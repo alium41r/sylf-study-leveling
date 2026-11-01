@@ -1,0 +1,33 @@
+{
+  "runId": "unpaid-PROVIDER_FAILURE",
+  "mode": "PROVIDER_FAILURE",
+  "state": "STOP_REQUESTED",
+  "stopReason": "PROVIDER_OR_PROTOCOL_FAILURE",
+  "physicalRequests": 0,
+  "roles": [
+    {
+      "sequence": 1,
+      "role": "RESEARCH",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 2,
+      "role": "VERIFICATION",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 3,
+      "role": "VERIFICATION",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 4,
+      "role": "SYNTHESIS",
+      "finished": true,
+      "stopReason": "PROVIDER_OR_PROTOCOL_FAILURE"
+    }
+  ]
+}

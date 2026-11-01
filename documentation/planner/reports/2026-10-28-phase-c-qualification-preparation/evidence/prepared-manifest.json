@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "status": "PREPARED_NOT_AUTHORIZED",
+  "paidCalls": 0,
+  "paidExecutionEnabled": false,
+  "pilotCaseId": "C01",
+  "frozenAnchor": "2026-10-29",
+  "repetitions": 1,
+  "approved": false,
+  "hashes": {
+    "CASE_BANK.json": "e9cd3912e5a6ce877522d61d03de627dd86d6ce18b4c78959e1d386f99267edc",
+    "PILOT_INPUT.json": "c498feb9b349dff43c31842045e711cbaf0dcf14d96a2ea7121d2f78c602de5b",
+    "EVALUATOR_ONLY.json": "80ee80108a9467830d0b0839b267f26de16d00df978370cf9901db26e11fb1d9",
+    "RUBRIC.json": "da7e444eba0efa05297f7b04a667badbd24c9c931c97c507c83710665c115ac2",
+    "PROTOCOL.md": "94aec94e6d5130751a3ae50ccea35aa6daec7175486485dcd8dc0d717e946658",
+    "APPROVAL_REQUEST.md": "81e3dead26eddd4fd4a1a2e6ea37ee8b0f259cc33fe1e7cffb1054a6c28ef96c"
+  },
+  "financialEnvelope": {
+    "maxCalls": 48,
+    "inputUnits": 3000000,
+    "completionTokens": 700000,
+    "roleInputUnits": 500000,
+    "roleCompletionTokens": 65536,
+    "processingMs": 14400000,
+    "peakInputUsdPerMillion": 0.3,
+    "peakOutputUsdPerMillion": 1.2,
+    "proposedAuthorizationUsd": 1.75,
+    "maximumModelUsd": 1.74,
+    "externalPaidToolsAllowed": false,
+    "balanceCoversProposedCeiling": true,
+    "metadataFresh": true,
+    "balanceCheckedAt": "2026-10-28T14:21:54.264Z",
+    "basis": "Published peak, cache-miss rates; reasoning included in completion once. This is a conservative admission bound, not a provider invoice guarantee."
+  },
+  "roles": {
+    "model": "deepseek-flash",
+    "effort": "HIGH",
+    "strategistFormat": "TEXT",
+    "otherFormats": "JSON"
+  },
+  "preservedPhaseBSourcePins": 285,
+  "qualificationOnlyHarnessChanges": [
+    "scripts/test/test-planner-ai-first-foundation.mjs"
+  ],
+  "qualificationSources": {
+    "scripts/qa/planner-phase-c/prepare.mjs": "09d2bb51a4fcdf4b936f6c3d75fb51cde0c97638541c0c3e85ee5020ac15a4c4",
+    "scripts/qa/planner-phase-c/preflight.mjs": "37932f8a6afb4b379c086e340ce1dbcff23defaa49aa0a4fb9de1eda51aa0914",
+    "scripts/test/test-planner-ai-first-foundation.mjs": "676fa67570e9421c7bfec33d9ae08b6bc371e21d9b0b1ee4bb85789b692231b3",
+    "scripts/test/test-planner-v2-phase1-postgres.mjs": "8a78bc2e8e0aed20ef1bfe89b57ea5cd88bd870103feb7a8605579a57ba001d5",
+    "__tests__/planner-v2/postgres/phase-c-preparation.phasec.ts": "1b75d34a61efd02307d54e79fdc2c2c6ccc35178e4f3c79340c0c37821ef48d8"
+  },
+  "modelInputPacketDigest": "90538ff1fa0cf8f2c51b1b6b4e0ca383429f235d139078befcaac549305a7e96",
+  "preparedAt": "2026-10-28T14:27:15.360Z",
+  "blockedActions": [
+    "Paid generation",
+    "DeepSeek Search/Fetch",
+    "Paid independent judge",
+    "Production admission/routing/deployment",
+    "Hosted Apply",
+    "UI"
+  ]
+}

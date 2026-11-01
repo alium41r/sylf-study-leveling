@@ -352,7 +352,29 @@ describe("encrypted production repository", () => {
       1
     );
     disposers.push(() => stream.close());
+    const previous = await ctx.repo.document(descriptor.documentId),
+      remote = new Y.Doc();
+    Y.applyUpdate(remote, Y.encodeStateAsUpdate(stream.doc));
+    remote.getText("text").insert(remote.getText("text").length, " remote");
+    const remoteUpdate = Y.encodeStateAsUpdate(
+      remote,
+      Y.encodeStateVector(stream.doc)
+    );
+    remote.destroy();
     blocked = true;
+    await ctx.repo.save({
+      operationId: newId(),
+      documentId: descriptor.documentId,
+      parents: previous.heads,
+      descriptor,
+      updates: [
+        {
+          streamId: descriptor.streams[0].streamId,
+          epoch: 1,
+          bytes: remoteUpdate,
+        },
+      ],
+    });
     const refreshing = stream.refresh();
     await loading;
     stream.doc.getText("text").insert(0, "first local ");
@@ -370,6 +392,7 @@ describe("encrypted production repository", () => {
     expect(loaded.doc.getText("text").toString()).toContain(
       "second local first local private-body-marker"
     );
+    expect(loaded.doc.getText("text").toString()).toContain(" remote");
     loaded.doc.destroy();
   });
   it("refreshes proof for the same account/root but refuses implicit rebinding", async () => {
@@ -587,11 +610,17 @@ describe("cloud batch and resource contracts", () => {
 });
 
 function relay() {
+  const reads = new Map<string, number>();
   const files = new Map<
     string,
     { id: string; hash: string; version: string; bytes: Uint8Array }
   >();
-  const state = { lost: false, quota: false, unreadable: false };
+  const state = {
+    lost: false,
+    quota: false,
+    unreadable: false,
+    retireOnRead: undefined as string | undefined,
+  };
   vi.stubGlobal("fetch", async (input: string, init: RequestInit = {}) => {
     const url = new URL(input, "http://notes.test");
     if (url.searchParams.get("action") === "upload") {
@@ -619,13 +648,20 @@ function relay() {
         })),
       });
     if (body.action === "read") {
+      reads.set(body.fileId, (reads.get(body.fileId) || 0) + 1);
+      if (state.retireOnRead === body.fileId) {
+        files.delete(body.fileId);
+        state.retireOnRead = undefined;
+      }
+      if (!files.has(body.fileId))
+        return Response.json({ code: "CORRUPT" }, { status: 409 });
       if (state.unreadable)
         return Response.json({ code: "NETWORK" }, { status: 503 });
       return new Response(files.get(body.fileId)!.bytes.slice().buffer);
     }
     throw new Error("Unexpected relay operation");
   });
-  return { files, state };
+  return { files, state, reads };
 }
 function transport(ctx: Awaited<ReturnType<typeof setup>>) {
   return new GoogleDriveTransport(
@@ -637,10 +673,99 @@ function transport(ctx: Awaited<ReturnType<typeof setup>>) {
       accountId: ctx.binding.accountId,
       rootId: ctx.binding.rootId,
     },
-    ctx.session
+    ctx.session,
+    (hash) => ctx.repo.readObject(hash)
   );
 }
 describe("production batched Drive synchronization with synthetic relay", () => {
+  it("downloads each small history pack once into a genuinely empty encrypted device", async () => {
+    const source = await setup(),
+      remote = relay(),
+      d = await seed(source.repo),
+      seen = new Set<string>();
+    for (let i = 0; i < 12; i++) {
+      if (i) {
+        const view = await source.repo.document(d.documentId),
+          loaded = await source.repo.loadStream(
+            d.documentId,
+            d.streams[0].streamId,
+            1
+          );
+        loaded.doc
+          .getText("text")
+          .insert(loaded.doc.getText("text").length, ` revision-${i}`);
+        await source.repo.save({
+          operationId: newId(),
+          documentId: d.documentId,
+          parents: view.heads,
+          kind: "edit",
+          descriptor: d,
+          updates: [
+            {
+              streamId: d.streams[0].streamId,
+              epoch: 1,
+              bytes: Y.encodeStateAsUpdate(loaded.doc),
+            },
+          ],
+        });
+        loaded.doc.destroy();
+      }
+      const heads = (await source.repo.document(d.documentId)).heads,
+        closure = await source.repo.closure(heads),
+        objects = closure.filter((o) => !seen.has(o.hash));
+      closure.forEach((o) => seen.add(o.hash));
+      const bytes = await encodePack(source.repo.libraryId, objects, heads),
+        id = newId();
+      remote.files.set(id, {
+        id,
+        hash: await digest(bytes),
+        version: "1",
+        bytes,
+      });
+    }
+    const newestFirst = [...remote.files.values()].reverse();
+    remote.files.clear();
+    newestFirst.forEach((f) => remote.files.set(f.id, f));
+    const target = await setup({ libraryId: source.repo.libraryId }),
+      sync = new NotesSynchronizer(target.repo, transport(target));
+    expect(await target.repo.catalogPage()).toHaveLength(0);
+    await sync.pull();
+    const restored = await target.repo.loadStream(
+      d.documentId,
+      d.streams[0].streamId,
+      1
+    );
+    expect(restored.doc.getText("text").toString()).toContain("revision-11");
+    restored.doc.destroy();
+    expect([...remote.reads.values()]).toEqual(Array(12).fill(1));
+  });
+  it("recovers a cold encrypted device when an identical pack is retired during its download", async () => {
+    const cloud = relay(),
+      a = await setup(),
+      descriptor = await seed(a.repo);
+    await new NotesSynchronizer(a.repo, transport(a)).publish();
+    const original = [...cloud.files.values()][0],
+      duplicate = { ...original, id: newId() };
+    cloud.files.set(duplicate.id, duplicate);
+    const b = await setup({ libraryId: a.repo.libraryId }),
+      t = transport(b);
+    await t.refresh();
+    expect(t.duplicatePackHashes()).toEqual([original.hash]);
+    cloud.state.retireOnRead = original.id;
+    await new NotesSynchronizer(b.repo, t).pull();
+    expect(
+      (await b.repo.document(descriptor.documentId)).descriptor.title
+    ).toBe(descriptor.title);
+    const loaded = await b.repo.loadStream(
+      descriptor.documentId,
+      descriptor.streams[0].streamId,
+      1
+    );
+    expect(loaded.doc.getText("text").toString()).toBe("private-body-marker");
+    loaded.doc.destroy();
+    expect(cloud.files.size).toBe(1);
+    expect(t.duplicatePackHashes()).toEqual([]);
+  });
   it("reconciles a lost upload response, reconstructs another encrypted device, and retains conflicting deletion/edit heads", async () => {
     const cloud = relay(),
       a = await setup(),
@@ -718,6 +843,16 @@ describe("production batched Drive synchronization with synthetic relay", () => 
     await target.pull();
     expect((await raw.table("documents").toArray())[0].version).toBe(before);
   });
+  it("explains an origin rejection without treating it as an outage or closing local access", async () => {
+    const a = await setup();
+    vi.stubGlobal("fetch", async () =>
+      Response.json({ code: "ORIGIN" }, { status: 403 })
+    );
+    await expect(notesRequest("/api/notes/connection")).rejects.toThrow(
+      "permanent Sylf address"
+    );
+    expect(a.session.signal.aborted).toBe(false);
+  });
   it("closes local key capabilities immediately on a broker 401 while keeping revoked Drive consent recoverable", async () => {
     const a = await setup();
     await seed(a.repo);
@@ -732,7 +867,7 @@ describe("production batched Drive synchronization with synthetic relay", () => 
       Response.json({ code: "AUTH" }, { status: 401 })
     );
     await expect(notesRequest("/api/notes/drive")).rejects.toMatchObject({
-      code: "AUTH",
+      code: "SESSION_ENDED",
     });
     expect(a.session.signal.aborted).toBe(true);
   });
@@ -888,5 +1023,65 @@ describe("production batched Drive synchronization with synthetic relay", () => 
     fail = false;
     expect(await recoverUnacknowledged(a.repo)).toBe(1);
     expect(retainedNotesRecovery(a.repo)).toEqual([]);
+  });
+});
+
+describe("quiet durable replication", () => {
+  it("persists scan progress and receipts without broadcasting them as document edits", async () => {
+    const a = await setup();
+    const d = await seed(a.repo);
+    const heads = (await a.repo.document(d.documentId)).heads;
+    const objects = await a.repo.closure(heads);
+    const changed = vi.fn();
+    a.repo.subscribe(changed);
+    await a.repo.installBatch([], [], "remote", {
+      channel: "quiet",
+      value: "done",
+    });
+    expect(await a.repo.cursor("quiet")).toBe("done");
+    await a.repo.installBatch(objects, heads, "remote");
+    expect(changed).not.toHaveBeenCalled();
+    expect((await a.repo.document(d.documentId)).heads).toEqual(heads);
+    await seed(a.repo, "A real new note");
+    expect(changed).toHaveBeenCalledTimes(1);
+    const job = await a.repo.claimJob();
+    await a.repo.settleJob(job!.id, job!.leaseId!, { verified: true });
+    expect(changed).toHaveBeenCalledTimes(1);
+  });
+  it("reads each physical pack once on cold discovery even after the four-pack memory cache evicts it", async () => {
+    const a = await setup();
+    const remote = relay();
+    for (let i = 0; i < 7; i++) {
+      const d = await seed(a.repo, "Synthetic page " + i);
+      const heads = (await a.repo.document(d.documentId)).heads;
+      const bytes = await encodePack(
+        a.repo.libraryId,
+        await a.repo.closure(heads),
+        heads
+      );
+      const id = newId();
+      remote.files.set(id, {
+        id,
+        hash: await digest(bytes),
+        version: "1",
+        bytes,
+      });
+    }
+    const t = transport(a),
+      sync = new NotesSynchronizer(a.repo, t);
+    await sync.pull();
+    await sync.verifyAcknowledged();
+    expect([...remote.reads.values()]).toEqual(Array(7).fill(1));
+    const changed = vi.fn();
+    a.repo.subscribe(changed);
+    await sync.pull();
+    expect(changed).not.toHaveBeenCalled();
+    expect([...remote.reads.values()]).toEqual(Array(7).fill(1));
+    const file = [...remote.files.values()][0];
+    remote.files.delete(file.id);
+    await sync.pull();
+    await expect(sync.verifyAcknowledged()).rejects.toMatchObject({
+      code: "CORRUPT",
+    });
   });
 });

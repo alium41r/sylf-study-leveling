@@ -5,10 +5,12 @@ const { chromium } = await import(
 import { randomUUID, createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import assert from "node:assert/strict";
-const evidence = new URL(
-  "../../../documentation/notes/reports/phase-4/evidence/",
-  import.meta.url
-).pathname;
+const evidence =
+  process.env.NOTES_QA_EVIDENCE ||
+  new URL(
+    "../../../documentation/notes/reports/phase-4/evidence/",
+    import.meta.url
+  ).pathname;
 mkdirSync(evidence, { recursive: true });
 const libraryId = randomUUID(),
   key = Buffer.alloc(32, 71).toString("base64"),
@@ -265,6 +267,61 @@ try {
       afterMetadata.push(performance.now() - t);
     }
     answer.afterMetadataSaves = stats(afterMetadata);
+    // The same renderer/model now qualify advanced brushes and discontinuous eraser geometry.
+    answer.brush4096Samples = {};
+    for (const nib of [
+      "ballpoint",
+      "fountain",
+      "brush",
+      "pencil",
+      "fineliner",
+    ]) {
+      const frames = [];
+      for (let i = 0; i < 30; i++) {
+        const t = performance.now();
+        renderer.overlay({
+          points: longPoints,
+          style: {
+            ...style,
+            nib,
+            pressure: 1,
+            smoothing: 0.65,
+            opacity: nib === "pencil" ? 0.65 : 1,
+          },
+        });
+        frames.push(performance.now() - t);
+      }
+      answer.brush4096Samples[nib] = stats(frames);
+    }
+    const eraseStarted = performance.now();
+    persisted.eraseSegments(
+      persisted
+        .strokes()
+        .slice(0, 40)
+        .map((s) => s.id),
+      Array.from({ length: 16 }, (_, i) => ({
+        x: 25 + i * 40,
+        y: 40,
+        radius: 8,
+      }))
+    );
+    answer.precision40StrokeCutMs = performance.now() - eraseStarted;
+    await opened.stream.flush();
+    const preview = document.createElement("canvas");
+    preview.width = 240;
+    preview.height = 330;
+    const previewStarted = performance.now();
+    const firstPage = (await lib.repository.document(id)).descriptor.pages[0]
+      .pageId;
+    await window.qa.renderNotesPagePreview(
+      lib.repository,
+      id,
+      firstPage,
+      preview
+    );
+    answer.denseNativePreviewMs = performance.now() - previewStarted;
+    preview.width = preview.height = 1;
+
     answer.storage = await lib.repository.storageStats();
     const navigationId = await lib.create(
       "300 page qualification",

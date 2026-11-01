@@ -8,7 +8,7 @@ export const AllocationFactsSchema=withPlannerEnvelope(z.strictObject({
     remainingMinutes:z.number().int().min(0).max(E.timeboxMaxMinutes),alreadyReserved:z.boolean(),contentDigest:DigestV2Schema,
     state:z.enum(["UNSTARTED","RUNNING","PAUSED","ENDED_INCOMPLETE","COMPLETED"]),remainingDisposition:z.enum(["OPEN","WITHDRAWN","COMPLETED"]),
     actualSeconds:z.number().int().nonnegative(),executionVersion:z.number().int().nonnegative()})).max(E.outstandingActivitiesPerPlan*E.targets),
-  externalActivities:z.array(z.strictObject({ref:LocalIdV2Schema,date:DateV2Schema,available:z.boolean(),contentDigest:DigestV2Schema})).max(E.outstandingActivitiesPerPlan*E.targets),
+  externalActivities:z.array(z.strictObject({ref:LocalIdV2Schema,date:DateV2Schema,available:z.boolean(),contentDigest:DigestV2Schema,reservationKey:z.string().min(1).max(250).optional()})).max(E.outstandingActivitiesPerPlan*E.targets),
   preferences:z.array(z.strictObject({planRef:LocalIdV2Schema,pacing:z.enum(["COMFORTABLE_EARLY","SPREAD"]),maximumTimeboxMinutes:z.number().int().min(5).max(240).optional()})).min(1).max(E.targets),
 }));
 export type AllocationFacts=z.infer<typeof AllocationFactsSchema>;

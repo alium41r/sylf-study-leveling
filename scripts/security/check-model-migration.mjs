@@ -60,6 +60,7 @@ const HISTORICAL = [
   /^AI_PLANNER_MODES_PHASE_\d/,
   /^documentation[/\\]/,
   /^scratch[/\\]/,
+  /^scripts[/\\]qa[/\\]planner-phase-c[/\\]/,
   /^scripts[/\\]security[/\\]check-model-migration\.mjs$/,
   /^__tests__[/\\]ai[/\\]model-migration\.test\.ts$/,
 ];

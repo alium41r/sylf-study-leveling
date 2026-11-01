@@ -275,8 +275,7 @@ export class TimezoneService {
   static getNextMidnightUTC(timezone: string, now: Date = new Date()): Date {
     const safeTz = this.validateTimezone(timezone) ? timezone : "UTC";
     const tomorrowStr = this.getUserLocalDateOffset(safeTz, 1, now);
-    const tomorrowNoon = new Date(`${tomorrowStr}T12:00:00Z`);
-    return this.getStartOfDayUTC(safeTz, tomorrowNoon);
+    return this.getStartOfLocalDateUTC(safeTz, tomorrowStr);
   }
 
   /**

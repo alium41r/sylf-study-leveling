@@ -1,0 +1,124 @@
+{
+  "recordedAtUtc": "2026-10-25T14:39:53.651498+00:00",
+  "clientDate": "2026-10-25",
+  "status": "FOUNDATION_IMPLEMENTED_RETAINED_V2_QUALIFICATION_BLOCKED",
+  "compilerVersion": 2,
+  "executionContractVersion": 2,
+  "intelligenceSchemaVersion": 1,
+  "checks": {
+    "unit": {
+      "exitCode": 0
+    },
+    "typecheck": {
+      "exitCode": 0
+    },
+    "scopedLint": {
+      "exitCode": 0
+    },
+    "prismaGenerate": {
+      "exitCode": 0
+    },
+    "workerBuild": {
+      "exitCode": 0
+    },
+    "credentialFreeNodeImports": {
+      "exitCode": 0
+    },
+    "webBuildWithTemporary6GiBHeap": {
+      "exitCode": 0
+    },
+    "mobileBuild": {
+      "exitCode": 0
+    },
+    "mobileBundleAudit": {
+      "exitCode": 0
+    }
+  },
+  "units": {
+    "passed": 382,
+    "failed": 0,
+    "skipped": 0,
+    "files": 32
+  },
+  "postgres": {
+    "newFoundationPassed": 9,
+    "newFoundationCases": [
+      {
+        "name": "AI-first retained artifacts on the actual durable core retains exact strategy bytes and versions, with replay and CAS",
+        "status": "passed"
+      },
+      {
+        "name": "AI-first retained artifacts on the actual durable core rejects foreign owners and forged accepted-intent correspondence",
+        "status": "passed"
+      },
+      {
+        "name": "AI-first retained artifacts on the actual durable core database backstops reject rewriting retained entries or appending without a fence",
+        "status": "passed"
+      },
+      {
+        "name": "AI-first retained artifacts on the actual durable core retains archives and accounting through lease takeover, rejecting stale and cancelled writers",
+        "status": "passed"
+      },
+      {
+        "name": "AI-first retained artifacts on the actual durable core cannot enter the legacy compiler/publication path or mutate execution",
+        "status": "passed"
+      },
+      {
+        "name": "AI-first retained artifacts on the actual durable core rejects unknown checkpoint interpretations even without a new archive",
+        "status": "passed"
+      },
+      {
+        "name": "AI-first retained artifacts on the actual durable core persists pending call identity and the complete accepted response before takeover assembly",
+        "status": "passed"
+      },
+      {
+        "name": "AI-first retained artifacts on the actual durable core keeps research-only work read-only",
+        "status": "passed"
+      },
+      {
+        "name": "AI-first retained artifacts on the actual durable core checks new storage guards at worker startup and preserves account erasure",
+        "status": "passed"
+      }
+    ],
+    "v2Passed": 186,
+    "v2Failed": 32,
+    "legacyPassed": 225,
+    "legacyFailed": 0,
+    "requiredSkipped": 0,
+    "optionalPaidExperimentExcluded": 1,
+    "baselineV2Passed": 177,
+    "baselineV2Failed": 32,
+    "baselineLegacyPassed": 225,
+    "baselineLegacyFailed": 0,
+    "failureNameSetsEqual": true,
+    "newOnlyV2Failures": []
+  },
+  "sourceDriftAfterFinalPostgres": [],
+  "preservation": "PASS",
+  "missingDocumentationLinks": [],
+  "runtime": {
+    "supported": "24.x",
+    "tested": "24.21.0",
+    "officialArchive": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-darwin-arm64.tar.gz",
+    "officialChecksums": "https://nodejs.org/dist/v24.21.0/SHASUMS256.txt",
+    "sha256": "bed7eea5325e1108f32ce5228ddd6a5f0f08a499ee42aa7442aea583702f6057",
+    "machineWideInstall": false
+  },
+  "migration": {
+    "path": "prisma/migrations/20261025000000_planner_ai_first_foundation/migration.sql",
+    "sha256": "f30ee66b1f515780cb89721f50ae4369013e21bca481d36fabffb34c4c305cb8",
+    "hostedApplied": false
+  },
+  "paidProviderCalls": 0,
+  "productionRoutingChanged": false,
+  "deploymentFlagsChanged": false,
+  "phaseBStarted": false,
+  "phase3UiStarted": false,
+  "educationalQualityQualified": false,
+  "limitations": [
+    "Retained V2 aggregate still fails 32 existing cases; matching control and raw results retained.",
+    "Existing import-only provider/logger lint diagnostics retained separately.",
+    "Disposable schema bootstrap is adapted to current SQL; not a complete historical empty-database migration replay.",
+    "Web TypeScript build needed temporary 6 GiB heap; no persisted build bypass."
+  ]
+}

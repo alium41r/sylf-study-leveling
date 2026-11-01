@@ -154,6 +154,11 @@ describe("Group Profile Picture & Conversation Avatar System", () => {
 
   describe("POST /api/conversations (Create Group with Avatar)", () => {
     it("creates group conversation with specified avatarUrl", async () => {
+      // A group may only hold people the creator can reach: both are friends here, with nothing blocked.
+      vi.spyOn(prisma.blockedUser, "findFirst").mockResolvedValue(null);
+      vi.spyOn(prisma.userPrivacy, "findUnique").mockResolvedValue({ allowDirectMessages: "FRIENDS" } as any);
+      vi.spyOn(prisma.friendship, "findFirst").mockResolvedValue({ id: 1 } as any);
+
       const createSpy = vi.spyOn(prisma.conversation, "create").mockResolvedValue({
         id: 77,
         name: "Research Cohort",

@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { BlockNoteViewRaw } from "@blocknote/react";
 import {
   ArrowLeft,
@@ -20,7 +21,7 @@ import {
 import { createNotesBlockNoteEditor } from "@/lib/notes/blocknote-adapter";
 import { exportNotesRecovery } from "@/lib/notes/portable";
 import type { NotesLibrary, NoteSummary } from "@/lib/notes/library";
-import type { SaveState } from "@/lib/notes/engine";
+import type { NotesStream, SaveState } from "@/lib/notes/engine";
 import { notesResumeSchema } from "@/lib/resources";
 import s from "../Notes.module.css";
 import { downloadNotesBytes as downloadBytes } from "@/lib/notes/download";
@@ -44,6 +45,9 @@ export default function NotesEditor({
   onError,
   onState,
   registerLeave,
+  diagnostics = false,
+  embedded,
+  fragment = "body",
 }: {
   library: NotesLibrary;
   note: NoteSummary;
@@ -51,7 +55,17 @@ export default function NotesEditor({
   onBack: () => void;
   onError: (message: string) => void;
   onState: (state: SaveState) => void;
-  registerLeave: (leave?: () => Promise<void>) => void;
+  registerLeave: (leave?: () => Promise<void>) => () => void;
+  diagnostics?: boolean;
+  fragment?: string;
+  embedded?: {
+    header: HTMLElement | null;
+    toolbar: HTMLElement | null;
+    enabled: boolean;
+    stream?: NotesStream;
+    reveal?: () => void;
+    focusOnOpen?: boolean;
+  };
 }) {
   const [binding, setBinding] = useState<Binding>(),
     [format, setFormat] = useState({
@@ -67,9 +81,11 @@ export default function NotesEditor({
     [titleState, setTitleState] = useState<"clean" | "saving" | "failed">(
       "clean"
     );
+  const reveal = embedded?.reveal;
   useEffect(() => {
     if (!binding) return;
     const update = () => {
+      if (reveal) requestAnimationFrame(reveal);
       try {
         const block = binding.editor.getTextCursorPosition().block,
           styles = binding.editor.getActiveStyles(),
@@ -96,7 +112,7 @@ export default function NotesEditor({
       selection();
       change();
     };
-  }, [binding]);
+  }, [binding, reveal]);
   const holder = useRef<Awaited<ReturnType<NotesLibrary["open"]>> | undefined>(
       undefined
     ),
@@ -121,6 +137,7 @@ export default function NotesEditor({
           const value = titleDraft.current.value;
           await library.mutate(note.id, (d) => {
             d.title = value.trim().slice(0, 500) || "Untitled note";
+            d.extensions.sylfTitleSet = !!value.trim();
           });
           if (titleDraft.current.value === value)
             titleDraft.current.dirty = false;
@@ -160,23 +177,47 @@ export default function NotesEditor({
     titleDraft.current.value = note.view.descriptor.title;
     queueMicrotask(() => setTitle(note.view.descriptor.title));
   }, [note.view.descriptor.title]);
+  const sharedStream = embedded?.stream;
   useEffect(() => {
     let cancelled = false,
-      dispose: (() => void) | undefined;
+      dispose: (() => void) | undefined,
+      images: ReturnType<NotesLibrary["imageResolver"]> | undefined,
+      releaseOpening: (() => void) | undefined;
+    const flushAndRelease = (
+      opened: Awaited<ReturnType<NotesLibrary["open"]>>
+    ) => {
+      void opened.stream
+        .flush()
+        .catch((error) =>
+          onError(
+            error instanceof Error ? error.message : "Keep your recovery copy."
+          )
+        )
+        .finally(() => opened.release());
+    };
     void (async () => {
-      const opened = await library.open(note.id, pageId);
+      const opened = sharedStream
+        ? { stream: sharedStream, release: () => {} }
+        : await library.open(note.id, pageId, embedded ? "text" : undefined);
       if (cancelled) {
-        opened.release();
+        if (!sharedStream) flushAndRelease(opened);
         return;
       }
       holder.current = opened;
+      releaseOpening = sharedStream
+        ? undefined
+        : () => flushAndRelease(opened);
+      images = library.imageResolver(note.id);
       const created = await createNotesBlockNoteEditor(opened.stream, {
+        fragment,
         uploadFile: (input) => library.uploadImage(note.id, input),
-        resolveFileUrl: (url) => library.resolveImage(note.id, url),
+        resolveFileUrl: (url) => images!.resolve(url),
       });
       if (cancelled) {
         created.close();
-        opened.release();
+        images.close();
+        if (!sharedStream) flushAndRelease(opened);
+        releaseOpening = undefined;
         return;
       }
       const remove = opened.stream.subscribe((state) => {
@@ -194,11 +235,21 @@ export default function NotesEditor({
             "This editor paused to protect your changes. Retry saving, or export a recovery copy before leaving."
           );
       });
+      let closedEditor = false;
+      const closeEditor = () => {
+        if (closedEditor) return;
+        closedEditor = true;
+        created.close();
+      };
       let leaving: Promise<void> | undefined;
       const leave = () => {
         if (leaving) return leaving;
         leaving = (async () => {
           await flushTitle();
+          if (sharedStream) {
+            await sharedStream.flush();
+            return;
+          }
           const wasPaused = opened.stream.status().state === "pausing";
           opened.stream.pause();
           try {
@@ -208,12 +259,13 @@ export default function NotesEditor({
               area && area.scrollHeight > area.clientHeight
                 ? area.scrollTop / (area.scrollHeight - area.clientHeight)
                 : 0;
-            await library.saveResume(note.id, {
-              version: 1,
-              ...(pageId ? { pageId } : {}),
-              blockId: created.editor.getTextCursorPosition().block.id,
-              scrollRatio: Math.max(0, Math.min(1, ratio)),
-            });
+            if (!embedded && !closedEditor)
+              await library.saveResume(note.id, {
+                version: 1,
+                ...(pageId ? { pageId } : {}),
+                blockId: created.editor.getTextCursorPosition().block.id,
+                scrollRatio: Math.max(0, Math.min(1, ratio)),
+              });
           } finally {
             if (!wasPaused) opened.stream.resume();
           }
@@ -223,11 +275,16 @@ export default function NotesEditor({
         return leaving;
       };
       const removeLeave = library.registerBeforeClose(leave);
-      registerLeave(leave);
+      const unregisterLeave = registerLeave(leave);
       dispose = () => {
         remove();
         removeLeave();
-        registerLeave(undefined);
+        unregisterLeave();
+        if (sharedStream) {
+          closeEditor();
+          void flushTitle().catch(() => {});
+          return;
+        }
         void leave()
           .catch((error) =>
             onError(
@@ -237,17 +294,23 @@ export default function NotesEditor({
             )
           )
           .finally(() => {
-            created.close();
+            closeEditor();
             opened.release();
           });
       };
+      releaseOpening = undefined;
       setBinding(created);
       const resume = notesResumeSchema.safeParse(
         note.resume ?? note.view.descriptor.extensions.resume
       );
       requestAnimationFrame(() => {
         if (cancelled) return;
-        if (resume.success && (!pageId || pageId === resume.data.pageId)) {
+        if (embedded?.focusOnOpen) created.editor.focus();
+        if (
+          !embedded &&
+          resume.success &&
+          (!pageId || pageId === resume.data.pageId)
+        ) {
           try {
             if (
               resume.data.blockId &&
@@ -267,6 +330,9 @@ export default function NotesEditor({
         }
       });
     })().catch((error) => {
+      images?.close();
+      releaseOpening?.();
+      releaseOpening = undefined;
       if (!cancelled) {
         setFailure(
           error instanceof Error
@@ -279,11 +345,12 @@ export default function NotesEditor({
     });
     return () => {
       cancelled = true;
+      images?.close();
       dispose?.();
     };
     // A document/page identity owns the binding. Metadata updates are accepted by the existing stream.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [library, note.id, pageId, flushTitle]);
+  }, [library, note.id, pageId, fragment, flushTitle, sharedStream]);
   const act = (fn: () => void) => {
     try {
       fn();
@@ -299,15 +366,30 @@ export default function NotesEditor({
   const editable =
     !!binding && !["failed", "closed", "pausing"].includes(status);
   return (
-    <section className={s.editorLayout} aria-label="Note editor">
+    <section
+      className={`${s.editorLayout} ${embedded ? s.embeddedEditor : ""}`}
+      aria-label="Note editor"
+      data-notes-box={embedded ? fragment : undefined}
+    >
+      {(!embedded || embedded.header) &&
+        (embedded ? createPortal(header(), embedded.header!) : header())}
+      {(!embedded || embedded.toolbar) &&
+        (embedded ? createPortal(toolbar(), embedded.toolbar!) : toolbar())}
+      {body()}
+    </section>
+  );
+  function header() {
+    return (
       <div className={s.documentHeader}>
-        <button
-          className={s.iconButton}
-          onClick={onBack}
-          aria-label="Back to notes"
-        >
-          <ArrowLeft size={19} />
-        </button>
+        {!embedded && (
+          <button
+            className={s.iconButton}
+            onClick={onBack}
+            aria-label="Back to notes"
+          >
+            <ArrowLeft size={19} />
+          </button>
+        )}
         <input
           aria-label="Document title"
           className={s.titleInput}
@@ -327,18 +409,24 @@ export default function NotesEditor({
           }}
           onBlur={() => void flushTitle().catch(() => {})}
         />
-        <span
-          role="status"
-          className={s.localStatus}
-          data-error={status === "failed" || titleState === "failed"}
-        >
-          {titleState === "failed"
-            ? "Title not saved — retry by leaving the field"
-            : titleState === "saving"
-              ? "Saving title…"
-              : states[status]}
-        </span>
+        {(diagnostics || status === "failed" || titleState === "failed") && (
+          <span
+            role="status"
+            className={s.localStatus}
+            data-error={status === "failed" || titleState === "failed"}
+          >
+            {titleState === "failed"
+              ? "Title not saved — retry by leaving the field"
+              : titleState === "saving"
+                ? "Saving title…"
+                : states[status]}
+          </span>
+        )}
       </div>
+    );
+  }
+  function toolbar() {
+    return (
       <div className={s.formatBar} role="toolbar" aria-label="Text formatting">
         <select
           aria-label="Block style"
@@ -480,164 +568,174 @@ export default function NotesEditor({
           <Redo2 size={18} />
         </button>
       </div>
-      {failure && (
-        <div role="alert" className={s.editorError}>
-          <span>{failure}</span>
-          <button
-            className={s.secondary}
-            onClick={() =>
+    );
+  }
+  function body() {
+    return (
+      <>
+        {failure && (
+          <div role="alert" className={s.editorError}>
+            <span>{failure}</span>
+            <button
+              className={s.secondary}
+              onClick={() =>
+                void holder.current?.stream
+                  .retry()
+                  .then(() => {
+                    setFailure(undefined);
+                    setStatus("local-durable");
+                  })
+                  .catch((error) => onError(String(error.message)))
+              }
+            >
+              <RotateCcw size={15} />
+              Retry save
+            </button>
+            <button
+              className={s.secondary}
+              onClick={() =>
+                void (async () => {
+                  if (!holder.current) return;
+                  const bytes = await exportNotesRecovery(
+                    library.repository,
+                    holder.current.stream.recoverySnapshot()
+                  );
+                  downloadBytes(bytes, `${title} recovery.sylfnote`);
+                })().catch((error) =>
+                  onError(
+                    error instanceof Error
+                      ? error.message
+                      : "Keep this tab open; export needs recovery."
+                  )
+                )
+              }
+            >
+              <Download size={15} />
+              Export recovery copy
+            </button>
+            <button
+              className={s.secondary}
+              disabled={pendingCount > 0 || !!library.snapshot().memoryPending}
+              onClick={() => {
+                if (
+                  holder.current?.stream.status().pending ||
+                  library.snapshot().memoryPending
+                ) {
+                  onError(
+                    "Export your recovery copy and retry saving before reopening. Unsaved changes are retained."
+                  );
+                  return;
+                }
+                window.location.reload();
+              }}
+            >
+              Reopen saved version
+            </button>
+          </div>
+        )}
+        <div
+          ref={scroll}
+          className={s.paperScroll}
+          inert={embedded && !embedded.enabled}
+          onKeyDown={(event) => {
+            if (
+              (event.ctrlKey || event.metaKey) &&
+              event.key.toLowerCase() === "s"
+            ) {
+              event.preventDefault();
               void holder.current?.stream
-                .retry()
-                .then(() => {
-                  setFailure(undefined);
-                  setStatus("local-durable");
-                })
-                .catch((error) => onError(String(error.message)))
+                .flush()
+                .catch((error) => onError(String(error.message)));
             }
-          >
-            <RotateCcw size={15} />
-            Retry save
-          </button>
-          <button
-            className={s.secondary}
-            onClick={() =>
-              void (async () => {
-                if (!holder.current) return;
-                const bytes = await exportNotesRecovery(
-                  library.repository,
-                  holder.current.stream.recoverySnapshot()
+          }}
+        >
+          <div className={s.paper}>
+            {binding ? (
+              <BlockNoteViewRaw
+                editor={binding.editor}
+                formattingToolbar={false}
+                slashMenu={false}
+                sideMenu={false}
+                filePanel={false}
+                linkToolbar={false}
+                tableHandles={false}
+              />
+            ) : (
+              !embedded &&
+              !failure && (
+                <p className={s.loading}>
+                  <Loader2 size={18} className={s.spin} />
+                  Opening document…
+                </p>
+              )
+            )}
+          </div>
+        </div>
+        <input
+          ref={file}
+          className={s.hidden}
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/gif"
+          aria-label="Choose an image"
+          onChange={(event) => {
+            const image = event.target.files?.[0];
+            event.target.value = "";
+            if (!image || !binding) return;
+            void library
+              .uploadImage(note.id, image)
+              .then((url) => {
+                binding.editor.insertBlocks(
+                  [{ type: "image", props: { url, name: image.name } }],
+                  binding.editor.getTextCursorPosition().block,
+                  "after"
                 );
-                downloadBytes(bytes, `${title} recovery.sylfnote`);
-              })().catch((error) =>
+              })
+              .catch((error) =>
                 onError(
                   error instanceof Error
                     ? error.message
-                    : "Keep this tab open; export needs recovery."
+                    : "Image upload failed."
                 )
-              )
-            }
-          >
-            <Download size={15} />
-            Export recovery copy
-          </button>
-          <button
-            className={s.secondary}
-            disabled={pendingCount > 0 || !!library.snapshot().memoryPending}
-            onClick={() => {
-              if (
-                holder.current?.stream.status().pending ||
-                library.snapshot().memoryPending
-              ) {
-                onError(
-                  "Export your recovery copy and retry saving before reopening. Unsaved changes are retained."
-                );
+              );
+          }}
+        />
+        <dialog ref={link} className={s.dialog} aria-label="Insert link">
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              const url = linkURL.current?.value || "";
+              if (!/^https?:\/\//i.test(url)) {
+                onError("Use a complete HTTPS or HTTP link.");
                 return;
               }
-              window.location.reload();
+              act(() => binding!.editor.createLink(url));
+              link.current?.close();
             }}
           >
-            Reopen saved version
-          </button>
-        </div>
-      )}
-      <div
-        ref={scroll}
-        className={s.paperScroll}
-        onKeyDown={(event) => {
-          if (
-            (event.ctrlKey || event.metaKey) &&
-            event.key.toLowerCase() === "s"
-          ) {
-            event.preventDefault();
-            void holder.current?.stream
-              .flush()
-              .catch((error) => onError(String(error.message)));
-          }
-        }}
-      >
-        <div className={s.paper}>
-          {binding ? (
-            <BlockNoteViewRaw
-              editor={binding.editor}
-              formattingToolbar={false}
-              slashMenu={false}
-              sideMenu={false}
-              filePanel={false}
-              linkToolbar={false}
-              tableHandles={false}
-            />
-          ) : (
-            !failure && (
-              <p className={s.loading}>
-                <Loader2 size={18} className={s.spin} />
-                Opening document…
-              </p>
-            )
-          )}
-        </div>
-      </div>
-      <input
-        ref={file}
-        className={s.hidden}
-        type="file"
-        accept="image/png,image/jpeg,image/webp,image/gif"
-        aria-label="Choose an image"
-        onChange={(event) => {
-          const image = event.target.files?.[0];
-          event.target.value = "";
-          if (!image || !binding) return;
-          void library
-            .uploadImage(note.id, image)
-            .then((url) => {
-              binding.editor.insertBlocks(
-                [{ type: "image", props: { url, name: image.name } }],
-                binding.editor.getTextCursorPosition().block,
-                "after"
-              );
-            })
-            .catch((error) =>
-              onError(
-                error instanceof Error ? error.message : "Image upload failed."
-              )
-            );
-        }}
-      />
-      <dialog ref={link} className={s.dialog} aria-label="Insert link">
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            const url = linkURL.current?.value || "";
-            if (!/^https?:\/\//i.test(url)) {
-              onError("Use a complete HTTPS or HTTP link.");
-              return;
-            }
-            act(() => binding!.editor.createLink(url));
-            link.current?.close();
-          }}
-        >
-          <h2>Insert link</h2>
-          <label className={s.field}>
-            Web address
-            <input
-              ref={linkURL}
-              type="url"
-              required
-              autoFocus
-              placeholder="https://…"
-            />
-          </label>
-          <div className={s.dialogActions}>
-            <button
-              type="button"
-              className={s.secondary}
-              onClick={() => link.current?.close()}
-            >
-              Cancel
-            </button>
-            <button className={s.primary}>Add link</button>
-          </div>
-        </form>
-      </dialog>
-    </section>
-  );
+            <h2>Insert link</h2>
+            <label className={s.field}>
+              Web address
+              <input
+                ref={linkURL}
+                type="url"
+                required
+                autoFocus
+                placeholder="https://…"
+              />
+            </label>
+            <div className={s.dialogActions}>
+              <button
+                type="button"
+                className={s.secondary}
+                onClick={() => link.current?.close()}
+              >
+                Cancel
+              </button>
+              <button className={s.primary}>Add link</button>
+            </div>
+          </form>
+        </dialog>
+      </>
+    );
+  }
 }

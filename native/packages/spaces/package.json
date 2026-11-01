@@ -1,0 +1,11 @@
+{
+  "name": "@sylf/spaces",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Sylf Spaces contracts (Home, Workspace, World), the shared study session, and restoration state. No UI.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@sylf/shared": "*"
+  }
+}

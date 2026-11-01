@@ -1,0 +1,20 @@
+{
+  "scope": "Earlier observed desktop run; summary retained from driver output before the final run replaced its JSON. Not raw per-sample timings.",
+  "pageNavigation": {
+    "pages": 300,
+    "sampleCount": 12,
+    "p50Ms": 10,
+    "p95Ms": 304.5,
+    "maxMs": 304.5
+  },
+  "pan": {
+    "p50Ms": 1.1,
+    "p95Ms": 2.2
+  },
+  "encryptedNativeSaves": {
+    "p50Ms": 2.8,
+    "p95Ms": 5.1
+  },
+  "finalResult": "ink-performance-results.json",
+  "conclusion": "Variation, including the navigation tail, remains a qualification limitation."
+}

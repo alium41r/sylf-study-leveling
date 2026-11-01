@@ -1,0 +1,384 @@
+{
+  "passed": true,
+  "failed": [],
+  "crashed": false,
+  "results": [
+    {
+      "name": "calculator-canvas-in",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 331,
+        "top": 286,
+        "right": 932,
+        "edge": 1101,
+        "zoom": 133
+      },
+      "zoomRatio": 1.33,
+      "fingerRatio": 1.533,
+      "errorPx": 2,
+      "frames": {
+        "total": 30,
+        "janky": 3,
+        "p50": 16,
+        "p90": 18,
+        "p99": 23
+      },
+      "ok": true
+    },
+    {
+      "name": "calculator-canvas-out",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 550,
+        "top": 1138,
+        "right": 813,
+        "edge": 887,
+        "zoom": 58
+      },
+      "zoomRatio": 0.58,
+      "fingerRatio": 0.522,
+      "errorPx": 3,
+      "frames": {
+        "total": 34,
+        "janky": 3,
+        "p50": 14,
+        "p90": 18,
+        "p99": 23
+      },
+      "ok": true
+    },
+    {
+      "name": "calculator-canvas-lifted",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 332,
+        "top": 288,
+        "right": 931,
+        "edge": 1100,
+        "zoom": 133
+      },
+      "zoomRatio": 1.33,
+      "fingerRatio": 1.533,
+      "errorPx": 0,
+      "frames": {
+        "total": 30,
+        "janky": 3,
+        "p50": 13,
+        "p90": 17,
+        "p99": 22
+      },
+      "ok": true
+    },
+    {
+      "name": "calculator-inside-in",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 337,
+        "top": 526,
+        "right": 970,
+        "edge": 1148,
+        "zoom": 140
+      },
+      "zoomRatio": 1.4,
+      "fingerRatio": 1.7,
+      "errorPx": 1,
+      "frames": {
+        "total": 29,
+        "janky": 3,
+        "p50": 16,
+        "p90": 19,
+        "p99": 24
+      },
+      "ok": true
+    },
+    {
+      "name": "calculator-inside-out",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 515,
+        "top": 794,
+        "right": 792,
+        "edge": 870,
+        "zoom": 61
+      },
+      "zoomRatio": 0.61,
+      "fingerRatio": 0.529,
+      "errorPx": 2,
+      "frames": {
+        "total": 31,
+        "janky": 2,
+        "p50": 14,
+        "p90": 17,
+        "p99": 23
+      },
+      "ok": true
+    },
+    {
+      "name": "calculator-edge-in",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 276,
+        "top": 576,
+        "right": 843,
+        "edge": 1002,
+        "zoom": 126
+      },
+      "zoomRatio": 1.26,
+      "fingerRatio": 1.5,
+      "errorPx": 1,
+      "frames": {
+        "total": 25,
+        "janky": 3,
+        "p50": 13,
+        "p90": 16,
+        "p99": 23
+      },
+      "ok": true
+    },
+    {
+      "name": "calculator-edge-out",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 618,
+        "top": 772,
+        "right": 925,
+        "edge": 1011,
+        "zoom": 68
+      },
+      "zoomRatio": 0.68,
+      "fingerRatio": 0.588,
+      "errorPx": 0,
+      "frames": {
+        "total": 29,
+        "janky": 2,
+        "p50": 12,
+        "p90": 17,
+        "p99": 23
+      },
+      "ok": true
+    },
+    {
+      "name": "timer-inside-out",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 810,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 497,
+        "top": 914,
+        "right": 810,
+        "edge": 898,
+        "zoom": 69
+      },
+      "zoomRatio": 0.69,
+      "fingerRatio": 0.571,
+      "errorPx": 2,
+      "frames": {
+        "total": 28,
+        "janky": 2,
+        "p50": 14,
+        "p90": 18,
+        "p99": 22
+      },
+      "ok": true
+    },
+    {
+      "name": "notes-inside-in",
+      "still": true,
+      "before": {
+        "left": 232,
+        "top": 565,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "after": {
+        "left": 232,
+        "top": 565,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "zoomRatio": 1,
+      "fingerRatio": 1.7,
+      "errorPx": 0,
+      "frames": {
+        "total": 0,
+        "janky": 0,
+        "p50": 4950,
+        "p90": 4950,
+        "p99": 4950
+      },
+      "ok": true
+    },
+    {
+      "name": "notes-inside-out",
+      "still": true,
+      "before": {
+        "left": 232,
+        "top": 565,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "after": {
+        "left": 232,
+        "top": 565,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "zoomRatio": 1,
+      "fingerRatio": 0.529,
+      "errorPx": 0,
+      "frames": {
+        "total": 0,
+        "janky": 0,
+        "p50": 4950,
+        "p90": 4950,
+        "p99": 4950
+      },
+      "ok": true
+    },
+    {
+      "name": "pdfs-inside-out",
+      "still": true,
+      "before": {
+        "left": 232,
+        "top": 467,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "after": {
+        "left": 232,
+        "top": 467,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "zoomRatio": 1,
+      "fingerRatio": 0.529,
+      "errorPx": 0,
+      "frames": {
+        "total": 0,
+        "janky": 0,
+        "p50": 4950,
+        "p90": 4950,
+        "p99": 4950
+      },
+      "ok": true
+    },
+    {
+      "name": "notes-edge-in",
+      "still": false,
+      "before": {
+        "left": 232,
+        "top": 565,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "after": {
+        "left": 0,
+        "top": 478,
+        "right": 1087,
+        "edge": 1247,
+        "zoom": 126
+      },
+      "zoomRatio": 1.26,
+      "fingerRatio": 1.5,
+      "errorPx": 1,
+      "frames": {
+        "total": 25,
+        "janky": 3,
+        "p50": 18,
+        "p90": 21,
+        "p99": 25
+      },
+      "ok": true
+    },
+    {
+      "name": "notes-edge-out",
+      "still": false,
+      "before": {
+        "left": 232,
+        "top": 565,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "after": {
+        "left": 564,
+        "top": 674,
+        "right": 1170,
+        "edge": 1256,
+        "zoom": 68
+      },
+      "zoomRatio": 0.68,
+      "fingerRatio": 0.588,
+      "errorPx": 0,
+      "frames": {
+        "total": 30,
+        "janky": 2,
+        "p50": 14,
+        "p90": 18,
+        "p99": 25
+      },
+      "ok": true
+    }
+  ]
+}

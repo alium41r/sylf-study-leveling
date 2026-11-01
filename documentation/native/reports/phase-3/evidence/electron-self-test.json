@@ -1,0 +1,116 @@
+{
+    "passed": true,
+    "checks": {
+        "declaredPreferencesHardened": true,
+        "rendererProcessSandboxed": true,
+        "contextIsolated": true,
+        "appOrigin": true,
+        "noNodeGlobalsInRenderer": true,
+        "bridgeMinimalAndFrozen": true,
+        "windowOpenBlocked": true,
+        "cspBlocksEval": true,
+        "externalNavigationBlocked": true,
+        "foundationStarted": true,
+        "sharedCodeParity": true
+    },
+    "renderer": {
+        "preloadWorldVisible": false,
+        "origin": "sylf://app",
+        "nodeGlobals": {
+            "require": "undefined",
+            "module": "undefined",
+            "Buffer": "undefined"
+        },
+        "processShim": {
+            "keys": [
+                "env"
+            ],
+            "nodeVersion": null,
+            "binding": "undefined"
+        },
+        "bridgeKeys": [
+            "platform",
+            "versions"
+        ],
+        "bridgeFrozen": true,
+        "windowOpenBlocked": true,
+        "evalBlockedByCsp": true
+    },
+    "foundation": {
+        "readyMs": 22,
+        "capabilities": {
+            "runtime": "desktop",
+            "os": "macos",
+            "osVersion": "27.2.0",
+            "formFactor": "desktop",
+            "input": {
+                "stylus": "unknown",
+                "hover": true,
+                "finePointer": true
+            },
+            "display": {
+                "refreshRates": [],
+                "scale": 2
+            },
+            "model": "Electron 45.1.0 / Chromium 156.0.8078.49"
+        },
+        "parity": {
+            "passed": true,
+            "results": [
+                {
+                    "name": "progression.rewards",
+                    "value": "c8ce4fb5",
+                    "ok": true
+                },
+                {
+                    "name": "appearance.tokens",
+                    "value": "8b870931",
+                    "ok": true
+                },
+                {
+                    "name": "calculator",
+                    "value": "7384805d",
+                    "ok": true
+                },
+                {
+                    "name": "timezone",
+                    "value": "true|2026-10-31|Friday",
+                    "ok": true
+                },
+                {
+                    "name": "timer.snapshot",
+                    "value": "4379c662",
+                    "ok": true
+                },
+                {
+                    "name": "ink.geometry",
+                    "value": "a127da69",
+                    "ok": true
+                },
+                {
+                    "name": "yjs.roundTrip",
+                    "value": "ok",
+                    "ok": true
+                }
+            ]
+        },
+        "crypto": {
+            "sha256": "a37f0c24a67f8fdbde80175e2ecad8adc386569d9c490209023d0d2443edec23"
+        }
+    },
+    "startupToFoundationMs": 1087,
+    "rendererProcess": {
+        "type": "Tab",
+        "sandboxed": true
+    },
+    "memory": {
+        "processes": 4,
+        "workingSetMb": 439
+    },
+    "versions": {
+        "electron": "45.1.0",
+        "chrome": "156.0.8078.49",
+        "node": "24.22.1"
+    },
+    "webRoot": "/Users/aliumair/Desktop/sylf/native/apps/sylf/dist"
+}

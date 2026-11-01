@@ -1,5 +1,5 @@
 import { DEEPSEEK_MODELS } from "../config";
-import { aiSignal, observeAiDispatch } from "../telemetry";
+import { aiSignal, observeAiDispatch } from "../telemetry-runtime";
 import { openAIUsage } from "./usage";
 import { collectHttpTextStream } from "./text-stream";
 import {
@@ -13,7 +13,9 @@ import {
 import crypto from "crypto";
 
 export interface DeepSeekAdapterOptions {
+  preserveText?: boolean;
   onTextDelta?: (text: string) => void;
+  onReasoningDelta?: (text:string)=>void;
   responseFormat?: "json_object" | "text";
   temperature?: number;
   maxTokens?: number;
@@ -35,6 +37,8 @@ export interface DeepSeekAdapterOptions {
   retryIndex?: number;
 }
 
+export const cleanDeepSeekApiKey = (key: string | undefined) => (key || "").replace(/[^\x20-\x7E]/g, "").trim();
+
 export class DeepSeekAdapter implements LLMAdapter {
   private apiKey: string;
   private model: string;
@@ -46,7 +50,7 @@ export class DeepSeekAdapter implements LLMAdapter {
     baseURL: string = process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com"
   ) {
     // Sanitize API key and baseURL against zero-width spaces (\u200B) or non-ASCII characters
-    this.apiKey = (apiKey || "").replace(/[^\x20-\x7E]/g, "").trim();
+    this.apiKey = cleanDeepSeekApiKey(apiKey);
     this.model = model;
     this.baseURL = (baseURL || "https://api.deepseek.com")
       .replace(/[^\x20-\x7E]/g, "")
@@ -209,7 +213,7 @@ export class DeepSeekAdapter implements LLMAdapter {
     const payload: Record<string, any> = {
       model: targetModel,
       messages: deepSeekMessages,
-      stream: Boolean(options?.onTextDelta && !tools.length && options.responseFormat !== "json_object"),
+      stream: Boolean(!tools.length&&(options?.onReasoningDelta||options?.onTextDelta&&options.responseFormat!=="json_object")),
     };
     if (payload.stream) payload.stream_options = { include_usage: true };
 
@@ -269,8 +273,8 @@ export class DeepSeekAdapter implements LLMAdapter {
         throw err;
       }
 
-      return payload.stream && options?.onTextDelta
-        ? collectHttpTextStream(response, options.onTextDelta, aiSignal(options.signal))
+      return payload.stream && (options?.onTextDelta||options?.onReasoningDelta)
+        ? collectHttpTextStream(response, options.onTextDelta??(()=>{}), aiSignal(options.signal),options.onReasoningDelta)
         : response.json();
     }, data => ({ model: data.model, usage: openAIUsage(data.usage), finishReason: data.choices?.[0]?.finish_reason }), options?.telemetry !== false, { stage: options?.telemetryStage, retryIndex: options?.retryIndex });
 
@@ -318,13 +322,17 @@ export class DeepSeekAdapter implements LLMAdapter {
       const rawText = message.content || "";
       const reasoningContent = message.reasoning_content;
 
-      // Retained only for in-memory tool continuation, never logs or user text.
-      const text = rawText ? rawText.trim() : undefined;
+      // Tool continuity stays in memory by default. Explicit opt-in callers
+      // receive DeepSeek's documented reasoning channel separately from content.
+      const text = rawText ? options?.preserveText ? rawText : rawText.trim() : undefined;
 
       return {
+        ...(typeof data.model === "string" ? { model: data.model } : {}),
+        ...(typeof data.system_fingerprint === "string" ? { fingerprint: data.system_fingerprint } : {}),
         finishReason: data.choices?.[0]?.finish_reason === "length" ? "MAX_TOKENS" :
           ["stop", "tool_calls"].includes(data.choices?.[0]?.finish_reason) ? "STOP" : "OTHER",
         text,
+        ...(options?.onReasoningDelta&&typeof reasoningContent==="string"?{reasoningText:reasoningContent}:{}),
         toolCalls:
           normalizedToolCalls.length > 0 ? normalizedToolCalls : undefined,
         rawCandidateParts: reasoningContent

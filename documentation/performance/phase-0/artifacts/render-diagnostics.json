@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-07T13:37:42.428Z",
+  "at": "2026-10-30T10:20:53.191Z",
   "environment": "React development Profiler in jsdom; synthetic IO, counts only",
   "results": [
     {
@@ -11,10 +11,10 @@
     {
       "case": "party callback identity",
       "stableCallbackChannelsAfterDataLoad": 0,
-      "inlineCallbackChannelsBeforeTicks": 1,
-      "inlineCallbackAdditionalChannelsForFiveRenders": 5,
-      "unsubscribes": 5,
-      "profilerCommits": 19
+      "inlineCallbackChannelsBeforeTicks": 0,
+      "inlineCallbackAdditionalChannelsForFiveRenders": 0,
+      "unsubscribes": 0,
+      "profilerCommits": 11
     }
   ]
 }

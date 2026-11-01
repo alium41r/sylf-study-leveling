@@ -1,0 +1,13 @@
+{
+  "models": 73,
+  "supportedSemanticDiffEmpty": true,
+  "source": "Actual SQL backup plus Notes; public column definitions/constraints/indexes match hosted after snapshot",
+  "sqlOwnedAdditionalCompositeFKs": 9,
+  "excludedGeneratedRelationFields": 18,
+  "partialIndexesOwnedBySQL": 5,
+  "introspectionCardinalityCorrections": [
+    "FocusParty.sessions remains an array despite partial active-session uniqueness",
+    "User.plannerAttempts remains an array despite partial running-attempt uniqueness"
+  ],
+  "productionDDLGeneratedOrExecutedFromPrisma": false
+}

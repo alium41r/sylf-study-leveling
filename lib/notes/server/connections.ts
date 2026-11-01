@@ -36,12 +36,21 @@ async function exchange(fields: Record<string, string>): Promise<Tokens> {
       ...fields,
     }),
   });
-  if (!response.ok)
-    throw new NotesServerError(
-      "Reconnect Google Drive with the same account.",
-      409,
-      response.status === 400 ? "AUTH" : "NETWORK"
+  if (!response.ok) {
+    const result = JSON.parse(
+      new TextDecoder().decode(await limitedBytes(response, 100000))
     );
+    const revoked = result.error === "invalid_grant";
+    // A misconfigured client or transient Google outage is not revoked consent.
+    // Keep the refresh credential; never force repeated consent for these errors.
+    throw new NotesServerError(
+      revoked
+        ? "Reconnect Google Drive with the same account."
+        : "Google Drive authorization is temporarily unavailable. Your connection is retained.",
+      revoked ? 409 : 503,
+      revoked ? "AUTH" : "NETWORK"
+    );
+  }
   const value = z
     .object({
       access_token: z.string().min(1),
@@ -281,7 +290,11 @@ export async function finishOAuth(
         );
     }
     await drive.checkedRoot(rootId, libraryId);
-    const query = `'${escapeQuery(rootId)}' in parents and trashed = false and appProperties has { key='sylfNotes' and value='descriptor-v1' }`;
+    let system = await drive.systemFolder(rootId, libraryId);
+    const parents = [rootId, ...(system ? [system.id] : [])]
+      .map((id) => `'${escapeQuery(id)}' in parents`)
+      .join(" or ");
+    const query = `(${parents}) and trashed = false and appProperties has { key='sylfNotes' and value='descriptor-v1' }`;
     const descriptors = await drive.list(query);
     const descriptor = librarySchema.parse({
       format: "sylf-notes",
@@ -303,7 +316,8 @@ export async function finishOAuth(
           "The cloud library descriptor is missing. Restore it from a verified copy before reconnecting.",
           409
         );
-      const file = await drive.create(rootId, "library.v1.json", bytes, {
+      system ||= await drive.systemFolder(rootId, libraryId, true);
+      const file = await drive.create(system!.id, "library.v1.json", bytes, {
         sylfNotes: "descriptor-v1",
         libraryId,
       });
@@ -327,10 +341,11 @@ export async function finishOAuth(
             "CORRUPT"
           );
     }
+    system ||= await drive.systemFolder(rootId, libraryId, true);
     const probe = randomBytes(48),
       probeHash = sha(probe);
     const probeFile = await drive.create(
-      rootId,
+      system!.id,
       `connection-check-${randomUUID()}`,
       probe,
       { sylfNotes: "probe-v1", libraryId }
@@ -375,7 +390,10 @@ export async function finishOAuth(
     throw error;
   }
 }
-export async function connectionToken(connection: NotesConnection) {
+export async function connectionToken(
+  connection: NotesConnection,
+  retried = false
+): Promise<string> {
   if (connection.status !== "ACTIVE")
     throw new NotesServerError(
       "Reconnect the original Google Drive account.",
@@ -399,13 +417,33 @@ export async function connectionToken(connection: NotesConnection) {
     },
     data: { refreshLeaseUntil: new Date(Date.now() + 30000) },
   });
-  if (!lease.count)
+  const newerToken = async () => {
+    if (retried) return;
+    const latest = await prisma.notesConnection.findUnique({
+      where: { id: connection.id },
+    });
+    if (
+      latest &&
+      latest.credentialRevision !== connection.credentialRevision &&
+      latest.status === "ACTIVE" &&
+      latest.userId === connection.userId &&
+      latest.libraryId === connection.libraryId &&
+      latest.accountId === connection.accountId &&
+      latest.rootId === connection.rootId &&
+      latest.bindingGeneration === connection.bindingGeneration
+    )
+      return connectionToken(latest, true);
+  };
+  if (!lease.count) {
+    const fresh = await newerToken();
+    if (fresh) return fresh;
     throw new NotesServerError(
       "Drive credentials are refreshing. Retry shortly.",
       503,
       "THROTTLE",
       5
     );
+  }
   try {
     const next = await exchange({
       grant_type: "refresh_token",
@@ -424,14 +462,22 @@ export async function connectionToken(connection: NotesConnection) {
         refreshLeaseUntil: null,
       },
     });
-    if (!saved.count)
+    if (!saved.count) {
+      const fresh = await newerToken();
+      if (fresh) return fresh;
       throw new NotesServerError(
-        "Drive connection changed. Retry synchronization.",
-        409,
-        "AUTH"
+        "Drive connection changed. Retry shortly.",
+        503,
+        "THROTTLE",
+        5
       );
+    }
     return next.accessToken;
   } catch (error) {
+    // Another worker may have refreshed/reconnected while this stale request
+    // was running. Never mark its newer credential as revoked.
+    const fresh = await newerToken();
+    if (fresh) return fresh;
     await prisma.notesConnection.updateMany({
       where: {
         id: connection.id,
@@ -471,6 +517,7 @@ export function publicBinding(connection: NotesConnection) {
       verifiedAt: connection.verifiedAt.toISOString(),
       probeHash: connection.probeHash,
     },
+    driveLayoutVersion: 1,
     label: connection.label,
     status: connection.status,
   };

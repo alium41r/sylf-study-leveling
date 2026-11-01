@@ -5,10 +5,12 @@ const { chromium } = await import(
 import { randomUUID, createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import assert from "node:assert/strict";
-const evidence = new URL(
-  "../../../documentation/notes/reports/phase-3/evidence/",
-  import.meta.url
-).pathname;
+const evidence =
+  process.env.NOTES_QA_EVIDENCE ||
+  new URL(
+    "../../../documentation/notes/reports/phase-3/evidence/",
+    import.meta.url
+  ).pathname;
 mkdirSync(evidence, { recursive: true });
 const libraryId = randomUUID(),
   key = Buffer.alloc(32, 71).toString("base64"),

@@ -1,0 +1,279 @@
+{
+ "note": "In process, on a disposable PostgreSQL 17 container on an 8 GB M1. No network between app and database, so a hosted round trip adds to each statement. Relative figures, not production latency.",
+ "scale": {
+  "users": 2000,
+  "friends": 40,
+  "sessions": 3000,
+  "quests": 1500,
+  "goals": 40,
+  "subjects": 12,
+  "messages": 4000,
+  "peerQuests": 60000
+ },
+ "sizes": [
+  {
+   "relname": "Quest",
+   "rows": 61500
+  },
+  {
+   "relname": "SystemMessage",
+   "rows": 8000
+  },
+  {
+   "relname": "StudySession",
+   "rows": 7000
+  },
+  {
+   "relname": "User",
+   "rows": 2001
+  },
+  {
+   "relname": "UserPrivacy",
+   "rows": 2001
+  }
+ ],
+ "results": [
+  {
+   "route": "getSession only",
+   "status": 200,
+   "bytes": 2,
+   "sqlStatements": 2,
+   "p50ms": 1.7,
+   "p95ms": 2.7
+  },
+  {
+   "route": "/api/user/stats",
+   "status": 200,
+   "bytes": 935,
+   "sqlStatements": 5,
+   "p50ms": 5.1,
+   "p95ms": 13.3
+  },
+  {
+   "route": "/api/user/detailed-stats",
+   "status": 200,
+   "bytes": 186231,
+   "sqlStatements": 8,
+   "p50ms": 68.1,
+   "p95ms": 84.7
+  },
+  {
+   "route": "/api/friends",
+   "status": 200,
+   "bytes": 22653,
+   "sqlStatements": 14,
+   "p50ms": 27.2,
+   "p95ms": 38
+  },
+  {
+   "route": "/api/user/detailed-stats?summary=true",
+   "status": 200,
+   "bytes": 1744,
+   "sqlStatements": 7,
+   "p50ms": 64.6,
+   "p95ms": 93
+  },
+  {
+   "route": "/api/sessions?limit=20",
+   "status": 200,
+   "bytes": 3981,
+   "sqlStatements": 5,
+   "p50ms": 2.6,
+   "p95ms": 2.8
+  },
+  {
+   "route": "/api/user/rankings",
+   "status": 200,
+   "bytes": 18457,
+   "sqlStatements": 5,
+   "p50ms": 25.7,
+   "p95ms": 31
+  },
+  {
+   "route": "/api/quests?all=true",
+   "status": 200,
+   "bytes": 905287,
+   "sqlStatements": 8,
+   "p50ms": 29.9,
+   "p95ms": 40.2
+  },
+  {
+   "route": "/api/quests?all=true&limit=50",
+   "status": 200,
+   "bytes": 30060,
+   "sqlStatements": 8,
+   "p50ms": 5.6,
+   "p95ms": 7.6
+  },
+  {
+   "route": "/api/quests (today)",
+   "status": 200,
+   "bytes": 2,
+   "sqlStatements": 8,
+   "p50ms": 3.7,
+   "p95ms": 5.2
+  },
+  {
+   "route": "/api/quests/weekly",
+   "status": 200,
+   "bytes": 363,
+   "sqlStatements": 6,
+   "p50ms": 4,
+   "p95ms": 5.5
+  },
+  {
+   "route": "/api/goals",
+   "status": 200,
+   "bytes": 8063,
+   "sqlStatements": 4,
+   "p50ms": 2.6,
+   "p95ms": 4.3
+  },
+  {
+   "route": "/api/subjects",
+   "status": 200,
+   "bytes": 2506,
+   "sqlStatements": 5,
+   "p50ms": 3.6,
+   "p95ms": 3.8
+  },
+  {
+   "route": "/api/achievements",
+   "status": 200,
+   "bytes": 8471,
+   "sqlStatements": 13,
+   "p50ms": 4.2,
+   "p95ms": 5
+  },
+  {
+   "route": "/api/notifications",
+   "status": 200,
+   "bytes": 1470,
+   "sqlStatements": 4,
+   "p50ms": 5.4,
+   "p95ms": 5.8
+  },
+  {
+   "route": "/api/system-messages",
+   "status": 200,
+   "bytes": 9165,
+   "sqlStatements": 4,
+   "p50ms": 3.5,
+   "p95ms": 4
+  },
+  {
+   "route": "/api/conversations",
+   "status": 200,
+   "bytes": 2,
+   "sqlStatements": 8,
+   "p50ms": 2.8,
+   "p95ms": 2.9
+  },
+  {
+   "route": "/api/chats",
+   "status": 200,
+   "bytes": 15,
+   "sqlStatements": 3,
+   "p50ms": 1.7,
+   "p95ms": 2.2
+  },
+  {
+   "route": "/api/chats?limit=20",
+   "status": 200,
+   "bytes": 33,
+   "sqlStatements": 3,
+   "p50ms": 1.7,
+   "p95ms": 1.9
+  },
+  {
+   "route": "/api/focus-party",
+   "status": 200,
+   "bytes": 40,
+   "sqlStatements": 7,
+   "p50ms": 2.4,
+   "p95ms": 2.9
+  },
+  {
+   "route": "/api/calendar/month",
+   "status": 200,
+   "bytes": 8335,
+   "sqlStatements": 18,
+   "p50ms": 11.2,
+   "p95ms": 13.4
+  },
+  {
+   "route": "/api/cosmetics",
+   "status": 200,
+   "bytes": 202,
+   "sqlStatements": 4,
+   "p50ms": 2.4,
+   "p95ms": 2.5
+  },
+  {
+   "route": "/api/inventory",
+   "status": 200,
+   "bytes": 162,
+   "sqlStatements": 5,
+   "p50ms": 2.4,
+   "p95ms": 3.3
+  },
+  {
+   "route": "/api/currency/stats",
+   "status": 200,
+   "bytes": 95,
+   "sqlStatements": 5,
+   "p50ms": 2.8,
+   "p95ms": 4.9
+  },
+  {
+   "route": "/api/users/search?q=peer1",
+   "status": 200,
+   "bytes": 858,
+   "sqlStatements": 5,
+   "p50ms": 2.7,
+   "p95ms": 2.8
+  }
+ ],
+ "leaderboard": {
+  "loadingEveryQuestId": {
+   "p50ms": 57.6,
+   "bytes": 889635
+  },
+  "countingInTheDatabase": {
+   "p50ms": 16.4,
+   "bytes": 133699
+  }
+ },
+ "plans": {
+  "stats: today's sessions": [
+   "Bitmap Heap Scan on \"StudySession\" (actual rows=23 loops=1)",
+   "->  Bitmap Index Scan on \"StudySession_userId_startedAt_idx\" (actual rows=23 loops=1)",
+   "Execution Time: 0.021 ms"
+  ],
+  "friendships both directions": [
+   "Seq Scan on \"Friendship\" (actual rows=40 loops=1)",
+   "Execution Time: 0.009 ms"
+  ],
+  "friends: today's aggregate": [
+   "->  Seq Scan on \"StudySession\" s (actual rows=943 loops=1)",
+   "Rows Removed by Filter: 6057",
+   "->  Seq Scan on \"Friendship\" (actual rows=40 loops=1)",
+   "Execution Time: 1.280 ms"
+  ],
+  "open session per user": [
+   "Index Scan using \"StudySession_userId_open_idx\" on \"StudySession\" (actual rows=0 loops=1)",
+   "Execution Time: 0.004 ms"
+  ],
+  "user search contains": [
+   "->  Seq Scan on \"User\" (actual rows=10 loops=1)",
+   "Rows Removed by Filter: 8",
+   "Execution Time: 0.008 ms"
+  ],
+  "session end flood guard": [
+   "->  Bitmap Heap Scan on \"StudySession\" (actual rows=0 loops=1)",
+   "Rows Removed by Filter: 3000",
+   "->  Bitmap Index Scan on \"StudySession_userId_subjectId_idx\" (actual rows=3000 loops=1)",
+   "Execution Time: 0.408 ms"
+  ]
+ }
+}

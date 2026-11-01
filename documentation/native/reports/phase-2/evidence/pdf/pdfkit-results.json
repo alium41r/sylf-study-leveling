@@ -1,0 +1,163 @@
+[
+  {
+    "errorPx" : 0.26925824035673362,
+    "id" : "a4-plain",
+    "markerPixels" : 25,
+    "pdfjsMarker" : [
+      148.75,
+      252.60000000000002
+    ],
+    "pdfjsSize" : [
+      595,
+      842
+    ],
+    "pdfjsUserUnit" : 1,
+    "pdfkitMarker" : [
+      148.5,
+      252.5
+    ],
+    "pdfkitSize" : [
+      595,
+      842
+    ],
+    "rotation" : 0
+  },
+  {
+    "errorPx" : 0.10000000000002274,
+    "id" : "letter-rot90",
+    "markerPixels" : 30,
+    "pdfjsMarker" : [
+      554.39999999999998,
+      153
+    ],
+    "pdfjsSize" : [
+      792,
+      612
+    ],
+    "pdfjsUserUnit" : 1,
+    "pdfkitMarker" : [
+      554.5,
+      153
+    ],
+    "pdfkitSize" : [
+      792,
+      612
+    ],
+    "rotation" : 90
+  },
+  {
+    "errorPx" : 0,
+    "id" : "crop-offset",
+    "markerPixels" : 30,
+    "pdfjsMarker" : [
+      112.5,
+      192
+    ],
+    "pdfjsSize" : [
+      450,
+      640
+    ],
+    "pdfjsUserUnit" : 1,
+    "pdfkitMarker" : [
+      112.5,
+      192
+    ],
+    "pdfkitSize" : [
+      450,
+      640
+    ],
+    "rotation" : 0
+  },
+  {
+    "errorPx" : 0,
+    "id" : "crop-rot270",
+    "markerPixels" : 36,
+    "pdfjsMarker" : [
+      213,
+      390
+    ],
+    "pdfjsSize" : [
+      710,
+      520
+    ],
+    "pdfjsUserUnit" : 1,
+    "pdfkitMarker" : [
+      213,
+      390
+    ],
+    "pdfkitSize" : [
+      710,
+      520
+    ],
+    "rotation" : 270
+  },
+  {
+    "errorPx" : 0,
+    "id" : "media-negative-origin",
+    "markerPixels" : 36,
+    "pdfjsMarker" : [
+      150,
+      240
+    ],
+    "pdfjsSize" : [
+      600,
+      800
+    ],
+    "pdfjsUserUnit" : 1,
+    "pdfkitMarker" : [
+      150,
+      240
+    ],
+    "pdfkitSize" : [
+      600,
+      800
+    ],
+    "rotation" : 0
+  },
+  {
+    "errorPx" : 0,
+    "id" : "rot180-crop",
+    "markerPixels" : 36,
+    "pdfjsMarker" : [
+      300,
+      420
+    ],
+    "pdfjsSize" : [
+      400,
+      600
+    ],
+    "pdfjsUserUnit" : 1,
+    "pdfkitMarker" : [
+      300,
+      420
+    ],
+    "pdfkitSize" : [
+      400,
+      600
+    ],
+    "rotation" : 180
+  },
+  {
+    "errorPx" : 141.50971698084905,
+    "id" : "userunit-2",
+    "markerPixels" : 36,
+    "pdfjsMarker" : [
+      150,
+      240
+    ],
+    "pdfjsSize" : [
+      600,
+      800
+    ],
+    "pdfjsUserUnit" : 2,
+    "pdfkitMarker" : [
+      75,
+      120
+    ],
+    "pdfkitSize" : [
+      300,
+      400
+    ],
+    "rotation" : 0
+  }
+]

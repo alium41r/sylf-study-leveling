@@ -11,8 +11,21 @@ import { reserveAttemptQuota, finalizeAttemptQuota, recordDispatch, recordUnknow
 import type { QuotaReservationReceipt } from "../../../ai/quota-accounting";
 import { reserveProviderCapacity, providerCategory, type ProviderGuard, type ProviderPolicy } from "../intelligence/provider-policy";
 import type { CompilerIdentity, CompilerRetry } from "../intelligence/schemas/quality";
+import { loadCompilerVersion, readCompilerVersion, type CompilerVersion } from "./compiler-version";
+import { ResourcePolicySchema, type ResourcePolicy } from "../intelligence/foundation/resources";
+import { type PlannerRole } from "../intelligence/foundation/contracts";
+import type { ReviewedResearchHandoff } from "../intelligence/schemas/reviewed-learning";
+import type { RoleCall } from "../intelligence/foundation/role-calls";
+import { boundRolePolicy, projectRoleResources, syncRoleStops, reserveRoleReceipt, settleRoleReceipt, recoverRoleReceipt,retainUnaccountedRoleResponse,type UnaccountedRoleResponse } from "./role-accounting";
 
 export interface AttemptPayload {
+  /** Bounded, non-authoritative visible text only. No private reasoning. */
+  visibleOutput?: unknown;
+  providerReasoning?:unknown;
+  understanding?: unknown;
+  reviewResearch?:ReviewedResearchHandoff;
+  researchContinuation?: { schemaVersion: 1; parentDigest: string; decisionDigest: string; originalRequestDigest: string; decision: unknown; answers: { ref: string; text: string }[] };
+  resourcePolicy?: ResourcePolicy;
   generationRequestDigest?: string;
   quotaReceipt?: QuotaReservationReceipt;
   checkpoint?: unknown;
@@ -44,6 +57,21 @@ export async function loadAttempt(sql: Sql, ownerId: number, attemptId: string, 
   return { attempt: PlannerAttemptV2Schema.parse(row.artifact), payload: row.payload ?? {} };
 }
 export async function persistAttempt(sql: Sql, before: PlannerAttemptV2, raw: PlannerAttemptV2, payload?: AttemptPayload): Promise<PlannerAttemptV2> {
+  // Stopped history retains its original projection. Late usage is financial
+  // only; a new child reads the fresh aggregate without rewriting its parent.
+  if (raw.budget.aiFirst && ["QUEUED", "RUNNING"].includes(before.state)) {
+    if (!payload) payload = (await loadAttempt(sql, raw.ownerId, raw.attemptId, false)).payload;
+    await syncRoleStops(sql, raw, payload);
+    await recordUnknown(sql, raw.ownerId, payload.calls ?? []);
+    const projected = await projectRoleResources(sql, raw, payload);
+    raw = { ...raw, budget: projected.budget };
+    if (raw.state === "RUNNING" && (raw.budget.consumed.inputTokens > raw.budget.aiFirst!.limits.inputUnits || raw.budget.consumed.outputTokens > raw.budget.aiFirst!.limits.completionTokens)) {
+      const stopped = stopAccounting(raw, payload); payload = stopped.payload;
+      await syncRoleStops(sql, raw, payload); await recordUnknown(sql, raw.ownerId, payload.calls ?? []);
+      raw = { ...raw, budget: (await projectRoleResources(sql, raw, payload)).budget, state: "FAILED", lease: null,
+        error: new DurablePlannerError("BUDGET_EXHAUSTED", "Actual role usage exceeded authorized resources.", raw.stage).detail };
+    }
+  }
   const after = PlannerAttemptV2Schema.parse(raw);
   const errors = validateAttemptTransition(before, after);
   if (errors.length) reject("INVALID_OUTPUT", errors.join("; "));
@@ -59,19 +87,19 @@ export async function persistAttempt(sql: Sql, before: PlannerAttemptV2, raw: Pl
     [after.attemptId, after.state, after.kind, after.fence, after.lease?.owner ?? null, after.lease?.expiresAt ?? null, after.budget.executionDeadlineAt, after, payload ?? null]);
   return after;
 }
-export async function assertAttemptCurrent(sql: Sql, attempt: PlannerAttemptV2): Promise<void> {
+export async function assertAttemptCurrent(sql: Sql, attempt: PlannerAttemptV2, lock = true): Promise<void> {
   for (const target of [...attempt.targets].sort((a, b) => a.planId.localeCompare(b.planId))) {
-    const plan = await ownedPlan(sql, attempt.ownerId, target.planId);
+    const plan = await ownedPlan(sql, attempt.ownerId, target.planId, lock);
     if (plan.contractVersion !== 2 || plan.state === "ARCHIVED" || plan.state === "COMPLETED" ||
       plan.workingIntentVersionId !== (target.resolvedIntentVersionId ?? target.requestedIntentVersionId) ||
       plan.version !== (target.resolvedPlanningVersion ?? target.planningVersion) || plan.activeRevisionId !== target.baseActiveRevisionId) reject("SUPERSEDED", "The accepted goal or active plan changed.");
   }
 }
-export async function assertLease(sql: Sql, attempt: PlannerAttemptV2, token: LeaseToken, allowExpiredDeadline = false): Promise<Date> {
+export async function assertLease(sql: Sql, attempt: PlannerAttemptV2, token: LeaseToken, allowExpiredDeadline = false, lockCurrent = true): Promise<Date> {
   const now = await clock(sql);
   if (attempt.state !== "RUNNING" || !attempt.lease || attempt.lease.owner !== token.workerId || attempt.fence !== token.fence || Date.parse(attempt.lease.expiresAt) <= now.getTime()) reject("LEASE_EXPIRED", "This worker no longer owns the operation.", attempt.stage);
   if (!allowExpiredDeadline && attempt.budget.executionDeadlineAt && Date.parse(attempt.budget.executionDeadlineAt) <= now.getTime()) reject("BUDGET_EXHAUSTED", "The operation exceeded its processing deadline.", attempt.stage);
-  await assertAttemptCurrent(sql, attempt);
+  await assertAttemptCurrent(sql, attempt, lockCurrent);
   return now;
 }
 /** Undispatched calls cost nothing. Dispatched uncertainty keeps its token
@@ -106,31 +134,55 @@ export class AttemptService {
   constructor(readonly db: PlannerDatabase) {}
   async enqueue(ownerId: number, request: {
     key: string; text: string; kind: PlannerAttemptV2["kind"]; targets: { planId: string; intentId: string; planningVersion: number; baseRevisionId: string | null; sourceCandidateId?: string }[];
-    budget: RuntimeBudgetV2; parentAttemptId?: string;
+    budget: RuntimeBudgetV2; parentAttemptId?: string; compilerVersion?: CompilerVersion; resourcePolicy?: ResourcePolicy; researchContinuation?: NonNullable<AttemptPayload["researchContinuation"]>;
   }): Promise<PlannerAttemptV2> {
     return this.db.coordinated(ownerId, sql => this.enqueueAccepted(sql, ownerId, request));
   }
   /** Compose admission and enqueue under the same existing owner transaction. */
   async enqueueAccepted(sql: Sql, ownerId: number, request: Parameters<AttemptService["enqueue"]>[1]): Promise<PlannerAttemptV2> {
-    const requestHash = hash("accepted-request", request);
+    const compilerVersion = readCompilerVersion(request.compilerVersion ?? 1);
+    if (compilerVersion === 1 && (request.resourcePolicy || request.budget.aiFirst)) reject("INTENT_CONFLICT", "Compiler v1 cannot admit v2 resource policies.");
+    const resourcePolicy = request.resourcePolicy ? ResourcePolicySchema.parse(request.resourcePolicy) : undefined;
+    const resourceParent = resourcePolicy && request.parentAttemptId ? await loadAttempt(sql, ownerId, request.parentAttemptId) : null;
+    const continuation=request.researchContinuation;
+    if(continuation && (!resourceParent || (await rows<{value:string}>(sql,"SELECT current_setting('sylf.planner_research_continuation',true) AS value"))[0].value!==continuation.decisionDigest ||
+      continuation.parentDigest!==hash("research-parent-v1",resourceParent.payload.understanding) || continuation.originalRequestDigest!==hash("accepted-instruction-v1",resourceParent.attempt.acceptedRequest) ||
+      hash("continuation-plans",request.targets.map(t=>t.planId).sort())!==hash("continuation-plans",resourceParent.attempt.targets.map(t=>t.planId).sort())))reject("INTENT_CONFLICT","Research continuation requires the owned student-decision transaction.","RESEARCH");
+    const rootId = resourceParent?.attempt.budget.rootRequestId ?? request.budget.rootRequestId;
+    // Preserve the accepted hash of all pre-versioning v1 requests.
+    const { compilerVersion: _version, ...legacyRequest } = request; void _version;
+    const requestHash = hash("accepted-request", resourcePolicy ? { ...legacyRequest, budget: { rootRequestId: rootId }, resourcePolicy, compilerVersion } : compilerVersion === 1 ? legacyRequest : { ...legacyRequest, compilerVersion });
       const existing = (await rows<{ artifact: unknown }>(sql, 'SELECT artifact FROM "PlannerAttempt" WHERE "userId"=$1 AND "requestKey"=$2', [ownerId, request.key]))[0];
       if (existing) {
         const attempt = PlannerAttemptV2Schema.parse(existing.artifact);
         if (attempt.requestHash !== requestHash) reject("IDEMPOTENCY_MISMATCH", "This request identity belongs to different input.");
+        if (await loadCompilerVersion(sql, attempt.attemptId) !== compilerVersion) reject("IDEMPOTENCY_MISMATCH", "This operation is pinned to another compiler version.");
         return attempt;
       }
-      if ((await rows(sql, 'SELECT id FROM "PlannerAttempt" WHERE artifact->\'budget\'->>\'rootRequestId\'=$1', [request.budget.rootRequestId])).length)
+      if (!resourceParent && (await rows(sql, 'SELECT id FROM "PlannerAttempt" WHERE artifact->\'budget\'->>\'rootRequestId\'=$1', [rootId])).length)
         reject("IDEMPOTENCY_MISMATCH", "A request budget cannot be transferred into two attempts.");
       if (request.parentAttemptId) {
         const parent = await loadAttempt(sql, ownerId, request.parentAttemptId);
+        if (await loadCompilerVersion(sql, parent.attempt.attemptId) !== compilerVersion) reject("INTENT_CONFLICT", "A retry must retain its parent's compiler interpretation.");
+        if (compilerVersion === 2 && (!resourcePolicy || !parent.attempt.budget.aiFirst)) reject("QUALITY_INCOMPLETE", "Compiler v2 continuation requires an admitted aggregate resource policy.", "PREFLIGHT");
+        if (resourcePolicy && (await rows(sql, 'SELECT id FROM "PlannerAttempt" WHERE artifact->>\'parentAttemptId\'=$1', [parent.attempt.attemptId])).length) reject("INTENT_CONFLICT", "This resource lineage already has a continuation.");
+        if (resourcePolicy && (request.budget.profile !== parent.attempt.budget.profile || hash("resource-policy-v1", parent.payload.resourcePolicy) !== hash("resource-policy-v1", resourcePolicy) || request.text !== parent.attempt.acceptedRequest.text ||
+          !continuation && hash("authorized-targets", request.targets) !== parent.attempt.acceptedRequest.targetAuthorizationDigest)) reject("INTENT_CONFLICT", "Resource continuation cannot change accepted facts, targets, instructions or permissions; research adoption requires its own correspondence.");
+        if (resourcePolicy && (await projectRoleResources(sql, parent.attempt, parent.payload)).snapshot.uncertainDispatch) reject("QUALITY_INCOMPLETE", "Reconcile uncertain root spending before admitting a continuation.");
         if (!["FAILED", "CANCELLED", "SUPERSEDED", "NEEDS_DECISION"].includes(parent.attempt.state)) reject("INTENT_CONFLICT", "Only a stopped operation can be explicitly retried.");
       }
+      if (compilerVersion === 2 && (!['PLAN', 'REPLAN', 'JOINT'].includes(request.kind) || !resourceParent && (request.budget.processingStartedAt !== null || request.budget.foregroundProcessingMs || Object.values(request.budget.consumed).some(n => n !== 0) || Object.values(request.budget.reserved).some(n => n !== 0)))) reject("INTENT_CONFLICT", "Compiler v2 admission requires explicit planning targets and an authorized resource root.");
+      if (resourcePolicy && resourcePolicy.authorizationDigest !== (continuation?resourceParent!.attempt.acceptedRequest.targetAuthorizationDigest:hash("authorized-targets", request.targets))) reject("INTENT_CONFLICT", "Resource authorization does not match the selected owned targets.");
+      if (resourcePolicy && !resourceParent && (await rows(sql, 'SELECT id FROM "AiUsageLog" WHERE "rootRequestId"=$1', [rootId])).length) reject("IDEMPOTENCY_MISMATCH", "This financial root was already used.");
+      let budget = request.budget;
+      if (resourcePolicy) budget = resourceParent ? (await projectRoleResources(sql, resourceParent.attempt, resourceParent.payload)).budget : { ...request.budget,
+        aiFirst: { schemaVersion: 1, policyDigest: hash("resource-policy-v1", resourcePolicy), limits: resourcePolicy.root, processingMs: resourcePolicy.processingMs } };
       const attempt = PlannerAttemptV2Schema.parse({ schemaVersion: 2, attemptId: randomUUID(), ownerId, kind: request.kind, state: "QUEUED", stage: "QUEUED",
         idempotencyKey: request.key, requestHash, requestedAt: (await clock(sql)).toISOString(), parentAttemptId: request.parentAttemptId ?? null,
-        acceptedRequest: { text: request.text, authorization: request.kind === "RESEARCH_ADVICE" ? "RESEARCH_ONLY" : "PLAN_ACTION", researchRequested: request.budget.profile === "RESEARCH", targetAuthorizationDigest: hash("authorized-targets", request.targets) },
+        acceptedRequest: continuation?resourceParent!.attempt.acceptedRequest:{ text: request.text, authorization: request.kind === "RESEARCH_ADVICE" ? "RESEARCH_ONLY" : "PLAN_ACTION", researchRequested: request.budget.profile === "RESEARCH", targetAuthorizationDigest: hash("authorized-targets", request.targets) },
         targets: request.targets.map(target => ({ planId: target.planId, requestedIntentVersionId: target.intentId, resolvedIntentVersionId: null, resolution: null,
           baseActiveRevisionId: target.baseRevisionId, sourceCandidateRevisionId: target.sourceCandidateId ?? null, planningVersion: target.planningVersion, resolvedPlanningVersion: null, contextDigest: null })),
-        budget: request.budget, fence: 0, lease: null, checkpoint: null, question: null, error: null, result: null, applyReceipt: null });
+        budget, fence: 0, lease: null, checkpoint: null, question: null, error: null, result: null, applyReceipt: null });
       await assertAttemptCurrent(sql, attempt);
       for (const target of attempt.targets) {
         const plan = await ownedPlan(sql, ownerId, target.planId);
@@ -139,16 +191,16 @@ export class AttemptService {
           [target.sourceCandidateRevisionId, target.planId, target.requestedIntentVersionId])).length) reject("REFERENCE_NOT_OWNED", "The candidate does not belong to this accepted intent.");
       }
       // An initial root may transfer foreground accounting, but never another root's worker deadline.
-      if (attempt.budget.processingStartedAt !== null) reject("INVALID_OUTPUT", "Enqueue requires unbound worker processing time.");
-      const foreground = await transferForegroundAccounting(sql, ownerId, attempt.attemptId, attempt.budget);
+      if (attempt.budget.processingStartedAt !== null && !resourceParent) reject("INVALID_OUTPUT", "Enqueue requires unbound worker processing time.");
+      const foreground: AttemptPayload = resourcePolicy ? { resourcePolicy, ...(continuation?{researchContinuation:continuation}:{}), ...(resourceParent?.payload.quotaReceipt?.state === "SETTLED" ? { quotaReceipt: resourceParent.payload.quotaReceipt } : {}) } : await transferForegroundAccounting(sql, ownerId, attempt.attemptId, attempt.budget);
       await supersedePlanAttempts(sql, ownerId, attempt.targets.map(target => target.planId));
       for (const target of attempt.targets) await sql.query('UPDATE "PlannerPlan" SET "latestDraftRevisionId"=NULL,"updatedAt"=clock_timestamp() WHERE id=$1', [target.planId]);
-      await sql.query('INSERT INTO "PlannerAttempt" (id,"userId",kind,state,"requestKey","requestHash",artifact,payload,"updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,clock_timestamp())',
-        [attempt.attemptId, ownerId, attempt.kind, attempt.state, attempt.idempotencyKey, requestHash, attempt, foreground]);
+      await sql.query('INSERT INTO "PlannerAttempt" (id,"userId",kind,state,"requestKey","requestHash",artifact,payload,"compilerVersion","executionDeadlineAt","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,clock_timestamp())',
+        [attempt.attemptId, ownerId, attempt.kind, attempt.state, attempt.idempotencyKey, requestHash, attempt, foreground, compilerVersion, attempt.budget.executionDeadlineAt]);
       return attempt;
   }
   async read(ownerId: number, attemptId: string): Promise<PlannerAttemptV2> {
-    return this.db.coordinated(ownerId, async sql => (await loadAttempt(sql, ownerId, attemptId)).attempt);
+    return this.db.observed(ownerId, async sql => (await loadAttempt(sql, ownerId, attemptId, false)).attempt);
   }
   async cancel(ownerId: number, attemptId: string): Promise<PlannerAttemptV2> {
     return this.db.coordinated(ownerId, async sql => {
@@ -185,9 +237,17 @@ export class AttemptService {
         const budget = { ...attempt.budget };
         if (!budget.processingStartedAt) {
           budget.processingStartedAt = now.toISOString();
-          budget.executionDeadlineAt = new Date(now.getTime() + PLANNER_V2_BUDGETS[budget.profile].executionSeconds * 1000 - budget.foregroundProcessingMs).toISOString();
+          budget.executionDeadlineAt = new Date(now.getTime() + (budget.aiFirst?.processingMs ?? PLANNER_V2_BUDGETS[budget.profile].executionSeconds * 1000) - budget.foregroundProcessingMs).toISOString();
         }
         const fence = attempt.fence + 1;
+        // An older worker can still see the shared queue during deployment,
+        // but SQL will not let it claim a v2 operation without this capability.
+        await sql.query("SELECT set_config('sylf.planner_compiler_version',$1,true)", [String(await loadCompilerVersion(sql, attempt.attemptId))]);
+        await sql.query("SELECT set_config('sylf.planner_understanding_version','1',true)");
+        await sql.query("SELECT set_config('sylf.planner_calendar_capacity_version','1',true)");
+        await sql.query("SELECT set_config('sylf.planner_natural_learning_version','1',true)");
+        await sql.query("SELECT set_config('sylf.planner_reviewed_journey_version','1',true)");
+        await sql.query("SELECT set_config('sylf.planner_reviewed_publication_version','1',true)");
         await persistAttempt(sql, attempt, { ...attempt, state: "RUNNING", stage: attempt.checkpoint?.stage ?? "PREFLIGHT", fence, budget,
           lease: { owner: workerId, fence, expiresAt: new Date(now.getTime() + 45_000).toISOString() } });
         return { ownerId: attempt.ownerId, attemptId: attempt.attemptId, workerId, fence };
@@ -200,8 +260,22 @@ export class AttemptService {
     return this.db.coordinated(token.ownerId, async sql => {
       const { attempt, payload } = await loadAttempt(sql, token.ownerId, token.attemptId);
       const now = await assertLease(sql, attempt, token);
+      if (attempt.budget.aiFirst) await sql.query("SELECT set_config('sylf.planner_role_fence',$1,true)", [String(token.fence)]);
       return work(sql, attempt, payload, now);
     });
+  }
+  /** Snapshot preparation is fenced but does not exclude heartbeat writes.
+   * Consumers still revalidate captured facts in their mutation transaction. */
+  async observe<T>(token: LeaseToken, work: (sql: Sql, attempt: PlannerAttemptV2, payload: AttemptPayload, now: Date) => Promise<T>): Promise<T> {
+    const value = await this.db.observed(token.ownerId, async sql => {
+      const { attempt, payload } = await loadAttempt(sql, token.ownerId, token.attemptId, false);
+      const now = await assertLease(sql, attempt, token, false, false);
+      return work(sql, attempt, payload, now);
+    });
+    // Check a new committed snapshot, not the old MVCC lease: a legitimate
+    // heartbeat may have renewed it while this read was being prepared.
+    await this.providerWindow(token, "BLUEPRINT");
+    return value;
   }
   async renew(token: LeaseToken): Promise<void> {
     await this.mutate(token, async (sql, attempt, _payload, now) => {
@@ -216,26 +290,34 @@ export class AttemptService {
   }
   async checkpoint(token: LeaseToken, stage: PlannerAttemptV2["stage"], value: unknown): Promise<void> {
     await this.mutate(token, async (sql, attempt, payload, now) => {
+      if (await loadCompilerVersion(sql, attempt.attemptId) !== 1) reject("INVALID_OUTPUT", "Compiler v2 checkpoints belong in the retained intelligence archive.");
       await persistAttempt(sql, attempt, { ...attempt, stage, checkpoint: { stage, digest: hash("checkpoint", value), persistedAt: now.toISOString() } }, { ...payload, checkpoint: value });
     });
   }
   async fail(token: LeaseToken, error: DurablePlannerError): Promise<void> {
     await this.db.coordinated(token.ownerId, async sql => {
       const { attempt, payload } = await loadAttempt(sql, token.ownerId, token.attemptId);
-      await assertLease(sql, attempt, token, true);
-      const stopped = stopAccounting(attempt, payload);
-      await persistAttempt(sql, attempt, { ...attempt, state: "FAILED", stage: error.detail.stage, lease: null, error: error.detail, budget: stopped.budget }, stopped.payload);
+      await this.failAccepted(sql,token,attempt,payload,error);
     });
+  }
+  /** Compose a durable stage handoff in the existing owner transaction. */
+  async failAccepted(sql:Sql,token:LeaseToken,attempt:PlannerAttemptV2,payload:AttemptPayload,error:DurablePlannerError){
+    await assertLease(sql,attempt,token,true);const stopped=stopAccounting(attempt,payload);
+    await persistAttempt(sql,attempt,{...attempt,state:"FAILED",stage:error.detail.stage,lease:null,error:error.detail,budget:stopped.budget},stopped.payload);
   }
   async needsDecision(token: LeaseToken, question: string): Promise<void> {
     await this.mutate(token, async (sql, attempt, payload) => {
-      const stopped = stopAccounting(attempt, payload);
-      await persistAttempt(sql, attempt, { ...attempt, state: "NEEDS_DECISION", question, lease: null, budget: stopped.budget }, stopped.payload);
+      await this.needsDecisionAccepted(sql,token,attempt,payload,question);
     });
+  }
+  async needsDecisionAccepted(sql:Sql,token:LeaseToken,attempt:PlannerAttemptV2,payload:AttemptPayload,question:string){
+    await assertLease(sql,attempt,token);const stopped=stopAccounting(attempt,payload);
+    await persistAttempt(sql,attempt,{...attempt,state:"NEEDS_DECISION",question,lease:null,budget:stopped.budget},stopped.payload);
   }
   async escalate(token: LeaseToken, profile: RuntimeBudgetV2["profile"], reason: string): Promise<void> {
     if (!reason.trim() || reason.length > 1000) reject("INVALID_OUTPUT", "Profile escalation requires a consequential reason.");
     await this.mutate(token, async (sql, attempt, payload) => {
+      if (attempt.budget.aiFirst) reject("INTENT_CONFLICT", "An admitted role policy and absolute deadline cannot be escalated.");
       const profiles = ["ADVICE", "CALENDAR_ONLY", "EDUCATIONAL", "RESEARCH"];
       if (profiles.indexOf(profile) < profiles.indexOf(attempt.budget.profile)) reject("INVALID_OUTPUT", "The root profile cannot downgrade.");
       if (profile === attempt.budget.profile) return;
@@ -268,6 +350,7 @@ export class AttemptService {
   }
   async reserveCall(token: LeaseToken, input: { provider: string; model: string; inputTokens: number; outputTokens: number; category: "PLANNING" | "RESEARCH" | "OTHER"; policy?: ProviderPolicy }): Promise<string> {
     return this.mutate(token, async (sql, attempt, payload, now) => {
+      if (await loadCompilerVersion(sql, attempt.attemptId) !== 1) reject("QUALITY_INCOMPLETE", "Compiler v2 role resource admission is not installed.", "PREFLIGHT");
       const calls = payload.calls ?? [];
       const callId = randomUUID();
       const budget = structuredClone(attempt.budget);
@@ -296,6 +379,10 @@ export class AttemptService {
       if (payload.callCategories?.[callId] !== category) reject("IDEMPOTENCY_MISMATCH", "The call category cannot change after reservation.");
       if (call.state === "DISPATCHED") return;
       if (call.state !== "RESERVED") reject("INVALID_OUTPUT", "This call cannot be dispatched again.");
+      if (attempt.budget.aiFirst) {
+        if ((await projectRoleResources(sql, attempt, payload)).snapshot.uncertainDispatch) reject("QUALITY_INCOMPLETE", "Uncertain root dispatch must be reconciled before further work.");
+        await sql.query('UPDATE "AiUsageLog" SET "accountingState"=\'DISPATCHED\' WHERE "requestId"=$1 AND "accountingState"=\'RESERVED\'', [callId]);
+      }
       call.state = "DISPATCHED";
       await recordDispatch(sql, attempt.ownerId, call);
       const quotaReceipt = payload.quotaReceipt ? await finalizeAttemptQuota(sql, payload.quotaReceipt, true, await clock(sql)) : undefined;
@@ -308,6 +395,12 @@ export class AttemptService {
   }
   async settleCall(token: LeaseToken, callId: string, usage: ProviderUsage): Promise<void> {
     await this.mutate(token, async (sql, attempt, payload) => {
+      if (attempt.budget.aiFirst) {
+        const call = payload.calls?.find(c => c.callId === callId);
+        if (!call || call.fence !== token.fence) reject("LEASE_EXPIRED", "Role usage belongs to another lease.");
+        const settled = await settleRoleReceipt(sql, attempt, payload, callId, usage);
+        await persistAttempt(sql, attempt, attempt, settled); return;
+      }
       const calls = structuredClone(payload.calls ?? []); const call = calls.find(call => call.callId === callId);
       if (!call || call.fence !== token.fence) reject("LEASE_EXPIRED", "Call reservation belongs to another lease.");
       if (call.state === "SETTLED") {
@@ -338,16 +431,25 @@ export class AttemptService {
   }
   async recordLateUsage(ownerId: number, attemptId: string, callId: string, usage: ProviderUsage): Promise<void> {
     await this.db.coordinated(ownerId, async sql => {
-      const { payload } = await loadAttempt(sql, ownerId, attemptId);
+      const { attempt, payload } = await loadAttempt(sql, ownerId, attemptId);
       const call = payload.calls?.find(candidate => candidate.callId === callId);
       if (!call || !["DISPATCHED", "UNKNOWN_SPEND", "SETTLED"].includes(call.state)) reject("REFERENCE_NOT_OWNED", "No owned provider dispatch can be reconciled.");
-      await recordActualUsage(sql, ownerId, call, usage);
+      if (attempt.budget.aiFirst) await settleRoleReceipt(sql, attempt, payload, callId, usage);
+      else await recordActualUsage(sql, ownerId, call, usage);
+    });
+  }
+  async retainUnaccountedResponse(token:LeaseToken,callId:string,response:UnaccountedRoleResponse):Promise<void>{
+    await this.db.coordinated(token.ownerId,async sql=>{const {attempt,payload}=await loadAttempt(sql,token.ownerId,token.attemptId);
+      // Older admitted v2 profiles retain their existing receipt meaning.
+      if(boundRolePolicy(attempt,payload).journeyVersion!==1)return;
+      await retainUnaccountedRoleResponse(sql,attempt,callId,token.fence,response);
     });
   }
   async closeProviderCall(token: LeaseToken, callId: string, result: { finishReason?: "STOP" | "MAX_TOKENS" | "OTHER"; errorCode?: string; accepted?: boolean }): Promise<void> {
     await this.db.coordinated(token.ownerId, async sql => {
       const { attempt, payload } = await loadAttempt(sql, token.ownerId, token.attemptId);
       const now = await assertLease(sql, attempt, token, !result.accepted);
+      if (attempt.budget.aiFirst) await sql.query("SELECT set_config('sylf.planner_role_fence',$1,true)", [String(token.fence)]);
       if (!result.accepted && attempt.budget.executionDeadlineAt && Date.parse(attempt.budget.executionDeadlineAt) <= now.getTime()) {
         const stopped = stopAccounting(attempt, payload);
         await persistAttempt(sql, attempt, { ...attempt, state: "FAILED", lease: null, budget: stopped.budget,
@@ -356,7 +458,7 @@ export class AttemptService {
       }
       const calls = structuredClone(payload.calls ?? []); const call = calls.find(c => c.callId === callId);
       const metadata = payload.providerCalls?.[callId];
-      if (!call || !metadata || call.fence !== token.fence) reject("LEASE_EXPIRED", "Provider result belongs to another lease.");
+      if (!call || !metadata || call.fence !== token.fence && !(attempt.budget.aiFirst && call.state === "SETTLED")) reject("LEASE_EXPIRED", "Provider result belongs to another lease.");
       const budget = structuredClone(attempt.budget);
       if (call.state === "RESERVED") {
         budget.reserved.modelCalls--; budget.reserved.inputTokens -= call.reservedInputTokens; budget.reserved.outputTokens -= call.reservedOutputTokens;
@@ -367,19 +469,60 @@ export class AttemptService {
         if (metadata.purpose === "REVIEW") providerGuard.reviewCompleted = true;
         if (metadata.purpose === "VERIFICATION") delete providerGuard.verificationReserve;
       }
+      if (attempt.budget.aiFirst) await sql.query('UPDATE "AiUsageLog" SET reservation=jsonb_set(reservation,\'{accepted}\',$2::jsonb) WHERE "requestId"=$1', [callId, JSON.stringify(result.accepted === true && result.finishReason === "STOP" && call.state === "SETTLED")]);
       await persistAttempt(sql, attempt, { ...attempt, budget }, { ...payload, calls, providerGuard,
         providerCalls: { ...payload.providerCalls, [callId]: { ...metadata, completedAt: metadata.completedAt ?? now.toISOString(), ...(result.finishReason ? { finishReason: result.finishReason } : {}),
           ...(result.errorCode ? { errorCode: result.errorCode.slice(0,80) } : {}) } } });
     });
   }
   async providerWindow(token: LeaseToken, purpose: ProviderPolicy["purpose"]) {
-    return this.mutate(token, async (_sql, attempt, payload, now) => ({ now: now.getTime(), deadline: Math.min(Date.parse(attempt.budget.executionDeadlineAt!),
-      ["RESEARCH", "OCR"].includes(purpose) && payload.providerGuard?.researchDeadlineAt ? Date.parse(payload.providerGuard.researchDeadlineAt) : Infinity) }));
+    return this.db.observed(token.ownerId, async sql => {
+      const { attempt, payload } = await loadAttempt(sql, token.ownerId, token.attemptId, false);
+      const now = await assertLease(sql, attempt, token, false, false);
+      return { now: now.getTime(), deadline: Math.min(Date.parse(attempt.budget.executionDeadlineAt!),
+        ["RESEARCH", "OCR"].includes(purpose) && payload.providerGuard?.researchDeadlineAt ? Date.parse(payload.providerGuard.researchDeadlineAt) : Infinity) };
+    });
+  }
+  async rolePolicy(token: LeaseToken, role: PlannerRole) {
+    return this.mutate(token, async (sql, attempt, payload) => {
+      if (await loadCompilerVersion(sql, attempt.attemptId) !== 2) reject("INTENT_CONFLICT", "Role calls require compiler v2 admission.");
+      const policy = boundRolePolicy(attempt, payload);
+      return { ...policy.roles[role], policyDigest: attempt.budget.aiFirst!.policyDigest };
+    });
+  }
+  async reserveRoleCall(token: LeaseToken, input: { provider: string; model: string; inputTokens: number; outputTokens: number; roleCall: RoleCall }) {
+    return this.mutate(token, async (sql, attempt, payload, now) => {
+      if (await loadCompilerVersion(sql, attempt.attemptId) !== 2) reject("INTENT_CONFLICT", "Role calls require compiler v2 admission.");
+      const callId = randomUUID(), next = await reserveRoleReceipt(sql, attempt, payload, now, { ...input, callId });
+      await persistAttempt(sql, attempt, attempt, next); return callId;
+    });
+  }
+  async recoverRoleCall(token: LeaseToken, roleCall: RoleCall) {
+    return this.mutate(token, (sql, attempt, payload) => recoverRoleReceipt(sql, attempt, payload, roleCall));
+  }
+  async resources(ownerId: number, attemptId: string) {
+    return this.db.coordinated(ownerId, async sql => {
+      const { attempt, payload } = await loadAttempt(sql, ownerId, attemptId);
+      if (!attempt.budget.executionDeadlineAt) reject("WORKER_UNAVAILABLE", "The resource root has not started processing.");
+      const { snapshot, policy } = await projectRoleResources(sql, attempt, payload); return { snapshot, policy };
+    });
   }
   /** Charge each search/fetch hop and extraction before work; failures and lease
    * takeover never refund or reset root research counters. */
   async consumeResearch(token: LeaseToken, delta: Partial<Pick<RuntimeBudgetV2["consumed"], "researchQueries"|"fetchAttempts"|"selectedSourceCharacters"|"extractedPages"|"ocrPages"|"followUps">>) {
     return this.mutate(token, async (sql, attempt, payload, now) => {
+      if (attempt.budget.aiFirst) {
+        const limits = boundRolePolicy(attempt,payload).researchTools;
+        if (!attempt.acceptedRequest.researchRequested || !limits) reject("QUALITY_INCOMPLETE", "This resource policy does not authorize external research tools.", "RESEARCH");
+        const budget = structuredClone(attempt.budget);
+        for (const [key,amount] of Object.entries(delta)) {
+          if (!(key in limits) || !Number.isSafeInteger(amount) || amount < 0) reject("INVALID_OUTPUT","Invalid research charge.","RESEARCH");
+          const field = key as keyof typeof limits;
+          if (budget.consumed[field]+amount>limits[field]) reject("BUDGET_EXHAUSTED","The admitted research tool allowance is exhausted.","RESEARCH");
+          budget.consumed[field]+=amount;
+        }
+        await persistAttempt(sql,attempt,{...attempt,budget},payload);return budget;
+      }
       if (attempt.budget.profile !== "RESEARCH" || !payload.providerGuard?.researchDeadlineAt || Date.parse(payload.providerGuard.researchDeadlineAt) <= now.getTime()) reject("BUDGET_EXHAUSTED","Research processing is not authorized or its window expired.","RESEARCH");
       const allowed = ["researchQueries","fetchAttempts","selectedSourceCharacters","extractedPages","ocrPages","followUps"];
       const budget = structuredClone(attempt.budget);
@@ -393,6 +536,7 @@ export class AttemptService {
   }
   async startResearchWindow(token: LeaseToken) {
     return this.mutate(token, async (sql, attempt, payload, now) => {
+      if (attempt.budget.aiFirst) reject("QUALITY_INCOMPLETE", "Compiler v2 research tool admission requires Step 3 integration.", "RESEARCH");
       if (attempt.budget.profile !== "RESEARCH") reject("BUDGET_EXHAUSTED", "Research requires an explicit research profile escalation.", "RESEARCH");
       const providerGuard = { ...payload.providerGuard, researchDeadlineAt: payload.providerGuard?.researchDeadlineAt ??
         new Date(Math.min(Date.parse(attempt.budget.executionDeadlineAt!), now.getTime() + 120000)).toISOString() };

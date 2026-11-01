@@ -1,0 +1,112 @@
+{
+  "status": "PHASE_B_STEP_1_COMPLETE",
+  "verifiedAt": "2026-10-25T17:44:53.425716+00:00",
+  "node": "24.21.0",
+  "postgres": {
+    "command": "node scripts/test/test-planner-ai-first-foundation.mjs --native-bin /absolute/postgresql/bin --evidence-dir documentation/planner/reports/2026-10-25-ai-first-phase-b-step1/evidence/final-postgres",
+    "v2Passed": 228,
+    "legacyPassed": 225,
+    "totalPassed": 453,
+    "failed": 0,
+    "requiredSkipped": 0,
+    "optionalPaidExperimentExcluded": 1,
+    "sourceDrift": [],
+    "evidence": "final-postgres/postgres-harness-run.json"
+  },
+  "paidProviderCalls": 0,
+  "hostedChanges": 0,
+  "unit": {
+    "command": "npx vitest run __tests__/planner-v2 --reporter=json",
+    "files": 30,
+    "passed": 382,
+    "failed": 0,
+    "skipped": 0,
+    "evidence": "unit-results.json"
+  },
+  "retainedFailures": {
+    "resolved": 32,
+    "productionRegressionsFound": 0,
+    "fixtureOrExpectationCorrections": 32,
+    "evidence": "regression-resolution.json"
+  },
+  "newCoverage": {
+    "unitTests": 6,
+    "postgresTests": 10,
+    "adaptedFoundationPostgresTests": 9,
+    "areas": [
+      "immutable admission/replay pin",
+      "old-worker claim rejection",
+      "v1 checkpoint/execution compatibility",
+      "v2 dispatch without providers",
+      "versioned role admission/publication barriers",
+      "owned exact historical strategy/translation/review",
+      "pre-V2 snapshot classification",
+      "takeover/cancellation/fence/deadline retention",
+      "legacy atomic apply/replay and protected execution",
+      "negative exam deadline"
+    ]
+  },
+  "checks": [
+    {
+      "command": "npx prisma generate",
+      "status": "PASSED",
+      "evidence": "prisma-generate.log"
+    },
+    {
+      "command": "npx prisma validate",
+      "status": "PASSED",
+      "evidence": "prisma-validate.log"
+    },
+    {
+      "command": "npx tsc --noEmit",
+      "status": "PASSED",
+      "evidence": "typecheck.log"
+    },
+    {
+      "command": "npx eslint <changed TypeScript and runner files>",
+      "status": "PASSED",
+      "errors": 0,
+      "warnings": 0,
+      "evidence": "lint.log"
+    },
+    {
+      "command": "npm run planner:worker:build",
+      "status": "PASSED",
+      "evidence": "worker-build.log"
+    },
+    {
+      "command": "credential-free ordinary Node imports of seven compiled owners",
+      "status": "PASSED",
+      "evidence": "node-imports.json"
+    },
+    {
+      "command": "NODE_OPTIONS=--max-old-space-size=6144 npx next build --webpack",
+      "status": "PASSED",
+      "evidence": "web-build.log"
+    },
+    {
+      "command": "git diff --check on changed files; local documentation link validation",
+      "status": "PASSED"
+    },
+    {
+      "command": "mobile build",
+      "status": "NOT_REQUIRED",
+      "reason": "Backend-only changes; shared client and existing API wire contracts unchanged."
+    }
+  ],
+  "activation": {
+    "publicAdmission": "compiler v1 unchanged",
+    "compilerV2": "trusted headless opt-in; dispatch terminates QUALITY_INCOMPLETE before role calls/publication",
+    "v2RoleMeter": "BLOCKED_UNTIL_STEP_2",
+    "v2Continuation": "BLOCKED_UNTIL_AGGREGATE_ACCOUNTING",
+    "v2PublicationAndApply": "BLOCKED_UNTIL_FULL_LIVE_REVALIDATION",
+    "migration": "PREPARED_NOT_DEPLOYED",
+    "schemaBuildVersion": 40
+  },
+  "remainingBlockers": [],
+  "preExistingNonblockingDiagnostics": [
+    "Vite warns about ESM configuration loaded as CommonJS.",
+    "pg warns about overlapping client.query calls in an existing regression path."
+  ],
+  "nextStep": "Phase B Step 2: connect versioned role resource policies and aggregate continuation accounting to the existing meter/financial receipts."
+}

@@ -10,17 +10,9 @@ const object = z.record(z.string(), z.unknown());
 const str = (v: unknown, fallback = "") =>
   typeof v === "string" ? v : fallback;
 const obj = (v: unknown) => object.parse(v ?? {});
-export interface ProviderEvent {
-  remoteId: string;
-  etag: string;
-  deleted?: boolean;
-  data?: EventInput;
-  seriesId?: string;
-  originalStart?: string;
-  recurring?: boolean;
-  busy?: boolean;
-  meeting?: boolean;
-}
+export type { ProviderEvent } from "../projection";
+import type { ProviderEvent } from "../projection";
+
 export interface ProviderCalendar {
   remoteId: string;
   name: string;

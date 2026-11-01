@@ -1,3 +1,6 @@
+// Derived client mapping only. SQL migrations retain policies, triggers, checks,
+// partial/expression indexes and additional composite Planner ownership FKs.
+// Do not use db push or apply a Prisma-generated schema diff.
 generator client {
   provider = "prisma-client-js"
 }
@@ -257,6 +260,7 @@ model User {
   @@index([selectedFocusBackgroundId])
   @@index([selectedCustomBackgroundId])
   @@index([focusBackgroundSource])
+  @@index([isAdmin])
 }
 
 model UserStats {
@@ -285,10 +289,10 @@ model StatInvestLedger {
   userId         Int
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   statKey        String // endurance | tenacity | velocity | discipline | synthesis
-  amount         Int // points granted (+5)
+  amount         Int      @default(0) // points granted (+5)
   currencyUsed   String // "sp" | "sylph"
-  cost           Int // units spent
-  statValueAfter Int // stat value after this invest
+  cost           Int      @default(0) // units spent
+  statValueAfter Int      @default(0)
   createdAt      DateTime @default(now())
 
   @@index([userId, createdAt(sort: Desc)])
@@ -469,6 +473,7 @@ model PlannerRevision {
   requestedIntentVersionId String?                @db.Uuid
   resolvedIntentVersionId  String?                @db.Uuid
   v2Artifact               Json?
+  intelligenceBundle       Json?
   attempt                  PlannerAttempt?        @relation(fields: [attemptId], references: [id], onDelete: NoAction)
   inputSnapshot            Json
   availabilitySnapshot     Json
@@ -594,7 +599,7 @@ model PlannerFrictionEvent {
   revision   PlannerRevision? @relation(fields: [revisionId], references: [id], onDelete: SetNull)
   user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, planId, revisionId, itemKey, reasonCode])
+  @@unique([userId, planId, revisionId, itemKey, reasonCode], map: "PlannerFrictionEvent_userId_planId_revisionId_itemKey_reasonCod")
   @@index([planId])
   @@index([userId, createdAt])
 }
@@ -661,8 +666,8 @@ model TimerSessionStart {
   clientKey   String
   requestHash String
   sessionId   Int
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  session     StudySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  session     StudySession @relation(fields: [sessionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   createdAt   DateTime     @default(now())
 
   @@id([userId, clientKey])
@@ -805,7 +810,7 @@ model FocusParty {
   leaderId    Int
   leader      User      @relation("partyLeader", fields: [leaderId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  updatedAt   DateTime           @default(now()) @updatedAt
   disbandedAt DateTime?
 
   members  FocusPartyMember[]
@@ -826,7 +831,7 @@ model FocusPartyMember {
 
   @@unique([partyId, userId])
   @@index([userId])
-  @@index([partyId, joinedAt(sort: Asc)])
+  @@index([partyId, joinedAt], map: "FocusPartyMember_party_joined_idx")
 }
 
 model FocusSession {
@@ -838,7 +843,7 @@ model FocusSession {
 
   members FocusSessionMember[]
 
-  @@index([partyId, startedAt(sort: Desc)])
+  @@index([partyId, startedAt(sort: Desc)], map: "FocusSession_party_started_idx")
 }
 
 model FocusSessionMember {
@@ -857,7 +862,7 @@ model FocusSessionMember {
 
   @@unique([sessionId, userId])
   @@index([userId])
-  @@index([sessionId, timerState])
+  @@index([sessionId, timerState], map: "FocusSessionMember_session_state_idx")
 }
 
 // ─── Economy Models ──────────────────────────────────────────
@@ -1204,6 +1209,13 @@ model AuthSession {
   lastActiveAt DateTime  @default(now())
   createdAt    DateTime  @default(now())
   expiresAt    DateTime?
+  // ADR 0009. NULL `kind` is a browser session from before native sign-in. Allowed values live in a CHECK constraint: BROWSER, NATIVE.
+  kind                String?
+  refreshHash         String?   @unique
+  previousRefreshHash String?
+  rotatedAt           DateTime?
+  clientName          String?
+  tokenVersion        Int?
 
   @@index([userId, lastActiveAt(sort: Desc)])
 }
@@ -1258,7 +1270,7 @@ model FocusBackgroundCategory {
   sortOrder   Int               @default(0)
   isActive    Boolean           @default(true)
   createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  updatedAt   DateTime          @default(now()) @updatedAt
   backgrounds FocusBackground[]
 
   @@index([sortOrder])
@@ -1275,11 +1287,11 @@ model FocusBackground {
   aspectRatio       Float
   focalX            Float?                  @default(0.5)
   focalY            Float?                  @default(0.5)
-  timerPosition     String?                 @default("auto")
+  timerPosition     String                  @default("auto")
   sortOrder         Int                     @default(0)
   isActive          Boolean                 @default(true)
   createdAt         DateTime                @default(now())
-  updatedAt         DateTime                @updatedAt
+  updatedAt         DateTime                @default(now()) @updatedAt
   usersWithSelected User[]
 
   @@index([categoryId])
@@ -1333,6 +1345,7 @@ model PlannerIntentVersion {
 
 model PlannerAttempt {
   id                  String            @id @db.Uuid
+  compilerVersion     Int               @default(1)
   userId              Int
   kind                String
   state               String
@@ -1344,6 +1357,7 @@ model PlannerAttempt {
   executionDeadlineAt DateTime?
   artifact            Json
   payload             Json?
+  intelligenceArtifacts Json?
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
   user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -1422,10 +1436,12 @@ model CalendarPreference {
   revision Int @default(1)
 }
 
+// Stored generated columns are derived from document by SQL. Prisma introspection
+// reports them nullable; callers must never write these projection fields.
 model CalendarNote {
-  previewText String @default(dbgenerated())
-  hasInk Boolean @default(dbgenerated())
-  documentMode String @default(dbgenerated())
+  previewText  String?                   @default(dbgenerated("\"left\"(COALESCE((document ->> 'text'::text), ''::text), 240)"))
+  hasInk       Boolean?                  @default(dbgenerated("\nCASE\n    WHEN (jsonb_typeof(((document -> 'ink'::text) -> 'strokes'::text)) = 'array'::text) THEN (jsonb_array_length(((document -> 'ink'::text) -> 'strokes'::text)) > 0)\n    ELSE false\nEND"))
+  documentMode String?                   @default(dbgenerated("COALESCE((document ->> 'mode'::text), 'note'::text)"))
   searchVector Unsupported("tsvector")?
   recognitions CalendarNoteRecognition[]
   id        String   @id
@@ -1441,6 +1457,7 @@ model CalendarNote {
   updatedAt DateTime @updatedAt
 
   @@index([userId, dateKey, createdAt])
+  @@index([searchVector], type: Gin)
 }
 
 // External credentials and projections are separate from user-owned Sylf events.
@@ -1593,7 +1610,7 @@ model CalendarNoteRecognition {
 model NotesConnection {
   id String @id
   userId Int @unique
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   libraryId String @unique
   accountId String
   rootId String?
@@ -1611,7 +1628,7 @@ model NotesConnection {
 model NotesOAuthState {
   id String @id
   userId Int
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   sessionHash String
   verifier String
   expiresAt DateTime

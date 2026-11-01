@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 import { getCachedGlobalRankings } from "@/lib/cache-service";
+import { isVisible } from "@/lib/privacy";
+import { Relationship } from "@/lib/privacy-types";
 
 /**
  * GET /api/user/rankings
@@ -22,11 +24,30 @@ export async function GET(req: NextRequest) {
     // Retrieve cached global leaderboard data
     const cachedUsers = await getCachedGlobalRankings();
 
-    // Map users to leaderboard entries
-    const leaderboard = cachedUsers.map((u) => ({
-      ...u,
-      isCurrentUser: u.id === userId,
-    }));
+    // Get current user's friends
+    const friendships = await prisma.friendship.findMany({
+      where: { OR: [{ userId }, { friendId: userId }] },
+      select: { userId: true, friendId: true },
+    });
+
+    const friendIds = new Set<number>();
+    friendIds.add(userId); // Include self in friend rankings
+    for (const f of friendships) {
+      friendIds.add(f.userId === userId ? f.friendId : f.userId);
+    }
+
+    // The board shows rank and hours together, so a person is on it only if this viewer
+    // may see both. Everyone keeps their own place; the settings travel with the cached entry.
+    const leaderboard = cachedUsers
+      .filter(({ id, privacy }) => {
+        if (id === userId) return true;
+        const relationship = friendIds.has(id) ? Relationship.FRIEND : Relationship.PUBLIC;
+        return [privacy.profileVisibility, privacy.showRank, privacy.showStudyHours].every((setting) => isVisible(setting, relationship));
+      })
+      .map(({ id, username, name, hunterRank, level, currentXP, totalStudyMinutes, studyHours, streakDays, questsCompleted }) => ({
+        id, username, name, hunterRank, level, currentXP, totalStudyMinutes, studyHours, streakDays, questsCompleted,
+        isCurrentUser: id === userId,
+      }));
 
     // Sort
     const sortFn = (a: (typeof leaderboard)[0], b: (typeof leaderboard)[0]) => {
@@ -50,18 +71,6 @@ export async function GET(req: NextRequest) {
       ...entry,
       rank: idx + 1,
     }));
-
-    // Get current user's friends
-    const friendships = await prisma.friendship.findMany({
-      where: { OR: [{ userId }, { friendId: userId }] },
-      select: { userId: true, friendId: true },
-    });
-
-    const friendIds = new Set<number>();
-    friendIds.add(userId); // Include self in friend rankings
-    for (const f of friendships) {
-      friendIds.add(f.userId === userId ? f.friendId : f.userId);
-    }
 
     const friendRankings = globalRankings
       .filter((e) => friendIds.has(e.id))

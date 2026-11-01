@@ -45,6 +45,7 @@ export class PlannerClientError<F = unknown> extends Error {
  * silently disabled feature.
  */
 export interface PlannerCapabilities {
+  studentWorkspace?: { enabled: boolean };
   today: string;
   timezone: string;
   restDays: number[];

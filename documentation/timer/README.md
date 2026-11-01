@@ -15,6 +15,8 @@ Current owners and guarantees for study timers and Focus Party timers. Source, t
 | Atomic rewards and party accounting | [`20261014000000_timer_durable_completion`](../../prisma/migrations/20261014000000_timer_durable_completion/migration.sql), [`weekly settlement`](../../lib/planner/v2/server/settlement.ts) |
 | Party authoritative state and local exit | [`FocusPartyContext`](../../app/social/components/focus-party/FocusPartyContext.tsx), [`useFocusPartyRealtime`](../../app/hooks/useFocusPartyRealtime.ts), [`party service`](../../lib/focus-party-service.ts) |
 
+**One session credits at most 12 hours** (`MAX_SESSION_FOCUS_SECONDS` in `SessionService`, both protocols), matching the Focus Party interval clamp. A start time is a client claim, and a delayed offline session must keep its real date, so age is not limited and length is. Time is otherwise bounded by the wall clock and by never overlapping credited work.
+
 ## End boundary
 
 End and Complete first catch up expired phases and freeze the snapshot at the click time. The client synchronously writes the account-scoped terminal intent into localStorage, clears the running cache, releases leadership, announces the local summary and leaves Focus. It does not await creation, a request, a tab lock, settlement or statistics refresh. If offline routing is unavailable, Focus renders an ended screen immediately and navigates on reconnect. A failed local write freezes the timer and leaves recovery state intact so the student can free storage and retry.
@@ -32,6 +34,8 @@ Requests bound both connection and body reads to 15 seconds. Network errors, los
 Storage is device/origin scoped. Closing the app pauses delivery until it is opened and authenticated again. Signing out never converts saved timer data into another user's session. Clearing browser data, uninstalling the app or device loss destroys data that has not reached the server; there is no remote copy of a fully offline intent. Invalid/removed resources or conflicting active work produce a visible error and retain the journal for resolution.
 
 The shell shows a pending-delivery notice once per failure episode. It disappears after six seconds, can be dismissed immediately, and clears when accepted. Repeated retry ticks do not reopen it or extend its lifetime. Hiding the notice never stops delivery or removes saved operations. User-facing wording describes saving to the account rather than requiring students to understand synchronization.
+
+Sylf Native delivers its sessions through this same journal, `TimerSync` unchanged (`createSessionBridge`, [ADR 0012](../native/decisions/0012-connected-app.md)), over a Storage-shaped adapter in one preference value (`createJournalStorage` in `@sylf/backend`). Only the server's answer makes a native session saved.
 
 ## Server invariants
 

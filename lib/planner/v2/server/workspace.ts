@@ -3,7 +3,8 @@ import { PlannerWorkspaceV2Schema, PlanChangeSetV2Schema, PlannerAttemptV2Schema
 import { PlannerDatabase, DurablePlannerError, rows, reject } from "./database";
 import { ownedPlan, loadIntent, type PlanRow } from "./intents";
 import { loadAttempt, assertAttemptCurrent } from "./attempts";
-import { loadRevision } from "./revisions";
+import { loadRevision, loadRevisionDocument } from "./revisions";
+import { loadAttemptArtifacts } from "./foundation";
 import { loadExecutionContext, liveExecution, verifyContextCorrespondence, verifyPlacement, type ExecutionContext } from "./context";
 import { verifyExecutionGraph } from "./execution-validation";
 
@@ -27,9 +28,27 @@ function liveSummary(active: NonNullable<PlannerWorkspaceV2["active"]>, planId: 
  * mutation authority. Apply and execution always recheck live facts. */
 export class WorkspaceService {
   constructor(readonly db: PlannerDatabase) {}
+  /** Headless owned inspection without changing the existing workspace wire
+   * contract or granting confirmation authority from a historical read. */
+  async readIntelligence(ownerId: number, planId: string, revisionId?: string) {
+    return this.db.observed(ownerId, async sql => {
+      const plan = await ownedPlan(sql, ownerId, planId, false);
+      const selected = revisionId ?? plan.latestDraftRevisionId ?? plan.activeRevisionId;
+      if (selected) {
+        const document = await loadRevisionDocument(sql, ownerId, selected);
+        if (document.revision.planId !== planId) reject("REFERENCE_NOT_OWNED", "This revision does not belong to the selected plan.");
+        return { schemaVersion: 1 as const, kind: "REVISION" as const, planId, document };
+      }
+      const attempt = (await rows<{ id: string }>(sql, `SELECT id FROM "PlannerAttempt" WHERE "userId"=$1
+        AND EXISTS (SELECT 1 FROM jsonb_array_elements(artifact->'targets') t WHERE t->>'planId'=$2)
+        ORDER BY "createdAt" DESC,id DESC LIMIT 1`, [ownerId, planId]))[0];
+      return attempt ? { schemaVersion: 1 as const, kind: "ATTEMPT" as const, planId, attemptId: attempt.id, document: await loadAttemptArtifacts(sql, ownerId, attempt.id) } :
+        { schemaVersion: 1 as const, kind: "EMPTY" as const, planId };
+    });
+  }
   async read(ownerId: number, planId: string): Promise<PlannerWorkspaceV2> {
-    return this.db.coordinated(ownerId, async sql => {
-      const plan = await ownedPlan(sql, ownerId, planId);
+    return this.db.observed(ownerId, async sql => {
+      const plan = await ownedPlan(sql, ownerId, planId, false);
       if (plan.contractVersion !== 2 || !plan.workingIntentVersionId) reject("INTENT_CONFLICT", "This legacy plan needs reviewed adoption before opening its V2 workspace.");
       const intent = await loadIntent(sql, ownerId, plan.workingIntentVersionId);
       let context: ExecutionContext | null = null;
@@ -75,16 +94,16 @@ export class WorkspaceService {
       let candidate: PlannerWorkspaceV2["candidate"] = null;
       if (plan.latestDraftRevisionId) {
         const revision = await loadRevision(sql, ownerId, plan.latestDraftRevisionId);
-        const result = await loadAttempt(sql, ownerId, revision.attemptId);
+        const result = await loadAttempt(sql, ownerId, revision.attemptId, false);
         const changeSet = PlanChangeSetV2Schema.parse(result.payload.changeSet);
         const target = changeSet.targets.find(target => target.planId === planId)!;
         const reasons: string[] = [];
         try {
           if (result.attempt.applyReceipt) reject("STALE_CONTEXT", "This proposal has already been confirmed.");
-          await assertAttemptCurrent(sql, result.attempt);
+          await assertAttemptCurrent(sql, result.attempt, false);
           const plans: PlanRow[] = []; const revisions: PlannerRevisionV2[] = []; const targets = [];
           for (const selected of [...changeSet.targets].sort((a, b) => a.planId.localeCompare(b.planId))) {
-            const selectedPlan = await ownedPlan(sql, ownerId, selected.planId);
+            const selectedPlan = await ownedPlan(sql, ownerId, selected.planId, false);
             if (selectedPlan.latestDraftRevisionId !== selected.revisionId) reject("STALE_CONTEXT", "Another selected plan has a newer candidate.");
             plans.push(selectedPlan); revisions.push(await loadRevision(sql, ownerId, selected.revisionId));
           }

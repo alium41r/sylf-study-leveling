@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { ExecutionTaskSpecV2Schema, PlannerRevisionV2Schema, PlanChangeSetV2Schema,
   QualityReportV2Schema, compareExecutionSpecs, type ExecutionTaskSpecV2,
   type ContextDependenciesV2, type PlannerRevisionV2, type QualityReportV2 } from "../contracts";
+import type { PlanningSupport } from "../intelligence/schemas/planning";
 import type { BlueprintSnapshot } from "../intelligence/allocator";
 import type { CompilerCheckpoint } from "../intelligence/schemas/checkpoint";
 import { CompilerIdentitiesSchema, type CompilerIdentity } from "../intelligence/schemas/quality";
@@ -96,6 +97,17 @@ export function sealCompilerCandidate(checkpoint: CompilerCheckpoint,
   const p = checkpoint.payload;
   if (!("quality" in p) || !["REVIEW", "VERIFICATION"].includes(p.stage) || p.allocation.report.status !== "FEASIBLE" || p.quality.some(q => q.report.status !== "PASSED"))
     reject("QUALITY_INCOMPLETE", "Only independently cleared, fully allocated education can seal.", "PERSISTENCE");
+  return sealAllocatedExecution(p,checkpoint.binding,targets,live,baseline,identities,sources,now);
+}
+
+/** Common canonical compilation/diff projection. Publication remains the
+ * independent authority; callers cannot manufacture approval through this helper. */
+export function sealAllocatedExecution(p:Pick<Extract<CompilerCheckpoint["payload"],{stage:"REVIEW"}>,"blueprints"|"allocation"|"envelope"|"planning"|"quality">,
+  binding:Pick<CompilerCheckpoint["binding"],"ownerId"|"attemptId"|"requestHash">,
+  targets:readonly (CompilationTarget & {requestedIntentVersionId:string;resolvedIntentVersionId:string;baseActiveRevisionId:string|null;planningVersion:number;resolvedPlanningVersion:number})[],
+  live:readonly ExecutionTaskSpecV2[],baseline:readonly ExecutionTaskSpecV2[],identities:readonly CompilerIdentity[],
+  sources:ReadonlyMap<string,readonly {sourceId:string;contentHash:string}[]>,now:string){
+  if(p.allocation.report.status!=="FEASIBLE"||p.quality.some(q=>q.report.status!=="PASSED"))reject("QUALITY_INCOMPLETE","Independently cleared feasible education is required before sealing.","PERSISTENCE");
   const compiled = compileExecution(p, targets, live, identities);
   const revisions: PlannerRevisionV2[] = compiled.map(plan => {
     const target = targets.find(t => t.planRef === plan.planRef)!;
@@ -109,11 +121,10 @@ export function sealCompilerCandidate(checkpoint: CompilerCheckpoint,
     // the caller supplies these same versions before the independent review.
     const quality = p.quality.find(q => q.planRef === plan.planRef)!.report;
     const revision = PlannerRevisionV2Schema.parse({ schemaVersion: 2, revisionId: randomUUID(), planId: target.planId,
-      ownerId: checkpoint.binding.ownerId, attemptId: checkpoint.binding.attemptId,
+      ownerId: binding.ownerId, attemptId: binding.attemptId,
       requestedIntentVersionId: target.requestedIntentVersionId, resolvedIntentVersionId: target.resolvedIntentVersionId,
       baseActiveRevisionId: target.baseActiveRevisionId, sealedAt: now, digest: "0".repeat(64), blueprint, executable: plan.specs,
-      context: plan.context, quality, forecast: p.planning?.forecasts.find(f => f.planRef === plan.planRef)?.phases
-        .filter(f => f.effort && f.status === "PROJECTED").map(f => ({ phaseRef: f.phaseRef, effort: f.effort!, ...(f.likelyFinishDate ? { expectedFinishDate: f.likelyFinishDate } : {}) })) ?? [] });
+      context: plan.context, quality, forecast: compileForecast(p.planning,plan.planRef) });
     revision.digest = revisionDigest(revision); return revision;
   });
   const pointer = (spec: ExecutionTaskSpecV2 | null) => spec ? { specDigest: specDigest(spec), contentDigest: contentDigest(spec), date: spec.placement.date, timezone: spec.placement.timezone, ...spec.effort } : null;
@@ -126,17 +137,23 @@ export function sealCompilerCandidate(checkpoint: CompilerCheckpoint,
     evidenceDigest: hash("joint-quality-evidence", p.quality.map(q => q.report.evidenceDigest)),
     educationalContentDigest: hash("joint-quality-content", p.quality.map(q => q.report.educationalContentDigest)),
     issues: p.quality.flatMap(q => q.report.issues), requiredAcknowledgements: p.quality.flatMap(q => q.report.requiredAcknowledgements) });
-  const days = p.envelope.days.filter(d => !d.excluded);
-  const changeSet = PlanChangeSetV2Schema.parse({ schemaVersion: 2, changeSetId: randomUUID(), attemptId: checkpoint.binding.attemptId,
-    requestDigest: checkpoint.binding.requestHash, targets: targets.map(t => { const r = revisions.find(r => r.planId === t.planId)!; return {
+  const changeSet = PlanChangeSetV2Schema.parse({ schemaVersion: 2, changeSetId: randomUUID(), attemptId: binding.attemptId,
+    requestDigest: binding.requestHash, targets: targets.map(t => { const r = revisions.find(r => r.planId === t.planId)!; return {
       planId: t.planId, requestedIntentVersionId: t.requestedIntentVersionId, resolvedIntentVersionId: t.resolvedIntentVersionId,
       baseActiveRevisionId: t.baseActiveRevisionId, planningVersion: t.planningVersion, resolvedPlanningVersion: t.resolvedPlanningVersion,
       revisionId: r.revisionId, revisionDigest: r.digest }; }), entries, quality, applyReceipt: null,
-    aggregate: { maximumCapacityMinutes: days.reduce((n, d) => n + d.ceilingMinutes, 0),
-      availableForTargetsMinutes: days.reduce((n, d) => n + Math.min(d.ceilingMinutes, d.availableMinutes + d.protectedTargetMinutes), 0),
-      committedTargetMinutes: p.allocation.report.placements.reduce((n, task) => n + (p.envelope.protectedExecution.find(pin => pin.planRef === task.planRef && pin.activityRef === task.activityRef)?.remainingMinutes ?? task.minutes), 0),
-      recommendedEffort: revisions.reduce((sum, r) => ({ lowMinutes: sum.lowMinutes + r.blueprint.strategy.recommendedEffort.lowMinutes,
-        likelyMinutes: sum.likelyMinutes + r.blueprint.strategy.recommendedEffort.likelyMinutes, highMinutes: sum.highMinutes + r.blueprint.strategy.recommendedEffort.highMinutes }), { lowMinutes: 0, likelyMinutes: 0, highMinutes: 0 }),
-      feasible: true, requiresReestimate: false, compromises: p.allocation.report.findings.filter(f => f.consequential).slice(0,20).map(f => f.consequence) } });
+    aggregate: allocationAggregate(p) });
   return { revisions, changeSet };
+}
+
+/** Existing canonical projections shared by both versioned publication paths. */
+export function compileForecast(planning:PlanningSupport|undefined,planRef:string){
+  return planning?.forecasts.find(f=>f.planRef===planRef)?.phases.filter(f=>f.effort&&f.status==="PROJECTED").map(f=>({phaseRef:f.phaseRef,effort:f.effort!,...(f.likelyFinishDate?{expectedFinishDate:f.likelyFinishDate}:{})}))??[];
+}
+export function allocationAggregate(p:Pick<Allocated,"envelope"|"allocation"|"blueprints">){
+  const days=p.envelope.days.filter(d=>!d.excluded);
+  return {maximumCapacityMinutes:days.reduce((n,d)=>n+d.ceilingMinutes,0),availableForTargetsMinutes:days.reduce((n,d)=>n+Math.min(d.ceilingMinutes,d.availableMinutes+d.protectedTargetMinutes),0),
+    committedTargetMinutes:p.allocation.report.placements.reduce((n,task)=>n+(p.envelope.protectedExecution.find(pin=>pin.planRef===task.planRef&&pin.activityRef===task.activityRef)?.remainingMinutes??task.minutes),0),
+    recommendedEffort:p.blueprints.plans.reduce((sum,p)=>({lowMinutes:sum.lowMinutes+p.blueprint.strategy.recommendedEffort.lowMinutes,likelyMinutes:sum.likelyMinutes+p.blueprint.strategy.recommendedEffort.likelyMinutes,highMinutes:sum.highMinutes+p.blueprint.strategy.recommendedEffort.highMinutes}),{lowMinutes:0,likelyMinutes:0,highMinutes:0}),
+    feasible:true,requiresReestimate:false,compromises:p.allocation.report.findings.filter(f=>f.consequential).slice(0,20).map(f=>f.consequence)};
 }

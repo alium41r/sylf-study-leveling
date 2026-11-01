@@ -1,3 +1,4 @@
+import { expireSessionCookie } from "@/lib/auth-session-service";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
@@ -13,12 +14,7 @@ export async function GET(req: NextRequest) {
     const session = await getSession(req);
     if (!session) {
       const res = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      res.cookies.set({
-        name: "hunter_token",
-        value: "",
-        maxAge: 0,
-        path: "/",
-      });
+      expireSessionCookie(res, req);
       return res;
     }
 
@@ -66,17 +62,12 @@ export async function GET(req: NextRequest) {
 
     if (!user) {
       const res = NextResponse.json({ error: "User not found" }, { status: 401 });
-      res.cookies.set({
-        name: "hunter_token",
-        value: "",
-        maxAge: 0,
-        path: "/",
-      });
+      expireSessionCookie(res, req);
       return res;
     }
     
     // Controlled admin bootstrap fallback
-    if (!user.isAdmin && isEmailInAdminBootstrap(user.email)) {
+    if (!user.isAdmin && user.verificationStatus === "VERIFIED" && isEmailInAdminBootstrap(user.email)) {
       await prisma.user.update({
         where: { id: user.id },
         data: { isAdmin: true },

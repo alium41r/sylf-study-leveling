@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { writeFileSync } from "node:fs";
 import { NextRequest } from "next/server";
 import { connect, user } from "./database";
-import { intentFixture } from "../contracts/fixtures";
+import { intentFixture } from "./intent-fixture";
 import { prepareProposal } from "./proposal-fixture";
 import { PlannerDatabase } from "@/lib/planner/v2/server/database";
 import { IntentService } from "@/lib/planner/v2/server/intents";
@@ -38,6 +38,9 @@ import { GET as readCosts } from "@/app/api/ai-costs/route";
 import { GET as readAssistant,POST as assistantAction } from "@/app/api/planner/[id]/assistant/route";
 import { POST as uploadDocument } from "@/app/api/planner/[id]/documents/route";
 import { GET as readOperation } from "@/app/api/planner/[id]/operations/[key]/route";
+import { GenerationService } from "@/lib/planner/v2/server/generation";
+import { offlineResourcePolicy } from "@/lib/planner/v2/intelligence/foundation/role-calls";
+import { hash } from "@/lib/planner/v2/server/database";
 
 let connection: Awaited<ReturnType<typeof connect>>; let db: PlannerDatabase;
 beforeAll(async () => { connection = await connect(); db = new PlannerDatabase(getApplicationPool()); process.env.PLANNER_V2_DURABLE_CORE_ENABLED = "true"; });
@@ -94,10 +97,26 @@ describe("Phase 1 production writer routes on PostgreSQL", () => {
     const response=await readCosts(request(ownerId,"/api/ai-costs",undefined,"GET"));
     expect(response.status).toBe(200);
     const costs=(await response.json()).last7Days;
-    expect(costs).toMatchObject({totalRequests:4,costUsd:0.25,unknownCostRequests:2,costComplete:false});
+    expect(costs).toMatchObject({totalRequests:4,costUsd:null,knownCostUsd:0.25,unknownCostRequests:2,costComplete:false});
     expect(costs.byModel.find((row:{model:string})=>row.model==="verified-zero")).toMatchObject({costUsd:0,unknownCostRequests:0});
-    expect(costs.byModel.find((row:{model:string})=>row.model==="legacy-zero")).toMatchObject({costUsd:0,unknownCostRequests:1});
+    expect(costs.byModel.find((row:{model:string})=>row.model==="legacy-zero")).toMatchObject({costUsd:null,knownCostUsd:0,unknownCostRequests:1});
     expect((await connection.query('SELECT * FROM "AiUsageLog" WHERE "userId"=$1 ORDER BY id',[ownerId])).rows).toEqual(before);
+  });
+  it("counts actual role dispatches while excluding unspent reservations and undispatched cancellation from cost totals", async () => {
+    const ownerId = await user(connection), attempts = new AttemptService(db);
+    const { authorizationDigest: _authorization, ...resources } = offlineResourcePolicy("a".repeat(64), randomUUID()); void _authorization;
+    const admitted = await new GenerationService(db, { compilerVersion: 2, resources }).accept(ownerId, { schemaVersion: 2, requestKey: randomUUID(), text: "Prepare the accepted goal", targets: [{ kind: "NEW", intent: intentFixture() }] });
+    const token = (await attempts.claim(`cost_role_${randomUUID()}`))!; expect(token.attemptId).toBe(admitted.attempt.attemptId);
+    const p = await attempts.rolePolicy(token, "STRATEGIST"), callId = await attempts.reserveRoleCall(token, { provider: "deepseek", model: "deepseek-flash", inputTokens: 100, outputTokens: 100,
+      roleCall: { schemaVersion: 1, key: randomUUID(), role: "STRATEGIST", purpose: "BLUEPRINT", format: "TEXT", effort: p.effort, policyDigest: p.policyDigest, inputDigest: hash("input", []), promptDigest: hash("prompt", []) } });
+    expect((await (await readCosts(request(ownerId, "/api/ai-costs", undefined, "GET"))).json()).last7Days.totalRequests).toBe(0);
+    await attempts.closeProviderCall(token, callId, { errorCode: "CANCELLED" });
+    expect((await (await readCosts(request(ownerId, "/api/ai-costs", undefined, "GET"))).json()).last7Days.totalRequests).toBe(0);
+    const original = (await connection.query('SELECT reservation FROM "AiUsageLog" WHERE "requestId"=$1', [callId])).rows[0].reservation.roleCall;
+    const dispatched = await attempts.reserveRoleCall(token, { provider: "deepseek", model: "deepseek-flash", inputTokens: 100, outputTokens: 100, roleCall: { ...original, key: randomUUID() } });
+    await attempts.dispatchCall(token, dispatched, "PLANNING");
+    expect((await (await readCosts(request(ownerId, "/api/ai-costs", undefined, "GET"))).json()).last7Days).toMatchObject({ totalRequests: 1, unknownCostRequests: 1, costUsd: null });
+    await attempts.cancel(ownerId, admitted.attempt.attemptId);
   });
   it("blocks old-client edits, completion and deletion of adopted work without side effects", async () => {
     const fixture = await proposal(); const params = { params: Promise.resolve({ id: String(fixture.questId) }) };

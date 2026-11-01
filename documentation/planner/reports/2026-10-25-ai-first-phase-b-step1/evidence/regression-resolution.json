@@ -1,0 +1,239 @@
+{
+  "retainedFailures": 32,
+  "resolved": 32,
+  "productionRegressionsFound": 0,
+  "byCause": {
+    "KNOWN_SUBTOTAL_VERSUS_UNKNOWN_TOTAL_EXPECTATION": 1,
+    "EXPIRED_LIFECYCLE_EXAM_FIXTURE": 28,
+    "CAPACITY_FIXTURE_EXAM_AND_SUNDAY_REST_DAY": 1,
+    "OUTDATED_BLOCKING_LOCK_EXPECTATION": 1,
+    "LATE_USAGE_REPLAY_WITH_DIFFERENT_COST": 1
+  },
+  "finalReport": "final-postgres/postgres-phase1-results.json",
+  "cases": [
+    {
+      "name": "Phase 1 production writer routes on PostgreSQL preserves historical zero estimates while reporting their uncertainty separately from verified zero cost",
+      "recordedFailure": "AssertionError: expected { totalRequests: 4, \u2026(16) } to match object { totalRequests: 4, \u2026(3) }",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "KNOWN_SUBTOTAL_VERSUS_UNKNOWN_TOTAL_EXPECTATION",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 production writer routes on PostgreSQL blocks old-client edits, completion and deletion of adopted work without side effects",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 production writer routes on PostgreSQL settles explicit generic Quest completion once across duplicate requests",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 production writer routes on PostgreSQL makes duplicate desired rest-day writes harmless without moving sealed Planner work",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 production writer routes on PostgreSQL rechecks actual calendar work added through the generic Quest route before apply",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 production writer routes on PostgreSQL blocks a reset of linked execution without consuming its security code",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 production writer routes on PostgreSQL returns derived remaining work to the shared Focus client without rewriting the approved timebox",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 production writer routes on PostgreSQL uses fresh coordinated achievement eligibility and credits duplicate claims only once",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 production writer routes on PostgreSQL erases historical party participation and Planner state through the actual account route",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 production writer routes on PostgreSQL keeps owned recovery reads, cancellation and execution protection available when admission is disabled",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 actual durable repositories applies an exact proposal once under concurrent confirmation",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 actual durable repositories rolls back every materialization boundary without a partial receipt",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 actual durable repositories protects zero-second starts, acknowledged pause/resume and receipt replays",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 2 context and metered boundary on genuine PostgreSQL loads 1500 historical rows without losing authoritative history/capacity or overflowing the dependency registry",
+      "recordedFailure": "AssertionError: expected { date: '2026-10-25', \u2026(6) } to match object { otherCommittedMinutes: 20, \u2026(2) }",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "CAPACITY_FIXTURE_EXAM_AND_SUNDAY_REST_DAY",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 2 context and metered boundary on genuine PostgreSQL bounds five reservations waiting on the same owner without exhausting serialization retries",
+      "recordedFailure": "Error: Five independent reservation connections never entered owner-lock wait",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "OUTDATED_BLOCKING_LOCK_EXPECTATION",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 2 context and metered boundary on genuine PostgreSQL transfers actual metered foreground time, quota and review holds exactly once into worker processing",
+      "recordedFailure": "Error: This provider request was already accounted differently.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "LATE_USAGE_REPLAY_WITH_DIFFERENT_COST",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration reviews and atomically applies a joint proposal once",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration retains an unstarted identity across semantic edits and rejects a racing Focus start",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration rolls back both targets of a joint apply at every durable boundary and retries exactly once",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration replans an adopted live baseline repeatedly without reverting edited content or lineage",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration shows live remaining work and keeps active intent separate from a later working edit",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration does not renew timing tolerance through repeated acknowledged pause/resume",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration erases owned durable artifacts through the explicit account cascade while fencing old workers",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration pins an owned cross-plan prerequisite, materializes it once and protects reverse dependencies",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration keeps unchanged Quest identity, content and execution rows byte-for-byte stable",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration withdraws stopped unfinished work into a distinct continuation without duplicating completion rewards",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration applies new cross-plan prerequisites in one joint transaction without requiring pre-existing Quests",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration anchors hard learning intervals to accepted completion date rather than the old calendar slot",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration coordinates direct SQL shop/equipment writers with apply and preserves their economic math",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "Phase 1 correspondence, projection and reviewed migration changes strategy only through a new owned canonical intent and supersedes the old candidate",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "over-count generation and over-byte publication fail explicitly without dropping requested work",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    },
+    {
+      "name": "timer lifecycle on genuine PostgreSQL replays offline V2 pause/resume/end intervals with exact accounting and durable receipts",
+      "recordedFailure": "Error: A reviewed activity conflicts with a date, timezone, rest day or deadline.",
+      "classification": "FIXTURE_OR_EXPECTATION_CORRECTION",
+      "cause": "EXPIRED_LIFECYCLE_EXAM_FIXTURE",
+      "finalStatus": "passed"
+    }
+  ]
+}

@@ -1,0 +1,557 @@
+{
+  "status": "PASSED",
+  "timezone": "Asia/Karachi",
+  "weekdayConvention": "MONDAY_ZERO",
+  "namedWeek": [
+    {
+      "name": "Monday",
+      "ceiling": 120,
+      "windows": [
+        [
+          1020,
+          1140
+        ]
+      ]
+    },
+    {
+      "name": "Tuesday",
+      "ceiling": 120,
+      "windows": [
+        [
+          1020,
+          1140
+        ]
+      ]
+    },
+    {
+      "name": "Wednesday",
+      "ceiling": 120,
+      "windows": [
+        [
+          1020,
+          1140
+        ]
+      ]
+    },
+    {
+      "name": "Thursday",
+      "ceiling": 120,
+      "windows": [
+        [
+          1020,
+          1140
+        ]
+      ]
+    },
+    {
+      "name": "Friday",
+      "ceiling": 0,
+      "windows": []
+    },
+    {
+      "name": "Saturday",
+      "ceiling": 180,
+      "windows": [
+        [
+          540,
+          720
+        ]
+      ]
+    },
+    {
+      "name": "Sunday",
+      "ceiling": 120,
+      "windows": [
+        [
+          600,
+          720
+        ]
+      ]
+    }
+  ],
+  "actualCalendarEvents": [
+    {
+      "date": "2026-10-31",
+      "start": "2026-10-31T05:00:00.000Z",
+      "end": "2026-10-31T06:00:00.000Z"
+    },
+    {
+      "date": "2026-10-31",
+      "start": "2026-10-31T05:30:00.000Z",
+      "end": "2026-10-31T06:30:00.000Z"
+    },
+    {
+      "date": "2026-11-03",
+      "start": "2026-11-03T12:30:00.000Z",
+      "end": "2026-11-03T13:30:00.000Z"
+    },
+    {
+      "date": "2026-11-04",
+      "start": "2026-11-04T13:00:00.000Z",
+      "end": "2026-11-04T14:00:00.000Z"
+    },
+    {
+      "date": "2026-11-07",
+      "start": "2026-11-07T05:00:00.000Z",
+      "end": "2026-11-07T06:00:00.000Z"
+    },
+    {
+      "date": "2026-11-07",
+      "start": "2026-11-07T05:30:00.000Z",
+      "end": "2026-11-07T06:30:00.000Z"
+    },
+    {
+      "date": "2026-11-10",
+      "start": "2026-11-10T12:30:00.000Z",
+      "end": "2026-11-10T13:30:00.000Z"
+    },
+    {
+      "date": "2026-11-11",
+      "start": "2026-11-11T13:00:00.000Z",
+      "end": "2026-11-11T14:00:00.000Z"
+    },
+    {
+      "date": "2026-11-14",
+      "start": "2026-11-14T05:00:00.000Z",
+      "end": "2026-11-14T06:00:00.000Z"
+    },
+    {
+      "date": "2026-11-14",
+      "start": "2026-11-14T05:30:00.000Z",
+      "end": "2026-11-14T06:30:00.000Z"
+    },
+    {
+      "date": "2026-11-17",
+      "start": "2026-11-17T12:30:00.000Z",
+      "end": "2026-11-17T13:30:00.000Z"
+    },
+    {
+      "date": "2026-11-18",
+      "start": "2026-11-18T13:00:00.000Z",
+      "end": "2026-11-18T14:00:00.000Z"
+    },
+    {
+      "date": "2026-11-21",
+      "start": "2026-11-21T05:00:00.000Z",
+      "end": "2026-11-21T06:00:00.000Z"
+    },
+    {
+      "date": "2026-11-21",
+      "start": "2026-11-21T05:30:00.000Z",
+      "end": "2026-11-21T06:30:00.000Z"
+    },
+    {
+      "date": "2026-11-24",
+      "start": "2026-11-24T12:30:00.000Z",
+      "end": "2026-11-24T13:30:00.000Z"
+    },
+    {
+      "date": "2026-11-25",
+      "start": "2026-11-25T13:00:00.000Z",
+      "end": "2026-11-25T14:00:00.000Z"
+    }
+  ],
+  "deadlines": [
+    {
+      "kind": "FIXED",
+      "date": "2026-11-20",
+      "examDayStudyAllowed": false
+    },
+    {
+      "kind": "FIXED",
+      "date": "2026-11-23",
+      "examDayStudyAllowed": false
+    }
+  ],
+  "english": {
+    "date": "2026-11-01",
+    "minutes": 35
+  },
+  "calendarSources": [
+    {
+      "ref": "native",
+      "version": {
+        "shared": [],
+        "events": [
+          {
+            "sharedCalendarId": null,
+            "id": "0add17a5-1545-4ed5-b7bb-e547c63e89ac",
+            "userId": 4,
+            "title": "Family appointment overlapping travel",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-10-31",
+            "endDate": "2026-10-31",
+            "startsAt": "2026-10-31T05:30:00.000Z",
+            "endsAt": "2026-10-31T06:30:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.195Z",
+            "updatedAt": "2026-10-29T01:25:49.195Z"
+          },
+          {
+            "sharedCalendarId": null,
+            "id": "157de71b-7984-408d-9b12-f1e5950ff1d5",
+            "userId": 4,
+            "title": "Family responsibility",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-11-10",
+            "endDate": "2026-11-10",
+            "startsAt": "2026-11-10T12:30:00.000Z",
+            "endsAt": "2026-11-10T13:30:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.197Z",
+            "updatedAt": "2026-10-29T01:25:49.197Z"
+          },
+          {
+            "sharedCalendarId": null,
+            "id": "18b452c6-ce78-4264-92b7-ee03ba15942b",
+            "userId": 4,
+            "title": "Travel",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-11-21",
+            "endDate": "2026-11-21",
+            "startsAt": "2026-11-21T05:00:00.000Z",
+            "endsAt": "2026-11-21T06:00:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.200Z",
+            "updatedAt": "2026-10-29T01:25:49.200Z"
+          },
+          {
+            "sharedCalendarId": null,
+            "id": "194cfcfa-63fc-45d2-b458-7ebccb799431",
+            "userId": 4,
+            "title": "Sports commitment",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-11-11",
+            "endDate": "2026-11-11",
+            "startsAt": "2026-11-11T13:00:00.000Z",
+            "endsAt": "2026-11-11T14:00:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.198Z",
+            "updatedAt": "2026-10-29T01:25:49.198Z"
+          },
+          {
+            "sharedCalendarId": null,
+            "id": "1eafa272-c065-48b3-9cd1-3e95fd30b3fa",
+            "userId": 4,
+            "title": "Family appointment overlapping travel",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-11-21",
+            "endDate": "2026-11-21",
+            "startsAt": "2026-11-21T05:30:00.000Z",
+            "endsAt": "2026-11-21T06:30:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.200Z",
+            "updatedAt": "2026-10-29T01:25:49.200Z"
+          },
+          {
+            "sharedCalendarId": null,
+            "id": "20925bb0-4e1e-45ea-9ba9-a4d361c5c86c",
+            "userId": 4,
+            "title": "Travel",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-10-31",
+            "endDate": "2026-10-31",
+            "startsAt": "2026-10-31T05:00:00.000Z",
+            "endsAt": "2026-10-31T06:00:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.195Z",
+            "updatedAt": "2026-10-29T01:25:49.195Z"
+          },
+          {
+            "sharedCalendarId": null,
+            "id": "333f64f0-a68f-4325-8282-25f1e4100633",
+            "userId": 4,
+            "title": "Travel",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-11-07",
+            "endDate": "2026-11-07",
+            "startsAt": "2026-11-07T05:00:00.000Z",
+            "endsAt": "2026-11-07T06:00:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.197Z",
+            "updatedAt": "2026-10-29T01:25:49.197Z"
+          },
+          {
+            "sharedCalendarId": null,
+            "id": "41d99ded-ebd9-4832-bdfc-a49f08d4db44",
+            "userId": 4,
+            "title": "Sports commitment",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-11-25",
+            "endDate": "2026-11-25",
+            "startsAt": "2026-11-25T13:00:00.000Z",
+            "endsAt": "2026-11-25T14:00:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.201Z",
+            "updatedAt": "2026-10-29T01:25:49.201Z"
+          },
+          {
+            "sharedCalendarId": null,
+            "id": "736997c1-f7e8-4d72-973d-5df6d51621cb",
+            "userId": 4,
+            "title": "Family appointment overlapping travel",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-11-14",
+            "endDate": "2026-11-14",
+            "startsAt": "2026-11-14T05:30:00.000Z",
+            "endsAt": "2026-11-14T06:30:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.199Z",
+            "updatedAt": "2026-10-29T01:25:49.199Z"
+          },
+          {
+            "sharedCalendarId": null,
+            "id": "7ad21c05-0b45-4243-b92e-b798ea061b94",
+            "userId": 4,
+            "title": "Travel",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-11-14",
+            "endDate": "2026-11-14",
+            "startsAt": "2026-11-14T05:00:00.000Z",
+            "endsAt": "2026-11-14T06:00:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.198Z",
+            "updatedAt": "2026-10-29T01:25:49.198Z"
+          },
+          {
+            "sharedCalendarId": null,
+            "id": "b898ea36-13d5-4788-90a6-a79a24d7fb51",
+            "userId": 4,
+            "title": "Family responsibility",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-11-24",
+            "endDate": "2026-11-24",
+            "startsAt": "2026-11-24T12:30:00.000Z",
+            "endsAt": "2026-11-24T13:30:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.201Z",
+            "updatedAt": "2026-10-29T01:25:49.201Z"
+          },
+          {
+            "sharedCalendarId": null,
+            "id": "c8847bc3-f299-4db2-8dc0-c70da0809b9f",
+            "userId": 4,
+            "title": "Sports commitment",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-11-18",
+            "endDate": "2026-11-18",
+            "startsAt": "2026-11-18T13:00:00.000Z",
+            "endsAt": "2026-11-18T14:00:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.199Z",
+            "updatedAt": "2026-10-29T01:25:49.199Z"
+          },
+          {
+            "sharedCalendarId": null,
+            "id": "e711f429-6b0c-49db-b902-e804ea55f488",
+            "userId": 4,
+            "title": "Family responsibility",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-11-17",
+            "endDate": "2026-11-17",
+            "startsAt": "2026-11-17T12:30:00.000Z",
+            "endsAt": "2026-11-17T13:30:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.199Z",
+            "updatedAt": "2026-10-29T01:25:49.199Z"
+          },
+          {
+            "sharedCalendarId": null,
+            "id": "e81835e7-be49-4a60-8246-ba8bd30606f2",
+            "userId": 4,
+            "title": "Family appointment overlapping travel",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-11-07",
+            "endDate": "2026-11-07",
+            "startsAt": "2026-11-07T05:30:00.000Z",
+            "endsAt": "2026-11-07T06:30:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.197Z",
+            "updatedAt": "2026-10-29T01:25:49.197Z"
+          },
+          {
+            "sharedCalendarId": null,
+            "id": "ecec7e44-7f06-4774-961d-d46295175e54",
+            "userId": 4,
+            "title": "Sports commitment",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-11-04",
+            "endDate": "2026-11-04",
+            "startsAt": "2026-11-04T13:00:00.000Z",
+            "endsAt": "2026-11-04T14:00:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.196Z",
+            "updatedAt": "2026-10-29T01:25:49.196Z"
+          },
+          {
+            "sharedCalendarId": null,
+            "id": "f79c6c93-232b-4c28-892c-46bf900d1435",
+            "userId": 4,
+            "title": "Family responsibility",
+            "description": "",
+            "color": "VIOLET",
+            "allDay": false,
+            "startDate": "2026-11-03",
+            "endDate": "2026-11-03",
+            "startsAt": "2026-11-03T12:30:00.000Z",
+            "endsAt": "2026-11-03T13:30:00.000Z",
+            "timezone": "Asia/Karachi",
+            "category": "personal",
+            "recurrence": null,
+            "recurrenceThrough": null,
+            "reminders": [],
+            "lastMutationId": null,
+            "lastMutationHash": null,
+            "revision": 1,
+            "createdAt": "2026-10-29T01:25:49.196Z",
+            "updatedAt": "2026-10-29T01:25:49.196Z"
+          }
+        ],
+        "exceptions": []
+      },
+      "complete": true,
+      "freshUntil": "2026-10-29T01:30:49.207Z"
+    },
+    {
+      "ref": "external_catalog",
+      "version": [],
+      "complete": true,
+      "freshUntil": "2026-10-29T01:30:49.207Z"
+    }
+  ]
+}

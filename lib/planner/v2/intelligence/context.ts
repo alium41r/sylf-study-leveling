@@ -188,11 +188,11 @@ export const projectPlannerInterviewContext = (context: ExecutionContext, target
 /** Use within the existing owner-coordinated transaction. Each target keeps its
  * own evidence/dependency seal; joint requests share complete execution facts. */
 async function loadContextSnapshot(sql: Sql, ownerId: number,
-  requested: readonly { planId: string; planRef: string; intentId: string }[], window: ContextWindow, options: Omit<ContextOptions, "academicSources"> = {}) {
+  requested: readonly { planId: string; planRef: string; intentId: string }[], window: ContextWindow, options: Omit<ContextOptions, "academicSources"> = {}, lockPlans = true) {
   if (!requested.length || requested.length > 2 || new Set(requested.map(t => t.planId)).size !== requested.length)
     reject("INVALID_OUTPUT", "Select one or two distinct context targets.", "PREFLIGHT");
   const plans = [];
-  for (const target of [...requested].sort((a,b) => a.planId.localeCompare(b.planId))) plans.push(await ownedPlan(sql, ownerId, target.planId));
+  for (const target of [...requested].sort((a,b) => a.planId.localeCompare(b.planId))) plans.push(await ownedPlan(sql, ownerId, target.planId, lockPlans));
   const targets: ContextTarget[] = []; const contexts: { planRef: string; context: ExecutionContext }[] = [];
   const academicSources: NonNullable<ContextOptions["academicSources"]> = [];
   for (const target of requested) {
@@ -211,12 +211,12 @@ async function loadContextSnapshot(sql: Sql, ownerId: number,
   }
   return { targets, contexts, academicSources, options };
 }
-export async function loadPlannerModelContext(sql: Sql, ownerId: number, requested: readonly { planId: string; planRef: string; intentId: string }[], window: ContextWindow, options: Omit<ContextOptions,"academicSources"> = {}) {
-  const snapshot = await loadContextSnapshot(sql,ownerId,requested,window,options);
+export async function loadPlannerModelContext(sql: Sql, ownerId: number, requested: readonly { planId: string; planRef: string; intentId: string }[], window: ContextWindow, options: Omit<ContextOptions,"academicSources"> = {}, lockPlans = true) {
+  const snapshot = await loadContextSnapshot(sql,ownerId,requested,window,options,lockPlans);
   return { ...projectPlannerContext(snapshot.contexts[0].context,snapshot.targets,window,{...options,academicSources:snapshot.academicSources}),contexts:snapshot.contexts };
 }
-export async function loadPlannerInterviewContext(sql: Sql, ownerId: number, requested: readonly { planId: string; planRef: string; intentId: string }[], window: ContextWindow, options: Omit<ContextOptions,"academicSources"> = {}) {
-  const snapshot = await loadContextSnapshot(sql,ownerId,requested,window,options);
+export async function loadPlannerInterviewContext(sql: Sql, ownerId: number, requested: readonly { planId: string; planRef: string; intentId: string }[], window: ContextWindow, options: Omit<ContextOptions,"academicSources"> = {}, lockPlans = true) {
+  const snapshot = await loadContextSnapshot(sql,ownerId,requested,window,options,lockPlans);
   return { ...projectPlannerInterviewContext(snapshot.contexts[0].context,snapshot.targets,window,{...options,academicSources:snapshot.academicSources}),contexts:snapshot.contexts };
 }
 

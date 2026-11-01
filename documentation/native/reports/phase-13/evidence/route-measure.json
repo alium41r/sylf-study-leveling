@@ -1,0 +1,16 @@
+{
+ "label": "route-measure",
+ "passed": 1,
+ "failed": 0,
+ "skipped": 0,
+ "collectionFailures": [],
+ "finishedAt": "2026-11-01T02:02:50.546Z",
+ "scope": "Handlers in-process on disposable PostgreSQL 17. Hosted Supabase, Redis and storage were not used.",
+ "cases": [
+  {
+   "file": "__tests__/backend/postgres/measure-routes.postgres.ts",
+   "name": "route cost measures",
+   "status": "passed"
+  }
+ ]
+}

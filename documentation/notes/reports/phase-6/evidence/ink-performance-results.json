@@ -1,0 +1,56 @@
+{
+  "strokes": 5000,
+  "samples": 320000,
+  "encodedBytes": 14335514,
+  "buildMs": 992.9000000059605,
+  "hydrateMs": 589,
+  "coldRenderMs": 166,
+  "pan": {
+    "p50Ms": 1.1000000014901161,
+    "p95Ms": 2.899999998509884,
+    "maxMs": 2.899999998509884
+  },
+  "activeLayer": {
+    "p50Ms": 0,
+    "p95Ms": 0.10000000149011612,
+    "maxMs": 0.5
+  },
+  "active4096Samples": {
+    "p50Ms": 0.5,
+    "p95Ms": 1.1000000014901161,
+    "maxMs": 1.5
+  },
+  "cache": {
+    "cachedPaths": 384,
+    "cachedPoints": 24576,
+    "canvasPixels": 1572864,
+    "rasterPixels": 3520000
+  },
+  "environment": "Headless Chromium desktop; 5,000 strokes / 320,000 original samples; isolated production model/renderer. No physical input-to-display claim.",
+  "encryptedNativeSaves": {
+    "p50Ms": 2.7000000029802322,
+    "p95Ms": 5.200000002980232,
+    "maxMs": 5.200000002980232
+  },
+  "afterMetadataSaves": {
+    "p50Ms": 3,
+    "p95Ms": 4.600000001490116,
+    "maxMs": 4.600000001490116
+  },
+  "storage": {
+    "objects": 73,
+    "objectBytes": 14388360,
+    "revisions": 34,
+    "pending": 33,
+    "stagedAssets": 0
+  },
+  "pageNavigation": {
+    "pages": 300,
+    "measurements": {
+      "p50Ms": 7.600000001490116,
+      "p95Ms": 9.799999997019768,
+      "maxMs": 9.799999997019768
+    },
+    "scope": "300 empty independent page streams; no dense-page or cloud latency extrapolation"
+  }
+}

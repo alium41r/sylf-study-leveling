@@ -1,0 +1,17 @@
+{
+  "results": [
+    "Handwritten notebook creation, exact pressure/tilt/twist input and durable pen/highlighter vectors",
+    "Segment-aware stroke erasing, undo, lasso selection, scaling and keyboard movement",
+    "Authored paper settings and pointer cancellation retain the observed stroke",
+    "Add, duplicate, reorder, retain and restore independent notebook pages",
+    "Real browser offline persistence, fresh-profile cloud reconstruction and concurrent device strokes",
+    "Retained native ink history can be inspected with page previews",
+    "Reload, authored colors across opposite surface polarities and desktop/tablet/phone layouts",
+    "Injected quota pauses writing, blocks logout, exports native ink recovery and retries safely",
+    "Touch/coarse targets, pinch navigation without ink, palm suppression, actual browser mouse input and focus exit",
+    "Acknowledged encrypted handwriting survives a renderer crash"
+  ],
+  "errors": [],
+  "cloudFiles": 5,
+  "input": "Synthetic PointerEvents in actual Chromium; physical stylus not tested"
+}

@@ -1,0 +1,11 @@
+{
+  "lib/notes/library.ts": "7d8459702fed6db78012350e4b6ad5faf767baf2e4b52e4316899d6d99222e64",
+  "lib/notes/sync.ts": "c793eb6be3435e3e3acabec44b63ff33072b760b94e7c8dcf6eca8194ede85e3",
+  "lib/notes/repository.ts": "5f5d97acba1b5732873bc77906424270f0c13d0a07188552769f1b226d3442ff",
+  "lib/notes/server/google-drive.ts": "19f74f247148f67381a4005443b7f6f99eb58962e905983680cd7b8e798ed50f",
+  "lib/notes/server/connections.ts": "ddfd3522610da8c1be88674745de671adfa9615014a270bb4b95d27720cc76c4",
+  "app/api/notes/drive/route.ts": "bf872bdb9d87314fd2a87aaeb6641fd3dd4884f179d907f94f7bd15e90834544",
+  "app/api/notes/unlock/route.ts": "00adbc071aa24048312bae62cff6a227c176f0bfc0c9dacbd741e9fd57b90821",
+  "app/notes/components/NotesScreen.tsx": "4e35e6c814ae1328b1610a8a5894b935c0cc974a8d1ee7b9a48efca0c48b57bc",
+  "app/notes/components/NotesEditor.tsx": "14402dd9f611d1ddc7dad2753af9e3ffc16caf0190ed575c41759bc7c7f60934"
+}

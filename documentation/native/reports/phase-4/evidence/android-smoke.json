@@ -1,0 +1,100 @@
+{
+  "passed": true,
+  "checks": {
+    "foundationReported": true,
+    "nativeRuntime": true,
+    "sharedCodeParity": true,
+    "cryptoAdapter": true
+  },
+  "device": {
+    "model": "SM-X510",
+    "android": "16"
+  },
+  "coldStartMs": {
+    "runs": [
+      263,
+      263,
+      236
+    ],
+    "median": 263
+  },
+  "totalPssMb": 98,
+  "apkMb": 30.2,
+  "foundation": {
+    "readyMs": 41,
+    "capabilities": {
+      "runtime": "native",
+      "os": "android",
+      "osVersion": "36",
+      "formFactor": "tablet",
+      "input": {
+        "stylus": true,
+        "hover": "unknown",
+        "finePointer": false
+      },
+      "display": {
+        "refreshRates": [
+          30,
+          60,
+          90
+        ],
+        "scale": 1.75
+      },
+      "model": "samsung SM-X510"
+    },
+    "scheme": "dark",
+    "spaces": [
+      "home",
+      "workspace",
+      "world"
+    ],
+    "parity": {
+      "passed": true,
+      "results": [
+        {
+          "name": "progression.rewards",
+          "value": "c8ce4fb5",
+          "ok": true
+        },
+        {
+          "name": "appearance.tokens",
+          "value": "8b870931",
+          "ok": true
+        },
+        {
+          "name": "calculator",
+          "value": "7384805d",
+          "ok": true
+        },
+        {
+          "name": "timezone",
+          "value": "true|2026-10-31|Friday",
+          "ok": true
+        },
+        {
+          "name": "timer.snapshot",
+          "value": "4379c662",
+          "ok": true
+        },
+        {
+          "name": "ink.geometry",
+          "value": "a127da69",
+          "ok": true
+        },
+        {
+          "name": "yjs.roundTrip",
+          "value": "ok",
+          "ok": true
+        }
+      ]
+    },
+    "crypto": {
+      "sha256": "a37f0c24a67f8fdbde80175e2ecad8adc386569d9c490209023d0d2443edec23"
+    },
+    "adapters": {
+      "storage": "unavailable",
+      "pdf": "pdfrenderer",
+      "session": "unavailable"
+    }
+  }
+}

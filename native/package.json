@@ -1,0 +1,63 @@
+{
+  "name": "sylf-native",
+  "private": true,
+  "description": "Sylf Native workspace: Expo app (iPad/Android/phone), Electron desktop host and shared packages. Independent of the root Next.js package.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.13 <23 || >=24.3"
+  },
+  "scripts": {
+    "start": "npm --workspace @sylf/app run start",
+    "web": "npm --workspace @sylf/app run web",
+    "build:web": "npm --workspace @sylf/app run build:web",
+    "android:prebuild": "npm --workspace @sylf/app run prebuild:android",
+    "android:build": "npm --workspace @sylf/app run build:android",
+    "android:install": "npm --workspace @sylf/app run install:android",
+    "android:smoke": "node tooling/checks/android-smoke.mjs",
+    "ios:prebuild": "npm --workspace @sylf/app run prebuild:ios",
+    "desktop:start": "npm run build:web && npm --workspace @sylf/desktop run start",
+    "desktop:dev": "npm --workspace @sylf/desktop run dev",
+    "desktop:self-test": "npm run build:web && npm --workspace @sylf/desktop run self-test",
+    "desktop:design-check": "npm run build:web && npm --workspace @sylf/desktop run design-check",
+    "desktop:spaces-check": "npm run build:web && npm --workspace @sylf/desktop run spaces-check",
+    "desktop:home-check": "npm run build:web && npm --workspace @sylf/desktop run home-check",
+    "desktop:workspace-check": "npm run build:web && npm --workspace @sylf/desktop run workspace-check",
+    "desktop:world-check": "npm run build:web && npm --workspace @sylf/desktop run world-check",
+    "desktop:session-check": "npm run build:web && npm --workspace @sylf/desktop run session-check",
+    "desktop:backend-check": "npm run build:web && npm --workspace @sylf/desktop run backend-check",
+    "android:design-check": "node tooling/checks/android-design-check.mjs",
+    "android:interaction-check": "node tooling/checks/android-interaction-check.mjs",
+    "android:spaces-check": "node tooling/checks/android-spaces-check.mjs",
+    "android:home-check": "node tooling/checks/android-home-check.mjs",
+    "android:memory-check": "node tooling/checks/android-memory-check.mjs",
+    "android:workspace-check": "node tooling/checks/android-workspace-check.mjs",
+    "android:r15-check": "node tooling/checks/android-r15-check.mjs",
+    "android:scroll-check": "node tooling/checks/android-scroll-check.mjs",
+    "android:pinch-check": "node tooling/checks/android-pinch-check.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p apps/desktop/tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.mts",
+    "check:boundaries": "node tooling/checks/check-boundaries.mjs",
+    "check:single-copy": "node tooling/checks/check-single-copy.mjs",
+    "verify": "npm run typecheck && npm run lint && npm run test && npm run check:boundaries && npm run check:single-copy && npm run build:web"
+  },
+  "allowScripts": {
+    "electron": true,
+    "esbuild": false,
+    "fsevents": false
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "eslint": "^9.39.0",
+    "globals": "^16.5.0",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^4.1.9",
+    "@types/node": "^24.10.0"
+  }
+}

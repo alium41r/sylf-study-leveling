@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "status": "PASSED",
+  "technicalScope": "Phase B Steps 6\u20138: independent complete-result review, substantive refinement, reviewed publication, separate atomic confirmation and offline mechanics qualification",
+  "runtime": {
+    "node": "v24.21.0",
+    "postgres": 180004,
+    "publicAdmission": "compiler-v1 unchanged",
+    "qualifiedTrustedAdmission": {
+      "compilerVersion": 2,
+      "journeyVersion": 1
+    }
+  },
+  "gates": {
+    "plannerPostgres": {
+      "passed": 618,
+      "failed": 0,
+      "requiredSkipped": 0,
+      "evidence": "qualification-final-7/postgres-harness-run.json",
+      "sourcePins": "qualification-final-7/postgres-source-pins.json"
+    },
+    "unit": {
+      "passed": 772,
+      "failed": 0,
+      "optInCases": 33,
+      "evidence": "qualified-unit-results.json"
+    },
+    "separateCalendarPostgres": {
+      "passed": 33,
+      "failed": 0,
+      "skipped": 0,
+      "allUnitOptInCasesCovered": true,
+      "evidence": "calendar-lock-order-2/calendar-postgres-results.json"
+    },
+    "eslint": {
+      "files": 30,
+      "errors": 0,
+      "warnings": 0,
+      "evidence": "final-qualified-lint.json"
+    },
+    "worker": {
+      "status": "PASSED",
+      "importedModules": 15,
+      "networkRequestsOnImport": 0,
+      "credentialsInherited": false,
+      "buildEvidence": "worker-build.log",
+      "importEvidence": "qualified-worker-imports.json",
+      "alsoBuiltByNativeHarness": true
+    },
+    "prismaValidate": {
+      "status": "PASSED",
+      "evidence": "prisma-validate.log"
+    },
+    "webProductionBuild": {
+      "status": "PASSED",
+      "bundler": "webpack",
+      "evidence": "web-build-run.json"
+    },
+    "postBuildTypecheck": {
+      "status": "PASSED",
+      "evidence": "post-build-typecheck-run.json"
+    },
+    "fullTypecheckAfterFixtureAdjustment": {
+      "status": "PASSED",
+      "evidence": "fixture-typecheck.log",
+      "observedExitCode": 0
+    }
+  },
+  "audits": {
+    "retainedCaseIdentities": "final-retention.json",
+    "baselineAndUnrelatedFiles": "final-source-preservation.json",
+    "sourcePinsWhitespaceAndDocumentLinks": "final-static-audit.json"
+  },
+  "sleepPrevention": {
+    "status": "RELEASED",
+    "evidence": "sleep-prevention.json"
+  },
+  "paidProviderCalls": 0,
+  "productionRoutingChanged": false,
+  "productionAdmissionChanged": false,
+  "productionDeployment": false,
+  "migrationDeployment": "Only disposable qualification databases; no production migration deployment",
+  "phase3UI": false,
+  "mobileVerification": "Not applicable: backend-only work; shared client/mobile baseline files remain unchanged",
+  "unresolvedTechnicalBlockers": [],
+  "remainingWork": [
+    "Phase C separately authorized live educational-quality qualification against representative held-out cases and an agreed acceptance rubric.",
+    "A separate production rollout/deployment decision after educational acceptance; Phase 3 UI remains separate."
+  ],
+  "limits": [
+    "Scripted providers verify mechanics, not real-model educational excellence, semantic faithfulness or reviewer judgment.",
+    "The Planner harness uses an audited disposable schema bootstrap plus actual relevant ordered migrations; it does not replay the incomplete historical migration chain.",
+    "Calendar service qualification uses its minimal bootstrap with inert Planner table seams; actual Planner guards/lifecycle are covered by the separate full Planner gate.",
+    "Remote Calendar currentness is bounded by existing cache freshness/coverage.",
+    "Response/archive/canonical execution and report storage envelopes remain finite and fail explicitly without clipping essential education.",
+    "Lost/unreceived provider responses remain uncertain; available saved evidence does not manufacture billing completion or authorize replay."
+  ],
+  "finishedAt": "2026-10-28T11:02:18.024532+00:00"
+}

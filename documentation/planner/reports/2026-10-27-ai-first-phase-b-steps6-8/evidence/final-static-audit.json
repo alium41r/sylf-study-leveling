@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "status": "PASSED",
+  "nativeSourcePins": 286,
+  "sourcePinDifferences": [],
+  "changedDuringNativeRun": [],
+  "scopedWhitespaceFiles": 38,
+  "whitespace": [],
+  "documents": 6,
+  "localLinks": 137,
+  "brokenLinks": [],
+  "finishedAt": "2026-10-28T11:02:17.990217+00:00"
+}

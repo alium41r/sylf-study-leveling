@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-10-22T05:09:14.076Z",
+  "results": [
+    {
+      "requestedOrigin": "https://sylf.app",
+      "hops": [],
+      "reachable": false,
+      "errorCode": "CERT_HAS_EXPIRED"
+    },
+    {
+      "requestedOrigin": "https://sylf-alium41rs-projects.vercel.app",
+      "hops": [
+        {
+          "url": "https://sylf-alium41rs-projects.vercel.app/",
+          "status": 200
+        }
+      ],
+      "title": "Sylf — A little focus. A different you.",
+      "bodyContainsSylf": true,
+      "reachable": true
+    }
+  ]
+}

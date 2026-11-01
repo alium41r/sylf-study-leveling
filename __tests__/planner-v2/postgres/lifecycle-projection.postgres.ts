@@ -2,7 +2,7 @@ import { beforeAll, afterAll, afterEach, describe, it, expect } from "vitest";
 import { randomUUID } from "node:crypto";
 import pg from "pg";
 import { connect, user, linked, waitForLock } from "./database";
-import { intentFixture } from "../contracts/fixtures";
+import { intentFixture } from "./intent-fixture";
 import { PlannerDatabase, rows } from "@/lib/planner/v2/server/database";
 import { TimezoneService } from "@/lib/timezone-service";
 import { IntentService, ownedPlan } from "@/lib/planner/v2/server/intents";

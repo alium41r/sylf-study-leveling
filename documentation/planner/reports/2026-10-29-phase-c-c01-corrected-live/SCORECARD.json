@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "assessment": "PROVISIONAL_SOURCE_BASED_AUDIT",
+  "rater": "Implementation assistant, also authored the case; not independent human expert qualification",
+  "runtimeEducationalReviewerInvoked": false,
+  "fullPlanDimensions": {
+    "correctness": null,
+    "personalization": null,
+    "depth": null,
+    "coverage": null,
+    "practicality": null,
+    "fidelity": null,
+    "review": null,
+    "uncertainty": null
+  },
+  "weightedScore": null,
+  "qualityConclusion": "INCOMPLETE_UNQUALIFIED",
+  "stageCoverage": {
+    "researchExtraction": "COMPLETE_VISIBLE_RESPONSE",
+    "chemistryResearchVerification": "COMPLETE_BUT_REJECTED_BY_SCHEMA",
+    "biologyResearchVerification": "NOT_INVOKED",
+    "researchSynthesis": "NOT_INVOKED",
+    "verifiedDossier": "NOT_COMPLETED",
+    "strategy": "UNOBSERVED",
+    "translation": "UNOBSERVED",
+    "scheduling": "UNOBSERVED_LIVE",
+    "independentEducationalReview": "UNOBSERVED",
+    "refinement": "UNOBSERVED",
+    "publication": "NOT_PERFORMED",
+    "apply": "NOT_PERFORMED"
+  },
+  "positiveObservedChanges": [
+    "Fresh LIVE Calendar input audit passed for all 16 exact commitments, corrected Friday rest and fixed 20/23 November deadlines.",
+    "Extraction retained diagnostic misconceptions, limited strengths, both goals, resources, English work and permissions; unknown future transfer was non-consequential.",
+    "Verification attributed Amina through accepted context rather than demanding her name occur in an anonymous quote.",
+    "Local school scope was treated as COURSE_OUTCOME and issuer authority stayed unverified rather than claiming official board certification."
+  ],
+  "defects": [
+    {
+      "id": "R1",
+      "kind": "INVALID_AND_CROSS_PLAN_SCOPE_BINDINGS",
+      "severity": "BLOCKING_DELIVERY",
+      "evidence": "evidence/schema-diagnosis.json",
+      "observation": "All 28 emitted scope-reference occurrences use illegal colon namespaces; some additionally refer to plan_2 in the plan_1 batch. No alias repair or rebinding was accepted."
+    },
+    {
+      "id": "R2",
+      "kind": "EDUCATIONAL_QUANTITY_LABEL_ERROR",
+      "severity": "NEEDS_CORRECTION_BEFORE_ACCEPTANCE",
+      "claimId": "claim_250facf12e67e4ea8adda62d",
+      "statement": "The chemistry worked example shows molar mass as grams divided by grams per mole and concentration as moles after converting millilitres to litres.",
+      "sourceExcerpt": "Chemistry worked example: 6.0 g carbon, molar mass 12.0 g/mol, gives 0.50 mol; show g divided by g/mol. A 100 mL sample of 0.50 mol/L solution contains 0.050 mol after converting to 0.100 L.",
+      "verification": {
+        "claimId": "claim_250facf12e67e4ea8adda62d",
+        "support": "SUPPORTED",
+        "applicability": "MATCHED",
+        "reason": "source_3 gives 6.0 g divided by 12.0 g/mol as 0.50 mol and 100 mL of 0.50 mol/L as 0.050 mol after converting to 0.100 L; this supports the worked methods."
+      },
+      "assessment": "Mass divided by molar mass gives amount of substance n in mol, not molar mass M. The numerical examples are correct, but the paraphrase mislabels the quantity and the proposed verification marks it SUPPORTED."
+    },
+    {
+      "id": "R3",
+      "kind": "DIAGNOSTIC_DISCREPANCY_MISCLASSIFIED_AS_CONFLICT",
+      "severity": "SECONDARY_OBSERVED_CONCERN",
+      "conflicts": [
+        "The student's self-reported confidence after three hours of videos conflicts with the diagnostic errors in molar-mass arithmetic, concentration conversion and limiting-reagent reasoning; source_2 states that video time supplies no performance credit."
+      ],
+      "assessment": "Confidence versus demonstrated diagnostic errors is learning evidence, not by itself an unresolved learner choice. A downstream unnecessary reinvestigation is possible under existing conflict routing, but none occurred because schema validation failed first."
+    }
+  ],
+  "mechanicalOutcome": {
+    "safeFailure": true,
+    "noRevisions": true,
+    "noApply": true,
+    "englishPreserved": true,
+    "allNewUsageKnown": true,
+    "providerTruncation": false,
+    "transportFailure": false,
+    "retry": false
+  },
+  "educationalLimit": "There is no complete strategy, translation, schedule or educational-review decision to evaluate. Qualitative research observations cannot establish exceptional plan quality or consistency."
+}

@@ -2,7 +2,8 @@ import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
-import { signToken, AUTH_COOKIE_OPTIONS, type AuthTokenPayload } from "@/lib/auth";
+import { type AuthTokenPayload } from "@/lib/auth";
+import { attachReissuedSession } from "@/lib/auth-session-service";
 import { formatScholarId } from "@/lib/scholar-id";
 import { xpForNextLevel } from "@/lib/game-engine";
 import { TimezoneService } from "@/lib/timezone-service";
@@ -132,8 +133,6 @@ export async function PATCH(req: NextRequest) {
       timezone: updatedUser.timezone || "UTC",
     };
 
-    const newToken = await signToken(tokenPayload);
-
     const response = NextResponse.json(
       {
         message: "Account information updated successfully.",
@@ -162,10 +161,7 @@ export async function PATCH(req: NextRequest) {
     );
 
     // Set updated session cookie
-    response.cookies.set({
-      ...AUTH_COOKIE_OPTIONS,
-      value: newToken,
-    });
+    await attachReissuedSession(response, session, tokenPayload);
 
     return response;
   } catch (error) {

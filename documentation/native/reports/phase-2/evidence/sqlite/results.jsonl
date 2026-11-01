@@ -1,0 +1,2 @@
+{"sync":"NORMAL","rounds":40,"killed":40,"ackedTotal":53035,"lostAcked":0,"partial":0,"digestMismatch":0,"integrityFailures":0,"gaps":0,"latency":{"batches":246,"medianP50ms":0.101,"medianP95ms":0.25}}
+{"sync":"FULL","rounds":40,"killed":40,"ackedTotal":48026,"lostAcked":0,"partial":0,"digestMismatch":0,"integrityFailures":0,"gaps":0,"latency":{"batches":220,"medianP50ms":0.154,"medianP95ms":0.307}}

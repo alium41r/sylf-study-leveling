@@ -1,0 +1,9 @@
+{
+  "checkedAt": "2026-10-29T02:08:33.213Z",
+  "paidCalls": 0,
+  "path": "/user/balance",
+  "ok": true,
+  "status": 200,
+  "roundedAccountBalanceDeltaUsd": 0.04,
+  "limitation": "Rounded account-wide metadata is corroboration only; per-request actual usage and the published-rate estimate remain separate from an invoice total."
+}

@@ -109,13 +109,13 @@ function containsLiteral(value: unknown, excerpt: string): boolean {
   if (record(value)) return Object.values(value).some(item => containsLiteral(item, excerpt));
   return false;
 }
-function verifyGrounds(grounds: GroundedFinding["grounds"], input: ReviewInput) {
+export function verifyGrounds(grounds: GroundedFinding["grounds"], input: ReviewInput) {
   for (const ground of grounds) {
     const entry = input.grounding.find(e => e.ref === ground.ref);
     if (!entry || !containsLiteral(JSON.parse(entry.text), ground.excerpt)) reject("INVALID_OUTPUT", "Quality evidence is not quoted from the actual owned review input.", input.stage);
   }
 }
-function findingForReport(finding: GroundedFinding, planRef: string, input: ReviewInput): QualityReportV2["issues"][number] {
+export function findingForReport(finding: GroundedFinding, planRef: string, input: ReviewInput): QualityReportV2["issues"][number] {
   verifyGrounds(finding.grounds, input);
   const plan = input.proposal.blueprints.plans.find(p => p.planRef === planRef)!;
   const known = new Set(["strategy", ...plan.blueprint.activities.map(a => a.localId), ...plan.blueprint.scope.map(s => s.scopeRef),
@@ -185,7 +185,7 @@ export function validateQualityVerification(raw: unknown, input: ReviewInput, pr
 export interface ReviewRecoveryState {
   concerns: (ReviewRecoveryReceipt["concerns"][number] & { rejectedFinding: unknown })[];
 }
-function captureRejectedReview(text: string, input: ReviewInput, state: ReviewRecoveryState) {
+export function captureRejectedReview(text: string, input: ReviewInput, state: ReviewRecoveryState) {
   let raw: unknown;
   try { raw = extractJsonValue(text); } catch { return { concerns: state.concerns }; }
   const addConcern = (finding:unknown, rawOwner:unknown, fullPath:string) => {
@@ -225,7 +225,7 @@ function captureRejectedReview(text: string, input: ReviewInput, state: ReviewRe
   if (state.concerns.length && !PendingReviewConcernsSchema.safeParse(state.concerns).success) reject("QUALITY_INCOMPLETE", "Rejected review concerns exceed the bounded recovery allowance.", input.stage);
   return { concerns: state.concerns };
 }
-function validateRecovery(dispositions: ReviewRecoveryReceipt["dispositions"] | undefined, state: ReviewRecoveryState | undefined,
+export function validateRecovery(dispositions: ReviewRecoveryReceipt["dispositions"] | undefined, state: ReviewRecoveryState | undefined,
   findings: QualitySupport["findings"], input: ReviewInput): ReviewRecoveryReceipt | undefined {
   const concerns = state?.concerns ?? [];
   if (!concerns.length) {

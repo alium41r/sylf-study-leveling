@@ -1,0 +1,9 @@
+{
+  "startedAt": "2026-10-29T01:39:07.679Z",
+  "finishedAt": "2026-10-29T01:39:31.195Z",
+  "node": "v24.21.0",
+  "isolation": "Disposable source copy; no .env/provider/hosted credentials copied or inherited",
+  "workerExit": 0,
+  "nextWebpackExit": 1,
+  "postBuildTypecheckExit": null
+}

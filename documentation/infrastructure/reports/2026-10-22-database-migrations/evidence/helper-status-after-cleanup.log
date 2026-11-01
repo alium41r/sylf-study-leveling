@@ -1,0 +1,13 @@
+{
+  "pending": [],
+  "unresolved": []
+}
+Datasource "db": PostgreSQL database "postgres", schema "public" at "127.0.0.1:60904"
+
+70 migrations found in prisma/migrations
+
+Database schema is up to date!
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Verified remote TLS connections: 2

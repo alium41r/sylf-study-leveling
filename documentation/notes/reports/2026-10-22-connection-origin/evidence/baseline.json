@@ -1,0 +1,13 @@
+{
+  "capturedAt": "2026-10-22T05:38:39.201Z",
+  "sha256": {
+    "app/notes/components/NotesScreen.tsx": "efe5c7ee0a446e5ec00a067198233e5602500e766538d027c3f6703f52fe9286",
+    "app/api/notes/connection/route.ts": "ab185c1836f704d9c5f256b32d1182a11998cdc5733ef6ac90bcf63d2a76b299",
+    "lib/notes/server/security.ts": "6805a770cfe9cb2187c555a2f5db4990b9f5a4815add7ebee8bde0f3e7e6ed9c",
+    "lib/notes/drive-transport.ts": "34ba70a45975ec2c9285916826c63a6f881a182fe5f5aa0146a90d00dc86c8fd",
+    "documentation/notes/workspace.md": "bc7c489a32839326309b6ef3c7b8f523fca2fd540c5df5d2ef21e1bd8d1acad6",
+    "documentation/notes/README.md": "89b5af0f8cf07d1e0452e43d87182f97b8855fff6fad3af7c54e694a15c81aa8",
+    "__tests__/notes/drive-broker.test.ts": "6b75f4c472d37af1e4332e8013535d73687dd7adbfd8412407a622182ba3b245",
+    "__tests__/notes/phase-3-foundation.test.ts": "13e071c73b7cf319f5b3889fbbbee5d5c31a4f745b14a478371189eabb5bc900"
+  }
+}

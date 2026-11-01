@@ -9,8 +9,18 @@ type CheckpointRead = { ok: true; checkpoint: CompilerCheckpoint } | {
 /** Node-only boundary. Expected bindings must be rebuilt by trusted repositories,
  * never copied from this checkpoint or accepted from a client/model response. */
 export function readCompilerCheckpoint(value: unknown, attempt: PlannerAttemptV2, expected: CompilerBinding): CheckpointRead {
+  const read = readHistoricalCompilerCheckpoint(value, attempt);
+  if (!read.ok) return read;
+  if (!CompilerBindingSchema.safeParse(expected).success) return { ok: false, reason: "MALFORMED_CHECKPOINT" };
+  if (hash("compiler-binding", read.checkpoint.binding) !== hash("compiler-binding", expected)) return { ok: false, reason: "STALE_COMPILER_BINDING" };
+  return read;
+}
+
+/** Historical inspection verifies retained identity/integrity only. Execution
+ * still requires readCompilerCheckpoint with freshly rebuilt owned bindings. */
+export function readHistoricalCompilerCheckpoint(value: unknown, attempt: PlannerAttemptV2): CheckpointRead {
   const parsed = CompilerCheckpointSchema.safeParse(value);
-  if (!parsed.success || !CompilerBindingSchema.safeParse(expected).success) return { ok: false, reason: "MALFORMED_CHECKPOINT" };
+  if (!parsed.success) return { ok: false, reason: "MALFORMED_CHECKPOINT" };
   const checkpoint = parsed.data;
   if (!attempt.checkpoint || attempt.checkpoint.stage !== checkpoint.payload.stage || attempt.checkpoint.digest !== hash("checkpoint", value)) return { ok: false, reason: "CHECKPOINT_DIGEST_MISMATCH" };
   const binding = checkpoint.binding;
@@ -20,7 +30,6 @@ export function readCompilerCheckpoint(value: unknown, attempt: PlannerAttemptV2
       const selected = attempt.targets.find(value => value.planId === target.planId);
       return !selected || Object.keys(selected).some(key => Reflect.get(target, key) !== Reflect.get(selected, key));
     })) return { ok: false, reason: "ATTEMPT_BINDING_MISMATCH" };
-  if (hash("compiler-binding", binding) !== hash("compiler-binding", expected)) return { ok: false, reason: "STALE_COMPILER_BINDING" };
   const payload = checkpoint.payload;
   if ("envelope" in payload && hash("scheduling-envelope", payload.envelope) !== binding.envelopeDigest) return { ok: false, reason: "ARTIFACT_DIGEST_MISMATCH" };
   if (payload.research) {

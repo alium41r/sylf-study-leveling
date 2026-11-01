@@ -1,0 +1,12 @@
+{
+  "updatedAt": "2026-10-22T05:11:34.906Z",
+  "file": ".env",
+  "changedVariableOnly": "NOTES_PUBLIC_URL",
+  "previousOrigin": "https://sylf.app",
+  "currentOrigin": "https://sylf-alium41rs-projects.vercel.app",
+  "redirectUri": "https://sylf-alium41rs-projects.vercel.app/api/notes/callback",
+  "existingNotesConnections": 0,
+  "pendingOAuthStates": 0,
+  "googleConsoleChanged": false,
+  "vercelEnvironmentChanged": false
+}

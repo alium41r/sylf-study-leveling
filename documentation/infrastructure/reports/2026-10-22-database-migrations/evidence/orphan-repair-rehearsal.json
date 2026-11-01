@@ -1,0 +1,30 @@
+{
+  "localOnly": true,
+  "archivedRows": 96,
+  "tables": [
+    {
+      "table": "FocusPartyMember",
+      "rows": 16
+    },
+    {
+      "table": "FocusSession",
+      "rows": 15
+    },
+    {
+      "table": "FocusSessionMember",
+      "rows": 29
+    },
+    {
+      "table": "Friendship",
+      "rows": 16
+    },
+    {
+      "table": "SessionInvite",
+      "rows": 20
+    }
+  ],
+  "actualApplicationTriggersInstalled": true,
+  "all114ForeignKeysValidated": true,
+  "newlyInstalledForeignKeys": 86,
+  "hostedDeletionPerformed": false
+}

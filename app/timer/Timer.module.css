@@ -347,13 +347,27 @@
   justify-content: space-between;
   gap: 1rem;
   position: relative;
+  z-index: 1;
   transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
 
 .itemCard:hover {
+  z-index: 2;
   transform: translateX(2px);
   border-color: var(--line);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.14);
+}
+
+.itemCardOpenMenu,
+.itemCard:has(.dropdownMenu) {
+  z-index: 50 !important;
+  transform: none !important;
+  border-color: var(--line);
+}
+
+.itemCardOpenMenu:hover,
+.itemCard:has(.dropdownMenu):hover {
+  transform: none !important;
 }
 
 .itemMain {
@@ -1152,6 +1166,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  z-index: 5;
 }
 
 .btnMenuTrigger {
@@ -1181,7 +1196,7 @@
   position: absolute;
   right: 0;
   top: calc(100% + 4px);
-  z-index: 40;
+  z-index: 60;
   min-width: 155px;
   background: var(--surface);
   border: 1px solid var(--subtle-line);
@@ -1192,6 +1207,17 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  pointer-events: auto;
+}
+
+/* Invisible bridge preventing hover drops across the 4px gap */
+.dropdownMenu::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
 }
 
 .menuItem {

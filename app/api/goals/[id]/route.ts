@@ -118,7 +118,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     }));
 
     return NextResponse.json(updated, { status: 200 });
-  } catch {
+  } catch (error) {
+    if (isPlannerConflict(error)) return NextResponse.json({ error: "PLANNER_REVIEW_REQUIRED" }, { status: 409 });
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

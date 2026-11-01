@@ -1,0 +1,335 @@
+{
+  "schemaVersion": 1,
+  "status": "SCRIPTED_REHEARSAL_PASSED",
+  "educationalConclusion": "NONE",
+  "paidCalls": 0,
+  "externalRequests": 0,
+  "compilerVersion": 2,
+  "journeyVersion": 1,
+  "anchor": "2026-10-29",
+  "targets": 2,
+  "uploadedMaterialHashes": [
+    "671785b7bd726732df32e8f9abcb0f3a53eddbf4eb387c7fb911576468b9cb69",
+    "3be5bbc37683ce394dea41512f8e7bc990d8b20c2e82ecbe66a35190bdef75a4",
+    "af6868dccef7bc93409ea8758055b44527d0c3bce126a97306c3842adc1ac503"
+  ],
+  "calendarEvents": 16,
+  "unselectedTaskPreserved": true,
+  "appliedAndReplayed": true,
+  "capacityEvidence": {
+    "window": {
+      "start": "2026-10-28",
+      "end": "2026-11-24"
+    },
+    "weeklyCeilingMinutes": 660,
+    "days": [
+      {
+        "date": "2026-10-28",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 0,
+        "availableMinutes": 0,
+        "excluded": false
+      },
+      {
+        "date": "2026-10-29",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 108,
+        "availableMinutes": 108,
+        "excluded": false
+      },
+      {
+        "date": "2026-10-30",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 108,
+        "availableMinutes": 108,
+        "excluded": false
+      },
+      {
+        "date": "2026-10-31",
+        "ceilingMinutes": 0,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 0,
+        "calendarAvailableMinutes": 0,
+        "availableMinutes": 0,
+        "excluded": true
+      },
+      {
+        "date": "2026-11-01",
+        "ceilingMinutes": 180,
+        "otherCommittedMinutes": 35,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 18,
+        "calendarAvailableMinutes": 127,
+        "availableMinutes": 127,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-02",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 108,
+        "availableMinutes": 108,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-03",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 48,
+        "availableMinutes": 48,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-04",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 48,
+        "availableMinutes": 48,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-05",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 108,
+        "availableMinutes": 108,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-06",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 108,
+        "availableMinutes": 108,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-07",
+        "ceilingMinutes": 0,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 0,
+        "calendarAvailableMinutes": 0,
+        "availableMinutes": 0,
+        "excluded": true
+      },
+      {
+        "date": "2026-11-08",
+        "ceilingMinutes": 180,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 18,
+        "calendarAvailableMinutes": 162,
+        "availableMinutes": 162,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-09",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 108,
+        "availableMinutes": 108,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-10",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 48,
+        "availableMinutes": 48,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-11",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 48,
+        "availableMinutes": 48,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-12",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 108,
+        "availableMinutes": 108,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-13",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 108,
+        "availableMinutes": 108,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-14",
+        "ceilingMinutes": 0,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 0,
+        "calendarAvailableMinutes": 0,
+        "availableMinutes": 0,
+        "excluded": true
+      },
+      {
+        "date": "2026-11-15",
+        "ceilingMinutes": 180,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 18,
+        "calendarAvailableMinutes": 162,
+        "availableMinutes": 162,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-16",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 108,
+        "availableMinutes": 108,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-17",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 48,
+        "availableMinutes": 48,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-18",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 48,
+        "availableMinutes": 48,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-19",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 108,
+        "availableMinutes": 108,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-20",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 108,
+        "availableMinutes": 108,
+        "excluded": false
+      },
+      {
+        "date": "2026-11-21",
+        "ceilingMinutes": 0,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 0,
+        "calendarAvailableMinutes": 0,
+        "availableMinutes": 0,
+        "excluded": true
+      },
+      {
+        "date": "2026-11-22",
+        "ceilingMinutes": 180,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 18,
+        "calendarAvailableMinutes": 162,
+        "availableMinutes": 0,
+        "excluded": true
+      },
+      {
+        "date": "2026-11-23",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 108,
+        "availableMinutes": 0,
+        "excluded": true
+      },
+      {
+        "date": "2026-11-24",
+        "ceilingMinutes": 120,
+        "otherCommittedMinutes": 0,
+        "protectedTargetMinutes": 0,
+        "recoveryMinutes": 12,
+        "calendarAvailableMinutes": 48,
+        "availableMinutes": 0,
+        "excluded": true
+      }
+    ]
+  },
+  "roleTrace": [
+    {
+      "role": "RESEARCH",
+      "inputBytes": 32070
+    },
+    {
+      "role": "VERIFICATION",
+      "inputBytes": 11006
+    },
+    {
+      "role": "SYNTHESIS",
+      "inputBytes": 34723
+    },
+    {
+      "role": "STRATEGIST",
+      "inputBytes": 72750
+    },
+    {
+      "role": "TRANSLATOR",
+      "inputBytes": 78739
+    },
+    {
+      "role": "REVIEWER",
+      "inputBytes": 219687
+    }
+  ],
+  "caseBankSha256": "e9cd3912e5a6ce877522d61d03de627dd86d6ce18b4c78959e1d386f99267edc"
+}

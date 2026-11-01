@@ -1,0 +1,62 @@
+# Phase B Step 3 — Research & Understanding
+
+26 October 2026. Follows the [approved handoff](../../AI_FIRST_PLANNER_HANDOFF.md), [foundation contract](../../AI_FIRST_FOUNDATION.md), [Phase B plan](../2026-10-25-ai-first-phase-a/PHASE_B_PLAN.md) and [Step 2](../2026-10-26-ai-first-phase-b-step2/README.md).
+
+## Result
+
+Compiler v2 can now complete a durable Research & Understanding stage using the existing research service, owned documents/context, provider dispatcher, financial receipts and Attempt lifecycle. It investigates material gaps, reads source contents, independently checks source claims and the complete synthesis, asks consequential questions, and retains a dossier for the future Study Strategist. There is no separate agent engine, queue or evidence database.
+
+The stage is available through `ResearchService.understanding().run(token, signal)` and the existing compiler. `read(ownerId, attemptId)` returns the owned retained stage, including complete question groups. `continue(ownerId, request)` accepts explicit headless student decisions with exact checkpoint/CAS bindings. Public web admission remains compiler v1; no new route or UI was added.
+
+Research completion is not whole-Attempt success. The compiler retains its dossier and reports `QUALITY_INCOMPLETE` because calendar capacity and the downstream pipeline are not installed. No revision or activity is published or applied. Existing compiler-v1 research/advice remains compatible and read-only advice keeps zero mutation targets.
+
+## Implemented guarantees
+
+| Area | Behavior |
+| --- | --- |
+| Student understanding | Capture exact accepted instructions, canonical intent versions, selected owned conversation/recommendation history, preferences, exclusions, deadlines, resources, academic hints, learning evidence, saved checks, execution history, running/protected work and competing commitments through existing owners. The context retains reliability, dates, scope, contradictions and disclosed history omissions. |
+| Knowledge versus claims | Self-report remains self-report. Time/completion and saved self-reported checks do not establish mastery. Supported check evidence retains its actual scope/date. Natural synthesis is separately checked against actual app data, answers and source evidence; unsupported synthesis returns to Research. This is model-assisted verification, not proof of educational model competence. |
+| Investigation | The role chooses a specific search, reads a discovered candidate, revisits selected upload/PDF sections, asks consequential clarification, or proposes completion. It has no fixed interview, mandatory diagnostic, one-follow-up rule or forced web search. Rejected unchanged synthesis and repeated identical research actions produce explicit incomplete outcomes rather than approval. |
+| Source reliability | Reuse issuer registry, actual safe fetch/redirect handling, original byte hashes, targeted PDF/text extraction, bounded OCR, anchors, literal quotation checks and separate support/applicability review. Search snippets, rankings, titles and provider authority scores cannot certify source content. Private ownership never certifies an official issuer. Unsupported or mismatched claims remain rejected/uncertain. |
+| Large/relevant materials | Multiple verification batches preserve more than nine total sources without changing legacy evidence contracts. Original PDF pages and explicit later plain-text character windows can be investigated in additional reads. Each receipt discloses unread sections, partial extraction and OCR uncertainty; no claim of complete coverage follows from a prefix. The existing upload and physical payload bounds remain explicit. |
+| Dossier | Append a versioned `DOSSIER` value with `schemaVersion:2` to the existing immutable archive. It retains captured context, raw read sections, action history, checked/rejected evidence, questions/answers, full synthesis/review and producing response references. Exact receipt response/digest ownership is rechecked when writing/reading it. `capacity:null` and `calendarDigest:null` explicitly mean Step 4 has not run; this version cannot seal a candidate. Historical dossier v1 remains readable. |
+| Accepted intent | Research evidence is adopted in the dossier without silently editing accepted canonical goals or hard facts. Targets are bound through the existing write-once `UNCHANGED` resolver. A student clarification can explicitly accept complete revised canonical facts using the existing `USER_EDIT` writer; original versions, requested instructions and decision correspondence remain retained. Unaccepted recommendations never grant permission. |
+| Clarification | Preserve exact question identities, consequences and full answers. Reject unanswered/foreign/duplicate question references and repeated known information without a concrete reconsideration. Accepted fixed deadlines/availability are not asked again without a named conflict. No small numeric questionnaire limit was introduced. |
+| Continuation | One owned child per parent, with immutable decision/input proof and current intent/base CAS. The same selected Plan membership, permission, root policy, original absolute deadline, quota and consumed/reserved/uncertain spending persist. Parent evidence remains history; the child captures current owned context and revalidates inherited sources. New execution targets or external-research permission cannot be granted by an answer/model. |
+| Recovery | Persist exact logical stage/input before calls and complete responses in existing accounting before assembly. Canonical transport serialization survives JSONB key ordering and worker takeover. Lost/uncertain tool responses never silently replay. Late responses update finance without rewriting stopped research artifacts. Cancellation, currentness, ownership and lease/fence checks remain authoritative. |
+| Resources | Explicit optional immutable `researchTools` policies allow finite needs-appropriate search/fetch/extraction/OCR resources. Missing policy denies external tools. V2 bypasses the old research counters and two-minute window through its versioned interpretation; v1 bounds remain unchanged. Role/OCR calls still share the Step 2 model budget and downstream holdbacks. There is no production tool allowance default. |
+| Deployment safety | Add only migration `20261026010000_planner_understanding`, preserving all earlier migrations. SQL guards research input/history, continuation proof, tool counters, receipt ownership/transitions and uncertainty. Updated worker readiness requires both guards; a transaction-local capability fences Step 2 workers from claiming profiled v2 research during mixed deployment. No Prisma fields/cache marker changed. |
+
+## DeepSeek Search investigation and integration
+
+Local configuration currently selects Serper. No environment file was edited. The existing adapter also supports Brave and SearXNG. The explicitly selected v2 research composition now prefers DeepSeek when its key is configured, retaining that previous configured backend and other existing providers as fallbacks. Default v1 selection remains unchanged. Provider identity follows the upstream that actually answered; no parallel search abstraction was introduced.
+
+The new adapter uses the official `POST /v1/tools/search`, bearer authentication, Unicode-aware query validation and `need_content:false`. Result hints feed discovery only. The documented Fetch API returns Markdown/title without the original bytes or validated final redirect chain required by our evidence machinery; it does not replace Sylf's direct safe fetch/PDF reader. [Official Search reference](https://api-docs.deepseek.com/api/search/), [Search & Fetch guide](https://api-docs.deepseek.com/guides/search/), [Fetch reference](https://api-docs.deepseek.com/api/fetch/).
+
+Each actual search upstream/fallback has a schema-v3 tool receipt in the existing `AiUsageLog`, not a token call or a second ledger. Known DeepSeek success uses the documented per-request estimated rate, pinned to `deepseek-search-2026-10-26`; known empty/rejected responses record zero. Unknown transport/billing remains null and blocks further spending/continuation until reconciliation. Other backend prices remain null when unverified. A known rejected primary can fall back; an uncertain dispatch cannot. Search quality/recall and live delivery have **not** been qualified. Serper remains available; no paid Search/Fetch/model request was run.
+
+## Affected owners
+
+- [Research stage](../../../../lib/planner/v2/server/understanding.ts) and [typed stage/input/prompts](../../../../lib/planner/v2/intelligence/schemas/understanding.ts), composed by existing [ResearchService](../../../../lib/planner/v2/server/research.ts) and [compiler](../../../../lib/planner/v2/server/compiler.ts).
+- Existing Attempt/admission, context/intent/document owners, foundation readers/persistence, role accounting, provider/OCR dispatcher, research reader/verification and resource contracts. The existing search provider/contracts plus comparison/telemetry provider enums gain DeepSeek compatibility.
+- [Additive SQL](../../../../prisma/migrations/20261026010000_planner_understanding/migration.sql), worker readiness and the existing disposable runner. ApplyService, revisions publication, execution, rewards, routing configuration, package files and all prior migrations remain unchanged.
+- [Research PostgreSQL cases](../../../../__tests__/planner-v2/postgres/understanding.postgres.ts) and [unit/source/search cases](../../../../__tests__/planner-v2/intelligence/understanding.test.ts).
+
+## Verification
+
+See [verification.json](evidence/verification.json), the [evidence index](evidence/README.md) and [preservation manifest](evidence/preservation.json).
+
+- 562 selected unit tests pass in 42 files, covering retained V2, DeepSeek, search, safe fetch, source evidence, comparison and telemetry behavior.
+- 263 V2 + 225 legacy PostgreSQL checks pass: **488 total**, all 468 retained checks plus 20 new Research cases, zero required skips. Only the existing optional paid qualification remains excluded.
+- Meaningful cases include context-only completion; private uploads; fabricated quotations; missing assessment identity; substantive synthesis correction; clarification/revised facts/CAS/ownership/concurrent children; known answers; saved response takeover; concurrent commitments; unknown search spending/reconciliation; provenance and pricing; v2 OCR; actual tool allowances; absolute deadlines with noncooperative late responses; cancellation; immutable SQL history/receipts; mixed-worker fencing and closed publication gates.
+- Full typecheck, scoped lint, worker build/credential-free imports, Prisma validation and production web build are recorded in the final manifest. Qualification uses supported Node 24.21.0 and disposable native PostgreSQL 18.4. The web build uses the existing 6 GiB process allowance.
+
+Development evidence preserves a genuine prompt-correspondence recovery defect fixed by canonical serialization; fixture corrections for minimum meaningful literal quotation and coordinated Quest mutation; and initial type-narrowing diagnostics. A green run with concurrent source edits is retained as such and does not substitute for the final frozen-source gate. No safeguards/assertions were relaxed to pass tests.
+
+## Remaining boundaries
+
+This verifies mechanics with scripted adapters, not exceptional live educational understanding or DeepSeek retrieval quality. No paid qualification, production activation, SQL deployment or Phase 3 UI occurred. Search billing estimates are not invoices; model aliases are not immutable snapshots. Existing private upload/storage, extraction and archive bounds remain. Student clarification cannot expand permissions or restart expired/uncertain financial roots.
+
+Canonical accepted targets are not autonomously expanded by source research. Verified facts and explicit scope-binding proposals remain in the complete dossier; later strategy/translation must honor the original accepted scope/exclusions and use an explicit immutable correspondence writer for any derived intent change. No truncated subset of dossier evidence is substituted into the older canonical research envelope.
+
+The next approved step is **Step 4 — calendar-aware capacity**, detailed in the [handoff](STEP_4_HANDOFF.md). Strategy, translation, complete-plan review/refinement and confirmation remain later steps.

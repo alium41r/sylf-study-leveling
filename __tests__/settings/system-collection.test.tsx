@@ -132,10 +132,10 @@ describe("Current System collection", () => {
     expect(pane).toHaveAttribute("tabindex", "0");
     pane.scrollTop = 250;
     fireEvent.click(
-      within(index).getByRole("button", { name: /Character styles/ })
+      within(index).getByRole("button", { name: /Pixel companion|Character styles/i })
     );
     expect(pane.scrollTop).toBe(0);
-    expect(screen.getByRole("heading", { name: "Deadpool" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: /^Meadow|Deadpool$/i })).toBeVisible();
     expect(screen.getAllByText("Selected").length).toBeGreaterThan(0);
     expect(
       screen.queryByRole("heading", { name: "Scholar" })

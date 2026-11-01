@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "status": "STOPPED_OBSERVATION_VERIFIED",
+  "checkedAt": "2026-10-29T02:14:29.984362+00:00",
+  "profileId": "C01-CORRECTED-2",
+  "runId": "ab24df69-8acd-46e1-a5fc-9be0c653b664",
+  "financialRootCount": 1,
+  "attemptCount": 1,
+  "physicalPaidRequests": 2,
+  "roleResponsesComplete": 2,
+  "finalState": "FAILED",
+  "failure": {
+    "code": "INVALID_OUTPUT",
+    "dates": [],
+    "stage": "RESEARCH",
+    "message": "The provider result failed structured validation.",
+    "traceId": "4393d248-3402-4f63-98fa-c69dac6fcc05",
+    "fieldRefs": [],
+    "resumable": false,
+    "retryable": false,
+    "activityRefs": [],
+    "schemaVersion": 2,
+    "recoveryAction": "NONE"
+  },
+  "noRetryOrAdditionalExperiment": true,
+  "newUnknownSpendReceipts": 0,
+  "allNewUsageKnown": true,
+  "verificationResponseAccepted": false,
+  "actualInvalidReferenceOccurrences": 28,
+  "sourceSchemaReproduction": "PASSED",
+  "publishedRevisions": 0,
+  "apply": null,
+  "englishPreserved": true,
+  "estimatedCostUsd": 0.036717408,
+  "conservativeCostUpperBoundUsd": 0.036944,
+  "priorUnknownSpendingPreserved": true,
+  "preflight": {
+    "freshUnpaidPostgresPilot": 1,
+    "freshUnpaidLegacyPostgres": 225,
+    "guardTestsPassed": 23,
+    "frozenSourcePins": 387,
+    "frozenInputPins": 6,
+    "datesAndCalendar": "PASSED_BEFORE_PAID_CALLS"
+  },
+  "liveObservationHarness": {
+    "status": "PASSED",
+    "observationTests": 1,
+    "legacyPostgres": 225,
+    "requiredSkips": 0,
+    "educationalQualification": "INCOMPLETE_UNASSESSED"
+  },
+  "preservation": {
+    "baselineFiles": 5962,
+    "changedBaselineFiles": [],
+    "missingFiles": [],
+    "frozenSourceOrInputChanges": [],
+    "productionConfigurationChanges": [],
+    "deployed": false,
+    "authorizedNewOneUseMarker": "documentation/planner/reports/2026-10-28-phase-c-c01-corrected-preparation/evidence/authorization-consumed.json"
+  },
+  "static": {
+    "localLinksChecked": 17,
+    "brokenLinks": [],
+    "whitespace": [],
+    "credentialLeakMatches": []
+  },
+  "sleepPrevention": {
+    "sessionId": 19409,
+    "activeThroughoutPreflightExecutionAndAudit": true,
+    "release": "RELEASED_AFTER_EXECUTION_AND_FINAL_AUDIT",
+    "observedExitCode": 1,
+    "releasedAt": "2026-10-29T02:16:54.538Z"
+  },
+  "keyCapsuleCleanup": {
+    "status": "REMOVED_OWN_DISPOSABLE_CAPSULE",
+    "at": "2026-10-29T02:16:24.315Z",
+    "storedCredentialsUnchanged": true
+  },
+  "limits": [
+    "No complete dossier, strategy, translation, schedule or educational review was produced.",
+    "No independent human-expert qualification or consistency claim.",
+    "Per-request usage is actual; published-rate costs are estimates, not an invoice."
+  ],
+  "executedSourceSnapshots": 11
+}

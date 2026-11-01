@@ -1,0 +1,51 @@
+{
+ "label": "pixel",
+ "passed": 8,
+ "failed": 0,
+ "skipped": 0,
+ "collectionFailures": [],
+ "finishedAt": "2026-11-01T06:21:24.422Z",
+ "scope": "Handlers in-process on disposable PostgreSQL 17. Hosted Supabase, Redis and storage were not used.",
+ "cases": [
+  {
+   "file": "__tests__/pixel-display/database-consolidation.test.ts",
+   "name": "real PostgreSQL companion persistence keeps stable IDs through rename and makes lost-response retries idempotent",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/pixel-display/database-consolidation.test.ts",
+   "name": "real PostgreSQL companion persistence does not confuse identical owner-scoped legacy slugs and rejects unowned equip",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/pixel-display/database-consolidation.test.ts",
+   "name": "real PostgreSQL companion persistence atomically repairs an equipped reference when deleting",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/pixel-display/database-consolidation.test.ts",
+   "name": "real PostgreSQL companion persistence serializes concurrent quota checks and revision writers",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/pixel-display/database-consolidation.test.ts",
+   "name": "real PostgreSQL companion persistence enforces RLS even if an external grant is reintroduced, and denies anonymous access",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/pixel-display/database-consolidation.test.ts",
+   "name": "real PostgreSQL companion persistence resolves selected target-owner art, privacy and blocks without exposing libraries",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/pixel-display/database-consolidation.test.ts",
+   "name": "real PostgreSQL companion persistence rejects legacy blank selections while retaining the document for editing",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/pixel-display/database-consolidation.test.ts",
+   "name": "real PostgreSQL companion persistence saves and equips a drawing painted entirely with the sixteenth swatch",
+   "status": "passed"
+  }
+ ]
+}

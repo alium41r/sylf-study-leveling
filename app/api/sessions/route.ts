@@ -7,6 +7,7 @@ import { revalidateTag } from "next/cache";
 import { durablePlanner } from "@/lib/planner/v2/server/web";
 import { DurablePlannerError } from "@/lib/planner/v2/server/database";
 import { StudySessionTransitionV2Schema } from "@/lib/planner/v2/contracts";
+import { nextPage, pageLimit } from "@/lib/pagination";
 
 const startSessionSchema = z.object({
   questId: z.number().int().optional(),
@@ -44,12 +45,34 @@ function invalidateSessionViews(userId: number) {
   } catch { /* Direct route tests have no Next.js request lifecycle. */ }
 }
 
+/** A student's finished sessions, newest first, a page at a time. It reads the (userId, startedAt) index, and costs the same at any history size. */
+async function listRecentSessions(req: NextRequest, userId: number) {
+  const limit = pageLimit(req.nextUrl.searchParams, 50);
+  const cursor = req.nextUrl.searchParams.get("cursor");
+  if (limit === null || limit === "invalid" || (cursor !== null && !/^\d{1,10}$/.test(cursor))) return NextResponse.json({ error: "Invalid session" }, { status: 400 });
+  const rows = await prisma.studySession.findMany({
+    where: { userId, endedAt: { not: null } },
+    select: { id: true, startedAt: true, endedAt: true, durationMinutes: true, durationSeconds: true, breakSeconds: true, focusRate: true,
+      subject: { select: { name: true, color: true } }, quest: { select: { title: true } } },
+    orderBy: [{ startedAt: "desc" }, { id: "desc" }],
+    take: limit + 1,
+    ...(cursor ? { cursor: { id: Number(cursor) }, skip: 1 } : {}),
+  });
+  const { page, nextCursor } = nextPage(rows, limit);
+  return NextResponse.json({
+    sessions: page.map(row => ({ id: row.id, startedAt: row.startedAt, endedAt: row.endedAt, durationSeconds: row.durationSeconds > 0 ? row.durationSeconds : row.durationMinutes * 60,
+      breakSeconds: row.breakSeconds || 0, focusRate: row.focusRate, subjectName: row.subject?.name ?? null, subjectColor: row.subject?.color ?? null, questTitle: row.quest?.title ?? null })),
+    nextCursor,
+  });
+}
+
 /** Restore an owned authoritative timer after refresh/client takeover. */
 export async function GET(req: NextRequest) {
   const session = await getSession(req);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const owner = req.nextUrl.searchParams.get("expectedOwnerId");
   if (owner !== null && Number(owner) !== session.userId) return NextResponse.json({ error: "ACCOUNT_CHANGED", message: "Sign in to the original account to sync this saved session." }, { status: 409 });
+  if (!req.nextUrl.searchParams.has("id")) return listRecentSessions(req, session.userId);
   const id = Number(req.nextUrl.searchParams.get("id"));
   if (!Number.isSafeInteger(id) || id <= 0) return NextResponse.json({ error: "Invalid session" }, { status: 400 });
   try { return NextResponse.json(await durablePlanner().sessions.restore(session.userId, id)); }

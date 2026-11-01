@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../prisma";
 import { AI_COST_USD_PER_1M, AI_PRICING_VERSION } from "./config";
 
-import { hasAiRequest } from "./telemetry";
+import { hasAiRequest } from "./telemetry-runtime";
 import type { LLMUsage } from "./providers/types";
 
 export interface AiUsageEntry {

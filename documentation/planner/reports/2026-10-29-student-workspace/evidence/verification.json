@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "status": "PASSED",
+  "finishedAt": "2026-10-29T06:57:47.513828+00:00",
+  "node": "24.21.0",
+  "paidProviderCalls": 0,
+  "productionDeployed": false,
+  "productionConfigurationChanged": false,
+  "migrationsDeployed": false,
+  "realModelSuccessClaimed": false,
+  "formalPhaseC": "DEFERRED_NOT_PASSED",
+  "checks": {
+    "postgres": {
+      "passed": 626,
+      "v2": 401,
+      "legacy": 225,
+      "failed": 0,
+      "requiredSkipped": 0,
+      "report": "postgres-http-final/postgres-harness-run.json",
+      "pins": "PASSED"
+    },
+    "units": {
+      "passed": 476,
+      "failed": 0,
+      "pending": 0,
+      "report": "unit-navigation-final.json"
+    },
+    "build": {
+      "status": "PASSED",
+      "report": "navigation-build/results.json"
+    },
+    "browser": {
+      "status": "PASSED",
+      "report": "browser-navigation-final.json"
+    },
+    "lint": {
+      "status": "PASSED",
+      "errors": 0,
+      "newCodeWarnings": 0,
+      "retainedShellWarnings": 2,
+      "reports": [
+        "lint-navigation-final.log",
+        "lint-navigation-shell.log"
+      ]
+    },
+    "static": {
+      "status": "PASSED",
+      "report": "static-final.json",
+      "globalExistingLimit": "Unrelated notes-license trailing whitespace retained"
+    }
+  },
+  "retention": "retention.json",
+  "preservation": "source-preservation.json",
+  "sourcePins": "implementation-source-pins.json",
+  "limits": [
+    "Provider responses are scripted; model correctness/translation semantics/reviewer accuracy remain unqualified",
+    "Default-off feature needs configured compatible local worker/provider/private storage and existing migrations for manual use",
+    "Same-host loopback readiness; one goal per UI creation; finite transport/storage/context envelopes",
+    "Two pre-existing unused mobile settings imports remain warnings; no scoped lint errors",
+    "Original full snapshot removed externally after the recorded preservation audit; scoped later patches and known concurrent evidence retained"
+  ],
+  "completionAudit": "../COMPLETION_AUDIT.md",
+  "cleanup": {
+    "disposablePostgresHarness": "completed successfully; native harness cleanup retained in its receipt",
+    "fixtureServer": "stopped after browser verification",
+    "taskSleepPrevention": "released",
+    "hostRuntimeInstallationChanged": false
+  },
+  "currentImplementationPinsMatched": 42
+}

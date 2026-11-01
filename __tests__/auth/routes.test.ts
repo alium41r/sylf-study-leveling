@@ -126,6 +126,7 @@ describe("Phase 1: API Route Handlers", () => {
       };
 
       vi.spyOn(prisma.user, "findUnique").mockResolvedValue(mockDbUser as any);
+      vi.spyOn(prisma.studySession, "findMany").mockResolvedValue([]);
 
       const req = new NextRequest("http://localhost:3000/api/user/stats", {
         headers: {

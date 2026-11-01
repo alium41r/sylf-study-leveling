@@ -5,7 +5,8 @@ import { connect, user } from "./database";
 import { PlannerDatabase } from "@/lib/planner/v2/server/database";
 import { IntentService } from "@/lib/planner/v2/server/intents";
 import { AttemptService, newBudget } from "@/lib/planner/v2/server/attempts";
-import { intentFixture, revisionFixture, changeSetFixture } from "../contracts/fixtures";
+import { revisionFixture, changeSetFixture } from "../contracts/fixtures";
+import { intentFixture } from "./intent-fixture";
 import { RevisionService, revisionDigest, educationalDigest, qualityEvidenceDigest } from "@/lib/planner/v2/server/revisions";
 import { ApplyService } from "@/lib/planner/v2/server/apply";
 import { SessionService } from "@/lib/planner/v2/server/sessions";
@@ -58,6 +59,17 @@ async function proposal() {
   return { ownerId, ...created, attempt, revision, changeSet, token: token! };
 }
 describe("Phase 1 actual durable repositories", () => {
+  it.each(["observed","coordinated"] as const)("survives an asynchronously terminated %s connection without committing or replaying",async mode=>{
+    const ownerId=await user(connection);let executions=0;
+    await expect(db[mode](ownerId,async sql=>{
+      executions++;const pid=(await sql.query("SELECT pg_backend_pid() AS pid")).rows[0].pid;
+      const disconnected=new Promise<void>(resolve=>(sql as pg.PoolClient).once("error",()=>resolve()));
+      await connection.query("SELECT pg_terminate_backend($1)",[pid]);await disconnected;
+      return "must not commit";
+    })).rejects.toThrow();
+    expect(executions).toBe(1);
+    expect(await db.observed(ownerId,async sql=>(await sql.query("SELECT 1 AS healthy")).rows[0].healthy)).toBe(1);
+  });
   it("creates one owned immutable intent and returns an identical retry", async () => {
     const ownerId = await user(connection); const key = randomUUID();
     const [first, second] = await Promise.all([intents.create(ownerId, key, intentFixture()), intents.create(ownerId, key, intentFixture())]);

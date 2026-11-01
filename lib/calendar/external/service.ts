@@ -1,4 +1,5 @@
 import "server-only";
+import { externalEventDTO, rangeMonths, externalCoverage } from "../projection";
 import { randomUUID } from "node:crypto";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
@@ -20,12 +21,8 @@ import {
 } from "./security";
 import { ProviderError } from "./http";
 import { fetchFeed, expandSubscription } from "./subscriptions";
-export function rangeMonths(start: string, end: string) {
-  const result: string[] = [];
-  for (let date = start; date < end; date = addDays(date, 1))
-    if (!result.includes(date.slice(0, 7))) result.push(date.slice(0, 7));
-  return result;
-}
+export { rangeMonths } from "../projection";
+
 export function monthBounds(month: string) {
   const start = month + "-01",
     d = new Date(start + "T12:00:00Z");
@@ -85,41 +82,8 @@ export async function pruneCalendarCache(
   });
 }
 
-export function externalEventDTO(
-  row: { id: string; revision: number; data: unknown; updatedAt: Date },
-  calendar: {
-    id: string;
-    name: string;
-    writable: boolean;
-    visible?: boolean;
-    planning?: boolean;
-    connection: { provider: string };
-  }
-): CalendarEvent {
-  const raw = row.data as unknown as ProviderEvent;
-  const data = eventInputSchema.parse(raw.data);
-  return {
-    ...data,
-    id: row.id,
-    revision: row.revision,
-    createdAt: row.updatedAt.toISOString(),
-    updatedAt: row.updatedAt.toISOString(),
-    external: {
-      calendarId: calendar.id,
-      calendarName: calendar.name,
-      provider: calendar.connection.provider as CalendarProvider,
-      writable: calendar.writable,
-      seriesId: raw.seriesId,
-      recurring: raw.recurring || false,
-      originalStart: raw.originalStart,
-      busy: raw.busy !== false,
-      meeting: raw.meeting || false,
-      etag: raw.etag,
-      visible: calendar.visible,
-      planning: calendar.planning,
-    },
-  };
-}
+export { externalEventDTO } from "../projection";
+
 export async function readExternalProjection(
   userId: number,
   start: string,
@@ -170,15 +134,7 @@ export async function readExternalProjection(
   for (const c of calendars) {
     const complete =
       (planning && c.planning === false && !selectedCalendarId) ||
-      (c.connection.status === "ACTIVE" &&
-        rangeMonths(start, end).every((month) =>
-          c.windows.some(
-            (w) =>
-              w.month === month &&
-              w.lastSuccessAt &&
-              w.lastSuccessAt.getTime() > Date.now() - 30 * 60000
-          )
-        ));
+      externalCoverage(c.connection.status, c.windows, rangeMonths(start, end), Date.now()).complete;
     if (!complete)
       warnings.push(
         `${c.name}: calendar coverage is incomplete or over 30 minutes old. Sync or reconnect in Calendar settings before relying on free-time estimates.`

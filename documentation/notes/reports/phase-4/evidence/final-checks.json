@@ -1,0 +1,88 @@
+{
+  "capturedAt": "2026-10-20T18:01:40.002710+00:00",
+  "productionWebBuild": {
+    "command": "npm run build",
+    "exitCode": 0,
+    "log": "web-build.log"
+  },
+  "productionMobileBuild": {
+    "command": "npm run mobile:build",
+    "exitCode": 0,
+    "log": "mobile-build.log"
+  },
+  "mobileBoundaryAudit": {
+    "command": "npm run mobile:verify",
+    "exitCode": 0,
+    "log": "mobile-verify.log"
+  },
+  "typecheck": {
+    "command": "npx tsc --noEmit",
+    "exitCode": 0,
+    "log": "typecheck.log"
+  },
+  "targetedLint": {
+    "exitCode": 0,
+    "log": "lint.log"
+  },
+  "focusedRegression": {
+    "exitCode": 0,
+    "files": 11,
+    "tests": 187,
+    "log": "regression.log"
+  },
+  "handwritingBrowser": {
+    "exitCode": 0,
+    "groups": 10,
+    "pageErrors": 0,
+    "result": "ink-browser-results.json"
+  },
+  "existingBrowser": {
+    "exitCode": 0,
+    "groups": 15,
+    "pageErrors": 0,
+    "result": "browser-results.json"
+  },
+  "focusedAccessibility": {
+    "passed": true,
+    "fullAudit": false,
+    "results": [
+      "ink-accessibility-results.json",
+      "accessibility-results.json"
+    ]
+  },
+  "offlineWorker": {
+    "passed": true,
+    "result": "offline-results.json"
+  },
+  "performance": {
+    "exitCode": 0,
+    "scope": "Synthetic desktop production modules; not physical stylus or live Drive",
+    "result": "ink-performance-results.json"
+  },
+  "liveGoogleTestPerformed": false,
+  "physicalStylusTestPerformed": false,
+  "hostedMigrationApplied": false,
+  "deployed": false,
+  "phase5Started": false,
+  "separateWorkspaceStarted": false,
+  "initialLongHistoryStress": {
+    "passed": false,
+    "revisions": 310,
+    "reason": "Pre-fix diagnostic timeout under concurrent load; final 310-revision regression passes after removing unchanged-frontier replay.",
+    "log": "long-history-stress.log",
+    "specificReplayCostFixed": true
+  },
+  "sustainedQueueRegression": {
+    "passed": true,
+    "strokes": 310,
+    "retainedRevisions": ">310",
+    "unchangedSourcePageReplays": 0,
+    "caseDurationMs": 22943,
+    "log": "regression.log",
+    "hoursOfLiveProviderThroughputQualified": false
+  },
+  "finalTestLint": {
+    "exitCode": 0,
+    "log": "final-lint.log"
+  }
+}

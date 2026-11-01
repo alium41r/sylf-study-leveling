@@ -1,0 +1,66 @@
+{
+ "label": "backend-integrity-after-fix",
+ "passed": 11,
+ "failed": 0,
+ "skipped": 0,
+ "collectionFailures": [],
+ "finishedAt": "2026-10-31T19:09:42.177Z",
+ "scope": "Handlers in-process on disposable PostgreSQL 17. Hosted Supabase, Redis and storage were not used.",
+ "cases": [
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "leaderboard privacy leaves out a person who keeps their profile private, and shows it to nobody but them",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "leaderboard privacy leaves out a person who hides their rank from the public, but keeps them for friends",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "friends privacy withholds what a friend has set to private",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "friends privacy shows everything to a friend when nothing is hidden",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations cannot pull a stranger into a group",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations cannot make a shared-group relationship with a stranger",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations cannot add someone who blocked the group's creator",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations still lets friends make a group",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations rejects a participant list that is not user ids",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "timer trust boundary credits a claimed 20-day session no more than one sitting",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "rls and rpc refuses the leader-only RPC to a token with someone else's id, whichever layer stops it",
+   "status": "passed"
+  }
+ ]
+}

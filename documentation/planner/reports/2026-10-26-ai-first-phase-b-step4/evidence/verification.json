@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "finishedAt": "2026-10-26T11:48:36.540773+00:00",
+  "status": "PASSED",
+  "runtime": {
+    "node": "v24.21.0",
+    "postgres": "18.4 native"
+  },
+  "postgres": {
+    "command": "node scripts/test/test-planner-ai-first-foundation.mjs --native-bin /private/tmp/sylf-phase-a-runtime/package/native/bin --evidence-dir documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/qualified-final",
+    "passed": 517,
+    "failed": 0,
+    "retainedRequired": 488,
+    "newCapacityChecks": 29,
+    "requiredSkipped": 0,
+    "optionalPaidExcluded": 1,
+    "sourcePinStatus": "PASSED",
+    "changedDuringRun": [],
+    "evidence": "qualified-final/postgres-harness-run.json"
+  },
+  "unit": {
+    "command": "npm run test -- --run __tests__/planner-v2 __tests__/planner/search-provider.test.ts __tests__/planner/source-fetch-security.test.ts __tests__/planner/research-evidence.test.ts __tests__/planner/comparison-service.test.ts __tests__/planner/comparison-contract.test.ts __tests__/planner/intake-telemetry.test.tsx __tests__/ai/deepseek-reasoning-controls.test.ts __tests__/ai/deepseek-tool-continuity.test.ts __tests__/ai/cost-summary.test.ts __tests__/ai/dispatch-telemetry.test.ts __tests__/calendar __tests__/ai/calendar-provider-schema.test.ts __tests__/ai/calendar-tools.test.ts __tests__/ai/sylvie-calendar-tools.test.ts __tests__/lib/timezone-service.test.ts --reporter=json --outputFile=documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/final-unit-results.json",
+    "passed": 748,
+    "failed": 0,
+    "activeFiles": 67,
+    "discoveredFiles": 70,
+    "optInCalendarDiscovered": 33,
+    "evidence": "final-unit-results.json"
+  },
+  "calendarPostgres": {
+    "command": "env -i [runtime PATH, HOME, TMPDIR] node /private/tmp/sylf-calendar-step4-runner.mjs",
+    "passed": 33,
+    "failed": 0,
+    "skipped": 0,
+    "files": 3,
+    "evidence": "calendar-postgres-results.json",
+    "runner": "calendar-postgres-runner.mjs",
+    "originalHarness": "scripts/test/test-calendar-postgres.mjs",
+    "originalHarnessDigest": "a8ef4654a342d2f8737a7ef99ce73f8d6c70e23791442571d8379d76be7dc173"
+  },
+  "typecheck": {
+    "command": "npx tsc --noEmit",
+    "exitCode": 0,
+    "evidence": "typecheck.log"
+  },
+  "lint": {
+    "command": "npx eslint <26 changed source files> --format json",
+    "files": 26,
+    "errors": 0,
+    "warnings": 0,
+    "evidence": "lint.json"
+  },
+  "worker": {
+    "command": "npm run planner:worker:build",
+    "exitCode": 0,
+    "evidence": "worker-build.log",
+    "imports": {
+      "status": "PASSED",
+      "node": "v24.21.0",
+      "modules": [
+        "planner/v2/server/compiler",
+        "planner/v2/server/calendar-capacity",
+        "planner/v2/server/foundation",
+        "planner/v2/server/understanding",
+        "planner/v2/server/attempts",
+        "planner/v2/server/worker",
+        "planner/v2/server/revisions",
+        "planner/v2/server/apply",
+        "planner/v2/intelligence/allocator",
+        "planner/v2/intelligence/capacity",
+        "planner/v2/intelligence/foundation/readers",
+        "calendar/planning",
+        "calendar/projection",
+        "calendar/recurrence",
+        "calendar/dates"
+      ],
+      "networkRequests": 0,
+      "credentialsInherited": false,
+      "finishedAt": "2026-10-26T11:45:58.601Z"
+    }
+  },
+  "prisma": {
+    "command": "npx prisma validate",
+    "exitCode": 0,
+    "evidence": "prisma-validate.log"
+  },
+  "web": {
+    "command": "NODE_OPTIONS=--max-old-space-size=6144 npx next build --webpack",
+    "exitCode": 0,
+    "evidence": "web-build.log"
+  },
+  "mobile": {
+    "command": "npm run mobile:build && npm run mobile:verify",
+    "exitCode": 0,
+    "evidence": [
+      "mobile-build.log",
+      "mobile-verify.log"
+    ]
+  },
+  "paidProviderCalls": 0,
+  "productionRoutingChanged": false,
+  "migrationsDeployed": false,
+  "prismaFieldsChanged": false,
+  "remainingBoundaries": [
+    "Strategy/translation Step 5; independent review/refinement Step 6; sealed publication/ApplyService with full live revalidation Step 7",
+    "Snapshot freshness is finite; no clock appointments or permanent external conflict guarantee",
+    "General git diff whitespace audit has pre-existing Notes license CRLF/trailing whitespace; unchanged task-start hash. Scoped check passes."
+  ],
+  "disposableMigrationsAppliedForQualification": true
+}

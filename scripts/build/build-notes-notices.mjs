@@ -40,6 +40,8 @@ for (const name of [
   "y-protocols",
   "fflate",
   "perfect-freehand",
+  "pdfjs-dist",
+  "pdf-lib",
 ])
   walk(name);
 let text =

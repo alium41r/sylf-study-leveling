@@ -1,0 +1,240 @@
+{
+  "passed": true,
+  "results": {
+    "opensInHome": true,
+    "startsCollapsed": true,
+    "iconHasName": {
+      "ok": true,
+      "detail": "Spaces. Current Space: Home"
+    },
+    "iconTouchTargetAtLeast44": {
+      "ok": true,
+      "detail": {
+        "w": 44,
+        "h": 44
+      }
+    },
+    "iconClearOfStatusBar": {
+      "ok": true,
+      "detail": {
+        "top": 42.3
+      }
+    },
+    "touchOpens": true,
+    "currentSpaceSelected": true,
+    "tabHomeTouchTarget": {
+      "ok": true,
+      "detail": {
+        "w": 97.1,
+        "h": 44
+      }
+    },
+    "tabWorkspaceTouchTarget": {
+      "ok": true,
+      "detail": {
+        "w": 137.1,
+        "h": 44
+      }
+    },
+    "tabWorldTouchTarget": {
+      "ok": true,
+      "detail": {
+        "w": 98.3,
+        "h": 44
+      }
+    },
+    "outsideTapCloses": true,
+    "backClosesBarOnly": true,
+    "tapSwitchesSpace": true,
+    "activeIndicatorInIconName": true,
+    "leftSpaceUnmounted": true,
+    "worldEntryHasSwitcher": true,
+    "backIgnoredWhileEntering": true,
+    "gameMenuReplacesIcon": true,
+    "backOpensGameMenu": true,
+    "backResumes": true,
+    "leavingReturnsToPreviousSpace": true,
+    "spaceSurvivesProcessKill": true,
+    "killMidGameRestoresEntry": true,
+    "homeScrollRestored": {
+      "ok": true,
+      "detail": {
+        "scrolledY": 321,
+        "restoredY": 321
+      }
+    },
+    "showcaseReplacesSpaces": true,
+    "backLeavesShowcase": true,
+    "noUnnamedControls-home": true,
+    "noUnnamedControls-workspace": true,
+    "noUnnamedControls-world": true,
+    "switcherUseDoesNotClimb": {
+      "ok": true,
+      "detail": [
+        {
+          "pss": 104,
+          "graphics": 22,
+          "native": 27
+        },
+        {
+          "pss": 143,
+          "graphics": 25,
+          "native": 48
+        },
+        {
+          "pss": 147,
+          "graphics": 25,
+          "native": 50
+        },
+        {
+          "pss": 149,
+          "graphics": 25,
+          "native": 51
+        }
+      ]
+    },
+    "popUpWindowResized": {
+      "ok": true,
+      "detail": {
+        "wide": {
+          "rect": [
+            40,
+            150,
+            1400,
+            1300
+          ],
+          "reported": "SYLF_WINDOW 777x657 class=medium fontScale=1.149999976158142",
+          "tabs": 3,
+          "right": 720,
+          "labelled": true
+        },
+        "medium": {
+          "rect": [
+            40,
+            150,
+            1200,
+            1500
+          ],
+          "reported": "SYLF_WINDOW 663x771 class=medium fontScale=1.149999976158142",
+          "tabs": 3,
+          "right": 720,
+          "labelled": true
+        },
+        "compact": {
+          "rect": [
+            40,
+            150,
+            860,
+            1600
+          ],
+          "reported": "SYLF_WINDOW 469x829 class=compact fontScale=1.149999976158142",
+          "tabs": 3,
+          "right": 720,
+          "labelled": true
+        },
+        "narrow": {
+          "rect": [
+            40,
+            150,
+            620,
+            1400
+          ],
+          "reported": "SYLF_WINDOW 331x714 class=compact fontScale=1.149999976158142",
+          "tabs": 3,
+          "right": 369,
+          "labelled": false
+        }
+      }
+    },
+    "barInsideEveryWindow": true,
+    "resizeDoesNotRemountSpace": true,
+    "noCrashes": true
+  },
+  "windows": {
+    "wide": {
+      "rect": [
+        40,
+        150,
+        1400,
+        1300
+      ],
+      "reported": "SYLF_WINDOW 777x657 class=medium fontScale=1.149999976158142",
+      "tabs": 3,
+      "right": 720,
+      "labelled": true
+    },
+    "medium": {
+      "rect": [
+        40,
+        150,
+        1200,
+        1500
+      ],
+      "reported": "SYLF_WINDOW 663x771 class=medium fontScale=1.149999976158142",
+      "tabs": 3,
+      "right": 720,
+      "labelled": true
+    },
+    "compact": {
+      "rect": [
+        40,
+        150,
+        860,
+        1600
+      ],
+      "reported": "SYLF_WINDOW 469x829 class=compact fontScale=1.149999976158142",
+      "tabs": 3,
+      "right": 720,
+      "labelled": true
+    },
+    "narrow": {
+      "rect": [
+        40,
+        150,
+        620,
+        1400
+      ],
+      "reported": "SYLF_WINDOW 331x714 class=compact fontScale=1.149999976158142",
+      "tabs": 3,
+      "right": 369,
+      "labelled": false
+    }
+  },
+  "switcherMemory": [
+    {
+      "pss": 104,
+      "graphics": 22,
+      "native": 27
+    },
+    {
+      "pss": 143,
+      "graphics": 25,
+      "native": 48
+    },
+    {
+      "pss": 147,
+      "graphics": 25,
+      "native": 50
+    },
+    {
+      "pss": 149,
+      "graphics": 25,
+      "native": 51
+    }
+  ],
+  "frames": {
+    "total": "913",
+    "janky": [
+      "18",
+      "1.97"
+    ],
+    "p50": "12",
+    "p90": "15",
+    "p95": "17",
+    "p99": "23"
+  },
+  "totalPssMb": 266,
+  "device": "SM-X510",
+  "wm": "Physical size: 1440x2304",
+  "fontScale": "1.15"
+}

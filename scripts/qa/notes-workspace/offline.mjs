@@ -1,10 +1,18 @@
 /** Actual production SW; disposable loopback server/browser. No authenticated content is cached. */
 import { createServer } from "node:http";
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import assert from "node:assert/strict";
 const { chromium } = await import(
   process.env.NOTES_PLAYWRIGHT_MODULE || "playwright"
 );
+const evidence =
+  process.env.NOTES_QA_EVIDENCE ||
+  new URL(
+    "../../../documentation/notes/reports/phase-3/evidence/",
+    import.meta.url
+  ).pathname;
+mkdirSync(evidence, { recursive: true });
 const server = createServer((req, res) => {
   const path = new URL(req.url, "http://localhost").pathname;
   if (path === "/sw.js") {
@@ -54,10 +62,7 @@ try {
   assert((await page.locator("body").innerText()).includes("Reconnect"));
   assert(!(await page.locator("body").innerText()).includes("PRIVATE"));
   await page.screenshot({
-    path: new URL(
-      "../../../documentation/notes/reports/phase-3/evidence/offline-locked.png",
-      import.meta.url
-    ).pathname,
+    path: join(evidence, "offline-locked.png"),
   });
   const result = {
     passed: true,
@@ -66,10 +71,7 @@ try {
     offlineContentUnlock: false,
   };
   writeFileSync(
-    new URL(
-      "../../../documentation/notes/reports/phase-3/evidence/offline-results.json",
-      import.meta.url
-    ),
+    join(evidence, "offline-results.json"),
     JSON.stringify(result, null, 2)
   );
   console.log(JSON.stringify(result));

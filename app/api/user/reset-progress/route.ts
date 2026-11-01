@@ -2,9 +2,10 @@ import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
 import { assertNoLinkedQuests, assertNoPlannerGoals, isPlannerConflict } from "@/lib/planner/server/mutation-guards";
 import { getSession } from "@/lib/auth-server";
-import { signToken, AUTH_COOKIE_NAME, AUTH_COOKIE_OPTIONS } from "@/lib/auth";
+import { attachReissuedSession } from "@/lib/auth-session-service";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { checkSecurityCode } from "@/lib/security-code";
 import { invalidateRankingsCache } from "@/lib/cache-service";
 
 export async function POST(req: NextRequest) {
@@ -47,23 +48,15 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const tokenKey = `RESET_PROGRESS:${code.trim()}`;
-      const validToken = await prisma.verificationToken.findFirst({
-        where: {
-          userId: session.userId,
-          token: tokenKey,
-          expiresAt: { gt: new Date() },
-        },
-      });
-
-      if (!validToken) {
+      const check = await checkSecurityCode(session.userId, "RESET_PROGRESS", code.trim());
+      if (!check.valid) {
         return NextResponse.json(
-          { error: "Invalid or expired security code. Please request a new one." },
-          { status: 400 }
+          { error: check.retryAfterSeconds ? "Too many wrong codes. Request a new one." : "Invalid or expired security code. Please request a new one." },
+          { status: check.retryAfterSeconds ? 429 : 400 }
         );
       }
 
-      verifiedTokenId = validToken.id;
+      verifiedTokenId = check.tokenId;
     }
 
     // Execute atomic reset
@@ -113,7 +106,7 @@ export async function POST(req: NextRequest) {
     invalidateRankingsCache();
 
     // Sign fresh token with updated stats
-    const newToken = await signToken({
+    const tokenPayload = {
       userId: updatedUser.id,
       email: updatedUser.email,
       username: updatedUser.username,
@@ -125,7 +118,7 @@ export async function POST(req: NextRequest) {
       hasCompletedOnboarding: updatedUser.hasCompletedOnboarding,
       hasPassword: updatedUser.password !== null,
       tokenVersion: updatedUser.tokenVersion,
-    });
+    };
 
     const response = NextResponse.json(
       {
@@ -146,7 +139,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
 
-    response.cookies.set(AUTH_COOKIE_NAME, newToken, AUTH_COOKIE_OPTIONS);
+    await attachReissuedSession(response, session, tokenPayload);
     return response;
   } catch (error) {
     if (error instanceof Error && error.message === "SECURITY_CODE_EXPIRED_OR_USED") return NextResponse.json({ error: "Invalid or expired security code. Please request a new one." }, { status: 400 });

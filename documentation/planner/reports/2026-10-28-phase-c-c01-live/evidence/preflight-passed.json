@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "status": "PASSED",
+  "unpaidChecks": [
+    "Frozen source/input integrity",
+    "Scripted full PostgreSQL journey and Apply/replay",
+    "PostgreSQL expired-review cancellation with known settled late usage and no second review",
+    "Seven guard tests",
+    "Full TypeScript",
+    "Scoped ESLint",
+    "Fresh model metadata and sufficient USD balance",
+    "Current published peak rates unchanged"
+  ],
+  "paidCallsSoFar": 0,
+  "runId": "28d07541-4655-450d-a0cc-59dbdca750ab",
+  "ceilingUsd": 1.75,
+  "checkedAt": "2026-10-28T15:18:49.401Z"
+}

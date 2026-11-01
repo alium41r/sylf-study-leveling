@@ -1,0 +1,116 @@
+{
+  "passed": false,
+  "failed": [
+    "in-empty-canvas",
+    "in-over-window",
+    "in-finger-lifted",
+    "out-empty-canvas",
+    "out-over-window",
+    "out-finger-lifted"
+  ],
+  "crashed": false,
+  "results": [
+    {
+      "name": "in-empty-canvas",
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "zoom": 100
+      },
+      "after": {
+        "zoom": 200
+      },
+      "zoomRatio": null,
+      "fingerRatio": 2.385,
+      "errorPx": null
+    },
+    {
+      "name": "in-over-window",
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "zoom": 100
+      },
+      "after": {
+        "left": 569,
+        "top": 760,
+        "right": 1020,
+        "zoom": 100
+      },
+      "zoomRatio": 1,
+      "fingerRatio": 2.385,
+      "errorPx": 171
+    },
+    {
+      "name": "in-finger-lifted",
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "zoom": 100
+      },
+      "after": {
+        "zoom": 200
+      },
+      "zoomRatio": null,
+      "fingerRatio": 2.385,
+      "errorPx": null
+    },
+    {
+      "name": "out-empty-canvas",
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "zoom": 100
+      },
+      "after": {
+        "left": 696,
+        "top": 1365,
+        "right": 898,
+        "zoom": 45
+      },
+      "zoomRatio": 0.448,
+      "fingerRatio": 0.419,
+      "errorPx": 130
+    },
+    {
+      "name": "out-over-window",
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "zoom": 100
+      },
+      "after": {
+        "left": 287,
+        "top": 566,
+        "right": 738,
+        "zoom": 100
+      },
+      "zoomRatio": 1,
+      "fingerRatio": 0.419,
+      "errorPx": 171
+    },
+    {
+      "name": "out-finger-lifted",
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "zoom": 100
+      },
+      "after": {
+        "left": 288,
+        "top": 566,
+        "right": 739,
+        "zoom": 100
+      },
+      "zoomRatio": 1,
+      "fingerRatio": 0.419,
+      "errorPx": 170
+    }
+  ]
+}

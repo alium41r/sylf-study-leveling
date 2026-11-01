@@ -1,0 +1,100 @@
+npm notice run sylf@0.1.0 prebuild
+npm notice run npm run calendar:recognition:build && node scripts/build/build-notes-notices.mjs && node scripts/build/build-notes-pdf-assets.mjs
+npm notice run sylf@0.1.0 calendar:recognition:build
+npm notice run node scripts/build/build-calendar-recognition.mjs
+Notes notices generated for 63 installed dependency packages; exact BlockNote source included.
+Pinned PDF.js worker and local resource/license files copied.
+npm notice run sylf@0.1.0 build
+npm notice run next build --webpack
+▲ Next.js 16.2.9 (webpack)
+- Environments: .env.local, .env
+- Experiments (use with caution):
+  · optimizePackageImports
+  · proxyClientMaxBodySize: "13mb"
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 27.6s
+  Running TypeScript ...
+
+  We detected TypeScript in your project and reconfigured your tsconfig.json file for you.
+  The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+
+  	- include was updated to add 'dist/database-migrations-next/types/**/*.ts'
+  	- include was updated to add 'dist/database-migrations-next/dev/types/**/*.ts'
+
+
+<--- Last few GCs --->
+
+[71521:0x8b880c000]    30919 ms: Scavenge (interleaved) 2033.5 (2049.9) -> 2030.3 (2058.4) MB, pooled: 0 MB, 4.38 / 0.00 ms  (average mu = 0.207, current mu = 0.112) allocation failure; 
+[71521:0x8b880c000]    31264 ms: Mark-Compact (reduce) 2038.4 (2059.4) -> 2035.6 (2049.1) MB, pooled: 0 MB, 307.54 / 0.00 ms  (+ 6.2 ms in 121 steps since start of marking, biggest step 3.5 ms, walltime since start of marking 334 ms) (average mu = 0.225, 
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0x1023659f4 node::OOMErrorHandler(char const*, v8::OOMDetails const&) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 2: 0x1025e0000 v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 3: 0x10283f4b4 v8::internal::Heap::stack() [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 4: 0x102842888 v8::internal::Heap::HasLowYoungGenerationAllocationRate() [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 5: 0x102853a7c v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags)::$_1::operator()() const [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 6: 0x102853350 void heap::base::Stack::SetMarkerAndCallbackImpl<v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags)::$_1>(heap::base::Stack*, void*, void const*) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 7: 0x103207be0 PushAllRegistersAndIterateStack [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 8: 0x10283d1b8 v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 9: 0x102831ec4 v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+10: 0x1028135a4 v8::internal::Factory::NewFillerObject(int, v8::internal::AllocationAlignment, v8::internal::AllocationType, v8::internal::AllocationOrigin) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+11: 0x102ca2d9c v8::internal::Runtime_AllocateInYoungGeneration(int, unsigned long*, v8::internal::Isolate*) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+12: 0x1032fa234 Builtins_CEntry_Return1_ArgvOnStack_NoBuiltinExit [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+13: 0x12f1324f4 
+14: 0x12efd3964 
+15: 0x12efd10b0 
+16: 0x12f0c0d9c 
+17: 0x12efe25b4 
+18: 0x12ec7de00 
+19: 0x12f0c0bb0 
+20: 0x12f10e69c 
+21: 0x12f0c0e8c 
+22: 0x12efd0cac 
+23: 0x12f0c0d9c 
+24: 0x12df007ac 
+25: 0x12f096b04 
+26: 0x12f09c078 
+27: 0x12ef1c320 
+28: 0x12eecc268 
+29: 0x12f0c1364 
+30: 0x12f145930 
+31: 0x12f0c1934 
+32: 0x12ef42a40 
+33: 0x12f0c13b4 
+34: 0x12f1cc030 
+35: 0x12f3717b4 
+36: 0x12f353658 
+37: 0x12f163114 
+38: 0x12f0e060c 
+39: 0x12f162b38 
+40: 0x12e515b50 
+41: 0x12f025328 
+42: 0x12f02a678 
+43: 0x12e51d3ac 
+44: 0x10325cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+45: 0x10325cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+46: 0x10329b7e8 Builtins_AsyncFunctionAwaitResolveClosure [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+47: 0x103370e58 Builtins_PromiseFulfillReactionJob [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+48: 0x10328abd0 Builtins_RunMicrotasks [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+49: 0x10325a7b0 Builtins_JSRunMicrotasksEntry [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+50: 0x102783690 v8::internal::(anonymous namespace)::Invoke(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+51: 0x102783f04 v8::internal::(anonymous namespace)::InvokeWithTryCatch(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+52: 0x102784040 v8::internal::Execution::TryRunMicrotasks(v8::internal::Isolate*, v8::internal::MicrotaskQueue*) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+53: 0x1027b2de4 v8::internal::MicrotaskQueue::RunMicrotasks(v8::internal::Isolate*) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+54: 0x1027b3744 v8::internal::MicrotaskQueue::PerformCheckpoint(v8::Isolate*) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+55: 0x1022430b8 node::InternalCallbackScope::Close() [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+56: 0x102242a90 node::InternalCallbackScope::~InternalCallbackScope() [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+57: 0x10236b118 node::fs::FileHandle::CloseReq::Resolve() [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+58: 0x1023868c4 node::fs::FileHandle::ClosePromise()::$_0::__invoke(uv_fs_s*) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+59: 0x10235b444 node::MakeLibuvRequestCallback<uv_fs_s, void (*)(uv_fs_s*)>::Wrapper(uv_fs_s*) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+60: 0x103233af8 uv__work_done [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+61: 0x103237548 uv__async_io [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+62: 0x10324be40 uv__io_poll [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+63: 0x103237e9c uv_run [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+64: 0x1022446a8 node::SpinEventLoopInternal(node::Environment*) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+65: 0x1023c07d8 node::NodeMainInstance::Run() [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+66: 0x1023127e0 node::Start(int, char**) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+67: 0x18eb6fe00 start [/usr/lib/dyld]
+Next.js build worker exited with code: null and signal: SIGABRT

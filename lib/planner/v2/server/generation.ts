@@ -4,6 +4,8 @@ import { AttemptService, loadAttempt, newBudget, persistAttempt } from "./attemp
 import { IntentService, ownedPlan, loadIntent } from "./intents";
 import { ownedDocumentMetadata } from "./documents";
 import { PlannerDatabase, hash, rows, reject } from "./database";
+import { loadCompilerVersion, readCompilerVersion, type CompilerVersion } from "./compiler-version";
+import type { ResourcePolicy } from "../intelligence/foundation/resources";
 
 const target = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("NEW"), intent: CanonicalIntentV2Schema }),
@@ -27,16 +29,27 @@ export const GenerateRequestV2Schema = withPlannerEnvelope(z.strictObject({
 export class GenerationService {
   readonly attempts:AttemptService;
   readonly intents:IntentService;
-  constructor(readonly db:PlannerDatabase){this.attempts=new AttemptService(db);this.intents=new IntentService(db);}
+  readonly compilerVersion: CompilerVersion;
+  constructor(readonly db:PlannerDatabase, readonly options: { compilerVersion?: CompilerVersion; studentPreview?: boolean; resources?: Omit<ResourcePolicy,"authorizationDigest"> } = {}){this.compilerVersion=readCompilerVersion(options.compilerVersion ?? 1);this.attempts=new AttemptService(db);this.intents=new IntentService(db);}
   async accept(ownerId:number,raw:unknown,signal?:AbortSignal){
-    const request=GenerateRequestV2Schema.parse(raw),requestDigest=hash("generation-admission",request);
+    const request=GenerateRequestV2Schema.parse(raw),requestDigest=hash("generation-admission",this.compilerVersion === 1 ? request : { ...request, compilerVersion: this.compilerVersion, ...(this.options.resources ? { resources: this.options.resources } : {}) });
     signal?.throwIfAborted();
     return this.db.coordinated(ownerId,async sql=>{
       signal?.throwIfAborted();
       const existing=(await rows<{id:string}>(sql,'SELECT id FROM "PlannerAttempt" WHERE "userId"=$1 AND "requestKey"=$2',[ownerId,request.requestKey]))[0];
       if(existing){const stored=await loadAttempt(sql,ownerId,existing.id);
+        if(await loadCompilerVersion(sql,existing.id)!==this.compilerVersion)reject("IDEMPOTENCY_MISMATCH","This generation key is pinned to another compiler version.","INTAKE");
         if(stored.payload.generationRequestDigest!==requestDigest)reject("IDEMPOTENCY_MISMATCH","This generation key belongs to different accepted input.","INTAKE");
         return {attempt:stored.attempt,replayed:true};}
+      if(this.options.studentPreview)for(const target of request.targets){
+        if(target.kind!=="EXISTING")reject("INTENT_CONFLICT","Save and inspect the accepted goal before preview admission.","INTAKE");
+        await ownedPlan(sql,ownerId,target.planId);
+        const prior=(await rows<{artifact:{state:string;budget:{rootRequestId:string}}}>(sql,`SELECT artifact FROM "PlannerAttempt" WHERE "userId"=$1 AND EXISTS (SELECT 1 FROM jsonb_array_elements(artifact->'targets') t WHERE t->>'planId'=$2) ORDER BY "createdAt" DESC,id DESC LIMIT 1`,[ownerId,target.planId]))[0];
+        if(prior){
+          if(["QUEUED","RUNNING","NEEDS_DECISION"].includes(prior.artifact.state))reject("INTENT_CONFLICT","Finish, answer or explicitly stop the saved journey before starting a new request.","INTAKE");
+          if((await rows(sql,`SELECT id FROM "AiUsageLog" WHERE "userId"=$1 AND "rootRequestId"=$2 AND "accountingState" IN ('DISPATCHED','UNKNOWN_SPEND') LIMIT 1`,[ownerId,prior.artifact.budget.rootRequestId])).length)reject("BUDGET_EXHAUSTED","The saved journey has uncertain spending. Reconcile it before authorizing another request.","INTAKE");
+        }
+      }
       // All membership/base/CAS checks precede edits; a later failure rolls back
       // the complete save, supersession and enqueue across both selected Plans.
       for(const t of request.targets.filter(t=>t.kind==="EXISTING").sort((a,b)=>a.planId.localeCompare(b.planId))){
@@ -57,7 +70,8 @@ export class GenerationService {
       const h=hash("generation-root",{ownerId,key:request.requestKey}),rootId=`${h.slice(0,8)}-${h.slice(8,12)}-5${h.slice(13,16)}-a${h.slice(17,20)}-${h.slice(20,32)}`;
       const attempt=await this.attempts.enqueueAccepted(sql,ownerId,{key:request.requestKey,text:request.text,
         kind:targets.length===2?"JOINT":targets[0].baseRevisionId?"REPLAN":"PLAN",targets,
-        budget:newBudget(request.researchRequested?"RESEARCH":"EDUCATIONAL",rootId),...(request.parentAttemptId?{parentAttemptId:request.parentAttemptId}:{})});
+        budget:newBudget(request.researchRequested?"RESEARCH":"EDUCATIONAL",rootId), compilerVersion:this.compilerVersion,
+        ...(this.options.resources ? { resourcePolicy: { ...this.options.resources, authorizationDigest: hash("authorized-targets", targets) } } : {}), ...(request.parentAttemptId?{parentAttemptId:request.parentAttemptId}:{})});
       const stored=await loadAttempt(sql,ownerId,attempt.attemptId);
       const readTargets=[];
       if(request.researchRequested)for(const t of targets){const intent=await loadIntent(sql,ownerId,t.intentId);readTargets.push({planId:t.planId,intentId:t.intentId,intentDigest:hash("research-intent",intent.intent)});}

@@ -1,0 +1,721 @@
+{
+  "label": "phase1",
+  "files": 9,
+  "passed": 161,
+  "failed": 2,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [
+    {
+      "name": "durable calendar-aware compiler-v2 capacity retains running selected work once and invalidates capacity when Focus changes",
+      "messages": [
+        "Error: Calendar, learning, permissions or protected execution changed; capture a new explicitly linked operation.\n    at reject (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/lib/planner/v2/server/database.ts:24:9)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/lib/planner/v2/server/calendar-capacity.ts:201:213\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at PlannerDatabase.coordinated (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/lib/planner/v2/server/database.ts:84:24)\n    at PlannerCalendarCapacity.retain (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/lib/planner/v2/server/calendar-capacity.ts:188:42)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/__tests__/planner-v2/postgres/calendar-capacity.postgres.ts:74:12\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review performs several substantive strategy/translation corrections and freshly reviews every named issue and the entire result",
+      "messages": [
+        "Error: Calendar, learning, permissions or protected execution changed; capture a new explicitly linked operation.\n    at reject (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/lib/planner/v2/server/database.ts:24:9)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/lib/planner/v2/server/calendar-capacity.ts:201:213\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at PlannerDatabase.coordinated (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/lib/planner/v2/server/database.ts:84:24)\n    at ReviewedLearningStage.dispatch (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/lib/planner/v2/server/reviewed-learning.ts:141:20)\n    at ReviewedLearningStage.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/lib/planner/v2/server/reviewed-learning.ts:204:13)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:36:21\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/__tests__/planner-v2/postgres/ai-first-foundation.postgres.ts",
+      "cases": [
+        {
+          "name": "AI-first retained artifacts on the actual durable core retains exact strategy bytes and versions, with replay and CAS",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core rejects foreign owners and forged accepted-intent correspondence",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core database backstops reject rewriting retained entries or appending without a fence",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core retains archives and accounting through lease takeover, rejecting stale and cancelled writers",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core cannot enter the legacy compiler/publication path or mutate execution",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core rejects unknown checkpoint interpretations even without a new archive",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core persists pending call identity and the complete accepted response before takeover assembly",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core keeps research-only work read-only",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core checks new storage guards at worker startup and preserves account erasure",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/__tests__/planner-v2/postgres/calendar-capacity.postgres.ts",
+      "cases": [
+        {
+          "name": "durable calendar-aware compiler-v2 capacity retains exact full research correspondence, finite freshness and immutable replay without provider calls",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity rejects foreign ownership and fabricated references",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity retains missing accepted windows as a consequential decision rather than unlimited capacity",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity accepts windows only through explicit linked student intent continuation preserving root/deadline",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity unions overlapping native commitments without double-counting minute budget",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity honors all-day blocks, rest days, blocked dates and accepted date overrides",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity uses native recurrence and sparse cancellation/moved overrides from Calendar",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity reports stale cached sources as incomplete without writing sync windows or spending",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity blocks invisible planning calendars and ignores explicitly transparent events",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity excludes opted-out disconnected calendars while detecting their later inclusion",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity does not trust cached free time while provider mutations remain unresolved",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity invalidates changed Calendar content and preserves the immutable historical snapshot",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity reads only active shared membership and rejects subsequent revocation",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity detects indivisible competing work even when scattered free minutes equal its duration",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity keeps actuals and remaining commitments as concurrent bounds charged once",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity proves accepted workload ceiling shortages independently of empty Calendar gaps",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity serializes concurrent captures without creating parallel capacity histories",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity preserves cancellation, stale fences, processing deadlines and zero execution writes",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity retains running selected work once and invalidates capacity when Focus changes",
+          "status": "failed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity replaces selected unstarted work without charging or deleting historical execution",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity rolls back both artifacts if bound-dossier assembly crashes and recovers without losing research",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity fences a Step 3 worker while retaining its research-specific older-worker guard",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity refreshes Calendar-only changes with immutable ancestry and no research/provider replay",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity charges actual accepted study on its session date separately from only the remaining competing work",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity rejects a Calendar write committed during capture before advancing and retains its historical evidence",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity never rebinds a reserved/dispatched educational call during refresh (dispatched=false)",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity never rebinds a reserved/dispatched educational call during refresh (dispatched=true)",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity rejects forged research lineage and capacity ancestry without retaining partial writes",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity uses the Research context's account-wide timezone when a selected Plan retains older availability",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/__tests__/planner-v2/postgres/compiler-versions.postgres.ts",
+      "cases": [
+        {
+          "name": "compiler admission, dispatch and historical compatibility admits v2 only from trusted service configuration and binds exact replay",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility defaults old admission to v1, retains it through recovery and forbids conversion",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility prevents a pre-versioning worker from claiming v2 during a mixed deployment",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility dispatches v2 in the existing worker without legacy calls or publication",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility keeps legacy checkpoint and resource writers closed for v2",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility recovers a fenced v2 checkpoint without resetting its version, deadline or archive",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility retains exact historical strategy and correspondence after newer drafts, cancellation and ownership checks",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility preserves canonical v1 publication, historical read, apply replay and protected execution",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility retains hard exam deadlines when fixtures intentionally exceed them",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility reads pre-V2 historical snapshots without fabricating a blueprint or reviewer approval",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/__tests__/planner-v2/postgres/generation-integration.postgres.ts",
+      "cases": [
+        {
+          "name": "existing generation requires authentication and enabled V2 admission before writes",
+          "status": "passed"
+        },
+        {
+          "name": "strict server admission rejects client budget and permission and forged mastery before writes",
+          "status": "passed"
+        },
+        {
+          "name": "queues without execution and durable operation/workspace reads recover the accepted target",
+          "status": "passed"
+        },
+        {
+          "name": "replays exact canonical input without duplicate creation and rejects changed-key reuse",
+          "status": "passed"
+        },
+        {
+          "name": "existing foreign target returns ownership failure without creating a first new joint target",
+          "status": "passed"
+        },
+        {
+          "name": "joint final-intent saving and enqueue roll back together on a late enqueue failure",
+          "status": "passed"
+        },
+        {
+          "name": "new plan and reserved intent roll back when enqueue is unavailable",
+          "status": "passed"
+        },
+        {
+          "name": "checks both current baselines before editing and rejects duplicate targets",
+          "status": "passed"
+        },
+        {
+          "name": "abort after final intent saving rolls the whole admission back",
+          "status": "passed"
+        },
+        {
+          "name": "the HTTP supervised compiler produces a sealed candidate that canonical confirmation applies exactly once",
+          "status": "passed"
+        },
+        {
+          "name": "final edited intent enqueues and replay survives the version increment",
+          "status": "passed"
+        },
+        {
+          "name": "joint compiled candidates apply all or none and the canonical route recovers after transaction rollback",
+          "status": "passed"
+        },
+        {
+          "name": "zero-new-work reviewed candidate confirms without manufacturing a Quest",
+          "status": "passed"
+        },
+        {
+          "name": "actual started execution is KEPT across compiler and canonical apply",
+          "status": "passed"
+        },
+        {
+          "name": "capacity changes after actual compiler publication block canonical apply without execution writes",
+          "status": "passed"
+        },
+        {
+          "name": "maximum HTTP transport and over-count targets fail explicitly with no partial admission",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/__tests__/planner-v2/postgres/natural-learning.postgres.ts",
+      "cases": [
+        {
+          "name": "natural strategy, faithful translation and real allocation supplies all ten verified research sources, adopted/rejected evidence and provenance without a legacy nine-source limit",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation preserves the settled strategy and blocks further work if actual uploaded bytes change during reasoning",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation books a shared prerequisite once across two goals and preserves the compiled dependency",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation retains conditional and optional education without booking its potential effort as required work",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation retains zero newly booked work and NONE deadlines without inventing a completion promise",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation keeps an incomplete allocation search distinct from a proven capacity shortage",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation records missing effective identity and cache pricing as unknown rather than fabricated",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation blocks uncertain dispatch and its Calendar refresh without automatic replay or a new budget",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation cancellation during reasoning wins over content while late actual finance remains truthful",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation respects the original absolute deadline through a slow strategy response",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation starts a linked continuation with the original deadline, accepted intent and aggregate consumed accounting",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation refuses a forged full-input snapshot before any strategy dispatch",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation retains exact natural TEXT, complete accepted input, actual identity/usage and an unreviewed executable candidate",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation replays durable candidates without repeating any role or minting identities",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation keeps independent review, confirmation and publication closed at the real compiler boundary",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation retains translation INCOMPLETE with its educational routing and consequential question",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation retains explicit semantic gaps without approving or allocating them",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation rejects invented anchor correspondence rather than inventing education",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation rejects invented resource correspondence rather than inventing education",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation rejects invented readiness correspondence rather than inventing education",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation rejects invented activity correspondence rather than inventing education",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation recovers a saved response after authoring assembly crashes without a repeated call",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation rolls back strategy and its checkpoint together on a checkpoint crash",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation preserves original input when Calendar changes during STRATEGIST and revalidates the entire workload",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation preserves original input when Calendar changes during TRANSLATOR and revalidates the entire workload",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation preserves identities and raw authorship across a later Calendar-only reallocation",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation retains the complete required education and mathematical shortage instead of shortening it",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation expands only declared meaningful splits and preserves full instructions, criteria and total duration",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation keeps owned unstarted work unchanged and charges it exactly once",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation preserves running approved content and its exact execution specification alongside new education",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation re-expands only original declared split points when a long translation encounters narrower Calendar gaps",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation preserves protected running work and stops on consequential Focus changes during reasoning",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation does not accept or automatically repeat MAX_TOKENS output",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation does not accept or automatically repeat OTHER output",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation preserves ownership, cancellation and worker fencing before authoring",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation serializes concurrent stage runners without dispatching duplicate strategy calls",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation rejects changed natural text or owned input even if a writer recomputes hashes",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation fences a Step 4 worker before it can claim an admitted natural-learning attempt",
+          "status": "passed"
+        },
+        {
+          "name": "natural strategy, faithful translation and real allocation also fences a previous worker version attempting takeover under the same worker identity",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts",
+      "cases": [
+        {
+          "name": "durable independent complete-result review runs a complete independent review to READY without publication",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review performs several substantive strategy/translation corrections and freshly reviews every named issue and the entire result",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review withdraws a false objection without changing educational content or claiming a repair",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review invalidates a completed assessment after Calendar changes and fully reallocates before a fresh complete review",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review stops a repeated unchanged correction only after independent reconsideration, retaining the blocker",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review corrects a known complete invalid review while accounting explicitly for its rejected objection",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review retains complete independent inputs, actual producer/finance and immutable approved assessment",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review recovers a complete saved review after a worker assembly interruption without another provider call",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rejects forged approval before an actual independently accepted complete response exists",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review persists grounded blocking issues and their actual routes without creating a cleared candidate",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back issue/review/checkpoint assembly together and preserves the settled response",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review enforces ownership, cancellation and fencing before independent dispatch",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/__tests__/planner-v2/postgres/role-resources.postgres.ts",
+      "cases": [
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL retains natural TEXT exactly, sends explicit effort/cap, and records reasoning once with effective identity",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL supports JSON translation/review and more than the legacy six/five-call ceiling",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL serializes concurrent reservations and preserves translation plus review/verification holdbacks",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL continues one root without resetting counters, quota or deadline and prevents sibling branches",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL retains uncertain spend through stopping and permits continuation only after actual reconciliation",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL resumes a complete response after takeover and never repeats its provider call",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL retains incomplete output and actual usage without approval, silent repetition or provider fallback",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL expires role work even when the provider ignores abort and reconciles late spend without changing failed history",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL enforces ownership and immutable policy/deadline at both service and SQL boundaries",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL keeps truthful actual overrun and unknown price while stopping further work",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL binds saved checkpoint text to its actual role receipt rather than a fabricated response",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL admits only one child under simultaneous continuations",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL keeps missing accounting usage uncertain and blocks subsequent role dispatch",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL retains actual spend on physical response overflow without clipping the education",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/__tests__/planner-v2/postgres/timer-lifecycle.postgres.ts",
+      "cases": [
+        {
+          "name": "timer lifecycle on genuine PostgreSQL settles delayed Focus Party exits once and ignores a replay after rejoining",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL cuts off an in-flight party pause/resume at the original saved exit and preserves the prior participation base",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL closes a Focus Party when its last members leave concurrently",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL denies direct public economic RPC calls with a fabricated timer owner",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL uses authoritative pause/resume and receipt replay for an ordinary timer",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL pays zero-delta final settlement exactly once after all time was checkpointed",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL freezes final time, rewards and end timestamp against late higher/lower heartbeats and retries",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL replays a lost start response after END and converges concurrent creation on one row",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL recovers a long offline creation without the old 30-minute truncation",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL does not silently close another subject's unsaved active session",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL keeps focus plus break inside one wall budget when stale writers disagree",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL recovers a delayed weekly mission once and repairs the streak without rewinding its latest week",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL rejects foreign sessions and forged Quest linkage without changing any ledger",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL replays offline V2 pause/resume/end intervals with exact accounting and durable receipts",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-3THmDL/__tests__/planner-v2/postgres/understanding.postgres.ts",
+      "cases": [
+        {
+          "name": "durable compiler-v2 Research & Understanding completes a context-only dossier without unnecessary questions or web research",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding reads owned uploaded contents and independently checks support without upgrading private issuer authority",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding keeps fabricated literal evidence rejected and asks about unresolved assessment identity",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding returns unsupported synthesis to Research for substantive correction before dossier acceptance",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding retains consequential clarification and continues with original root, deadline, exact instructions and accounting",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding requires explicit student-accepted canonical changes for hard facts and retains old immutable intent history",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding rejects foreign ownership, stale decision digests, incomplete answers and concurrent sibling decisions",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding does not ask already answered information again without explaining a new consequential conflict",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding recovers the exact saved model response after a crash without a duplicate call",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding rejects a saved response after concurrent commitments change the protected context",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding blocks silent repeats and continuations after an uncertain search dispatch",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding retains real search provenance, safe fetch hops and known per-request DeepSeek cost",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding routes bounded OCR through the existing DeepSeek adapter and the same role receipts",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding refuses invented fetch URLs and does not dispatch research without accepted permission",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding rejects changed uploaded bytes before recovering a saved dossier",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding keeps cancellation, original deadline and closed downstream compiler gates authoritative",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding admits explicit deep tool allowances and inherits them instead of the old eight-query/one-follow-up caps",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding bounds a noncooperative search by the absolute deadline and accepts only its late financial settlement",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding database guards reject changed research input and financial receipt identity",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding fences a Step 2 worker from new research interpretation during mixed deployment",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

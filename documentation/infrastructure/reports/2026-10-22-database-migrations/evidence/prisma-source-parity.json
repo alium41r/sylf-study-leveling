@@ -1,0 +1,7 @@
+{
+  "source": "Schema-only restore from hosted SQL backup plus the applied Notes SQL",
+  "columnDefinitionsExact": true,
+  "physicalColumnPositionIgnored": "pg_dump compacts dropped-column ordinal gaps without changing definitions",
+  "constraintsExact": true,
+  "indexesExact": true
+}

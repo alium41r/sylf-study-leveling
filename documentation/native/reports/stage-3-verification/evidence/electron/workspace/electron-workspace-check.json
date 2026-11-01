@@ -1,0 +1,887 @@
+{
+  "summary": {
+    "passed": false,
+    "total": 184,
+    "failed": [
+      "dotsAtEveryZoom",
+      "dotsKeepOneSize",
+      "dotSpacingStaysReadable"
+    ]
+  },
+  "checks": {
+    "opensWithEmptyCanvas": true,
+    "noPageOverflow": true,
+    "dragPansCanvas": true,
+    "wheelPans": true,
+    "pinchZooms": true,
+    "pinchHoldsPoint": true,
+    "panStopsAtWorldEdge": true,
+    "zoomStopsAtMinimum": true,
+    "zoomStopsAtMaximum": true,
+    "resetViewReturnsHome": true,
+    "fitShowsWholeWorldWhenEmpty": true,
+    "cameraSurvivesReload": true,
+    "dotsAtEveryZoom": false,
+    "dotsKeepOneSize": false,
+    "dotSpacingStaysReadable": false,
+    "touchPinchZoomsIn": true,
+    "touchPinchHoldsPoint": true,
+    "touchPinchZoomsOut": true,
+    "touchPinchOutHoldsPoint": true,
+    "pinchEndsWithoutASnap": true,
+    "pinchOverOrdinaryToolZoomsCanvas": true,
+    "pinchAcrossWindowEdgeZoomsCanvas": true,
+    "pinchOn_notes_LeavesCanvasStill": true,
+    "pinchOn_pdfs_LeavesCanvasStill": true,
+    "pinchOn_whiteboard_LeavesCanvasStill": true,
+    "pinchAcrossNotesEdgeZoomsCanvas": true,
+    "pinchFromTitleBarZoomsCanvas": true,
+    "pinchFromTitleBarLeavesWindow": true,
+    "dockHas_notes": true,
+    "dockHas_pdfs": true,
+    "dockHas_whiteboard": true,
+    "dockHas_planner": true,
+    "dockHas_calendar": true,
+    "dockHas_sylvie": true,
+    "dockHas_timer": true,
+    "dockHas_calculator": true,
+    "dockHas_audio": true,
+    "dockHas_resources": true,
+    "dockCentered": true,
+    "dockOpensTool": true,
+    "toolInView": true,
+    "singleToolNotDoubled": true,
+    "dockMenuOpens": true,
+    "dockMenuOpensNewWindow": true,
+    "dockListsInstances": true,
+    "zoomMenuOpens": true,
+    "closeButtonCloses": true,
+    "opens_notes": true,
+    "opens_pdfs": true,
+    "opens_whiteboard": true,
+    "opens_planner": true,
+    "opens_calendar": true,
+    "opens_sylvie": true,
+    "opens_timer": true,
+    "opens_calculator": true,
+    "opens_audio": true,
+    "opens_resources": true,
+    "calculatorUsesRealEngine": true,
+    "calculatorKeepsState": true,
+    "shelfOpensDocument": true,
+    "twoInstancesOfOneTool": true,
+    "dragMovesWindow": true,
+    "dragLandsOnGrid": true,
+    "dragLeavesOthersAlone": true,
+    "pressFocuses": true,
+    "focusRaises": true,
+    "pressInsideFocusesAndActs": true,
+    "cornerResizes": true,
+    "resizeStopsAtToolMinimum": true,
+    "leadingEdgeResizeHoldsFarEdge": true,
+    "cameraLeavesWindowsAlone": true,
+    "minimizeKeepsWindow": true,
+    "minimizedShowsChip": true,
+    "minimizedLeavesTabOrder": true,
+    "restoreKeepsPlace": true,
+    "instancesAreIndependent": true,
+    "stageNeverScrolls": true,
+    "dragStaysInWorld": true,
+    "focusFillsWithOneTool": true,
+    "focusClosesNothing": true,
+    "focusIsAt100Percent": true,
+    "focusTucksCommandCenter": true,
+    "handleBringsCommandCenterBack": true,
+    "splitPlacesTwoSideBySide": true,
+    "assistantPutsSylvieBeside": true,
+    "backRestoresArrangement": true,
+    "backReturnsCamera": true,
+    "adjustmentBecomesFree": true,
+    "layoutSurvivesRestart": true,
+    "restoredWindowsAreOnScreen": true,
+    "restoredToolStateShows": true,
+    "layoutSurvivesSpaceChange": true,
+    "badWindowDroppedOthersKept": true,
+    "corruptWorkspaceOpensEmpty": true,
+    "minimizedToolIsBackground": true,
+    "overviewReleasesContent": true,
+    "framesRemainInOverview": true,
+    "overviewPressFrames": true,
+    "toolReturnsAfterOverview": true,
+    "timerKeptTimeWhileAway": true,
+    "hiddenTimerRendersNothing": true,
+    "idleWorkspaceWritesNothing": true,
+    "altDigitOpensTool": true,
+    "altBracketCycles": true,
+    "altMMinimizes": true,
+    "altWCloses": true,
+    "altFFocus": true,
+    "escapeLeavesFocus": true,
+    "commandKOpensSwitcher": true,
+    "switcherOpensByTyping": true,
+    "arrowsMoveWindow": true,
+    "shiftArrowsResizeWindow": true,
+    "spaceShowsHand": true,
+    "spaceDragPansOverWindow": true,
+    "spaceReleaseEndsHand": true,
+    "stageIgnoresScrollIntoView": true,
+    "compactShowsOneTool": true,
+    "compactFillsWidth": true,
+    "crossingWidthDoesNotRemount": true,
+    "compactNoOverflow": true,
+    "dockSwitchesToolInCompact": true,
+    "compactNeverBlank": true,
+    "compactChangesNoWorldPosition": true,
+    "everyControlNamed": true,
+    "textContrastAtLeast45": true,
+    "minimizedNotTabbable": true,
+    "toolbarNamed": true,
+    "windowsNamed": true,
+    "reducedMotionOpensTool": true,
+    "reducedMotionDoesNotCoast": true,
+    "contrast_signature-light": true,
+    "contrast_signature-dark": true,
+    "contrast_studio-light": true,
+    "contrast_studio-dark": true,
+    "contrast_arcane-light": true,
+    "contrast_arcane-dark": true,
+    "contrast_voxel-light": true,
+    "contrast_voxel-dark": true,
+    "contrast_cozy-light": true,
+    "contrast_cozy-dark": true,
+    "contrast_student-light": true,
+    "contrast_student-dark": true,
+    "contrast_custom-dark": true,
+    "contrast_custom-light": true,
+    "panHolds60": true,
+    "zoomHolds60": true,
+    "dragHolds60": true,
+    "resizeHolds60": true,
+    "fullWorkspacePanHolds60": true,
+    "mountedContentStaysInBudget": true,
+    "entersUnder300ms": true,
+    "noOverflow_wide": true,
+    "dockFits_wide": true,
+    "noOverflow_expanded": true,
+    "dockFits_expanded": true,
+    "noOverflow_medium": true,
+    "dockFits_medium": true,
+    "noOverflow_short": true,
+    "dockFits_short": true,
+    "noOverflow_compact": true,
+    "dockFits_compact": true,
+    "renders_signature_light": true,
+    "renders_signature_dark": true,
+    "renders_studio_light": true,
+    "renders_studio_dark": true,
+    "renders_arcane_light": true,
+    "renders_arcane_dark": true,
+    "renders_voxel_light": true,
+    "renders_voxel_dark": true,
+    "renders_cozy_light": true,
+    "renders_cozy_dark": true,
+    "renders_student_light": true,
+    "renders_student_dark": true,
+    "windowsRetainNoNodes": true,
+    "windowsRetainNoHeap": true,
+    "spaceRetainsNoNodes": true,
+    "spaceRetainsNoHeap": true,
+    "probeRetainsNoHeap_views": true,
+    "probeRetainsNoNodes_views": true,
+    "probeRetainsNoHeap_text": true,
+    "probeRetainsNoNodes_text": true,
+    "probeRetainsNoHeap_pressable": true,
+    "probeRetainsNoNodes_pressable": true,
+    "noConsoleErrors": true
+  },
+  "results": {
+    "afterPan": {
+      "x": 3178.301868433745,
+      "y": 2009.270525031281,
+      "zoom": 1
+    },
+    "afterPinch": {
+      "x": 3498.3035505270623,
+      "y": 2134.3034268285683,
+      "zoom": 1.822118800390509
+    },
+    "atCorner": {
+      "x": 520,
+      "y": 257.5,
+      "zoom": 1
+    },
+    "dots": {
+      "1": {
+        "count": 72,
+        "light": 1668,
+        "spacing": 28
+      },
+      "2": {
+        "count": 81,
+        "light": 1464,
+        "spacing": 28
+      },
+      "0.2": {
+        "count": 24,
+        "light": 1651,
+        "spacing": 44.9
+      },
+      "0.35": {
+        "count": 36,
+        "light": 1662,
+        "spacing": 39.3
+      },
+      "0.5": {
+        "count": 64,
+        "light": 1667,
+        "spacing": 28
+      },
+      "0.71": {
+        "count": 36,
+        "light": 1659,
+        "spacing": 39.8
+      },
+      "1.4": {
+        "count": 0,
+        "light": 0,
+        "spacing": 0
+      }
+    },
+    "pinch": {
+      "emptyIn": {
+        "ratio": 1.311,
+        "error": 2.4,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2801.8128662109375,
+          "y": 1811.09375,
+          "zoom": 1.3114754098360657
+        }
+      },
+      "emptyOut": {
+        "ratio": 0.582,
+        "error": 1.6,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2797.1875,
+          "y": 1846.953125,
+          "zoom": 0.5818181818181817
+        }
+      },
+      "fingersLift": {
+        "ratio": 1.626,
+        "error": 0,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2800,
+          "y": 1805.5557858425452,
+          "zoom": 1.6264897781449994
+        }
+      },
+      "calculatorInside": {
+        "ratio": 1.311,
+        "error": 2.5,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2801.875,
+          "y": 1823.325,
+          "zoom": 1.3114754098360657
+        }
+      },
+      "calculatorEdge": {
+        "ratio": 1.311,
+        "error": 2.5,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2841.775,
+          "y": 1823.325,
+          "zoom": 1.3114754098360657
+        }
+      },
+      "notesInside": {
+        "ratio": 1,
+        "error": 0,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        }
+      },
+      "pdfsInside": {
+        "ratio": 1,
+        "error": 0,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        }
+      },
+      "whiteboardInside": {
+        "ratio": 1,
+        "error": 0,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        }
+      },
+      "notesEdge": {
+        "ratio": 1.311,
+        "error": 2.5,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2875.025,
+          "y": 1823.325,
+          "zoom": 1.3114754098360657
+        }
+      },
+      "fromTitleBar": {
+        "ratio": 1.309,
+        "error": 0,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2825.943396226415,
+          "y": 1764.811320754717,
+          "zoom": 1.308641975308642
+        }
+      }
+    },
+    "dock": {
+      "x": 333.51300048828125,
+      "y": 683,
+      "width": 613,
+      "height": 60
+    },
+    "calculatorPreview": "8",
+    "moved": {
+      "from": [
+        2520,
+        1512
+      ],
+      "to": [
+        2744,
+        1652
+      ],
+      "zoom": 0.6
+    },
+    "resized": {
+      "from": [
+        336,
+        532
+      ],
+      "to": [
+        448,
+        616
+      ]
+    },
+    "scrollers": [
+      false
+    ],
+    "assistant": [
+      [
+        "calculator",
+        560
+      ],
+      [
+        "sylvie",
+        392
+      ]
+    ],
+    "timerRunning": "24:59",
+    "overviewMounted": 3,
+    "timerAfter": "24:54",
+    "compactShown": [
+      "workspace-window-w2"
+    ],
+    "audit": {
+      "controls": 118,
+      "unnamed": 0,
+      "names": [],
+      "lowest": 4.52,
+      "sample": {
+        "text": "25 min",
+        "ratio": 4.52
+      },
+      "hiddenTabbable": 0
+    },
+    "reducedPan": {
+      "first": {
+        "x": 2650,
+        "y": 1790,
+        "zoom": 1
+      },
+      "second": {
+        "x": 2650,
+        "y": 1790,
+        "zoom": 1
+      },
+      "start": {
+        "x": 640,
+        "y": 378
+      }
+    },
+    "contrast": {
+      "signature-light": {
+        "lowest": 4.68,
+        "sample": {
+          "text": "=",
+          "ratio": 4.68
+        }
+      },
+      "signature-dark": {
+        "lowest": 4.52,
+        "sample": {
+          "text": "25 min",
+          "ratio": 4.52
+        }
+      },
+      "studio-light": {
+        "lowest": 5.24,
+        "sample": {
+          "text": "25 min",
+          "ratio": 5.24
+        }
+      },
+      "studio-dark": {
+        "lowest": 4.52,
+        "sample": {
+          "text": "25 min",
+          "ratio": 4.52
+        }
+      },
+      "arcane-light": {
+        "lowest": 5.3,
+        "sample": {
+          "text": "=",
+          "ratio": 5.3
+        }
+      },
+      "arcane-dark": {
+        "lowest": 5.6,
+        "sample": {
+          "text": "Complex numbers",
+          "ratio": 5.6
+        }
+      },
+      "voxel-light": {
+        "lowest": 5.33,
+        "sample": {
+          "text": "=",
+          "ratio": 5.33
+        }
+      },
+      "voxel-dark": {
+        "lowest": 5.62,
+        "sample": {
+          "text": "Complex numbers",
+          "ratio": 5.62
+        }
+      },
+      "cozy-light": {
+        "lowest": 5.52,
+        "sample": {
+          "text": "25 min",
+          "ratio": 5.52
+        }
+      },
+      "cozy-dark": {
+        "lowest": 4.54,
+        "sample": {
+          "text": "25 min",
+          "ratio": 4.54
+        }
+      },
+      "student-light": {
+        "lowest": 5.48,
+        "sample": {
+          "text": "25 min",
+          "ratio": 5.48
+        }
+      },
+      "student-dark": {
+        "lowest": 4.5,
+        "sample": {
+          "text": "25 min",
+          "ratio": 4.5
+        }
+      },
+      "custom-dark": {
+        "lowest": 5.43,
+        "sample": {
+          "text": "25 min",
+          "ratio": 5.43
+        }
+      },
+      "custom-light": {
+        "lowest": 4.91,
+        "sample": {
+          "text": "Complex numbers",
+          "ratio": 4.91
+        }
+      }
+    },
+    "panFrames": {
+      "frames": 145,
+      "p50": 16.7,
+      "p95": 17.3,
+      "p99": 17.6,
+      "max": 17.7
+    },
+    "zoomFrames": {
+      "frames": 145,
+      "p50": 16.7,
+      "p95": 17,
+      "p99": 17.6,
+      "max": 17.7
+    },
+    "dragFrames": {
+      "frames": 95,
+      "p50": 16.7,
+      "p95": 17.5,
+      "p99": 17.7,
+      "max": 17.7
+    },
+    "resizeFrames": {
+      "frames": 95,
+      "p50": 16.7,
+      "p95": 17.3,
+      "p99": 17.6,
+      "max": 17.6
+    },
+    "fullWorkspace": {
+      "nodes": 2019,
+      "mounted": 11
+    },
+    "fullPanFrames": {
+      "frames": 145,
+      "p50": 16.7,
+      "p95": 16.8,
+      "p99": 17.4,
+      "max": 17.6
+    },
+    "enterMs": [
+      19.1,
+      17.8,
+      16.7,
+      20.3,
+      23.3
+    ],
+    "memory": {
+      "processes": 4,
+      "workingSetMb": 663,
+      "rendererMb": 343
+    },
+    "windowRetention": [
+      {
+        "nodes": 252,
+        "listeners": 259,
+        "heapMb": 11.26
+      },
+      {
+        "nodes": 431,
+        "listeners": 290,
+        "heapMb": 11.92
+      },
+      {
+        "nodes": 431,
+        "listeners": 290,
+        "heapMb": 12.07
+      },
+      {
+        "nodes": 431,
+        "listeners": 290,
+        "heapMb": 12.21
+      },
+      {
+        "nodes": 431,
+        "listeners": 290,
+        "heapMb": 12.32
+      },
+      {
+        "nodes": 431,
+        "listeners": 290,
+        "heapMb": 12.35
+      },
+      {
+        "nodes": 431,
+        "listeners": 290,
+        "heapMb": 12.37
+      },
+      {
+        "nodes": 431,
+        "listeners": 290,
+        "heapMb": 12.45
+      }
+    ],
+    "spaceRetention": [
+      {
+        "nodes": 876,
+        "listeners": 594,
+        "heapMb": 14.21
+      },
+      {
+        "nodes": 876,
+        "listeners": 595,
+        "heapMb": 14.68
+      },
+      {
+        "nodes": 876,
+        "listeners": 595,
+        "heapMb": 14.96
+      },
+      {
+        "nodes": 876,
+        "listeners": 595,
+        "heapMb": 15.17
+      },
+      {
+        "nodes": 876,
+        "listeners": 595,
+        "heapMb": 15.27
+      },
+      {
+        "nodes": 876,
+        "listeners": 595,
+        "heapMb": 15.35
+      },
+      {
+        "nodes": 876,
+        "listeners": 595,
+        "heapMb": 15.39
+      }
+    ],
+    "probe_views": [
+      {
+        "nodes": 52,
+        "listeners": 187,
+        "heapMb": 7.72,
+        "status": "views 5"
+      },
+      {
+        "nodes": 52,
+        "listeners": 187,
+        "heapMb": 7.81,
+        "status": "views 26"
+      },
+      {
+        "nodes": 352,
+        "listeners": 187,
+        "heapMb": 8.41,
+        "status": "views 46"
+      },
+      {
+        "nodes": 52,
+        "listeners": 187,
+        "heapMb": 7.89,
+        "status": "views 67"
+      },
+      {
+        "nodes": 52,
+        "listeners": 187,
+        "heapMb": 7.91,
+        "status": "views 88"
+      },
+      {
+        "nodes": 352,
+        "listeners": 187,
+        "heapMb": 8.47,
+        "status": "views 108"
+      },
+      {
+        "nodes": 52,
+        "listeners": 187,
+        "heapMb": 7.93,
+        "status": "views 129"
+      }
+    ],
+    "probe_text": [
+      {
+        "nodes": 52,
+        "listeners": 187,
+        "heapMb": 7.66,
+        "status": "text 5"
+      },
+      {
+        "nodes": 52,
+        "listeners": 187,
+        "heapMb": 7.8,
+        "status": "text 26"
+      },
+      {
+        "nodes": 952,
+        "listeners": 187,
+        "heapMb": 8.6,
+        "status": "text 46"
+      },
+      {
+        "nodes": 52,
+        "listeners": 187,
+        "heapMb": 7.87,
+        "status": "text 67"
+      },
+      {
+        "nodes": 52,
+        "listeners": 187,
+        "heapMb": 7.91,
+        "status": "text 88"
+      },
+      {
+        "nodes": 952,
+        "listeners": 187,
+        "heapMb": 8.69,
+        "status": "text 108"
+      },
+      {
+        "nodes": 952,
+        "listeners": 187,
+        "heapMb": 8.83,
+        "status": "text 129"
+      }
+    ],
+    "probe_pressable": [
+      {
+        "nodes": 52,
+        "listeners": 187,
+        "heapMb": 7.74,
+        "status": "pressable 5"
+      },
+      {
+        "nodes": 52,
+        "listeners": 187,
+        "heapMb": 7.87,
+        "status": "pressable 26"
+      },
+      {
+        "nodes": 352,
+        "listeners": 787,
+        "heapMb": 9.9,
+        "status": "pressable 46"
+      },
+      {
+        "nodes": 52,
+        "listeners": 187,
+        "heapMb": 7.91,
+        "status": "pressable 67"
+      },
+      {
+        "nodes": 52,
+        "listeners": 187,
+        "heapMb": 7.96,
+        "status": "pressable 88"
+      },
+      {
+        "nodes": 352,
+        "listeners": 787,
+        "heapMb": 9.98,
+        "status": "pressable 108"
+      },
+      {
+        "nodes": 352,
+        "listeners": 787,
+        "heapMb": 10.23,
+        "status": "pressable 129"
+      }
+    ],
+    "homeScrollThrottled": {
+      "today": {
+        "valid": true,
+        "frames": 115,
+        "p50": 16.7,
+        "p95": 18.1,
+        "max": 18.6,
+        "over20": 0,
+        "events": 109
+      },
+      "focus": {
+        "valid": true,
+        "frames": 115,
+        "p50": 16.7,
+        "p95": 18.3,
+        "max": 18.6,
+        "over20": 0,
+        "events": 109
+      },
+      "circle": {
+        "valid": true,
+        "frames": 115,
+        "p50": 16.7,
+        "p95": 18,
+        "max": 18.6,
+        "over20": 0,
+        "events": 108
+      },
+      "progress": {
+        "valid": true,
+        "frames": 115,
+        "p50": 16.7,
+        "p95": 18.4,
+        "max": 18.7,
+        "over20": 0,
+        "events": 108
+      },
+      "showcase": {
+        "valid": true,
+        "frames": 115,
+        "p50": 16.7,
+        "p95": 18.3,
+        "max": 18.5,
+        "over20": 0,
+        "events": 108
+      }
+    },
+    "consoleErrors": []
+  }
+}

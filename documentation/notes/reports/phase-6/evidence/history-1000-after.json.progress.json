@@ -1,0 +1,10 @@
+{
+  "stage": "audit",
+  "detail": {
+    "skipped": false,
+    "ms": 869.2566670000001,
+    "objectReads": 2001,
+    "uniqueHashes": 2001
+  },
+  "at": "2026-10-21T14:09:54.270Z"
+}

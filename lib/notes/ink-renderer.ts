@@ -1,4 +1,7 @@
 import { getStroke } from "perfect-freehand";
+import { isDarkColor } from "@/lib/color-utils";
+import { displayInkColor } from "./note-style";
+import { inkSegments, inkOpacity, strokePieces } from "./ink-geometry";
 import type { InkStroke, InkPaper, InkSample, InkBrush } from "./ink";
 export interface InkViewport {
   zoom: number;
@@ -73,15 +76,45 @@ export class InkSpatialIndex {
 export function inkOutline(
   points: readonly InkSample[],
   style: InkBrush,
-  last = true
+  last = true,
+  tiltOverride?: number
 ) {
+  // Retained stylus tilt shades with the side of a pencil; zero-tilt and legacy
+  // brushes keep their original geometry. Input samples themselves never change.
+  const pencil = style.input === "pen" && style.nib === "pencil";
+  const tilt =
+    tiltOverride ??
+    (pencil && points.length
+      ? points.reduce(
+          (n, p) => n + Math.min(1, Math.hypot(p[4], p[5]) / 80),
+          0
+        ) / points.length
+      : 0);
+  const smoothing = style.smoothing ?? 0.65;
   return getStroke(
-    points.map((p) => [p[0], p[1], p[2]]),
+    points.map((p) => [
+      p[0],
+      p[1],
+      pencil
+        ? Math.min(
+            1,
+            p[2] * 0.75 + Math.min(1, Math.hypot(p[4], p[5]) / 80) * 0.4
+          )
+        : style.nib === "brush" && style.input === "pen"
+          ? Math.pow(p[2], 0.75)
+          : p[2],
+    ]),
     {
-      size: style.width,
-      thinning: style.tool === "highlighter" ? 0 : 0.55,
-      smoothing: 0.65,
-      streamline: 0.25,
+      size: style.width * (1 + tilt * 1.8),
+      thinning:
+        style.tool === "highlighter" || style.nib === "fineliner"
+          ? 0
+          : (style.pressure ?? 1) *
+            ({ ballpoint: 0.45, fountain: 0.8, brush: 1, pencil: 0.35 }[
+              style.nib as "ballpoint"
+            ] ?? 0.55),
+      smoothing,
+      streamline: Math.min(0.42, Math.max(0.08, smoothing * 0.34)),
       simulatePressure: style.input !== "pen",
       last,
       start: { cap: true },
@@ -89,59 +122,200 @@ export function inkOutline(
     }
   );
 }
-function pathFor(points: readonly InkSample[], style: InkBrush, last = true) {
-  const outline = inkOutline(points, style, last),
-    path = new Path2D();
-  if (!outline.length) return path;
-  path.moveTo(outline[0][0], outline[0][1]);
-  for (let i = 1; i < outline.length; i++) {
-    const p = outline[i],
-      next = outline[(i + 1) % outline.length];
-    path.quadraticCurveTo(
-      p[0],
-      p[1],
-      (p[0] + next[0]) / 2,
-      (p[1] + next[1]) / 2
-    );
+function pathFor(
+  points: readonly InkSample[],
+  style: InkBrush,
+  last = true,
+  pieces?: InkSample[][],
+  tiltOverride?: number
+) {
+  const path = new Path2D();
+  for (const segment of pieces
+    ? pieces.flatMap((piece) =>
+        inkSegments(piece, { ...style, shape: undefined, straighten: false })
+      )
+    : inkSegments(points, style)) {
+    const outline = inkOutline(segment, style, last, tiltOverride);
+    if (!outline.length) continue;
+    path.moveTo(outline[0][0], outline[0][1]);
+    for (let i = 1; i < outline.length; i++) {
+      const p = outline[i],
+        next = outline[(i + 1) % outline.length];
+      path.quadraticCurveTo(
+        p[0],
+        p[1],
+        (p[0] + next[0]) / 2,
+        (p[1] + next[1]) / 2
+      );
+    }
+    path.closePath();
   }
-  path.closePath();
   return path;
 }
+export function paperGeometry(
+  paper: InkPaper,
+  width: number,
+  height: number,
+  visible?: InkRect
+) {
+  const lines: number[][] = [],
+    dots: number[][] = [],
+    labels: [string, number, number][] = [];
+  const gap = paper.spacing;
+  const left = Math.max(0, (visible?.x || 0) - 2),
+    top = Math.max(0, (visible?.y || 0) - 2);
+  const right = Math.min(
+      width,
+      visible ? visible.x + visible.width + 2 : width
+    ),
+    bottom = Math.min(
+      height,
+      visible ? visible.y + visible.height + 2 : height
+    );
+  const startAt = (start: number, step: number) =>
+    start + Math.max(0, Math.ceil((top - start) / step)) * step;
+  if (
+    paper.template === "blank" ||
+    ((right - left) * (bottom - top)) / (gap * gap) > 100000
+  )
+    return { lines, dots, labels };
+  const line = (x: number, y: number, x2: number, y2: number) => {
+    if (
+      Math.max(x, x2) >= left &&
+      Math.min(x, x2) <= right &&
+      Math.max(y, y2) >= top &&
+      Math.min(y, y2) <= bottom
+    )
+      lines.push([x, y, x2, y2]);
+  };
+  if (paper.template === "dotted") {
+    for (let y = startAt(gap, gap); y < bottom; y += gap)
+      for (
+        let x = Math.max(gap, Math.ceil(left / gap) * gap);
+        x < right;
+        x += gap
+      )
+        dots.push([x, y]);
+  } else if (paper.template === "music") {
+    for (let y = gap * 4; y + gap * 4 < height; y += gap * 8)
+      for (let i = 0; i < 5; i++)
+        line(40, y + i * gap, width - 40, y + i * gap);
+  } else if (paper.template === "weekly") {
+    const cell = (height - 140) / 4;
+    for (let i = 0; i <= 4; i++)
+      line(40, 80 + i * cell, width - 40, 80 + i * cell);
+    line(width / 2, 80, width / 2, height - 60);
+    [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+      "Notes",
+    ].forEach((text, i) =>
+      labels.push([
+        text,
+        52 + (i % 2) * (width / 2 - 40),
+        104 + Math.floor(i / 2) * cell,
+      ])
+    );
+  } else if (paper.template === "daily") {
+    labels.push(["TODAY", 40, 45], ["PRIORITIES", width * 0.67, 90]);
+    line(width * 0.64, 70, width * 0.64, height - 60);
+    for (let y = 100, h = 6; y < height - 60; y += gap * 2, h++) {
+      line(70, y, width * 0.61, y);
+      labels.push([String(h).padStart(2, "0") + ":00", 30, y]);
+    }
+    for (let y = 120; y < height - 60; y += gap)
+      line(width * 0.67, y, width - 35, y);
+  } else {
+    let start = gap * 2,
+      end = height;
+    if (paper.template === "cornell") {
+      line(width * 0.27, 60, width * 0.27, height - 180);
+      line(35, height - 180, width - 35, height - 180);
+      labels.push(
+        ["CUES", 42, 43],
+        ["NOTES", width * 0.3, 43],
+        ["SUMMARY", 42, height - 155]
+      );
+      start = 80;
+      end = height - 180;
+    }
+    if (paper.template === "journal") {
+      labels.push(
+        ["DATE  __________________", 45, 48],
+        ["WHAT I AM THINKING ABOUT", 45, 100],
+        ["ONE THING TO REMEMBER", 45, height - 150]
+      );
+      start = 130;
+      end = height - 180;
+    }
+    for (let y = startAt(start, gap); y < Math.min(end, bottom); y += gap)
+      line(
+        paper.template === "cornell"
+          ? width * 0.3
+          : paper.template === "journal"
+            ? 40
+            : 0,
+        y,
+        paper.template === "journal" ? width - 40 : width,
+        y
+      );
+    if (paper.template === "grid")
+      for (let x = gap; x < width; x += gap) line(x, 0, x, height);
+  }
+  return {
+    lines,
+    dots,
+    labels: visible
+      ? labels.filter(
+          ([, x, y]) => x <= right && y >= top - 20 && y <= bottom + 20
+        )
+      : labels,
+  };
+}
+export const paperLabelColor = (paper: InkPaper) =>
+  isDarkColor(paper.color) ? "#a6afbf" : "#687386";
 export function drawPaper(
   ctx: CanvasRenderingContext2D,
   paper: InkPaper,
   width: number,
-  height: number
+  height: number,
+  gallery = false
 ) {
   ctx.fillStyle = paper.color;
   ctx.fillRect(0, 0, width, height);
   ctx.strokeStyle = paper.rule;
   ctx.fillStyle = paper.rule;
-  ctx.lineWidth = 0.65;
-  if (paper.template === "blank") return;
-  const gap = paper.spacing;
-  // Subpixel template details are disposable; avoid unbounded dot loops on huge imported pages.
-  if (gap * Math.abs(ctx.getTransform().a) < 3) return;
+  ctx.lineWidth = gallery
+    ? Math.max(0.65, 0.5 / Math.abs(ctx.getTransform().a))
+    : 0.65;
+  const transform = ctx.getTransform();
+  const { lines, dots, labels } = paperGeometry(paper, width, height, {
+    x: -transform.e / transform.a,
+    y: -transform.f / transform.d,
+    width: ctx.canvas.width / transform.a,
+    height: ctx.canvas.height / transform.d,
+  });
+  if (!gallery && paper.spacing * Math.abs(ctx.getTransform().a) < 3) return;
   ctx.beginPath();
-  if (paper.template === "dotted") {
-    for (let y = gap; y < height; y += gap)
-      for (let x = gap; x < width; x += gap) {
-        ctx.moveTo(x + 0.9, y);
-        ctx.arc(x, y, 0.9, 0, Math.PI * 2);
-      }
-    ctx.fill();
-    return;
+  for (const [x, y, x2, y2] of lines) {
+    ctx.moveTo(x, y);
+    ctx.lineTo(x2, y2);
   }
-  for (let y = gap * 2; y < height; y += gap) {
-    ctx.moveTo(0, y);
-    ctx.lineTo(width, y);
-  }
-  if (paper.template === "grid")
-    for (let x = gap; x < width; x += gap) {
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
-    }
   ctx.stroke();
+  ctx.beginPath();
+  for (const [x, y] of dots) {
+    ctx.moveTo(x + 0.9, y);
+    ctx.arc(x, y, 0.9, 0, Math.PI * 2);
+  }
+  ctx.fill();
+  ctx.fillStyle = paperLabelColor(paper);
+  ctx.font = `500 ${gallery ? 19 : 13}px Arial, sans-serif`;
+  for (const [text, x, y] of labels) ctx.fillText(text, x, y);
 }
 export class InkRenderer {
   readonly index = new InkSpatialIndex();
@@ -154,16 +328,37 @@ export class InkRenderer {
     { version: number; path: Path2D; points: number }
   >();
   private cachedPoints = 0;
+  private liveDirty?: InkRect;
+  private liveCache?: {
+    firstX: number;
+    firstY: number;
+    checkIdx: number;
+    checkX: number;
+    checkY: number;
+    styleKey: string;
+    tilt: number;
+    prefixEnd: number;
+    prefixPath: Path2D;
+    bounds: { minX: number; minY: number; maxX: number; maxY: number };
+  };
   private width = 1;
   private height = 1;
   private dpr = 1;
+  adaptDark = false;
   viewport: InkViewport = { zoom: 1, x: 0, y: 0 };
   constructor(
     readonly base: HTMLCanvasElement,
     readonly live: HTMLCanvasElement,
-    readonly pageWidth: number,
-    readonly pageHeight: number
+    public pageWidth: number,
+    public pageHeight: number,
+    private readonly transparent = false
   ) {}
+  surfaceWidth() {
+    return this.width;
+  }
+  surfaceHeight() {
+    return this.height;
+  }
   resize(width: number, height: number) {
     this.width = Math.max(1, width);
     this.height = Math.max(1, height);
@@ -172,18 +367,29 @@ export class InkRenderer {
       2,
       Math.sqrt(4000000 / (this.width * this.height))
     );
+    const cssW = `${this.width}px`,
+      cssH = `${this.height}px`;
     for (const canvas of [this.base, this.live]) {
-      canvas.width = Math.ceil(this.width * this.dpr);
-      canvas.height = Math.ceil(this.height * this.dpr);
-      canvas.style.width = `${this.width}px`;
-      canvas.style.height = `${this.height}px`;
+      const w = Math.ceil(this.width * this.dpr),
+        h = Math.ceil(this.height * this.dpr);
+      if (canvas.width !== w || canvas.height !== h) {
+        if (canvas.width !== w) canvas.width = w;
+        if (canvas.height !== h) canvas.height = h;
+        if (canvas === this.live) this.liveDirty = undefined;
+      }
+      if (canvas.style.width !== cssW) canvas.style.width = cssW;
+      if (canvas.style.height !== cssH) canvas.style.height = cssH;
     }
   }
   fit() {
+    const zoom = Math.min(
+      1.5,
+      Math.max(0.3, (this.width - 32) / this.pageWidth)
+    );
     this.viewport = {
-      zoom: Math.min(1.5, Math.max(0.1, (this.width - 48) / this.pageWidth)),
-      x: 24,
-      y: 24,
+      zoom,
+      x: (this.width - this.pageWidth * zoom) / 2,
+      y: 20,
     };
   }
   pagePoint(x: number, y: number) {
@@ -192,7 +398,10 @@ export class InkRenderer {
   }
   zoom(factor: number, x = this.width / 2, y = this.height / 2) {
     const p = this.pagePoint(x, y),
-      zoom = Math.max(0.1, Math.min(8, this.viewport.zoom * factor));
+      zoom = Math.max(
+        Math.min(0.6, Math.max(0.3, (this.width - 32) / this.pageWidth)),
+        Math.min(4, this.viewport.zoom * factor)
+      );
     this.viewport = { zoom, x: x - p.x * zoom, y: y - p.y * zoom };
     this.clamp();
   }
@@ -233,8 +442,10 @@ export class InkRenderer {
       if (item) this.cachedPoints -= item.points;
       item = {
         version: s.version,
-        path: pathFor(s.points, s.style),
-        points: s.points.length,
+        path: pathFor(s.points, s.style, true, s.segments),
+        points:
+          s.segments?.reduce((sum, piece) => sum + piece.length, 0) ||
+          s.points.length,
       };
       this.cache.set(s.id, item);
       this.cachedPoints += item.points;
@@ -264,7 +475,7 @@ export class InkRenderer {
     if (v.zoom * this.dpr <= scale * 1.5) {
       const visible = strokes.filter((s) => !omit.has(s.id)),
         byId = new Map(visible.map((s) => [s.id, s]));
-      const paperKey = JSON.stringify(paper);
+      const paperKey = JSON.stringify([paper, this.adaptDark]);
       const additions = visible.filter((s) => !this.rasterVersions.has(s.id));
       const stale =
         !this.raster ||
@@ -293,7 +504,9 @@ export class InkRenderer {
       raster.setTransform(scale, 0, 0, scale, 0, 0);
       if (stale) {
         raster.globalAlpha = 1;
-        drawPaper(raster, paper, this.pageWidth, this.pageHeight);
+        raster.clearRect(0, 0, this.pageWidth, this.pageHeight);
+        if (!this.transparent)
+          drawPaper(raster, paper, this.pageWidth, this.pageHeight);
         this.rasterVersions.clear();
       }
       raster.save();
@@ -301,8 +514,8 @@ export class InkRenderer {
       raster.rect(0, 0, this.pageWidth, this.pageHeight);
       raster.clip();
       for (const s of stale ? visible : additions) {
-        raster.fillStyle = s.style.color;
-        raster.globalAlpha = s.style.tool === "highlighter" ? 0.28 : 1;
+        raster.fillStyle = displayInkColor(s.style.color, this.adaptDark);
+        raster.globalAlpha = inkOpacity(s.style);
         raster.fill(this.path(s));
         this.rasterVersions.set(s.id, s.version);
       }
@@ -313,7 +526,8 @@ export class InkRenderer {
       ctx.drawImage(this.raster, 0, 0, this.pageWidth, this.pageHeight);
       return;
     }
-    drawPaper(ctx, paper, this.pageWidth, this.pageHeight);
+    if (!this.transparent)
+      drawPaper(ctx, paper, this.pageWidth, this.pageHeight);
     ctx.save();
     ctx.beginPath();
     ctx.rect(0, 0, this.pageWidth, this.pageHeight);
@@ -337,60 +551,268 @@ export class InkRenderer {
         !omit.has(stroke.id) &&
         intersects(rect, stroke.bounds)
       ) {
-        ctx.fillStyle = stroke.style.color;
-        ctx.globalAlpha = stroke.style.tool === "highlighter" ? 0.28 : 1;
+        ctx.fillStyle = displayInkColor(stroke.style.color, this.adaptDark);
+        ctx.globalAlpha = inkOpacity(stroke.style);
         ctx.fill(this.path(stroke));
       }
     ctx.restore();
     ctx.globalAlpha = 1;
   }
+  private liveStrokePath(
+    points: readonly InkSample[],
+    predicted: readonly InkSample[] | undefined,
+    style: InkBrush
+  ): {
+    path: Path2D;
+    bounds: { minX: number; minY: number; maxX: number; maxY: number };
+  } {
+    const canChunk =
+      points.length >= 160 &&
+      !style.shape &&
+      !style.straighten &&
+      (!style.lineStyle || style.lineStyle === "solid");
+    if (!canChunk) {
+      this.liveCache = undefined;
+      const all = predicted?.length ? [...points, ...predicted] : points;
+      let minX = Infinity,
+        minY = Infinity,
+        maxX = -Infinity,
+        maxY = -Infinity;
+      for (const p of all) {
+        if (p[0] < minX) minX = p[0];
+        if (p[1] < minY) minY = p[1];
+        if (p[0] > maxX) maxX = p[0];
+        if (p[1] > maxY) maxY = p[1];
+      }
+      return {
+        path: pathFor(all, style, false),
+        bounds: { minX, minY, maxX, maxY },
+      };
+    }
+    const pencil = style.input === "pen" && style.nib === "pencil";
+    let tilt = 0;
+    if (pencil) {
+      const step = Math.max(1, Math.floor(points.length / 64));
+      let sum = 0,
+        count = 0;
+      for (let i = 0; i < points.length; i += step) {
+        sum += Math.min(1, Math.hypot(points[i][4], points[i][5]) / 80);
+        count++;
+      }
+      tilt = Math.round((sum / count) * 50) / 50;
+    }
+    const styleKey = `${style.tool}:${style.nib || ""}:${style.width}:${style.input}:${style.pressure ?? 1}:${style.smoothing ?? 0.65}:${tilt}`;
+    const targetPrefixEnd = Math.floor((points.length - 64) / 64) * 64;
+    let cache = this.liveCache;
+    if (
+      !cache ||
+      cache.styleKey !== styleKey ||
+      cache.firstX !== points[0][0] ||
+      cache.firstY !== points[0][1] ||
+      cache.prefixEnd > targetPrefixEnd ||
+      points[cache.checkIdx]?.[0] !== cache.checkX ||
+      points[cache.checkIdx]?.[1] !== cache.checkY
+    ) {
+      let minX = Infinity,
+        minY = Infinity,
+        maxX = -Infinity,
+        maxY = -Infinity;
+      for (let i = 0; i < targetPrefixEnd; i++) {
+        const p = points[i];
+        if (p[0] < minX) minX = p[0];
+        if (p[1] < minY) minY = p[1];
+        if (p[0] > maxX) maxX = p[0];
+        if (p[1] > maxY) maxY = p[1];
+      }
+      const checkIdx = targetPrefixEnd - 1;
+      cache = {
+        firstX: points[0][0],
+        firstY: points[0][1],
+        checkIdx,
+        checkX: points[checkIdx][0],
+        checkY: points[checkIdx][1],
+        styleKey,
+        tilt,
+        prefixEnd: targetPrefixEnd,
+        prefixPath: pathFor(
+          points.slice(0, Math.min(points.length, targetPrefixEnd + 8)),
+          style,
+          false,
+          undefined,
+          tilt
+        ),
+        bounds: { minX, minY, maxX, maxY },
+      };
+      this.liveCache = cache;
+    } else if (cache.prefixEnd < targetPrefixEnd) {
+      for (let i = cache.prefixEnd; i < targetPrefixEnd; i++) {
+        const p = points[i];
+        if (p[0] < cache.bounds.minX) cache.bounds.minX = p[0];
+        if (p[1] < cache.bounds.minY) cache.bounds.minY = p[1];
+        if (p[0] > cache.bounds.maxX) cache.bounds.maxX = p[0];
+        if (p[1] > cache.bounds.maxY) cache.bounds.maxY = p[1];
+      }
+      cache.prefixPath.addPath(
+        pathFor(
+          points.slice(
+            Math.max(0, cache.prefixEnd - 12),
+            Math.min(points.length, targetPrefixEnd + 8)
+          ),
+          style,
+          false,
+          undefined,
+          tilt
+        )
+      );
+      cache.prefixEnd = targetPrefixEnd;
+      cache.checkIdx = targetPrefixEnd - 1;
+      cache.checkX = points[cache.checkIdx][0];
+      cache.checkY = points[cache.checkIdx][1];
+    }
+    let { minX, minY, maxX, maxY } = cache.bounds;
+    for (let i = cache.prefixEnd; i < points.length; i++) {
+      const p = points[i];
+      if (p[0] < minX) minX = p[0];
+      if (p[1] < minY) minY = p[1];
+      if (p[0] > maxX) maxX = p[0];
+      if (p[1] > maxY) maxY = p[1];
+    }
+    if (predicted)
+      for (const p of predicted) {
+        if (p[0] < minX) minX = p[0];
+        if (p[1] < minY) minY = p[1];
+        if (p[0] > maxX) maxX = p[0];
+        if (p[1] > maxY) maxY = p[1];
+      }
+    const tailSlice = points.slice(Math.max(0, cache.prefixEnd - 12));
+    const tail = predicted?.length ? [...tailSlice, ...predicted] : tailSlice;
+    const combined = new Path2D(cache.prefixPath);
+    combined.addPath(pathFor(tail, style, false, undefined, tilt));
+    return { path: combined, bounds: { minX, minY, maxX, maxY } };
+  }
   overlay(
-    active?: { points: InkSample[]; style: InkBrush },
+    active?: {
+      id?: string;
+      points: InkSample[];
+      predicted?: InkSample[];
+      style: InkBrush;
+    },
     lasso?: { x: number; y: number }[],
     selection?: InkRect,
     ghost?: { strokes: InkStroke[]; dx: number; dy: number }
   ) {
-    const ctx = this.context(this.live),
-      zoom = this.viewport.zoom;
+    const hasActive = !!active?.points.length,
+      hasExtra = !!(lasso?.length || selection || ghost);
+    if (!hasActive && !hasExtra) {
+      this.liveCache = undefined;
+      if (this.liveDirty) {
+        const ctx = this.live.getContext("2d")!;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(
+          this.liveDirty.x,
+          this.liveDirty.y,
+          this.liveDirty.width,
+          this.liveDirty.height
+        );
+        this.liveDirty = undefined;
+      }
+      return;
+    }
+    const ctx = this.live.getContext("2d")!,
+      v = this.viewport,
+      zoom = v.zoom;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    if (this.liveDirty) {
+      ctx.clearRect(
+        this.liveDirty.x,
+        this.liveDirty.y,
+        this.liveDirty.width,
+        this.liveDirty.height
+      );
+    } else {
+      ctx.clearRect(0, 0, this.live.width, this.live.height);
+    }
+    ctx.setTransform(
+      this.dpr * v.zoom,
+      0,
+      0,
+      this.dpr * v.zoom,
+      this.dpr * v.x,
+      this.dpr * v.y
+    );
     ctx.save();
     ctx.beginPath();
     ctx.rect(0, 0, this.pageWidth, this.pageHeight);
     ctx.clip();
-    if (active?.points.length) {
-      ctx.fillStyle = active.style.color;
-      ctx.globalAlpha = active.style.tool === "highlighter" ? 0.28 : 1;
-      ctx.fill(pathFor(active.points, active.style, false));
+    let nextDirty: InkRect | undefined;
+    if (hasActive && active) {
+      const { path, bounds } = this.liveStrokePath(
+        active.points,
+        active.predicted,
+        active.style
+      );
+      ctx.fillStyle = displayInkColor(active.style.color, this.adaptDark);
+      ctx.globalAlpha = inkOpacity(active.style);
+      ctx.fill(path);
       ctx.globalAlpha = 1;
+      if (!hasExtra) {
+        const pad = active.style.width * 3.2 + 12;
+        const x0 = Math.max(
+          0,
+          Math.floor(this.dpr * ((bounds.minX - pad) * zoom + v.x))
+        );
+        const y0 = Math.max(
+          0,
+          Math.floor(this.dpr * ((bounds.minY - pad) * zoom + v.y))
+        );
+        const x1 = Math.min(
+          this.live.width,
+          Math.ceil(this.dpr * ((bounds.maxX + pad) * zoom + v.x))
+        );
+        const y1 = Math.min(
+          this.live.height,
+          Math.ceil(this.dpr * ((bounds.maxY + pad) * zoom + v.y))
+        );
+        if (x1 > x0 && y1 > y0)
+          nextDirty = { x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
+      }
+    } else {
+      this.liveCache = undefined;
     }
     if (ghost) {
       ctx.save();
       ctx.translate(ghost.dx, ghost.dy);
       for (const stroke of ghost.strokes) {
-        ctx.fillStyle = stroke.style.color;
-        ctx.globalAlpha = stroke.style.tool === "highlighter" ? 0.28 : 1;
+        ctx.fillStyle = displayInkColor(stroke.style.color, this.adaptDark);
+        ctx.globalAlpha = inkOpacity(stroke.style);
         ctx.fill(this.path(stroke));
       }
       ctx.restore();
       ctx.globalAlpha = 1;
     }
     ctx.restore();
-    ctx.strokeStyle = "#5865dc";
-    ctx.lineWidth = 1.5 / zoom;
-    ctx.setLineDash([5 / zoom, 4 / zoom]);
-    if (lasso?.length) {
-      ctx.beginPath();
-      ctx.moveTo(lasso[0].x, lasso[0].y);
-      for (const p of lasso.slice(1)) ctx.lineTo(p.x, p.y);
-      ctx.stroke();
+    if (lasso?.length || selection) {
+      ctx.strokeStyle = "#5865dc";
+      ctx.lineWidth = 1.5 / zoom;
+      ctx.setLineDash([5 / zoom, 4 / zoom]);
+      if (lasso?.length) {
+        ctx.beginPath();
+        ctx.moveTo(lasso[0].x, lasso[0].y);
+        for (const p of lasso.slice(1)) ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+      }
+      if (selection)
+        ctx.strokeRect(
+          selection.x,
+          selection.y,
+          selection.width,
+          selection.height
+        );
+      ctx.setLineDash([]);
     }
-    if (selection)
-      ctx.strokeRect(
-        selection.x,
-        selection.y,
-        selection.width,
-        selection.height
-      );
-    ctx.setLineDash([]);
+    this.liveDirty = hasExtra
+      ? { x: 0, y: 0, width: this.live.width, height: this.live.height }
+      : nextDirty;
   }
   metrics() {
     return {
@@ -408,6 +830,8 @@ export class InkRenderer {
   releaseCaches() {
     this.cache.clear();
     this.cachedPoints = 0;
+    this.liveCache = undefined;
+    this.liveDirty = undefined;
     if (this.raster) {
       this.raster.width = this.raster.height = 1;
       this.raster = undefined;
@@ -451,8 +875,10 @@ export function hitInk(
     })
   )
     return false;
-  return stroke.points.some(
-    (p, i) => distanceToSegment(x, y, p, stroke.points[Math.max(0, i - 1)]) <= r
+  return strokePieces(stroke).some((points) =>
+    points.some(
+      (p, i) => distanceToSegment(x, y, p, points[Math.max(0, i - 1)]) <= r
+    )
   );
 }
 export function insidePolygon(
@@ -490,23 +916,24 @@ export function lassoInk(
     })
   )
     return false;
-  if (stroke.points.some((p) => insidePolygon(p[0], p[1], polygon)))
-    return true;
-  for (let i = 1; i < stroke.points.length; i++) {
-    const a = stroke.points[i - 1],
-      b = stroke.points[i],
-      dx = b[0] - a[0],
-      dy = b[1] - a[1];
-    for (let j = 0; j < polygon.length; j++) {
-      const c = polygon[j],
-        d = polygon[(j + 1) % polygon.length],
-        ex = d.x - c.x,
-        ey = d.y - c.y,
-        den = dx * ey - dy * ex;
-      if (!den) continue;
-      const t = ((c.x - a[0]) * ey - (c.y - a[1]) * ex) / den,
-        u = ((c.x - a[0]) * dy - (c.y - a[1]) * dx) / den;
-      if (t >= 0 && t <= 1 && u >= 0 && u <= 1) return true;
+  for (const points of strokePieces(stroke)) {
+    if (points.some((p) => insidePolygon(p[0], p[1], polygon))) return true;
+    for (let i = 1; i < points.length; i++) {
+      const a = points[i - 1],
+        b = points[i],
+        dx = b[0] - a[0],
+        dy = b[1] - a[1];
+      for (let j = 0; j < polygon.length; j++) {
+        const c = polygon[j],
+          d = polygon[(j + 1) % polygon.length],
+          ex = d.x - c.x,
+          ey = d.y - c.y,
+          den = dx * ey - dy * ex;
+        if (!den) continue;
+        const t = ((c.x - a[0]) * ey - (c.y - a[1]) * ex) / den,
+          u = ((c.x - a[0]) * dy - (c.y - a[1]) * dx) / den;
+        if (t >= 0 && t <= 1 && u >= 0 && u <= 1) return true;
+      }
     }
   }
   return false;

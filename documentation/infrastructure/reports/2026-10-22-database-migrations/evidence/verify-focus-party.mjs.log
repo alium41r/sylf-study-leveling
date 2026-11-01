@@ -1,0 +1,122 @@
+==================================================
+🚀 STARTING FOCUS PARTY VERIFICATION (SECURITY AUDITED)
+==================================================
+
+--- Setting up 5 test users ---
+Test users created: u1=5, u2=6, u3=7, u4=8, u5=9
+
+--- Test 1: Create party ---
+✅ PASSED: create_focus_party returns success: true
+✅ PASSED: Leader is u1
+✅ PASSED: u1 is in FocusPartyMember
+
+--- Test 2: Add members up to 4 & Invitation Enforcement ---
+✅ PASSED: Uninvited user u2 blocked from joining party with 42501
+✅ PASSED: Users 2, 3, 4 successfully joined with active invites
+✅ PASSED: Party has exactly 4 members
+
+--- Test 3: Prevent 5th member & PostgREST write revocation ---
+✅ PASSED: 5th member rejected by party capacity / authorization check
+✅ PASSED: Direct SQL insert of 5th member blocked by database trigger
+✅ PASSED: Direct PostgREST INSERT by 'authenticated' role is blocked with 42501 permission denied
+
+--- Test 4: Create active session ---
+✅ PASSED: enter_focus_session returns success
+✅ PASSED: Active session ID created
+✅ PASSED: Initial timer state is NOT_STARTED
+✅ PASSED: Initial accumulated seconds is 0
+
+--- Test 5: Prevent duplicate active sessions ---
+✅ PASSED: Duplicate active session for same party rejected by partial unique index
+
+--- Test 6: Add multiple session members ---
+✅ PASSED: u2 joins session #1
+✅ PASSED: u3 joins session #1
+✅ PASSED: 3 members in active focus session
+✅ PASSED: u4 is in Party but NOT in Focus Session (concept separation verified)
+
+--- Test 7: User starts own timer & DFA transitions ---
+✅ PASSED: DFA: pause_focus_timer on NOT_STARTED is rejected
+✅ PASSED: DFA: resume_focus_timer on NOT_STARTED is rejected
+✅ PASSED: u1 timerState is FOCUSING
+✅ PASSED: u1 currentStartedAt is set
+✅ PASSED: Idempotent start_focus_timer returns current state
+
+--- Test 8: User pauses own timer ---
+✅ PASSED: u1 timerState is PAUSED
+✅ PASSED: u1 currentStartedAt is NULL after pause
+✅ PASSED: u1 accumulatedSeconds banked >= 1s (got 1s)
+✅ PASSED: DFA: start_focus_timer on PAUSED is rejected (must use resume)
+
+--- Test 9: User resumes own timer ---
+✅ PASSED: u1 timerState resumed to FOCUSING
+✅ PASSED: u1 currentStartedAt re-anchored
+✅ PASSED: Banked seconds preserved on resume
+
+--- Test 10: User leaves Focus ---
+✅ PASSED: u1 successfully left focus session
+✅ PASSED: Session remains active because u2 and u3 are still participants
+✅ PASSED: Additional interval banked on leaving
+✅ PASSED: u1 left Focus room but is STILL in Party
+
+--- Test 11: User rejoins Focus with cumulative time preserved ---
+✅ PASSED: u1 rejoins the SAME active session
+✅ PASSED: u1 timerState resumed as PAUSED
+✅ PASSED: Cumulative seconds preserved! Expected 2, got 2
+✅ PASSED: Exactly ONE logical session membership row for u1 (no duplicate rows)
+
+--- Test 12: Another member cannot modify user timer & PostgREST write tampering ---
+✅ PASSED: Calling start_focus_timer on behalf of another user is rejected with 42501 S2 identity guard
+✅ PASSED: Direct PostgREST UPDATE of accumulatedSeconds = 999999 is blocked with 42501 permission denied
+
+--- Test 13: Non-members cannot access party/session ---
+✅ PASSED: Non-member u5 rejected from entering focus session
+✅ PASSED: Direct insert into FocusSessionMember for non-party user blocked by database trigger
+
+--- Test 14: Leader-only actions protected ---
+✅ PASSED: Non-leader u2 prevented from removing member u3
+
+--- Test 15: Leader leaves and leadership transfers correctly ---
+✅ PASSED: Leadership transferred flag is true
+✅ PASSED: Leadership transferred to u2 (oldest joined remaining member)
+✅ PASSED: Database record reflects u2 as new leader
+
+--- Test 16: Final participant leaves & ended session protection ---
+✅ PASSED: Session still active after u2 leaves (u3 still in room)
+✅ PASSED: Session ends when u3 (the last participant) leaves
+✅ PASSED: FocusSession.endedAt is populated with timestamp
+✅ PASSED: Modifying timer state on an ended session is blocked by database trigger
+✅ PASSED: Deleting participant records from ended session blocked by delete guard trigger
+
+--- Test 17: New Focus after previous session ends creates a new session ---
+✅ PASSED: New session created with ID 4 (different from ended session 2)
+✅ PASSED: Exactly 1 active session for party
+✅ PASSED: Historical session preserved (total 2 sessions for party)
+
+--- Test 18: Disbanding party preserves historical records ---
+✅ PASSED: Last member leaving marks party disbanded
+✅ PASSED: Party is marked disbanded (disbandedAt populated), NOT hard-deleted
+✅ PASSED: All historical FocusSession records remain permanently intact in database
+✅ PASSED: Entering session on a disbanded party is rejected
+
+--- Test 19: Concurrency safety (simultaneous session entrants) ---
+✅ PASSED: Simultaneous entrants resolved to identical session ID 6 (no duplicate session created)
+✅ PASSED: Exactly 1 active session in concurrent test
+
+--- Test 20: Party Invites via SessionInvite ---
+✅ PASSED: SessionInvite created with partyId
+✅ PASSED: Duplicate pending party invite blocked by unique index
+✅ PASSED: Invite automatically set to ACCEPTED upon joining
+
+--- Test 21: get_focus_party_state & Non-Member Privacy Protection ---
+✅ PASSED: Non-member u1 blocked from querying get_focus_party_state with 42501
+✅ PASSED: State contains party metadata
+✅ PASSED: State lists 3 members (u2, u3, u5)
+✅ PASSED: State includes active session with collective time
+
+--- Cleaning up test artifacts ---
+Cleanup complete.
+
+==================================================
+🎉 VERIFICATION COMPLETE: 67 PASSED, 0 FAILED
+==================================================

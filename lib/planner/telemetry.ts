@@ -167,7 +167,7 @@ export type PlannerSurface = "CLASSIC" | "MODES";
  */
 /** The one research backend this phase ships. A closed enum for the same reason as the rest. */
 export type ResearchBackend = "DEEPSEEK_SEARCH";
-export type SearchProviderTelemetry = "brave" | "serper" | "searxng" | "none";
+export type SearchProviderTelemetry = "brave" | "serper" | "searxng" | "deepseek" | "none";
 export type ResearchStatusTelemetry = "OK" | "WEAK" | "UNAVAILABLE";
 /**
  * How hard a research run decided to look.
@@ -391,7 +391,7 @@ const ENTRY_PATHS: IntakeEntryPath[] = ["LEGACY_WIZARD", "QUICK_PLAN", "ADVANCED
 const ABANDON_REASONS: IntakeAbandonReason[] = ["LEFT", "CANCELLED", "SWITCHED_MODE"];
 const SURFACES: PlannerSurface[] = ["CLASSIC", "MODES"];
 const RESEARCH_BACKENDS: ResearchBackend[] = ["DEEPSEEK_SEARCH"];
-const SEARCH_PROVIDERS: SearchProviderTelemetry[] = ["brave", "serper", "searxng", "none"];
+const SEARCH_PROVIDERS: SearchProviderTelemetry[] = ["brave", "serper", "searxng", "deepseek", "none"];
 const RESEARCH_STATUSES_TELEMETRY: ResearchStatusTelemetry[] = ["OK", "WEAK", "UNAVAILABLE"];
 const RESEARCH_DEPTHS_TELEMETRY: ResearchDepthTelemetry[] = ["LOOKUP", "STANDARD", "DEEP"];
 const FETCH_BYTES_BUCKETS: FetchBytesBucket[] = ["NONE", "UNDER_64K", "UNDER_512K", "UNDER_2M", "OVER_2M"];

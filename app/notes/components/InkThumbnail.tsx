@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { NotesLibrary, NoteSummary } from "@/lib/notes/library";
-import { InkModel, INK_ADAPTER } from "@/lib/notes/ink";
-import { InkRenderer } from "@/lib/notes/ink-renderer";
+import { renderNotesPagePreview } from "@/lib/notes/drive-pdf";
+import { readNoteStyle } from "@/lib/notes/note-style";
 import s from "../Ink.module.css";
 let thumbnails = Promise.resolve();
 /** Visible-only, serialized previews. No persistent bitmap or second document store. */
@@ -11,11 +11,13 @@ export default function InkThumbnail({
   note,
   pageId,
   size = 96,
+  preview,
 }: {
   library: NotesLibrary;
   note: NoteSummary;
   pageId: string;
   size?: number;
+  preview?: string;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null),
     [visible, setVisible] = useState(false),
@@ -37,43 +39,22 @@ export default function InkThumbnail({
     let cancelled = false;
     const task = async () => {
       if (cancelled || library.session.signal.aborted) return;
-      const page = note.view.descriptor.pages.find((p) => p.pageId === pageId),
-        stream = note.view.descriptor.streams.find(
-          (s) => s.streamId === page?.streamId
-        );
-      if (!page || !stream) return;
-      if (stream.adapter !== INK_ADAPTER)
-        throw new Error("Use the typed page reader for this preview.");
-      const loaded = await library.repository.loadStream(
+      const page = note.view.descriptor.pages.find((p) => p.pageId === pageId);
+      if (!page) return;
+      const style = readNoteStyle(page.extensions.noteStyle);
+      const height = Math.min(page.height, style.height);
+      node.width = size * 2;
+      node.height = Math.ceil((size * height) / page.width) * 2;
+      node.style.width = `${size}px`;
+      node.style.height = `${(size * height) / page.width}px`;
+      await renderNotesPagePreview(
+        library.repository,
         note.id,
-        stream.streamId,
-        stream.epoch,
-        note.view.heads
+        pageId,
+        node,
+        note.view
       );
-      let model: InkModel | undefined, renderer: InkRenderer | undefined;
-      try {
-        library.session.assert();
-        if (cancelled) return;
-        model = new InkModel(loaded.doc, () => false);
-        setFailed(false);
-        renderer = new InkRenderer(
-          node,
-          document.createElement("canvas"),
-          page.width,
-          page.height
-        );
-        renderer.resize(size, (size * page.height) / page.width);
-        renderer.viewport = {
-          zoom: size / page.width,
-          x: 0,
-          y: 0,
-        };
-        renderer.draw(model.strokes(), model.paper());
-      } finally {
-        renderer?.releaseCaches();
-        model?.close();
-        loaded.doc.destroy(); /* Keep only the small final bitmap; geometry is released. */
-      }
+      if (!cancelled) setFailed(false);
     };
     thumbnails = thumbnails.then(task).catch(() => {
       if (!cancelled) setFailed(true);
@@ -91,6 +72,7 @@ export default function InkThumbnail({
       style={size !== 96 ? { width: size, height: size * 1.375 } : undefined}
     >
       <canvas ref={canvas} width={96} height={132} aria-hidden="true" />
+      {preview && failed && <p className={s.thumbnailText}>{preview}</p>}
       {failed && <small>Preview unavailable</small>}
     </span>
   );

@@ -12,7 +12,7 @@ import { z } from "zod";
 export const RESEARCH_BACKENDS = ["DEEPSEEK_SEARCH"] as const;
 export type ResearchBackend = (typeof RESEARCH_BACKENDS)[number];
 
-export const SEARCH_PROVIDERS = ["brave", "serper", "searxng"] as const;
+export const SEARCH_PROVIDERS = ["brave", "serper", "searxng", "deepseek"] as const;
 export type SearchProviderId = (typeof SEARCH_PROVIDERS)[number];
 
 /**
@@ -165,7 +165,8 @@ export interface SearchResult {
 }
 export interface SearchProvider {
   readonly id: SearchProviderId;
-  search(input: { query: string; limit: number; signal?: AbortSignal; beforeRequest?: () => Promise<void> }): Promise<SearchResult[]>;
+  search(input: { query: string; limit: number; signal?: AbortSignal; beforeRequest?: (provider?: SearchProviderId) => Promise<void>;
+    afterRequest?: (receipt: { provider: SearchProviderId; outcome: "RESULT" | "EMPTY" | "REJECTED" | "UNKNOWN" }) => Promise<void> }): Promise<SearchResult[]>;
 }
 
 /**

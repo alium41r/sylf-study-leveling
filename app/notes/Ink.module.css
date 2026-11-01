@@ -2,6 +2,117 @@
   position: relative;
   --ink-chrome: var(--surface-1);
 }
+.notebook {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+}
+.notebookChrome {
+  display: contents;
+}
+.notebook[data-dock="bottom"] .notebookScroll { order: 0; }
+.notebook[data-dock="bottom"] .notebookChrome .tools { order: 4; }
+.notebook[data-dock="bottom"] .notebookChrome .pageControls { bottom: 82px; }
+.notebookScroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  overflow-anchor: none;
+  background: var(--surface-2);
+  scrollbar-gutter: stable;
+}
+.notebookTrack {
+  position: relative;
+  width: 100%;
+}
+.notebookPage {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 3px 18px #00000014;
+  background: var(--surface-1);
+}
+.notebookPage[data-layout="continuous"] {
+  box-shadow: -6px 0 16px -4px #00000015, 6px 0 16px -4px #00000015;
+  border-radius: 0;
+  clip-path: inset(0 -24px -1px -24px);
+}
+.notebookPage[data-layout="continuous"]:not([data-last-page="true"])::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: inherit;
+  pointer-events: none;
+}
+.notebookPage[data-layout="continuous"][data-first-page="true"] {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  box-shadow: -6px -4px 16px -4px #00000015, 6px -4px 16px -4px #00000015;
+  clip-path: inset(-24px -24px -1px -24px);
+}
+.notebookPage[data-layout="continuous"][data-last-page="true"] {
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  box-shadow: -6px 4px 16px -4px #00000015, 6px 4px 16px -4px #00000015;
+  clip-path: inset(0 -24px -24px -24px);
+}
+.notebookPage[data-layout="continuous"][data-first-page="true"][data-last-page="true"] {
+  border-radius: 4px;
+  box-shadow: 0 4px 20px #00000018;
+  clip-path: none;
+}
+.infiniteBadge {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: var(--surface-2);
+  color: var(--foreground);
+  user-select: none;
+  white-space: nowrap;
+}
+.notebookSlice {
+  position: absolute;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+}
+.editor[data-notebook-surface="true"] {
+  height: 100%;
+  min-height: 0;
+}
+.editor[data-notebook-surface="true"] .body {
+  height: 100%;
+  min-height: 0;
+}
+.editor[data-notebook-surface="true"] .canvasHost {
+  min-height: 1px;
+  background: transparent;
+}
+.notebookChrome .pageRail {
+  position: absolute;
+  top: 100px;
+  bottom: 72px;
+  left: 0;
+  z-index: 50;
+  box-shadow: 8px 0 30px #00000015;
+}
+.notebookChrome .pageControls {
+  z-index: 45;
+}
+.notebook[data-focus="true"] .notebookChrome .header {
+  display: none;
+}
 .header {
   display: flex;
   align-items: center;
@@ -329,8 +440,8 @@
   overscroll-behavior: contain;
   background: var(--surface-2);
   outline-offset: -3px !important;
-  user-select: none;
   -webkit-user-select: none;
+  user-select: none;
 }
 .canvasHost canvas {
   position: absolute;
@@ -532,4 +643,436 @@
     min-width: 44px;
     min-height: 44px;
   }
+}
+
+/* One adaptable tool dock over an uninterrupted writing surface. */
+.header {
+  min-height: 58px;
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.titleSlot {
+  flex: 1;
+  min-width: 0;
+}
+.titleSlot > div {
+  padding: 0;
+}
+.titleSlot input {
+  font-size: 16px !important;
+}
+.tools {
+  flex-wrap: nowrap;
+  gap: 4px;
+  padding: 6px 16px;
+  min-height: 58px;
+  background: var(--surface-1);
+}
+.tools button span {
+  display: none;
+}
+.penTools,
+.textTools,
+.modeSwitch {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 3px;
+}
+.penTools[hidden],
+.textTools[hidden],
+.footer[hidden] {
+  display: none;
+}
+.modeSwitch {
+  background: var(--surface-2);
+  padding: 3px;
+  border-radius: 13px;
+  margin-right: 8px;
+}
+.modeSwitch button {
+  min-width: 44px;
+  min-height: 38px;
+}
+.modeSwitch button[aria-pressed="true"] {
+  background: var(--surface-1);
+  box-shadow: 0 1px 4px #0001;
+}
+.textTools > div {
+  padding: 0;
+  border: 0;
+  flex-wrap: nowrap;
+  overflow: visible;
+}
+.tools button,
+.tools summary {
+  border-radius: 10px;
+  min-width: 40px;
+  min-height: 42px;
+}
+.optionsPanel {
+  position: fixed;
+  top: 128px;
+  left: max(16px, calc(50% - 150px));
+  width: 300px;
+  box-shadow: 0 20px 60px #0003;
+  padding: 22px;
+  border-radius: 22px;
+  max-height: min(65dvh, 540px);
+  overflow: auto;
+}
+.paperOptions .optionsPanel {
+  left: auto;
+  right: 18px;
+  top: auto;
+  bottom: 78px;
+}
+.pageControls {
+  position: absolute;
+  z-index: 5;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: 50px;
+  padding: 4px 10px;
+  box-shadow: 0 6px 24px #0001;
+  white-space: nowrap;
+  max-width: calc(100% - 24px);
+}
+.pageControls > .spacer {
+  flex: 0;
+}
+.pageControls button {
+  min-width: 36px;
+}
+.pageRail {
+  display: none;
+  width: 186px;
+  min-width: 186px;
+  padding: 14px;
+}
+.pageRail[data-open="true"] {
+  display: flex;
+}
+.railHeader button {
+  display: inline-flex;
+}
+.canvasHost {
+  background: var(--surface-2);
+}
+.textLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  z-index: 1;
+  pointer-events: none;
+  user-select: text;
+  -webkit-user-select: text;
+}
+.editor[data-typing="true"] .textLayer {
+  pointer-events: auto;
+  touch-action: pan-y;
+}
+.canvasHost canvas:last-of-type {
+  z-index: 2;
+}
+.editor[data-dock="bottom"] .tools {
+  order: 4;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 0;
+}
+.editor[data-dock="bottom"] .pageControls {
+  bottom: 82px;
+}
+.editor[data-focus="true"] .header {
+  display: none;
+}
+.footer {
+  display: none;
+}
+@media (max-width: 1100px) {
+  .tools {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+  .tools > .spacer {
+    display: none;
+  }
+}
+@media (max-width: 700px) {
+  .header {
+    padding: 4px 8px;
+    min-height: 54px;
+  }
+  .tools {
+    min-height: 56px;
+    padding: 5px 8px;
+  }
+  .tools button,
+  .tools summary {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .modeSwitch {
+    margin-right: 3px;
+  }
+  .pageControls {
+    bottom: max(12px, env(safe-area-inset-bottom));
+    padding: 3px 5px;
+  }
+  .pageControls > button {
+    min-width: 32px;
+  }
+  .pageControls > button span {
+    display: none;
+  }
+  .paperOptions .optionsPanel,
+  .tools .optionsPanel {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    bottom: 82px;
+    top: auto;
+    max-height: 60dvh;
+  }
+  .pageRail[data-open="true"] {
+    width: 186px;
+  }
+}
+.canvasHost[data-placing-text="true"] {
+  cursor: crosshair !important;
+}
+.canvasHost[data-placing-text="true"] .textLayer {
+  pointer-events: none;
+}
+.placeHint {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 8;
+  border-radius: 12px;
+  padding: 12px 18px;
+  background: var(--surface-1);
+  color: var(--text-primary);
+  box-shadow: 0 5px 24px #0002;
+  font-size: 12px;
+  pointer-events: none;
+  max-width: 90%;
+  text-align: center;
+}
+.thumbnail .thumbnailText {
+  position: absolute;
+  top: 5%;
+  left: 8%;
+  right: 8%;
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  text-align: left;
+  display: -webkit-box;
+  -webkit-line-clamp: 8;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.modeSwitch {
+  position: sticky;
+  left: 0;
+  z-index: 7;
+  box-shadow: 6px 0 0 var(--surface-1);
+}
+.canvasHost .paperCanvas {
+  z-index: 0;
+}
+.canvasHost .inkCanvas {
+  z-index: 2;
+}
+.canvasHost canvas:last-of-type {
+  z-index: 3;
+}
+.editor[data-typing="false"]
+  .textLayer
+  :global(.bn-block-content:has(.ProseMirror-trailingBreak:only-child):after) {
+  visibility: hidden;
+}
+/* Phase 2 content shares the existing page transform and encrypted text stream. */
+.editor[data-typing="true"] .textLayer {
+  pointer-events: none;
+}
+.editor[data-typing="true"] .contentBox {
+  pointer-events: auto;
+}
+.canvasHost[data-placing-text]:not([data-placing-text="false"]) .contentBox {
+  pointer-events: none;
+}
+.contentBox {
+  position: absolute;
+  z-index: 1;
+  border-radius: 2px;
+  touch-action: pan-y;
+}
+.contentBox[data-selected="true"] {
+  outline: 1px solid var(--accent);
+  outline-offset: 6px;
+}
+.contentBox .boxHandles {
+  position: absolute;
+  top: -35px;
+  left: -7px;
+  right: -7px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  z-index: 5;
+  pointer-events: none;
+  align-items: flex-start;
+}
+.boxHandles button {
+  pointer-events: auto;
+  min-height: 28px;
+  min-width: 28px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 7px;
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  font-size: 10px;
+  box-shadow: 0 2px 6px #0002;
+  touch-action: none;
+  cursor: grab;
+}
+.boxHandles button:first-child {
+  margin-right: auto;
+}
+.boxHandles .boxResize {
+  position: absolute;
+  right: -7px;
+  top: calc(100% + 5px);
+  transform: translateY(var(--box-height, 0px));
+}
+.contentBox .boxHandles {
+  bottom: -8px;
+}
+.contentBox .boxHandles .boxResize {
+  top: auto;
+  bottom: -7px;
+  right: -7px;
+  cursor: nwse-resize;
+}
+
+.contentBox :global(.bn-editor) {
+  padding: 0 !important;
+}
+.contentBox:not(:focus-within)
+  :global(.bn-block-content:has(.ProseMirror-trailingBreak:only-child):after) {
+  visibility: hidden;
+}
+
+.pageBackground {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.8;
+  overflow: hidden;
+}
+.favoritePens {
+  display: flex;
+  gap: 2px;
+}
+.favoritePens button {
+  position: relative;
+  min-width: 32px;
+  padding: 7px !important;
+}
+.favoritePens button > span {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1px solid #8884;
+}
+.favoritePens button > svg {
+  position: absolute;
+  bottom: 5px;
+  right: 3px;
+  color: var(--text-secondary);
+}
+
+.tools button .currentColor,
+.favoritePens button > span {
+  display: block;
+}
+.boxHandles button {
+  min-height: calc(32px / var(--notes-page-zoom, 1));
+  min-width: calc(32px / var(--notes-page-zoom, 1));
+  padding: calc(5px / var(--notes-page-zoom, 1))
+    calc(7px / var(--notes-page-zoom, 1));
+  font-size: calc(10px / var(--notes-page-zoom, 1));
+  gap: calc(6px / var(--notes-page-zoom, 1));
+  border-radius: calc(8px / var(--notes-page-zoom, 1));
+}
+.boxHandles button svg {
+  width: calc(15px / var(--notes-page-zoom, 1));
+  height: calc(15px / var(--notes-page-zoom, 1));
+}
+.contentBox .boxHandles {
+  top: calc(-37px / var(--notes-page-zoom, 1));
+  bottom: calc(-8px / var(--notes-page-zoom, 1));
+}
+.contentBox .boxHandles .boxResize {
+  bottom: calc(-7px / var(--notes-page-zoom, 1));
+  right: calc(-7px / var(--notes-page-zoom, 1));
+}
+.alignmentGuides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15;
+}
+.alignmentGuides i {
+  position: absolute;
+  background: var(--accent);
+  opacity: 0.8;
+}
+.alignmentGuides i[data-axis="x"] {
+  top: 0;
+  bottom: 0;
+  width: calc(1px / var(--notes-page-zoom, 1));
+}
+.alignmentGuides i[data-axis="y"] {
+  left: 0;
+  right: 0;
+  height: calc(1px / var(--notes-page-zoom, 1));
+}
+
+.zoomGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  padding: 2px;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+.tools .zoomGroup button {
+  min-width: 36px;
+  min-height: 36px;
+  padding: 5px 7px;
+}
+.tools .zoomGroup .zoom {
+  min-width: 64px;
+  gap: 4px;
+}
+.tools .zoomGroup .zoom span {
+  display: inline;
 }

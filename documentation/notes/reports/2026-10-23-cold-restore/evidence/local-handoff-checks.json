@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-10-23T17:22:30.243Z",
+  "sourceHashesMatch": true,
+  "reviewedSourceFiles": 47,
+  "compiledClientFilesScanned": 310,
+  "configuredPrivateValueScanPassed": true,
+  "unexpectedRootEnvironmentFiles": [],
+  "productionUploaded": false,
+  "deploymentStatus": "Deferred by user",
+  "temporaryAuthorizationEnded": true,
+  "temporaryCredentialsCreated": false,
+  "temporaryAuthorizationDirectoryRemoved": true,
+  "candidateDependencySymlinkRemoved": true,
+  "uploadPlanNotRun": true
+}

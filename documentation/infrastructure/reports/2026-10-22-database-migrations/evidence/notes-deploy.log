@@ -1,0 +1,23 @@
+{
+  "pending": [
+    "20261020000000_notes_connections"
+  ],
+  "unresolved": []
+}
+Datasource "db": PostgreSQL database "postgres", schema "public" at "127.0.0.1:60012"
+
+70 migrations found in prisma/migrations
+
+Applying migration `20261020000000_notes_connections`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20261020000000_notes_connections/
+    └─ migration.sql
+
+All migrations have been successfully applied.
+Verified remote TLS connections: 2
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.

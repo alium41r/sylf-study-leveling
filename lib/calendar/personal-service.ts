@@ -1,4 +1,5 @@
 import "server-only";
+import { eventDTO } from "./projection";
 import { createHash } from "node:crypto";
 import { Prisma, type CalendarNote } from "@prisma/client";
 import {
@@ -408,47 +409,8 @@ function mutationHash(input: CalendarWrite | CalendarDelete) {
       : JSON.stringify(value);
   return createHash("sha256").update(canonical(input)).digest("hex");
 }
-export function eventDTO(row: {
-  id: string;
-  title: string;
-  description: string;
-  color: string;
-  category: string;
-  allDay: boolean;
-  startDate: string;
-  endDate: string;
-  startsAt: Date | null;
-  endsAt: Date | null;
-  timezone: string;
-  recurrence: unknown;
-  reminders: number[];
-  revision: number;
-  createdAt: Date;
-  updatedAt: Date;
-  lastMutationId: string | null;
-}): CalendarEvent {
-  return {
-    ...eventInputSchema.parse({
-      title: row.title,
-      description: row.description,
-      color: row.color,
-      category: row.category,
-      allDay: row.allDay,
-      startDate: row.startDate,
-      endDate: row.endDate,
-      startsAt: row.startsAt?.toISOString() || null,
-      endsAt: row.endsAt?.toISOString() || null,
-      timezone: row.timezone,
-      recurrence: row.recurrence,
-      reminders: row.reminders,
-    }),
-    id: row.id,
-    revision: row.revision,
-    createdAt: row.createdAt.toISOString(),
-    updatedAt: row.updatedAt.toISOString(),
-    lastMutationId: row.lastMutationId,
-  };
-}
+export { eventDTO } from "./projection";
+
 function eventDatabaseInput(input: EventInput) {
   return {
     ...input,

@@ -1,0 +1,19 @@
+{
+  "sha256": {
+    "app/api/notes/connection/route.ts": "0a69d89fd2579d3015b505019df6ee0700d7258c509f5629625f649a22eb2d40",
+    "app/notes/components/NotesScreen.tsx": "4e35e6c814ae1328b1610a8a5894b935c0cc974a8d1ee7b9a48efca0c48b57bc",
+    "lib/notes/connection-location.ts": "56a6b3ce66f63dacaab8c28ea540a710288b3521003da35528c4784a3ed7eb08",
+    "lib/notes/server/security.ts": "494ba1fbe8227b521631b2c4aedbe7bf87f66310d264338eae4c62a670cafc48",
+    "lib/notes/drive-transport.ts": "fd7ed31c3df9e3475f90597cef04ae05c118d5c038d218cd2251fdeeb4198754",
+    "__tests__/notes/connection-location.test.ts": "df21e3afd5a25b1ccd80205ec6ab0db526f1b62e8fce5b25d70593830545f668",
+    "__tests__/notes/connection-screen.test.tsx": "fa58a6f862da50c38f5d38c802638fa5b8376fc0e9478986a25db129d660f5c9",
+    "__tests__/notes/drive-broker.test.ts": "d0fc225f031512d73daec0c3ebb6682e14f7d9d7305548d3628fac8bea154a58",
+    "__tests__/notes/phase-3-foundation.test.ts": "7c0cc23b28cf8b5afa5deba5c290c4d71aa32a78664bf8eae573b550e97d0faf",
+    "documentation/notes/workspace.md": "170a39c6311bf6a103849ec448ae851b338dc2eabcecd6de4800f57cb1f7fbb6",
+    "documentation/notes/README.md": "0d756cf037465a95197dab176db52f2743fa4ac49788f0c246e97569697a34cf",
+    "documentation/notes/reports/2026-10-22-connection-origin/report.md": "e0d7efcc25d35b389e6edd201e8b1679cb18dbea299ab3c69431f0abb614b388",
+    "documentation/notes/reports/2026-10-22-connection-origin/evidence/README.md": "9b3d4072c8014d65c0d46020da83f1426267c2682f2e0f93d9c265ea71788e7f"
+  },
+  "secretValueScanPassed": true,
+  "localDocumentationLinksValid": true
+}

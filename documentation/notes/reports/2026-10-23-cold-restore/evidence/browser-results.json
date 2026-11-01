@@ -1,0 +1,10 @@
+{
+  "scope": "Exact isolated candidate, real Chromium with synthetic provider",
+  "desktopDarkOutageVisible": true,
+  "desktopRetryRecovered": true,
+  "phoneCustomLightOutageVisible": true,
+  "phoneViewportWidth": 390,
+  "phoneContentWidth": 390,
+  "viewportOverrideReset": true,
+  "liveFullLibraryRestore": false
+}

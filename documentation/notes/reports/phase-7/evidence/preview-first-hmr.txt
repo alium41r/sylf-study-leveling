@@ -1,0 +1,3 @@
+Phase 7 synthetic preview ready at http://127.0.0.1:4393
+12:50:02 PM [vite] (client) page reload workspace.html
+12:50:26 PM [vite] (client) page reload workspace.html

@@ -1,0 +1,34 @@
+{
+  "identity": {
+    "database": "[configured database]",
+    "role": "postgres",
+    "version": "17.6",
+    "readonly": "on",
+    "tls": false,
+    "prisma_ledger": "_prisma_migrations",
+    "supabase_ledger": null
+  },
+  "counts": {
+    "prisma": 71,
+    "tables": 126,
+    "columns": 815,
+    "constraints": 252,
+    "indexes": 259,
+    "enums": 71,
+    "policies": 78,
+    "grants": 818,
+    "functions": 49,
+    "triggers": 39,
+    "defaults": 24,
+    "roles": 5,
+    "extensions": 5,
+    "publication": 12,
+    "columnTypes": 815,
+    "privateAccess": 34
+  },
+  "localMigrations": 70,
+  "pending": [],
+  "checksumMismatches": [],
+  "failed": [],
+  "supabaseVersions": []
+}

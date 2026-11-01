@@ -2,20 +2,10 @@
 // Focus Party Verification Suite — Tests all 18 specification requirements
 // + Security Hardening & Penetration Vectors (Vibe Security Audit)
 // ============================================================================
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 import pg from "pg";
+import { focusPartyTestUrl } from "../db/disposable-database.mjs";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const envPath = path.join(__dirname, "../..", ".env");
-const env = {};
-for (const line of fs.readFileSync(envPath, "utf8").split("\n")) {
-  const m = line.match(/^([A-Z0-9_]+)\s*=\s*"?([^"\n]*)"?$/);
-  if (m) env[m[1]] = m[2];
-}
-
-const url = env.DIRECT_URL || env.DATABASE_URL;
+const url = focusPartyTestUrl(process.env.FOCUS_PARTY_TEST_DATABASE_URL);
 const pool = new pg.Pool({ connectionString: url, max: 10 });
 
 let testUserIds = [];
@@ -540,10 +530,7 @@ async function main() {
     console.log("\n--- Cleaning up test artifacts ---");
     try {
       await client.query("BEGIN");
-      await client.query("SET LOCAL session_replication_role = 'replica'");
-      if (testPartyIds.length > 0) {
-        await client.query(`DELETE FROM public."FocusParty" WHERE id = ANY($1)`, [testPartyIds]);
-      }
+      // Normal FK cascades remove fixtures; never suppress constraint triggers.
       if (testUserIds.length > 0) {
         await client.query(`DELETE FROM public."User" WHERE id = ANY($1)`, [testUserIds]);
       }
@@ -552,6 +539,7 @@ async function main() {
     } catch (cleanupErr) {
       await client.query("ROLLBACK");
       console.warn("Cleanup warning:", cleanupErr.message);
+      process.exitCode = 1;
     }
     client.release();
   }

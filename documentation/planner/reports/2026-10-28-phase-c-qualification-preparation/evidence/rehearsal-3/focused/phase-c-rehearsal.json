@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "status": "SCRIPTED_REHEARSAL_PASSED",
+  "educationalConclusion": "NONE",
+  "paidCalls": 0,
+  "externalRequests": 0,
+  "compilerVersion": 2,
+  "journeyVersion": 1,
+  "anchor": "2026-10-29",
+  "targets": 2,
+  "uploadedMaterialHashes": [
+    "671785b7bd726732df32e8f9abcb0f3a53eddbf4eb387c7fb911576468b9cb69",
+    "3be5bbc37683ce394dea41512f8e7bc990d8b20c2e82ecbe66a35190bdef75a4",
+    "76410d4165f60fe08dafcfa9b813510a35637fced8c6c14633d7cbbc4a2f8eb5"
+  ],
+  "calendarEvents": 16,
+  "unselectedTaskPreserved": true,
+  "appliedAndReplayed": true,
+  "roleTrace": [
+    {
+      "role": "RESEARCH",
+      "inputBytes": 32131
+    },
+    {
+      "role": "VERIFICATION",
+      "inputBytes": 11067
+    },
+    {
+      "role": "SYNTHESIS",
+      "inputBytes": 34784
+    },
+    {
+      "role": "STRATEGIST",
+      "inputBytes": 72811
+    },
+    {
+      "role": "TRANSLATOR",
+      "inputBytes": 78800
+    },
+    {
+      "role": "REVIEWER",
+      "inputBytes": 219870
+    }
+  ],
+  "caseBankSha256": "3f685b20576e88913e59482c53146bcf0ad2ddfea9f48d6eb04b248c8c4be6b5"
+}

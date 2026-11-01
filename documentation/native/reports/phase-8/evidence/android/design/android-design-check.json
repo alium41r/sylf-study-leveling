@@ -1,0 +1,47 @@
+{
+  "device": "SM-X510",
+  "wm": "Physical size: 1440x2304",
+  "density": "Physical density: 280",
+  "fontScale": "1.15",
+  "renders": [
+    "signature-light",
+    "signature-dark",
+    "studio-light",
+    "studio-dark",
+    "arcane-light",
+    "arcane-dark",
+    "voxel-light",
+    "voxel-dark",
+    "cozy-light",
+    "cozy-dark",
+    "student-light",
+    "student-dark"
+  ],
+  "crashes": 0,
+  "accessibility": {
+    "clickable": 38,
+    "unnamed": 0,
+    "smallerThan44InBothAxes": [
+      "Back to Spaces",
+      "Switch to day",
+      "Color",
+      "Motion",
+      "Notifications",
+      "Disabled",
+      "Remove Tag"
+    ]
+  },
+  "frames": {
+    "total": "0",
+    "janky": [
+      "0",
+      "0.00"
+    ],
+    "p50": "4950",
+    "p90": "4950",
+    "p95": "4950",
+    "p99": "4950"
+  },
+  "totalPssMb": 247,
+  "passed": true
+}

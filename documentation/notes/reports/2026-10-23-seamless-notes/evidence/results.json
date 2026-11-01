@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-23",
+  "status": "Local repair verified; controlled deployment waiting for fresh Vercel CLI account-access confirmation",
+  "testsPassed": 183,
+  "optionalProfileSkipped": 1,
+  "typecheckPassed": true,
+  "targetedLintPassed": true,
+  "isolatedWebBuildPassed": true,
+  "mobileBuildPassed": true,
+  "mobileBoundaryAuditPassed": true,
+  "productionUploaded": false,
+  "newLiveDeploymentVerified": false,
+  "temporaryCliAuthorizationPending": true,
+  "realGoogleRefreshSucceeded": true,
+  "refreshExpiredInputSimulated": true,
+  "googleConsentRequiredForRefresh": false,
+  "sameLibraryAccountRootAndVaultPreserved": true,
+  "databaseMigrationsApplied": 0,
+  "notesDeleted": false,
+  "oauthScopesExpanded": false,
+  "realBrowserSyntheticChecks": {
+    "actualEncryptedIndexedDB": true,
+    "normalModeRoutineLabelsHidden": true,
+    "developerDiagnosticsVisible": true,
+    "textRetainedAfterProviderOutage": true,
+    "coldReloadOpenedExistingNoteWithoutManualGate": true,
+    "providerReconnectCaughtUp": true,
+    "desktopDark": [
+      1440,
+      756
+    ],
+    "desktopCustomLight": [
+      1440,
+      756
+    ],
+    "phoneDark": [
+      390,
+      844
+    ],
+    "phoneCustomLight": [
+      390,
+      844
+    ],
+    "phoneHorizontalOverflow": false,
+    "viewportOverridesReset": true
+  },
+  "coverageLimits": [
+    "User-reported intermittent click failure not reproduced on demand; actual production navigation and stale-callback races covered by regression tests",
+    "Browser fixture uses a synthetic provider and mobile hash navigation; web History API selection separately tested",
+    "Fresh-profile/device recovery, physical stylus and real account revocation/quota drills remain unverified",
+    "Historical immutable deployment URLs retain old code; use the stable Sylf address",
+    "Cold reopening still requires authenticated online Sylf unlock; browser clearing can remove unsynchronized work"
+  ],
+  "oneTimeConsentHandoffConsumed": true
+}

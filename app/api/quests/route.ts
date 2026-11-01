@@ -13,6 +13,7 @@ import { calculateSemanticScopeWeight, evaluateSyllabusScopeWithAI } from "@/lib
 import { reserveQuota, releaseQuota } from "@/lib/ai/usage-limiter";
 import { calculateQuestRewards } from "@/lib/difficulty-engine";
 import { projectQuestDuration } from "@/lib/planner/v2/quest-read";
+import { nextPage, pageLimit } from "@/lib/pagination";
 
 /**
  * GET /api/quests
@@ -27,6 +28,12 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const isAll = searchParams.get("all") === "true";
+    // Sylf Native pages through this list. The web's unbounded read stays as it was when `limit` is absent.
+    const limit = pageLimit(searchParams, 100);
+    const cursor = searchParams.get("cursor");
+    if (limit === "invalid" || (cursor !== null && !/^\d{1,10}$/.test(cursor))) {
+      return NextResponse.json({ error: "Invalid page" }, { status: 400 });
+    }
 
     const tz = await getUserTimezone(session.userId);
     let date = searchParams.get("date");
@@ -101,11 +108,13 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-      orderBy: { createdAt: "asc" },
+      orderBy: limit === null ? { createdAt: "asc" } : [{ createdAt: "asc" }, { id: "asc" }],
+      ...(limit === null ? {} : { take: limit + 1, ...(cursor ? { cursor: { id: Number(cursor) }, skip: 1 } : {}) }),
     });
 
+    const paged = limit === null ? { page: quests, nextCursor: null } : nextPage(quests, limit);
     const now = new Date();
-    const enriched = quests.map((q) => {
+    const enriched = paged.page.map((q) => {
       const { sessions, ...rest } = q;
       const sessionSeconds = (sessions || []).reduce((acc, s) => {
         if (s.executionState != null) return acc + (s.durationSeconds || 0);
@@ -124,6 +133,7 @@ export async function GET(req: NextRequest) {
       };
     });
 
+    if (limit !== null) return NextResponse.json({ quests: enriched, nextCursor: paged.nextCursor }, { status: 200 });
     return NextResponse.json(enriched, { status: 200 });
   } catch (error) {
     console.error("GET /api/quests error:", error);

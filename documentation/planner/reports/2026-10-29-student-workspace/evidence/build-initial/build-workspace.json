@@ -1,0 +1,33 @@
+{
+  "workspace": "/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-student-workspace-build-anvfc_r3",
+  "steps": [
+    {
+      "name": "worker-build",
+      "exitCode": 0,
+      "seconds": 6.39
+    },
+    {
+      "name": "web-build",
+      "exitCode": 0,
+      "seconds": 73.67
+    },
+    {
+      "name": "post-build-typecheck",
+      "exitCode": 0,
+      "seconds": 34.05
+    },
+    {
+      "name": "mobile-build",
+      "exitCode": 0,
+      "seconds": 5.17
+    },
+    {
+      "name": "mobile-verify",
+      "exitCode": 0,
+      "seconds": 0.21
+    }
+  ],
+  "status": "PASSED",
+  "paidCalls": 0,
+  "credentials": "stripped; no environment files copied"
+}

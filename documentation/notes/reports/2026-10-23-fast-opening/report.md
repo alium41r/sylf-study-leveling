@@ -1,0 +1,30 @@
+# Progressive Notes opening repair
+
+**23 October 2026. Qualification, controlled production deployment and scoped live acceptance passed.**
+
+## Findings and repair
+
+The opening path made sequential connection and unlock requests, then awaited catalog source/history replay and the full metadata refresh. On a fresh local repository it could also await complete cloud synchronization, including derived PDF work. Each network request previously allowed 55 seconds. These dependencies explain real opportunities for a long spinner; the user's particular stalled request was not instrumented retrospectively.
+
+The existing Notes owners now expose one authenticated bootstrap, followed by a bounded first page of encrypted local projections. Catalog replay, remaining metadata, indexing and cloud work run after the library handle becomes available. The first view does not acknowledge pending edits or substitute cached metadata for source validation. A fresh device exposes recovery controls before remote work completes; creation stays blocked until original-library discovery succeeds. Network startup has a 15-second deadline with a retryable error. Optional subjects never hold opening. No persistent plaintext keys, auth bypass, vault migration, dependency or parallel document store was introduced.
+
+The earlier same-site navigation, quiet status, token persistence and verified Drive cleanup repairs are included. Routine status controls stay in explicit administrator diagnostics. Actionable data-recovery, consent and storage failures remain visible.
+
+## Verification
+
+- **204 active Notes tests passed; one opt-in scalability profile skipped.** New production-module tests hold catalog replay and Drive indefinitely while encrypted local metadata opens, finish paging afterward, forbid a replacement catalog on an empty device, fence an account change during unlock, and preserve local records after a simulated request deadline. Broker tests require authenticated ownership and same-origin key release while proving one lookup and no Google call. Shared-screen regressions cover pending subjects and deep links outside the first page.
+- TypeScript, targeted lint, isolated production webpack build, mobile build and mobile server/secret-boundary audit passed using Node 24. The upload preflight excludes environment files, private agent settings, builds and unrelated local edits; reviewed runtime source and compiled clients passed the configured-private-value scan.
+- **Live production:** deployment `dpl_EMBCpQgrUNrW25j7dCpADQ9Mn3Xm` is READY and assigned to `sylf-alium41rs-projects.vercel.app`. An authenticated repeat reload reached visible existing cards in approximately **4.62 seconds** of browser-control wall time (includes transport/control overhead). The first reload after deployment initially downloaded the new screen bundle; that observation is not a steady-state latency claim. No consent or Open Notes gate appeared. Card selection changed the same-page URL within a 0.55-second observation, followed by lazy editor hydration. Both synthetic test markers survived a full reload. Normal mode had no routine sync indicators.
+- **Live Google follow-up:** the second synthetic edit eventually produced a changed current PDF fingerprint/file, with exactly one active named PDF in its correct folder and three obsolete derived PDFs in recoverable Trash. The legacy native archive remained protected. An earlier poll still showed the prior current PDF while background work was pending; it is retained as intermediate evidence, not counted as completion. See [settled inventory](../2026-10-23-drive-cleanup/evidence/live-after-second-settled.json).
+- Google Drive's actual viewer opened the current named PDF and visibly rendered both test-revision markers. See [live PDF preview](evidence/live-drive-current-pdf.png); this was a read-only preview, with no Gemini interaction, sharing or conversion.
+- **Real Chromium with synthetic provider:** desktop 1440×900 dark/custom-purple library and phone 390×844 custom-light/green editor were visually inspected. Text survived page reload, normal statuses stayed quiet and phone content width equaled viewport width. The local synthetic library reload observation was 0.25 seconds; that excludes real authentication/Google latency and is not a live-site speed guarantee. Temporary viewport overrides were reset. See [browser results](evidence/browser-results.json).
+
+## Limits
+
+**Subsequent finding:** the user later opened the immutable deployment URL and reported a three-to-four-minute first download. This run's cached canonical-origin checks did not qualify that path. The [cold-restore follow-up](../2026-10-23-cold-restore/report.md) reproduces the empty-repository cache problem and records the additional repair and its deployment status.
+
+Cold authentication and online key retrieval still take time. This repair does not keep keys through logout or browser process death. Existing encrypted device storage remains intact; explicit browser-data deletion can lose unsynchronized work. Very large history replay/search still have a cost in the background. Independent physical-device/profile recovery, real tablet/stylus and prolonged natural token-expiry coverage remain the earlier pilot gates. Unique native history is retained; only independently verified derived predecessors or identical physical duplicates are eligible for recoverable cleanup. Google Trash continues to consume space until its own removal policy applies.
+
+See the [current opening contract](../../workspace.md#progressive-authenticated-opening), [cleanup qualification](../2026-10-23-drive-cleanup/report.md) and [reviewed release manifest](evidence/release-candidate.json).
+
+**Verdict:** the reported opening dependency and routine synchronization issues are repaired and deployed; the scoped live checks support a supervised pilot. This does not qualify an unrestricted public release or eliminate cold authentication/loading time. Independent-device recovery and physical tablet/browser qualification remain required before broader rollout.

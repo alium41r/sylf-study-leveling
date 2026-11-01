@@ -1,0 +1,20 @@
+{
+  "label": "phase1",
+  "files": 1,
+  "passed": 1,
+  "failed": 0,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [],
+  "suites": [
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-9amyIo/__tests__/planner-v2/postgres/phase-c-preparation.postgres.ts",
+      "cases": [
+        {
+          "name": "retains exactly one owned C01 journey and its actual finance under the approved execution boundary",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

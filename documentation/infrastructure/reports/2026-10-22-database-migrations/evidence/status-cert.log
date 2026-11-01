@@ -1,0 +1,5 @@
+Datasource "db": PostgreSQL database "postgres", schema "public" at "[redacted]:5432"
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Error: P1011: Error opening a TLS connection: The certificate was not trusted.

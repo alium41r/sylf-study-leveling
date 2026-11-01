@@ -1,6 +1,6 @@
 # Sylf Notes technical contracts — Phase 1 baseline
 
-**19 October 2026. Phase 1 design baseline.** Phase 2 subsequently implemented the [current foundation contract](foundation.md); consult it for actual behavior, supported limits and deviations. Phase 3 subsequently implemented the [workspace, local vault and Drive contract](workspace.md); consult that current contract and its report for actual provider/UX behavior. Unimplemented native sections below remain design inputs. Product decisions and external gates are in the [Phase 1 report](reports/phase-1/report.md), updated by the [Phase 2 report](reports/phase-2/report.md).
+**19 October 2026. Phase 1 design baseline.** Phase 2 subsequently implemented the [current foundation contract](foundation.md); consult it for actual behavior, supported limits and deviations. Phase 3 subsequently implemented the [workspace, local vault and Drive contract](workspace.md); consult that current contract and its report for actual provider/UX behavior. Phase 4 adds the [current paper/handwriting contract](ink.md). Phase 5 adds the [current PDF contract](pdf.md), including its actual source/export limits. Phase 6 hardens these same owners; see its [qualification report](reports/phase-6/report.md). Unimplemented native sections below remain design inputs. Product decisions and external gates are in the [Phase 1 report](reports/phase-1/report.md), updated by the [Phase 2 report](reports/phase-2/report.md).
 
 ## 1. Authorities and storage boundaries
 
@@ -94,6 +94,8 @@ Current `next.config.ts` needs narrowly scoped cloud `connect-src` origins befor
 ## 8. Recovery, history and lifecycle
 
 Keep immutable cloud history and independent native exports. Provider trash/version history is an additional recovery aid, not Sylf's only backup. History within the same cloud account is not independent protection against account/root deletion. A fresh-device restore must verify every referenced object and reproduce document/asset identities.
+
+The 23 October [Drive maintenance policy](workspace.md#verified-drive-copy-cleanup) retires only verified derived PDFs and byte-identical physical duplicates through recoverable provider Trash. It does not discard native history, dependencies, pending work or original source archives.
 
 Phase 2 enables **no destructive cloud garbage collection or automatic history expiry**. Later retention needs an approved budget, restore tests, offline-device epoch policy and a reversible dry run. Compaction may add lineage-preserving checkpoints; it cannot delete the last pending copy or make a valid old device silently lose edits. Obsolete epochs import late edits into a recovery branch; never reset the remote library to match an old device.
 

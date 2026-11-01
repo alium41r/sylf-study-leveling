@@ -219,6 +219,8 @@ describe("Profile System APIs", () => {
         aura: "aura_cyber",
       };
 
+      vi.spyOn(prisma, "$transaction").mockImplementation((async (run: (tx: typeof prisma) => unknown) => run(prisma)) as never);
+      const lock = vi.spyOn(prisma, "$queryRaw").mockResolvedValue([] as never);
       vi.spyOn(prisma.user, "update").mockResolvedValue({
         id: 999,
         username: "hunter_test",
@@ -256,6 +258,7 @@ describe("Profile System APIs", () => {
 
       const res = await PATCH(req);
       expect(res.status).toBe(200);
+      expect(lock).toHaveBeenCalledOnce();
 
       const data = await res.json();
       expect(data.message).toContain("updated successfully");

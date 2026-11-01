@@ -93,7 +93,8 @@ export async function consumeResponseWithTimeout<T>(request: typeof fetch, input
     return await Promise.race([deadline, (async () => {
       const response = await request(input, { ...init, signal: controller.signal });
       const result = await consume(response, controller.signal);
-      controller.signal.throwIfAborted();
+      // Not signal.throwIfAborted(): React Native's AbortSignal does not have it, and this runs after the server has already accepted.
+      if (controller.signal.aborted) throw controller.signal.reason ?? new Error("Request aborted");
       return result;
     })()]);
   } finally {

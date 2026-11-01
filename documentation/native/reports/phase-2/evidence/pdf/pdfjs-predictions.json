@@ -1,0 +1,177 @@
+[
+  {
+    "id": "a4-plain",
+    "pdfjs": {
+      "width": 595,
+      "height": 842,
+      "rotation": 0,
+      "userUnit": 1,
+      "transform": [
+        1,
+        0,
+        0,
+        -1,
+        0,
+        842
+      ],
+      "marker": [
+        148.75,
+        252.60000000000002
+      ]
+    },
+    "markerUser": [
+      148.75,
+      589.4
+    ]
+  },
+  {
+    "id": "letter-rot90",
+    "pdfjs": {
+      "width": 792,
+      "height": 612,
+      "rotation": 90,
+      "userUnit": 1,
+      "transform": [
+        0,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "marker": [
+        554.4,
+        153
+      ]
+    },
+    "markerUser": [
+      153,
+      554.4
+    ]
+  },
+  {
+    "id": "crop-offset",
+    "pdfjs": {
+      "width": 450,
+      "height": 640,
+      "rotation": 0,
+      "userUnit": 1,
+      "transform": [
+        1,
+        0,
+        0,
+        -1,
+        -50,
+        700
+      ],
+      "marker": [
+        112.5,
+        192
+      ]
+    },
+    "markerUser": [
+      162.5,
+      508
+    ]
+  },
+  {
+    "id": "crop-rot270",
+    "pdfjs": {
+      "width": 710,
+      "height": 520,
+      "rotation": 270,
+      "userUnit": 1,
+      "transform": [
+        0,
+        -1,
+        -1,
+        0,
+        740,
+        560
+      ],
+      "marker": [
+        213,
+        390
+      ]
+    },
+    "markerUser": [
+      170,
+      527
+    ]
+  },
+  {
+    "id": "media-negative-origin",
+    "pdfjs": {
+      "width": 600,
+      "height": 800,
+      "rotation": 0,
+      "userUnit": 1,
+      "transform": [
+        1,
+        0,
+        0,
+        -1,
+        100,
+        700
+      ],
+      "marker": [
+        150,
+        240
+      ]
+    },
+    "markerUser": [
+      50,
+      460
+    ]
+  },
+  {
+    "id": "rot180-crop",
+    "pdfjs": {
+      "width": 400,
+      "height": 600,
+      "rotation": 180,
+      "userUnit": 1,
+      "transform": [
+        -1,
+        0,
+        0,
+        1,
+        500,
+        -100
+      ],
+      "marker": [
+        300,
+        420
+      ]
+    },
+    "markerUser": [
+      200,
+      520
+    ]
+  },
+  {
+    "id": "userunit-2",
+    "pdfjs": {
+      "width": 600,
+      "height": 800,
+      "rotation": 0,
+      "userUnit": 2,
+      "transform": [
+        2,
+        0,
+        0,
+        -2,
+        0,
+        800
+      ],
+      "marker": [
+        150,
+        240
+      ]
+    },
+    "markerUser": [
+      75,
+      280
+    ]
+  }
+]

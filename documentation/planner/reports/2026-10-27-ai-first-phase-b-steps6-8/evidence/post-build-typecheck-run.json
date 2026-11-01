@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "status": "PASSED",
+  "command": [
+    "/private/tmp/sylf-phase-a-runtime/node-v24.21.0-darwin-arm64/bin/node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "node": "v24.21.0",
+  "nodeOptions": "--max-old-space-size=6144",
+  "startedAt": "2026-10-28T10:37:30.424659+00:00",
+  "finishedAt": "2026-10-28T10:37:35.599583+00:00",
+  "exitCode": 0,
+  "log": "post-build-typecheck.log",
+  "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

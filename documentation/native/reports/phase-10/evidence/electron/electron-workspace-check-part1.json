@@ -1,0 +1,346 @@
+{
+  "summary": {
+    "passed": true,
+    "total": 89,
+    "failed": []
+  },
+  "checks": {
+    "opensWithEmptyCanvas": true,
+    "noPageOverflow": true,
+    "dragPansCanvas": true,
+    "wheelPans": true,
+    "pinchZooms": true,
+    "pinchHoldsPoint": true,
+    "panStopsAtWorldEdge": true,
+    "zoomStopsAtMinimum": true,
+    "zoomStopsAtMaximum": true,
+    "resetViewReturnsHome": true,
+    "fitShowsWholeWorldWhenEmpty": true,
+    "cameraSurvivesReload": true,
+    "dotsAtEveryZoom": true,
+    "dotsKeepOneSize": true,
+    "dotSpacingStaysReadable": true,
+    "touchPinchZoomsIn": true,
+    "touchPinchHoldsPoint": true,
+    "touchPinchZoomsOut": true,
+    "touchPinchOutHoldsPoint": true,
+    "pinchEndsWithoutASnap": true,
+    "pinchOverOrdinaryToolZoomsCanvas": true,
+    "pinchAcrossWindowEdgeZoomsCanvas": true,
+    "pinchOn_notes_LeavesCanvasStill": true,
+    "pinchOn_pdfs_LeavesCanvasStill": true,
+    "pinchOn_whiteboard_LeavesCanvasStill": true,
+    "pinchAcrossNotesEdgeZoomsCanvas": true,
+    "pinchFromTitleBarZoomsCanvas": true,
+    "pinchFromTitleBarLeavesWindow": true,
+    "dockHas_notes": true,
+    "dockHas_pdfs": true,
+    "dockHas_whiteboard": true,
+    "dockHas_planner": true,
+    "dockHas_calendar": true,
+    "dockHas_sylvie": true,
+    "dockHas_timer": true,
+    "dockHas_calculator": true,
+    "dockHas_audio": true,
+    "dockHas_resources": true,
+    "dockCentered": true,
+    "dockOpensTool": true,
+    "toolInView": true,
+    "singleToolNotDoubled": true,
+    "dockMenuOpens": true,
+    "dockMenuOpensNewWindow": true,
+    "dockListsInstances": true,
+    "zoomMenuOpens": true,
+    "closeButtonCloses": true,
+    "opens_notes": true,
+    "opens_pdfs": true,
+    "opens_whiteboard": true,
+    "opens_planner": true,
+    "opens_calendar": true,
+    "opens_sylvie": true,
+    "opens_timer": true,
+    "opens_calculator": true,
+    "opens_audio": true,
+    "opens_resources": true,
+    "calculatorUsesRealEngine": true,
+    "calculatorKeepsState": true,
+    "shelfOpensDocument": true,
+    "twoInstancesOfOneTool": true,
+    "dragMovesWindow": true,
+    "dragLandsOnGrid": true,
+    "dragLeavesOthersAlone": true,
+    "pressFocuses": true,
+    "focusRaises": true,
+    "pressInsideFocusesAndActs": true,
+    "cornerResizes": true,
+    "resizeStopsAtToolMinimum": true,
+    "leadingEdgeResizeHoldsFarEdge": true,
+    "cameraLeavesWindowsAlone": true,
+    "minimizeKeepsWindow": true,
+    "minimizedShowsChip": true,
+    "minimizedLeavesTabOrder": true,
+    "restoreKeepsPlace": true,
+    "instancesAreIndependent": true,
+    "stageNeverScrolls": true,
+    "dragStaysInWorld": true,
+    "focusFillsWithOneTool": true,
+    "focusClosesNothing": true,
+    "focusIsAt100Percent": true,
+    "focusTucksCommandCenter": true,
+    "handleBringsCommandCenterBack": true,
+    "splitPlacesTwoSideBySide": true,
+    "assistantPutsSylvieBeside": true,
+    "backRestoresArrangement": true,
+    "backReturnsCamera": true,
+    "adjustmentBecomesFree": true,
+    "noConsoleErrors": true
+  },
+  "results": {
+    "afterPan": {
+      "x": 3195.7508744646307,
+      "y": 2018.0241405971221,
+      "zoom": 1
+    },
+    "afterPinch": {
+      "x": 3515.752488923705,
+      "y": 2145.0873900319857,
+      "zoom": 1.822118800390509
+    },
+    "atCorner": {
+      "x": 520,
+      "y": 253,
+      "zoom": 1
+    },
+    "dots": {
+      "1": {
+        "count": 72,
+        "light": 1667,
+        "spacing": 28
+      },
+      "2": {
+        "count": 72,
+        "light": 1667,
+        "spacing": 28
+      },
+      "0.2": {
+        "count": 24,
+        "light": 1651,
+        "spacing": 44.9
+      },
+      "0.35": {
+        "count": 36,
+        "light": 1663,
+        "spacing": 39.3
+      },
+      "0.5": {
+        "count": 64,
+        "light": 1667,
+        "spacing": 28
+      },
+      "0.71": {
+        "count": 36,
+        "light": 1659,
+        "spacing": 39.8
+      },
+      "1.4": {
+        "count": 36,
+        "light": 1661,
+        "spacing": 39.3
+      }
+    },
+    "pinch": {
+      "emptyIn": {
+        "ratio": 1.311,
+        "error": 2.5,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2801.875,
+          "y": 1812.1625,
+          "zoom": 1.3114754098360657
+        }
+      },
+      "emptyOut": {
+        "ratio": 0.582,
+        "error": 1.6,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2797.1875,
+          "y": 1843.71875,
+          "zoom": 0.5818181818181817
+        }
+      },
+      "fingersLift": {
+        "ratio": 1.626,
+        "error": 0,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2800,
+          "y": 1807.2890915414398,
+          "zoom": 1.6264897781449994
+        }
+      },
+      "calculatorInside": {
+        "ratio": 1.311,
+        "error": 2.5,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2801.875,
+          "y": 1823.325,
+          "zoom": 1.3114754098360657
+        }
+      },
+      "calculatorEdge": {
+        "ratio": 1.311,
+        "error": 2.5,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2841.775,
+          "y": 1823.325,
+          "zoom": 1.3114754098360657
+        }
+      },
+      "notesInside": {
+        "ratio": 1,
+        "error": 0,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        }
+      },
+      "pdfsInside": {
+        "ratio": 1,
+        "error": 0,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        }
+      },
+      "whiteboardInside": {
+        "ratio": 1,
+        "error": 0,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        }
+      },
+      "notesEdge": {
+        "ratio": 1.311,
+        "error": 2.5,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2875.025,
+          "y": 1823.325,
+          "zoom": 1.3114754098360657
+        }
+      },
+      "fromTitleBar": {
+        "ratio": 1.309,
+        "error": 0,
+        "windowMoved": false,
+        "before": {
+          "x": 2800,
+          "y": 1820,
+          "zoom": 1
+        },
+        "after": {
+          "x": 2825.943396226415,
+          "y": 1764.811320754717,
+          "zoom": 1.308641975308642
+        }
+      }
+    },
+    "dock": {
+      "x": 333.51312255859375,
+      "y": 674,
+      "width": 613,
+      "height": 60
+    },
+    "calculatorPreview": "8",
+    "moved": {
+      "from": [
+        2520,
+        1512
+      ],
+      "to": [
+        2744,
+        1652
+      ],
+      "zoom": 0.6
+    },
+    "resized": {
+      "from": [
+        336,
+        532
+      ],
+      "to": [
+        448,
+        616
+      ]
+    },
+    "scrollers": [
+      false
+    ],
+    "assistant": [
+      [
+        "calculator",
+        560
+      ],
+      [
+        "sylvie",
+        392
+      ]
+    ],
+    "consoleErrors": []
+  }
+}

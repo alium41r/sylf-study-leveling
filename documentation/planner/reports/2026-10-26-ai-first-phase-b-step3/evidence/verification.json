@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "finishedAt": "2026-10-26T10:42:00.840259+00:00",
+  "runtime": "Node 24.21.0; native PostgreSQL 18.4",
+  "unit": {
+    "command": "npx vitest run __tests__/planner-v2 __tests__/planner/search-provider.test.ts __tests__/planner/source-fetch-security.test.ts __tests__/planner/research-evidence.test.ts __tests__/planner/comparison-service.test.ts __tests__/planner/comparison-contract.test.ts __tests__/planner/intake-telemetry.test.tsx __tests__/ai/deepseek-reasoning-controls.test.ts __tests__/ai/deepseek-tool-continuity.test.ts __tests__/ai/cost-summary.test.ts __tests__/ai/dispatch-telemetry.test.ts --reporter=json",
+    "exitCode": 0,
+    "files": 42,
+    "passed": 562,
+    "failed": 0,
+    "skipped": 0,
+    "evidence": "unit-tests.json"
+  },
+  "postgres": {
+    "command": "node scripts/test/test-planner-ai-first-foundation.mjs --native-bin /private/tmp/sylf-phase-a-runtime/package/native/bin --evidence-dir documentation/planner/reports/2026-10-26-ai-first-phase-b-step3/evidence/final-gate",
+    "status": "PASSED",
+    "passed": 488,
+    "requiredSkipped": 0,
+    "retainedStep2Checks": 468,
+    "newChecks": 20,
+    "optionalPaidProviderExcluded": 1,
+    "evidence": "final-gate/postgres-harness-run.json",
+    "sourcePins": "final-gate/postgres-source-pins.json",
+    "sourceDrift": []
+  },
+  "typecheck": {
+    "command": "npx tsc --noEmit",
+    "exitCode": 0,
+    "evidence": "typecheck.log"
+  },
+  "lint": {
+    "command": "npx eslint <25 changed source files> --format json",
+    "exitCode": 0,
+    "files": 25,
+    "errors": 0,
+    "warnings": 0,
+    "evidence": "lint.json"
+  },
+  "worker": {
+    "command": "npm run planner:worker:build",
+    "exitCode": 0,
+    "evidence": "worker-build.log",
+    "ordinaryNodeImports": "worker-imports.json"
+  },
+  "web": {
+    "command": "NODE_OPTIONS=--max-old-space-size=6144 npx next build --webpack",
+    "exitCode": 0,
+    "evidence": "web-build.log",
+    "allowance": "Existing Phase A process allowance; no repository config change"
+  },
+  "schema": {
+    "command": "npx prisma validate",
+    "exitCode": 0,
+    "evidence": "prisma-validate.log",
+    "generation": "Not required: no Prisma field change"
+  },
+  "mobile": "Not required: no shared client change",
+  "paidProviderCalls": 0,
+  "hostedMigrationDeployments": 0,
+  "environmentFileChanges": 0,
+  "productionModelRoutingChanges": 0,
+  "searchSelection": "Explicit profiled v2 research prefers DeepSeek with previous backend retained as fallback. V1/default selection unchanged. Live suitability unqualified.",
+  "preservation": "preservation.json"
+}

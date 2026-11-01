@@ -1,0 +1,22 @@
+{
+  "results": [
+    "Protected and corrupt PDF imports fail before creating replacement documents",
+    "Actual PDF.js worker import; cropped/rotated UserUnit page metadata; selectable source text",
+    "Existing production handwriting controller writes durable pressure/tilt vectors over PDF",
+    "Real PDF.js text selection produces persistent page-space highlight rectangles",
+    "Unicode comment entry is durable and uses the shared recovery stream",
+    "Real export worker creates an annotated PDF study copy",
+    "Cropped UserUnit source and extra rotation preserve canonical ink positions and export",
+    "Insert, write, duplicate, reorder, retain and restore pages without rewriting the original PDF",
+    "Original text search and durable page bookmarks reuse document organization",
+    "Real offline persistence, clean-profile source reconstruction and concurrent editable comments merge",
+    "Quota failure locks input, retains pending delta across zoom, exports recovery and retries with undo intact",
+    "Acknowledged PDF source and annotations survive a renderer crash",
+    "Desktop, tablet, narrow phone and opposite surface polarities render without page overflow",
+    "Coarse 44px controls, touch pan/pinch without ink, and focus exit work in the PDF surface"
+  ],
+  "errors": [],
+  "cloudFiles": 6,
+  "liveGoogle": false,
+  "physicalStylus": false
+}

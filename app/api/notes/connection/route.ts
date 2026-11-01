@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { beginOAuth, publicBinding } from "@/lib/notes/server/connections";
 import {
   configured,
+  publicOrigin,
+  notesRequestOrigin,
   requireOrigin,
   NotesServerError,
 } from "@/lib/notes/server/security";
@@ -13,8 +15,11 @@ export async function GET(req: Request) {
     const connection = await prisma.notesConnection.findUnique({
       where: { userId },
     });
+    const ready = configured();
     return json({
-      configured: configured(),
+      configured: ready,
+      notesUrl: ready ? `${publicOrigin()}/notes` : null,
+      localAccess: ready && !!notesRequestOrigin(req),
       connection: connection?.verifiedAt ? publicBinding(connection) : null,
     });
   } catch (error) {

@@ -3,20 +3,10 @@
 // 1. Invite Creation Authorization (Members can create, non-members cannot)
 // 2. Rejoin Cleanup & State Reset (leftAt wiped, state reset, 0 duplicate rows)
 // ============================================================================
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 import pg from "pg";
+import { focusPartyTestUrl } from "./disposable-database.mjs";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const envPath = path.join(__dirname, "../..", ".env");
-const env = {};
-for (const line of fs.readFileSync(envPath, "utf8").split("\n")) {
-  const m = line.match(/^([A-Z0-9_]+)\s*=\s*"?([^"\n]*)"?$/);
-  if (m) env[m[1]] = m[2];
-}
-
-const url = env.DIRECT_URL || env.DATABASE_URL;
+const url = focusPartyTestUrl(process.env.FOCUS_PARTY_TEST_DATABASE_URL);
 const pool = new pg.Pool({ connectionString: url, max: 5 });
 
 async function runConfirmation() {
@@ -240,10 +230,7 @@ async function runConfirmation() {
     console.log("\n--- Cleaning up test artifacts ---");
     try {
       await client.query("BEGIN");
-      await client.query("SET LOCAL session_replication_role = 'replica'");
-      if (partyId) {
-        await client.query(`DELETE FROM public."FocusParty" WHERE id = $1`, [partyId]);
-      }
+      // Normal FK cascades remove fixtures; never suppress constraint triggers.
       if (testUserIds.length > 0) {
         await client.query(`DELETE FROM public."User" WHERE id = ANY($1)`, [testUserIds]);
       }
@@ -252,6 +239,7 @@ async function runConfirmation() {
     } catch (e) {
       await client.query("ROLLBACK");
       console.warn("Cleanup warning:", e.message);
+      process.exitCode = 1;
     }
     client.release();
   }

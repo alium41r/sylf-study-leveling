@@ -17,9 +17,10 @@ export async function GET(req: NextRequest) {
     // Auto-expire invites older than 15 minutes
     const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000);
 
-    // Auto-update expired invites (optional cleanup)
+    // Auto-update expired invites (scoped to this receiver)
     await prisma.sessionInvite.updateMany({
       where: {
+        receiverId: userId,
         status: "PENDING",
         createdAt: { lt: fifteenMinsAgo }
       },

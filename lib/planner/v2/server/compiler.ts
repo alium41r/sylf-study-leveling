@@ -21,6 +21,10 @@ import { RevisionService, loadRevision } from "./revisions";
 import { assignCompilerIdentities, sealCompilerCandidate } from "./compilation";
 import { hash, reject, DurablePlannerError } from "./database";
 import type { WorkerHandler } from "./worker";
+import { assertLegacyCompiler, loadAttemptArtifacts } from "./foundation";
+import { PlannerCalendarCapacity } from "./calendar-capacity";
+import { loadCompilerVersion } from "./compiler-version";
+import { ReviewedLearningStage } from "./reviewed-learning";
 
 type Owned = Awaited<ReturnType<LearningCompilerService["capture"]>>;
 type Allocated = Extract<CompilerCheckpoint["payload"], { stage: "ALLOCATION" }>;
@@ -34,8 +38,8 @@ export class PlannerCompilerService {
     provider?: Parameters<typeof dispatchMeteredProvider>[2]; research?: ResearchService;
     maximumSearchNodes?: number;
   } = {}) {
-    this.learning = new LearningCompilerService(attempts, dependencies);
     this.research = dependencies.research ?? new ResearchService(attempts, { provider: dependencies.provider });
+    this.learning = new LearningCompilerService(attempts, { ...dependencies, documents: this.research.documents });
   }
   private allocated(checkpoint: CompilerCheckpoint): Allocated {
     if (!("allocation" in checkpoint.payload)) reject("QUALITY_INCOMPLETE", "Independent review requires allocation.", "REVIEW");
@@ -68,6 +72,38 @@ export class PlannerCompilerService {
     signal.throwIfAborted();
     let attempt = await this.attempts.read(token.ownerId, token.attemptId);
     if (attempt.state === "SUCCEEDED") return;
+    const compilerVersion = await this.attempts.mutate(token, (sql, current) => loadCompilerVersion(sql, current.attemptId));
+    if (compilerVersion === 2) {
+      // Step 1 installs durable dispatch and recovery interpretation only.
+      // Never fall through into v1's provider, repair or publication semantics.
+      const retained = await this.attempts.mutate(token, (sql, current) => loadAttemptArtifacts(sql, current.ownerId, current.attemptId));
+      signal.throwIfAborted();
+      if(attempt.budget.aiFirst) {
+        const alreadyLearning = retained.compilerVersion===2 && Object.values(retained.archive.entries).some(a=>a.kind==="CHECKPOINT"&&a.value.schemaVersion===2);
+        if(!alreadyLearning){
+          await this.research.understanding().run(token,signal);
+          attempt=await this.attempts.read(token.ownerId,token.attemptId);if(attempt.state!=="RUNNING")return;
+          const capacity=await new PlannerCalendarCapacity(this.attempts).run(token,signal);
+          attempt=await this.attempts.read(token.ownerId,token.attemptId);if(attempt.state!=="RUNNING")return;
+          if(capacity.value.schemaVersion!==2||capacity.value.status!=="READY")reject("QUALITY_INCOMPLETE",capacity.value.schemaVersion===2?capacity.value.reasons[0]:"Verified capacity is required.","PREFLIGHT");
+        }
+        if((await this.attempts.resources(token.ownerId,token.attemptId)).policy.journeyVersion===1){
+          const reviewed=await new ReviewedLearningStage(this.learning.natural(),this.research.understanding()).run(token,signal);
+          attempt=await this.attempts.read(token.ownerId,token.attemptId);if(attempt.state!=="RUNNING")return;
+          if(reviewed.value.stage!=="READY")reject("QUALITY_INCOMPLETE",reviewed.value.reason,"REVIEW");
+          await new RevisionService(this.attempts,this.research.documents).publishReviewed(token);
+          return;
+        }
+        const learning=await this.learning.natural().run(token,signal);
+        attempt=await this.attempts.read(token.ownerId,token.attemptId);if(attempt.state!=="RUNNING")return;
+        const allocated=learning.value.learning.allocated;
+        if(!allocated)reject("QUALITY_INCOMPLETE",learning.value.reason,"BLUEPRINT");
+        if(allocated.allocation.status!=="FEASIBLE")reject("ALLOCATION_UNRESOLVED","The complete educational workload is retained; bounded allocation did not establish feasibility.","ALLOCATION");
+        reject("QUALITY_INCOMPLETE","Complete natural strategy, faithful translation and verified allocation are retained. Independent review/refinement and confirmation await Steps 6–7.","REVIEW");
+      }
+      reject("QUALITY_INCOMPLETE", "Compiler v2 research/strategy orchestration and publication are not installed; retained artifacts are available for recovery.", "PREFLIGHT");
+    }
+    await this.attempts.mutate(token, (sql, current) => assertLegacyCompiler(sql, current.attemptId));
     if (!["PLAN", "REPLAN", "JOINT"].includes(attempt.kind)) reject("INTENT_CONFLICT", "This compiler requires explicit educational targets.", "PREFLIGHT");
     if (!attempt.checkpoint && attempt.parentAttemptId) {
       await new RevisionService(this.attempts).resolveUnchanged(token);

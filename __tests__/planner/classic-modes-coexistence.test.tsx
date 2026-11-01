@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import PlannerTab from "@/app/system/components/PlannerTab";
 import { emptyComparisonView } from "@/lib/planner/intake/actions";
-import { emptyBrief } from "@/lib/planner/intake/brief";
 
 /**
  * The acceptance test for permanent coexistence.
@@ -126,7 +125,7 @@ describe("Classic Planner and Planner Modes coexist", () => {
 
     // 2. Exam, reached deliberately.
     fireEvent.click(screen.getByRole("button", { name: /Planner modes/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Exam Planner/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Prepare for an Exam/ }));
     expect(await screen.findByRole("heading", { name: MODE_HEADINGS.EXAM }, { timeout: 5000 })).toBeInTheDocument();
     // Quick Plan is still the default creation flow inside a mode.
     expect(screen.getByRole("button", { name: "Generate my plan" })).toBeInTheDocument();
@@ -139,8 +138,8 @@ describe("Classic Planner and Planner Modes coexist", () => {
 
     // 4. And again, in the same session, for the other two modes.
     for (const [label, heading] of [
-      [/Course \/ Syllabus Roadmap/, MODE_HEADINGS.ROADMAP],
-      [/Chapter \/ Unit Mastery/, MODE_HEADINGS.MASTERY],
+      [/Plan a Course/, MODE_HEADINGS.ROADMAP],
+      [/Master a Unit/, MODE_HEADINGS.MASTERY],
     ] as const) {
       fireEvent.click(screen.getByRole("button", { name: /Planner modes/ }));
       fireEvent.click(screen.getByRole("button", { name: label }));
@@ -156,7 +155,7 @@ describe("Classic Planner and Planner Modes coexist", () => {
   it("keeps every Planner Modes capability the phase before this one established", async () => {
     tab();
     fireEvent.click(screen.getByRole("button", { name: /Planner modes/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Exam Planner/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Prepare for an Exam/ }));
     await screen.findByRole("heading", { name: MODE_HEADINGS.EXAM }, { timeout: 5000 });
 
     // Weekly hours remain the default capacity input, not seven daily fields.
@@ -183,7 +182,7 @@ describe("Classic Planner and Planner Modes coexist", () => {
       ]);
 
       fireEvent.click(screen.getByRole("button", { name: /Planner modes/ }));
-      fireEvent.click(screen.getByRole("button", { name: /Exam Planner/ }));
+      fireEvent.click(screen.getByRole("button", { name: /Prepare for an Exam/ }));
       await screen.findByRole("heading", { name: MODE_HEADINGS.EXAM }, { timeout: 5000 });
       // The choice is reported as a mode, and the surface as Planner Modes.
       expect(events()).toEqual(
@@ -219,7 +218,7 @@ describe("Classic Planner and Planner Modes coexist", () => {
   it("returns to Classic from Advanced setup as well as from Quick Plan", async () => {
     tab();
     fireEvent.click(screen.getByRole("button", { name: /Planner modes/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Mastery/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Master a Unit/ }));
     await screen.findByRole("heading", { name: MODE_HEADINGS.MASTERY }, { timeout: 5000 });
     fireEvent.click(screen.getByRole("button", { name: "Fine-tune first" }));
     // Inside the detailed wizard the way back to Classic is still visible.

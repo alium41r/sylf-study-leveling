@@ -1,5 +1,5 @@
 import type { GoogleGenAI, GenerateContentResponse } from "@google/genai";
-import { aiSignal, observeAiDispatch } from "../telemetry";
+import { aiSignal, observeAiDispatch } from "../telemetry-runtime";
 import { geminiUsage } from "./usage";
 
 type Params = Parameters<GoogleGenAI["models"]["generateContent"]>[0];

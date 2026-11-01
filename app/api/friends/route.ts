@@ -2,8 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 import { TimezoneService } from "@/lib/timezone-service";
+import { isVisible } from "@/lib/privacy";
+import { Relationship } from "@/lib/privacy-types";
 import { selectedCompanionsForUsers } from "@/lib/pixel-companion-service";
-import { Prisma } from "@prisma/client";
+
+/** Friends still load if study time cannot, and a failure must reach the log: silently it reads as everyone being idle. */
+function studyAggregateFailed(error: unknown): never[] {
+  console.error("[friends] study aggregate failed:", error);
+  return [];
+}
 
 /**
  * GET /api/friends
@@ -41,6 +48,7 @@ export async function GET(req: NextRequest) {
       activeTitle: true,
       activeAura: true,
       characterConfig: true,
+      privacy: { select: { showOnlineStatus: true, showCurrentSession: true, showStudyHours: true, showRank: true } },
     } as const;
 
     // ── Independent reads in parallel ─────────────────────────
@@ -89,21 +97,21 @@ export async function GET(req: NextRequest) {
           SELECT "userId", COALESCE(SUM(CASE WHEN "endedAt" IS NOT NULL THEN "durationSeconds" ELSE 0 END), 0)::int AS seconds,
             COALESCE(SUM("durationSeconds"), 0)::int AS "todaySeconds"
           FROM "StudySession" AS s
-          WHERE "userId" IN (${Prisma.join(friendIds)})
+          WHERE "userId" = ANY(${friendIds}::int[])
             AND CASE WHEN to_jsonb(s)->'executionContext'->>'actualCivilDate' IS NOT NULL
               THEN to_jsonb(s)->'executionContext'->>'actualCivilDate' = ${TimezoneService.getUserLocalDate(timezone)}
               ELSE "startedAt" >= ${todayStart} END
           GROUP BY "userId"
-        `.catch(() => []),
+        `.catch(studyAggregateFailed),
         prisma.$queryRaw<Array<{ userId: number; startedAt: Date }>>`
           SELECT "userId", MAX("startedAt") AS "startedAt"
           FROM "StudySession" AS s
-          WHERE "userId" IN (${Prisma.join(friendIds)})
+          WHERE "userId" = ANY(${friendIds}::int[])
             AND "endedAt" IS NULL
             AND (to_jsonb(s)->>'executionState' = 'RUNNING' OR to_jsonb(s)->>'executionState' IS NULL
               AND ("startedAt" >= ${new Date(now.getTime() - 180_000)} OR "durationSeconds" > 0 AND "startedAt" >= ${twelveHoursAgo}))
           GROUP BY "userId"
-        `.catch(() => []),
+        `.catch(studyAggregateFailed),
       ]);
 
       for (const row of completedRows) {
@@ -124,16 +132,23 @@ export async function GET(req: NextRequest) {
       const friendData = f.userId === userId ? f.friend : f.user;
       const friendId = friendData.id;
 
-      const completedTodaySeconds = completedMap.get(friendId) ?? 0;
-      const hasActiveSession = activeSessionMap.has(friendId);
-      const activeSessionStarted = activeSessionMap.get(friendId);
+      // A friend's own settings still apply to friends: PRIVATE means nobody. A missing row reads as public, as it does elsewhere.
+      const may = (setting: string | undefined) => isVisible(setting ?? "PUBLIC", Relationship.FRIEND);
+      const showHours = may(friendData.privacy?.showStudyHours);
+      const showSession = may(friendData.privacy?.showCurrentSession);
+      const showOnline = may(friendData.privacy?.showOnlineStatus);
+      const showRank = may(friendData.privacy?.showRank);
+
+      const completedTodaySeconds = showHours ? completedMap.get(friendId) ?? 0 : 0;
+      const hasActiveSession = showSession && activeSessionMap.has(friendId);
+      const activeSessionStarted = showSession ? activeSessionMap.get(friendId) : undefined;
 
       // A session is only considered "currently studying" if it started
       // within the last 12 hours (guards against zombie rows).
       const activeSession = activeSessionStarted ?? null;
-      const todaySeconds = todayMap.get(friendId) ?? completedTodaySeconds;
+      const todaySeconds = showHours ? todayMap.get(friendId) ?? completedTodaySeconds : 0;
       const todayMinutes = Math.floor(todaySeconds / 60);
-      const isOnline = friendData.lastSeenAt
+      const isOnline = showOnline && friendData.lastSeenAt
         ? new Date(friendData.lastSeenAt) >= twoMinAgo
         : false;
       const isStudying = Boolean(activeSession) || (isOnline && hasActiveSession);
@@ -144,10 +159,12 @@ export async function GET(req: NextRequest) {
         id: friendData.id,
         name: friendData.name,
         username: friendData.username,
-        hunterRank: friendData.hunterRank,
-        level: friendData.level,
-        totalStudyMinutes: friendData.totalStudyMinutes,
-        totalStudySeconds: friendData.totalStudySeconds || (friendData.totalStudyMinutes * 60),
+        // Hidden values read as 0 or false below, so a client needs this to tell "hidden" from "none".
+        visible: { hours: showHours, session: showSession, online: showOnline, rank: showRank },
+        hunterRank: showRank ? friendData.hunterRank : null,
+        level: showRank ? friendData.level : null,
+        totalStudyMinutes: showHours ? friendData.totalStudyMinutes : 0,
+        totalStudySeconds: showHours ? friendData.totalStudySeconds || (friendData.totalStudyMinutes * 60) : 0,
         todayMinutes,
         todaySeconds,
         completedTodaySeconds,
@@ -160,7 +177,7 @@ export async function GET(req: NextRequest) {
         activeTitle: friendData.activeTitle || "title_novice",
         activeAura: friendData.activeAura || "none",
         characterConfig: friendData.characterConfig || null,
-        lastSeenAt: friendData.lastSeenAt,
+        lastSeenAt: showOnline ? friendData.lastSeenAt : null,
       };
     });
 

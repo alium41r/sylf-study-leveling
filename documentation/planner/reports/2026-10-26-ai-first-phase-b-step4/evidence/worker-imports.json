@@ -1,0 +1,24 @@
+{
+  "status": "PASSED",
+  "node": "v24.21.0",
+  "modules": [
+    "planner/v2/server/compiler",
+    "planner/v2/server/calendar-capacity",
+    "planner/v2/server/foundation",
+    "planner/v2/server/understanding",
+    "planner/v2/server/attempts",
+    "planner/v2/server/worker",
+    "planner/v2/server/revisions",
+    "planner/v2/server/apply",
+    "planner/v2/intelligence/allocator",
+    "planner/v2/intelligence/capacity",
+    "planner/v2/intelligence/foundation/readers",
+    "calendar/planning",
+    "calendar/projection",
+    "calendar/recurrence",
+    "calendar/dates"
+  ],
+  "networkRequests": 0,
+  "credentialsInherited": false,
+  "finishedAt": "2026-10-26T11:45:58.601Z"
+}

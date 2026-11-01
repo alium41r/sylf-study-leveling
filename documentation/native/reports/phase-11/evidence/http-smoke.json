@@ -1,0 +1,174 @@
+{
+ "schemaVersion": 1,
+ "startedAt": "2026-10-31T19:27:22.368Z",
+ "steps": [
+  {
+   "name": "register sets a cookie",
+   "ok": true,
+   "status": 201,
+   "ms": 137
+  },
+  {
+   "name": "cookie reaches a protected route",
+   "ok": true,
+   "status": 200,
+   "ms": 31
+  },
+  {
+   "name": "a bearer header is still refused",
+   "ok": true,
+   "status": 401
+  },
+  {
+   "name": "second device signs in",
+   "ok": true,
+   "status": 200,
+   "ms": 82
+  },
+  {
+   "name": "both devices are listed",
+   "ok": true,
+   "status": 200,
+   "count": 2
+  },
+  {
+   "name": "a revoked device is out on its next request",
+   "ok": true,
+   "status": 401
+  },
+  {
+   "name": "a study session starts",
+   "ok": true,
+   "status": 201,
+   "ms": 47
+  },
+  {
+   "name": "a replayed start makes no second session",
+   "ok": true,
+   "status": 201
+  },
+  {
+   "name": "it settles through the server",
+   "ok": true,
+   "status": 200,
+   "ms": 48,
+   "accepted": 5
+  },
+  {
+   "name": "GET /api/user/rankings",
+   "ok": true,
+   "status": 200,
+   "ms": 19,
+   "bytes": 466
+  },
+  {
+   "name": "GET /api/friends",
+   "ok": true,
+   "status": 200,
+   "ms": 18,
+   "bytes": 2
+  },
+  {
+   "name": "GET /api/quests/weekly",
+   "ok": true,
+   "status": 200,
+   "ms": 13,
+   "bytes": 354
+  },
+  {
+   "name": "GET /api/goals",
+   "ok": true,
+   "status": 200,
+   "ms": 9,
+   "bytes": 2
+  },
+  {
+   "name": "GET /api/subjects",
+   "ok": true,
+   "status": 200,
+   "ms": 13,
+   "bytes": 2
+  },
+  {
+   "name": "GET /api/achievements",
+   "ok": true,
+   "status": 200,
+   "ms": 23,
+   "bytes": 8442
+  },
+  {
+   "name": "GET /api/acoustics",
+   "ok": true,
+   "status": 200,
+   "ms": 4,
+   "bytes": 4590
+  },
+  {
+   "name": "GET /api/focus-backgrounds",
+   "ok": true,
+   "status": 200,
+   "ms": 6,
+   "bytes": 1184
+  },
+  {
+   "name": "GET /api/focus-party",
+   "ok": true,
+   "status": 200,
+   "ms": 10,
+   "bytes": 40
+  },
+  {
+   "name": "GET /api/calendar/month",
+   "ok": true,
+   "status": 200,
+   "ms": 21,
+   "bytes": 8335
+  },
+  {
+   "name": "GET /api/cosmetics",
+   "ok": true,
+   "status": 200,
+   "ms": 8,
+   "bytes": 202
+  },
+  {
+   "name": "GET /api/inventory",
+   "ok": true,
+   "status": 200,
+   "ms": 7,
+   "bytes": 164
+  },
+  {
+   "name": "GET /api/user/detailed-stats",
+   "ok": true,
+   "status": 200,
+   "ms": 13,
+   "bytes": 1893
+  },
+  {
+   "name": "GET /api/planner",
+   "ok": true,
+   "status": 200,
+   "ms": 7,
+   "bytes": 2
+  },
+  {
+   "name": "the edge proxy still redirects a guest",
+   "ok": true,
+   "status": 307
+  },
+  {
+   "name": "a token copied before logout is dead after it",
+   "ok": true,
+   "status": 401
+  }
+ ],
+ "schema": {
+  "migrations": 79,
+  "recovered": 11,
+  "unresolved": 0
+ },
+ "buildSeconds": 49,
+ "serverErrors": [],
+ "finishedAt": "2026-10-31T19:28:16.024Z"
+}

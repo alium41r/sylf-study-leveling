@@ -1,0 +1,10 @@
+{
+  "stage": "closure",
+  "detail": {
+    "ms": 206.19908299999997,
+    "objectReads": 721,
+    "uniqueHashes": 361,
+    "objects": 361
+  },
+  "at": "2026-10-21T13:59:03.935Z"
+}

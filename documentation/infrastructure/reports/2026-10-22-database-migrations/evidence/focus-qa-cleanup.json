@@ -1,0 +1,15 @@
+{
+  "localOnly": true,
+  "schemaSource": "Actual hosted SQL backup plus Notes",
+  "results": [
+    {
+      "script": "scripts/db/confirm-invites-and-rejoin.mjs",
+      "exitCode": 0
+    },
+    {
+      "script": "scripts/verify/verify-focus-party.mjs",
+      "exitCode": 0
+    }
+  ],
+  "leftover": []
+}

@@ -1,0 +1,33 @@
+{
+  "name": "@sylf/platform",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Platform boundary for Sylf Native: capability detection and adapter interfaces with web (desktop) and native implementations.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./polyfills": "./src/polyfills.ts",
+    "./lib0-webcrypto": "./src/shims/lib0-webcrypto.ts"
+  },
+  "dependencies": {
+    "@sylf/shared": "*",
+    "@sylf/native-platform": "*"
+  },
+  "peerDependencies": {
+    "expo-crypto": "*",
+    "react-native": "*",
+    "expo-secure-store": "*"
+  },
+  "peerDependenciesMeta": {
+    "expo-crypto": {
+      "optional": true
+    },
+    "react-native": {
+      "optional": true
+    },
+    "expo-secure-store": {
+      "optional": true
+    }
+  }
+}

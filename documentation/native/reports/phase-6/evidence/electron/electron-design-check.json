@@ -1,0 +1,172 @@
+{
+  "passed": true,
+  "checks": {
+    "allThemesRenderDistinctGrounds": true,
+    "noThemeOverflowsHorizontally": true,
+    "documentsUnchangedAcrossThemes": true,
+    "fontsLoad": true,
+    "tabReachesControls": true,
+    "enterActivates": true,
+    "focusMovedIntoDialog": true,
+    "focusTrappedInDialog": true,
+    "escapeCloses": true,
+    "focusRestored": true,
+    "hoverShowsTooltip": true,
+    "rightClickOpensMenu": true,
+    "sliderDrags": true,
+    "sliderKeyboard": true,
+    "noOverflowAtAnyWindowSize": true,
+    "systemReducedMotionHonored": true,
+    "themeSwitchUnder300ms": true,
+    "preferencePersists": true,
+    "noConsoleErrors": true
+  },
+  "renders": {
+    "signature-light": {
+      "ground": "rgb(243, 242, 248)",
+      "polarity": "Newsreader-Regular",
+      "overflow": false
+    },
+    "signature-dark": {
+      "ground": "rgb(16, 14, 23)",
+      "polarity": "Newsreader-Regular",
+      "overflow": false
+    },
+    "studio-light": {
+      "ground": "rgb(245, 246, 247)",
+      "polarity": "IBMPlexSans-Regular",
+      "overflow": false
+    },
+    "studio-dark": {
+      "ground": "rgb(20, 22, 26)",
+      "polarity": "IBMPlexSans-Regular",
+      "overflow": false
+    },
+    "arcane-light": {
+      "ground": "rgb(236, 231, 242)",
+      "polarity": "Cinzel-Regular",
+      "overflow": false
+    },
+    "arcane-dark": {
+      "ground": "rgb(15, 11, 34)",
+      "polarity": "Cinzel-Regular",
+      "overflow": false
+    },
+    "voxel-light": {
+      "ground": "rgb(228, 234, 241)",
+      "polarity": "PixelifySans-Regular",
+      "overflow": false
+    },
+    "voxel-dark": {
+      "ground": "rgb(18, 20, 29)",
+      "polarity": "PixelifySans-Regular",
+      "overflow": false
+    },
+    "cozy-light": {
+      "ground": "rgb(250, 242, 231)",
+      "polarity": "Fraunces-Regular",
+      "overflow": false
+    },
+    "cozy-dark": {
+      "ground": "rgb(31, 23, 20)",
+      "polarity": "Fraunces-Regular",
+      "overflow": false
+    },
+    "student-light": {
+      "ground": "rgb(247, 243, 234)",
+      "polarity": "Literata-Regular",
+      "overflow": false
+    },
+    "student-dark": {
+      "ground": "rgb(24, 26, 31)",
+      "polarity": "Literata-Regular",
+      "overflow": false
+    }
+  },
+  "document": "{\"color\":\"rgb(26, 26, 42)\",\"font\":\"-apple-system, \\\"system-ui\\\", \\\"Segoe UI\\\", Roboto, Helvetica, Arial, sans-serif\",\"size\":\"18px\",\"paper\":\"rgb(255, 254, 248)\"}",
+  "fonts": {
+    "cinzel": true,
+    "alegreya": true,
+    "loaded": 13
+  },
+  "keyboardReached": [
+    "Back to Spaces",
+    "Switch to day",
+    "Theme Studio",
+    "Identity",
+    "Color",
+    "Type",
+    "Surfaces",
+    "Icons",
+    "Themes",
+    "Controls",
+    "Fields",
+    "Overlays",
+    "Feedback",
+    "Layout",
+    "Motion",
+    "Input",
+    "Documents",
+    "System",
+    "Popover",
+    "Menu",
+    "Sheet",
+    "Dialog"
+  ],
+  "sliderDrag": {
+    "before": "0.4",
+    "after": "0.8"
+  },
+  "windows": {
+    "expanded-studio": {
+      "overflow": false,
+      "width": 1280
+    },
+    "expanded-layout": {
+      "overflow": false,
+      "width": 1280
+    },
+    "medium-studio": {
+      "overflow": false,
+      "width": 820
+    },
+    "medium-layout": {
+      "overflow": false,
+      "width": 820
+    },
+    "compact-studio": {
+      "overflow": false,
+      "width": 480
+    },
+    "compact-layout": {
+      "overflow": false,
+      "width": 480
+    }
+  },
+  "framesMarker": {
+    "frames": 145,
+    "p50": 16.7,
+    "p95": 17.3,
+    "max": 17.7
+  },
+  "themeSwitchMs": [
+    57.2,
+    53.2,
+    50.7,
+    56.4,
+    51.6,
+    48,
+    49.4,
+    52.2
+  ],
+  "persisted": "cozy",
+  "memory": {
+    "processes": 4,
+    "workingSetMb": 561
+  },
+  "consoleErrors": [],
+  "versions": {
+    "electron": "45.1.0",
+    "chrome": "156.0.8078.49"
+  }
+}

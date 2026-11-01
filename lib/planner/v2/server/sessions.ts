@@ -6,6 +6,7 @@ import { PlannerDatabase, rows, clock, hash, reject, type Sql } from "./database
 import { civilDate, type SessionRow, type QuestRow } from "./context";
 import { settleWeeklyMission } from "./settlement";
 import { TimezoneService } from "../../../timezone-service";
+import { MAX_SESSION_FOCUS_SECONDS } from "../../../timer-engine";
 
 async function executionCapability(sql: Sql, sessionId: number, questId: number | null): Promise<void> {
   await sql.query("SELECT set_config('sylf.planner_v2_session_transition',$1,true),set_config('sylf.planner_v2_execution_quest',$2,true)", [String(sessionId), questId === null ? "" : String(questId)]);
@@ -18,6 +19,9 @@ async function sessionView(sql: Sql, row: SessionRow) {
     actualCivilDate: row.executionContext?.actualCivilDate ?? civilDate(row.startedAt, user.timezone), timezone: row.executionContext?.timezone ?? user.timezone });
 }
 export interface TimerStartIdentity { clientSessionKey: string; startedAt: string }
+/** The most one session can credit, matching the Focus Party interval clamp. A start time is only a claim, and a delayed offline
+ * session must keep its real date, so age cannot be limited. Length can: no sitting of study lasts longer than this. */
+export { MAX_SESSION_FOCUS_SECONDS };
 async function startReceipt(sql: Sql, ownerId: number, identity: TimerStartIdentity, questId?: number, subjectId?: number) {
   const requestHash = hash("timer-start", { ...identity, questId: questId ?? null, subjectId: subjectId ?? null });
   const receipt = (await rows<{ sessionId: number; requestHash: string }>(sql,
@@ -144,7 +148,7 @@ export class SessionService {
       const elapsed = session.executionState === "RUNNING" ? Math.max(0, Math.floor((now.getTime() - session.runningSince!.getTime()) / 1000)) : 0;
       const toleranceUsed = session.executionContext?.toleranceUsedSeconds ?? 0;
       const maximum = session.executionState === "RUNNING" ? elapsed + Math.max(0, 5 - toleranceUsed) : 0;
-      const focus = Math.max(session.durationSeconds, Math.min(request.cumulativeFocusSeconds,
+      const focus = Math.max(session.durationSeconds, Math.min(request.cumulativeFocusSeconds, MAX_SESSION_FOCUS_SECONDS,
         session.acceptedFocusAtResume + Math.max(0, maximum - (session.breakSeconds - session.acceptedBreakAtResume))));
       const breaks = Math.max(session.breakSeconds, Math.min(request.cumulativeBreakSeconds,
         session.acceptedBreakAtResume + Math.max(0, maximum - (focus - session.acceptedFocusAtResume))));
@@ -197,7 +201,7 @@ export class SessionService {
       const user = (await rows<{ timezone: string }>(sql, 'SELECT timezone FROM "User" WHERE id=$1', [ownerId]))[0];
       const result = (await rows<{ result: Record<string, unknown> }>(sql,
         'SELECT public.settle_study_session_atomic($1,$2,$3,$4,$5,NULL,$6,$7,$8) AS result',
-        [ownerId, request.id, request.focus, request.breaks, request.questId ?? row.questId ?? null, request.complete, request.final, civilDate(now, user.timezone)]))[0].result;
+        [ownerId, request.id, Math.max(row.durationSeconds, Math.min(request.focus, MAX_SESSION_FOCUS_SECONDS)), request.breaks, request.questId ?? row.questId ?? null, request.complete, request.final, civilDate(now, user.timezone)]))[0].result;
       const attributedDay = row.executionContext?.actualCivilDate ?? civilDate(row.startedAt, user.timezone);
       result.weeklyAwarded = await settleWeeklyMission(sql, ownerId, TimezoneService.getStartOfLocalDateUTC(user.timezone, attributedDay));
       return result;

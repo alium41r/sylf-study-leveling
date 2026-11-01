@@ -1,0 +1,20 @@
+{
+  "label": "phase1",
+  "files": 1,
+  "passed": 1,
+  "failed": 0,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [],
+  "suites": [
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-T6HemR/__tests__/planner-v2/postgres/phase-c-preparation.postgres.ts",
+      "cases": [
+        {
+          "name": "rehearses the frozen two-subject pilot through real research, worker, capacity, strategy, translation, review, publication and disposable Apply with no external requests",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

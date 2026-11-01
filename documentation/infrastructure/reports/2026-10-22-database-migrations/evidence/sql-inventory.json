@@ -1,0 +1,2257 @@
+[
+  {
+    "name": "20260808000000_init",
+    "bytes": 15304,
+    "operations": [
+      {
+        "tables": [
+          "\"User\"",
+          "\"Goal\"",
+          "\"Quest\"",
+          "\"Subject\"",
+          "\"StudySession\"",
+          "\"SystemMessage\"",
+          "\"ChatSession\"",
+          "\"Friendship\"",
+          "\"FriendRequest\"",
+          "\"Conversation\"",
+          "\"ConversationParticipant\"",
+          "\"Message\"",
+          "\"SessionInvite\"",
+          "\"InventoryItem\"",
+          "\"SylphLedger\"",
+          "\"HpLedger\"",
+          "\"UserCosmetic\"",
+          "\"UserAchievement\"",
+          "\"UserPrivacy\"",
+          "\"ConnectedAccount\""
+        ]
+      },
+      {
+        "alters": [
+          "\"Goal\"",
+          "\"Quest\"",
+          "\"Quest\"",
+          "\"Subject\"",
+          "\"StudySession\"",
+          "\"StudySession\"",
+          "\"StudySession\"",
+          "\"SystemMessage\"",
+          "\"SystemMessage\"",
+          "\"ChatSession\"",
+          "\"Friendship\"",
+          "\"Friendship\"",
+          "\"FriendRequest\"",
+          "\"FriendRequest\"",
+          "\"ConversationParticipant\"",
+          "\"ConversationParticipant\"",
+          "\"Message\"",
+          "\"Message\"",
+          "\"SessionInvite\"",
+          "\"SessionInvite\"",
+          "\"SessionInvite\"",
+          "\"InventoryItem\"",
+          "\"SylphLedger\"",
+          "\"HpLedger\"",
+          "\"UserCosmetic\"",
+          "\"UserAchievement\"",
+          "\"UserPrivacy\"",
+          "\"ConnectedAccount\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260808010000_add_ai_models",
+    "bytes": 1181,
+    "operations": [
+      {
+        "tables": [
+          "\"AiMemory\"",
+          "\"AiInsight\""
+        ]
+      },
+      {
+        "alters": [
+          "\"AiMemory\"",
+          "\"AiInsight\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260808083947_update_effort_level",
+    "bytes": 879,
+    "operations": [
+      {
+        "alters": [
+          "\"public\"",
+          "\"Goal\"",
+          "\"Goal\""
+        ]
+      },
+      {
+        "drops": [
+          "DROP TYPE \"public\".\"EffortLevel_old\""
+        ]
+      }
+    ],
+    "explicitTransaction": true,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260808084000_add_daily_briefing",
+    "bytes": 902,
+    "operations": [
+      {
+        "tables": [
+          "\"DailyBriefingLog\""
+        ]
+      },
+      {
+        "alters": [
+          "\"User\"",
+          "\"DailyBriefingLog\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260820000000_add_achievement_ledger_source",
+    "bytes": 78,
+    "operations": [],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260821000000_add_user_stats_and_progression_rpc",
+    "bytes": 5279,
+    "operations": [
+      {
+        "tables": [
+          "\"UserStats\""
+        ]
+      },
+      {
+        "alters": [
+          "\"UserStats\""
+        ]
+      },
+      {
+        "functions": [
+          "public.commit_focus_progression"
+        ]
+      },
+      {
+        "mutations": [
+          "    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\", \"endurance\", \"tenacity\", \"velocity\", \"discipline\", \"synthesis\", \"updatedAt\")",
+          "    UPDATE \"UserStats\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260821010000_add_economy_and_inventory_rpcs",
+    "bytes": 8538,
+    "operations": [
+      {
+        "functions": [
+          "public.purchase_shop_item",
+          "public.toggle_equip_item"
+        ]
+      },
+      {
+        "mutations": [
+          "    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\", \"endurance\", \"tenacity\", \"velocity\", \"discipline\", \"synthesis\", \"updatedAt\")",
+          "    UPDATE \"UserStats\"",
+          "\n    UPDATE \"User\"",
+          "    INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO \"UserInventory\" (\"userId\", \"itemId\", quantity, \"isEquipped\", \"acquiredAt\", \"updatedAt\")",
+          "        INSERT INTO \"UserInventory\" (\"userId\", \"itemId\", quantity, \"isEquipped\", \"acquiredAt\", \"updatedAt\")",
+          "\n        INSERT INTO \"UserInventory\" (\"userId\", \"itemId\", quantity, \"isEquipped\", \"acquiredAt\", \"updatedAt\")",
+          "        UPDATE \"UserInventory\" ui",
+          "        UPDATE \"UserInventory\"",
+          "        UPDATE \"UserInventory\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260821020000_add_skill_tree_rpc",
+    "bytes": 3602,
+    "operations": [
+      {
+        "functions": [
+          "public.unlock_skill_node"
+        ]
+      },
+      {
+        "mutations": [
+          "    INSERT INTO \"UserStats\" (\"userId\", \"updatedAt\") VALUES (v_user_id, CURRENT_TIMESTAMP) ON CONFLICT (\"userId\") DO NOTHING;",
+          "    UPDATE \"UserStats\"",
+          "\n    INSERT INTO \"UserSkill\" (\"userId\", \"skillNodeId\")"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260821030000_add_concept_forge_rpc",
+    "bytes": 7233,
+    "operations": [
+      {
+        "functions": [
+          "public.commit_forge_progress"
+        ]
+      },
+      {
+        "mutations": [
+          "    INSERT INTO \"UserForgeProgress\" (\"userId\", \"forgeTopicId\", progress, \"updatedAt\")",
+          "        UPDATE \"UserForgeProgress\"",
+          "        INSERT INTO \"UserForgeCoreMastery\" (\"userId\", \"forgeCoreId\", \"completedAt\", \"prestigeTier\")",
+          "            INSERT INTO \"UserStats\" (\"userId\", \"updatedAt\") ",
+          "            UPDATE \"UserStats\"",
+          "            INSERT INTO \"SylphLedger\" (\"userId\", delta, \"balanceAfter\", reason, metadata)"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260822000000_atomic_apex_forge_and_skill_unlock_rpcs",
+    "bytes": 23131,
+    "operations": [
+      {
+        "tables": [
+          "\"XpLedger\"",
+          "\"UserSkillNode\""
+        ]
+      },
+      {
+        "alters": [
+          "\"XpLedger\"",
+          "\"UserSkillNode\""
+        ]
+      },
+      {
+        "functions": [
+          "public.canonical_required_xp",
+          "public.canonical_level_from_xp",
+          "public.canonical_xp_for_next_level",
+          "public.canonical_rank_db",
+          "public.canonical_rank_display",
+          "public.forge_apex_node_atomic",
+          "public.unlock_skill_node_atomic",
+          "public.claim_quest_reward"
+        ]
+      },
+      {
+        "drops": [
+          "DROP FUNCTION public.claim_quest_reward(integer, integer, text)"
+        ]
+      },
+      {
+        "mutations": [
+          "\n    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "    UPDATE \"SubjectNode\"",
+          "\n    UPDATE \"User\"",
+          "\n    UPDATE \"UserStats\"",
+          "    INSERT INTO \"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "\n    INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "    UPDATE \"UserStats\"",
+          "\n    INSERT INTO \"UserSkillNode\" (\"userId\", \"nodeKey\", \"unlockedAt\")",
+          "\n    UPDATE public.\"Quest\"",
+          "\n    UPDATE public.\"User\"",
+          "      INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "\n    INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "  UPDATE public.\"Quest\"",
+          "\n  UPDATE public.\"User\"",
+          "  INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "    INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "    INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "    INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "    INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "\n  INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "    INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260822010000_atomic_session_and_achievement_rpcs",
+    "bytes": 22250,
+    "operations": [
+      {
+        "alters": [
+          "\"StudySession\""
+        ]
+      },
+      {
+        "functions": [
+          "public.claim_session_reward_atomic",
+          "public.claim_achievement_reward_atomic",
+          "public.complete_study_session"
+        ]
+      },
+      {
+        "drops": [
+          "DROP FUNCTION public.complete_study_session(integer, integer, integer, integer, integer, integer, integer)"
+        ]
+      },
+      {
+        "mutations": [
+          "\n    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "\n            UPDATE \"SubjectNode\"",
+          "        UPDATE \"User\"",
+          "\n        UPDATE \"UserStats\"",
+          "\n        UPDATE \"StudySession\"",
+          "            INSERT INTO \"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "            INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "\n    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "        INSERT INTO \"UserAchievement\" (\"userId\", \"achievementId\", \"claimedAt\")",
+          "    UPDATE \"User\"",
+          "\n    UPDATE \"UserStats\"",
+          "        INSERT INTO \"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "    UPDATE public.\"StudySession\"",
+          "    INSERT INTO public.\"StudySession\" (",
+          "  UPDATE public.\"User\"",
+          "\n  INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "    INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "    INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "    INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "    INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "    UPDATE public.\"Quest\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260822020000_usage_quota_table",
+    "bytes": 1351,
+    "operations": [
+      {
+        "tables": [
+          "\"UserQuota\""
+        ]
+      },
+      {
+        "alters": [
+          "\"UserQuota\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260822030000_subject_compilation_cooldown",
+    "bytes": 424,
+    "operations": [
+      {
+        "alters": [
+          "\"Subject\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260823000000_add_goal_color_and_quest_linking",
+    "bytes": 919,
+    "operations": [
+      {
+        "alters": [
+          "\"Goal\"",
+          "\"Goal\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260823000000_irregular_rest_days_and_quest_cascade",
+    "bytes": 1254,
+    "operations": [
+      {
+        "tables": [
+          "\"FloatingRestDay\""
+        ]
+      },
+      {
+        "alters": [
+          "\"FloatingRestDay\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260823020000_fix_session_duration_inflation",
+    "bytes": 10811,
+    "operations": [
+      {
+        "functions": [
+          "public.complete_study_session"
+        ]
+      },
+      {
+        "drops": [
+          "DROP FUNCTION public.complete_study_session(integer, integer, integer, integer, integer, integer, integer)"
+        ]
+      },
+      {
+        "mutations": [
+          "    UPDATE public.\"StudySession\"",
+          "    INSERT INTO public.\"StudySession\" (",
+          "    UPDATE public.\"User\"",
+          "    UPDATE public.\"Quest\"",
+          "    UPDATE public.\"User\"",
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "      INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "      INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "      INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "      INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260824000000_ai_usage_telemetry",
+    "bytes": 1428,
+    "operations": [
+      {
+        "tables": [
+          "\"AiUsageLog\""
+        ]
+      },
+      {
+        "alters": [
+          "\"AiUsageLog\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260824010000_ai_usage_cache_hit_tokens",
+    "bytes": 479,
+    "operations": [
+      {
+        "alters": [
+          "\"AiUsageLog\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260824020000_system_message_model_used",
+    "bytes": 527,
+    "operations": [
+      {
+        "alters": [
+          "\"SystemMessage\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260824120000_add_subject_syllabus_note",
+    "bytes": 155,
+    "operations": [
+      {
+        "alters": [
+          "\"Subject\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260825000000_add_session_break_seconds",
+    "bytes": 11041,
+    "operations": [
+      {
+        "alters": [
+          "\"StudySession\""
+        ]
+      },
+      {
+        "functions": [
+          "public.complete_study_session"
+        ]
+      },
+      {
+        "drops": [
+          "DROP FUNCTION public.complete_study_session(integer, integer, integer, integer, integer, integer, integer, boolean)"
+        ]
+      },
+      {
+        "mutations": [
+          "    UPDATE public.\"StudySession\"",
+          "    INSERT INTO public.\"StudySession\" (",
+          "    UPDATE public.\"User\"",
+          "    UPDATE public.\"Quest\"",
+          "    UPDATE public.\"User\"",
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "      INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "      INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "      INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "      INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260826000000_fix_level1_xp_bucket",
+    "bytes": 37285,
+    "operations": [
+      {
+        "alters": [
+          "\"User\""
+        ]
+      },
+      {
+        "functions": [
+          "public.canonical_xp_for_next_level",
+          "public.forge_apex_node_atomic",
+          "public.claim_quest_reward",
+          "public.claim_session_reward_atomic",
+          "public.claim_achievement_reward_atomic",
+          "public.complete_study_session"
+        ]
+      },
+      {
+        "mutations": [
+          "\n    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "    UPDATE \"SubjectNode\"",
+          "\n    UPDATE \"User\"",
+          "\n    UPDATE \"UserStats\"",
+          "    INSERT INTO \"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "\n    INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "\n    UPDATE public.\"Quest\"",
+          "\n    UPDATE public.\"User\"",
+          "      INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "\n    INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "  UPDATE public.\"Quest\"",
+          "\n  UPDATE public.\"User\"",
+          "  INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "    INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "    INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "    INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "    INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "\n  INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "    INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "\n    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "\n            UPDATE \"SubjectNode\"",
+          "        UPDATE \"User\"",
+          "\n        UPDATE \"UserStats\"",
+          "\n        UPDATE \"StudySession\"",
+          "            INSERT INTO \"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "            INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "\n    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "        INSERT INTO \"UserAchievement\" (\"userId\", \"achievementId\", \"claimedAt\")",
+          "    UPDATE \"User\"",
+          "\n    UPDATE \"UserStats\"",
+          "        INSERT INTO \"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "    UPDATE public.\"StudySession\"",
+          "    INSERT INTO public.\"StudySession\" (",
+          "    UPDATE public.\"User\"",
+          "    UPDATE public.\"Quest\"",
+          "    UPDATE public.\"User\"",
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "      INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "      INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "      INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "      INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "UPDATE \"UserStats\" SET xp = xp + 100, \"updatedAt\" = CURRENT_TIMESTAMP WHERE level <= 1;",
+          "UPDATE \"User\" SET \"xpToNextLevel\" = 182 WHERE level <= 1;"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260826010000_add_waitlist_entry",
+    "bytes": 952,
+    "operations": [
+      {
+        "tables": [
+          "\"WaitlistEntry\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260826030000_reconcile_levels_from_lifetime_xp",
+    "bytes": 1996,
+    "operations": [
+      {
+        "mutations": [
+          "UPDATE \"User\" u",
+          "UPDATE \"UserStats\" us"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260826040000_cognitive_stats_invest",
+    "bytes": 17217,
+    "operations": [
+      {
+        "tables": [
+          "\"StatInvestLedger\""
+        ]
+      },
+      {
+        "alters": [
+          "\"StatInvestLedger\""
+        ]
+      },
+      {
+        "functions": [
+          "public.forge_apex_node_atomic",
+          "public.complete_study_session"
+        ]
+      },
+      {
+        "mutations": [
+          "\n    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "    UPDATE \"SubjectNode\"",
+          "\n    UPDATE \"User\"",
+          "\n    UPDATE \"UserStats\"",
+          "    INSERT INTO \"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "\n    INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "    UPDATE public.\"StudySession\"",
+          "    INSERT INTO public.\"StudySession\" (",
+          "    UPDATE public.\"User\"",
+          "    UPDATE public.\"Quest\"",
+          "    UPDATE public.\"User\"",
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "      INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "      INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "      INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "      INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260826040000_timer_settlement_and_lifecycle",
+    "bytes": 34018,
+    "operations": [
+      {
+        "functions": [
+          "public.complete_study_session",
+          "public.start_study_session",
+          "public.settle_study_session_atomic"
+        ]
+      },
+      {
+        "mutations": [
+          "    UPDATE public.\"StudySession\"",
+          "    INSERT INTO public.\"StudySession\" (",
+          "    UPDATE public.\"User\"",
+          "    UPDATE public.\"Quest\"",
+          "    UPDATE public.\"User\"",
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "      INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "      INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "      INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "      INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "  UPDATE public.\"StudySession\"",
+          "    UPDATE public.\"Quest\"",
+          "  INSERT INTO public.\"StudySession\" (",
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "        UPDATE public.\"StudySession\"",
+          "        INSERT INTO public.\"StudySession\" (",
+          "        UPDATE public.\"User\"",
+          "        UPDATE public.\"Quest\"",
+          "\n            UPDATE public.\"Quest\"",
+          "            UPDATE public.\"SubjectNode\"",
+          "        UPDATE public.\"User\"",
+          "\n        UPDATE public.\"UserStats\"",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "UPDATE public.\"StudySession\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260826050000_drop_legacy_start_study_session_overload",
+    "bytes": 840,
+    "operations": [
+      {
+        "drops": [
+          "DROP FUNCTION IF EXISTS public.start_study_session(integer, integer, integer)"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260826060000_fix_settle_record_guards",
+    "bytes": 19573,
+    "operations": [
+      {
+        "functions": [
+          "public.settle_study_session_atomic"
+        ]
+      },
+      {
+        "mutations": [
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "        UPDATE public.\"StudySession\"",
+          "        INSERT INTO public.\"StudySession\" (",
+          "        UPDATE public.\"User\"",
+          "        UPDATE public.\"Quest\"",
+          "\n            UPDATE public.\"Quest\"",
+          "            UPDATE public.\"SubjectNode\"",
+          "        UPDATE public.\"User\"",
+          "\n        UPDATE public.\"UserStats\"",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260826070000_fix_settle_nested_quest_guard",
+    "bytes": 19872,
+    "operations": [
+      {
+        "functions": [
+          "public.settle_study_session_atomic"
+        ]
+      },
+      {
+        "mutations": [
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "        UPDATE public.\"StudySession\"",
+          "        INSERT INTO public.\"StudySession\" (",
+          "        UPDATE public.\"User\"",
+          "        UPDATE public.\"Quest\"",
+          "\n            UPDATE public.\"Quest\"",
+          "            UPDATE public.\"SubjectNode\"",
+          "        UPDATE public.\"User\"",
+          "\n        UPDATE public.\"UserStats\"",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260826080000_start_session_zero_duration",
+    "bytes": 2410,
+    "operations": [
+      {
+        "functions": [
+          "public.start_study_session"
+        ]
+      },
+      {
+        "mutations": [
+          "  UPDATE public.\"StudySession\"",
+          "    UPDATE public.\"Quest\"",
+          "  INSERT INTO public.\"StudySession\" ("
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260826090000_timer_trust_boundaries",
+    "bytes": 5017,
+    "operations": [
+      {
+        "functions": [
+          "public.start_study_session"
+        ]
+      },
+      {
+        "mutations": [
+          "    UPDATE public.\"Quest\"",
+          "  UPDATE public.\"StudySession\"",
+          "  INSERT INTO public.\"StudySession\" ("
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260826100000_t3_trust_hardening",
+    "bytes": 26739,
+    "operations": [
+      {
+        "functions": [
+          "public.start_study_session",
+          "public.settle_study_session_atomic"
+        ]
+      },
+      {
+        "mutations": [
+          "    UPDATE public.\"Quest\"",
+          "  UPDATE public.\"StudySession\"",
+          "  INSERT INTO public.\"StudySession\" (",
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "        UPDATE public.\"StudySession\"",
+          "\n        INSERT INTO public.\"StudySession\" (",
+          "        UPDATE public.\"User\"",
+          "        UPDATE public.\"Quest\"",
+          "\n            UPDATE public.\"Quest\"",
+          "            UPDATE public.\"SubjectNode\"",
+          "        UPDATE public.\"User\"",
+          "\n        UPDATE public.\"UserStats\"",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260826110000_t3_settle_insert_wall_clamp",
+    "bytes": 27610,
+    "operations": [
+      {
+        "functions": [
+          "public.start_study_session",
+          "public.settle_study_session_atomic"
+        ]
+      },
+      {
+        "mutations": [
+          "    UPDATE public.\"Quest\"",
+          "  UPDATE public.\"StudySession\"",
+          "  INSERT INTO public.\"StudySession\" (",
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "        UPDATE public.\"StudySession\"",
+          "\n        INSERT INTO public.\"StudySession\" (",
+          "        UPDATE public.\"User\"",
+          "        UPDATE public.\"Quest\"",
+          "\n            UPDATE public.\"Quest\"",
+          "            UPDATE public.\"SubjectNode\"",
+          "        UPDATE public.\"User\"",
+          "\n        UPDATE public.\"UserStats\"",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260827000000_s2_security_hardening",
+    "bytes": 76191,
+    "operations": [
+      {
+        "alters": [
+          "\"AiUsageLog\"",
+          "\"FloatingRestDay\"",
+          "\"UserInventory\"",
+          "\"UserQuota\"",
+          "\"UserSkillNode\"",
+          "\"UserStats\"",
+          "\"XpLedger\"",
+          "\"WaitlistEntry\"",
+          "\"Item\""
+        ]
+      },
+      {
+        "functions": [
+          "public.start_study_session",
+          "public.settle_study_session_atomic",
+          "public.complete_study_session",
+          "public.claim_quest_reward",
+          "public.forge_apex_node_atomic",
+          "public.claim_achievement_reward_atomic",
+          "public.unlock_skill_node_atomic"
+        ]
+      },
+      {
+        "drops": [
+          "DROP FUNCTION IF EXISTS public.claim_session_reward_atomic(text, text, integer, integer, text, numeric)",
+          "DROP POLICY IF EXISTS \"aiusagelog_user_policy\" ON \"AiUsageLog\"",
+          "DROP POLICY IF EXISTS \"floatingrestday_user_policy\" ON \"FloatingRestDay\"",
+          "DROP POLICY IF EXISTS \"userinventory_user_policy\" ON \"UserInventory\"",
+          "DROP POLICY IF EXISTS \"userquota_user_policy\" ON \"UserQuota\"",
+          "DROP POLICY IF EXISTS \"userskillnode_user_policy\" ON \"UserSkillNode\"",
+          "DROP POLICY IF EXISTS \"userstats_user_policy\" ON \"UserStats\"",
+          "DROP POLICY IF EXISTS \"xpledger_user_policy\" ON \"XpLedger\"",
+          "DROP POLICY IF EXISTS \"item_select_public_catalog\" ON \"Item\"",
+          "DROP POLICY IF EXISTS \"users_select_policy\" ON \"User\"",
+          "DROP POLICY IF EXISTS \"users_update_policy\" ON \"User\"",
+          "DROP POLICY IF EXISTS \"convo_write_policy\" ON \"Conversation\"",
+          "DROP POLICY IF EXISTS \"friend_request_update_delete_policy\" ON \"FriendRequest\"",
+          "DROP POLICY IF EXISTS \"session_invite_write_policy\" ON \"SessionInvite\"",
+          "DROP POLICY IF EXISTS \"Users manage own subject nodes\" ON \"SubjectNode\"",
+          "DROP POLICY IF EXISTS \"Users manage own quests\" ON \"Quest\"",
+          "DROP POLICY IF EXISTS \"Users manage own subjects\" ON \"Subject\""
+        ]
+      },
+      {
+        "mutations": [
+          "    UPDATE public.\"Quest\"",
+          "  UPDATE public.\"StudySession\"",
+          "  INSERT INTO public.\"StudySession\" (",
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "        UPDATE public.\"StudySession\"",
+          "\n        INSERT INTO public.\"StudySession\" (",
+          "        UPDATE public.\"User\"",
+          "        UPDATE public.\"Quest\"",
+          "\n            UPDATE public.\"Quest\"",
+          "            UPDATE public.\"SubjectNode\"",
+          "        UPDATE public.\"User\"",
+          "\n        UPDATE public.\"UserStats\"",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "    UPDATE public.\"StudySession\"",
+          "    INSERT INTO public.\"StudySession\" (",
+          "    UPDATE public.\"User\"",
+          "    UPDATE public.\"Quest\"",
+          "    UPDATE public.\"User\"",
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "      INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "      INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "      INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "      INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "\n    UPDATE public.\"Quest\"",
+          "\n    UPDATE public.\"User\"",
+          "      INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "\n    INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "  UPDATE public.\"Quest\"",
+          "\n  UPDATE public.\"User\"",
+          "  INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "    INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "    INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "    INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "    INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "\n  INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "    INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "\n    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "    UPDATE \"SubjectNode\"",
+          "\n    UPDATE \"User\"",
+          "\n    UPDATE \"UserStats\"",
+          "    INSERT INTO \"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "\n    INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "\n    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "        INSERT INTO \"UserAchievement\" (\"userId\", \"achievementId\", \"claimedAt\")",
+          "    UPDATE \"User\"",
+          "\n    UPDATE \"UserStats\"",
+          "        INSERT INTO \"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "    UPDATE \"UserStats\"",
+          "\n    INSERT INTO \"UserSkillNode\" (\"userId\", \"nodeKey\", \"unlockedAt\")"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260827010000_s2_policy_jwt_semantics",
+    "bytes": 17923,
+    "operations": [
+      {
+        "drops": [
+          "DROP POLICY IF EXISTS \"aiinsight_user_policy\" ON \"AiInsight\"",
+          "DROP POLICY IF EXISTS \"aimemory_user_policy\" ON \"AiMemory\"",
+          "DROP POLICY IF EXISTS \"aiusagelog_user_policy\" ON \"AiUsageLog\"",
+          "DROP POLICY IF EXISTS \"authsession_user_policy\" ON \"AuthSession\"",
+          "DROP POLICY IF EXISTS \"blockeduser_user_policy\" ON \"BlockedUser\"",
+          "DROP POLICY IF EXISTS \"chatsession_user_policy\" ON \"ChatSession\"",
+          "DROP POLICY IF EXISTS \"connectedaccount_user_policy\" ON \"ConnectedAccount\"",
+          "DROP POLICY IF EXISTS \"dailybriefinglog_user_policy\" ON \"DailyBriefingLog\"",
+          "DROP POLICY IF EXISTS \"floatingrestday_user_policy\" ON \"FloatingRestDay\"",
+          "DROP POLICY IF EXISTS \"goal_user_policy\" ON \"Goal\"",
+          "DROP POLICY IF EXISTS \"hpledger_user_policy\" ON \"HpLedger\"",
+          "DROP POLICY IF EXISTS \"inventoryitem_user_policy\" ON \"InventoryItem\"",
+          "DROP POLICY IF EXISTS \"quest_user_policy\" ON \"Quest\"",
+          "DROP POLICY IF EXISTS \"studysession_user_policy\" ON \"StudySession\"",
+          "DROP POLICY IF EXISTS \"subject_user_policy\" ON \"Subject\"",
+          "DROP POLICY IF EXISTS \"sylphledger_user_policy\" ON \"SylphLedger\"",
+          "DROP POLICY IF EXISTS \"systemmessage_user_policy\" ON \"SystemMessage\"",
+          "DROP POLICY IF EXISTS \"userachievement_user_policy\" ON \"UserAchievement\"",
+          "DROP POLICY IF EXISTS \"usercosmetic_user_policy\" ON \"UserCosmetic\"",
+          "DROP POLICY IF EXISTS \"userinventory_user_policy\" ON \"UserInventory\"",
+          "DROP POLICY IF EXISTS \"userprivacy_user_policy\" ON \"UserPrivacy\"",
+          "DROP POLICY IF EXISTS \"userquota_user_policy\" ON \"UserQuota\"",
+          "DROP POLICY IF EXISTS \"userskillnode_user_policy\" ON \"UserSkillNode\"",
+          "DROP POLICY IF EXISTS \"userstats_user_policy\" ON \"UserStats\"",
+          "DROP POLICY IF EXISTS \"verificationtoken_user_policy\" ON \"VerificationToken\"",
+          "DROP POLICY IF EXISTS \"xpledger_user_policy\" ON \"XpLedger\"",
+          "DROP POLICY IF EXISTS \"users_select_own_policy\" ON \"User\"",
+          "DROP POLICY IF EXISTS \"users_update_own_policy\" ON \"User\"",
+          "DROP POLICY IF EXISTS \"users_delete_policy\" ON \"User\"",
+          "DROP POLICY IF EXISTS \"convo_participant_select_policy\" ON \"ConversationParticipant\"",
+          "DROP POLICY IF EXISTS \"convo_participant_write_policy\" ON \"ConversationParticipant\"",
+          "DROP POLICY IF EXISTS \"convo_select_policy\" ON \"Conversation\"",
+          "DROP POLICY IF EXISTS \"conversation_insert_creator\" ON \"Conversation\"",
+          "DROP POLICY IF EXISTS \"conversation_update_creator\" ON \"Conversation\"",
+          "DROP POLICY IF EXISTS \"conversation_delete_participant\" ON \"Conversation\"",
+          "DROP POLICY IF EXISTS \"message_insert_policy\" ON \"Message\"",
+          "DROP POLICY IF EXISTS \"message_select_policy\" ON \"Message\"",
+          "DROP POLICY IF EXISTS \"friendship_write_policy\" ON \"Friendship\"",
+          "DROP POLICY IF EXISTS \"friendship_select_policy\" ON \"Friendship\"",
+          "DROP POLICY IF EXISTS \"friend_request_insert_policy\" ON \"FriendRequest\"",
+          "DROP POLICY IF EXISTS \"friend_request_select_policy\" ON \"FriendRequest\"",
+          "DROP POLICY IF EXISTS \"friend_request_update_policy\" ON \"FriendRequest\"",
+          "DROP POLICY IF EXISTS \"friend_request_delete_policy\" ON \"FriendRequest\"",
+          "DROP POLICY IF EXISTS \"session_invite_select_policy\" ON \"SessionInvite\"",
+          "DROP POLICY IF EXISTS \"session_invite_update_policy\" ON \"SessionInvite\"",
+          "DROP POLICY IF EXISTS \"session_invite_delete_policy\" ON \"SessionInvite\"",
+          "DROP POLICY IF EXISTS \"subject_node_user_policy\" ON \"SubjectNode\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260827020000_s2_policy_recursion_fix",
+    "bytes": 1452,
+    "operations": [
+      {
+        "drops": [
+          "DROP POLICY IF EXISTS \"convo_participant_select_policy\" ON \"ConversationParticipant\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260827030000_cognitive_stats_effects",
+    "bytes": 24206,
+    "operations": [
+      {
+        "functions": [
+          "public.settle_study_session_atomic"
+        ]
+      },
+      {
+        "mutations": [
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "        UPDATE public.\"StudySession\"",
+          "\n        INSERT INTO public.\"StudySession\" (",
+          "        UPDATE public.\"User\"",
+          "        UPDATE public.\"Quest\"",
+          "\n            UPDATE public.\"Quest\"",
+          "            UPDATE public.\"SubjectNode\"",
+          "        UPDATE public.\"User\"",
+          "\n        UPDATE public.\"UserStats\"",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260827040000_fix_apex_synthesis_threshold",
+    "bytes": 5802,
+    "operations": [
+      {
+        "functions": [
+          "public.forge_apex_node_atomic"
+        ]
+      },
+      {
+        "mutations": [
+          "\n    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "    UPDATE \"SubjectNode\"",
+          "\n    UPDATE \"User\"",
+          "\n    UPDATE \"UserStats\"",
+          "    INSERT INTO \"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "\n    INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260827050000_sp_stipend_level_rank_ups",
+    "bytes": 37657,
+    "operations": [
+      {
+        "functions": [
+          "public.settle_study_session_atomic",
+          "public.claim_quest_reward",
+          "public.claim_achievement_reward_atomic"
+        ]
+      },
+      {
+        "mutations": [
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "        UPDATE public.\"StudySession\"",
+          "\n        INSERT INTO public.\"StudySession\" (",
+          "        UPDATE public.\"User\"",
+          "        UPDATE public.\"Quest\"",
+          "\n            UPDATE public.\"Quest\"",
+          "            UPDATE public.\"SubjectNode\"",
+          "        UPDATE public.\"User\"",
+          "\n        UPDATE public.\"UserStats\"",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "\n    UPDATE public.\"Quest\"",
+          "\n    UPDATE public.\"User\"",
+          "      INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "\n    INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "  UPDATE public.\"Quest\"",
+          "\n  UPDATE public.\"User\"",
+          "  INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "    INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "    INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "    INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "    INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "\n  INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "    INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "\n    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "        INSERT INTO \"UserAchievement\" (\"userId\", \"achievementId\", \"claimedAt\")",
+          "    UPDATE \"User\"",
+          "\n    UPDATE \"UserStats\"",
+          "        INSERT INTO \"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260907000000_focus_party_foundation",
+    "bytes": 40454,
+    "operations": [
+      {
+        "tables": [
+          "public.\"FocusParty\"",
+          "public.\"FocusPartyMember\"",
+          "public.\"FocusSession\"",
+          "public.\"FocusSessionMember\""
+        ]
+      },
+      {
+        "alters": [
+          "public.\"SessionInvite\"",
+          "public.\"SessionInvite\"",
+          "public.\"FocusParty\"",
+          "public.\"FocusPartyMember\"",
+          "public.\"FocusSession\"",
+          "public.\"FocusSessionMember\"",
+          "public.\"FocusParty\"",
+          "public.\"FocusPartyMember\"",
+          "public.\"FocusSession\"",
+          "public.\"FocusSessionMember\""
+        ]
+      },
+      {
+        "functions": [
+          "public.check_focus_party_capacity",
+          "public.check_focus_session_member_party",
+          "public.check_focus_session_ended_guard",
+          "public.is_focus_party_member",
+          "public.is_focus_session_participant",
+          "public.create_focus_party",
+          "public.join_focus_party",
+          "public.leave_focus_party",
+          "public.remove_focus_party_member",
+          "public.enter_focus_session",
+          "public.start_focus_timer",
+          "public.pause_focus_timer",
+          "public.resume_focus_timer",
+          "public.leave_focus_session",
+          "public.get_focus_party_state"
+        ]
+      },
+      {
+        "drops": [
+          "DROP TRIGGER IF EXISTS trg_check_focus_party_capacity ON public.\"FocusPartyMember\"",
+          "DROP TRIGGER IF EXISTS trg_check_focus_session_member_party ON public.\"FocusSessionMember\"",
+          "DROP TRIGGER IF EXISTS trg_check_focus_session_ended_guard ON public.\"FocusSessionMember\"",
+          "DROP POLICY IF EXISTS \"focus_party_select_policy\" ON public.\"FocusParty\"",
+          "DROP POLICY IF EXISTS \"focus_party_insert_policy\" ON public.\"FocusParty\"",
+          "DROP POLICY IF EXISTS \"focus_party_update_leader\" ON public.\"FocusParty\"",
+          "DROP POLICY IF EXISTS \"focus_party_delete_leader\" ON public.\"FocusParty\"",
+          "DROP POLICY IF EXISTS \"focus_party_member_select\" ON public.\"FocusPartyMember\"",
+          "DROP POLICY IF EXISTS \"focus_party_member_insert\" ON public.\"FocusPartyMember\"",
+          "DROP POLICY IF EXISTS \"focus_party_member_delete\" ON public.\"FocusPartyMember\"",
+          "DROP POLICY IF EXISTS \"focus_session_select\" ON public.\"FocusSession\"",
+          "DROP POLICY IF EXISTS \"focus_session_insert\" ON public.\"FocusSession\"",
+          "DROP POLICY IF EXISTS \"focus_session_update\" ON public.\"FocusSession\"",
+          "DROP POLICY IF EXISTS \"focus_session_member_select\" ON public.\"FocusSessionMember\"",
+          "DROP POLICY IF EXISTS \"focus_session_member_insert\" ON public.\"FocusSessionMember\"",
+          "DROP POLICY IF EXISTS \"focus_session_member_update\" ON public.\"FocusSessionMember\"",
+          "DROP POLICY IF EXISTS \"focus_session_member_delete\" ON public.\"FocusSessionMember\""
+        ]
+      },
+      {
+        "mutations": [
+          "\n  INSERT INTO public.\"FocusParty\" (\"name\", \"leaderId\", \"createdAt\", \"updatedAt\")",
+          "\n  INSERT INTO public.\"FocusPartyMember\" (\"partyId\", \"userId\", \"joinedAt\")",
+          "  INSERT INTO public.\"FocusPartyMember\" (\"partyId\", \"userId\", \"joinedAt\")",
+          "  UPDATE public.\"SessionInvite\"",
+          "\n  DELETE FROM public.\"FocusPartyMember\"",
+          "    DELETE FROM public.\"FocusParty\" WHERE id = p_party_id;",
+          "\n    UPDATE public.\"FocusParty\"",
+          "\n  DELETE FROM public.\"FocusPartyMember\"",
+          "    INSERT INTO public.\"FocusSession\" (\"partyId\", \"startedAt\")",
+          "    INSERT INTO public.\"FocusSessionMember\" (",
+          "      UPDATE public.\"FocusSessionMember\"",
+          "\n  UPDATE public.\"FocusSessionMember\"",
+          "\n  UPDATE public.\"FocusSessionMember\"",
+          "\n  UPDATE public.\"FocusSessionMember\"",
+          "\n  UPDATE public.\"FocusSessionMember\"",
+          "    UPDATE public.\"FocusSession\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260907010000_focus_party_security_hardening",
+    "bytes": 33349,
+    "operations": [
+      {
+        "alters": [
+          "public.\"FocusParty\""
+        ]
+      },
+      {
+        "functions": [
+          "public.check_focus_party_capacity",
+          "public.check_focus_session_member_party",
+          "public.check_focus_session_ended_guard",
+          "public.check_focus_session_member_delete_guard",
+          "public.create_focus_party",
+          "public.join_focus_party",
+          "public.leave_focus_party",
+          "public.remove_focus_party_member",
+          "public.enter_focus_session",
+          "public.start_focus_timer",
+          "public.pause_focus_timer",
+          "public.resume_focus_timer",
+          "public.leave_focus_session",
+          "public.get_focus_party_state",
+          "public.check_focus_party_invite_sender"
+        ]
+      },
+      {
+        "drops": [
+          "DROP POLICY IF EXISTS \"focus_party_insert_policy\" ON public.\"FocusParty\"",
+          "DROP POLICY IF EXISTS \"focus_party_update_leader\" ON public.\"FocusParty\"",
+          "DROP POLICY IF EXISTS \"focus_party_delete_leader\" ON public.\"FocusParty\"",
+          "DROP POLICY IF EXISTS \"focus_party_member_insert\" ON public.\"FocusPartyMember\"",
+          "DROP POLICY IF EXISTS \"focus_party_member_delete\" ON public.\"FocusPartyMember\"",
+          "DROP POLICY IF EXISTS \"focus_session_insert\" ON public.\"FocusSession\"",
+          "DROP POLICY IF EXISTS \"focus_session_update\" ON public.\"FocusSession\"",
+          "DROP POLICY IF EXISTS \"focus_session_member_insert\" ON public.\"FocusSessionMember\"",
+          "DROP POLICY IF EXISTS \"focus_session_member_update\" ON public.\"FocusSessionMember\"",
+          "DROP POLICY IF EXISTS \"focus_session_member_delete\" ON public.\"FocusSessionMember\"",
+          "DROP TRIGGER IF EXISTS trg_check_focus_session_member_delete_guard ON public.\"FocusSessionMember\"",
+          "DROP TRIGGER IF EXISTS trg_check_focus_party_invite_sender ON public.\"SessionInvite\""
+        ]
+      },
+      {
+        "mutations": [
+          "\n  INSERT INTO public.\"FocusParty\" (\"name\", \"leaderId\", \"createdAt\", \"updatedAt\")",
+          "\n  INSERT INTO public.\"FocusPartyMember\" (\"partyId\", \"userId\", \"joinedAt\")",
+          "  INSERT INTO public.\"FocusPartyMember\" (\"partyId\", \"userId\", \"joinedAt\")",
+          "  UPDATE public.\"SessionInvite\"",
+          "\n  DELETE FROM public.\"FocusPartyMember\"",
+          "    UPDATE public.\"FocusParty\"",
+          "\n    UPDATE public.\"FocusParty\"",
+          "\n  DELETE FROM public.\"FocusPartyMember\"",
+          "    INSERT INTO public.\"FocusSession\" (\"partyId\", \"startedAt\")",
+          "    INSERT INTO public.\"FocusSessionMember\" (",
+          "      UPDATE public.\"FocusSessionMember\"",
+          "\n  UPDATE public.\"FocusSessionMember\"",
+          "\n  UPDATE public.\"FocusSessionMember\"",
+          "\n  UPDATE public.\"FocusSessionMember\"",
+          "\n  UPDATE public.\"FocusSessionMember\"",
+          "    UPDATE public.\"FocusSession\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260907020000_focus_party_realtime_security",
+    "bytes": 2197,
+    "operations": [
+      {
+        "alters": [
+          "public.\"SessionInvite\""
+        ]
+      },
+      {
+        "functions": [
+          "public.has_pending_party_invite"
+        ]
+      },
+      {
+        "drops": [
+          "DROP POLICY IF EXISTS \"focus_party_select_policy\" ON public.\"FocusParty\"",
+          "DROP POLICY IF EXISTS \"session_invite_select\" ON public.\"SessionInvite\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260907030000_focus_party_single_active_membership",
+    "bytes": 12869,
+    "operations": [
+      {
+        "functions": [
+          "public.check_user_single_active_party",
+          "public.create_focus_party",
+          "public.join_focus_party",
+          "public.leave_focus_party",
+          "public.remove_focus_party_member"
+        ]
+      },
+      {
+        "drops": [
+          "DROP TRIGGER IF EXISTS trg_check_user_single_active_party ON public.\"FocusPartyMember\""
+        ]
+      },
+      {
+        "mutations": [
+          "\n  INSERT INTO public.\"FocusParty\" (\"name\", \"leaderId\", \"createdAt\", \"updatedAt\")",
+          "\n  INSERT INTO public.\"FocusPartyMember\" (\"partyId\", \"userId\", \"joinedAt\")",
+          "  INSERT INTO public.\"FocusPartyMember\" (\"partyId\", \"userId\", \"joinedAt\")",
+          "  UPDATE public.\"SessionInvite\"",
+          "\n  DELETE FROM public.\"FocusPartyMember\"",
+          "    UPDATE public.\"FocusParty\"",
+          "\n    UPDATE public.\"FocusParty\"",
+          "\n  DELETE FROM public.\"FocusPartyMember\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260909000000_focus_background_catalog",
+    "bytes": 5128,
+    "operations": [
+      {
+        "tables": [
+          "public.\"FocusBackgroundCategory\"",
+          "public.\"FocusBackground\""
+        ]
+      },
+      {
+        "alters": [
+          "public.\"User\""
+        ]
+      },
+      {
+        "mutations": [
+          "INSERT INTO public.\"FocusBackgroundCategory\" (\"slug\", \"name\", \"description\", \"layoutKey\", \"sortOrder\", \"isActive\")",
+          "INSERT INTO public.\"FocusBackgroundCategory\" (\"slug\", \"name\", \"description\", \"layoutKey\", \"sortOrder\", \"isActive\")",
+          "    INSERT INTO storage.buckets (\"id\", \"name\", \"public\", \"file_size_limit\", \"allowed_mime_types\")"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260909010000_focus_background_rls",
+    "bytes": 2359,
+    "operations": [
+      {
+        "alters": [
+          "public.\"FocusBackgroundCategory\"",
+          "public.\"FocusBackground\""
+        ]
+      },
+      {
+        "drops": [
+          "DROP POLICY IF EXISTS \"Public Read Active Categories\" ON public.\"FocusBackgroundCategory\"",
+          "DROP POLICY IF EXISTS \"Public Read Active Backgrounds\" ON public.\"FocusBackground\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260909020000_focus_background_timer_position",
+    "bytes": 547,
+    "operations": [
+      {
+        "alters": [
+          "public.\"FocusBackground\"",
+          "public.\"FocusBackground\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260909030000_focus_background_user_preference",
+    "bytes": 1321,
+    "operations": [
+      {
+        "alters": [
+          "public.\"User\"",
+          "public.\"User\"",
+          "public.\"User\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260909040000_user_focus_background",
+    "bytes": 4677,
+    "operations": [
+      {
+        "tables": [
+          "UserFocusBackground",
+          "public.\"UserFocusBackground\""
+        ]
+      },
+      {
+        "alters": [
+          "public.\"UserFocusBackground\"",
+          "public.\"UserFocusBackground\""
+        ]
+      },
+      {
+        "drops": [
+          "DROP POLICY IF EXISTS \"user_focus_background_select_own\" ON public.\"UserFocusBackground\""
+        ]
+      },
+      {
+        "mutations": [
+          "    INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260909040001_storage_restrictive_isolation",
+    "bytes": 1313,
+    "operations": [],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260909050000_focus_background_preference_source",
+    "bytes": 5687,
+    "operations": [
+      {
+        "alters": [
+          "public.\"User\"",
+          "public.\"User\"",
+          "public.\"User\"",
+          "public.\"User\"",
+          "public.\"User\"",
+          "public.\"User\"",
+          "public.\"User\""
+        ]
+      },
+      {
+        "functions": [
+          "public.handle_focus_background_deletion"
+        ]
+      },
+      {
+        "drops": [
+          "DROP TRIGGER IF EXISTS trg_official_background_delete ON public.\"FocusBackground\"",
+          "DROP TRIGGER IF EXISTS trg_custom_background_delete ON public.\"UserFocusBackground\""
+        ]
+      },
+      {
+        "mutations": [
+          "UPDATE public.\"User\"",
+          "    UPDATE public.\"User\"",
+          "    UPDATE public.\"User\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260909060000_user_focus_background_layout_key",
+    "bytes": 988,
+    "operations": [
+      {
+        "alters": [
+          "public.\"UserFocusBackground\"",
+          "public.\"UserFocusBackground\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260924010000_planner_foundation",
+    "bytes": 17233,
+    "operations": [
+      {
+        "tables": [
+          "\"PlannerPlan\"",
+          "\"PlannerRevision\"",
+          "\"PlannerQuestLink\""
+        ]
+      },
+      {
+        "alters": [
+          "\"PlannerPlan\"",
+          "\"PlannerPlan\"",
+          "\"PlannerPlan\"",
+          "\"PlannerPlan\"",
+          "\"PlannerPlan\"",
+          "\"PlannerRevision\"",
+          "\"PlannerRevision\"",
+          "\"PlannerQuestLink\"",
+          "\"PlannerQuestLink\"",
+          "\"PlannerQuestLink\"",
+          "\"PlannerQuestLink\"",
+          "\"PlannerPlan\"",
+          "\"PlannerPlan\"",
+          "\"PlannerRevision\"",
+          "\"PlannerQuestLink\"",
+          "\"PlannerQuestLink\"",
+          "\"PlannerPlan\"",
+          "\"PlannerRevision\"",
+          "\"PlannerQuestLink\"",
+          "\"PlannerPlan\"",
+          "\"PlannerRevision\"",
+          "\"PlannerQuestLink\""
+        ]
+      },
+      {
+        "functions": [
+          "public.planner_revision_guard",
+          "public.planner_ownership_guard",
+          "public.planner_quest_guard",
+          "public.planner_goal_delete_guard"
+        ]
+      },
+      {
+        "mutations": [
+          "    UPDATE \"PlannerQuestLink\" SET \"questId\" = NULL, disposition = 'DELETED', \"removedAt\" = now(), \"removalReason\" = 'ACCOUNT_DELETED', \"updatedAt\" = now() WHERE ",
+          "    UPDATE \"PlannerQuestLink\" SET \"questId\" = NULL, disposition = 'DELETED', \"removedAt\" = now(), \"removalReason\" = 'USER_DELETED', \"changedAt\" = now(), \"updated",
+          "  UPDATE \"PlannerQuestLink\" SET disposition = 'DETACHED', \"changedAt\" = now(), \"updatedAt\" = now() WHERE \"questId\" = OLD.id;"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260925152657_planner_check_result",
+    "bytes": 1553,
+    "operations": [
+      {
+        "tables": [
+          "\"PlannerCheckResult\""
+        ]
+      },
+      {
+        "alters": [
+          "\"PlannerCheckResult\"",
+          "\"PlannerCheckResult\"",
+          "\"PlannerCheckResult\"",
+          "\"PlannerCheckResult\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260926010000_planner_preference_friction",
+    "bytes": 5546,
+    "operations": [
+      {
+        "tables": [
+          "\"PlannerPreference\"",
+          "\"PlannerFrictionEvent\""
+        ]
+      },
+      {
+        "alters": [
+          "\"PlannerPreference\"",
+          "\"PlannerPreference\"",
+          "\"PlannerFrictionEvent\"",
+          "\"PlannerFrictionEvent\"",
+          "\"PlannerFrictionEvent\"",
+          "\"PlannerPreference\"",
+          "\"PlannerFrictionEvent\"",
+          "\"PlannerPreference\"",
+          "\"PlannerFrictionEvent\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260926020000_planner_intake_session",
+    "bytes": 2241,
+    "operations": [
+      {
+        "tables": [
+          "\"PlannerIntakeSession\""
+        ]
+      },
+      {
+        "alters": [
+          "\"PlannerIntakeSession\"",
+          "\"PlannerIntakeSession\"",
+          "\"PlannerIntakeSession\"",
+          "\"PlannerIntakeSession\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260926030000_subject_archived_at",
+    "bytes": 201,
+    "operations": [
+      {
+        "alters": [
+          "\"Subject\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260927090000_planner_user_released_disposition",
+    "bytes": 3177,
+    "operations": [
+      {
+        "alters": [
+          "\"PlannerQuestLink\"",
+          "\"PlannerQuestLink\""
+        ]
+      },
+      {
+        "functions": [
+          "public.planner_ownership_guard"
+        ]
+      },
+      {
+        "drops": [
+          "DROP CONSTRAINT planner_link_bounds"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20260927100000_planner_reoffer_state",
+    "bytes": 4132,
+    "operations": [
+      {
+        "alters": [
+          "\"PlannerQuestLink\"",
+          "\"PlannerQuestLink\""
+        ]
+      },
+      {
+        "functions": [
+          "public.planner_ownership_guard"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20261002000000_planner_v2_durable_core",
+    "bytes": 129332,
+    "operations": [
+      {
+        "tables": [
+          "\"PlannerIntentVersion\"",
+          "\"PlannerAttempt\""
+        ]
+      },
+      {
+        "alters": [
+          "\"Quest\"",
+          "\"PlannerPlan\"",
+          "\"PlannerRevision\"",
+          "\"PlannerQuestLink\"",
+          "\"StudySession\"",
+          "\"PlannerPlan\"",
+          "\"PlannerRevision\"",
+          "\"PlannerIntentVersion\"",
+          "\"PlannerIntentVersion\"",
+          "\"PlannerIntentVersion\"",
+          "\"PlannerAttempt\"",
+          "\"AiUsageLog\"",
+          "\"AiUsageLog\"",
+          "\"AiUsageLog\"",
+          "\"PlannerPlan\"",
+          "\"PlannerPlan\"",
+          "\"PlannerPlan\"",
+          "\"PlannerIntentVersion\"",
+          "\"PlannerRevision\"",
+          "\"PlannerRevision\"",
+          "\"PlannerIntentVersion\"",
+          "\"PlannerAttempt\"",
+          "\"PlannerRevision\"",
+          "\"PlannerRevision\"",
+          "\"PlannerQuestLink\"",
+          "\"PlannerQuestLink\"",
+          "\"PlannerPlan\"",
+          "\"Quest\"",
+          "\"StudySession\"",
+          "\"PlannerIntentVersion\"",
+          "\"PlannerAttempt\"",
+          "\"StudySession\""
+        ]
+      },
+      {
+        "functions": [
+          "public.planner_v2_assert_coordinated",
+          "public.planner_v2_artifact_guard",
+          "public.planner_v2_revision_guard",
+          "public.planner_v2_core_guard",
+          "public.planner_v2_source_guard",
+          "public.check_focus_session_member_delete_guard",
+          "public.planner_quest_guard",
+          "public.planner_v2_execution_guard",
+          "public.start_study_session",
+          "public.settle_study_session_atomic",
+          "public.claim_quest_reward",
+          "public.complete_study_session",
+          "public.planner_v2_goal_guard",
+          "public.planner_goal_delete_guard",
+          "public.forge_apex_node_atomic",
+          "public.unlock_skill_node_atomic",
+          "public.claim_achievement_reward_atomic",
+          "public.commit_focus_progression",
+          "public.commit_forge_progress",
+          "public.purchase_shop_item",
+          "public.toggle_equip_item",
+          "public.planner_ownership_guard"
+        ]
+      },
+      {
+        "drops": [
+          "DROP CONSTRAINT planner_plan_bounds",
+          "DROP CONSTRAINT planner_revision_bounds'",
+          "DROP CONSTRAINT planner_link_bounds'",
+          "DROP FUNCTION IF EXISTS public.commit_focus_progression(integer,integer,integer,integer,integer,integer,integer)",
+          "DROP FUNCTION IF EXISTS public.commit_forge_progress(text,integer,integer)",
+          "DROP FUNCTION IF EXISTS public.unlock_skill_node(integer)"
+        ]
+      },
+      {
+        "mutations": [
+          "    UPDATE \"PlannerQuestLink\" SET \"questId\" = NULL, disposition = 'DELETED', \"removedAt\" = now(), \"removalReason\" = 'ACCOUNT_DELETED', \"updatedAt\" = now() WHERE ",
+          "    UPDATE \"PlannerQuestLink\" SET \"questId\" = NULL, disposition = 'DELETED', \"removedAt\" = now(), \"removalReason\" = 'USER_DELETED', \"changedAt\" = now(), \"updated",
+          "  UPDATE \"PlannerQuestLink\" SET disposition = 'DETACHED', \"changedAt\" = now(), \"updatedAt\" = now() WHERE \"questId\" = OLD.id;",
+          "    UPDATE public.\"Quest\"",
+          "  UPDATE public.\"StudySession\"",
+          "  INSERT INTO public.\"StudySession\" (",
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "        UPDATE public.\"StudySession\"",
+          "\n        INSERT INTO public.\"StudySession\" (",
+          "        UPDATE public.\"User\"",
+          "        UPDATE public.\"Quest\"",
+          "\n            UPDATE public.\"Quest\"",
+          "            UPDATE public.\"SubjectNode\"",
+          "        UPDATE public.\"User\"",
+          "\n        UPDATE public.\"UserStats\"",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "\n    UPDATE public.\"Quest\"",
+          "\n    UPDATE public.\"User\"",
+          "      INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "\n    INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "  UPDATE public.\"Quest\"",
+          "\n  UPDATE public.\"User\"",
+          "  INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "    INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "    INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "    INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "    INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "\n  INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "    INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "    UPDATE public.\"StudySession\"",
+          "    INSERT INTO public.\"StudySession\" (",
+          "    UPDATE public.\"User\"",
+          "    UPDATE public.\"Quest\"",
+          "    UPDATE public.\"User\"",
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "      INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "      INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "      INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "      INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "\n    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "    UPDATE \"SubjectNode\"",
+          "\n    UPDATE \"User\"",
+          "\n    UPDATE \"UserStats\"",
+          "    INSERT INTO \"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "\n    INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "    UPDATE \"UserStats\"",
+          "\n    INSERT INTO \"UserSkillNode\" (\"userId\", \"nodeKey\", \"unlockedAt\")",
+          "\n    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "        INSERT INTO \"UserAchievement\" (\"userId\", \"achievementId\", \"claimedAt\")",
+          "    UPDATE \"User\"",
+          "\n    UPDATE \"UserStats\"",
+          "        INSERT INTO \"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\", \"endurance\", \"tenacity\", \"velocity\", \"discipline\", \"synthesis\", \"updatedAt\")",
+          "    UPDATE \"UserStats\"",
+          "    INSERT INTO \"UserForgeProgress\" (\"userId\", \"forgeTopicId\", progress, \"updatedAt\")",
+          "        UPDATE \"UserForgeProgress\"",
+          "        INSERT INTO \"UserForgeCoreMastery\" (\"userId\", \"forgeCoreId\", \"completedAt\", \"prestigeTier\")",
+          "            INSERT INTO \"UserStats\" (\"userId\", \"updatedAt\") ",
+          "            UPDATE \"UserStats\"",
+          "            INSERT INTO \"SylphLedger\" (\"userId\", delta, \"balanceAfter\", reason, metadata)",
+          "    INSERT INTO \"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\", \"endurance\", \"tenacity\", \"velocity\", \"discipline\", \"synthesis\", \"updatedAt\")",
+          "    UPDATE \"UserStats\"",
+          "\n    UPDATE \"User\"",
+          "    INSERT INTO \"SylphLedger\" (\"userId\", amount, delta, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO \"UserInventory\" (\"userId\", \"itemId\", quantity, \"isEquipped\", \"acquiredAt\", \"updatedAt\")",
+          "        INSERT INTO \"UserInventory\" (\"userId\", \"itemId\", quantity, \"isEquipped\", \"acquiredAt\", \"updatedAt\")",
+          "\n        INSERT INTO \"UserInventory\" (\"userId\", \"itemId\", quantity, \"isEquipped\", \"acquiredAt\", \"updatedAt\")",
+          "        UPDATE \"UserInventory\" ui",
+          "        UPDATE \"UserInventory\"",
+          "        UPDATE \"UserInventory\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20261004000000_planner_v2_assistant_documents",
+    "bytes": 1674,
+    "operations": [
+      {
+        "alters": [
+          "\"PlannerPlan\"",
+          "\"PlannerPlan\"",
+          "\"PlannerPlan\""
+        ]
+      },
+      {
+        "functions": [
+          "public.planner_v2_conversation_guard"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20261005000000_pixel_creations",
+    "bytes": 1454,
+    "operations": [
+      {
+        "tables": [
+          "\"PixelCreation\""
+        ]
+      },
+      {
+        "alters": [
+          "\"PixelCreation\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20261007000000_pixel_companion_consolidation",
+    "bytes": 683,
+    "operations": [
+      {
+        "alters": [
+          "\"PixelCreation\"",
+          "\"PixelCreation\"",
+          "\"PixelCreation\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20261014000000_timer_durable_completion",
+    "bytes": 38729,
+    "operations": [
+      {
+        "tables": [
+          "public.\"TimerSessionStart\""
+        ]
+      },
+      {
+        "alters": [
+          "public.\"TimerSessionStart\"",
+          "public.\"FocusSessionMember\""
+        ]
+      },
+      {
+        "functions": [
+          "public.settle_study_session_atomic",
+          "public.enter_focus_session",
+          "public.pause_focus_timer",
+          "public.leave_focus_session",
+          "public.leave_focus_session"
+        ]
+      },
+      {
+        "mutations": [
+          "\n    INSERT INTO public.\"UserStats\" (\"userId\", \"level\", \"xp\", \"rank\", \"currency\", \"skillPoints\",",
+          "        UPDATE public.\"StudySession\"",
+          "\n        INSERT INTO public.\"StudySession\" (",
+          "        UPDATE public.\"User\"",
+          "        UPDATE public.\"Quest\"",
+          "\n            UPDATE public.\"Quest\"",
+          "            UPDATE public.\"SubjectNode\"",
+          "        UPDATE public.\"User\"",
+          "\n        UPDATE public.\"UserStats\"",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"XpLedger\" (\"userId\", amount, \"balanceAfter\", reason, source, metadata, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SylphLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"HpLedger\" (\"userId\", amount, source, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "        INSERT INTO public.\"SystemMessage\" (\"userId\", content, type, read, \"createdAt\")",
+          "    INSERT INTO public.\"FocusSession\" (\"partyId\", \"startedAt\")",
+          "    INSERT INTO public.\"FocusSessionMember\" (",
+          "      UPDATE public.\"FocusSessionMember\"",
+          "\n  UPDATE public.\"FocusSessionMember\"",
+          "\n  UPDATE public.\"FocusSessionMember\"",
+          "    UPDATE public.\"FocusSession\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20261015130000_ai_dispatch_telemetry",
+    "bytes": 780,
+    "operations": [
+      {
+        "alters": [
+          "\"AiUsageLog\"",
+          "\"AiUsageLog\""
+        ]
+      },
+      {
+        "mutations": [
+          "UPDATE \"AiUsageLog\" SET \"estimatedCostUsd\"=NULL"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20261015170000_chat_image_storage",
+    "bytes": 1613,
+    "operations": [
+      {
+        "mutations": [
+          "\n    INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20261018000000_personal_calendar",
+    "bytes": 2292,
+    "operations": [
+      {
+        "tables": [
+          "\"CalendarEvent\"",
+          "\"CalendarNote\""
+        ]
+      },
+      {
+        "alters": [
+          "\"CalendarEvent\"",
+          "\"CalendarNote\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20261018010000_calendar_scheduling",
+    "bytes": 2176,
+    "operations": [
+      {
+        "tables": [
+          "\"CalendarEventException\"",
+          "\"CalendarReminderReceipt\"",
+          "\"CalendarPreference\""
+        ]
+      },
+      {
+        "alters": [
+          "\"CalendarEvent\"",
+          "\"CalendarEventException\"",
+          "\"CalendarReminderReceipt\"",
+          "\"CalendarPreference\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20261018020000_external_calendars",
+    "bytes": 6850,
+    "operations": [
+      {
+        "tables": [
+          "\"CalendarConnection\"",
+          "\"CalendarOAuthState\"",
+          "\"ConnectedCalendar\"",
+          "\"CalendarSyncWindow\"",
+          "\"ExternalCalendarEvent\"",
+          "\"CalendarSyncMember\"",
+          "\"ExternalCalendarMutation\""
+        ]
+      },
+      {
+        "alters": [
+          "\"CalendarConnection\"",
+          "\"CalendarOAuthState\"",
+          "\"ConnectedCalendar\"",
+          "\"CalendarSyncWindow\"",
+          "\"ExternalCalendarEvent\"",
+          "\"CalendarSyncMember\"",
+          "\"CalendarSyncMember\"",
+          "\"ExternalCalendarMutation\"",
+          "\"CalendarConnection\"",
+          "\"CalendarOAuthState\"",
+          "\"ConnectedCalendar\"",
+          "\"CalendarSyncWindow\"",
+          "\"ExternalCalendarEvent\"",
+          "\"CalendarSyncMember\"",
+          "\"ExternalCalendarMutation\"",
+          "\"ConnectedCalendar\"",
+          "\"ConnectedCalendar\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20261018030000_calendar_completion",
+    "bytes": 6311,
+    "operations": [
+      {
+        "tables": [
+          "\"SharedCalendar\"",
+          "\"SharedCalendarMember\"",
+          "\"CalendarNoteRecognition\""
+        ]
+      },
+      {
+        "alters": [
+          "\"CalendarEvent\"",
+          "\"CalendarNote\"",
+          "\"CalendarNote\"",
+          "\"CalendarNote\"",
+          "\"CalendarNote\"",
+          "\"SharedCalendar\"",
+          "\"SharedCalendarMember\"",
+          "\"SharedCalendarMember\"",
+          "\"CalendarNoteRecognition\"",
+          "\"CalendarEvent\"",
+          "\"SharedCalendarMember\"",
+          "\"SharedCalendarMember\"",
+          "\"CalendarNoteRecognition\"",
+          "\"SharedCalendar\"",
+          "\"SharedCalendarMember\"",
+          "\"CalendarNoteRecognition\""
+        ]
+      },
+      {
+        "functions": [
+          "calendar_note_search_before",
+          "calendar_recognition_search_after"
+        ]
+      },
+      {
+        "mutations": [
+          "  UPDATE \"CalendarNote\" n SET \"searchVector\"=to_tsvector('simple',coalesce(n.\"title\",'') || ' ' || coalesce(n.\"document\"->>'text','') || ' ' || coalesce((SELEC",
+          "UPDATE \"CalendarNote\" SET \"searchVector\"=to_tsvector('simple',coalesce(\"title\",'') || ' ' || coalesce(\"document\"->>'text',''));"
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  },
+  {
+    "name": "20261020000000_notes_connections",
+    "bytes": 1387,
+    "operations": [
+      {
+        "tables": [
+          "\"NotesConnection\"",
+          "\"NotesOAuthState\""
+        ]
+      },
+      {
+        "alters": [
+          "\"NotesConnection\"",
+          "\"NotesOAuthState\""
+        ]
+      }
+    ],
+    "explicitTransaction": false,
+    "concurrentIndex": false
+  }
+]

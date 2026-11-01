@@ -1,0 +1,64 @@
+{
+  "label": "phase1",
+  "files": 1,
+  "passed": 12,
+  "failed": 0,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [],
+  "suites": [
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-DeX66X/__tests__/planner-v2/postgres/durable-core.postgres.ts",
+      "cases": [
+        {
+          "name": "Phase 1 actual durable repositories survives an asynchronously terminated observed connection without committing or replaying",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories survives an asynchronously terminated coordinated connection without committing or replaying",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories creates one owned immutable intent and returns an identical retry",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories binds one lease, survives cancellation and rejects its late checkpoint",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories never retargets an attempt after accepted intent changes",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories recovers an expired lease without resetting budget or accepting the previous fence",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories admits one planning and one read-only research job per user across workers",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories applies an exact proposal once under concurrent confirmation",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories rolls back every materialization boundary without a partial receipt",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories protects zero-second starts, acknowledged pause/resume and receipt replays",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories settles the weekly mission atomically and only once across competing protocols",
+          "status": "passed"
+        },
+        {
+          "name": "Phase 1 actual durable repositories settles legacy timer history without V2 columns and preserves accepted V2 civil dates",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

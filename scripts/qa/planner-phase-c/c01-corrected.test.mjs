@@ -1,0 +1,16 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {readFileSync,mkdtempSync,writeFileSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';
+import {readC01,validateC01Input,civilWeek} from './c01-profile.mjs';
+import {requestCancellation,readCancellation} from './operator-control.mjs';
+test('corrected explicit Monday-zero civil week matches all seven named days',()=>{const c=readC01();assert.deepEqual(c.availability.restWeekdays,[4]);assert.deepEqual(civilWeek.map(d=>d.name),['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']);});
+test('old frozen encoding and schema-valid shifted windows/ceilings/rest cannot pass preparation',()=>{
+ const old=JSON.parse(readFileSync('documentation/planner/reports/2026-10-28-phase-c-qualification-preparation/PILOT_INPUT.json'));assert.throws(()=>validateC01Input(old));
+ for(const change of [c=>c.availability.restWeekdays=[5],c=>c.availability.dailyCeilingMinutes=[120,120,120,120,120,0,180],c=>c.availability.studyWindows[0].weekday=1,c=>c.goals[0].deadline.examDayStudyAllowed=true,c=>c.goals[1].deadline.date=c.goals[0].deadline.date,c=>c.webPermission=true]){const c=readC01();change(c);assert.throws(()=>validateC01Input(c));}
+});
+test('operator requests bind the exact run/root, require a reason and cannot be overwritten',()=>{const dir=mkdtempSync(join(tmpdir(),'sylf-c01-control-'));try{writeFileSync(join(dir,'control.json'),JSON.stringify({schemaVersion:1,runId:'run',rootRequestId:'root'}));assert.throws(()=>requestCancellation(dir,''));requestCancellation(dir,'Stop for input integrity');assert.equal(readCancellation(dir,'run','root').reason,'Stop for input integrity');assert.throws(()=>readCancellation(dir,'other','root'),/IDENTITY/);assert.throws(()=>requestCancellation(dir,'Second reason'),/EEXIST/);}finally{rmSync(dir,{recursive:true,force:true});}});
+test('fresh approval cannot reuse the old experiment or ignore its uncertain liability',async()=>{
+ const {checkFreshFunding,profileId}=await import('./c01-profile.mjs');const now=Date.now(),auth={profileId,priorUnknownSpendAcknowledged:true,ceilingUsd:1.75,repetitions:1},metadata={status:'METADATA_REACHABLE',checkedAt:new Date(now).toISOString(),balance:{isAvailable:true,balances:[{currency:'USD',total_balance:'2.11'}]},model:{id:'deepseek-flash',contextWindow:1048576,maxOutputTokens:393216,effort:{supported_levels:['high']}}};
+ assert.equal(checkFreshFunding(auth,metadata,.1032822,now).balanceCoversNewCeilingAndPriorLiability,true);
+ for(const a of [{...auth,profileId:'C01-original'},{...auth,priorUnknownSpendAcknowledged:false},{...auth,repetitions:2},{...auth,ceilingUsd:2}])assert.throws(()=>checkFreshFunding(a,metadata,.1032822,now));
+ assert.throws(()=>checkFreshFunding(auth,{...metadata,checkedAt:new Date(now-900001).toISOString()},.1032822,now));assert.throws(()=>checkFreshFunding(auth,metadata,.4,now));assert.throws(()=>checkFreshFunding(auth,{...metadata,model:{...metadata.model,contextWindow:undefined}},.1032822,now));assert.throws(()=>checkFreshFunding(auth,{...metadata,balance:{...metadata.balance,balances:[{currency:'USD',total_balance:'9'.repeat(400)}]}},.1032822,now));
+});

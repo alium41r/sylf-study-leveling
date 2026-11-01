@@ -36,6 +36,31 @@ export async function areUsersBlocked(userA: number, userB: number): Promise<boo
 }
 
 /**
+ * Whether `actorId` may put `targetId` into a conversation. A group is a way of reaching someone,
+ * so it answers to the same rules as a direct message: no block in either direction, the person's
+ * allowDirectMessages setting, and friendship unless they accept messages from everyone. Fails
+ * closed, because the block helpers above report a failed query as "not blocked".
+ */
+export async function mayAddToConversation(actorId: number, targetId: number): Promise<boolean> {
+  if (actorId === targetId) return true;
+  const [blocks, privacy, friendship] = await Promise.all([
+    prisma.blockedUser.findFirst({
+      where: { OR: [{ userId: actorId, blockedId: targetId }, { userId: targetId, blockedId: actorId }] },
+      select: { id: true },
+    }),
+    prisma.userPrivacy.findUnique({ where: { userId: targetId }, select: { allowDirectMessages: true } }),
+    prisma.friendship.findFirst({
+      where: { OR: [{ userId: actorId, friendId: targetId }, { userId: targetId, friendId: actorId }] },
+      select: { id: true },
+    }),
+  ]);
+  if (blocks) return false;
+  const policy = privacy?.allowDirectMessages ?? "FRIENDS";
+  if (policy === "PRIVATE") return false;
+  return policy === "PUBLIC" || Boolean(friendship);
+}
+
+/**
  * Removes a friendship and cleans up any related friend requests.
  */
 export async function removeFriendship(userA: number, userB: number): Promise<boolean> {

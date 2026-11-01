@@ -1,0 +1,1 @@
+PASS: actual additive migration, foreign keys, user/library uniqueness, RLS and denied anonymous/authenticated access, single refresh lease, ownership cascade. Disposable baseline only; no hosted migration.

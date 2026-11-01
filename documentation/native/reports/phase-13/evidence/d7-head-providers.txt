@@ -1,0 +1,2 @@
+Error: Command failed: /usr/local/bin/node scripts/build/build-planner-worker.mjs
+Error: Command failed: node_modules/.bin/tsc -p config/tsconfig.planner-worker.json

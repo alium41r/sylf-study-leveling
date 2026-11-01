@@ -1,0 +1,14 @@
+{
+  "path": "public/notes-licenses/blocknote-0.56.0-source.zip",
+  "sha256": "3d2a64c03b23ae65a0d3d65109c6a7ea5b3ea2c941a1e2ddacde590503586343",
+  "sourceOfferUnchanged": true,
+  "bytes": 1552171,
+  "sourceFiles": 690,
+  "dependencyNoticeCount": 57,
+  "perfectFreehand": {
+    "version": "1.2.3",
+    "license": "MIT",
+    "noticeIncluded": true
+  },
+  "thirdPartySourceModified": false
+}

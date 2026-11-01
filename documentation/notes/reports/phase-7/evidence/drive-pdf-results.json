@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "realChromiumIndexedDB": true,
+  "encryptedRepository": true,
+  "syntheticContentOnly": true,
+  "nativeHistoryUnchanged": true,
+  "copies": [
+    {
+      "kind": "rich-text",
+      "pages": 3,
+      "bytes": 560382,
+      "elapsedMs": 1491.5,
+      "nativeRevisionIdsUnchanged": true
+    },
+    {
+      "kind": "title-only",
+      "pages": 1,
+      "bytes": 14466,
+      "elapsedMs": 654.5,
+      "nativeRevisionIdsUnchanged": true
+    },
+    {
+      "kind": "handwriting",
+      "pages": 2,
+      "bytes": 8172,
+      "elapsedMs": 164.29999999701977,
+      "nativeRevisionIdsUnchanged": true
+    },
+    {
+      "kind": "annotated-pdf",
+      "pages": 1,
+      "bytes": 3593,
+      "elapsedMs": 138.3999999910593,
+      "nativeRevisionIdsUnchanged": true
+    }
+  ],
+  "richTextRasterized": true
+}

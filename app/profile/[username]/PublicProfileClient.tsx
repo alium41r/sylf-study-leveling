@@ -228,12 +228,12 @@ export function PublicProfileClient({
     if (!profile || actionLoading) return;
     setActionLoading(true);
     try {
-      const res = await fetch("/api/friends/request", {
+      const res = await fetch("/api/friends/requests", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ receiverId: profile.id }),
+        body: JSON.stringify({ username: profile.username, receiverId: profile.id }),
       });
       if (res.ok) {
         setRelationship("PENDING_SENT");

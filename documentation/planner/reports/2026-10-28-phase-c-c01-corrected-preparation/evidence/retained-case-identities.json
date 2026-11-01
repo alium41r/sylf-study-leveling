@@ -1,0 +1,9 @@
+{
+  "previousPassed": 618,
+  "currentPassed": 619,
+  "missing": [],
+  "added": [
+    "__tests__/planner-v2/postgres/understanding.postgres.ts :: durable compiler-v2 Research & Understanding retains exact accepted student attribution and local school scope through versioned verification without official authority"
+  ],
+  "status": "PASSED"
+}

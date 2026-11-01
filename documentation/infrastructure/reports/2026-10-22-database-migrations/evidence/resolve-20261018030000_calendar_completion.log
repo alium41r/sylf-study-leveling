@@ -1,0 +1,7 @@
+Datasource "db": PostgreSQL database "postgres", schema "public" at "127.0.0.1:60002"
+
+Migration 20261018030000_calendar_completion marked as applied.
+
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.

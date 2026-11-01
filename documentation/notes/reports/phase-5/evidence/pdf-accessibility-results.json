@@ -1,0 +1,73 @@
+{
+  "passed": true,
+  "touchTargets": [
+    {
+      "label": "PDF pages and search",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Select text",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Pen",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Highlighter",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Stroke eraser",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Lasso selection",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Text annotation",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Comment",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Undo PDF ink",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Redo PDF annotation",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Zoom PDF out",
+      "width": 44,
+      "height": 44
+    },
+    {
+      "label": "Fit PDF width",
+      "width": 57.078125,
+      "height": 44
+    },
+    {
+      "label": "Zoom PDF in",
+      "width": 44,
+      "height": 44
+    }
+  ],
+  "keyboardSearchAndSave": true,
+  "fullAssistiveTechnologyAudit": false,
+  "physicalStylus": false
+}

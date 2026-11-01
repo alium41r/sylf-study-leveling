@@ -1,4 +1,5 @@
 -- Additive metadata-only Notes broker. Apply through the normal deployment migration process.
+BEGIN;
 CREATE TABLE "NotesConnection" (
  "id" TEXT PRIMARY KEY, "userId" INTEGER NOT NULL UNIQUE REFERENCES "User"("id") ON DELETE CASCADE,
  "libraryId" TEXT NOT NULL UNIQUE, "accountId" TEXT NOT NULL, "rootId" TEXT, "label" TEXT NOT NULL,
@@ -17,3 +18,4 @@ DO $$ BEGIN
  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname='anon') THEN REVOKE ALL ON "NotesConnection", "NotesOAuthState" FROM anon; END IF;
  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname='authenticated') THEN REVOKE ALL ON "NotesConnection", "NotesOAuthState" FROM authenticated; END IF;
 END $$;
+COMMIT;

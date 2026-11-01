@@ -1,0 +1,779 @@
+{
+  "passed": true,
+  "total": 189,
+  "failed": [],
+  "checks": {
+    "titleShown": true,
+    "enterOffered": true,
+    "previewLabelled": true,
+    "sampleLabelled": true,
+    "scenePresent": true,
+    "switcherAtEntry": true,
+    "allPlatesLoaded": true,
+    "startsAtGate": true,
+    "travellerSelected": true,
+    "travellerShown": true,
+    "travellerSampleLevel": true,
+    "collectionShown": true,
+    "hiddenPanelStaysMounted": true,
+    "lockerReserved": true,
+    "preparationsShown": true,
+    "sectionStored": true,
+    "sectionRestoredAfterReload": true,
+    "escapeReturnsToGate": true,
+    "closeReturnsToGate": true,
+    "sectionsReachedByTab": true,
+    "arrowMovesFocus": true,
+    "endJumps": true,
+    "homeJumps": true,
+    "arrowWraps": true,
+    "enterSelects": true,
+    "noConsoleErrorsInNavigation": true,
+    "sky_dawn_selected": true,
+    "sky_dawn_plate": true,
+    "sky_day_selected": true,
+    "sky_day_plate": true,
+    "sky_sunset_selected": true,
+    "sky_sunset_plate": true,
+    "sky_dusk_selected": true,
+    "sky_dusk_plate": true,
+    "sky_night_selected": true,
+    "sky_night_plate": true,
+    "sky_mist_selected": true,
+    "sky_mist_plate": true,
+    "oldSkyLeaves": true,
+    "skyStored": true,
+    "followTheDayInLightModeIsNotNight": true,
+    "followTheDayInDarkModeIsNight": true,
+    "driftOffStopsEverything": true,
+    "driftOffRemovesPetals": true,
+    "driftStored": true,
+    "escapeIgnoredWhileEntering": true,
+    "progressReported": true,
+    "progressOnlyRises": true,
+    "switcherGoneWhileEntering": true,
+    "hostLoadedOnEntry": true,
+    "sceneReleasedInPlay": true,
+    "surfaceShown": true,
+    "surfaceSaysSo": true,
+    "escapeOpensMenu": true,
+    "menuIsHonest": true,
+    "escapeResumes": true,
+    "savingShown": true,
+    "savedShown": true,
+    "returnsToPreviousSpace": true,
+    "switcherBack": true,
+    "oneHostCreatedAndDisposed": true,
+    "hostLeftNothingBehind": true,
+    "saveReceiptStored": true,
+    "recordIsSmall": true,
+    "lastVisitShown": true,
+    "lobbyAfterAVisit": true,
+    "reloadMidGameReturnsToLobby": true,
+    "failedLoadComesBack": true,
+    "failedLoadSaysSo": true,
+    "switcherBackAfterFailedLoad": true,
+    "sceneBackAfterFailedLoad": true,
+    "retryClearsFault": true,
+    "failedSaveStaysInMenu": true,
+    "failedSaveSaysSo": true,
+    "tryAgainFailsTheSameWay": true,
+    "leavingSaysItDidNotSave": true,
+    "leavingWithoutSavingGetsOut": true,
+    "noReceiptWhenNothingSaved": true,
+    "sessionComesFirst": true,
+    "sessionHasNoEnter": true,
+    "sessionLeadsToFocus": true,
+    "emptyHasNoGlance": true,
+    "emptyHasNoSampleNotice": true,
+    "emptySaysWhy": true,
+    "emptyStillReserves": true,
+    "slowDataKeepsTheLobby": true,
+    "smallWindowExplains": true,
+    "smallWindowBlocksEntry": true,
+    "largerWindowAllowsEntry": true,
+    "reducedMotionStopsTheScene": true,
+    "reducedMotionHasNoPetals": true,
+    "reducedMotionExplainsDrift": true,
+    "reducedMotionDoesNotWalk": true,
+    "motionCappedAtThirty": true,
+    "steppedThemeUpdatesLess": true,
+    "noWorldArtUnderHome": true,
+    "onlyThisSkysPlatesLoad": true,
+    "hostCodeNotLoadedInLobby": true,
+    "hostCodeLoadsOnEntry": true,
+    "backAtHome": true,
+    "worldUnmounted": true,
+    "nothingRunsAfterLeaving": true,
+    "nothingRunsAfterSwitchingAway": true,
+    "controlsAreNamed": true,
+    "titleIsAHeading": true,
+    "artHiddenFromAssistiveTech": true,
+    "oneSectionInTabOrder": true,
+    "hiddenPanelIsHiddenFromAssistiveTech": true,
+    "tabsAreBigEnough": true,
+    "contrast_dawn_signature": true,
+    "contrast_dawn_voxel": true,
+    "contrast_day_signature": true,
+    "contrast_day_voxel": true,
+    "contrast_sunset_signature": true,
+    "contrast_sunset_voxel": true,
+    "contrast_dusk_signature": true,
+    "contrast_dusk_voxel": true,
+    "contrast_night_signature": true,
+    "contrast_night_voxel": true,
+    "contrast_mist_signature": true,
+    "contrast_mist_voxel": true,
+    "contrast_custom_accent": true,
+    "contrast_custom_ground": true,
+    "size_wide_gate_noOverflow": true,
+    "size_wide_gate_inside": true,
+    "size_wide_traveller_noOverflow": true,
+    "size_wide_traveller_inside": true,
+    "size_wide_traveller_panelVisible": true,
+    "size_wide_preparations_noOverflow": true,
+    "size_wide_preparations_inside": true,
+    "size_wide_preparations_panelVisible": true,
+    "size_expanded_gate_noOverflow": true,
+    "size_expanded_gate_inside": true,
+    "size_expanded_traveller_noOverflow": true,
+    "size_expanded_traveller_inside": true,
+    "size_expanded_traveller_panelVisible": true,
+    "size_expanded_preparations_noOverflow": true,
+    "size_expanded_preparations_inside": true,
+    "size_expanded_preparations_panelVisible": true,
+    "size_medium_gate_noOverflow": true,
+    "size_medium_gate_inside": true,
+    "size_medium_traveller_noOverflow": true,
+    "size_medium_traveller_inside": true,
+    "size_medium_traveller_panelVisible": true,
+    "size_medium_preparations_noOverflow": true,
+    "size_medium_preparations_inside": true,
+    "size_medium_preparations_panelVisible": true,
+    "size_compact_gate_noOverflow": true,
+    "size_compact_gate_inside": true,
+    "size_compact_traveller_noOverflow": true,
+    "size_compact_traveller_inside": true,
+    "size_compact_traveller_panelVisible": true,
+    "size_compact_preparations_noOverflow": true,
+    "size_compact_preparations_inside": true,
+    "size_compact_preparations_panelVisible": true,
+    "size_narrow_gate_noOverflow": true,
+    "size_narrow_gate_inside": true,
+    "size_narrow_traveller_noOverflow": true,
+    "size_narrow_traveller_inside": true,
+    "size_narrow_traveller_panelVisible": true,
+    "size_narrow_preparations_noOverflow": true,
+    "size_narrow_preparations_inside": true,
+    "size_narrow_preparations_panelVisible": true,
+    "size_short_gate_noOverflow": true,
+    "size_short_gate_inside": true,
+    "size_short_traveller_noOverflow": true,
+    "size_short_traveller_inside": true,
+    "size_short_traveller_panelVisible": true,
+    "size_short_preparations_noOverflow": true,
+    "size_short_preparations_inside": true,
+    "size_short_preparations_panelVisible": true,
+    "theme_signature_light_noOverflow": true,
+    "theme_signature_dark_noOverflow": true,
+    "theme_studio_light_noOverflow": true,
+    "theme_studio_dark_noOverflow": true,
+    "theme_arcane_light_noOverflow": true,
+    "theme_arcane_dark_noOverflow": true,
+    "theme_voxel_light_noOverflow": true,
+    "theme_voxel_dark_noOverflow": true,
+    "theme_cozy_light_noOverflow": true,
+    "theme_cozy_dark_noOverflow": true,
+    "theme_student_light_noOverflow": true,
+    "theme_student_dark_noOverflow": true,
+    "lobbyHolds60": true,
+    "panelsHold": true,
+    "nodesLevelOff": true,
+    "listenersLevelOff": true,
+    "heapLevelsOff": true,
+    "noConsoleErrors": true
+  },
+  "results": {
+    "images": [
+      [
+        "sky-sunset.0b3a0b409f897015320484e12657e6bd.png",
+        320,
+        180,
+        1280
+      ],
+      [
+        "cloud-b-sunset.ec141255db76166a2001cd7cc807e852.png",
+        340,
+        170,
+        192
+      ],
+      [
+        "cloud-a-sunset.1aab3fe3f5e6b1bbbe29c461762bf1f9.png",
+        480,
+        240,
+        346
+      ],
+      [
+        "cloud-b-sunset.ec141255db76166a2001cd7cc807e852.png",
+        340,
+        170,
+        218
+      ],
+      [
+        "gate-sunset.e2835c123b4c11d67d90bbd31915ee72.png",
+        780,
+        830,
+        621
+      ],
+      [
+        "glow.8fadff5eee9d93552ad5e819b6231ee7.png",
+        256,
+        256,
+        410
+      ],
+      [
+        "glow.8fadff5eee9d93552ad5e819b6231ee7.png",
+        256,
+        256,
+        149
+      ],
+      [
+        "glow.8fadff5eee9d93552ad5e819b6231ee7.png",
+        256,
+        256,
+        149
+      ],
+      [
+        "sea-sunset.f59af7ff1f702ad82f2e74c128136a91.png",
+        1500,
+        350,
+        1408
+      ]
+    ],
+    "tabOrder": [
+      "Design System (development only)",
+      "Spaces. Current Space: World",
+      "Gate"
+    ],
+    "drift": {
+      "moving": 33.3,
+      "still": 0
+    },
+    "progress": [
+      30,
+      30,
+      65,
+      65,
+      65,
+      65,
+      65,
+      65,
+      100,
+      100,
+      100,
+      100
+    ],
+    "hostLog": [
+      "SYLF_WORLD host-created \"preview\"",
+      "SYLF_WORLD playing",
+      "SYLF_WORLD leaving",
+      "SYLF_WORLD host-disposed"
+    ],
+    "record": {
+      "section": "gate",
+      "sky": "sunset",
+      "drift": true,
+      "save": {
+        "ref": "preview-1793455509926",
+        "savedAt": 1793455509926,
+        "location": "device",
+        "pendingSync": false
+      },
+      "leftAt": 1793455510834
+    },
+    "updatesDefault": 30,
+    "updatesVoxel": 12,
+    "updatesReduced": 0,
+    "reducedWalk": "translateX(0px) translateY(0px) scale(1)",
+    "updatesAfterReduced": 30,
+    "loadedAtHome": [
+      "__expo-metro-runtime-8c088df87a31e4e6accd81c554ec290d.js",
+      "__common-973c0f34410e1a0343af26fba5b11a8d.js",
+      "index-bd9a895478f4de8aa3e27a2935a99ef2.js",
+      "HomeSpace-784fcbc5271386e9034c3962cd967479.js"
+    ],
+    "loadedInLobby": [
+      "sky-sunset.0b3a0b409f897015320484e12657e6bd.png",
+      "cloud-b-sunset.ec141255db76166a2001cd7cc807e852.png",
+      "cloud-a-sunset.1aab3fe3f5e6b1bbbe29c461762bf1f9.png",
+      "gate-sunset.e2835c123b4c11d67d90bbd31915ee72.png",
+      "glow.8fadff5eee9d93552ad5e819b6231ee7.png",
+      "sea-sunset.f59af7ff1f702ad82f2e74c128136a91.png"
+    ],
+    "loadedAfterEntry": [
+      "preview-231ea84f223e30f002cb0a2fe32f1644.js",
+      "PreviewSurface-c97128e43dece0f67b4875900eac1e43.js"
+    ],
+    "updatesAfterLeaving": 0,
+    "updatesAfterSwitching": 0,
+    "a11y": {
+      "controls": 5,
+      "unnamed": 0,
+      "title": "heading",
+      "level": "1",
+      "sceneHidden": "true",
+      "selectable": 1
+    },
+    "targets": [
+      44,
+      44,
+      44,
+      44
+    ],
+    "contrast": {
+      "dawn_signature": {
+        "lowest": 4.68,
+        "text": "Enter the world",
+        "large": false
+      },
+      "dawn_voxel": {
+        "lowest": 4.96,
+        "text": "ENTER THE WORLD",
+        "large": false
+      },
+      "day_signature": {
+        "lowest": 4.68,
+        "text": "Enter the world",
+        "large": false
+      },
+      "day_voxel": {
+        "lowest": 4.6,
+        "text": "ENTER THE WORLD",
+        "large": false
+      },
+      "sunset_signature": {
+        "lowest": 4.86,
+        "text": "Enter the world",
+        "large": false
+      },
+      "sunset_voxel": {
+        "lowest": 4.87,
+        "text": "ENTER THE WORLD",
+        "large": false
+      },
+      "dusk_signature": {
+        "lowest": 4.64,
+        "text": "A place you earn by studying.",
+        "large": false
+      },
+      "dusk_voxel": {
+        "lowest": 4.72,
+        "text": "A place you earn by studying.",
+        "large": false
+      },
+      "night_signature": {
+        "lowest": 4.79,
+        "text": "Preview",
+        "large": false
+      },
+      "night_voxel": {
+        "lowest": 4.77,
+        "text": "Preview",
+        "large": false
+      },
+      "mist_signature": {
+        "lowest": 4.68,
+        "text": "Enter the world",
+        "large": false
+      },
+      "mist_voxel": {
+        "lowest": 4.51,
+        "text": "ENTER THE WORLD",
+        "large": false
+      },
+      "custom_accent": {
+        "lowest": 4.88,
+        "text": "Enter the world",
+        "large": false
+      },
+      "custom_ground": {
+        "lowest": 4.84,
+        "text": "Enter the world",
+        "large": false
+      }
+    },
+    "sizes": {
+      "wide_gate": {
+        "title": {
+          "left": 24,
+          "right": 344,
+          "top": 72,
+          "bottom": 137
+        },
+        "panel": null,
+        "enter": {
+          "left": 36,
+          "right": 197.6875,
+          "top": 658,
+          "bottom": 694
+        },
+        "overflow": false
+      },
+      "wide_traveller": {
+        "title": {
+          "left": 24,
+          "right": 344,
+          "top": 72,
+          "bottom": 137
+        },
+        "panel": {
+          "left": 356,
+          "right": 796,
+          "top": 16,
+          "bottom": 516
+        },
+        "enter": {
+          "left": 36,
+          "right": 197.6875,
+          "top": 658,
+          "bottom": 694
+        },
+        "overflow": false
+      },
+      "wide_preparations": {
+        "title": {
+          "left": 24,
+          "right": 344,
+          "top": 72,
+          "bottom": 137
+        },
+        "panel": {
+          "left": 356,
+          "right": 796,
+          "top": 16,
+          "bottom": 497
+        },
+        "enter": {
+          "left": 36,
+          "right": 197.6875,
+          "top": 658,
+          "bottom": 694
+        },
+        "overflow": false
+      },
+      "expanded_gate": {
+        "title": {
+          "left": 24,
+          "right": 344,
+          "top": 72,
+          "bottom": 137
+        },
+        "panel": null,
+        "enter": {
+          "left": 36,
+          "right": 197.6875,
+          "top": 658,
+          "bottom": 694
+        },
+        "overflow": false
+      },
+      "expanded_traveller": {
+        "title": {
+          "left": 24,
+          "right": 344,
+          "top": 72,
+          "bottom": 137
+        },
+        "panel": {
+          "left": 356,
+          "right": 796,
+          "top": 16,
+          "bottom": 516
+        },
+        "enter": {
+          "left": 36,
+          "right": 197.6875,
+          "top": 658,
+          "bottom": 694
+        },
+        "overflow": false
+      },
+      "expanded_preparations": {
+        "title": {
+          "left": 24,
+          "right": 344,
+          "top": 72,
+          "bottom": 137
+        },
+        "panel": {
+          "left": 356,
+          "right": 796,
+          "top": 16,
+          "bottom": 497
+        },
+        "enter": {
+          "left": 36,
+          "right": 197.6875,
+          "top": 658,
+          "bottom": 694
+        },
+        "overflow": false
+      },
+      "medium_gate": {
+        "title": {
+          "left": 24,
+          "right": 344,
+          "top": 72,
+          "bottom": 137
+        },
+        "panel": null,
+        "enter": {
+          "left": 36,
+          "right": 197.6875,
+          "top": 658,
+          "bottom": 694
+        },
+        "overflow": false
+      },
+      "medium_traveller": {
+        "title": {
+          "left": 24,
+          "right": 344,
+          "top": 72,
+          "bottom": 137
+        },
+        "panel": {
+          "left": 355.9997863769531,
+          "right": 795.999755859375,
+          "top": 16,
+          "bottom": 516
+        },
+        "enter": {
+          "left": 36,
+          "right": 197.6875,
+          "top": 658,
+          "bottom": 694
+        },
+        "overflow": false
+      },
+      "medium_preparations": {
+        "title": {
+          "left": 24,
+          "right": 344,
+          "top": 72,
+          "bottom": 137
+        },
+        "panel": {
+          "left": 356,
+          "right": 796,
+          "top": 16,
+          "bottom": 497
+        },
+        "enter": {
+          "left": 36,
+          "right": 197.6875,
+          "top": 658,
+          "bottom": 694
+        },
+        "overflow": false
+      },
+      "compact_gate": {
+        "title": {
+          "left": 16,
+          "right": 464,
+          "top": 72,
+          "bottom": 137
+        },
+        "panel": null,
+        "enter": {
+          "left": 28,
+          "right": 189.6875,
+          "top": 618,
+          "bottom": 654
+        },
+        "overflow": false
+      },
+      "compact_traveller": {
+        "title": {
+          "left": 16,
+          "right": 464,
+          "top": 72,
+          "bottom": 137
+        },
+        "panel": {
+          "left": 11.998169898986816,
+          "right": 467.9981698989868,
+          "top": 72,
+          "bottom": 572
+        },
+        "enter": null,
+        "overflow": false
+      },
+      "compact_preparations": {
+        "title": {
+          "left": 16,
+          "right": 464,
+          "top": 72,
+          "bottom": 137
+        },
+        "panel": {
+          "left": 11.998169898986816,
+          "right": 467.9981698989868,
+          "top": 72,
+          "bottom": 553
+        },
+        "enter": null,
+        "overflow": false
+      },
+      "narrow_gate": {
+        "title": {
+          "left": 16,
+          "right": 324,
+          "top": 72,
+          "bottom": 137
+        },
+        "panel": null,
+        "enter": {
+          "left": 28,
+          "right": 189.6875,
+          "top": 512,
+          "bottom": 548
+        },
+        "overflow": false
+      },
+      "narrow_traveller": {
+        "title": {
+          "left": 16,
+          "right": 324,
+          "top": 72,
+          "bottom": 137
+        },
+        "panel": {
+          "left": 11.997154235839844,
+          "right": 327.99715423583984,
+          "top": 72,
+          "bottom": 572
+        },
+        "enter": null,
+        "overflow": false
+      },
+      "narrow_preparations": {
+        "title": {
+          "left": 16,
+          "right": 324,
+          "top": 72,
+          "bottom": 137
+        },
+        "panel": {
+          "left": 11.996095657348633,
+          "right": 327.99609565734863,
+          "top": 72,
+          "bottom": 584
+        },
+        "enter": null,
+        "overflow": false
+      },
+      "short_gate": {
+        "title": {
+          "left": 24,
+          "right": 344,
+          "top": 72,
+          "bottom": 119
+        },
+        "panel": null,
+        "enter": {
+          "left": 637.0234375,
+          "right": 798.7109375,
+          "top": 336,
+          "bottom": 372
+        },
+        "overflow": false
+      },
+      "short_traveller": {
+        "title": {
+          "left": 24,
+          "right": 344,
+          "top": 72,
+          "bottom": 119
+        },
+        "panel": {
+          "left": 355.99847412109375,
+          "right": 795.9984741210938,
+          "top": 16,
+          "bottom": 404
+        },
+        "enter": null,
+        "overflow": false
+      },
+      "short_preparations": {
+        "title": {
+          "left": 24,
+          "right": 344,
+          "top": 72,
+          "bottom": 119
+        },
+        "panel": {
+          "left": 355.9991149902344,
+          "right": 795.9991455078125,
+          "top": 16,
+          "bottom": 404
+        },
+        "enter": null,
+        "overflow": false
+      }
+    },
+    "framesLobby": {
+      "frames": 175,
+      "p50": 16.7,
+      "p95": 18.3,
+      "p99": 18.7,
+      "max": 18.7
+    },
+    "framesPanels": {
+      "frames": 115,
+      "p50": 16.7,
+      "p95": 17.5,
+      "p99": 18.1,
+      "max": 18.1
+    },
+    "framesEntering": {
+      "frames": 85,
+      "p50": 16.7,
+      "p95": 18.2,
+      "p99": 18.6,
+      "max": 18.6
+    },
+    "memory": {
+      "usedMb": 14.8
+    },
+    "workingSetMb": {
+      "atHome": 451,
+      "inLobby": 456,
+      "afterLeaving": 436,
+      "afterSevenVisits": 349
+    },
+    "retention": [
+      {
+        "nodes": 268,
+        "listeners": 222,
+        "heapMb": 10.47
+      },
+      {
+        "nodes": 268,
+        "listeners": 222,
+        "heapMb": 10.64
+      },
+      {
+        "nodes": 268,
+        "listeners": 222,
+        "heapMb": 10.89
+      },
+      {
+        "nodes": 268,
+        "listeners": 222,
+        "heapMb": 10.97
+      }
+    ],
+    "consoleErrors": []
+  }
+}

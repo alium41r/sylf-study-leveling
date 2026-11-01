@@ -1,0 +1,23 @@
+{
+  "fromAnchor": "2026-10-29",
+  "toAnchor": "2026-10-30",
+  "clientDate": "2026-10-29",
+  "deadlines": [
+    {
+      "kind": "FIXED",
+      "date": "2026-11-20",
+      "examDayStudyAllowed": false
+    },
+    {
+      "kind": "FIXED",
+      "date": "2026-11-23",
+      "examDayStudyAllowed": false
+    }
+  ],
+  "englishDate": "2026-11-01",
+  "calendarOccurrences": 16,
+  "clockOwner": "existing compiled Calendar addDays/localTimeToISO and TimezoneService",
+  "acceptedTextUnchanged": true,
+  "notAuthorized": true,
+  "reason": "New preparation day; no prior live authorization reused. Earlier draft and rehearsals preserved."
+}

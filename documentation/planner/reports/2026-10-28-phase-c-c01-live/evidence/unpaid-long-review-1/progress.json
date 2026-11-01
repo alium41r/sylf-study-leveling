@@ -1,0 +1,45 @@
+{
+  "runId": "unpaid-LONG_REVIEW",
+  "mode": "LONG_REVIEW",
+  "state": "STOP_REQUESTED",
+  "stopReason": "REVIEW_CALENDAR_EXPIRED_AFTER_COMPLETE_RESPONSE",
+  "physicalRequests": 0,
+  "roles": [
+    {
+      "sequence": 1,
+      "role": "RESEARCH",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 2,
+      "role": "VERIFICATION",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 3,
+      "role": "SYNTHESIS",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 4,
+      "role": "STRATEGIST",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 5,
+      "role": "TRANSLATOR",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 6,
+      "role": "REVIEWER",
+      "finished": true,
+      "stopReason": "REVIEW_CALENDAR_EXPIRED_AFTER_COMPLETE_RESPONSE"
+    }
+  ]
+}

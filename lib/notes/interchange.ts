@@ -1,5 +1,6 @@
 import * as Y from "yjs";
 import type { DocumentDescriptor } from "./contracts";
+import { storedTextBoxes, textFragments } from "./text-boxes";
 import { NotesError } from "./errors";
 
 /** Sylf's editor-independent readable tree. Native updates remain the authoritative merge history. */
@@ -58,5 +59,23 @@ export function projectStream(
     version: 1,
     kind: spec.type,
     content: readable,
+    ...(stream.adapter === "blocknote/0.56.0" && doc.getMap("text-boxes").size
+      ? {
+          boxes: storedTextBoxes(doc),
+          fragments: textFragments(doc)
+            .filter((name) => name !== spec.root)
+            .map((name) => ({
+              name,
+              content: JSON.parse(
+                JSON.stringify(
+                  doc
+                    .getXmlFragment(name)
+                    .toArray()
+                    .map((node) => xml(node as Y.XmlElement | Y.XmlText))
+                )
+              ),
+            })),
+        }
+      : {}),
   };
 }

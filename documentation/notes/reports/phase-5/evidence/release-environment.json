@@ -1,0 +1,13 @@
+{
+  "NOTES_PUBLIC_URL": false,
+  "NOTES_ENCRYPTION_KEY": false,
+  "GOOGLE_NOTES_CLIENT_ID": false,
+  "GOOGLE_NOTES_CLIENT_SECRET": false,
+  "GOOGLE_CLIENT_ID": true,
+  "GOOGLE_CLIENT_SECRET": true,
+  "authorizedNotesTestGrantAvailable": false,
+  "liveGoogleTestPerformed": false,
+  "credentialValuesPrinted": false,
+  "hostedDatabaseRead": false,
+  "physicalDeviceAvailable": false
+}

@@ -1,0 +1,48 @@
+{
+  "status": "PASS",
+  "baselineEntries": 5112,
+  "changedPreExisting": [
+    "documentation/planner/README.md",
+    "lib/ai/providers/deepseek.ts",
+    "lib/ai/providers/gemini-dispatch.ts",
+    "lib/ai/providers/groq.ts",
+    "lib/ai/telemetry.ts",
+    "lib/ai/usage-logger.ts",
+    "lib/planner/v2/main.ts",
+    "lib/planner/v2/server/compiler.ts",
+    "lib/planner/v2/server/revisions.ts",
+    "lib/planner/v2/server/worker.ts",
+    "lib/prisma.ts",
+    "prisma/schema.prisma",
+    "scripts/build/build-planner-worker.mjs"
+  ],
+  "unexpectedChanges": [],
+  "frozenAndAuthorityPreservation": {
+    "lib/planner/v2/contracts/artifacts.ts": true,
+    "lib/planner/v2/contracts/blueprint.ts": true,
+    "documentation/planner/reports/2026-10-25-ai-first-architecture-proposal/README.md": true,
+    ".node-version": true,
+    "lib/planner/v2/contracts/primitives.ts": true,
+    "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md": true,
+    "lib/planner/v2/contracts/workspace.ts": true,
+    "lib/planner/v2/contracts/lineage.ts": true,
+    "lib/planner/v2/contracts/execution.ts": true,
+    "package.json": true,
+    "lib/planner/v2/contracts/intent.ts": true,
+    "lib/planner/v2/contracts/index.ts": true,
+    "documentation/planner/AI_FIRST_PLANNER_HANDOFF.md": true,
+    "lib/planner/v2/contracts/envelope.ts": true,
+    "lib/planner/v2/contracts/evidence.ts": true,
+    "lib/planner/v2/contracts/operations.ts": true,
+    "package-lock.json": true,
+    "AGENTS.md": true,
+    "lib/planner/v2/contracts/session.ts": true
+  },
+  "providerAndLoggerImportOnly": {
+    "lib/ai/providers/deepseek.ts": true,
+    "lib/ai/providers/groq.ts": true,
+    "lib/ai/providers/gemini-dispatch.ts": true,
+    "lib/ai/usage-logger.ts": true
+  },
+  "unrelatedChangesPreserved": true
+}

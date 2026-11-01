@@ -40,6 +40,8 @@
     "node_modules",
     "tools",
     "archive",
-    "scratch"
+    "scratch",
+    "native",
+    "documentation/**/evidence/executed-sources/**"
   ]
 }

@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-10-22T05:12:48.146Z",
+  "origin": "https://sylf-alium41rs-projects.vercel.app",
+  "results": [
+    {
+      "path": "/notes",
+      "status": 307,
+      "location": "/login?redirect=%2Fnotes",
+      "contentType": "text/plain",
+      "publicResponse": null,
+      "cookiesOrSessionSupplied": false
+    },
+    {
+      "path": "/api/notes/connection",
+      "status": 401,
+      "location": null,
+      "contentType": "application/json",
+      "publicResponse": {
+        "code": "AUTH",
+        "error": "Sign in to unlock Notes."
+      },
+      "cookiesOrSessionSupplied": false
+    }
+  ],
+  "authenticatedConfigurationOrProviderFlowVerified": false
+}

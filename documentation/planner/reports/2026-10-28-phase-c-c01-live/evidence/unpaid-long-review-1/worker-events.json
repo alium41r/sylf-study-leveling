@@ -1,0 +1,22 @@
+[
+  {
+    "event": "claimed",
+    "attemptId": "2632bafc-688d-4c50-b219-ec03071a41ab",
+    "fence": 1,
+    "at": "2026-10-28T15:06:56.949Z"
+  },
+  {
+    "event": "late_result_rejected",
+    "attemptId": "2632bafc-688d-4c50-b219-ec03071a41ab",
+    "fence": 1,
+    "code": "LEASE_EXPIRED",
+    "at": "2026-10-28T15:07:01.448Z"
+  },
+  {
+    "event": "stopped",
+    "attemptId": "2632bafc-688d-4c50-b219-ec03071a41ab",
+    "fence": 1,
+    "code": "LEASE_EXPIRED",
+    "at": "2026-10-28T15:07:01.448Z"
+  }
+]

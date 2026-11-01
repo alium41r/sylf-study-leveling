@@ -13,23 +13,41 @@ const fileSchema = z.object({
   version: z.string().min(1).max(64),
 });
 type File = z.infer<typeof fileSchema>;
+type DecodedPack = Awaited<ReturnType<typeof decodePack>>;
+// Small delta packs must survive an entire cold dependency walk. Bound bytes
+// rather than evicting after four tiny files (and downloading them repeatedly).
+const PACK_CACHE_BYTES = 16 * 1024 * 1024;
+const PACK_CACHE_FILES = 128;
 export async function notesRequest(path: string, init: RequestInit = {}) {
-  const response = await apiFetch(path, {
-    ...init,
-    credentials: "include",
-    cache: "no-store",
-    signal: init.signal
-      ? AbortSignal.any([init.signal, AbortSignal.timeout(55000)])
-      : AbortSignal.timeout(55000),
-  });
+  let response: Response;
+  try {
+    response = await apiFetch(path, {
+      ...init,
+      credentials: "include",
+      cache: "no-store",
+      signal: init.signal
+        ? AbortSignal.any([init.signal, AbortSignal.timeout(55000)])
+        : AbortSignal.timeout(55000),
+    });
+  } catch (error) {
+    if (init.signal?.aborted) throw error;
+    throw new TransportError("NETWORK");
+  }
   if (!response.ok) {
     // Broker 401 means Sylf authentication ended; Drive consent failures use 409.
     // Fence loaded keys immediately rather than waiting for a profile refresh.
     if (response.status === 401) {
       invalidateNotesAccess();
-      throw new TransportError("AUTH");
+      throw new NotesError(
+        "SESSION_ENDED",
+        "Sign in to Sylf again to reopen Notes. Your local notes are retained."
+      );
     }
     const error = await response.json().catch(() => ({}));
+    if (response.status === 403 && error.code === "ORIGIN")
+      throw new Error(
+        "Open Notes at your permanent Sylf address to connect Google Drive. Your local notes are kept."
+      );
     const code = [
       "AUTH",
       "QUOTA",
@@ -41,9 +59,9 @@ export async function notesRequest(path: string, init: RequestInit = {}) {
       : response.status === 401
         ? "AUTH"
         : "NETWORK";
-    if (error.code === "CORRUPT")
+    if (["CORRUPT", "OWNERSHIP", "UNSUPPORTED", "LIMIT"].includes(error.code))
       throw new NotesError(
-        "CORRUPT",
+        error.code,
         error.error || "Cloud integrity verification failed."
       );
     throw new TransportError(
@@ -64,11 +82,14 @@ export class GoogleDriveTransport implements NotesTransport {
   private readonly delivered = new Map<string, string>();
   private readonly cache = new Map<
     string,
-    Awaited<ReturnType<typeof decodePack>>
+    { pack: DecodedPack; bytes: number }
   >();
+  private cacheBytes = 0;
+  private readonly loading = new Map<string, Promise<DecodedPack>>();
   constructor(
     readonly scope: NotesTransport["scope"],
-    private readonly session: NotesSession
+    private readonly session: NotesSession,
+    private readonly readLocal?: (hash: string) => Promise<Uint8Array>
   ) {
     session.onClose(() => {
       this.files = [];
@@ -77,6 +98,8 @@ export class GoogleDriveTransport implements NotesTransport {
       this.delivered.clear();
       this.pendingPage = undefined;
       this.cache.clear();
+      this.cacheBytes = 0;
+      this.loading.clear();
     });
   }
   private async request(input: unknown, signal: AbortSignal) {
@@ -89,6 +112,16 @@ export class GoogleDriveTransport implements NotesTransport {
     });
     this.session.assert();
     return response;
+  }
+  duplicatePackHashes() {
+    this.session.assert();
+    const seen = new Set<string>(),
+      duplicates = new Set<string>();
+    for (const file of this.files) {
+      if (seen.has(file.hash)) duplicates.add(file.hash);
+      seen.add(file.hash);
+    }
+    return [...duplicates].slice(0, 4);
   }
   async refresh(signal = this.session.signal) {
     const files: File[] = [],
@@ -134,7 +167,7 @@ export class GoogleDriveTransport implements NotesTransport {
     for (const [id, version] of this.indexed)
       if (!current.has(id) || current.get(id)!.version !== version) {
         this.indexed.delete(id);
-        this.cache.delete(id);
+        this.evict(id);
         for (const [hash, location] of this.locations)
           if (location === id) this.locations.delete(hash);
       }
@@ -151,15 +184,61 @@ export class GoogleDriveTransport implements NotesTransport {
     this.listingInitialized = true;
     this.files = files;
   }
-  private async load(file: File, signal: AbortSignal) {
+  private evict(id: string) {
+    const cached = this.cache.get(id);
+    if (cached) this.cacheBytes -= cached.bytes;
+    this.cache.delete(id);
+  }
+  private load(
+    file: File,
+    signal: AbortSignal,
+    allowReplacement = true
+  ): Promise<DecodedPack> {
+    this.session.assert();
+    const key = `${file.id}:${file.version}`;
+    const existing = this.loading.get(key);
+    if (existing) return existing;
+    const task = this.download(file, signal, allowReplacement).finally(() => {
+      if (this.loading.get(key) === task) this.loading.delete(key);
+    });
+    this.loading.set(key, task);
+    return task;
+  }
+  private async download(
+    file: File,
+    signal: AbortSignal,
+    allowReplacement = true
+  ): Promise<DecodedPack> {
     this.session.assert();
     const cached = this.cache.get(file.id);
-    if (cached && this.indexed.get(file.id) === file.version) return cached;
-    if (cached) this.cache.delete(file.id);
-    const response = await this.request(
-      { action: "read", fileId: file.id },
-      signal
-    );
+    if (cached && this.indexed.get(file.id) === file.version) {
+      this.cache.delete(file.id);
+      this.cache.set(file.id, cached);
+      return cached.pack;
+    }
+    if (cached) this.evict(file.id);
+    let response: Response;
+    try {
+      response = await this.request(
+        { action: "read", fileId: file.id },
+        signal
+      );
+    } catch (error) {
+      // Another tab may have retired an identical physical duplicate since our
+      // scan. Retry only an exact pack hash; a missing unique pack still fails.
+      if (
+        allowReplacement &&
+        error instanceof NotesError &&
+        ["CORRUPT", "OWNERSHIP"].includes(error.code)
+      ) {
+        await this.refresh(signal);
+        const replacement = this.files.find(
+          (f) => f.id !== file.id && f.hash === file.hash
+        );
+        if (replacement) return this.load(replacement, signal, false);
+      }
+      throw error;
+    }
     if (Number(response.headers.get("content-length") || 0) > PACK_BYTES)
       throw new NotesError("LIMIT", "Cloud transfer exceeds its safe limit.");
     const reader = response.body!.getReader(),
@@ -192,9 +271,14 @@ export class GoogleDriveTransport implements NotesTransport {
     this.session.assert();
     this.indexed.set(file.id, file.version);
     for (const hash of pack.objects.keys()) this.locations.set(hash, file.id);
-    this.cache.set(file.id, pack);
-    while (this.cache.size > 4)
-      this.cache.delete(this.cache.keys().next().value!);
+    this.evict(file.id);
+    this.cache.set(file.id, { pack, bytes: size });
+    this.cacheBytes += size;
+    while (
+      this.cacheBytes > PACK_CACHE_BYTES ||
+      this.cache.size > PACK_CACHE_FILES
+    )
+      this.evict(this.cache.keys().next().value!);
     return pack;
   }
   async candidates(hash: string, signal: AbortSignal): Promise<Uint8Array[]> {
@@ -203,15 +287,36 @@ export class GoogleDriveTransport implements NotesTransport {
     const location = this.locations.get(hash),
       known = this.files.find((f) => f.id === location);
     if (known) {
+      // This exact physical version was downloaded and fully hash-verified in
+      // this unlocked session. Reuse matching durable bytes instead of fetching
+      // its entire pack for each historical dependency after cache eviction.
+      if (this.readLocal && this.indexed.get(known.id) === known.version) {
+        try {
+          const bytes = await this.readLocal(hash);
+          this.session.assert();
+          if ((await digest(bytes)) !== hash)
+            throw new NotesError("CORRUPT", "Local object checksum failed.");
+          return [bytes];
+        } catch (error) {
+          if (!(error instanceof NotesError) || error.code !== "NOT_FOUND")
+            throw error;
+        }
+      }
       const bytes = (await this.load(known, signal)).objects.get(hash);
       if (bytes) return [bytes.slice()];
     }
-    for (const file of this.files)
-      if (!this.indexed.has(file.id)) {
-        const pack = await this.load(file, signal);
+    const unindexed = this.files.filter((file) => !this.indexed.has(file.id));
+    for (let offset = 0; offset < unindexed.length; offset += 4) {
+      const packs = await Promise.all(
+        unindexed
+          .slice(offset, offset + 4)
+          .map((file) => this.load(file, signal))
+      );
+      for (const pack of packs) {
         const bytes = pack.objects.get(hash);
         if (bytes) return [bytes.slice()];
       }
+    }
     return [];
   }
   async create(hash: string, bytes: Uint8Array, signal: AbortSignal) {
@@ -284,11 +389,13 @@ export class GoogleDriveTransport implements NotesTransport {
     }
     const slice = this.files.slice(offset, offset + 2),
       revisions = new Set<string>();
-    for (const file of slice) {
-      if (this.delivered.get(file.id) === file.version) continue;
-      const pack = await this.load(file, signal);
-      for (const id of pack.revisions) revisions.add(id);
-    }
+    await Promise.all(
+      slice.map(async (file) => {
+        if (this.delivered.get(file.id) === file.version) return;
+        const pack = await this.load(file, signal);
+        for (const id of pack.revisions) revisions.add(id);
+      })
+    );
     const more = offset + slice.length < this.files.length;
     const nextCursor = more
       ? `scan:${this.scanId}:${offset + slice.length}`

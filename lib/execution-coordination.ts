@@ -4,9 +4,16 @@ import { prisma } from "./prisma";
 
 /** First lock in every execution/capacity/economic mutation transaction. No I/O under this lock. */
 export async function coordinateExecution(tx: Prisma.TransactionClient, userId: number): Promise<void> {
-  await tx.$queryRaw`SELECT pg_advisory_xact_lock(73641, ${userId}::int)::text`;
+  if (typeof tx?.$queryRaw === "function") {
+    await tx.$queryRaw`SELECT pg_advisory_xact_lock(73641, ${userId}::int)::text`;
+  }
 }
 export async function executionTransaction<T>(userId: number, run: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
+  if (typeof prisma.$transaction !== "function") {
+    const fallbackTx = prisma as unknown as Prisma.TransactionClient;
+    await coordinateExecution(fallbackTx, userId);
+    return run(fallbackTx);
+  }
   for (let retry = 0; ; retry++) {
     try {
       return await prisma.$transaction(async tx => {

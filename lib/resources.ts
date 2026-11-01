@@ -33,6 +33,13 @@ export const notesResumeSchema = z
       })
       .strict()
       .optional(),
+    pdfViewport: z
+      .object({
+        zoom: z.number().min(0.25).max(4),
+        offset: z.number().finite().min(-1000000).max(1000000),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 export type NotesResumePosition = z.infer<typeof notesResumeSchema>;

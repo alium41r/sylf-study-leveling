@@ -1,0 +1,40 @@
+{
+  "workspace": "/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-student-navigation-zi51e6kz",
+  "runtime": "/private/tmp/sylf-planner-node24/node-v24.21.0-darwin-arm64/bin/node",
+  "node": "24.21.0",
+  "status": "PASSED",
+  "steps": [
+    {
+      "name": "worker",
+      "exitCode": 0,
+      "seconds": 14.11
+    },
+    {
+      "name": "route-types",
+      "exitCode": 0,
+      "seconds": 0.47
+    },
+    {
+      "name": "web",
+      "exitCode": 0,
+      "seconds": 68.81
+    },
+    {
+      "name": "types",
+      "exitCode": 0,
+      "seconds": 29.2
+    },
+    {
+      "name": "mobile",
+      "exitCode": 0,
+      "seconds": 5.92
+    },
+    {
+      "name": "mobile-verify",
+      "exitCode": 0,
+      "seconds": 0.21
+    }
+  ],
+  "paidCalls": 0,
+  "isolation": "No environment files; provider/database credentials stripped"
+}

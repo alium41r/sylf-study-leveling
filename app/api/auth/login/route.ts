@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
 import { xpForNextLevel } from "@/lib/game-engine";
 import { signToken, AUTH_COOKIE_OPTIONS, type AuthTokenPayload } from "@/lib/auth";
 import { formatScholarId } from "@/lib/scholar-id";
-import { rateLimit, getClientIp, ipKey } from "@/lib/rate-limit";
+import { authenticatePassword } from "@/lib/auth-password";
+import { openAuthSession } from "@/lib/auth-session-service";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email or username is required").optional(),
@@ -29,61 +28,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Email or username is required" }, { status: 400 });
     }
 
-    // S4: brute-force protection — per-IP window plus per-identifier window.
-    const ipLimit = await rateLimit(`login:ip:${ipKey(getClientIp(req))}`, {
-      limit: 10,
-      windowMs: 60_000,
-    });
-    if (!ipLimit.allowed) {
+    const attempt = await authenticatePassword(req, loginTarget, password);
+    if (!attempt.ok) {
       return NextResponse.json(
-        { error: "Too many login attempts. Please wait a minute." },
-        { status: 429, headers: { "Retry-After": String(ipLimit.retryAfterSeconds) } }
+        { error: attempt.error },
+        { status: attempt.status, ...(attempt.retryAfterSeconds ? { headers: { "Retry-After": String(attempt.retryAfterSeconds) } } : {}) }
       );
     }
-    const idLimit = await rateLimit(`login:id:${ipKey(loginTarget.toLowerCase())}`, {
-      limit: 10,
-      windowMs: 15 * 60_000,
-    });
-    if (!idLimit.allowed) {
-      return NextResponse.json(
-        { error: "Too many login attempts for this account. Please wait a few minutes." },
-        { status: 429, headers: { "Retry-After": String(idLimit.retryAfterSeconds) } }
-      );
-    }
-
-    // Find user by email OR username (case-insensitive)
-    const user = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { email: { equals: loginTarget, mode: "insensitive" } },
-          { username: { equals: loginTarget, mode: "insensitive" } },
-        ],
-      },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "Invalid credentials" },
-        { status: 401 }
-      );
-    }
-
-    // Handle OAuth-only accounts without passwords
-    if (!user.password) {
-      return NextResponse.json(
-        { error: "This account was registered with Google or GitHub. Please sign in with OAuth." },
-        { status: 401 }
-      );
-    }
-
-    // Verify password
-    const passwordMatches = await bcrypt.compare(password, user.password);
-    if (!passwordMatches) {
-      return NextResponse.json(
-        { error: "Invalid credentials" },
-        { status: 401 }
-      );
-    }
+    const { user } = attempt;
 
     const scholarId = user.scholarId || formatScholarId(user.id);
 
@@ -102,7 +54,8 @@ export async function POST(req: NextRequest) {
       tokenVersion: user.tokenVersion,
     };
 
-    const token = await signToken(tokenPayload);
+    const sid = await openAuthSession(user.id, req);
+    const token = await signToken({ ...tokenPayload, ...(sid ? { sid } : {}) });
 
     // Return user profile only — the session token travels exclusively in the
     // httpOnly cookie set below.

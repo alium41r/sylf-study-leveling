@@ -1,0 +1,8 @@
+{
+  "name": "@sylf/phone",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Reserved for the Sylf phone companion frontend (master plan §4.5). Intentionally empty until its phase.",
+  "main": "src/index.ts",
+  "types": "src/index.ts"
+}

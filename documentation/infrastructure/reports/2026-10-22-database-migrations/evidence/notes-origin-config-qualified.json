@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-10-22T05:11:35.606Z",
+  "actualProductionSecurityModuleQualified": true,
+  "sourceSHA256": "6805a770cfe9cb2187c555a2f5db4990b9f5a4815add7ebee8bde0f3e7e6ed9c",
+  "configured": true,
+  "publicOrigin": "https://sylf-alium41rs-projects.vercel.app",
+  "redirectUri": "https://sylf-alium41rs-projects.vercel.app/api/notes/callback",
+  "requestedScopes": "openid email https://www.googleapis.com/auth/drive.file",
+  "exactOriginAccepted": true,
+  "differentOriginRejected": true,
+  "encryptionKeyRoundTripPassed": true,
+  "secretValuesLogged": false,
+  "googleConsentPerformed": false,
+  "driveFileOperationsPerformed": false
+}

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth-server";
+import { isNativeSession } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { SignJWT } from "jose";
 
 /**
@@ -25,6 +27,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // A native token carries no profile claims (ADR 0009), and this route is the only reader of them.
+  const profile = isNativeSession(payload) ? await prisma.user.findUnique({ where: { id: payload.userId }, select: { email: true, username: true } }) : payload;
+
   const secret = new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET);
 
   const token = await new SignJWT({
@@ -32,8 +37,8 @@ export async function GET(req: NextRequest) {
     // presence works either way. Sub carries the app's integer user id as a
     // string so SQL RLS policies can cast it: (auth.jwt() ->> 'sub')::bigint
     role: "authenticated",
-    email: payload.email ?? "",
-    username: payload.username ?? "",
+    email: profile?.email ?? "",
+    username: profile?.username ?? "",
   })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(String(payload.userId))

@@ -1,0 +1,504 @@
+{
+  "passed": true,
+  "checks": {
+    "opensOnToday": true,
+    "otherDestinationsNotMounted": true,
+    "fourDestinations": true,
+    "sampleDataLabelled": true,
+    "mouseOpens-today": true,
+    "headingOn-today": true,
+    "sampleLabelOn-today": true,
+    "mouseOpens-focus": true,
+    "headingOn-focus": true,
+    "sampleLabelOn-focus": true,
+    "mouseOpens-circle": true,
+    "headingOn-circle": true,
+    "sampleLabelOn-circle": true,
+    "mouseOpens-progress": true,
+    "headingOn-progress": true,
+    "sampleLabelOn-progress": true,
+    "onlyOneVisible": true,
+    "returningMountsNothing": true,
+    "beginIsReal": true,
+    "localTimeIsLabelled": true,
+    "inviteDisabled": true,
+    "spacesIconFirst": true,
+    "dockIsSecondStop": true,
+    "railIsThirdStop": true,
+    "arrowMovesDown": true,
+    "arrowWrapsUp": true,
+    "endJumpsOnRail": true,
+    "enterSelectsDestination": true,
+    "focusStaysOnRail": true,
+    "tabLeavesRailForPage": true,
+    "tabNeverEntersHiddenDestination": true,
+    "barOpensOverHome": true,
+    "outsideTapDoesNotReachRail": true,
+    "outsideTapClosesBar": true,
+    "leavingUnmountsHome": true,
+    "destinationSurvivesSpaceChange": true,
+    "scrollSurvivesSpaceChange": true,
+    "destinationSurvivesReload": true,
+    "scrollSurvivesReload": true,
+    "storedRecordIsSmall": true,
+    "scrollWasReallyApplied": true,
+    "phase5RecordMigrates": true,
+    "corruptRecordOpensToday": true,
+    "prepareGoesToFocus": true,
+    "quickActionOpensWorkspace": true,
+    "railInsideEveryWindow": true,
+    "noPageWiderThanWindow": true,
+    "noClippedText": true,
+    "railWidthStaysCompact": true,
+    "bottomBarWhenCompact": true,
+    "labelsWhereThereIsRoom": true,
+    "liveResizeKeepsDestination": true,
+    "liveResizeRemountsNothing": true,
+    "shortWindowDropsLabels": true,
+    "hoverNamesIconWhenLabelsAreGone": true,
+    "hoverShowsChartValue": true,
+    "emptyState-today": true,
+    "emptyState-focus": true,
+    "emptyState-circle": true,
+    "emptyState-progress": true,
+    "loadingShowsNoSampleLabel": true,
+    "loadingResolves": true,
+    "reducedMotionSwitches": true,
+    "reducedMotionHasNoTravel": true,
+    "everyControlNamed": true,
+    "headingsStartAtOne": true,
+    "textContrastAtLeast45": true,
+    "destinationChangeUnder100ms": true,
+    "destinationsRetainNoNodes": true,
+    "destinationsRetainNoHeap": true,
+    "leavingHomeReleasesDestinations": true,
+    "noConsoleErrors": true
+  },
+  "firstMountMs": [
+    "SYLF_HOME_MOUNT today 285",
+    "SYLF_HOME_MOUNT focus 3",
+    "SYLF_HOME_MOUNT circle 4",
+    "SYLF_HOME_MOUNT progress 5"
+  ],
+  "afterRail": "Design System (development only)",
+  "applied": {
+    "today": 180,
+    "focus": 120,
+    "circle": 210,
+    "progress": 260
+  },
+  "afterSpaceChange": {
+    "today": 180,
+    "focus": 120,
+    "circle": 210,
+    "progress": 260
+  },
+  "afterReload": {
+    "today": 180,
+    "focus": 120,
+    "circle": 210,
+    "progress": 260
+  },
+  "stored": {
+    "version": 1,
+    "activeSpace": "home",
+    "returnSpace": "home",
+    "snapshots": {
+      "home": {
+        "destination": "progress",
+        "scroll": {
+          "today": 180,
+          "focus": 120,
+          "circle": 210,
+          "progress": 260
+        }
+      }
+    }
+  },
+  "windows": {
+    "wide": {
+      "found": {
+        "today": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "focus": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "circle": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "progress": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        }
+      },
+      "overflow": false
+    },
+    "expanded": {
+      "found": {
+        "today": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "focus": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "circle": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "progress": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        }
+      },
+      "overflow": false
+    },
+    "medium": {
+      "found": {
+        "today": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "focus": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "circle": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "progress": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        }
+      },
+      "overflow": false
+    },
+    "compact": {
+      "found": {
+        "today": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 120,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "focus": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 120,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "circle": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 120,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "progress": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 120,
+          "tabHeight": 56,
+          "labelled": true
+        }
+      },
+      "overflow": false
+    },
+    "narrow": {
+      "found": {
+        "today": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 85,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "focus": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 85,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "circle": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 85,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "progress": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 85,
+          "tabHeight": 56,
+          "labelled": true
+        }
+      },
+      "overflow": false
+    },
+    "short": {
+      "found": {
+        "today": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "focus": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "circle": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        },
+        "progress": {
+          "inside": true,
+          "horizontal": false,
+          "clipped": 0,
+          "tabWidth": 60,
+          "tabHeight": 56,
+          "labelled": true
+        }
+      },
+      "overflow": false
+    }
+  },
+  "short": {
+    "count": 4,
+    "names": true,
+    "labelled": false
+  },
+  "chartTooltip": "Wed, 2 hr 10 min",
+  "reducedTransform": "matrix(1, 0, 0, 1, 0, 0)",
+  "audit": {
+    "today": {
+      "controls": 4,
+      "unnamed": 0,
+      "levels": [
+        1,
+        2,
+        2,
+        2
+      ],
+      "firstLevel": 1,
+      "lowest": 6.95,
+      "lowestText": "Saturday 31 October"
+    },
+    "focus": {
+      "controls": 9,
+      "unnamed": 0,
+      "levels": [
+        1,
+        2,
+        2
+      ],
+      "firstLevel": 1,
+      "lowest": 4.68,
+      "lowestText": "Begin session"
+    },
+    "circle": {
+      "controls": 1,
+      "unnamed": 0,
+      "levels": [
+        1,
+        2,
+        2
+      ],
+      "firstLevel": 1,
+      "lowest": 4.61,
+      "lowestText": "AO"
+    },
+    "progress": {
+      "controls": 7,
+      "unnamed": 0,
+      "levels": [
+        1,
+        2,
+        2,
+        2
+      ],
+      "firstLevel": 1,
+      "lowest": 6.95,
+      "lowestText": "Your study record"
+    }
+  },
+  "tabPanels": [
+    "Today",
+    "Focus",
+    "Circle",
+    "Progress"
+  ],
+  "railFrames": {
+    "frames": 165,
+    "p50": 16.7,
+    "p95": 17.7,
+    "max": 17.8
+  },
+  "changeMs": [
+    26.1,
+    28.2,
+    27.1,
+    26.5,
+    26.8,
+    26.5
+  ],
+  "destinationRetention": [
+    {
+      "nodes": 315,
+      "listeners": 219,
+      "heapMb": 9.6
+    },
+    {
+      "nodes": 804,
+      "listeners": 256,
+      "heapMb": 12.32
+    },
+    {
+      "nodes": 804,
+      "listeners": 256,
+      "heapMb": 12.38
+    },
+    {
+      "nodes": 804,
+      "listeners": 256,
+      "heapMb": 12.49
+    },
+    {
+      "nodes": 804,
+      "listeners": 256,
+      "heapMb": 12.51
+    },
+    {
+      "nodes": 804,
+      "listeners": 256,
+      "heapMb": 12.53
+    },
+    {
+      "nodes": 804,
+      "listeners": 256,
+      "heapMb": 12.56
+    }
+  ],
+  "homeRemountRetention": [
+    {
+      "nodes": 804,
+      "listeners": 256,
+      "heapMb": 12.56
+    },
+    {
+      "nodes": 804,
+      "listeners": 257,
+      "heapMb": 12.62
+    },
+    {
+      "nodes": 804,
+      "listeners": 257,
+      "heapMb": 12.86
+    },
+    {
+      "nodes": 804,
+      "listeners": 257,
+      "heapMb": 12.97
+    },
+    {
+      "nodes": 804,
+      "listeners": 257,
+      "heapMb": 13.04
+    },
+    {
+      "nodes": 804,
+      "listeners": 257,
+      "heapMb": 13.19
+    },
+    {
+      "nodes": 804,
+      "listeners": 257,
+      "heapMb": 13.23
+    }
+  ],
+  "memory": {
+    "processes": 4,
+    "workingSetMb": 397
+  },
+  "consoleErrors": [],
+  "versions": {
+    "electron": "45.1.0",
+    "chrome": "156.0.8078.49"
+  }
+}

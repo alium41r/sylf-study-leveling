@@ -1,0 +1,19 @@
+▲ Next.js 16.2.9 (webpack)
+- Experiments (use with caution):
+  · optimizePackageImports
+  · proxyClientMaxBodySize: "13mb"
+
+  Creating an optimized production build ...
+Failed to compile.
+
+./app/settings/account/services/account-capability.ts
+Module not found: Can't resolve '@/mobile/src/adapters/account/mobile-account-capability'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./app/settings/account/SecurityInformation.tsx
+./app/settings/account/components/AccountSettingsScreen.tsx
+
+
+> Build failed because of webpack errors

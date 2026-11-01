@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "status": "PASSED",
+  "identity": [
+    "normalized test file",
+    "full case name",
+    "multiplicity"
+  ],
+  "postgres": {
+    "baselinePassed": 556,
+    "currentPassed": 618,
+    "newPassed": 62,
+    "missing": []
+  },
+  "separateCalendar": {
+    "unitOptInCases": 33,
+    "nativePassed": 33,
+    "uncovered": []
+  },
+  "units": {
+    "baselinePassed": 760,
+    "currentPassed": 772,
+    "newPassed": 12,
+    "missing": []
+  },
+  "finishedAt": "2026-10-28T11:02:17.466225+00:00"
+}

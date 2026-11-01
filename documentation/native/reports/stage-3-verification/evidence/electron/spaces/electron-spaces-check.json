@@ -1,0 +1,249 @@
+{
+  "passed": true,
+  "checks": {
+    "opensInHome": true,
+    "onlyActiveSpaceMounted": true,
+    "startsCollapsed": true,
+    "opensOnClick": true,
+    "activeSpaceIsSelected": true,
+    "outsideClickCloses": true,
+    "outsideClickDoesNotSwitch": true,
+    "escapeCloses": true,
+    "escapeRestoresFocus": true,
+    "iconIsFirstInTabOrder": true,
+    "enterOpens": true,
+    "focusMovesToCurrentSpace": true,
+    "arrowMoves": true,
+    "arrowWraps": true,
+    "endJumps": true,
+    "enterSelects": true,
+    "selectionCloses": true,
+    "selectionReturnsFocus": true,
+    "tabLeavesAndCloses": true,
+    "leftSpaceUnmounted": true,
+    "unmountLogged": true,
+    "switcherAvailableAtWorldEntry": true,
+    "switcherGoneWhileEntering": true,
+    "escapeIgnoredWhileEntering": true,
+    "gameMenuTakesTheCorner": true,
+    "switcherGoneWhilePlaying": true,
+    "escapeOpensGameMenu": true,
+    "escapeResumes": true,
+    "savingShown": true,
+    "savedShown": true,
+    "leavingReturnsToPreviousSpace": true,
+    "switcherBackAfterLeaving": true,
+    "worldSnapshotRestored": true,
+    "activeSpaceSurvivesReload": true,
+    "reloadMidGameReturnsToEntry": true,
+    "storedRecordIsSmall": true,
+    "homeScrollRestored": true,
+    "barStaysInsideWindow": true,
+    "noOverflowAtAnyWindowSize": true,
+    "labelsDropOnlyWhenNarrow": true,
+    "liveResizeKeepsBarValid": true,
+    "barFollowsEveryTheme": true,
+    "noThemeOverflows": true,
+    "reducedMotionOpens": true,
+    "reducedMotionSwitches": true,
+    "spaceSwitchUnder300ms": true,
+    "showcaseOpensFromDevEntry": true,
+    "showcaseUnloadsSpaces": true,
+    "showcaseReturnsToSpace": true,
+    "switchingRetainsNoNodes": true,
+    "switchingRetainsNoHeap": true,
+    "noConsoleErrors": true
+  },
+  "beforeTab": {
+    "expanded": "true",
+    "focused": "Workspace"
+  },
+  "afterTab": {
+    "expanded": "false",
+    "focused": "Spaces. Current Space: Workspace"
+  },
+  "lastVisitText": "Last here at 11:39",
+  "stored": {
+    "version": 1,
+    "activeSpace": "world",
+    "returnSpace": "workspace",
+    "snapshots": {
+      "world": {
+        "save": {
+          "ref": "preview-1793515167285",
+          "savedAt": 1793515167285,
+          "location": "device",
+          "pendingSync": false
+        },
+        "leftAt": 1793515168195
+      }
+    }
+  },
+  "scrollAfterSwitch": 310,
+  "scrollAfterReload": 310,
+  "windows": {
+    "expanded": {
+      "right": 351,
+      "width": 1280,
+      "labelled": true,
+      "overflow": false
+    },
+    "medium": {
+      "right": 351,
+      "width": 820,
+      "labelled": true,
+      "overflow": false
+    },
+    "compact": {
+      "right": 351,
+      "width": 480,
+      "labelled": true,
+      "overflow": false
+    },
+    "narrow": {
+      "right": 156,
+      "width": 340,
+      "labelled": false,
+      "overflow": false
+    },
+    "short": {
+      "right": 351,
+      "width": 900,
+      "labelled": true,
+      "overflow": false
+    }
+  },
+  "looks": {
+    "signature-light": {
+      "font": "InstrumentSans-Medium",
+      "color": "rgb(92, 92, 96)",
+      "overflow": false
+    },
+    "signature-dark": {
+      "font": "InstrumentSans-Medium",
+      "color": "rgb(156, 155, 162)",
+      "overflow": false
+    },
+    "studio-light": {
+      "font": "IBMPlexSans-SemiBold",
+      "color": "rgb(92, 94, 97)",
+      "overflow": false
+    },
+    "studio-dark": {
+      "font": "IBMPlexSans-SemiBold",
+      "color": "rgb(162, 164, 168)",
+      "overflow": false
+    },
+    "arcane-light": {
+      "font": "AlegreyaSans-Medium",
+      "color": "rgb(89, 86, 81)",
+      "overflow": false
+    },
+    "arcane-dark": {
+      "font": "AlegreyaSans-Medium",
+      "color": "rgb(161, 155, 144)",
+      "overflow": false
+    },
+    "voxel-light": {
+      "font": "SpaceGrotesk-Medium",
+      "color": "rgb(85, 87, 84)",
+      "overflow": false
+    },
+    "voxel-dark": {
+      "font": "SpaceGrotesk-Medium",
+      "color": "rgb(159, 164, 157)",
+      "overflow": false
+    },
+    "cozy-light": {
+      "font": "Nunito-SemiBold",
+      "color": "rgb(96, 92, 86)",
+      "overflow": false
+    },
+    "cozy-dark": {
+      "font": "Nunito-SemiBold",
+      "color": "rgb(172, 166, 163)",
+      "overflow": false
+    },
+    "student-light": {
+      "font": "Literata-SemiBold",
+      "color": "rgb(94, 92, 88)",
+      "overflow": false
+    },
+    "student-dark": {
+      "font": "Literata-SemiBold",
+      "color": "rgb(167, 169, 173)",
+      "overflow": false
+    }
+  },
+  "reducedPlateWidth": 333.984375,
+  "switchFrames": {
+    "frames": 145,
+    "p50": 16.7,
+    "p95": 18.2,
+    "max": 18.6
+  },
+  "switchMs": [
+    27.8,
+    31.2,
+    26.3,
+    27.5,
+    29.6,
+    37
+  ],
+  "retention": [
+    {
+      "nodes": 315,
+      "listeners": 219,
+      "heapMb": 10.01
+    },
+    {
+      "nodes": 315,
+      "listeners": 220,
+      "heapMb": 10.7
+    },
+    {
+      "nodes": 315,
+      "listeners": 220,
+      "heapMb": 10.98
+    },
+    {
+      "nodes": 315,
+      "listeners": 220,
+      "heapMb": 11.12
+    },
+    {
+      "nodes": 315,
+      "listeners": 220,
+      "heapMb": 11.24
+    },
+    {
+      "nodes": 315,
+      "listeners": 220,
+      "heapMb": 11.34
+    },
+    {
+      "nodes": 315,
+      "listeners": 220,
+      "heapMb": 11.39
+    },
+    {
+      "nodes": 315,
+      "listeners": 220,
+      "heapMb": 11.43
+    },
+    {
+      "nodes": 315,
+      "listeners": 220,
+      "heapMb": 11.45
+    }
+  ],
+  "memory": {
+    "processes": 4,
+    "workingSetMb": 592
+  },
+  "consoleErrors": [],
+  "versions": {
+    "electron": "45.1.0",
+    "chrome": "156.0.8078.49"
+  }
+}

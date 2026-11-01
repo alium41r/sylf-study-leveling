@@ -110,6 +110,23 @@ export interface FetchCachedOptions {
   forceFresh?: boolean;
 }
 
+/** Share only an outstanding read, retaining neither a stale value nor storage.
+ * Reuses the same logout/invalidation generations as cached application reads. */
+export function shareClientRead<T>(key: string, load: () => Promise<T>): Promise<T> {
+  const existing = inflight.get(key);
+  if (existing) return existing as Promise<T>;
+  const epoch = sessionEpoch, generation = generations.get(key) ?? 0;
+  const request = Promise.resolve().then(load).then(value => {
+    if (sessionEpoch !== epoch || (generations.get(key) ?? 0) !== generation)
+      throw new Error("CLIENT_READ_INVALIDATED");
+    return value;
+  }).finally(() => {
+    if (inflight.get(key) === request) inflight.delete(key);
+  });
+  inflight.set(key, request);
+  return request;
+}
+
 /** Invalidate client-side cache entries matching a URL or key fragment. */
 export function invalidateClientCache(urlOrPrefix: string): void {
   invalidateClientCaches([urlOrPrefix]);

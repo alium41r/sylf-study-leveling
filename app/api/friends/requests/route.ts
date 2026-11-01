@@ -62,16 +62,23 @@ export async function POST(req: NextRequest) {
 
     const userId = session.userId;
     const body = await req.json();
-    const { username } = body;
+    const { username, receiverId } = body;
 
-    if (!username) {
+    if (!username && !receiverId) {
       return NextResponse.json({ error: "Username is required" }, { status: 400 });
     }
 
-    // Find the target user
-    const targetUser = await prisma.user.findUnique({
-      where: { username: username.toLowerCase() },
-    });
+    // Find the target user by username or receiverId
+    const parsedReceiverId = typeof receiverId === "number" ? receiverId : Number(receiverId);
+    const targetUser = username
+      ? await prisma.user.findUnique({
+          where: { username: String(username).toLowerCase() },
+        })
+      : Number.isSafeInteger(parsedReceiverId) && parsedReceiverId > 0
+      ? await prisma.user.findUnique({
+          where: { id: parsedReceiverId },
+        })
+      : null;
 
     if (!targetUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -133,6 +140,19 @@ export async function POST(req: NextRequest) {
 
     if (existingRequest) {
       return NextResponse.json({ error: "A friend request already exists" }, { status: 400 });
+    }
+
+    // Remove any non-pending historical request from sender to receiver so unique constraint (senderId, receiverId) does not fail
+    if (typeof prisma.friendRequest.deleteMany === "function") {
+      await prisma.friendRequest
+        .deleteMany({
+          where: {
+            senderId: userId,
+            receiverId: targetUser.id,
+            status: { not: "PENDING" },
+          },
+        })
+        .catch(() => null);
     }
 
     const request = await prisma.friendRequest.create({

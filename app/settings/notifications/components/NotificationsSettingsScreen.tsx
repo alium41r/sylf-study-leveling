@@ -27,7 +27,7 @@ import {
   NotificationPreferences,
   DEFAULT_NOTIFICATION_PREFERENCES,
 } from "@/lib/notification-preferences";
-import { fetchCachedJSON } from "@/lib/client-data-cache";
+import { fetchCachedJSON, invalidateClientCache } from "@/lib/client-data-cache";
 import styles from "../../components/SystemHubPage.module.css";
 
 interface ToggleItemProps {
@@ -167,6 +167,7 @@ export function NotificationsSettingsScreen() {
         throw new Error(errData.error || "Failed to save alert preference");
       }
 
+      invalidateClientCache("/api/notifications/preferences");
       triggerToast("Alert preferences saved");
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("notification-preferences-updated"));
@@ -174,6 +175,7 @@ export function NotificationsSettingsScreen() {
     } catch (e: unknown) {
       console.error(e);
       setErrorMessage(e instanceof Error ? e.message : "Failed to save changes. Please try again.");
+      invalidateClientCache("/api/notifications/preferences");
       fetchPreferences();
     } finally {
       setIsSaving(false);
@@ -197,6 +199,7 @@ export function NotificationsSettingsScreen() {
       });
 
       if (!res.ok) throw new Error("Failed to reset preferences");
+      invalidateClientCache("/api/notifications/preferences");
       triggerToast("Reset all preferences to system defaults");
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("notification-preferences-updated"));
@@ -204,6 +207,7 @@ export function NotificationsSettingsScreen() {
     } catch (e) {
       console.error(e);
       setErrorMessage("Failed to reset defaults.");
+      invalidateClientCache("/api/notifications/preferences");
       fetchPreferences();
     } finally {
       setIsSaving(false);

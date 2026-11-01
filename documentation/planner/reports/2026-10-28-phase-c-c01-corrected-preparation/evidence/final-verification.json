@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 2,
+  "status": "UNPAID_READY",
+  "checkedAt": "2026-10-29T01:49:11.139555+00:00",
+  "profileId": "C01-CORRECTED-2",
+  "paidCalls": 0,
+  "approved": false,
+  "currentInput": {
+    "anchor": "2026-10-30",
+    "chemistry": "2026-11-20",
+    "biology": "2026-11-23",
+    "weekdayConvention": "MONDAY_ZERO"
+  },
+  "baselinePostgres": {
+    "passed": 619,
+    "failed": 0,
+    "requiredSkipped": 0,
+    "retainedPreviousIdentities": 618,
+    "missingIdentities": [],
+    "status": "PASSED"
+  },
+  "rehearsal": {
+    "passed": 5,
+    "failed": 0,
+    "legacyPassed": 225,
+    "requiredSkipped": 0,
+    "status": "PASSED",
+    "path": "qualification-ready",
+    "runtimeSourceChanges": [],
+    "externalRequests": 0
+  },
+  "units": {
+    "passed": 488,
+    "failed": 0,
+    "pending": 0,
+    "files": 39
+  },
+  "noNetworkNodeTests": {
+    "passed": 23,
+    "failed": 0
+  },
+  "static": {
+    "typecheck": "PASSED",
+    "lintFiles": 15,
+    "lintErrors": 0,
+    "lintWarnings": 0,
+    "workerBuildExit": 0,
+    "nextWebpackBuildExit": 0,
+    "postBuildTypecheckExit": 0,
+    "localLinksChecked": 29,
+    "brokenLinks": [],
+    "whitespace": []
+  },
+  "preservation": {
+    "baselineFiles": 5614,
+    "expectedChanges": [
+      "__tests__/planner-v2/postgres/phase-c-execution.phasec.ts",
+      "__tests__/planner-v2/postgres/understanding.postgres.ts",
+      "documentation/planner/AI_FIRST_FOUNDATION.md",
+      "lib/planner/v2/intelligence/schemas/understanding.ts",
+      "lib/planner/v2/server/understanding.ts",
+      "scripts/qa/planner-phase-c/README.md",
+      "scripts/qa/planner-phase-c/c01-journey.ts",
+      "scripts/qa/planner-phase-c/execution-guard.mjs",
+      "scripts/qa/planner-phase-c/execution-guard.test.mjs",
+      "scripts/qa/planner-phase-c/run-c01.mjs",
+      "documentation/planner/README.md",
+      "tsconfig.json"
+    ],
+    "unexpectedChanges": [],
+    "missingFiles": [],
+    "originalFailedExperimentOrPreparationChanges": [],
+    "migrationsChanged": [],
+    "productionConfigurationChanges": [],
+    "deployed": false
+  },
+  "spending": {
+    "schemaVersion": 1,
+    "status": "UNRECONCILED_PRESERVED_UNKNOWN",
+    "checkedAt": "2026-10-29T01:44:32.926Z",
+    "oldRunId": "28d07541-4655-450d-a0cc-59dbdca750ab",
+    "rootRequestId": "e84d4fc9-e8b3-57f8-a704-cc6f8e41d7d9",
+    "requestId": "5c93ed22-cf9e-4b06-84a3-2a39b655353c",
+    "originalAccountingSha256": "fbe44817caf95bae0436585e66dcf004a5742874b91c8ef7ce70409de9a8fbe6",
+    "actualInterruptedUsage": null,
+    "actualInterruptedCostUsd": null,
+    "retainedPeakLiabilityUsd": 0.10328219999999999,
+    "knownCompletionUsage": {
+      "promptTokens": 18632,
+      "completionTokens": 45780,
+      "totalTokens": 64412,
+      "reasoningTokens": 38612,
+      "completionTokensOtherThanReasoning": 7168,
+      "cacheHitTokens": 128
+    },
+    "accountMetadataCheckedAt": "2026-10-29T01:41:53.266Z",
+    "knownRoundedAccountChangeFromOriginalPreflightUsd": 0.03,
+    "reconciliationLimits": [
+      "Only three complete request-level provider receipts survived. The interrupted request has no complete provider usage or response identity.",
+      "The documented balance GET provides aggregate rounded account amounts, not a request-specific settlement receipt. No undocumented endpoint or generating retry was probed.",
+      "A rounded account-wide reduction compatible with known usage does not establish whether the interrupted request was charged or free.",
+      "Original UNKNOWN_SPEND state, null actual cost and full reservation remain unchanged; no fabricated refund or accounting repair."
+    ],
+    "officialReferences": [
+      "https://api-docs.deepseek.com/api/get-user-balance/",
+      "https://api-docs.deepseek.com/api/create-chat-completion/",
+      "https://api-docs.deepseek.com/quick_start/pricing/"
+    ],
+    "newApprovalRequirements": {
+      "freshProfile": "C01-CORRECTED-2",
+      "explicitPriorUncertaintyAcknowledgement": true,
+      "newCeilingUsd": 1.75,
+      "separatePriorReserveUsd": 0.10328219999999999,
+      "minimumAvailableBalanceUsd": 1.8532822
+    },
+    "paidCallsInCorrectionPhase": 0,
+    "newMetadataEvidence": "metadata-final.json"
+  },
+  "metadata": {
+    "schemaVersion": 1,
+    "status": "METADATA_REACHABLE",
+    "checkedAt": "2026-10-29T01:41:53.266Z",
+    "paidCalls": 0,
+    "metadataRequests": [
+      {
+        "path": "/models",
+        "ok": true,
+        "status": 200
+      },
+      {
+        "path": "/user/balance",
+        "ok": true,
+        "status": 200
+      }
+    ],
+    "model": {
+      "id": "deepseek-flash",
+      "name": "DeepSeek-V4.1-Flash",
+      "contextWindow": 1048576,
+      "maxOutputTokens": 393216,
+      "effort": {
+        "supported_levels": [
+          "low",
+          "high",
+          "max"
+        ],
+        "default_level": "high"
+      }
+    },
+    "officialOrigin": "https://api.deepseek.com",
+    "balanceAvailable": true,
+    "balanceCoversProposedCeilingAndPriorReserve": true,
+    "priorLiabilityUsd": 0.10328219999999999,
+    "minimumAvailableBalanceUsd": 1.8532822,
+    "approved": false,
+    "limitations": [
+      "Metadata does not authorize generation or establish request-level settlement. Refresh again after a fresh spending approval and before execution."
+    ]
+  },
+  "sleepPrevention": {
+    "sessionId": 61333,
+    "command": "caffeinate -i -s",
+    "activeDuringFinalRehearsalsAndRegression": true,
+    "release": "RELEASED_AFTER_ALL_FINAL_GATES",
+    "observedExitCode": 1,
+    "releasedAt": "2026-10-29T01:53:21.437Z"
+  },
+  "limitations": [
+    "No real-model educational qualification is claimed.",
+    "The prior interrupted real request remains UNKNOWN_SPEND.",
+    "Earlier aggregate timeout, restricted-loopback and disposable-build/audit mistakes are retained and resolved by clean gates without deadline/assertion weakening.",
+    "Fresh human approval, model/rates/balance, valid dated anchor and private one-use authorization are required before LIVE."
+  ],
+  "buildCleanup": {
+    "status": "REMOVED_DISPOSABLE_SOURCE_COPY",
+    "at": "2026-10-29T01:52:12.832Z"
+  },
+  "frozenManifest": {
+    "sha256": "a94847bfbca26fae504367fbb16b3e3b91c868af621a41f78942e5d82ab6b707",
+    "approved": false,
+    "sourcePins": 387
+  }
+}

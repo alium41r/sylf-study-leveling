@@ -430,7 +430,7 @@ export async function getProfileDossier(
       const showAchievements = isSelf || isVisible(privacy.showAchievements, baseRelationship);
       const showOnline = isSelf || isVisible(privacy.showOnlineStatus, baseRelationship);
 
-      const companions = await selectedCompanionsForUsers([targetUser.id], viewerId, baseRelationship === Relationship.FRIEND || isSelf ? "friends" : "public", false);
+      const companions = await selectedCompanionsForUsers([targetUser.id], viewerId, baseRelationship === Relationship.FRIEND || isSelf ? "friends" : "public", false).catch(() => new Map());
       finalProfile = {
         ...rawProfileData,
         companion: companions.get(targetUser.id),

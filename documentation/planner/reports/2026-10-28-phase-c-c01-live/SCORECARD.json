@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "caseId": "C01",
+  "repetition": 1,
+  "status": "STOPPED_INPUT_INTEGRITY_ERROR",
+  "providerResponseCount": 3,
+  "paidPotentialRequestCount": 4,
+  "scores": {
+    "correctness": null,
+    "personalization": null,
+    "depth": null,
+    "coverage": null,
+    "practicality": null,
+    "fidelity": null,
+    "review": null,
+    "uncertainty": null
+  },
+  "weightedScore": null,
+  "qualityConclusion": "INCOMPLETE_UNQUALIFIED",
+  "seriousDefect": {
+    "kind": "QUALIFICATION_FIXTURE_PRE_FLIGHT",
+    "description": "Frozen numeric weekday values conflict with explicit Friday rest and intended civil study windows under canonical Monday-zero semantics."
+  },
+  "independentDefects": [
+    {
+      "id": "F01",
+      "stage": "FIXTURE",
+      "severity": "BLOCKING",
+      "finding": "Canonical weekday 5 means Saturday, but fixture uses it for stated Friday rest. Daily ceilings and study windows are shifted as well."
+    },
+    {
+      "id": "R01",
+      "stage": "RESEARCH_VERIFICATION",
+      "severity": "DIAGNOSTIC_REQUIRES_INVESTIGATION",
+      "finding": "Verifier excludes valid diagnostic strengths because source excerpts omit Amina's name, though the accepted request identifies her and owns the supplied diagnostic. The verifier packet lacks the accepted student context. No downstream impact observed."
+    },
+    {
+      "id": "R02",
+      "stage": "RESEARCH_VERIFICATION",
+      "severity": "DIAGNOSTIC_REQUIRES_INVESTIGATION",
+      "finding": "Issuer-only certification rejects school-scope claims as official/unverified. Preserving provenance is correct; applicability to GENERAL accepted school-mock scope must be tested without promoting it to official board scope. Synthesis/clarification outcome unobserved."
+    }
+  ],
+  "refinementWitness": "NOT_OBSERVED",
+  "reviewSensitivity": "UNOBSERVED",
+  "stageCoverage": {
+    "researchExtraction": "OBSERVED_COMPLETE_RESPONSE",
+    "researchVerification": "TWO_COMPLETE_RESPONSES",
+    "researchSynthesis": "INTERRUPTED_UNKNOWN_SPEND",
+    "verifiedDossier": "NOT_COMPLETED",
+    "naturalStrategy": "UNOBSERVED",
+    "translation": "UNOBSERVED",
+    "scheduling": "UNOBSERVED_LIVE",
+    "independentEducationalReview": "UNOBSERVED",
+    "refinement": "UNOBSERVED",
+    "publication": "NOT_PERFORMED",
+    "apply": "NOT_PERFORMED"
+  },
+  "raterIdentity": "Implementation assistant; authored frozen cases; provisional source-based audit, not two independent subject-expert qualification raters",
+  "initialObservation": "evidence/initial-research-observation.json",
+  "assessmentSeparation": "Runtime independent educational reviewer was never invoked. Initial research observations were retained before inspecting verification responses. Research verification is not the educational-review stage.",
+  "evidenceReferences": [
+    "evidence/live/journey.json",
+    "evidence/live/calls/001-RESEARCH.json",
+    "evidence/live/calls/002-VERIFICATION.json",
+    "evidence/live/calls/003-VERIFICATION.json",
+    "evidence/operator-cancellation.json",
+    "evidence/fixture-weekday-audit.json"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-10-23T06:25:15.329Z",
+  "syntheticFileId": "1lPgxxVVY9FmI3BNpGR8tbk1oTWPQdewU",
+  "v2EtagPresent": true,
+  "v3RejectsStaleV2Etag": false,
+  "staleV3Status": 200,
+  "v2RejectsStaleEtag": true,
+  "staleV2Status": 412,
+  "personalNotesChanged": false,
+  "filesDeleted": false
+}

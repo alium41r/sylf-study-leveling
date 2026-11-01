@@ -1,6 +1,7 @@
 import * as Y from "yjs";
 import { z } from "zod";
 import { NotesError } from "./errors";
+import { cutInk, inkGeometry, type EraseCircle } from "./ink-geometry";
 
 export const INK_ADAPTER = "sylf-ink/1";
 export const INK_LIMITS = {
@@ -24,7 +25,17 @@ export const inkSampleSchema = z.tuple([
 export type InkSample = z.infer<typeof inkSampleSchema>;
 export const paperSchema = z
   .object({
-    template: z.enum(["blank", "ruled", "grid", "dotted"]),
+    template: z.enum([
+      "blank",
+      "ruled",
+      "grid",
+      "dotted",
+      "cornell",
+      "music",
+      "weekly",
+      "daily",
+      "journal",
+    ]),
     color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
     rule: z.string().regex(/^#[0-9a-fA-F]{6}$/),
     spacing: z.number().min(12).max(80),
@@ -44,6 +55,15 @@ const brush = z
     width: z.number().min(0.5).max(40),
     input: z.enum(["pen", "mouse", "touch"]),
     brush: z.literal("perfect-freehand/1.2.3:sylf-1"),
+    nib: z
+      .enum(["ballpoint", "fountain", "brush", "pencil", "fineliner"])
+      .optional(),
+    opacity: z.number().min(0.05).max(1).optional(),
+    pressure: z.number().min(0).max(1).optional(),
+    smoothing: z.number().min(0).max(1).optional(),
+    lineStyle: z.enum(["solid", "dashed", "dotted"]).optional(),
+    shape: z.enum(["line", "rectangle", "ellipse"]).optional(),
+    straighten: z.boolean().optional(),
   })
   .strict();
 export type InkBrush = z.infer<typeof brush>;
@@ -68,8 +88,26 @@ const editSchema = z
     kind: z.literal("edit"),
     targets: z.array(z.uuid()).min(1).max(INK_LIMITS.strokes),
     erase: z.boolean().optional(),
+    cut: z
+      .array(
+        z
+          .object({
+            x: coordinate,
+            y: coordinate,
+            radius: z.number().min(1).max(100),
+          })
+          .strict()
+      )
+      .min(1)
+      .max(1024)
+      .optional(),
     color: brush.shape.color.optional(),
     width: brush.shape.width.optional(),
+    nib: brush.shape.nib,
+    opacity: brush.shape.opacity,
+    pressure: brush.shape.pressure,
+    smoothing: brush.shape.smoothing,
+    lineStyle: brush.shape.lineStyle,
     transform: z
       .object({
         dx: coordinate,
@@ -106,11 +144,71 @@ export interface InkStroke {
   order: number;
   style: InkBrush;
   points: InkSample[];
+  segments?: InkSample[][];
   bounds: { x: number; y: number; width: number; height: number };
   version: number;
 }
 const compare = (a: InkRecord, b: InkRecord) =>
   a.clock - b.clock || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+function parseSample(point: InkSample): InkSample {
+  if (
+    Array.isArray(point) &&
+    point.length === 8 &&
+    typeof point[0] === "number" &&
+    point[0] >= -100000 &&
+    point[0] <= 100000 &&
+    typeof point[1] === "number" &&
+    point[1] >= -100000 &&
+    point[1] <= 100000 &&
+    typeof point[2] === "number" &&
+    point[2] >= 0 &&
+    point[2] <= 1 &&
+    typeof point[3] === "number" &&
+    point[3] >= 0 &&
+    point[3] <= 86400000 &&
+    typeof point[4] === "number" &&
+    point[4] >= -90 &&
+    point[4] <= 90 &&
+    typeof point[5] === "number" &&
+    point[5] >= -90 &&
+    point[5] <= 90 &&
+    typeof point[6] === "number" &&
+    point[6] >= 0 &&
+    point[6] <= 359 &&
+    typeof point[7] === "number" &&
+    point[7] >= -1 &&
+    point[7] <= 1
+  ) {
+    return [
+      point[0],
+      point[1],
+      point[2],
+      point[3],
+      point[4],
+      point[5],
+      point[6],
+      point[7],
+    ];
+  }
+  return inkSampleSchema.parse(point);
+}
+function sameBrush(a: InkBrush, b: InkBrush) {
+  return (
+    a === b ||
+    (a.tool === b.tool &&
+      a.color === b.color &&
+      a.width === b.width &&
+      a.input === b.input &&
+      a.brush === b.brush &&
+      a.nib === b.nib &&
+      a.opacity === b.opacity &&
+      a.pressure === b.pressure &&
+      a.smoothing === b.smoothing &&
+      a.lineStyle === b.lineStyle &&
+      a.shape === b.shape &&
+      a.straighten === b.straighten)
+  );
+}
 export function strokeBounds(points: readonly InkSample[], width: number) {
   let x = Infinity,
     y = Infinity,
@@ -142,11 +240,13 @@ export class InkModel {
   >();
   private readonly edits = new Map<string, z.infer<typeof editSchema>[]>();
   private readonly projected = new Map<string, InkStroke>();
+  private sortedStrokes?: InkStroke[];
   private readonly listeners = new Set<() => void>();
   private paperOps: z.infer<typeof paperOpSchema>[] = [];
   private clock = 0;
   private samples = 0;
   private version = 0;
+  private lastDirtyStroke?: string;
   private error?: Error;
   private active?: {
     id: string;
@@ -158,9 +258,10 @@ export class InkModel {
   };
   constructor(
     readonly doc: Y.Doc,
-    private readonly writable: () => boolean = () => true
+    private readonly writable: () => boolean = () => true,
+    records?: Y.Map<unknown>
   ) {
-    this.records = doc.getMap("ink");
+    this.records = records || doc.getMap("ink");
     this.undo = new Y.UndoManager(this.records, {
       trackedOrigins: new Set([this.origin]),
       captureTimeout: 86400000,
@@ -173,16 +274,16 @@ export class InkModel {
     this.update(new Set(this.records.keys()));
     this.records.observe(this.observe);
   }
-  private observe = (event: Y.YMapEvent<unknown>) => {
+  private observe = (event: Y.YMapEvent<unknown>, transaction: Y.Transaction) => {
     try {
-      this.update(event.keysChanged);
+      this.update(event.keysChanged, transaction.origin === this.origin);
     } catch (error) {
       this.error =
         error instanceof Error ? error : new Error("Damaged ink source.");
     }
     for (const listener of this.listeners) listener();
   };
-  private update(keys: Set<string>) {
+  private update(keys: Set<string>, trusted = false) {
     if (this.parsed.size > INK_LIMITS.records)
       throw new NotesError(
         "LIMIT",
@@ -201,13 +302,24 @@ export class InkModel {
       else if (old?.kind === "paper") paperChanged = true;
       this.parsed.delete(key);
       if (!this.records.has(key)) continue;
-      const result = inkRecordSchema.safeParse(this.records.get(key));
-      if (!result.success || result.data.id !== key)
-        throw new NotesError(
-          "CORRUPT",
-          "This page contains unsupported or damaged ink. Original bytes were retained; export recovery before repairing."
-        );
-      const op = result.data;
+      const raw = this.records.get(key);
+      let op: InkRecord;
+      if (
+        trusted &&
+        raw &&
+        typeof raw === "object" &&
+        (raw as { id?: string }).id === key
+      ) {
+        op = raw as InkRecord;
+      } else {
+        const result = inkRecordSchema.safeParse(raw);
+        if (!result.success || result.data.id !== key)
+          throw new NotesError(
+            "CORRUPT",
+            "This page contains unsupported or damaged ink. Original bytes were retained; export recovery before repairing."
+          );
+        op = result.data;
+      }
       this.parsed.set(key, op);
       this.clock = Math.max(this.clock, op.clock);
       if (op.kind === "part") {
@@ -247,12 +359,19 @@ export class InkModel {
         }
       for (const id of this.parts.keys()) dirty.add(id);
     }
-    if (paperChanged)
+    if (paperChanged) {
       this.paperOps = [...this.parsed.values()]
         .filter(
           (op): op is z.infer<typeof paperOpSchema> => op.kind === "paper"
         )
         .sort(compare);
+      ++this.version;
+    }
+    if (dirty.size) this.sortedStrokes = undefined;
+    this.lastDirtyStroke =
+      !editChanged && !paperChanged && dirty.size === 1
+        ? [...dirty][0]
+        : undefined;
     for (const id of dirty) {
       const chunks = [...(this.parts.get(id)?.values() || [])].sort(
         (a, b) => a.part - b.part
@@ -267,7 +386,7 @@ export class InkModel {
           (p, i) =>
             p.part !== i ||
             p.clock !== chunks[0].clock ||
-            JSON.stringify(p.style) !== JSON.stringify(chunks[0].style)
+            !sameBrush(p.style, chunks[0].style)
         )
       )
         throw new NotesError(
@@ -276,31 +395,46 @@ export class InkModel {
         );
       let points = chunks.flatMap((p) => p.points),
         erased = false;
+      let segments: InkSample[][] | undefined;
       const style = { ...chunks[0].style };
       for (const edit of this.edits.get(id) || []) {
         if (edit.erase !== undefined) erased = edit.erase;
         if (edit.color) style.color = edit.color;
         if (edit.width) style.width = edit.width;
+        if (edit.nib !== undefined) style.nib = edit.nib;
+        if (edit.opacity !== undefined) style.opacity = edit.opacity;
+        if (edit.pressure !== undefined) style.pressure = edit.pressure;
+        if (edit.smoothing !== undefined) style.smoothing = edit.smoothing;
+        if (edit.lineStyle !== undefined) style.lineStyle = edit.lineStyle;
+        if (edit.cut)
+          segments = (segments || [inkGeometry(points, style)]).flatMap(
+            (piece) => cutInk(piece, edit.cut!)
+          );
         if (edit.transform) {
           const t = edit.transform;
-          points = points.map(
-            (p) =>
-              [
-                t.cx + (p[0] - t.cx) * t.scale + t.dx,
-                t.cy + (p[1] - t.cy) * t.scale + t.dy,
-                ...p.slice(2),
-              ] as InkSample
-          );
+          const transform = (p: InkSample) =>
+            [
+              t.cx + (p[0] - t.cx) * t.scale + t.dx,
+              t.cy + (p[1] - t.cy) * t.scale + t.dy,
+              ...p.slice(2),
+            ] as InkSample;
+          points = points.map(transform);
+          segments = segments?.map((piece) => piece.map(transform));
           style.width = Math.max(0.5, Math.min(40, style.width * t.scale));
         }
       }
-      if (!erased)
+      if (!erased && (!segments || segments.length))
         this.projected.set(id, {
           id,
           order: chunks[0].clock,
           style,
           points,
-          bounds: strokeBounds(points, style.width),
+          ...(segments ? { segments } : {}),
+          bounds: strokeBounds(
+            segments?.flat() || points,
+            style.width *
+              (style.nib === "pencil" && style.input === "pen" ? 2.8 : 1)
+          ),
           version: ++this.version,
         });
     }
@@ -310,9 +444,22 @@ export class InkModel {
   }
   strokes() {
     this.assertHealthy();
-    return [...this.projected.values()].sort(
-      (a, b) => a.order - b.order || a.id.localeCompare(b.id)
-    );
+    if (!this.sortedStrokes)
+      this.sortedStrokes = [...this.projected.values()].sort(
+        (a, b) => a.order - b.order || a.id.localeCompare(b.id)
+      );
+    return [...this.sortedStrokes];
+  }
+  strokeCount() {
+    this.assertHealthy();
+    return this.projected.size;
+  }
+  sceneVersion() {
+    this.assertHealthy();
+    return this.version;
+  }
+  onlyDirtyStroke() {
+    return this.lastDirtyStroke;
   }
   paper() {
     this.assertHealthy();
@@ -350,7 +497,13 @@ export class InkModel {
       id: crypto.randomUUID(),
       clock: ++this.clock,
       part: 0,
-      style: brush.parse(style),
+      // Optional UI settings must not add unknown undefined keys to legacy
+      // strokes: older strict readers must still recognize the original brush.
+      style: brush.parse(
+        Object.fromEntries(
+          Object.entries(style).filter(([, value]) => value !== undefined)
+        )
+      ),
       buffer: [],
     };
     return this.active.id;
@@ -368,11 +521,22 @@ export class InkModel {
           "This page is full; the captured stroke was retained. Start another page."
         );
       }
-      this.active.buffer.push(inkSampleSchema.parse(point));
+      this.active.buffer.push(parseSample(point));
       if (this.active.buffer.length >= INK_LIMITS.chunk) this.flushPart();
     }
-    if (this.active && !this.active.timer)
-      this.active.timer = setTimeout(() => this.flushPart(), 32);
+    if (this.active) {
+      clearTimeout(this.active.timer);
+      if (this.active.buffer.length)
+        this.active.timer = setTimeout(() => this.flushPart(), 140);
+      else this.active.timer = undefined;
+    }
+  }
+  /** Discard an un-flushed accidental touch tap when multi-touch navigation takes over. */
+  cancelUnflushed() {
+    if (!this.active || this.active.part > 0) return false;
+    clearTimeout(this.active.timer);
+    this.active = undefined;
+    return true;
   }
   private flushPart(ended?: "complete" | "interrupted") {
     const active = this.active;
@@ -433,7 +597,45 @@ export class InkModel {
     this.doc.transact(() => this.records.set(id, op), this.origin);
     this.undo.stopCapturing();
   }
+  /** Commutative cut geometry stays attached to its original stroke; concurrent erasers cannot duplicate fragments. */
+  eraseSegments(targets: string[], circles: EraseCircle[]) {
+    this.assertHealthy();
+    this.finish();
+    if (!circles.length || !targets.length) return;
+    for (const target of targets) {
+      const stroke = this.projected.get(target);
+      if (!stroke) continue;
+      const relevant = circles.filter(
+        (c) =>
+          c.x + c.radius >= stroke.bounds.x &&
+          c.x - c.radius <= stroke.bounds.x + stroke.bounds.width &&
+          c.y + c.radius >= stroke.bounds.y &&
+          c.y - c.radius <= stroke.bounds.y + stroke.bounds.height
+      );
+      const pieces = (
+        stroke.segments || [inkGeometry(stroke.points, stroke.style)]
+      ).flatMap((piece) => cutInk(piece, relevant));
+      if (
+        pieces.reduce((sum, piece) => sum + piece.length, 0) >
+        INK_LIMITS.samples
+      )
+        throw new NotesError(
+          "LIMIT",
+          "Precision erasing would exceed this page's geometry budget. Use the stroke eraser or start another page."
+        );
+    }
+    this.edit({ targets, cut: circles }, true);
+  }
   setPaper(paper: InkPaper) {
+    const current = this.paper();
+    if (
+      current.template === paper.template &&
+      current.color === paper.color &&
+      current.rule === paper.rule &&
+      current.spacing === paper.spacing
+    ) {
+      return;
+    }
     this.assertWritable();
     this.finish();
     const id = crypto.randomUUID();
@@ -465,13 +667,13 @@ export class InkModel {
   }
 }
 
-export function initialInkUpdate() {
+export function initialInkUpdate(paper: InkPaper = DEFAULT_PAPER) {
   const doc = new Y.Doc();
   try {
     const id = crypto.randomUUID();
     doc
       .getMap("ink")
-      .set(id, { kind: "paper", id, clock: 1, paper: { ...DEFAULT_PAPER } });
+      .set(id, { kind: "paper", id, clock: 1, paper: { ...paper } });
     return Y.encodeStateAsUpdate(doc);
   } finally {
     doc.destroy();

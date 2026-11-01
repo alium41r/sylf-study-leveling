@@ -1,0 +1,6 @@
+Datasource "db": PostgreSQL database "postgres", schema "public" at "[redacted]:5432"
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Error: Schema engine error:
+

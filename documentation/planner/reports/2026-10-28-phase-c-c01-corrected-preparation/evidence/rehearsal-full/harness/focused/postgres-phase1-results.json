@@ -1,0 +1,27 @@
+{
+  "label": "phase1",
+  "files": 1,
+  "passed": 0,
+  "failed": 1,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [
+    {
+      "name": "retains exactly one owned C01 journey and its actual finance under the approved execution boundary",
+      "messages": [
+        "AssertionError: expected 'CANCELLED' to be 'SUCCEEDED' // Object.is equality\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-sw9ALk/__tests__/planner-v2/postgres/phase-c-preparation.postgres.ts:24:72\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-sw9ALk/__tests__/planner-v2/postgres/phase-c-preparation.postgres.ts",
+      "cases": [
+        {
+          "name": "retains exactly one owned C01 journey and its actual finance under the approved execution boundary",
+          "status": "failed"
+        }
+      ]
+    }
+  ]
+}

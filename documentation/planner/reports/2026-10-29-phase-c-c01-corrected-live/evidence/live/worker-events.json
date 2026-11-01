@@ -1,0 +1,15 @@
+[
+  {
+    "event": "claimed",
+    "attemptId": "28461f85-f0b6-499d-a442-14b36bc68733",
+    "fence": 1,
+    "at": "2026-10-29T01:59:37.461Z"
+  },
+  {
+    "event": "stopped",
+    "attemptId": "28461f85-f0b6-499d-a442-14b36bc68733",
+    "fence": 1,
+    "code": "INVALID_OUTPUT",
+    "at": "2026-10-29T02:01:57.305Z"
+  }
+]

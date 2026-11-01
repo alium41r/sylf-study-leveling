@@ -1,0 +1,43 @@
+{
+  "startedAt": "2026-10-22T05:09:17.341Z",
+  "committedAt": "2026-10-22T05:09:20.425Z",
+  "userApproval": "Approve removal of the 96 archived orphaned test records",
+  "committed": true,
+  "deleted": [
+    {
+      "table": "FocusSessionMember",
+      "rows": 29
+    },
+    {
+      "table": "FocusSession",
+      "rows": 15
+    },
+    {
+      "table": "FocusPartyMember",
+      "rows": 16
+    },
+    {
+      "table": "Friendship",
+      "rows": 16
+    },
+    {
+      "table": "SessionInvite",
+      "rows": 20
+    }
+  ],
+  "totalDeleted": 96,
+  "allUnselectedRowFingerprintsPreserved": true,
+  "publicTablesCompared": 74,
+  "migrationLedgerUnchanged": true,
+  "actualForeignKeysChecked": 116,
+  "foreignKeyViolationsRemaining": 0,
+  "triggersBypassed": false,
+  "disabledTriggers": 0,
+  "schemaOrSecurityDDLExecuted": false,
+  "verifiedTLS": true,
+  "privateRecoveryArchiveVerified": true,
+  "freshPrivateBackupVerified": true,
+  "reviewedSQLSHA256": "b54c5e9c8b67ddb4dfd97fe3f69ffbfb2a57ab629cb9b54b76130f4d97708b2d",
+  "archiveSHA256": "259d94ec3552980603632d8d5d36183adb0b5388ab355cd2491eb03451be1c87",
+  "backupSHA256": "71416dfb6dcf3fb5eec73ed4e01f57a47c8b922f1f94b150e2713410f58d7e5e"
+}

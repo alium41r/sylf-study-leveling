@@ -17,6 +17,8 @@ export function isStaticViewportRoute(pathname: string | null | undefined): bool
   return (
     pathname === "/focus" ||
     pathname.startsWith("/focus/") ||
+    pathname === "/planner" ||
+    pathname.startsWith("/planner/") ||
     pathname === "/system" ||
     pathname.startsWith("/system/") ||
     pathname.startsWith("/social/chat") ||
@@ -55,6 +57,7 @@ export function SylfAppShell({ children }: SylfAppShellProps) {
 
   return (
     <div
+      data-sylf-shell
       className={
         isStatic
           ? "h-[100dvh] max-h-[100dvh] w-full bg-transparent text-foreground flex flex-col md:flex-row overflow-hidden overscroll-none"

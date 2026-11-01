@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
-import { DIFFICULTY_CONFIG } from "@/lib/difficulty-engine";
+import { DIFFICULTY_CONFIG, calculateQuestRewards } from "@/lib/difficulty-engine";
 import { TimezoneService } from "@/lib/timezone-service";
 import { invalidateRankingsCache } from "@/lib/cache-service";
 import { StudyScheduleService } from "@/lib/study-schedule-service";
@@ -18,7 +18,7 @@ const updateQuestSchema = z.object({
   description: z.string().nullable().optional(),
   requiredMinutes: z.number().int().min(1).optional(),
   scheduledFor: z.string().optional(),
-  status: z.enum(["PENDING", "IN_PROGRESS", "COMPLETED", "FAILED"]).optional(),
+  status: z.enum(["PENDING", "ACTIVE", "IN_PROGRESS", "COMPLETED", "FAILED"]).optional(),
   elapsedSeconds: z.number().int().min(0).optional(),
   difficulty: z.enum(["EASY", "NORMAL", "HARD", "EXPERT"]).optional(),
   goalId: z.number().int().positive().nullable().optional(),
@@ -111,6 +111,11 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
     if (quest.plannedMinutes != null) return NextResponse.json({ error: "PLANNER_EXECUTION_PROTOCOL_REQUIRED", message: "Reload or update this client to change this plan's work." }, { status: 409 });
 
+    // Prevent reopening or re-claiming a terminal quest (COMPLETED or FAILED).
+    if ((quest.status === "COMPLETED" || quest.status === "FAILED") && status !== undefined && status !== quest.status) {
+      return NextResponse.json({ error: "Cannot change status of a completed or failed quest" }, { status: 409 });
+    }
+
     // Goal relink: verify the target goal belongs to the user before applying.
     if (goalId !== undefined && goalId !== null) {
       const goal = await tx.goal.findFirst({
@@ -162,6 +167,13 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     if (scheduledFor !== undefined) dataToUpdate.scheduledFor = scheduledFor;
     if (elapsedSeconds !== undefined) dataToUpdate.elapsedSeconds = elapsedSeconds;
     if (difficulty !== undefined) dataToUpdate.difficulty = difficulty;
+    if ((requiredMinutes !== undefined || difficulty !== undefined) && quest.status !== "COMPLETED") {
+      const nextMinutes = requiredMinutes ?? quest.requiredMinutes;
+      const nextDifficulty = (difficulty ?? quest.difficulty) as keyof typeof DIFFICULTY_CONFIG;
+      const recalculated = calculateQuestRewards(nextMinutes, nextDifficulty);
+      dataToUpdate.xpReward = recalculated.xp;
+      dataToUpdate.sylphReward = recalculated.sylph;
+    }
     if (goalId !== undefined) dataToUpdate.goalId = goalId;
     if (status !== undefined) {
       dataToUpdate.status = status;

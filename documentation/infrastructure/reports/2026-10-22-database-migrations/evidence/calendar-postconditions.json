@@ -1,0 +1,238 @@
+{
+  "calendarTables": [
+    "CalendarConnection",
+    "CalendarEvent",
+    "CalendarEventException",
+    "CalendarNote",
+    "CalendarNoteRecognition",
+    "CalendarOAuthState",
+    "CalendarPreference",
+    "CalendarReminderReceipt",
+    "CalendarSyncMember",
+    "CalendarSyncWindow",
+    "ConnectedCalendar",
+    "ExternalCalendarEvent",
+    "ExternalCalendarMutation",
+    "SharedCalendar",
+    "SharedCalendarMember"
+  ],
+  "counts": {
+    "tables": {
+      "expected": 15,
+      "actual": 15
+    },
+    "columns": {
+      "expected": 130,
+      "actual": 130
+    },
+    "columnTypes": {
+      "expected": 130,
+      "actual": 130
+    },
+    "constraints": {
+      "expected": 41,
+      "actual": 41
+    },
+    "indexes": {
+      "expected": 38,
+      "actual": 38
+    },
+    "triggers": {
+      "expected": 2,
+      "actual": 2
+    },
+    "policies": {
+      "expected": 0,
+      "actual": 0
+    }
+  },
+  "differences": {
+    "tables": {
+      "missing": [],
+      "unexpected": []
+    },
+    "columns": {
+      "missing": [],
+      "unexpected": []
+    },
+    "columnTypes": {
+      "missing": [],
+      "unexpected": []
+    },
+    "constraints": {
+      "missing": [],
+      "unexpected": []
+    },
+    "indexes": {
+      "missing": [],
+      "unexpected": []
+    },
+    "triggers": {
+      "missing": [],
+      "unexpected": []
+    },
+    "policies": {
+      "missing": [],
+      "unexpected": []
+    },
+    "function:calendar_note_search_before": {
+      "match": true
+    },
+    "function:calendar_recognition_search_after": {
+      "match": true
+    }
+  },
+  "browserRoleEffectiveAccess": [
+    {
+      "relname": "CalendarConnection",
+      "rolname": "anon",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarConnection",
+      "rolname": "authenticated",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarEvent",
+      "rolname": "anon",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarEvent",
+      "rolname": "authenticated",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarEventException",
+      "rolname": "anon",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarEventException",
+      "rolname": "authenticated",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarNote",
+      "rolname": "anon",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarNote",
+      "rolname": "authenticated",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarNoteRecognition",
+      "rolname": "anon",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarNoteRecognition",
+      "rolname": "authenticated",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarOAuthState",
+      "rolname": "anon",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarOAuthState",
+      "rolname": "authenticated",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarPreference",
+      "rolname": "anon",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarPreference",
+      "rolname": "authenticated",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarReminderReceipt",
+      "rolname": "anon",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarReminderReceipt",
+      "rolname": "authenticated",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarSyncMember",
+      "rolname": "anon",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarSyncMember",
+      "rolname": "authenticated",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarSyncWindow",
+      "rolname": "anon",
+      "any_access": false
+    },
+    {
+      "relname": "CalendarSyncWindow",
+      "rolname": "authenticated",
+      "any_access": false
+    },
+    {
+      "relname": "ConnectedCalendar",
+      "rolname": "anon",
+      "any_access": false
+    },
+    {
+      "relname": "ConnectedCalendar",
+      "rolname": "authenticated",
+      "any_access": false
+    },
+    {
+      "relname": "ExternalCalendarEvent",
+      "rolname": "anon",
+      "any_access": false
+    },
+    {
+      "relname": "ExternalCalendarEvent",
+      "rolname": "authenticated",
+      "any_access": false
+    },
+    {
+      "relname": "ExternalCalendarMutation",
+      "rolname": "anon",
+      "any_access": false
+    },
+    {
+      "relname": "ExternalCalendarMutation",
+      "rolname": "authenticated",
+      "any_access": false
+    },
+    {
+      "relname": "SharedCalendar",
+      "rolname": "anon",
+      "any_access": false
+    },
+    {
+      "relname": "SharedCalendar",
+      "rolname": "authenticated",
+      "any_access": false
+    },
+    {
+      "relname": "SharedCalendarMember",
+      "rolname": "anon",
+      "any_access": false
+    },
+    {
+      "relname": "SharedCalendarMember",
+      "rolname": "authenticated",
+      "any_access": false
+    }
+  ],
+  "verifiedEquivalent": true
+}

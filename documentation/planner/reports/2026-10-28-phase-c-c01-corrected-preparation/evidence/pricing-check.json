@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-10-29T01:44:32.927Z",
+  "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+  "modelAlias": "deepseek-flash",
+  "publishedVersion": "DeepSeek-V4.1-Flash-1017",
+  "peakInputCacheMissUsdPerMillion": 0.3,
+  "peakInputCacheHitUsdPerMillion": 0.006,
+  "peakCompletionUsdPerMillion": 1.2,
+  "rootPeakBoundUsd": 1.74,
+  "proposedCeilingUsd": 1.75,
+  "modelCalls": 0,
+  "unchanged": true
+}

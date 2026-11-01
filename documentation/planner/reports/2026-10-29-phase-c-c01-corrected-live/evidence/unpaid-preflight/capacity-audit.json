@@ -1,0 +1,371 @@
+{
+  "status": "PASSED",
+  "days": [
+    {
+      "date": "2026-10-30",
+      "weekday": "Friday",
+      "ceiling": 0,
+      "recovery": 0,
+      "available": 0,
+      "freeIntervals": []
+    },
+    {
+      "date": "2026-10-31",
+      "weekday": "Saturday",
+      "ceiling": 180,
+      "recovery": 18,
+      "available": 72,
+      "freeIntervals": [
+        {
+          "start": 1793419200000,
+          "end": 1793422800000
+        },
+        {
+          "start": 1793428200000,
+          "end": 1793430000000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-01",
+      "weekday": "Sunday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 73,
+      "freeIntervals": [
+        {
+          "start": 1793509200000,
+          "end": 1793516400000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-02",
+      "weekday": "Monday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 108,
+      "freeIntervals": [
+        {
+          "start": 1793620800000,
+          "end": 1793628000000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-03",
+      "weekday": "Tuesday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 48,
+      "freeIntervals": [
+        {
+          "start": 1793707200000,
+          "end": 1793709000000
+        },
+        {
+          "start": 1793712600000,
+          "end": 1793714400000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-04",
+      "weekday": "Wednesday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 48,
+      "freeIntervals": [
+        {
+          "start": 1793793600000,
+          "end": 1793797200000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-05",
+      "weekday": "Thursday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 108,
+      "freeIntervals": [
+        {
+          "start": 1793880000000,
+          "end": 1793887200000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-06",
+      "weekday": "Friday",
+      "ceiling": 0,
+      "recovery": 0,
+      "available": 0,
+      "freeIntervals": []
+    },
+    {
+      "date": "2026-11-07",
+      "weekday": "Saturday",
+      "ceiling": 180,
+      "recovery": 18,
+      "available": 72,
+      "freeIntervals": [
+        {
+          "start": 1794024000000,
+          "end": 1794027600000
+        },
+        {
+          "start": 1794033000000,
+          "end": 1794034800000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-08",
+      "weekday": "Sunday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 108,
+      "freeIntervals": [
+        {
+          "start": 1794114000000,
+          "end": 1794121200000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-09",
+      "weekday": "Monday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 108,
+      "freeIntervals": [
+        {
+          "start": 1794225600000,
+          "end": 1794232800000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-10",
+      "weekday": "Tuesday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 48,
+      "freeIntervals": [
+        {
+          "start": 1794312000000,
+          "end": 1794313800000
+        },
+        {
+          "start": 1794317400000,
+          "end": 1794319200000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-11",
+      "weekday": "Wednesday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 48,
+      "freeIntervals": [
+        {
+          "start": 1794398400000,
+          "end": 1794402000000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-12",
+      "weekday": "Thursday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 108,
+      "freeIntervals": [
+        {
+          "start": 1794484800000,
+          "end": 1794492000000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "weekday": "Friday",
+      "ceiling": 0,
+      "recovery": 0,
+      "available": 0,
+      "freeIntervals": []
+    },
+    {
+      "date": "2026-11-14",
+      "weekday": "Saturday",
+      "ceiling": 180,
+      "recovery": 18,
+      "available": 72,
+      "freeIntervals": [
+        {
+          "start": 1794628800000,
+          "end": 1794632400000
+        },
+        {
+          "start": 1794637800000,
+          "end": 1794639600000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-15",
+      "weekday": "Sunday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 108,
+      "freeIntervals": [
+        {
+          "start": 1794718800000,
+          "end": 1794726000000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-16",
+      "weekday": "Monday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 108,
+      "freeIntervals": [
+        {
+          "start": 1794830400000,
+          "end": 1794837600000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "weekday": "Tuesday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 48,
+      "freeIntervals": [
+        {
+          "start": 1794916800000,
+          "end": 1794918600000
+        },
+        {
+          "start": 1794922200000,
+          "end": 1794924000000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-18",
+      "weekday": "Wednesday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 48,
+      "freeIntervals": [
+        {
+          "start": 1795003200000,
+          "end": 1795006800000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-19",
+      "weekday": "Thursday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 108,
+      "freeIntervals": [
+        {
+          "start": 1795089600000,
+          "end": 1795096800000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-20",
+      "weekday": "Friday",
+      "ceiling": 0,
+      "recovery": 0,
+      "available": 0,
+      "freeIntervals": []
+    },
+    {
+      "date": "2026-11-21",
+      "weekday": "Saturday",
+      "ceiling": 180,
+      "recovery": 18,
+      "available": 72,
+      "freeIntervals": [
+        {
+          "start": 1795233600000,
+          "end": 1795237200000
+        },
+        {
+          "start": 1795242600000,
+          "end": 1795244400000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-22",
+      "weekday": "Sunday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 108,
+      "freeIntervals": [
+        {
+          "start": 1795323600000,
+          "end": 1795330800000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-23",
+      "weekday": "Monday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 0,
+      "freeIntervals": [
+        {
+          "start": 1795435200000,
+          "end": 1795442400000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-24",
+      "weekday": "Tuesday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 0,
+      "freeIntervals": [
+        {
+          "start": 1795521600000,
+          "end": 1795523400000
+        },
+        {
+          "start": 1795527000000,
+          "end": 1795528800000
+        }
+      ]
+    },
+    {
+      "date": "2026-11-25",
+      "weekday": "Wednesday",
+      "ceiling": 120,
+      "recovery": 12,
+      "available": 0,
+      "freeIntervals": [
+        {
+          "start": 1795608000000,
+          "end": 1795611600000
+        }
+      ]
+    }
+  ],
+  "englishAvailableMinutes": 73,
+  "overlapUnionMinutes": 90,
+  "examDayStudyAllowed": false
+}

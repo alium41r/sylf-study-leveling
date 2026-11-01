@@ -247,7 +247,12 @@ export async function exportNotes(
       "LIMIT",
       "Export exceeds this version's in-memory archive limit; export a smaller selection."
     );
-  const bytes = zipSync(files, { level: 0 });
+  // ZIP stores local calendar fields, not UTC. Use identical local fields on
+  // every device so time zones cannot produce duplicate archive byte hashes.
+  const bytes = zipSync(files, {
+    level: 0,
+    mtime: new Date(2000, 0, 1, 0, 0, 0),
+  });
   repository.session.assert();
   return { bytes, revisionIds: manifest.revisions };
 }

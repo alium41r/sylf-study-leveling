@@ -1,0 +1,26 @@
+{
+  "notesBrokerTableProtections": [
+    {
+      "relname": "NotesConnection",
+      "relrowsecurity": true,
+      "anon_access": false,
+      "authenticated_access": false
+    },
+    {
+      "relname": "NotesOAuthState",
+      "relrowsecurity": true,
+      "anon_access": false,
+      "authenticated_access": false
+    }
+  ],
+  "checkedAt": "2026-10-22T08:06:03.091Z",
+  "readOnly": true,
+  "remoteTLSVerified": true,
+  "migrationFiles": 70,
+  "pending": [],
+  "unresolved": [],
+  "sourceChecksumsMatch": true,
+  "notesEncryptionKeyConfigured": true,
+  "notesClientConfigured": true,
+  "publicOrigin": "https://sylf-alium41rs-projects.vercel.app"
+}

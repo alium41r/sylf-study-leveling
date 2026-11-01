@@ -1,0 +1,10 @@
+{
+ "scope": "Root test run, hosted variables overridden, compared with phase-11/evidence/baseline-vitest-failures.json",
+ "total": 4788,
+ "passed": 4451,
+ "failed": 36,
+ "skipped": 301,
+ "newFailures": [],
+ "goneFailures": [],
+ "filesThatFailToCollect": 8
+}

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "status": "UNRECONCILED_PRESERVED_UNKNOWN",
+  "checkedAt": "2026-10-29T01:44:32.926Z",
+  "oldRunId": "28d07541-4655-450d-a0cc-59dbdca750ab",
+  "rootRequestId": "e84d4fc9-e8b3-57f8-a704-cc6f8e41d7d9",
+  "requestId": "5c93ed22-cf9e-4b06-84a3-2a39b655353c",
+  "originalAccountingSha256": "fbe44817caf95bae0436585e66dcf004a5742874b91c8ef7ce70409de9a8fbe6",
+  "actualInterruptedUsage": null,
+  "actualInterruptedCostUsd": null,
+  "retainedPeakLiabilityUsd": 0.10328219999999999,
+  "knownCompletionUsage": {
+    "promptTokens": 18632,
+    "completionTokens": 45780,
+    "totalTokens": 64412,
+    "reasoningTokens": 38612,
+    "completionTokensOtherThanReasoning": 7168,
+    "cacheHitTokens": 128
+  },
+  "accountMetadataCheckedAt": "2026-10-29T01:41:53.266Z",
+  "knownRoundedAccountChangeFromOriginalPreflightUsd": 0.03,
+  "reconciliationLimits": [
+    "Only three complete request-level provider receipts survived. The interrupted request has no complete provider usage or response identity.",
+    "The documented balance GET provides aggregate rounded account amounts, not a request-specific settlement receipt. No undocumented endpoint or generating retry was probed.",
+    "A rounded account-wide reduction compatible with known usage does not establish whether the interrupted request was charged or free.",
+    "Original UNKNOWN_SPEND state, null actual cost and full reservation remain unchanged; no fabricated refund or accounting repair."
+  ],
+  "officialReferences": [
+    "https://api-docs.deepseek.com/api/get-user-balance/",
+    "https://api-docs.deepseek.com/api/create-chat-completion/",
+    "https://api-docs.deepseek.com/quick_start/pricing/"
+  ],
+  "newApprovalRequirements": {
+    "freshProfile": "C01-CORRECTED-2",
+    "explicitPriorUncertaintyAcknowledgement": true,
+    "newCeilingUsd": 1.75,
+    "separatePriorReserveUsd": 0.10328219999999999,
+    "minimumAvailableBalanceUsd": 1.8532822
+  },
+  "paidCallsInCorrectionPhase": 0,
+  "newMetadataEvidence": "metadata-final.json"
+}

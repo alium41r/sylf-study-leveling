@@ -2,7 +2,8 @@ import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
-import { signToken, AUTH_COOKIE_OPTIONS, type AuthTokenPayload } from "@/lib/auth";
+import { type AuthTokenPayload } from "@/lib/auth";
+import { attachReissuedSession } from "@/lib/auth-session-service";
 import { xpForNextLevel } from "@/lib/game-engine";
 import { formatScholarId } from "@/lib/scholar-id";
 import { TimezoneService } from "@/lib/timezone-service";
@@ -47,7 +48,6 @@ export async function POST(req: NextRequest) {
         timezone: currentUser.timezone || "UTC",
       };
 
-      const freshToken = await signToken(tokenPayload);
       const response = NextResponse.json(
         {
           success: true,
@@ -76,10 +76,7 @@ export async function POST(req: NextRequest) {
         { status: 200 }
       );
 
-      response.cookies.set({
-        ...AUTH_COOKIE_OPTIONS,
-        value: freshToken,
-      });
+      await attachReissuedSession(response, session, tokenPayload);
 
       return response;
     }
@@ -271,8 +268,6 @@ export async function POST(req: NextRequest) {
       timezone: updatedUser.timezone || "UTC",
     };
 
-    const newToken = await signToken(tokenPayload);
-
     const response = NextResponse.json(
       {
         success: true,
@@ -301,10 +296,7 @@ export async function POST(req: NextRequest) {
     );
 
     // Set updated session cookie
-    response.cookies.set({
-      ...AUTH_COOKIE_OPTIONS,
-      value: newToken,
-    });
+    await attachReissuedSession(response, session, tokenPayload);
 
     return response;
   } catch (error) {

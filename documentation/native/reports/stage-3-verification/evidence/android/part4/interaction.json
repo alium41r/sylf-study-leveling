@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "results": {
+    "touchOpensDialog": true,
+    "backClosesDialogOnly": true,
+    "touchOpensSheet": true,
+    "dragDismissesSheet": true,
+    "longPressOpensMenu": true,
+    "sliderIsInAccessibilityTree": true,
+    "touchDragMovesSlider": {
+      "ok": true,
+      "detail": {
+        "before": "40%",
+        "after": "85%"
+      }
+    },
+    "themePersistsAcrossProcessKill": true,
+    "noCrashes": true
+  },
+  "device": "SM-X510"
+}

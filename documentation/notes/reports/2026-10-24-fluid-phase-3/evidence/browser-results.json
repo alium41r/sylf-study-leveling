@@ -1,0 +1,281 @@
+{
+  "open": {
+    "url": "http://127.0.0.1:4390/#/notes?library=20ab8ad4-0e0c-4dfc-94a3-aa78317a4897&document=5af9f5bc-76e3-4b51-9041-b24584cd6dab&page=db7e3032-a856-4b9b-8ec3-3bfd956dd118",
+    "errors": [],
+    "state": {
+      "id": "5af9f5bc-76e3-4b51-9041-b24584cd6dab",
+      "page": "db7e3032-a856-4b9b-8ec3-3bfd956dd118",
+      "strokes": 1,
+      "streams": 2
+    },
+    "text": "Electromagnetic induction\n\nA changing magnetic field produces an electromotive force."
+  },
+  "regression": {
+    "results": [
+      "Mixed text/ink survives reload",
+      "Bounded 60–400% desktop zoom and fit width",
+      "Positioned rich text on the same ink page",
+      "Independent mixed-layer page duplication",
+      "Focus mode and bottom toolbar",
+      "Tablet and phone layout, custom appearance, ink options, library return"
+    ],
+    "positioned": {
+      "id": "5af9f5bc-76e3-4b51-9041-b24584cd6dab",
+      "strokes": 1,
+      "pages": 1,
+      "streams": 2,
+      "origin": {
+        "id": "body",
+        "x": 108,
+        "y": 246,
+        "width": 672,
+        "height": 100,
+        "kind": "text"
+      }
+    }
+  },
+  "creative": {
+    "results": [
+      "Independent rich-text boxes retain typing, drag, resize and keyboard nudges across reload",
+      "Pressure-aware fountain brush, saved favorite, dashed shapes and precision erasing with undo/redo persist",
+      "Template gallery, encrypted defaults, arranged images, composite PDF, dark adaptation and responsive panels verified"
+    ],
+    "exported": {
+      "bytes": 96640,
+      "pages": 2,
+      "pens": 4,
+      "style": {
+        "paper": {
+          "template": "weekly",
+          "color": "#dfebe5",
+          "rule": "#d9dfea",
+          "spacing": 28
+        },
+        "width": 800,
+        "height": 1100,
+        "layout": "paged",
+        "adaptDark": true
+      }
+    },
+    "defaults": {
+      "adaptDark": true,
+      "height": 1100,
+      "layout": "paged",
+      "paper": {
+        "color": "#dfebe5",
+        "rule": "#d9dfea",
+        "spacing": 28,
+        "template": "weekly"
+      },
+      "width": 800
+    }
+  },
+  "workflows": {
+    "results": [
+      "Nested folders, folder cards, grid/list and actual text previews",
+      "Image import through original encrypted attachment pipeline",
+      "Real PDF import, local worker rendering, selectable source text and Unicode typed annotation exports",
+      "Composite text/ink Drive PDF, synthetic sync and sustained typing with caret navigation",
+      "Readable copies preserve unopened original ink pages alongside new text layers"
+    ],
+    "imageState": {
+      "assets": 1,
+      "streams": 2,
+      "strokes": 1
+    },
+    "exported": {
+      "bytes": 96640,
+      "pages": 2,
+      "pending": 8,
+      "localDrafts": 8
+    },
+    "annotated": {
+      "bytes": 22295,
+      "originalSelectable": true,
+      "annotationSelectable": true,
+      "text": "Sylf PDF Qualification  Vector fields and photosynthesis: searchable lecture text.  A stable reference point  Annotation   Unicode   Ω   東京   😀"
+    },
+    "legacyExport": {
+      "changed": true,
+      "pages": 2
+    },
+    "caret": {
+      "top": 973.882568359375,
+      "bottom": 993.532470703125,
+      "hostBottom": 1082.9375,
+      "viewportTop": 119
+    }
+  },
+  "fresh": {
+    "url": "http://127.0.0.1:4390/#/notes?library=68bd25fe-da38-4edf-bc71-723dfb0eb721&document=5749a63c-3ba5-40a1-b8ce-007fd3f052d3&page=afedbc6b-e423-48fe-b2e7-962c106a3f79",
+    "errors": [],
+    "state": {
+      "id": "5749a63c-3ba5-40a1-b8ce-007fd3f052d3",
+      "page": "afedbc6b-e423-48fe-b2e7-962c106a3f79",
+      "strokes": 1,
+      "streams": 2
+    },
+    "text": "Electromagnetic induction\n\nA changing magnetic field produces an electromotive force."
+  },
+  "fluid": {
+    "rendered": 2,
+    "moved": {
+      "source": "<blockgroup><blockcontainer id=\"3919ac54-c719-458d-a90c-57f2288a8049\"><paragraph backgroundColor=\"default\" textAlignment=\"left\" textColor=\"default\"></paragraph></blockcontainer></blockgroup>",
+      "target": "<blockgroup><blockcontainer id=\"a5d0689e-62e7-4059-8968-8724afc89a39\"><paragraph backgroundColor=\"default\" textAlignment=\"left\" textColor=\"default\">Second page searchable αβγ – 東京 😀</paragraph></blockcontainer></blockgroup>",
+      "boxes": 2
+    },
+    "exported": {
+      "bytes": 114323,
+      "pdf": [
+        {
+          "width": 600,
+          "height": 825,
+          "transform": [
+            1,
+            0,
+            0,
+            -1,
+            0,
+            825
+          ],
+          "rotation": 0
+        },
+        {
+          "width": 600,
+          "height": 825,
+          "transform": [
+            1,
+            0,
+            0,
+            -1,
+            0,
+            825
+          ],
+          "rotation": 0
+        },
+        {
+          "width": 600,
+          "height": 825,
+          "transform": [
+            1,
+            0,
+            0,
+            -1,
+            0,
+            825
+          ],
+          "rotation": 0
+        },
+        {
+          "width": 600,
+          "height": 825,
+          "transform": [
+            1,
+            0,
+            0,
+            -1,
+            0,
+            825
+          ],
+          "rotation": 0
+        },
+        {
+          "width": 600,
+          "height": 825,
+          "transform": [
+            1,
+            0,
+            0,
+            -1,
+            0,
+            825
+          ],
+          "rotation": 0
+        }
+      ],
+      "texts": [
+        "Electromagnetic inductionA changing magnetic field produces an electromotive force.",
+        "",
+        "Second page searchable αβγ – 東京 😀 Contextual formatting stays here.",
+        "Electromagnetic inductionA changing magnetic field produces an electromotive force.Second page searchable αβγ – 東京 😀",
+        ""
+      ]
+    },
+    "offlineReconnect": {
+      "pending": 0,
+      "localDrafts": 0
+    },
+    "groupedCrossPageCopy": true,
+    "contextualToolbarOwnership": true
+  },
+  "scale": {
+    "state": {
+      "id": "5749a63c-3ba5-40a1-b8ce-007fd3f052d3",
+      "pages": 300,
+      "setupMs": 657.5999999940395
+    },
+    "measurements": [
+      {
+        "ratio": 0.1,
+        "settleMs": 383,
+        "pages": 2,
+        "canvases": 6,
+        "canvasPixels": 3628560,
+        "dom": 834
+      },
+      {
+        "ratio": 0.5,
+        "settleMs": 420,
+        "pages": 2,
+        "canvases": 6,
+        "canvasPixels": 4645680,
+        "dom": 834
+      },
+      {
+        "ratio": 0.9,
+        "settleMs": 364,
+        "pages": 2,
+        "canvases": 6,
+        "canvasPixels": 5665920,
+        "dom": 834
+      },
+      {
+        "ratio": 0.25,
+        "settleMs": 402,
+        "pages": 2,
+        "canvases": 6,
+        "canvasPixels": 4009200,
+        "dom": 834
+      },
+      {
+        "ratio": 0.75,
+        "settleMs": 317,
+        "pages": 2,
+        "canvases": 6,
+        "canvasPixels": 5285280,
+        "dom": 834
+      },
+      {
+        "ratio": 0.99,
+        "settleMs": 312,
+        "pages": 2,
+        "canvases": 6,
+        "canvasPixels": 5896800,
+        "dom": 834
+      }
+    ],
+    "scrollFrames": {
+      "p95Ms": 17.300000000000182,
+      "maxMs": 17.600000000000364,
+      "frames": 89,
+      "over33ms": 0
+    },
+    "long": {
+      "elapsedMs": 7936.5,
+      "bytes": 517838,
+      "pages": 46,
+      "maxCanvasPixels": 3566648,
+      "markerCount": 1
+    }
+  }
+}

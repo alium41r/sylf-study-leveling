@@ -13,6 +13,11 @@ Sylf’s `/login` and `/register` share the Floating Sanctuary: the original flo
 - `app/components/landing/companion/Companion.tsx`: the existing canonical companion, unchanged by this implementation. Its painted rig, reading book, halo, ribbons, motion, `MagicalEyes`, and bounded reaction system remain the source of truth. See the [companion contract](../landing-companion/README.md).
 - `app/components/OAuthButtons.tsx`: existing Google OAuth dispatch.
 - Authentication API/session authorities remain `lib/auth-server.ts`, `lib/auth.ts`, and the existing `app/api/auth/` handlers.
+- Device sessions: `lib/auth-session-service.ts`. A token carries `sid`, the id of its `AuthSession` row, and keeps it when a route reissues it. Ending a row ends that token on its next request, and logout ends it too. `tokenVersion` stays the account-wide switch for sign-out everywhere and password changes. Tokens from before this have no `sid`, and are found by hash.
+- OAuth linking answers only to the verified session. `oauth_link_user_*` is a hint that a link was started, and a value that disagrees with the session links nothing.
+- Security codes: `lib/security-code.ts`.
+- Sylf Native signs in through `/api/auth/native/*`: an `AuthSession` row per device, a 15-minute bearer token with audience `sylf-native`, and a rotating refresh token kept only as a hash. The branch sits inside `getSession`, with the same revocation check. No endpoint turns a cookie into a bearer token, a web token is never a bearer token, and a request with `Sec-Fetch-Site` cannot use that path. [ADR 0009](../native/decisions/0009-native-authentication.md), [backend guide](../native/backend/README.md).
+- The password check and registration gate live in `lib/auth-password.ts`, for both clients. Any route that sets or clears the session cookie goes through `attachReissuedSession` and `expireSessionCookie`, which never answer a bearer request with a cookie.
 
 The surrounding scene contains no raster artwork, SVG image embeds, foreign objects, canvas renderer, or new dependency. The companion deliberately retains its existing painted-rig asset and SVG eyes; it is not a redrawn/vectorized substitute.
 

@@ -1,0 +1,350 @@
+{
+  "action": "COMPLETE",
+  "summary": {
+    "goals": "Amina's accepted goal is to prepare for two school-issued mock papers: chemistry first, due 2026-11-20, and biology three days later, due 2026-11-23. The stated outcomes are independent explanation and solution of mole, concentration, balanced-equation and limiting-reagent problems, and explanation, interpretation and justification of cell-transport and enzyme-investigation data. The existing English deadline task and Friday rest are to be preserved.",
+    "background": "Upper-secondary student; English is a comfortable second language; school has covered the topics once. No private tutor or paid question bank is available. A phone, paper, calculator and the three supplied teacher packets are available. She reports three hours of mole videos, but that is a self-report and the teacher-annotated diagnostic is the relevant performance evidence.",
+    "strengths": "In the supplied diagnostic, the student correctly balanced three simpler equations without help and correctly described diffusion down a concentration gradient. Student context also reports English comfort, but this is self-report, not chemistry or biology mastery.",
+    "weaknesses": "The diagnostic shows specific errors: multiplying mass and molar mass for amount; missing the mL-to-L conversion; deciding the limiting reagent from coefficient size; calling a fall from 20.0 g to 18.0 g '+10%' and saying water entered the tissue; saying active transport needs no energy; changing temperature and enzyme concentration together; and treating every rate decrease as proof of denaturation. Teacher annotations identify chemical arithmetic, unit conversion, limiting-reagent reasoning, osmosis direction, controlled variables and overclaiming from data as areas needing work. Confidence from video time does not demonstrate readiness, and transfer to unfamiliar wording remains uncertain.",
+    "resources": "Three owned teacher documents: a school-mock scope and assessment notice, an annotated diagnostic, and a practice pack. The pack contains worked chemistry examples, a biology percentage-change example, cautions about observed rate trends versus mechanism and about controlled variables, eight unworked mixed questions explicitly described as inventory rather than a mandatory quota, and permission for additional self-contained examples and checks with clear givens, feedback and stopping criteria. A phone, paper and calculator are available; no paid website or undisclosed textbook is needed.",
+    "constraints": "Fixed chemistry deadline 2026-11-20 and biology deadline 2026-11-23; both begin at 09:00 local time and exam-day study is not available. Friday rest and the existing English reading submission of 35 minutes on 2026-11-01 are to be preserved. No web browsing or purchases are authorized; only the uploads may be read. Accepted capacity is 660 minutes per week with daily ceilings and recovery, but no plan is being proposed here.",
+    "preferences": "Explain why a method applies, then allow independent application. Sessions of about 35-50 minutes suit her; moderate intensity and spaced pacing are preferred. Avoid fragmented five-minute checklist tasks and unnecessary filler. Keep Friday free. Prefer useful explanation and independent application over rereading or arbitrary question counts.",
+    "uncertainty": "The packet's issuer is not independently certified; it is a private school mock, so official board identity, complete assessed scope, mark weighting and paper duration remain unknown and should not be invented. The diagnostic sample is small and cannot establish global mastery or transfer readiness. It is not yet known whether all eight mixed questions are useful within the available time; the pack says eight is inventory, not a mandatory workload. Support for unfamiliar-transfer performance must remain conditional."
+  },
+  "batches": [
+    {
+      "planRef": "plan_1",
+      "sourceRefs": [
+        "source_1",
+        "source_2",
+        "source_3"
+      ],
+      "extraction": {
+        "identities": [],
+        "claims": [
+          {
+            "sourceId": "source_1",
+            "statement": "The chemistry school-mock scope includes amount of substance, molar mass, solution concentration, balancing equations, reacting amounts and limiting reagents.",
+            "excerpt": "Chemistry: amount of substance, molar mass, solution concentration, balancing equations, reacting amounts, limiting reagents.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "COURSE_OUTCOME"
+          },
+          {
+            "sourceId": "source_1",
+            "statement": "The mock papers mix explanation, calculation and unfamiliar-data questions.",
+            "excerpt": "Each paper mixes explanation, calculation and unfamiliar-data questions.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_1",
+            "statement": "A calculator is allowed, and method justification and units are expected rather than memorized worked answers.",
+            "excerpt": "Students may use a calculator. The teacher expects method justification and units, not memorized worked answers.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_1",
+            "statement": "No chapters beyond the listed chemistry and biology topics are assessed.",
+            "excerpt": "No other chapters are assessed.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "COURSE_OUTCOME"
+          },
+          {
+            "sourceId": "source_1",
+            "statement": "The mock papers begin at 09:00 local time and exam-day study is not available.",
+            "excerpt": "both begin at 09:00 local time. Exam-day study is not available.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_2",
+            "statement": "The diagnostic records a molar-mass arithmetic error: 12 g magnesium with molar mass 24 g/mol was answered as 288 mol by multiplying mass and molar mass.",
+            "excerpt": "Q1, amount in 12 g magnesium with molar mass 24 g/mol: student wrote 288 mol, multiplying mass and molar mass.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_2",
+            "statement": "The diagnostic records a concentration unit-conversion error: 250 mL of 0.20 mol/L was answered as 50 mol without converting mL to L.",
+            "excerpt": "Q2, amount in 250 mL of 0.20 mol/L solution: student wrote 50 mol; no mL-to-L conversion.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_2",
+            "statement": "The diagnostic records a limiting-reagent error: with 0.60 mol H2 and 0.20 mol O2, the student wrote 0.60 mol water and said hydrogen limits because its coefficient is larger.",
+            "excerpt": "Q3, 2 H2 + O2 -> 2 H2O, supplied 0.60 mol H2 and 0.20 mol O2: student wrote 0.60 mol water and said hydrogen limits because its coefficient is larger.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_2",
+            "statement": "The diagnostic shows three simpler equations were balanced correctly without help.",
+            "excerpt": "Correctly balanced three simpler equations without help.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_2",
+            "statement": "Teacher annotations identify chemical arithmetic, unit conversion, limiting-reagent reasoning, osmosis direction, controlled variables and overclaiming from data as needing work.",
+            "excerpt": "Teacher's annotated judgments: chemical arithmetic, unit conversion, limiting reagent reasoning, osmosis direction, controlled variables and overclaiming from data need work.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_2",
+            "statement": "Three hours of videos is a student report and supplies no performance credit.",
+            "excerpt": "Three hours of videos is a student report and supplies no performance credit.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_3",
+            "statement": "The chemistry worked example shows molar mass as grams divided by grams per mole and concentration as moles after converting millilitres to litres.",
+            "excerpt": "Chemistry worked example: 6.0 g carbon, molar mass 12.0 g/mol, gives 0.50 mol; show g divided by g/mol. A 100 mL sample of 0.50 mol/L solution contains 0.050 mol after converting to 0.100 L.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_3",
+            "statement": "The worked limiting-reagent method compares supplied amount divided by coefficient and uses the smaller reaction extent.",
+            "excerpt": "For 2 H2 + O2 -> 2 H2O, compare supplied amount divided by coefficient, then use the smaller reaction extent.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_3",
+            "statement": "The pack contains eight unworked mixed questions, but eight is an inventory rather than a mandatory workload.",
+            "excerpt": "The pack also has eight unworked mixed questions, but eight is an inventory, not mandatory workload.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_3",
+            "statement": "The planner may author additional self-contained examples and independent checks when givens, answers or feedback and stopping criteria are clear.",
+            "excerpt": "The planner may author additional self-contained examples and independent checks, provided givens, answers/feedback and stopping criteria are clear.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_3",
+            "statement": "The student owns the packet and no paid website or undisclosed textbook is needed.",
+            "excerpt": "The student owns this packet; no paid website or undisclosed textbook is needed.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          }
+        ],
+        "completeSourceIds": [
+          "source_1",
+          "source_2",
+          "source_3"
+        ],
+        "gaps": [
+          "No official issuer identity, mark weighting or paper duration is provided; the documents support only local school-mock contents."
+        ],
+        "answer": "Chemistry evidence: the teacher notice sets a school-mock scope in amount of substance, molar mass, solution concentration, balanced equations, reacting amounts and limiting reagents, with explanation, calculation and unfamiliar-data questions. The diagnostic is stronger evidence of specific gaps than the self-report: molar-mass multiplication, missing mL-to-L conversion and limiting-reagent reasoning are wrong, while three simpler equations were balanced correctly. The pack supplies worked examples and eight unworked mixed questions that are an inventory, not a quota, and permits additional self-contained examples and checks. Official certification, complete assessed scope, paper duration and mark weighting are not established."
+      }
+    },
+    {
+      "planRef": "plan_2",
+      "sourceRefs": [
+        "source_1",
+        "source_2",
+        "source_3"
+      ],
+      "extraction": {
+        "identities": [],
+        "claims": [
+          {
+            "sourceId": "source_1",
+            "statement": "The biology school-mock scope includes diffusion, osmosis, active transport, interpreting mass changes and rates, enzyme conditions, controls and conclusions.",
+            "excerpt": "Biology: diffusion, osmosis, active transport, interpreting mass changes and rates, enzyme conditions, controls and conclusions.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "COURSE_OUTCOME"
+          },
+          {
+            "sourceId": "source_1",
+            "statement": "The mock papers mix explanation, calculation and unfamiliar-data questions.",
+            "excerpt": "Each paper mixes explanation, calculation and unfamiliar-data questions.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_1",
+            "statement": "A calculator is allowed, and method justification and units are expected rather than memorized worked answers.",
+            "excerpt": "Students may use a calculator. The teacher expects method justification and units, not memorized worked answers.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_1",
+            "statement": "No chapters beyond the listed chemistry and biology topics are assessed.",
+            "excerpt": "No other chapters are assessed.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "COURSE_OUTCOME"
+          },
+          {
+            "sourceId": "source_1",
+            "statement": "The mock papers begin at 09:00 local time and exam-day study is not available.",
+            "excerpt": "both begin at 09:00 local time. Exam-day study is not available.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_2",
+            "statement": "The diagnostic shows diffusion down a concentration gradient was described correctly.",
+            "excerpt": "correctly described diffusion down a concentration gradient.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_2",
+            "statement": "The diagnostic records an osmosis and percentage-change error: 20.0 g becoming 18.0 g was called +10%, with water said to move into the tissue.",
+            "excerpt": "For potato mass 20.0 g becoming 18.0 g, student wrote +10% and claimed water moved into the tissue.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_2",
+            "statement": "The diagnostic records the incorrect claim that active transport needs no energy.",
+            "excerpt": "Said active transport needs no energy.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_2",
+            "statement": "The diagnostic records an enzyme-temperature investigation in which temperature and enzyme concentration were both changed, followed by the claim that every rate decrease proves denaturation.",
+            "excerpt": "In an enzyme-temperature investigation, student proposed changing both temperature and enzyme concentration, then concluded every decrease in rate proves denaturation.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_2",
+            "statement": "Teacher annotations identify chemical arithmetic, unit conversion, limiting-reagent reasoning, osmosis direction, controlled variables and overclaiming from data as needing work.",
+            "excerpt": "Teacher's annotated judgments: chemical arithmetic, unit conversion, limiting reagent reasoning, osmosis direction, controlled variables and overclaiming from data need work.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_2",
+            "statement": "Three hours of videos is a student report and supplies no performance credit.",
+            "excerpt": "Three hours of videos is a student report and supplies no performance credit.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_3",
+            "statement": "The biology worked example gives percentage change as final minus initial, divided by initial, times 100.",
+            "excerpt": "Biology worked example: percentage change = (final - initial)/initial x 100.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_3",
+            "statement": "The pack distinguishes an observed rate trend from its mechanism and states that an observed fall alone does not establish denaturation.",
+            "excerpt": "Distinguish an observed rate trend from its mechanism; temperature can affect rate and extreme conditions may alter enzyme structure, but an observed fall alone does not establish that explanation.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_3",
+            "statement": "The pack requires preserving enzyme amount, substrate, pH, timing and measurement method while changing the intended independent variable.",
+            "excerpt": "Preserve enzyme amount, substrate, pH, timing and measurement method while changing the intended independent variable.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          },
+          {
+            "sourceId": "source_3",
+            "statement": "The planner may author additional self-contained examples and independent checks when givens, answers or feedback and stopping criteria are clear.",
+            "excerpt": "The planner may author additional self-contained examples and independent checks, provided givens, answers/feedback and stopping criteria are clear.",
+            "anchor": {
+              "section": "Document"
+            },
+            "kind": "RESOURCE"
+          }
+        ],
+        "completeSourceIds": [
+          "source_1",
+          "source_2",
+          "source_3"
+        ],
+        "gaps": [
+          "No official issuer identity, mark weighting or paper duration is provided; the documents support only local school-mock contents."
+        ],
+        "answer": "Biology evidence: the teacher notice sets a school-mock scope in diffusion, osmosis, active transport, interpreting mass changes and rates, enzyme conditions, controls and conclusions, with explanation, calculation and unfamiliar-data questions. The diagnostic shows correct diffusion but errors in osmosis direction and percentage change, active-transport energy, controlled variables and overclaiming denaturation from any rate decrease. The pack supplies the percentage-change formula, separates observed rate trends from mechanism and specifies variables to preserve. Official certification, complete assessed scope, paper duration and mark weighting are not established."
+      }
+    }
+  ],
+  "unresolved": [
+    {
+      "ref": "gap_1",
+      "consequential": false,
+      "explanation": "The uploaded notice does not name an external board, mark weighting or paper duration. Under GENERAL policy the local school-mock scope is usable, but official certification, complete assessed scope and exact timing or marks remain unknown."
+    },
+    {
+      "ref": "gap_2",
+      "consequential": false,
+      "explanation": "The diagnostic contains only a few items, so it supports specific demonstrated successes and errors, not general mastery or transfer readiness. Performance on unfamiliar wording and numbers remains uncertain and must be checked conditionally."
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "readOnlyGeneratedClientQueriesPassed": true,
+  "modelsQueried": 7,
+  "calendarGeneratedColumnsReadable": true,
+  "notesSetupPresence": {
+    "notesKey": true,
+    "notesGoogleClientId": true,
+    "notesGoogleClientSecret": true,
+    "notesPublicOrigin": false
+  },
+  "oauthConsentTestPerformed": false,
+  "applicationDatabaseURLRequestsTLS": [
+    {
+      "sslmode": null,
+      "ssl": null,
+      "explicitRootCA": false
+    }
+  ]
+}

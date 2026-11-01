@@ -1,0 +1,4 @@
+import { requireNativeModule, requireNativeView } from "expo";
+export type NativeInkStats = { seconds: number; dispatches: number; samples: number; historicalSamples: number; samplesPerSecond: number; dispatchesPerSecond: number; toolTypes: Record<string, number>; pressureMin: number; pressureMax: number; tiltMaxDeg: number; canceledPalm: number; fingerIgnored: number; strokes: number; dispatchLatencyMsP50: number; dispatchLatencyMsP95: number; lastStrokeSamples: number; lastStrokeSylfTuples: number; unbuffered: boolean };
+export const SylfNativeProbe = requireNativeModule<{ pdfMarkers(base64: string): Promise<{ page: number; width: number; height: number; marker: [number, number]; pixels: number }[]>; deviceInfo(): Record<string, string | number | boolean> }>("SylfNativeProbe");
+export const NativeInkView = requireNativeView<{ style?: object; stylusOnly?: boolean; onStats?: (e: { nativeEvent: NativeInkStats }) => void }>("SylfNativeProbe");

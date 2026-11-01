@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "finishedAt": "2026-10-26T05:48:12.295153+00:00",
+  "runtime": "Node 24.21.0; native PostgreSQL 18.4",
+  "unit": {
+    "command": "npx vitest run __tests__/planner-v2 __tests__/ai/deepseek-reasoning-controls.test.ts __tests__/ai/deepseek-tool-continuity.test.ts __tests__/ai/cost-summary.test.ts __tests__/ai/dispatch-telemetry.test.ts --reporter=json",
+    "exitCode": 0,
+    "files": 35,
+    "passed": 395,
+    "failed": 0,
+    "skipped": 0,
+    "evidence": "unit-tests.json"
+  },
+  "postgres": {
+    "command": "node scripts/test/test-planner-ai-first-foundation.mjs --native-bin /private/tmp/sylf-phase-a-runtime/package/native/bin --evidence-dir documentation/planner/reports/2026-10-26-ai-first-phase-b-step2/evidence/final",
+    "status": "PASSED",
+    "passed": 468,
+    "requiredSkipped": 0,
+    "retainedStep1Checks": 453,
+    "newChecks": 15,
+    "optionalPaidProviderExcluded": 1,
+    "evidence": "final/postgres-harness-run.json",
+    "sourcePins": "final/postgres-source-pins.json",
+    "sourceDrift": []
+  },
+  "typecheck": {
+    "command": "npx tsc --noEmit",
+    "exitCode": 0,
+    "evidence": "typecheck.log",
+    "earlierBuildRace": "typecheck-build-race.log"
+  },
+  "worker": {
+    "command": "npm run planner:worker:build",
+    "exitCode": 0,
+    "evidence": "worker-build.log",
+    "ordinaryNodeImports": "worker-imports.json"
+  },
+  "web": {
+    "command": "NODE_OPTIONS=--max-old-space-size=6144 npx next build --webpack",
+    "exitCode": 0,
+    "evidence": "web-build.log",
+    "allowance": "Existing Phase A qualification process allowance; no repository config changed"
+  },
+  "schema": {
+    "command": "npx prisma validate",
+    "exitCode": 0,
+    "evidence": "prisma-validate.log",
+    "generation": "Not required; Prisma fields unchanged"
+  },
+  "lint": {
+    "command": "npx eslint <18 changed source files> --format json",
+    "exitCode": 1,
+    "files": 18,
+    "newDiagnostics": 0,
+    "preExistingErrors": 17,
+    "warnings": 0,
+    "evidence": "lint.json",
+    "taskStartComparison": "lint-baseline.json"
+  },
+  "mobile": "Not required: no shared client changes",
+  "paidProviderCalls": 0,
+  "hostedMigrationDeployments": 0,
+  "productionRoutingChanges": 0,
+  "preservation": "preservation.json"
+}

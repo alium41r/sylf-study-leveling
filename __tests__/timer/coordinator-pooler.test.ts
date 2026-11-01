@@ -12,7 +12,7 @@ function pooler(attempts: boolean[]) {
     if (/pg_advisory_lock\(|pg_advisory_unlock\(/.test(text)) throw new Error("Session lock leaks on transaction poolers");
     return { rows: text.includes("pg_try_advisory_xact_lock") ? [{ locked: attempts[attempt - 1] ?? true }] : [] };
   });
-  const client = { query, release: vi.fn((discard: boolean) => { releases.push(discard); }) };
+  const client = { query, on: vi.fn(), removeListener: vi.fn(), release: vi.fn((discard: boolean) => { releases.push(discard); }) };
   const pool = { connect: vi.fn(async () => client) } as unknown as Pool;
   return { pool, statements, releases, query };
 }

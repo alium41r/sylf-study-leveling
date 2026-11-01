@@ -1,0 +1,2897 @@
+{
+  "generatedAt": "2026-10-30T07:39:10.995Z",
+  "counts": {
+    "server": 172,
+    "portable": 174,
+    "adapter": 119,
+    "framework": 16
+  },
+  "rows": [
+    {
+      "file": "lib/achievement-facts.ts",
+      "cls": "server",
+      "apis": "intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/achievement-progress.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": ""
+    },
+    {
+      "file": "lib/achievements-catalog.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": ""
+    },
+    {
+      "file": "lib/acoustics/audio-engine.ts",
+      "cls": "adapter",
+      "apis": "dom,webaudio",
+      "ext": ""
+    },
+    {
+      "file": "lib/acoustics/custom-audio-store.ts",
+      "cls": "adapter",
+      "apis": "blob,storage,webaudio",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/agent-router.ts",
+      "cls": "server",
+      "apis": "streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg"
+    },
+    {
+      "file": "lib/ai/chat-tool-executor.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/ai/chat-tools.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/ai/cheap-answers/calculators.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/cheap-answers/datetime.ts",
+      "cls": "server",
+      "apis": "intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/ai/cheap-answers/facts.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/cheap-answers/index.ts",
+      "cls": "server",
+      "apis": "intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/ai/cheap-answers/math.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/cheap-answers/units.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/client-budget.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/config.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/context-engine.ts",
+      "cls": "server",
+      "apis": "intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg"
+    },
+    {
+      "file": "lib/ai/daily-briefing-service.ts",
+      "cls": "server",
+      "apis": "intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg"
+    },
+    {
+      "file": "lib/ai/deterministic-responder.ts",
+      "cls": "server",
+      "apis": "intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/ai/entitlement-policy.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/entitlements.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/intents/continuation.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/intents/executors.ts",
+      "cls": "server",
+      "apis": "intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/ai/intents/matcher.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/intents/registry.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/intents/signals.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/intents/vocabulary.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/json-extractor.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/ai/message-intent.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/orchestrator.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/ai/planner/context.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/planner/critic.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/ai/planner/exam.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/ai/planner/expansion.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/ai/planner/mastery.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/ai/planner/pipeline.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/ai/planner/rebalance.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/ai/planner/repair.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/ai/planner/roadmap.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/ai/planner/validation-hints.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/planning-engine.ts",
+      "cls": "server",
+      "apis": "intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/ai/prompts.ts",
+      "cls": "server",
+      "apis": "streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg"
+    },
+    {
+      "file": "lib/ai/providers/deepseek.ts",
+      "cls": "server",
+      "apis": "streams",
+      "ext": "@prisma/adapter-pg,@prisma/client,crypto,pg"
+    },
+    {
+      "file": "lib/ai/providers/factory.ts",
+      "cls": "server",
+      "apis": "streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg"
+    },
+    {
+      "file": "lib/ai/providers/gemini-dispatch.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/ai/providers/gemini.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,pg"
+    },
+    {
+      "file": "lib/ai/providers/groq.ts",
+      "cls": "server",
+      "apis": "streams",
+      "ext": "@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg"
+    },
+    {
+      "file": "lib/ai/providers/text-stream.ts",
+      "cls": "adapter",
+      "apis": "streams",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/providers/tool-schema.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "@google/genai"
+    },
+    {
+      "file": "lib/ai/providers/types.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/providers/usage.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/quota-accounting.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/scope-evaluator.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "@google/genai,zod"
+    },
+    {
+      "file": "lib/ai/syllabus-compiler.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/ai/sylvie/action-server.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "crypto,zod"
+    },
+    {
+      "file": "lib/ai/sylvie/action.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/sylvie/calendar-contracts.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/ai/sylvie/calendar-page-context.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/sylvie/calendar-tools.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/ai/sylvie/chat-client.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/ai/sylvie/chat-stream-server.ts",
+      "cls": "framework",
+      "apis": "streams",
+      "ext": "next/server"
+    },
+    {
+      "file": "lib/ai/sylvie/completion.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/sylvie/event-stream.ts",
+      "cls": "adapter",
+      "apis": "streams",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/sylvie/image-contract.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/sylvie/image-storage.ts",
+      "cls": "server",
+      "apis": "blob,streams",
+      "ext": "@supabase/supabase-js,crypto,jose,sharp"
+    },
+    {
+      "file": "lib/ai/sylvie/images-server.ts",
+      "cls": "server",
+      "apis": "blob,streams",
+      "ext": "crypto,sharp"
+    },
+    {
+      "file": "lib/ai/sylvie/knowledge.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/sylvie/planner-bridge.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/ai/sylvie/planner-handoff-client.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/ai/sylvie/planner-message.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/ai/sylvie/quick-replies.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/sylvie/tool-context.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/ai/sylvie/turn-context.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/ai/telemetry-runtime.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/ai/telemetry.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/ai/tool-confirmation.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "crypto"
+    },
+    {
+      "file": "lib/ai/usage-limiter.ts",
+      "cls": "server",
+      "apis": "intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/ai/usage-logger.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/ai/usage-pricing.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/api-transport.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/archive-catalog.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": ""
+    },
+    {
+      "file": "lib/asset-manifest.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/auth-admin.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "@prisma/adapter-pg,@prisma/client,jose,pg"
+    },
+    {
+      "file": "lib/auth-server.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "@prisma/adapter-pg,@prisma/client,jose,pg"
+    },
+    {
+      "file": "lib/auth-service.ts",
+      "cls": "server",
+      "apis": "intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,bcryptjs,crypto,jose,pg"
+    },
+    {
+      "file": "lib/auth.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "jose"
+    },
+    {
+      "file": "lib/block-service.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/cache-service.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "@prisma/adapter-pg,@prisma/client,@upstash/redis,next/cache,pg"
+    },
+    {
+      "file": "lib/calculator/math-engine.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/calendar/contracts.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/calendar/dates.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/calendar/event-operations.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz,locks,storage,workers",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/calendar/external/connections.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/calendar/external/http.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/calendar/external/mutations.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/calendar/external/notifications.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/calendar/external/providers.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/calendar/external/security.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/calendar/external/service.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/calendar/external/subscriptions.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/calendar/external/worker.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/calendar/ink.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/calendar/intelligence.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/calendar/note-autosave.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz,locks,storage,workers",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/calendar/notebook-service.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/calendar/personal-service.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/calendar/planning.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "pg,zod"
+    },
+    {
+      "file": "lib/calendar/preferences.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/calendar/projection.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/calendar/quick-add.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/calendar/recognition-client.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz,webcrypto,workers",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/calendar/recognition-contracts.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/calendar/recognition-geometry.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz,webcrypto",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/calendar/recognition.worker.ts",
+      "cls": "adapter",
+      "apis": "workers",
+      "ext": "@huggingface/transformers"
+    },
+    {
+      "file": "lib/calendar/recurrence.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/calendar/reminder-service.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/calendar/scheduling.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/calendar/shared-contracts.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/calendar/shared-projection.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/calendar/shared-service.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,ical.js,jose,pg,zod"
+    },
+    {
+      "file": "lib/character-traits.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/client-data-cache.ts",
+      "cls": "adapter",
+      "apis": "dom,locks,storage,workers",
+      "ext": ""
+    },
+    {
+      "file": "lib/cognitive-stats.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": ""
+    },
+    {
+      "file": "lib/color-utils.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/concept-forge.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/cosmetics-catalog.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/db-notification-preferences.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/difficulty-engine.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": ""
+    },
+    {
+      "file": "lib/email.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "nodemailer,nodemailer/lib/addressparser"
+    },
+    {
+      "file": "lib/emails/waitlist-welcome.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "nodemailer,nodemailer/lib/addressparser"
+    },
+    {
+      "file": "lib/execution-coordination.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/focus-background-client.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/focus-background-preference.ts",
+      "cls": "adapter",
+      "apis": "storage",
+      "ext": ""
+    },
+    {
+      "file": "lib/focus-background-types.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/focus-party-service.ts",
+      "cls": "server",
+      "apis": "dom",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/focus-party-types.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/game-engine.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": ""
+    },
+    {
+      "file": "lib/goal-theme.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": ""
+    },
+    {
+      "file": "lib/hp-penalty-service.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/image-dimensions.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/immersive-mode.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": ""
+    },
+    {
+      "file": "lib/markdown-math.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/motion.ts",
+      "cls": "framework",
+      "apis": "",
+      "ext": "framer-motion"
+    },
+    {
+      "file": "lib/notes/blocknote-adapter.ts",
+      "cls": "framework",
+      "apis": "dom,locks,storage,structuredClone,webcrypto,workers",
+      "ext": "@blocknote/core,@blocknote/core/extensions,@blocknote/core/locales,@blocknote/core/yjs,dexie,yjs,zod"
+    },
+    {
+      "file": "lib/notes/bytes.ts",
+      "cls": "adapter",
+      "apis": "webcrypto",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/notes/clipboard.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "yjs,zod"
+    },
+    {
+      "file": "lib/notes/cloud-policy.ts",
+      "cls": "adapter",
+      "apis": "dom,locks,storage,structuredClone,webcrypto,workers",
+      "ext": "dexie,yjs,zod"
+    },
+    {
+      "file": "lib/notes/connection-location.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/notes/content-edit.ts",
+      "cls": "adapter",
+      "apis": "dom,storage,structuredClone",
+      "ext": "perfect-freehand,yjs,zod"
+    },
+    {
+      "file": "lib/notes/content-layout.ts",
+      "cls": "adapter",
+      "apis": "dom,storage,structuredClone",
+      "ext": "perfect-freehand,yjs,zod"
+    },
+    {
+      "file": "lib/notes/contracts.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/notes/device-recovery.ts",
+      "cls": "adapter",
+      "apis": "dom,locks,storage,streams,structuredClone,webcrypto,workers",
+      "ext": "dexie,yjs,zod"
+    },
+    {
+      "file": "lib/notes/download.ts",
+      "cls": "adapter",
+      "apis": "blob,dom",
+      "ext": ""
+    },
+    {
+      "file": "lib/notes/drive-pdf.ts",
+      "cls": "framework",
+      "apis": "blob,dom,locks,storage,streams,structuredClone,webcrypto,workers",
+      "ext": "@blocknote/core,@blocknote/core/extensions,@blocknote/core/locales,@blocknote/core/yjs,dexie,pdf-lib,perfect-freehand,yjs,zod"
+    },
+    {
+      "file": "lib/notes/drive-publication.ts",
+      "cls": "framework",
+      "apis": "blob,dom,locks,storage,streams,structuredClone,webcrypto,workers",
+      "ext": "@blocknote/core,@blocknote/core/extensions,@blocknote/core/locales,@blocknote/core/yjs,dexie,pdf-lib,perfect-freehand,yjs,zod"
+    },
+    {
+      "file": "lib/notes/drive-transport.ts",
+      "cls": "adapter",
+      "apis": "dom,locks,storage,streams,structuredClone,webcrypto,workers",
+      "ext": "dexie,yjs,zod"
+    },
+    {
+      "file": "lib/notes/engine.ts",
+      "cls": "adapter",
+      "apis": "dom,locks,storage,structuredClone,webcrypto,workers",
+      "ext": "dexie,yjs,zod"
+    },
+    {
+      "file": "lib/notes/errors.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/notes/graph.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/notes/ink-controller.ts",
+      "cls": "adapter",
+      "apis": "dom,pointer,storage,structuredClone",
+      "ext": "perfect-freehand,yjs,zod"
+    },
+    {
+      "file": "lib/notes/ink-geometry.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "yjs,zod"
+    },
+    {
+      "file": "lib/notes/ink-renderer.ts",
+      "cls": "adapter",
+      "apis": "dom,storage,structuredClone",
+      "ext": "perfect-freehand,yjs,zod"
+    },
+    {
+      "file": "lib/notes/ink.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "yjs,zod"
+    },
+    {
+      "file": "lib/notes/interchange.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "yjs,zod"
+    },
+    {
+      "file": "lib/notes/library.ts",
+      "cls": "framework",
+      "apis": "blob,dom,locks,storage,streams,structuredClone,webcrypto,workers",
+      "ext": "@blocknote/core,@blocknote/core/extensions,@blocknote/core/locales,@blocknote/core/yjs,dexie,pdf-lib,perfect-freehand,yjs,zod"
+    },
+    {
+      "file": "lib/notes/navigation.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": ""
+    },
+    {
+      "file": "lib/notes/note-style.ts",
+      "cls": "adapter",
+      "apis": "dom,storage,structuredClone",
+      "ext": "yjs,zod"
+    },
+    {
+      "file": "lib/notes/notebook-layout.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/notes/pack.ts",
+      "cls": "adapter",
+      "apis": "webcrypto",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/notes/page-layers.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/notes/pdf-export-core.ts",
+      "cls": "adapter",
+      "apis": "dom,storage,structuredClone",
+      "ext": "pdf-lib,perfect-freehand,yjs,zod"
+    },
+    {
+      "file": "lib/notes/pdf-export.ts",
+      "cls": "framework",
+      "apis": "blob,dom,locks,storage,streams,structuredClone,webcrypto,workers",
+      "ext": "@blocknote/core,@blocknote/core/extensions,@blocknote/core/locales,@blocknote/core/yjs,dexie,pdf-lib,perfect-freehand,yjs,zod"
+    },
+    {
+      "file": "lib/notes/pdf-export.worker.ts",
+      "cls": "adapter",
+      "apis": "dom,storage,structuredClone,workers",
+      "ext": "pdf-lib,perfect-freehand,yjs,zod"
+    },
+    {
+      "file": "lib/notes/pdf-reader.ts",
+      "cls": "framework",
+      "apis": "blob,dom,locks,storage,streams,structuredClone,webcrypto,workers",
+      "ext": "@blocknote/core,@blocknote/core/extensions,@blocknote/core/locales,@blocknote/core/yjs,dexie,pdf-lib,pdfjs-dist,perfect-freehand,yjs,zod"
+    },
+    {
+      "file": "lib/notes/pdf-search-text.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "pdf-lib"
+    },
+    {
+      "file": "lib/notes/pdf.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "yjs,zod"
+    },
+    {
+      "file": "lib/notes/portable.ts",
+      "cls": "adapter",
+      "apis": "dom,locks,storage,structuredClone,webcrypto,workers",
+      "ext": "dexie,fflate,yjs,zod"
+    },
+    {
+      "file": "lib/notes/repository.ts",
+      "cls": "adapter",
+      "apis": "dom,locks,storage,structuredClone,webcrypto,workers",
+      "ext": "dexie,yjs,zod"
+    },
+    {
+      "file": "lib/notes/server/connections.ts",
+      "cls": "server",
+      "apis": "streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,jose,pg,zod"
+    },
+    {
+      "file": "lib/notes/server/google-drive.ts",
+      "cls": "server",
+      "apis": "streams,webcrypto",
+      "ext": "jose,zod"
+    },
+    {
+      "file": "lib/notes/server/http.ts",
+      "cls": "server",
+      "apis": "streams",
+      "ext": "@prisma/adapter-pg,@prisma/client,jose,next/server,pg"
+    },
+    {
+      "file": "lib/notes/server/organize-drive.ts",
+      "cls": "server",
+      "apis": "streams,webcrypto",
+      "ext": "@prisma/adapter-pg,@prisma/client,jose,pg,zod"
+    },
+    {
+      "file": "lib/notes/server/publications.ts",
+      "cls": "server",
+      "apis": "streams,webcrypto",
+      "ext": "jose,zod"
+    },
+    {
+      "file": "lib/notes/server/security.ts",
+      "cls": "server",
+      "apis": "streams",
+      "ext": "jose"
+    },
+    {
+      "file": "lib/notes/session.ts",
+      "cls": "adapter",
+      "apis": "dom,locks,storage,workers",
+      "ext": ""
+    },
+    {
+      "file": "lib/notes/stylus.ts",
+      "cls": "adapter",
+      "apis": "dom,storage",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/notes/sync.ts",
+      "cls": "adapter",
+      "apis": "dom,locks,storage,structuredClone,webcrypto,workers",
+      "ext": "dexie,yjs,zod"
+    },
+    {
+      "file": "lib/notes/text-boxes.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "yjs,zod"
+    },
+    {
+      "file": "lib/notes/vault.ts",
+      "cls": "adapter",
+      "apis": "dom,locks,storage,webcrypto,workers",
+      "ext": ""
+    },
+    {
+      "file": "lib/notification-preferences.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/oauth.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-companion-contract.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-companion-service.ts",
+      "cls": "server",
+      "apis": "dom",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/pixel-creation-service.ts",
+      "cls": "server",
+      "apis": "dom",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/pixel-creations-client.ts",
+      "cls": "framework",
+      "apis": "dom,locks,storage,workers",
+      "ext": "react"
+    },
+    {
+      "file": "lib/pixel-display/content/asset/attachment.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/asset/compose.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/asset/creation-asset.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/asset/creation.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/asset/empty.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/asset/identity.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/asset/index.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/asset/paint.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/asset/reference/ember-aura.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/asset/reference/index.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/asset/reference/pedestal-meadow.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/asset/reference/practice-wand.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/asset/reference/study-scarf.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/asset/resolve.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/asset/types.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/asset/validate.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/index.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/palette.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/sylf/character.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/sylf/effects.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/content/sylf/frames.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/engine/color.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/engine/display.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/engine/framebuffer.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/engine/geometry.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/engine/index.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/engine/runtime.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/engine/types.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/react/PixelDisplay.tsx",
+      "cls": "framework",
+      "apis": "dom",
+      "ext": "react"
+    },
+    {
+      "file": "lib/pixel-display/react/usePixRuntime.ts",
+      "cls": "framework",
+      "apis": "dom",
+      "ext": "react"
+    },
+    {
+      "file": "lib/pixel-display/renderers/canvas-2d.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display/renderers/grid-presentation.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/pixel-display-style.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/capacity.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/client.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz,locks,storage,workers",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/comparison/contracts.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/comparison/units.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/constraints.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/contracts.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/copilot/client.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/copilot/context.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/copilot/contracts.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/copilot/explain.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/copilot/image-client.ts",
+      "cls": "adapter",
+      "apis": "intlTz,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/copilot/image-input.ts",
+      "cls": "server",
+      "apis": "blob,dom,intlTz,streams",
+      "ext": "@prisma/adapter-pg,@prisma/client,crypto,jose,pg,sharp,zod"
+    },
+    {
+      "file": "lib/planner/copilot/map.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/copilot/model.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/planner/copilot/outcomes.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/copilot/proposal.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/copilot/release.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/copilot/run.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/planner/coverage-client.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/coverage.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/dates.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/designer/client.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/designer/contracts.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/designer/model.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/planner/designer/project.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/designer/run.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/planner/done.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/draft-rules.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/edit-client.ts",
+      "cls": "adapter",
+      "apis": "intlTz,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/errors.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/exam-client.ts",
+      "cls": "adapter",
+      "apis": "intlTz,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/exam-fields.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/exam-policy.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/expansion-fields.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/expansion-policy.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/friction-client.ts",
+      "cls": "adapter",
+      "apis": "intlTz,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/friction-fields.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/import/outline.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/import/pdf-runtime.ts",
+      "cls": "server",
+      "apis": "dom",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/import/pdf.ts",
+      "cls": "server",
+      "apis": "dom",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/import/service.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/import/storage.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "@supabase/supabase-js,crypto,jose"
+    },
+    {
+      "file": "lib/planner/import/validate.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": "crypto,zod"
+    },
+    {
+      "file": "lib/planner/import/vision.ts",
+      "cls": "server",
+      "apis": "dom",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/intake/actions.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/intake/brief.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/intake/client.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz,storage,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/intake/distribution.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/intake/findings.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/intake/readiness.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/intake/scope-node.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/intake/scope-sync.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/intake/to-input.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/intake-telemetry.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/load.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/mastery-client.ts",
+      "cls": "adapter",
+      "apis": "intlTz,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/mastery-fields.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/mastery-policy.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/mastery-progress.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/planner-role.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/preference-fields.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/preferences-client.ts",
+      "cls": "adapter",
+      "apis": "intlTz,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/preparedness-matrix.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/preparedness.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/priority.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/quality/corpus.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/quality/evaluate.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/quality/metrics.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/rebalance-client.ts",
+      "cls": "adapter",
+      "apis": "intlTz,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/rebalance-fields.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/rebalance-mode-rules.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/rebalance-policy.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/rebalance-scope.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/reoffer-client.ts",
+      "cls": "adapter",
+      "apis": "intlTz,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/reoffer.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/research/agent.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/planner/research/authority.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/research/comparison.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/planner/research/contracts.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/research/coverage.ts",
+      "cls": "server",
+      "apis": "dom",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/research/deepseek.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/planner/research/evidence-runtime.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/research/evidence.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/research/import-scope.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/planner/research/plan-quality.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/research/redact.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/research/search/contracts.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/research/search/fetch-runtime.ts",
+      "cls": "server",
+      "apis": "dom,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/research/search/fetch.ts",
+      "cls": "server",
+      "apis": "dom,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/research/search/pool.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/research/search/provider-runtime.ts",
+      "cls": "server",
+      "apis": "streams",
+      "ext": "@prisma/adapter-pg,@prisma/client,crypto,pg,zod"
+    },
+    {
+      "file": "lib/planner/research/search/provider.ts",
+      "cls": "server",
+      "apis": "streams",
+      "ext": "@prisma/adapter-pg,@prisma/client,crypto,pg,zod"
+    },
+    {
+      "file": "lib/planner/research/search/url.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/research/selection.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/research/service.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/planner/research/sources.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/retrieval-client.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/retrieval.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/roadmap-client.ts",
+      "cls": "adapter",
+      "apis": "intlTz,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/roadmap-fields.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/roadmap-policy.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/roadmap-progress.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/scope-topic.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/semantic.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/server/check-result.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/core.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/expansion.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/flexibility.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/server/friction.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/generation.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/http.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@prisma/adapter-pg,@prisma/client,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/intake-session.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/intake.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/materialize.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/mutation-guards.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/operations.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/preferences.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/rebalance-run.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,crypto,groq-sdk,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/rebalance.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/reoffer.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/revisions.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/server/running.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/server/stretch.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/planner/smart-setup.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/stretch-client.ts",
+      "cls": "adapter",
+      "apis": "intlTz,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/telemetry.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/transport.ts",
+      "cls": "adapter",
+      "apis": "intlTz,streams",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/client/transport.ts",
+      "cls": "adapter",
+      "apis": "dom,locks,storage,streams,workers",
+      "ext": ""
+    },
+    {
+      "file": "lib/planner/v2/client/workspace.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/contracts/artifacts.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/contracts/blueprint.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/contracts/envelope.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/contracts/evidence.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/contracts/execution.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/contracts/index.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/contracts/intent.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/contracts/lineage.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/contracts/operations.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/contracts/primitives.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/contracts/session.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/contracts/workspace.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/allocator.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,structuredClone",
+      "ext": "@supabase/supabase-js,crypto,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/assistant.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/blueprint.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/capacity.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,structuredClone",
+      "ext": "@supabase/supabase-js,crypto,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/checkpoints.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/context.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/forecast.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,structuredClone",
+      "ext": "@supabase/supabase-js,crypto,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/foundation/calendar.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/foundation/contracts.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/foundation/readers.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/foundation/resources.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/foundation/role-calls.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/foundation/validation.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/foundation/workflow.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/natural-learning.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/ocr.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/provider-policy.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,structuredClone",
+      "ext": "pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/provider.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/quality.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/research-cache.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@supabase/supabase-js,@upstash/redis,crypto,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/research-reader.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@supabase/supabase-js,crypto,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/research-verification.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/reviewed-learning.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/schemas/assistant-intake.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/schemas/assistant.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/schemas/blueprint-response.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/schemas/checkpoint.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/schemas/conversation.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/schemas/documents.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/schemas/natural-learning.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/schemas/planning.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/schemas/quality.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/schemas/repair-response.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/schemas/research-model.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/schemas/research.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/schemas/reviewed-learning.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/schemas/scheduling.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/intelligence/schemas/understanding.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/main.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/quest-read.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/planner/v2/server/accounting.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,structuredClone",
+      "ext": "pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/activity.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/adoption.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,structuredClone",
+      "ext": "@supabase/supabase-js,crypto,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/apply.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/assistant.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/attempts.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,structuredClone",
+      "ext": "@supabase/supabase-js,crypto,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/calendar-capacity.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/compilation.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/compiler-version.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/compiler.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/context.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,structuredClone",
+      "ext": "@supabase/supabase-js,crypto,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/database.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/documents.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,structuredClone",
+      "ext": "@supabase/supabase-js,crypto,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/execution-validation.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,structuredClone",
+      "ext": "@supabase/supabase-js,crypto,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/foundation.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/generation.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,structuredClone",
+      "ext": "@supabase/supabase-js,crypto,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/intents.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,structuredClone",
+      "ext": "@supabase/supabase-js,crypto,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/learning.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/natural-learning.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/research.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/reviewed-learning.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/reviewed-publication.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/revisions.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/role-accounting.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,structuredClone",
+      "ext": "@supabase/supabase-js,crypto,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/sessions.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,structuredClone",
+      "ext": "@supabase/supabase-js,crypto,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/settlement.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/student-workspace.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/understanding.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/web.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/worker.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,structuredClone",
+      "ext": "@supabase/supabase-js,crypto,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/server/workspace.ts",
+      "cls": "server",
+      "apis": "dom,intlTz,streams,structuredClone",
+      "ext": "@google/genai,@prisma/adapter-pg,@prisma/client,@supabase/supabase-js,@upstash/redis,crypto,groq-sdk,jose,pg,zod"
+    },
+    {
+      "file": "lib/planner/v2/session-client.ts",
+      "cls": "adapter",
+      "apis": "intlTz,storage,structuredClone",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/prelaunch.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/prisma.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/privacy-types.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/privacy.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/profile-service.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,@upstash/redis,next/cache,pg"
+    },
+    {
+      "file": "lib/provider-types.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/rate-limit.ts",
+      "cls": "server",
+      "apis": "dom",
+      "ext": "@upstash/redis,crypto"
+    },
+    {
+      "file": "lib/realtime-status.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/redis.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "@upstash/redis"
+    },
+    {
+      "file": "lib/resources.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/scholar-id.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "crypto"
+    },
+    {
+      "file": "lib/scroll-lock.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": ""
+    },
+    {
+      "file": "lib/session-math.ts",
+      "cls": "adapter",
+      "apis": "dom",
+      "ext": ""
+    },
+    {
+      "file": "lib/session-service.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "crypto"
+    },
+    {
+      "file": "lib/shop-items.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/skill-tree-skeleton.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/skill-tree-theme.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/skill-tree.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/study-schedule-service.ts",
+      "cls": "server",
+      "apis": "dom,intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg,zod"
+    },
+    {
+      "file": "lib/study-schedule-types.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/study-systems.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/subject-service.ts",
+      "cls": "server",
+      "apis": "",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/supabase-browser.ts",
+      "cls": "adapter",
+      "apis": "storage",
+      "ext": "@supabase/supabase-js"
+    },
+    {
+      "file": "lib/supabase-storage.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "@supabase/supabase-js,crypto,jose"
+    },
+    {
+      "file": "lib/sylvs/anchors.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/sylvs/colors.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/sylvs/index.ts",
+      "cls": "framework",
+      "apis": "",
+      "ext": "react"
+    },
+    {
+      "file": "lib/sylvs/registry.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/sylvs/renderer/AnchorOverlay.tsx",
+      "cls": "framework",
+      "apis": "",
+      "ext": "react"
+    },
+    {
+      "file": "lib/sylvs/renderer/FemaleBase.tsx",
+      "cls": "framework",
+      "apis": "",
+      "ext": "react"
+    },
+    {
+      "file": "lib/sylvs/renderer/MaleBase.tsx",
+      "cls": "framework",
+      "apis": "",
+      "ext": "react"
+    },
+    {
+      "file": "lib/sylvs/renderer/SylvRenderer.tsx",
+      "cls": "framework",
+      "apis": "",
+      "ext": "react"
+    },
+    {
+      "file": "lib/sylvs/types.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/system-collection.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/timer-engine.ts",
+      "cls": "adapter",
+      "apis": "storage",
+      "ext": ""
+    },
+    {
+      "file": "lib/timer-leader.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": ""
+    },
+    {
+      "file": "lib/timer-sync.ts",
+      "cls": "adapter",
+      "apis": "dom,intlTz,locks,storage,structuredClone",
+      "ext": "zod"
+    },
+    {
+      "file": "lib/timezone-server.ts",
+      "cls": "server",
+      "apis": "intlTz",
+      "ext": "@prisma/adapter-pg,@prisma/client,pg"
+    },
+    {
+      "file": "lib/timezone-service.ts",
+      "cls": "portable",
+      "apis": "intlTz",
+      "ext": ""
+    },
+    {
+      "file": "lib/upload-security.ts",
+      "cls": "portable",
+      "apis": "",
+      "ext": "crypto"
+    }
+  ]
+}

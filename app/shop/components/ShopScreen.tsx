@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/app/components/AuthProvider";
 import { useRouter } from "next/navigation";
 import { CharacterConfig } from "@/lib/character-traits";
-import { fetchCachedJSON } from "@/lib/client-data-cache";
+import { fetchCachedJSON, invalidateClientCaches } from "@/lib/client-data-cache";
 import {
   CATALOG_ITEMS,
   CatalogItemDefinition,
@@ -350,6 +350,8 @@ export function ShopScreen() {
       if (!res.ok || !data.success) {
         throw new Error(data.error || "Purchase failed");
       }
+
+      invalidateClientCaches(["/api/shop", "shop:data:", "/api/inventory"]);
 
       // Instant state sync: mutate global user balance
       if (user) {

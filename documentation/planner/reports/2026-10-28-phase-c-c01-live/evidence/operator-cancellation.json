@@ -1,0 +1,92 @@
+{
+  "at": "2026-10-28T15:26:34.355Z",
+  "reason": "Frozen fixture uses Sunday-zero weekday values, but Planner canonical availability uses Monday-zero. Friday rest and accepted structured availability conflict. Stop on material input-integrity error; no restart authorized.",
+  "rootRequestId": "e84d4fc9-e8b3-57f8-a704-cc6f8e41d7d9",
+  "service": "AttemptService.cancel",
+  "attempts": [
+    {
+      "schemaVersion": 2,
+      "attemptId": "ef103fa8-6f40-4e24-9a83-c233d714b40c",
+      "ownerId": 1,
+      "kind": "JOINT",
+      "state": "CANCELLED",
+      "stage": "RESEARCH",
+      "idempotencyKey": "1ba3c8b2-c607-4dfb-8449-d4bea0506fa4",
+      "requestHash": "95a0c05c7a552b0e1c099fbc785197fd0a7ac4010e66d40deca96c72f3c1132d",
+      "requestedAt": "2026-10-28T15:21:47.113Z",
+      "parentAttemptId": null,
+      "acceptedRequest": {
+        "text": "Use the exact teacher packets and my diagnostic work to prepare chemistry first and biology three days later. Keep both outcomes, Friday rest and the existing English deadline task. Prefer useful explanation and independent application over rereading or arbitrary question counts. I authorize reading these uploads only; do not browse the web or buy resources. Preserve uncertainty about transfer and show when support is conditional. If full useful work does not fit, explain the conflict rather than deleting education or increasing my availability.\nStudent context: {\"name\":\"Amina\",\"stage\":\"Upper-secondary school\",\"background\":\"English is a comfortable second language. School has covered the topics once. No private tutor or paid question bank. A phone, paper, calculator and the three supplied teacher packets are available.\",\"claims\":[\"I feel confident about moles because I watched explanations for three hours.\",\"I often recognize a worked example but get stuck when numbers or wording change.\"],\"preferences\":[\"Explain why a method applies, then let me try independently.\",\"Sessions of about 35–50 minutes suit me; avoid fragmented five-minute checklist tasks.\",\"Keep Friday free. Do not fill spare time with unnecessary work.\"]}",
+        "authorization": "PLAN_ACTION",
+        "researchRequested": true,
+        "targetAuthorizationDigest": "fd3d1ae5790e53357e6dad38a9ea98b5660742ab3d1c881b532d90ad01c960a0"
+      },
+      "targets": [
+        {
+          "planId": "e63f1007-08b1-459a-9090-a9452966fb0a",
+          "requestedIntentVersionId": "5a7c214a-8163-4651-933a-cc035df208da",
+          "resolvedIntentVersionId": null,
+          "resolution": null,
+          "baseActiveRevisionId": null,
+          "sourceCandidateRevisionId": null,
+          "planningVersion": 0,
+          "resolvedPlanningVersion": null,
+          "contextDigest": null
+        },
+        {
+          "planId": "bf5626b9-c7e8-45c9-9dd5-18d0ef560082",
+          "requestedIntentVersionId": "eeae2fe0-86a9-442c-8b8c-012936f7be1a",
+          "resolvedIntentVersionId": null,
+          "resolution": null,
+          "baseActiveRevisionId": null,
+          "sourceCandidateRevisionId": null,
+          "planningVersion": 0,
+          "resolvedPlanningVersion": null,
+          "contextDigest": null
+        }
+      ],
+      "budget": {
+        "aiFirst": {
+          "schemaVersion": 1,
+          "policyDigest": "998516c78f21bf1b7379d3dd343a887e4768510f6a9ef1cad99ab597704c6f4a",
+          "processingMs": 14400000,
+          "limits": {
+            "calls": 48,
+            "inputUnits": 3000000,
+            "completionTokens": 700000
+          }
+        },
+        "rootRequestId": "e84d4fc9-e8b3-57f8-a704-cc6f8e41d7d9",
+        "profile": "RESEARCH",
+        "foregroundProcessingMs": 0,
+        "processingStartedAt": "2026-10-28T15:21:47.135Z",
+        "executionDeadlineAt": "2026-10-28T19:21:47.135Z",
+        "consumed": {
+          "modelCalls": 4,
+          "inputTokens": 18632,
+          "outputTokens": 45780,
+          "planningCalls": 0,
+          "researchSynthesisCalls": 4,
+          "researchQueries": 0,
+          "fetchAttempts": 0,
+          "selectedSourceCharacters": 2925,
+          "extractedPages": 0,
+          "ocrPages": 0,
+          "followUps": 0
+        },
+        "reserved": {
+          "modelCalls": 0,
+          "inputTokens": 82130,
+          "outputTokens": 65536
+        }
+      },
+      "fence": 1,
+      "lease": null,
+      "checkpoint": null,
+      "question": null,
+      "error": null,
+      "result": null,
+      "applyReceipt": null
+    }
+  ]
+}

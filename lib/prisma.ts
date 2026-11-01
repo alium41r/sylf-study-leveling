@@ -18,7 +18,7 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 // Increment this version whenever schema fields are modified
-const SCHEMA_BUILD_VERSION = 37;
+const SCHEMA_BUILD_VERSION = 41;
 let applicationPool: Pool | undefined;
 
 /** Raw durable-core transactions reuse the web pool already owned by Prisma. */
@@ -70,6 +70,9 @@ export function getPrismaClient(): PrismaClient {
     max: process.env.NODE_ENV === "production" ? 20 : 10,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 5000,
+    query_timeout: 35000,
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 10000,
     // Fail slow queries fast instead of hanging serverless invocations on
     // the pooler (Supabase transaction pooler / pgbouncer connection
     // bottleneck from the 25k scaling video).

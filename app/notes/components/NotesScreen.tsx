@@ -36,6 +36,8 @@ import {
   RotateCcw,
   History,
   X,
+  ImagePlus,
+  ArrowLeft,
 } from "lucide-react";
 import { useAuth } from "@/app/components/AuthProvider";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
@@ -46,6 +48,11 @@ import {
   type LibrarySnapshot,
 } from "@/lib/notes/library";
 import { notesRequest } from "@/lib/notes/drive-transport";
+import {
+  alternateNotesURL,
+  freshDeploymentNotesURL,
+} from "@/lib/notes/connection-location";
+import { navigateNotes } from "@/lib/notes/navigation";
 import { prepareNotesLogout } from "@/lib/notes/session";
 import { notesResourceURL } from "@/lib/resources";
 import { exportLockedNotesDevice } from "@/lib/notes/device-recovery";
@@ -57,9 +64,11 @@ import NotesActions, {
   type NotesSubject,
 } from "./NotesActions";
 import s from "../Notes.module.css";
-const NotesEditor = lazy(() => import("./NotesEditor"));
-const InkEditor = lazy(() => import("./InkEditor"));
+const InkEditor = lazy(() => import("./NotebookWorkspace"));
+const ImageThumbnail = lazy(() => import("./ImageThumbnail"));
 const InkThumbnail = lazy(() => import("./InkThumbnail"));
+const PdfThumbnail = lazy(() => import("./PdfThumbnail"));
+const PdfWorkspace = lazy(() => import("./PdfWorkspace"));
 const emptySnapshot: LibrarySnapshot = {
   notes: [],
   folders: [],
@@ -82,7 +91,7 @@ const message = (error: unknown) =>
     : "Notes could not finish this operation.";
 
 export default function NotesScreen() {
-  const { user, isLoading } = useAuth(),
+  const { user, isLoading, refreshStats } = useAuth(),
     router = useRouter(),
     params = useSearchParams();
   const ownerId = user ? String(user.id) : "",
@@ -94,24 +103,43 @@ export default function NotesScreen() {
     [headerRecoveryFor, setHeaderRecoveryFor] = useState<string>(),
     [connection, setConnection] = useState<NotesCloudConnection | null>(),
     [configured, setConfigured] = useState(false),
+    [canonicalNotesURL, setCanonicalNotesURL] = useState<string>(),
+    [localAccess, setLocalAccess] = useState(false),
     [opening, setOpening] = useState(true),
     [error, setError] = useState(""),
     [retry, setRetry] = useState(0),
     [busy, setBusy] = useState(false),
     [navOpen, setNavOpen] = useState(false),
-    [filter, setFilter] = useState("recent"),
+    [filter, setFilter] = useState("all"),
     [query, setQuery] = useState(""),
     [sort, setSort] = useState("recent"),
     [grid, setGrid] = useState(true),
     [limit, setLimit] = useState(50),
     [folderLimit, setFolderLimit] = useState(200),
+    [collapsedFolders, setCollapsedFolders] = useState<Set<string>>(
+      () => new Set()
+    ),
     [editorGeneration, setEditorGeneration] = useState(0),
     [subjects, setSubjects] = useState<NotesSubject[]>([]),
     [modal, setModal] = useState<NotesModal>(),
     [saveState, setSaveState] = useState<SaveState>("ready"),
     [createOpen, setCreateOpen] = useState(false);
   const leave = useRef<(() => Promise<void>) | undefined>(undefined),
-    importInput = useRef<HTMLInputElement>(null);
+    navigation = useRef(0),
+    autoConnect = useRef(false),
+    revalidatedSession = useRef<string | undefined>(undefined),
+    importInput = useRef<HTMLInputElement>(null),
+    pdfInput = useRef<HTMLInputElement>(null),
+    imageInput = useRef<HTMLInputElement>(null);
+  const diagnostics = !!user?.isAdmin && params.get("dev") === "true";
+  const selectURL = useCallback(
+    (href: string) => {
+      const url = new URL(href, window.location.href);
+      if (diagnostics) url.searchParams.set("dev", "true");
+      navigateNotes(url.pathname + url.search, router);
+    },
+    [diagnostics, router]
+  );
   const ownsLibrary =
     library?.session.ownerId === ownerId && !library?.session.signal.aborted;
   const snapshot = useSyncExternalStore(
@@ -119,6 +147,23 @@ export default function NotesScreen() {
     ownsLibrary ? library.snapshot : () => emptySnapshot,
     () => emptySnapshot
   );
+  useEffect(() => {
+    if (
+      !library?.session.signal.aborted ||
+      !ownerId ||
+      revalidatedSession.current === library.session.epoch
+    )
+      return;
+    revalidatedSession.current = library.session.epoch;
+    let cancelled = false;
+    void refreshStats().then(() => {
+      if (!cancelled && owner.current === ownerId)
+        setRetry((value) => value + 1);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [library, snapshot, ownerId, refreshStats]);
   const documentId = params.get("document"),
     pageId = params.get("page") || undefined;
   const note =
@@ -134,43 +179,46 @@ export default function NotesScreen() {
     )
       ? note.resume.pageId
       : undefined);
-  const isInk =
-    note?.view.descriptor.streams.find(
-      (s) =>
-        s.streamId ===
-        (
-          note.view.descriptor.pages.find((p) => p.pageId === resolvedPage) ||
-          note.view.descriptor.pages.find((p) => !p.extensions.archived)
-        )?.streamId
-    )?.adapter === "sylf-ink/1";
+  const isPdf = note?.view.descriptor.kind === "pdf";
   useEffect(() => {
     if (
       !ownsLibrary ||
       !library ||
       !note ||
       pageId ||
-      note.view.descriptor.kind !== "notebook"
+      !["notebook", "pdf"].includes(note.view.descriptor.kind)
     )
       return;
     const initialPage =
       resolvedPage ||
       note.view.descriptor.pages.find((p) => !p.extensions.archived)?.pageId;
     if (initialPage)
-      router.replace(
+      selectURL(
         notesResourceURL({
           version: 1,
           type: "sylf-note",
           libraryId: library.repository.libraryId,
           documentId: note.id,
           pageId: initialPage,
-        }),
-        { scroll: false }
+        })
       );
-  }, [ownsLibrary, library, note, pageId, resolvedPage, router]);
+  }, [ownsLibrary, library, note, pageId, resolvedPage, selectURL]);
   const onError = useCallback((value: string) => setError(value), []),
-    onState = useCallback((state: SaveState) => setSaveState(state), []),
+    onState = useCallback(
+      (state: SaveState) => {
+        setSaveState((previous) =>
+          diagnostics || state === "failed" || previous === "failed"
+            ? state
+            : previous
+        );
+      },
+      [diagnostics]
+    ),
     registerLeave = useCallback((callback?: () => Promise<void>) => {
       leave.current = callback;
+      return () => {
+        if (leave.current === callback) leave.current = undefined;
+      };
     }, []);
   useEffect(() => {
     let disposed = false,
@@ -179,10 +227,16 @@ export default function NotesScreen() {
       if (!disposed) {
         setOpening(!!ownerId);
         setError("");
+        setConfigured(false);
+        setConnection(undefined);
+        setCanonicalNotesURL(undefined);
+        setLocalAccess(false);
+        leave.current = undefined;
+        navigation.current++;
         setSubjects([]);
         setModal(undefined);
         setQuery("");
-        setFilter("recent");
+        setFilter("all");
         setNavOpen(false);
         setLimit(50);
         setSaveState("ready");
@@ -193,28 +247,52 @@ export default function NotesScreen() {
         disposed = true;
       };
     void (async () => {
-      const result = await (await notesRequest("/api/notes/connection")).json();
-      if (disposed || owner.current !== ownerId) return;
-      setConfigured(result.configured);
-      setConnection(result.connection);
-      if (result.connection) {
-        opened = await NotesLibrary.unlock(
-          ownerId,
-          () => !disposed && owner.current === ownerId,
-          headerRecoveryFor === ownerId
-        );
+      let emptyDeviceTarget: string | undefined;
+      opened = await NotesLibrary.bootstrap(
+        ownerId,
+        () => !disposed && owner.current === ownerId,
+        headerRecoveryFor === ownerId,
+        (result) => {
+          if (disposed || owner.current !== ownerId) return false;
+          const canonical = alternateNotesURL(
+            result.notesUrl,
+            window.location.href
+          );
+          setConfigured(result.configured);
+          setConnection(result.connection);
+          setCanonicalNotesURL(canonical);
+          setLocalAccess(result.localAccess === true || !canonical);
+          if (result.localAccess === true)
+            emptyDeviceTarget = freshDeploymentNotesURL(
+              result.notesUrl,
+              window.location.href
+            );
+          return (
+            (!canonical || result.localAccess === true) && !!result.connection
+          );
+        },
+        () => {
+          if (disposed || owner.current !== ownerId) return false;
+          if (!emptyDeviceTarget) return true;
+          window.location.replace(emptyDeviceTarget);
+          return false;
+        }
+      );
+      if (opened) {
         if (disposed) {
           await opened.dispose();
           return;
         }
         setLibrary(opened);
+        // Optional subject associations never hold the Notes opening operation.
+        void fetchCachedJSON<NotesSubject[]>("/api/subjects", undefined, {
+          ttlMs: 60000,
+        })
+          .then((loaded) => {
+            if (!disposed) setSubjects(Array.isArray(loaded) ? loaded : []);
+          })
+          .catch(() => {});
       }
-      const loaded = await fetchCachedJSON<NotesSubject[]>(
-        "/api/subjects",
-        undefined,
-        { ttlMs: 60000 }
-      );
-      if (!disposed) setSubjects(Array.isArray(loaded) ? loaded : []);
     })()
       .catch((error) => {
         if (!disposed) setError(message(error));
@@ -248,6 +326,14 @@ export default function NotesScreen() {
         throw new Error(
           "Notes access changed. Reopen the current account before connecting Drive."
         );
+      if (canonicalNotesURL) {
+        // Only first-time/revoked-consent OAuth needs the registered callback
+        // origin. Existing libraries open on this deployment without a handoff.
+        const target = new URL(canonicalNotesURL);
+        target.searchParams.set("connect", "drive");
+        window.location.assign(target.href);
+        return;
+      }
       const response = await notesRequest("/api/notes/connection", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -265,6 +351,25 @@ export default function NotesScreen() {
       setBusy(false);
     }
   };
+  useEffect(() => {
+    if (
+      params.get("connect") === "drive" &&
+      !opening &&
+      configured &&
+      !canonicalNotesURL &&
+      !autoConnect.current
+    ) {
+      autoConnect.current = true;
+      // Consume the explicit handoff before leaving for Google. Reloading or
+      // revisiting this history entry must not restart consent on every visit.
+      const current = new URL(window.location.href);
+      current.searchParams.delete("connect");
+      window.history.replaceState(null, "", current.pathname + current.search);
+      void connect();
+    }
+    // Only an explicit connect handoff starts consent; ordinary visits never do.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params, opening, configured, canonicalNotesURL]);
   const run = async (action: () => Promise<unknown>) => {
     setBusy(true);
     setError("");
@@ -277,7 +382,10 @@ export default function NotesScreen() {
     }
   };
   const open = async (id: string, page?: string) => {
+    const intent = ++navigation.current;
     await leave.current?.();
+    if (intent !== navigation.current || !library || !ownsLibrary) return;
+    if (documentId) library?.requestCloudSync();
     setSaveState("ready");
     setNavOpen(false);
     const selected = snapshot.notes.find((n) => n.id === id);
@@ -290,21 +398,23 @@ export default function NotesScreen() {
         ? resumePage
         : selected?.view.descriptor.pages.find((p) => !p.extensions.archived)
             ?.pageId);
-    router.replace(
+    selectURL(
       notesResourceURL({
         version: 1,
         type: "sylf-note",
         libraryId: library!.repository.libraryId,
         documentId: id,
         ...(targetPage ? { pageId: targetPage } : {}),
-      }),
-      { scroll: false }
+      })
     );
   };
   const back = async () => {
+    const intent = ++navigation.current;
     await leave.current?.();
+    if (intent !== navigation.current) return;
+    library?.requestCloudSync();
     setSaveState("ready");
-    router.replace("/notes", { scroll: false });
+    selectURL("/notes");
   };
   const chooseFilter = (value: string) => {
     void run(async () => {
@@ -363,6 +473,14 @@ export default function NotesScreen() {
           : b.updatedAt.localeCompare(a.updatedAt)
     );
   const cloudError = snapshot.error ? message(new Error(snapshot.error)) : "";
+  const restoring = !snapshot.ready && !snapshot.localReady;
+  const criticalCloudError =
+    cloudError &&
+    ["AUTH", "CORRUPT", "OWNERSHIP", "UNSUPPORTED", "QUOTA"].includes(
+      snapshot.errorCode || ""
+    );
+  const delayedBackup =
+    snapshot.backupDelayed && snapshot.pending > (snapshot.localDrafts || 0);
   const cloudLabel = snapshot.memoryPending
     ? "Unsaved recovery"
     : saveState === "saving" || busy
@@ -376,11 +494,12 @@ export default function NotesScreen() {
             : snapshot.localUploads
               ? `${snapshot.localUploads} upload${snapshot.localUploads === 1 ? "" : "s"} on device`
               : snapshot.pending
-                ? `${snapshot.pending} pending`
+                ? snapshot.pending === snapshot.localDrafts
+                  ? "Drafts on this device"
+                  : "Saved locally · cloud pending"
                 : snapshot.verifiedAt
                   ? "Saved to Drive"
                   : "On this device";
-  const titleLabel = note?.view.descriptor.title || heading;
   if (isLoading || (opening && !ownsLibrary))
     return (
       <div className={s.root}>
@@ -406,6 +525,31 @@ export default function NotesScreen() {
           <p>Sign in to open your private Notes library.</p>
           <Link className={s.primary} href="/login">
             Sign in
+          </Link>
+        </div>
+      </div>
+    );
+  if (!ownsLibrary && library?.session.signal.aborted)
+    return (
+      <div className={s.root}>
+        <header className={s.pageHeader}>
+          <h1>Notes</h1>
+        </header>
+        <div className={s.onboarding}>
+          <BookOpen size={42} />
+          <h2>Your library is locked</h2>
+          <p>
+            Confirm your Sylf sign-in to continue. Your notes on this device are
+            retained.
+          </p>
+          <button
+            className={s.primary}
+            onClick={() => setRetry((value) => value + 1)}
+          >
+            Try again
+          </button>
+          <Link className={s.textButton} href="/login">
+            Sign in to Sylf
           </Link>
         </div>
       </div>
@@ -446,33 +590,55 @@ export default function NotesScreen() {
               account. Any existing library was kept.
             </p>
           )}
-          <button
-            className={s.primary}
-            disabled={busy || !configured}
-            onClick={() => void connect()}
-          >
-            {busy ? (
-              <Loader2 size={18} className={s.spin} />
-            ) : (
-              <Cloud size={19} />
-            )}{" "}
-            {connection ? "Reconnect Google Drive" : "Connect Google Drive"}
-            <ArrowUpRight size={16} />
-          </button>
+          {canonicalNotesURL && !localAccess ? (
+            <>
+              <p role="status" className={s.hint}>
+                Open Notes at your permanent Sylf address to connect Google
+                Drive. Any notes on this device are kept.
+              </p>
+              <a className={s.primary} href={canonicalNotesURL}>
+                Continue to Sylf <ArrowUpRight size={16} />
+              </a>
+            </>
+          ) : (
+            <button
+              className={s.primary}
+              disabled={busy || !configured}
+              onClick={() =>
+                connection && connection.status !== "RECONNECT"
+                  ? setRetry((value) => value + 1)
+                  : void connect()
+              }
+            >
+              {busy ? (
+                <Loader2 size={18} className={s.spin} />
+              ) : (
+                <Cloud size={19} />
+              )}{" "}
+              {connection?.status === "RECONNECT"
+                ? "Reconnect Google Drive"
+                : connection
+                  ? "Try opening again"
+                  : "Connect Google Drive"}
+              <ArrowUpRight size={16} />
+            </button>
+          )}
           {!configured && (
             <p className={s.hint}>
               Google Drive is not available on this Sylf deployment yet.
             </p>
           )}
-          <button
-            className={s.textButton}
-            onClick={() => {
-              setHeaderRecoveryFor(undefined);
-              setRetry((value) => value + 1);
-            }}
-          >
-            Retry opening library
-          </button>
+          {diagnostics && (
+            <button
+              className={s.textButton}
+              onClick={() => {
+                setHeaderRecoveryFor(undefined);
+                setRetry((value) => value + 1);
+              }}
+            >
+              Retry opening library
+            </button>
+          )}
           {connection && error && (
             <button
               className={s.textButton}
@@ -518,6 +684,18 @@ export default function NotesScreen() {
         </div>
       </div>
     );
+  const visibleFolders: typeof snapshot.folders = [];
+  const appendFolders = (parent: string | null, seen = new Set<string>()) => {
+    for (const folder of snapshot.folders
+      .filter((f) => f.parentId === parent)
+      .sort((a, b) => a.name.localeCompare(b.name))) {
+      if (seen.has(folder.id)) continue;
+      seen.add(folder.id);
+      visibleFolders.push(folder);
+      if (!collapsedFolders.has(folder.id)) appendFolders(folder.id, seen);
+    }
+  };
+  appendFolders(null);
   const folderDepth = (id: string) => {
     let depth = 0,
       current = snapshot.folders.find((f) => f.id === id);
@@ -530,6 +708,8 @@ export default function NotesScreen() {
   return (
     <div
       className={s.root}
+      data-notes-document={!!documentId}
+      data-notes-workspace
       onKeyDown={(event) => {
         if (
           event.key === "Escape" &&
@@ -550,31 +730,45 @@ export default function NotesScreen() {
       }}
     >
       <header className={s.pageHeader}>
-        <h1>Notes</h1>
-        <div className={s.headerActions}>
-          <button
-            className={s.cloudStatus}
-            data-warning={
-              !!cloudError || !!snapshot.memoryPending || saveState === "failed"
-            }
-            onClick={() => void run(() => library.retrySync())}
-            title={
-              snapshot.verifiedAt
-                ? `Last verified ${new Date(snapshot.verifiedAt).toLocaleString()}`
-                : "View synchronization status"
-            }
+        <div className={s.libraryBrand}>
+          <Link
+            href="/dashboard"
+            className={s.iconButton}
+            aria-label="Back to Sylf"
+            title="Back to Sylf"
           >
-            {snapshot.syncing ? (
-              <Loader2 size={15} className={s.spin} />
-            ) : cloudError ? (
-              <CloudOff size={16} />
-            ) : snapshot.verifiedAt && !snapshot.pending ? (
-              <Check size={16} />
-            ) : (
-              <Cloud size={16} />
-            )}
-            <span>{cloudLabel}</span>
-          </button>
+            <ArrowLeft size={20} />
+          </Link>
+          <h1>Notes</h1>
+        </div>
+        <div className={s.headerActions}>
+          {diagnostics && (
+            <button
+              className={s.cloudStatus}
+              data-warning={
+                !!cloudError ||
+                !!snapshot.memoryPending ||
+                saveState === "failed"
+              }
+              onClick={() => void run(() => library.retrySync())}
+              title={
+                snapshot.verifiedAt
+                  ? `Last verified ${new Date(snapshot.verifiedAt).toLocaleString()}`
+                  : "View synchronization status"
+              }
+            >
+              {snapshot.syncing ? (
+                <Loader2 size={15} className={s.spin} />
+              ) : cloudError ? (
+                <CloudOff size={16} />
+              ) : snapshot.verifiedAt && !snapshot.pending ? (
+                <Check size={16} />
+              ) : (
+                <Cloud size={16} />
+              )}
+              <span>{cloudLabel}</span>
+            </button>
+          )}
           <button
             className={s.iconButton}
             title="Recovery and storage"
@@ -585,13 +779,21 @@ export default function NotesScreen() {
           </button>
         </div>
       </header>
-      {(error || cloudError || !!snapshot.memoryPending) && (
+      {(error ||
+        ((restoring || snapshot.restorePending) && cloudError) ||
+        delayedBackup ||
+        criticalCloudError ||
+        (diagnostics && cloudError) ||
+        !!snapshot.memoryPending) && (
         <div role="alert" className={s.notice}>
           <CloudOff size={17} />
           <span>
             {snapshot.memoryPending
               ? "Unsaved edits are retained in this tab. Open Recovery to export or retry them before closing."
-              : error || cloudError}
+              : error ||
+                (delayedBackup && !criticalCloudError
+                  ? "Your recent changes are saved on this device, but cloud backup has been unavailable for a while. Keep this device’s storage intact and try again when connected."
+                  : cloudError)}
           </span>
           {!!snapshot.memoryPending && (
             <button
@@ -605,11 +807,13 @@ export default function NotesScreen() {
             className={s.textButton}
             onClick={() => void run(() => library.retrySync())}
           >
-            Retry sync
+            {diagnostics ? "Retry sync" : "Try again"}
           </button>
-          <button className={s.textButton} onClick={() => void connect()}>
-            Reconnect
-          </button>
+          {snapshot.errorCode === "AUTH" && (
+            <button className={s.textButton} onClick={() => void connect()}>
+              Reconnect
+            </button>
+          )}
           {error && (
             <button
               className={s.iconButton}
@@ -621,7 +825,10 @@ export default function NotesScreen() {
           )}
         </div>
       )}
-      <div className={`${s.workspace} ${navOpen ? s.navOpen : ""}`} data-paper={isInk || undefined}>
+      <div
+        className={`${s.workspace} ${navOpen ? s.navOpen : ""}`}
+        data-paper={!!documentId || undefined}
+      >
         {navOpen && (
           <button
             className={s.navBackdrop}
@@ -676,12 +883,33 @@ export default function NotesScreen() {
             {snapshot.folders.length === 0 && (
               <p className={s.navHint}>A little order for your ideas.</p>
             )}
-            {snapshot.folders.slice(0, folderLimit).map((folder) => (
+            {visibleFolders.slice(0, folderLimit).map((folder) => (
               <div
                 key={folder.id}
                 className={s.folderRow}
                 style={{ paddingLeft: folderDepth(folder.id) * 12 }}
               >
+                {snapshot.folders.some((f) => f.parentId === folder.id) && (
+                  <button
+                    className={s.folderExpand}
+                    aria-label={`${collapsedFolders.has(folder.id) ? "Expand" : "Collapse"} ${folder.name}`}
+                    aria-expanded={!collapsedFolders.has(folder.id)}
+                    onClick={() =>
+                      setCollapsedFolders((old) => {
+                        const next = new Set(old);
+                        if (next.has(folder.id)) next.delete(folder.id);
+                        else next.add(folder.id);
+                        return next;
+                      })
+                    }
+                  >
+                    {collapsedFolders.has(folder.id) ? (
+                      <ChevronRight size={14} />
+                    ) : (
+                      <ChevronDown size={14} />
+                    )}
+                  </button>
+                )}
                 <button
                   className={`${s.navItem} ${selectedFolder === folder.id ? s.navActive : ""}`}
                   title={folder.name}
@@ -738,7 +966,7 @@ export default function NotesScreen() {
             <div>
               <strong>Google Drive</strong>
               <span>
-                {snapshot.pending
+                {diagnostics && snapshot.pending
                   ? "Changes waiting to sync"
                   : "Your connected library"}
               </span>
@@ -749,7 +977,7 @@ export default function NotesScreen() {
           className={s.mainPane}
           aria-label={documentId ? "Document workspace" : "Document library"}
         >
-          <div className={s.libraryHeader}>
+          <div className={s.libraryHeader} hidden={!!documentId}>
             <div className={s.breadcrumb}>
               <button
                 className={s.mobileNavToggle}
@@ -764,7 +992,7 @@ export default function NotesScreen() {
               {documentId && (
                 <>
                   <ChevronRight size={14} />
-                  <strong>{titleLabel}</strong>
+                  <strong>{note?.view.descriptor.title}</strong>
                 </>
               )}
             </div>
@@ -807,7 +1035,7 @@ export default function NotesScreen() {
                       await open(
                         await library.create(
                           "Untitled note",
-                          "flow",
+                          "notebook",
                           selectedFolder
                         )
                       );
@@ -837,27 +1065,29 @@ export default function NotesScreen() {
                       <button
                         onClick={() => {
                           setCreateOpen(false);
-                          setModal({
-                            type: "notebook",
-                            parentId: selectedFolder,
-                            ink: true,
-                          });
+                          pdfInput.current?.click();
                         }}
                       >
-                        <BookOpen size={17} />
-                        Handwritten notebook
+                        <Upload size={17} />
+                        Import PDF
                       </button>
                       <button
                         onClick={() => {
                           setCreateOpen(false);
-                          setModal({
-                            type: "notebook",
-                            parentId: selectedFolder,
-                          });
+                          imageInput.current?.click();
                         }}
                       >
-                        <BookOpen size={17} />
-                        New notebook
+                        <ImagePlus size={17} />
+                        Import image
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCreateOpen(false);
+                          importInput.current?.click();
+                        }}
+                      >
+                        <Upload size={17} />
+                        Import Notes archive
                       </button>
                       <button
                         onClick={() => {
@@ -877,13 +1107,18 @@ export default function NotesScreen() {
               </div>
             </div>
           </div>
-          {!snapshot.ready ? (
+          {restoring ? (
             <div className={s.empty}>
-              <Loader2 size={26} className={s.spin} />
-              <h2>Restoring your library</h2>
+              {!cloudError && <Loader2 size={26} className={s.spin} />}
+              <h2>
+                {cloudError
+                  ? "Library download paused"
+                  : "Downloading your notes"}
+              </h2>
               <p>
-                Notes creation is available after the original cloud library has
-                been verified. Existing data is kept.
+                {cloudError
+                  ? "Your existing data is kept. Check the message above and try again when connected."
+                  : "Your notes will appear as verified copies arrive. The rest of your library downloads in the background."}
               </p>
               <button
                 className={s.secondary}
@@ -935,38 +1170,6 @@ export default function NotesScreen() {
                       </button>
                     </div>
                   )}
-                  {note.view.descriptor.kind === "notebook" && !isInk && (
-                    <div className={s.pageTabs} aria-label="Notebook pages">
-                      {note.view.descriptor.pages.map((page, index) => (
-                        <button
-                          key={page.pageId}
-                          aria-current={
-                            page.pageId ===
-                            (resolvedPage ||
-                              note.view.descriptor.pages[0]?.pageId)
-                              ? "page"
-                              : undefined
-                          }
-                          onClick={() =>
-                            void run(() => open(note.id, page.pageId))
-                          }
-                        >
-                          Page {index + 1}
-                        </button>
-                      ))}
-                      <button
-                        aria-label="Add notebook page"
-                        onClick={() =>
-                          void run(async () => {
-                            await leave.current?.();
-                            await open(note.id, await library.addPage(note.id));
-                          })
-                        }
-                      >
-                        <Plus size={16} />
-                      </button>
-                    </div>
-                  )}
                   <Suspense
                     fallback={
                       <p role="status" className={s.loading}>
@@ -974,33 +1177,57 @@ export default function NotesScreen() {
                       </p>
                     }
                   >
-                    {isInk ? (
+                    {isPdf ? (
+                      <PdfWorkspace
+                        key={`${note.id}:${editorGeneration}`}
+                        library={library}
+                        note={note}
+                        pageId={resolvedPage}
+                        onBack={() => void run(back)}
+                        onError={onError}
+                        onState={onState}
+                        registerLeave={registerLeave}
+                        diagnostics={diagnostics}
+                      />
+                    ) : (
                       <InkEditor
-                        key={`${note.id}:${resolvedPage || "first"}:${editorGeneration}`}
+                        key={`${note.id}:${editorGeneration}`}
                         library={library}
                         note={note}
                         pageId={resolvedPage}
                         onBack={() => void run(back)}
                         onPage={(page) => void run(() => open(note.id, page))}
+                        onVisiblePage={(page) =>
+                          selectURL(
+                            notesResourceURL({
+                              version: 1,
+                              type: "sylf-note",
+                              libraryId: library.repository.libraryId,
+                              documentId: note.id,
+                              pageId: page,
+                            })
+                          )
+                        }
                         onError={onError}
                         onState={onState}
                         registerLeave={registerLeave}
-                      />
-                    ) : (
-                      <NotesEditor
-                        key={`${note.id}:${resolvedPage || "first"}:${editorGeneration}`}
-                        library={library}
-                        note={note}
-                        pageId={resolvedPage}
-                        onBack={() => void run(back)}
-                        onError={onError}
-                        onState={onState}
-                        registerLeave={registerLeave}
+                        diagnostics={diagnostics}
+                        onDetails={() =>
+                          setModal({ type: "manage", id: note.id })
+                        }
+                        onHistory={() =>
+                          setModal({ type: "history", id: note.id })
+                        }
                       />
                     )}
                   </Suspense>
                 </>
               )
+            ) : snapshot.catalogComplete === false ? (
+              <div className={s.empty} role="status">
+                <Loader2 size={26} className={s.spin} />
+                <h2>Opening this note…</h2>
+              </div>
             ) : (
               <div className={s.empty}>
                 <FileText size={30} />
@@ -1082,6 +1309,52 @@ export default function NotesScreen() {
                 </p>
               )}
               <div className={s.collectionScroll}>
+                {!query && (filter === "all" || !!selectedFolder) && (
+                  <div className={s.folderGrid} aria-label="Folders">
+                    {snapshot.folders
+                      .filter((f) => f.parentId === selectedFolder)
+                      .map((f) => (
+                        <button
+                          key={f.id}
+                          onClick={() => chooseFilter("folder:" + f.id)}
+                          className={s.folderCard}
+                        >
+                          <Folder size={34} strokeWidth={1.3} />
+                          <strong>{f.name}</strong>
+                          <span>
+                            {
+                              snapshot.notes.filter(
+                                (n) =>
+                                  n.view.state !== "trashed" &&
+                                  n.view.descriptor.folderId === f.id
+                              ).length
+                            }{" "}
+                            notes
+                          </span>
+                        </button>
+                      ))}
+                  </div>
+                )}
+                {selectedFolder && (
+                  <button
+                    className={s.textButton}
+                    onClick={() => {
+                      const parent = snapshot.folders.find(
+                        (f) => f.id === selectedFolder
+                      )?.parentId;
+                      chooseFilter(parent ? "folder:" + parent : "all");
+                    }}
+                  >
+                    ← Back to{" "}
+                    {snapshot.folders.find(
+                      (f) =>
+                        f.id ===
+                        snapshot.folders.find((f) => f.id === selectedFolder)
+                          ?.parentId
+                    )?.name || "all notes"}
+                  </button>
+                )}
+
                 {filtered.length ? (
                   <>
                     <div className={grid ? s.noteGrid : s.noteList}>
@@ -1142,7 +1415,7 @@ export default function NotesScreen() {
                         ? "Try another title or wait for local content indexing."
                         : filter === "trash"
                           ? "Deleted notes appear here, ready to restore."
-                          : "Start with a note, or gather a subject into a notebook."}
+                          : "Type, sketch, or bring in a PDF. Every idea belongs here."}
                     </p>
                     {!query && filter !== "trash" && (
                       <button
@@ -1152,7 +1425,7 @@ export default function NotesScreen() {
                             open(
                               await library.create(
                                 "Untitled note",
-                                "flow",
+                                "notebook",
                                 selectedFolder
                               )
                             )
@@ -1193,6 +1466,50 @@ export default function NotesScreen() {
           });
         }}
       />
+      <input
+        ref={imageInput}
+        className={s.hidden}
+        type="file"
+        accept="image/png,image/jpeg,image/webp,image/gif"
+        aria-label="Choose image to import"
+        onChange={(event) => {
+          const image = event.target.files?.[0];
+          event.target.value = "";
+          if (!image) return;
+          void run(async () => {
+            await leave.current?.();
+            const id = await library.importImage(image, selectedFolder);
+            await open(id);
+          });
+        }}
+      />
+      <input
+        ref={pdfInput}
+        className={s.hidden}
+        type="file"
+        accept="application/pdf,.pdf"
+        aria-label="Choose PDF file"
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          event.target.value = "";
+          if (!file) return;
+          void run(async () => {
+            await leave.current?.();
+            if (file.size > 50 * 1024 * 1024)
+              throw new Error("Choose a PDF up to 50 MiB.");
+            const { inspectPdf } = await import("@/lib/notes/pdf-reader"),
+              bytes = new Uint8Array(await file.arrayBuffer()),
+              pages = await inspectPdf(bytes, library.session.signal);
+            const id = await library.importPdf(
+              bytes,
+              pages,
+              file.name,
+              selectedFolder
+            );
+            await open(id);
+          });
+        }}
+      />
       {modal && (
         <NotesActions
           key={`${modal.type}:${modal.id || "new"}`}
@@ -1230,11 +1547,15 @@ function NoteCard({
 }) {
   const descriptor = note.view.descriptor,
     notebook = descriptor.kind === "notebook",
+    image = descriptor.assets?.find((a) => a.mediaType.startsWith("image/")),
     inkPage = descriptor.pages.find(
       (p) =>
         !p.extensions.archived &&
         descriptor.streams.some(
-          (s) => s.streamId === p.streamId && s.adapter === "sylf-ink/1"
+          (s) =>
+            (s.streamId === p.streamId ||
+              s.streamId === p.extensions.inkStreamId) &&
+            s.adapter === "sylf-ink/1"
         )
     );
   return (
@@ -1248,16 +1569,35 @@ function NoteCard({
           className={`${s.documentPreview} ${notebook ? s.notebookPreview : ""}`}
           aria-hidden="true"
         >
-          {inkPage ? (
+          {descriptor.kind === "pdf" && descriptor.pages[0] ? (
+            <Suspense fallback={<FileText size={29} />}>
+              <PdfThumbnail
+                library={library}
+                note={note}
+                pageId={
+                  descriptor.pages.find((p) => !p.extensions.archived)
+                    ?.pageId || descriptor.pages[0].pageId
+                }
+              />
+            </Suspense>
+          ) : image ? (
+            <Suspense fallback={<ImagePlus size={26} />}>
+              <ImageThumbnail
+                library={library}
+                documentId={note.id}
+                assetId={image.assetId}
+              />
+            </Suspense>
+          ) : inkPage ? (
             <Suspense fallback={<BookOpen size={29} />}>
               <InkThumbnail
                 library={library}
                 note={note}
                 pageId={inkPage.pageId}
+                size={240}
+                preview={note.preview}
               />
             </Suspense>
-          ) : notebook ? (
-            <BookOpen size={29} />
           ) : (
             <>
               <span className={s.previewHeading}>{descriptor.title}</span>
@@ -1278,9 +1618,11 @@ function NoteCard({
           <h3>{descriptor.title}</h3>
           <p>
             {folder ||
-              (notebook
-                ? `${descriptor.pages.length} ${descriptor.pages.length === 1 ? "page" : "pages"}`
-                : "Note")}
+              (descriptor.kind === "pdf"
+                ? `PDF · ${descriptor.pages.filter((p) => !p.extensions.archived).length} pages`
+                : notebook
+                  ? `${descriptor.pages.length} ${descriptor.pages.length === 1 ? "page" : "pages"}`
+                  : "Note")}
             <span>·</span>
             {new Date(note.updatedAt).toLocaleDateString(undefined, {
               month: "short",

@@ -113,6 +113,20 @@ export function configured() {
 }
 /** Isolate staging/production discovery even when both use the same Google app and numeric user IDs. */
 export const driveRealm = () => sha(publicOrigin());
+/** Exact server-provided deployment identities, never arbitrary *.vercel.app
+ * hosts or a client-supplied forwarded host. The storage realm stays canonical. */
+export function notesRequestOrigin(req: Request) {
+  const origin = new URL(req.url).origin;
+  const allowed = new Set([publicOrigin()]);
+  if (process.env.VERCEL === "1")
+    for (const host of [
+      process.env.VERCEL_URL,
+      process.env.VERCEL_PROJECT_PRODUCTION_URL,
+    ])
+      if (host && /^[a-z0-9.-]+$/i.test(host) && !host.includes(".."))
+        allowed.add(`https://${host.toLowerCase()}`);
+  return allowed.has(origin) ? origin : undefined;
+}
 export function sessionHash(req: Request) {
   return sha(
     (req.headers.get("cookie") || "")
@@ -123,10 +137,11 @@ export function sessionHash(req: Request) {
 }
 export function requireOrigin(req: Request) {
   const origin = req.headers.get("origin");
-  if (!origin || origin !== publicOrigin())
+  if (!origin || origin !== notesRequestOrigin(req))
     throw new NotesServerError(
       "Open Notes from its authenticated Sylf origin.",
-      403
+      403,
+      "ORIGIN"
     );
 }
 export async function limitedBytes(

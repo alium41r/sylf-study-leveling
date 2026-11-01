@@ -1,0 +1,1074 @@
+{
+ "when": "2026-11-01T14:21:26.662Z",
+ "server": "local disposable, production build",
+ "results": [
+  {
+   "label": "find the fourth",
+   "method": "GET",
+   "path": "/api/users/search?q=q_a",
+   "status": 200,
+   "ms": 9,
+   "bytes": 95,
+   "answer": [
+    {
+     "id": 4,
+     "name": "Probe a",
+     "username": "q_a_xx3y9i",
+     "hunterRank": "E",
+     "level": 1,
+     "isFriend": false
+    }
+   ]
+  },
+  {
+   "label": "request",
+   "method": "POST",
+   "path": "/api/friends/#",
+   "status": 201,
+   "ms": 15,
+   "bytes": 94,
+   "answer": {
+    "id": 2,
+    "senderId": 1,
+    "receiverId": 2,
+    "status": "PENDING",
+    "createdAt": "2026-11-01T14:21:26.111Z"
+   }
+  },
+  {
+   "label": "pending",
+   "method": "GET",
+   "path": "/api/friends/#",
+   "status": 200,
+   "ms": 8,
+   "bytes": 481,
+   "answer": [
+    {
+     "id": 2,
+     "senderId": 1,
+     "receiverId": 2,
+     "status": "PENDING",
+     "createdAt": "2026-11-01T14:21:26.111Z",
+     "sender": {
+      "id": 1,
+      "name": "Probe a",
+      "username": "p1_a_mvxx27jn",
+      "hunterRank": "E",
+      "level": 1,
+      "avatarUrl": null,
+      "activeAvatar": "class_scholar",
+      "activeFrame": "none",
+      "activeTitle": "Novice",
+      "characterConfig": null,
+      "createdAt": "2026-11-01T14:19:36.883Z",
+      "companion": {
+       "ownerId": 1,
+       "config": {
+        "displayBorder": "none",
+        "pixelGap": 0.12,
+        "aura": "none"
+       },
+       "creation": null,
+       "revision": null,
+       "unavailable": false
+      }
+     }
+    }
+   ]
+  },
+  {
+   "label": "accept",
+   "method": "PATCH",
+   "path": "/api/friends/requests/2",
+   "status": 200,
+   "ms": 10,
+   "bytes": 34,
+   "answer": {
+    "success": true,
+    "action": "ACCEPT"
+   }
+  },
+  {
+   "label": "request",
+   "method": "POST",
+   "path": "/api/friends/#",
+   "status": 201,
+   "ms": 11,
+   "bytes": 94,
+   "answer": {
+    "id": 3,
+    "senderId": 1,
+    "receiverId": 3,
+    "status": "PENDING",
+    "createdAt": "2026-11-01T14:21:26.140Z"
+   }
+  },
+  {
+   "label": "pending",
+   "method": "GET",
+   "path": "/api/friends/#",
+   "status": 200,
+   "ms": 7,
+   "bytes": 481,
+   "answer": [
+    {
+     "id": 3,
+     "senderId": 1,
+     "receiverId": 3,
+     "status": "PENDING",
+     "createdAt": "2026-11-01T14:21:26.140Z",
+     "sender": {
+      "id": 1,
+      "name": "Probe a",
+      "username": "p1_a_mvxx27jn",
+      "hunterRank": "E",
+      "level": 1,
+      "avatarUrl": null,
+      "activeAvatar": "class_scholar",
+      "activeFrame": "none",
+      "activeTitle": "Novice",
+      "characterConfig": null,
+      "createdAt": "2026-11-01T14:19:36.883Z",
+      "companion": {
+       "ownerId": 1,
+       "config": {
+        "displayBorder": "none",
+        "pixelGap": 0.12,
+        "aura": "none"
+       },
+       "creation": null,
+       "revision": null,
+       "unavailable": false
+      }
+     }
+    }
+   ]
+  },
+  {
+   "label": "accept",
+   "method": "PATCH",
+   "path": "/api/friends/requests/3",
+   "status": 200,
+   "ms": 9,
+   "bytes": 34,
+   "answer": {
+    "success": true,
+    "action": "ACCEPT"
+   }
+  },
+  {
+   "label": "request",
+   "method": "POST",
+   "path": "/api/friends/#",
+   "status": 201,
+   "ms": 10,
+   "bytes": 94,
+   "answer": {
+    "id": 4,
+    "senderId": 2,
+    "receiverId": 3,
+    "status": "PENDING",
+    "createdAt": "2026-11-01T14:21:26.166Z"
+   }
+  },
+  {
+   "label": "pending",
+   "method": "GET",
+   "path": "/api/friends/#",
+   "status": 200,
+   "ms": 7,
+   "bytes": 481,
+   "answer": [
+    {
+     "id": 4,
+     "senderId": 2,
+     "receiverId": 3,
+     "status": "PENDING",
+     "createdAt": "2026-11-01T14:21:26.166Z",
+     "sender": {
+      "id": 2,
+      "name": "Probe b",
+      "username": "p1_b_mvxx27jn",
+      "hunterRank": "E",
+      "level": 1,
+      "avatarUrl": null,
+      "activeAvatar": "class_scholar",
+      "activeFrame": "none",
+      "activeTitle": "Novice",
+      "characterConfig": null,
+      "createdAt": "2026-11-01T14:19:36.995Z",
+      "companion": {
+       "ownerId": 2,
+       "config": {
+        "displayBorder": "none",
+        "pixelGap": 0.12,
+        "aura": "none"
+       },
+       "creation": null,
+       "revision": null,
+       "unavailable": false
+      }
+     }
+    }
+   ]
+  },
+  {
+   "label": "accept",
+   "method": "PATCH",
+   "path": "/api/friends/requests/4",
+   "status": 200,
+   "ms": 9,
+   "bytes": 34,
+   "answer": {
+    "success": true,
+    "action": "ACCEPT"
+   }
+  },
+  {
+   "label": "friend with no heartbeat",
+   "method": "GET",
+   "path": "/api/friends",
+   "status": 200,
+   "ms": 16,
+   "bytes": 1329,
+   "answer": "[{\"companion\":{\"ownerId\":2,\"config\":{\"displayBorder\":\"none\",\"pixelGap\":0.12,\"aura\":\"none\"},\"creation\":null,\"revision\":null,\"unavailable\":false},\"friendshipId\":2,\"id\":2,\"name\":\"Probe b\",\"username\":\"p1_b_mvxx27jn\",\"visible\":{\"hours\":true,\"session\":true,\"online\":true,\"rank\":true},\"hunterRank\":\"E\",\"level\":1,\"totalStudyMinutes\":0,\"totalStudySeconds\":0,\"todayMinutes\":0,\"todaySeconds\":0,\"completedTodaySeconds\":0,\"isOnline\":false,\"isStudying\":false,\"activeSessionStartedAt\":null,\"avatarUrl\":null,\"activeAvatar\":\"class_scholar\",\"activeFrame\":\"none\",\"activeTitle\":\"Novice\",\"activeAura\":\"none\",\"characterConfig\":null,\"lastSeenAt\":null},{\"companion\":{\"ownerId\":3,\"config\":{\"displayBorder\":\"none\",\"pixelGap\":0\u2026"
+  },
+  {
+   "label": "A-1 isOnline before heartbeat",
+   "value": false
+  },
+  {
+   "label": "heartbeat",
+   "method": "POST",
+   "path": "/api/user/h#",
+   "status": 200,
+   "ms": 13,
+   "bytes": 11,
+   "answer": {
+    "ok": true
+   }
+  },
+  {
+   "label": "friend after heartbeat",
+   "method": "GET",
+   "path": "/api/friends",
+   "status": 200,
+   "ms": 10,
+   "bytes": 1350,
+   "answer": "[{\"companion\":{\"ownerId\":2,\"config\":{\"displayBorder\":\"none\",\"pixelGap\":0.12,\"aura\":\"none\"},\"creation\":null,\"revision\":null,\"unavailable\":false},\"friendshipId\":2,\"id\":2,\"name\":\"Probe b\",\"username\":\"p1_b_mvxx27jn\",\"visible\":{\"hours\":true,\"session\":true,\"online\":true,\"rank\":true},\"hunterRank\":\"E\",\"level\":1,\"totalStudyMinutes\":0,\"totalStudySeconds\":0,\"todayMinutes\":0,\"todaySeconds\":0,\"completedTodaySeconds\":0,\"isOnline\":true,\"isStudying\":false,\"activeSessionStartedAt\":null,\"avatarUrl\":null,\"activeAvatar\":\"class_scholar\",\"activeFrame\":\"none\",\"activeTitle\":\"Novice\",\"activeAura\":\"none\",\"characterConfig\":null,\"lastSeenAt\":\"2026-11-01T14:21:26.206Z\"},{\"companion\":{\"ownerId\":3,\"config\":{\"displayBorder\u2026"
+  },
+  {
+   "label": "A-1 isOnline after heartbeat",
+   "value": true
+  },
+  {
+   "label": "store hostile urls",
+   "method": "PATCH",
+   "path": "/api/profile/custo#",
+   "status": 200,
+   "ms": 7,
+   "bytes": 527,
+   "answer": {
+    "success": true,
+    "message": "Profile identity updated successfully.",
+    "characterConfig": null,
+    "user": {
+     "id": 3,
+     "username": "p1_c_mvxx27jn",
+     "name": "Probe c",
+     "email": "changed_mvxx27jn@example.test",
+     "avatarUrl": "http://attacker.invalid/track.png",
+     "bannerUrl": "javascript:alert(1)",
+     "bio": null,
+     "activeAvatar": "class_scholar",
+     "activeFrame": "frame_mythic_probe",
+     "activeTitle": "Emperor",
+     "activeAura": "aura_mythic_probe",
+     "activeNameColor": "name_mythic_probe",
+     "socialLinks": null,
+     "characterConfig": null,
+     "level": 1,
+     "hunterRank": "E",
+     "currentXP": 0
+    }
+   }
+  },
+  {
+   "label": "profile as a friend",
+   "method": "GET",
+   "path": "/api/profile/p1_c_#",
+   "status": 200,
+   "ms": 17,
+   "bytes": 1576,
+   "answer": "{\"profile\":{\"id\":3,\"name\":\"Probe c\",\"username\":\"p1_c_mvxx27jn\",\"scholarId\":\"#000003\",\"verificationStatus\":\"UNVERIFIED\",\"avatarUrl\":\"http://attacker.invalid/track.png\",\"bannerUrl\":\"javascript:alert(1)\",\"bio\":null,\"hunterRank\":\"E\",\"level\":1,\"currentXP\":0,\"xpToNextLevel\":182,\"levelProgress\":0,\"hp\":100,\"maxHp\":100,\"streakDays\":0,\"totalStudyMinutes\":0,\"totalStudySeconds\":0,\"todayStudyMinutes\":0,\"todayStudySeconds\":0,\"completedTodaySeconds\":0,\"isStudying\":false,\"isOnline\":false,\"activeSessionStartedAt\":null,\"activeAvatar\":\"class_scholar\",\"activeFrame\":\"frame_mythic_probe\",\"activeTitle\":\"Emperor\",\"activeAura\":\"aura_mythic_probe\",\"activeNameColor\":\"name_mythic_probe\",\"characterConfig\":null,\"socialLi\u2026"
+  },
+  {
+   "label": "hostile urls served to others",
+   "banner": true,
+   "avatar": true,
+   "title": true
+  },
+  {
+   "label": "create subject with code",
+   "method": "POST",
+   "path": "/api/#",
+   "status": 201,
+   "ms": 24,
+   "bytes": 278,
+   "answer": {
+    "id": 3,
+    "userId": 1,
+    "name": "Chemistry",
+    "code": "CHEM",
+    "examBoard": "CAIE",
+    "level": "A-Level",
+    "color": "#8B5CF6",
+    "syllabusNote": null,
+    "lastCompiledAt": null,
+    "archivedAt": null,
+    "createdAt": "2026-11-01T14:21:26.254Z",
+    "updatedAt": "2026-11-01T14:21:26.254Z",
+    "nodesCount": 48,
+    "todaySeconds": 0
+   }
+  },
+  {
+   "label": "subject dependencies",
+   "method": "GET",
+   "path": "/api/subjects/3",
+   "status": 200,
+   "ms": 6,
+   "bytes": 326,
+   "answer": {
+    "id": 3,
+    "name": "Chemistry",
+    "code": "CHEM",
+    "examBoard": "CAIE",
+    "level": "A-Level",
+    "color": "#8B5CF6",
+    "syllabusNote": null,
+    "archivedAt": null,
+    "createdAt": "2026-11-01T14:21:26.254Z",
+    "updatedAt": "2026-11-01T14:21:26.254Z",
+    "hasActiveSession": false,
+    "activeSessionId": null,
+    "activeQuestsCount": 0,
+    "activePlansCount": 0,
+    "totalSessionsCount": 0
+   }
+  },
+  {
+   "label": "archive subject",
+   "method": "DELETE",
+   "path": "/api/subjects/3",
+   "status": 200,
+   "ms": 10,
+   "bytes": 389,
+   "answer": {
+    "success": true,
+    "message": "Subject \"Chemistry\" removed from active subjects. Historical progress preserved.",
+    "subject": {
+     "id": 3,
+     "userId": 1,
+     "name": "Chemistry",
+     "code": "CHEM",
+     "examBoard": "CAIE",
+     "level": "A-Level",
+     "color": "#8B5CF6",
+     "syllabusNote": null,
+     "lastCompiledAt": null,
+     "archivedAt": "2026-11-01T14:21:26.283Z",
+     "createdAt": "2026-11-01T14:21:26.254Z",
+     "updatedAt": "2026-11-01T14:21:26.284Z"
+    }
+   }
+  },
+  {
+   "label": "restore subject",
+   "method": "POST",
+   "path": "/api/subjects/3/restore",
+   "status": 200,
+   "ms": 9,
+   "bytes": 329,
+   "answer": {
+    "success": true,
+    "message": "Subject \"Chemistry\" restored successfully.",
+    "subject": {
+     "id": 3,
+     "userId": 1,
+     "name": "Chemistry",
+     "code": "CHEM",
+     "examBoard": "CAIE",
+     "level": "A-Level",
+     "color": "#8B5CF6",
+     "syllabusNote": null,
+     "lastCompiledAt": null,
+     "archivedAt": null,
+     "createdAt": "2026-11-01T14:21:26.254Z",
+     "updatedAt": "2026-11-01T14:21:26.293Z"
+    }
+   }
+  },
+  {
+   "label": "create quest",
+   "method": "POST",
+   "path": "/api/quests",
+   "status": 201,
+   "ms": 17,
+   "bytes": 654,
+   "answer": {
+    "id": 2,
+    "userId": 1,
+    "goalId": null,
+    "subjectId": null,
+    "subjectNodeId": null,
+    "title": "Edit me",
+    "description": null,
+    "targetMinutes": 30,
+    "requiredMinutes": 30,
+    "elapsedSeconds": 0,
+    "scopeWeight": 0.25,
+    "status": "ACTIVE",
+    "difficulty": "NORMAL",
+    "scheduledFor": "2026-11-03",
+    "isKamishWardActive": false,
+    "isGateKeyApplied": false,
+    "createdByAi": false,
+    "xpReward": 150,
+    "sylphReward": 15,
+    "createdAt": "2026-11-01T14:21:26.308Z",
+    "completedAt": null,
+    "plannedMinutes": null,
+    "remainingMinutesEstimate": null,
+    "remainingEstimateBasisActualSeconds": null,
+    "remainingDisposition": "OPEN",
+    "executionVersion": 0,
+    "plannerSpec": null,
+    "plannerSpecDigest": null,
+    "subjectNode": null,
+    "subject": null,
+    "goal": null
+   }
+  },
+  {
+   "label": "edit quest",
+   "method": "PATCH",
+   "path": "/api/quests/2",
+   "status": 200,
+   "ms": 11,
+   "bytes": 617,
+   "answer": {
+    "quest": {
+     "id": 2,
+     "userId": 1,
+     "goalId": null,
+     "subjectId": null,
+     "subjectNodeId": null,
+     "title": "Edited",
+     "description": null,
+     "targetMinutes": 30,
+     "requiredMinutes": 30,
+     "elapsedSeconds": 0,
+     "scopeWeight": 0.25,
+     "status": "ACTIVE",
+     "difficulty": "NORMAL",
+     "scheduledFor": "2026-11-03",
+     "isKamishWardActive": false,
+     "isGateKeyApplied": false,
+     "createdByAi": false,
+     "xpReward": 150,
+     "sylphReward": 15,
+     "createdAt": "2026-11-01T14:21:26.308Z",
+     "completedAt": null,
+     "plannedMinutes": null,
+     "remainingMinutesEstimate": null,
+     "remainingEstimateBasisActualSeconds": null,
+     "remainingDisposition": "OPEN",
+     "executionVersion": 0,
+     "plannerSpec": null,
+     "plannerSpecDigest": null
+    }
+   }
+  },
+  {
+   "label": "delete quest",
+   "method": "DELETE",
+   "path": "/api/quests/2",
+   "status": 200,
+   "ms": 8,
+   "bytes": 27,
+   "answer": {
+    "message": "Quest deleted"
+   }
+  },
+  {
+   "label": "floating rest day status",
+   "method": "GET",
+   "path": "/api/user/study-schedule/floating-rest-day?dateKey=2026-11-03",
+   "status": 200,
+   "ms": 7,
+   "bytes": 130,
+   "answer": {
+    "dateKey": "2026-11-03",
+    "isFloatingRest": false,
+    "isFixedRest": false,
+    "weekKey": "2026-W45",
+    "weekUsage": 0,
+    "weekQuota": 1,
+    "canAdd": true
+   }
+  },
+  {
+   "label": "calendar preferences",
+   "method": "GET",
+   "path": "/api/calendar/pre#",
+   "status": 200,
+   "ms": 8,
+   "bytes": 282,
+   "answer": {
+    "settings": {
+     "timePlanning": false,
+     "workload": false,
+     "organization": false,
+     "detailedEvents": false,
+     "view": "month",
+     "filters": {
+      "personal": true,
+      "objectives": true,
+      "study": true,
+      "blocks": true,
+      "notes": true,
+      "annotations": true,
+      "categories": [
+       "personal",
+       "work",
+       "learning",
+       "health"
+      ]
+     }
+    },
+    "revision": 0
+   }
+  },
+  {
+   "label": "create event",
+   "method": "POST",
+   "path": "/api/calendar/#",
+   "status": 200,
+   "ms": 27,
+   "bytes": 389,
+   "answer": {
+    "event": {
+     "title": "Probe",
+     "description": "",
+     "color": "BLUE",
+     "category": "personal",
+     "recurrence": null,
+     "reminders": [],
+     "allDay": true,
+     "startDate": "2026-11-05",
+     "endDate": "2026-11-06",
+     "startsAt": null,
+     "endsAt": null,
+     "timezone": "Asia/Karachi",
+     "id": "19b474cc-06aa-4ac1-a19f-8c587586d077",
+     "revision": 1,
+     "createdAt": "2026-11-01T14:21:26.364Z",
+     "updatedAt": "2026-11-01T14:21:26.364Z",
+     "lastMutationId": null
+    }
+   }
+  },
+  {
+   "label": "edit event without revision",
+   "method": "PATCH",
+   "path": "/api/calendar/#",
+   "status": 400,
+   "ms": 4,
+   "bytes": 62,
+   "answer": {
+    "error": "Invalid input: expected number, received undefined"
+   }
+  },
+  {
+   "label": "edit event stale revision",
+   "method": "PATCH",
+   "path": "/api/calendar/#",
+   "status": 409,
+   "ms": 9,
+   "bytes": 109,
+   "answer": {
+    "error": "This item changed in another tab. Your draft is kept. Reopen the latest item before saving again."
+   }
+  },
+  {
+   "label": "another reads event",
+   "method": "GET",
+   "path": "/api/calendar/personal?id=19b474cc-06aa-4ac1-a19f-8c587586d077&kind=event",
+   "status": 404,
+   "ms": 10,
+   "bytes": 28,
+   "answer": {
+    "error": "Event not found."
+   }
+  },
+  {
+   "label": "calendar month keys",
+   "method": "GET",
+   "path": "/api/calendar/month",
+   "status": 200,
+   "ms": 12,
+   "bytes": 8521,
+   "answer": "{\"year\":2026,\"month\":10,\"monthName\":\"November\",\"dailyGoalMinutes\":90,\"restDays\":[6],\"enableHpPenalty\":true,\"days\":[{\"date\":\"2026-11-01\",\"dayOfWeek\":0,\"isRestDay\":false,\"dailyGoalMinutes\":90,\"totalMinutes\":0,\"totalSeconds\":0,\"completionPercentage\":0,\"goalMet\":false,\"sessionsCount\":0,\"sessions\":[],\"questsCount\":0,\"questsCompleted\":0,\"xpGained\":0,\"subjectBreakdown\":[],\"quests\":[]},{\"date\":\"2026-11-02\",\"dayOfWeek\":1,\"isRestDay\":false,\"dailyGoalMinutes\":90,\"totalMinutes\":0,\"totalSeconds\":0,\"completionPercentage\":0,\"goalMet\":false,\"sessionsCount\":0,\"sessions\":[],\"questsCount\":1,\"questsCompleted\":0,\"xpGained\":0,\"subjectBreakdown\":[],\"quests\":[{\"id\":1,\"title\":\"Probe quest\",\"description\":null,\"status\u2026"
+  },
+  {
+   "label": "month keys",
+   "keys": [
+    "year",
+    "month",
+    "monthName",
+    "dailyGoalMinutes",
+    "restDays",
+    "enableHpPenalty",
+    "days",
+    "milestones",
+    "floatingRestDays",
+    "monthStats"
+   ],
+   "first": [
+    "date",
+    "dayOfWeek",
+    "isRestDay",
+    "dailyGoalMinutes",
+    "totalMinutes",
+    "totalSeconds",
+    "completionPercentage",
+    "goalMet",
+    "sessionsCount",
+    "sessions",
+    "questsCount",
+    "questsCompleted",
+    "xpGained",
+    "subjectBreakdown",
+    "quests"
+   ]
+  },
+  {
+   "label": "create group",
+   "method": "POST",
+   "path": "/api/conve#",
+   "status": 201,
+   "ms": 11,
+   "bytes": 8,
+   "answer": {
+    "id": 2
+   }
+  },
+  {
+   "label": "stranger reads group",
+   "method": "GET",
+   "path": "/api/conversations/2",
+   "status": 403,
+   "ms": 4,
+   "bytes": 29,
+   "answer": {
+    "error": "Not a participant"
+   }
+  },
+  {
+   "label": "member renames group",
+   "method": "PATCH",
+   "path": "/api/conversations/2",
+   "status": 403,
+   "ms": 5,
+   "bytes": 57,
+   "answer": {
+    "error": "Only the group creator can manage this group."
+   }
+  },
+  {
+   "label": "add a stranger",
+   "method": "PATCH",
+   "path": "/api/conversations/2",
+   "status": 403,
+   "ms": 7,
+   "bytes": 57,
+   "answer": {
+    "error": "You can only add friends who accept messages."
+   }
+  },
+  {
+   "label": "member leaves",
+   "method": "PATCH",
+   "path": "/api/conversations/2",
+   "status": 200,
+   "ms": 5,
+   "bytes": 110,
+   "answer": {
+    "success": true,
+    "conversation": {
+     "id": 2,
+     "name": "Probe group",
+     "avatarUrl": "javascript:alert(2)",
+     "isGroup": true
+    }
+   }
+  },
+  {
+   "label": "list conversations",
+   "method": "GET",
+   "path": "/api/conve#",
+   "status": 200,
+   "ms": 5,
+   "bytes": 595,
+   "answer": [
+    {
+     "id": 2,
+     "name": "Probe group",
+     "avatarUrl": "javascript:alert(2)",
+     "isGroup": true,
+     "participants": [
+      {
+       "id": 1,
+       "name": "Probe a",
+       "username": "p1_a_mvxx27jn",
+       "hunterRank": "E",
+       "level": 1,
+       "avatarUrl": null,
+       "activeAvatar": "class_scholar",
+       "activeFrame": "none",
+       "characterConfig": null,
+       "isOnline": true
+      },
+      {
+       "id": 3,
+       "name": "Probe c",
+       "username": "p1_c_mvxx27jn",
+       "hunterRank": "E",
+       "level": 1,
+       "avatarUrl": "http://attacker.invalid/track.png",
+       "activeAvatar": "class_scholar",
+       "activeFrame": "frame_mythic_probe",
+       "characterConfig": null,
+       "isOnline": false
+      }
+     ],
+     "lastMessage": null,
+     "hasUnread": false,
+     "updatedAt": "2026-11-01T14:21:26.417Z"
+    }
+   ]
+  },
+  {
+   "label": "create party",
+   "method": "POST",
+   "path": "/api/focus-party",
+   "status": 201,
+   "ms": 6,
+   "bytes": 56,
+   "answer": {
+    "name": "Probe",
+    "partyId": 2,
+    "success": true,
+    "leaderId": 2
+   }
+  },
+  {
+   "label": "invite",
+   "method": "POST",
+   "path": "/api/focus-party/2/invite",
+   "status": 201,
+   "ms": 10,
+   "bytes": 29,
+   "answer": {
+    "success": true,
+    "inviteId": 1
+   }
+  },
+  {
+   "label": "invited view",
+   "method": "GET",
+   "path": "/api/focus-party",
+   "status": 200,
+   "ms": 7,
+   "bytes": 230,
+   "answer": {
+    "activeParty": null,
+    "pendingInvites": [
+     {
+      "id": 1,
+      "partyId": 2,
+      "partyName": "Probe",
+      "senderId": 2,
+      "senderName": "Probe b",
+      "senderUsername": "p1_b_mvxx27jn",
+      "senderAvatarUrl": null,
+      "createdAt": "2026-11-01T14:21:26.463Z",
+      "status": "PENDING"
+     }
+    ]
+   }
+  },
+  {
+   "label": "answer invite",
+   "method": "PATCH",
+   "path": "/api/focus-party/invites/1",
+   "status": 400,
+   "ms": 5,
+   "bytes": 111,
+   "answer": {
+    "error": "action must be 'ACCEPTED' or 'DECLINED' (or response 'accept'/'decline')",
+    "code": "VALIDATION_FAILED"
+   }
+  },
+  {
+   "label": "stranger reads party",
+   "method": "GET",
+   "path": "/api/focus-party/2",
+   "status": 403,
+   "ms": 6,
+   "bytes": 102,
+   "answer": {
+    "error": "You must be a member of this Focus Party to perform this action.",
+    "code": "NOT_PARTY_MEMBER"
+   }
+  },
+  {
+   "label": "stranger joins party",
+   "method": "POST",
+   "path": "/api/focus-party/2/join",
+   "status": 403,
+   "ms": 7,
+   "bytes": 97,
+   "answer": {
+    "error": "You must have a pending invitation to join this Focus Party.",
+    "code": "INVITE_REQUIRED"
+   }
+  },
+  {
+   "label": "start party session",
+   "method": "POST",
+   "path": "/api/focus-party/2/session",
+   "status": 200,
+   "ms": 6,
+   "bytes": 127,
+   "answer": {
+    "userId": 2,
+    "partyId": 2,
+    "success": true,
+    "sessionId": 1,
+    "timerState": "NOT_STARTED",
+    "currentStartedAt": null,
+    "accumulatedSeconds": 0
+   }
+  },
+  {
+   "label": "party timer start",
+   "method": "POST",
+   "path": "/api/focus-party/2/session/timer",
+   "status": 200,
+   "ms": 10,
+   "bytes": 133,
+   "answer": {
+    "userId": 2,
+    "success": true,
+    "sessionId": 1,
+    "timerState": "FOCUSING",
+    "currentStartedAt": "2026-11-01T14:21:26.504",
+    "accumulatedSeconds": 0
+   }
+  },
+  {
+   "label": "member timer start",
+   "method": "POST",
+   "path": "/api/focus-party/2/session/timer",
+   "status": 403,
+   "ms": 6,
+   "bytes": 102,
+   "answer": {
+    "error": "You must be a member of this Focus Party to perform this action.",
+    "code": "NOT_PARTY_MEMBER"
+   }
+  },
+  {
+   "label": "party state",
+   "method": "GET",
+   "path": "/api/focus-party/2/session",
+   "status": 200,
+   "ms": 7,
+   "bytes": 285,
+   "answer": {
+    "session": {
+     "id": 1,
+     "startedAt": "2026-11-01T14:21:26.493Z",
+     "collectiveSeconds": 0,
+     "members": [
+      {
+       "userId": 2,
+       "timerState": "FOCUSING",
+       "accumulatedSeconds": 0,
+       "currentStartedAt": "2026-11-01T14:21:26.504Z",
+       "joinedAt": "2026-11-01T14:21:26.493Z",
+       "leftAt": null,
+       "liveSeconds": 0,
+       "isFocusing": true
+      }
+     ]
+    }
+   }
+  },
+  {
+   "label": "solo session during a party",
+   "method": "POST",
+   "path": "/api/#",
+   "status": 400,
+   "ms": 6,
+   "bytes": 66,
+   "answer": {
+    "error": "A timer identity and start time are required together."
+   }
+  },
+  {
+   "label": "session invite",
+   "method": "POST",
+   "path": "/api/invites",
+   "status": 201,
+   "ms": 7,
+   "bytes": 126,
+   "answer": {
+    "id": 2,
+    "senderId": 1,
+    "receiverId": 3,
+    "subjectId": null,
+    "partyId": null,
+    "status": "PENDING",
+    "createdAt": "2026-11-01T14:21:26.531Z"
+   }
+  },
+  {
+   "label": "invites for C",
+   "method": "GET",
+   "path": "/api/invites",
+   "status": 200,
+   "ms": 7,
+   "bytes": 440,
+   "answer": [
+    {
+     "id": 2,
+     "senderId": 1,
+     "receiverId": 3,
+     "subjectId": null,
+     "partyId": null,
+     "status": "PENDING",
+     "createdAt": "2026-11-01T14:21:26.531Z",
+     "sender": {
+      "id": 1,
+      "name": "Probe a",
+      "username": "p1_a_mvxx27jn",
+      "hunterRank": "E"
+     },
+     "subject": null
+    },
+    {
+     "id": 1,
+     "senderId": 2,
+     "receiverId": 3,
+     "subjectId": null,
+     "partyId": 2,
+     "status": "PENDING",
+     "createdAt": "2026-11-01T14:21:26.463Z",
+     "sender": {
+      "id": 2,
+      "name": "Probe b",
+      "username": "p1_b_mvxx27jn",
+      "hunterRank": "E"
+     },
+     "subject": null
+    }
+   ]
+  },
+  {
+   "label": "Sylvie SSE events",
+   "status": 200,
+   "type": "text/event-stream; charset=utf-8",
+   "events": [
+    "status",
+    "session",
+    "status",
+    "status",
+    "reset",
+    "reset",
+    "reset",
+    "result"
+   ],
+   "sample": "reatedAt\":\"2026-11-01T14:21:26.564Z\",\"truncated\":false},\"reply\":\"The AI service is temporarily unavailable. Please try again later.\",\"message\":\"The AI service is temporarily unavailable. Please try again later.\",\"sessionId\":2,\"session\":{\"id\":2,\"userId\":1,\"title\":\"hello\",\"createdAt\":\"2026-11-01T14:21:26.548Z\",\"updatedAt\":\"2026-11-01T14:21:26.548Z\"},\"modelUsed\":\"GEMINI\",\"modelDisplayName\":\"GEMINI (gemini-2.5-flash)\"}\n\n"
+  },
+  {
+   "label": "logout-all with password",
+   "method": "POST",
+   "path": "/api/auth/logout-all",
+   "status": 200,
+   "ms": 81,
+   "bytes": 79,
+   "answer": {
+    "success": true,
+    "message": "All sessions have been revoked across all devices."
+   }
+  },
+  {
+   "label": "bearer after logout-all",
+   "method": "GET",
+   "path": "/api/user/stats",
+   "status": 401,
+   "ms": 3,
+   "bytes": 24,
+   "answer": {
+    "error": "Unauthorized"
+   }
+  },
+  {
+   "label": "refresh after logout-all",
+   "method": "POST",
+   "path": "/api/auth/native/token",
+   "status": 401,
+   "ms": 5,
+   "bytes": 73,
+   "answer": {
+    "error": "This session has ended. Sign in again.",
+    "code": "session_ended"
+   }
+  },
+  {
+   "label": "device list as bearer",
+   "method": "GET",
+   "path": "/api/user/#",
+   "status": 200,
+   "ms": 7,
+   "bytes": 433,
+   "answer": {
+    "sessions": [
+     {
+      "id": "5accf3a1c3796f1395c89ef48771a32d",
+      "device": "Part 1 probe",
+      "platform": "Sylf app",
+      "location": "Asia/Dubai",
+      "lastActive": "Active Now",
+      "isCurrent": true,
+      "icon": "\ud83d\udcbb",
+      "createdAt": "2026-11-01T14:21:26.009Z"
+     },
+     {
+      "id": "b0eae9902ff97e7f66f2d2085a7363fb",
+      "device": "Part 1 probe",
+      "platform": "Sylf app",
+      "location": "Current Location",
+      "lastActive": "Active Now",
+      "isCurrent": false,
+      "icon": "\ud83d\udcbb",
+      "createdAt": "2026-11-01T14:19:37.103Z"
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -6,6 +6,7 @@ import { NotesError } from "./errors";
 export async function createNotesBlockNoteEditor(
   stream: NotesStream,
   options: {
+    fragment?: string;
     uploadFile?: (file: File) => Promise<string>;
     resolveFileUrl?: (url: string) => Promise<string>;
   } = {}
@@ -20,17 +21,47 @@ export async function createNotesBlockNoteEditor(
       "UNSUPPORTED",
       "This stream requires its original editor adapter."
     );
-  const [{ BlockNoteEditor }, { withCollaboration }, { ReadOnlyExtension }] =
-    await Promise.all([
-      import("@blocknote/core"),
-      import("@blocknote/core/yjs"),
-      import("@blocknote/core/extensions"),
-    ]);
+  const [
+    { BlockNoteEditor },
+    { withCollaboration },
+    { ReadOnlyExtension },
+    { en },
+  ] = await Promise.all([
+    import("@blocknote/core"),
+    import("@blocknote/core/yjs"),
+    import("@blocknote/core/extensions"),
+    import("@blocknote/core/locales"),
+  ]);
+  // Virtual pages may finish loading while a document mutation is adopting its
+  // frontier. Do not let ProseMirror initialize an empty root inside that pause.
+  if (stream.status().state === "pausing")
+    await new Promise<void>((resolve, reject) => {
+      const remove = stream.subscribe((state) => {
+        if (state === "pausing") return;
+        remove();
+        if (state === "closed" || state === "failed")
+          reject(
+            new NotesError(
+              "CONFLICT",
+              "Reopen this page after its save is recovered."
+            )
+          );
+        else resolve();
+      });
+    });
   const editor = BlockNoteEditor.create(
     withCollaboration({
       ...options,
+      dictionary: {
+        ...en,
+        placeholders: {
+          ...en.placeholders,
+          default: "Start writing…",
+          emptyDocument: "Start writing…",
+        },
+      },
       collaboration: {
-        fragment: stream.doc.getXmlFragment("body"),
+        fragment: stream.doc.getXmlFragment(options.fragment || "body"),
         user: { name: "", color: "#666666" },
       },
     })
@@ -61,7 +92,11 @@ export async function createNotesBlockNoteEditor(
 }
 
 /** Explicit one-time creation only. Never run on ordinary open, reload, checkpoint or merge. */
-export async function initialRichTextUpdate(text = ""): Promise<Uint8Array> {
+export async function initialRichTextUpdate(
+  text = "",
+  image?: { url: string; name: string },
+  fragment = "body"
+): Promise<Uint8Array> {
   if (typeof document === "undefined")
     throw new NotesError(
       "UNSUPPORTED",
@@ -72,7 +107,21 @@ export async function initialRichTextUpdate(text = ""): Promise<Uint8Array> {
     import("@blocknote/core/yjs"),
   ]);
   const editor = BlockNoteEditor.create(),
-    doc = blocksToYDoc(editor, [{ type: "paragraph", content: text }], "body");
+    doc = blocksToYDoc(
+      editor,
+      [
+        { type: "paragraph", content: text },
+        ...(image
+          ? [
+              {
+                type: "image" as const,
+                props: { url: image.url, name: image.name },
+              },
+            ]
+          : []),
+      ],
+      fragment
+    );
   try {
     return Y.encodeStateAsUpdate(doc);
   } finally {

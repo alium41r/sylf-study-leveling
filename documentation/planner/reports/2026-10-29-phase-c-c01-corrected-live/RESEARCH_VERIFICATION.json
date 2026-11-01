@@ -1,0 +1,229 @@
+{
+  "claims": [
+    {
+      "claimId": "claim_cccd567924c60ed10085a760",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_1 explicitly lists these chemistry topics, and the accepted plan_1 scopes cover them. This is support for a local school-mock COURSE_OUTCOME, not for certified external assessment."
+    },
+    {
+      "claimId": "claim_73ea29016ab8f6681e011cc1",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_1 exactly states that each paper mixes explanation, calculation and unfamiliar-data questions; this matches the accepted preference for explanation and independent application."
+    },
+    {
+      "claimId": "claim_d452a46016337021546292be",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_1 permits calculator use and expects method justification and units rather than memorized worked answers; this is a local resource/format fact."
+    },
+    {
+      "claimId": "claim_32cb50d7982a1997f6301ce3",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_1 states that no other chapters are assessed after listing the chemistry and biology topics. It supports a local boundary only, not official coverage certification."
+    },
+    {
+      "claimId": "claim_f67cbde3c01551e5ff74f648",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_1 states both assessments begin at 09:00 local time and that exam-day study is not available; this matches the accepted fixed deadlines and examDayStudyAllowed=false."
+    },
+    {
+      "claimId": "claim_820679acb65e3687fbd679e1",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_2 exactly records 288 mol from 12 g and 24 g/mol by multiplying mass and molar mass. The accepted request identifies this as the student's diagnostic, so it applies to the amount/molar scope."
+    },
+    {
+      "claimId": "claim_8d0f5039eb5123cc58eee7f5",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_2 exactly records 50 mol for 250 mL of 0.20 mol/L with no mL-to-L conversion; this applies to the concentration/volume scope."
+    },
+    {
+      "claimId": "claim_cb77a587abd8262f1ba9c155",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_2 exactly records 0.60 mol water and the claim that hydrogen limits because its coefficient is larger; this applies to balanced reacting amounts and limiting reagents."
+    },
+    {
+      "claimId": "claim_8e083385893a7c0b4d25d767",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_2 states three simpler equations were balanced correctly without help. This supports a specific diagnostic strength, not general mastery."
+    },
+    {
+      "claimId": "claim_749a8f4f54a9c0cf718d029c",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_2 lists teacher judgments matching chemical arithmetic, unit conversion, limiting-reagent reasoning, osmosis direction, controlled variables and overclaiming from data; these map across the accepted chemistry and biology scopes."
+    },
+    {
+      "claimId": "claim_5927e2a265893ed56216918a",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_2 exactly says three hours of videos is a student report and supplies no performance credit; this directly addresses the self-report without establishing mastery."
+    },
+    {
+      "claimId": "claim_250facf12e67e4ea8adda62d",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_3 gives 6.0 g divided by 12.0 g/mol as 0.50 mol and 100 mL of 0.50 mol/L as 0.050 mol after converting to 0.100 L; this supports the worked methods."
+    },
+    {
+      "claimId": "claim_28b8a50384eef0ed8cd96836",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_3 states comparing supplied amount divided by coefficient and using the smaller reaction extent; this supports the limiting-reagent method."
+    },
+    {
+      "claimId": "claim_20f8349a2020eaa38289b371",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_3 states there are eight unworked mixed questions but calls eight an inventory, not mandatory workload; this matches the accepted preference against arbitrary question counts."
+    },
+    {
+      "claimId": "claim_ec3c360d2b4e9a7bf8938881",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_3 permits additional self-contained examples and independent checks when givens, answers/feedback and stopping criteria are clear; this supports resource authoring."
+    },
+    {
+      "claimId": "claim_3666c9806a05cb747052b53d",
+      "support": "SUPPORTED",
+      "applicability": "MATCHED",
+      "reason": "source_3 states the student owns the packet and no paid website or undisclosed textbook is needed; this matches the accepted resource constraints."
+    }
+  ],
+  "identities": [],
+  "completeSourceIds": [
+    "source_1",
+    "source_2",
+    "source_3"
+  ],
+  "conflicts": [
+    "The student's self-reported confidence after three hours of videos conflicts with the diagnostic errors in molar-mass arithmetic, concentration conversion and limiting-reagent reasoning; source_2 states that video time supplies no performance credit."
+  ],
+  "answer": "For Amina (accepted-context basis; the diagnostic excerpt itself is anonymous), the read sources support a local chemistry school-mock scope in amount of substance, molar mass, solution concentration, balanced equations, reacting amounts and limiting reagents. They also support the local format: mixed explanation, calculation and unfamiliar-data questions; calculator use; method and units expected; and 09:00 starts with no exam-day study. The diagnostic supports specific chemistry gaps in molar-mass arithmetic, mL-to-L conversion and limiting-reagent reasoning, while three simpler equations were balanced correctly without help. Teacher annotations also identify needs in chemical arithmetic, unit conversion, limiting-reagent reasoning, osmosis direction, controlled variables and overclaiming from data. The practice pack supplies worked examples, a coefficient-division limiting-reagent method, eight unworked mixed questions as an inventory rather than a quota, and permission for additional self-contained examples and checks if givens, answers/feedback and stopping criteria are clear. Three hours of videos is self-report only and cannot establish mastery. These are private school-mock materials: issuer authority is unverified; no external board, official assessed scope, paper duration or mark weighting is certified, and completeAssessedScope remains false. Biology-related claims are supported only in the same local-resource sense and are matched to the accepted biology scopes where the source explicitly covers them.",
+  "scopeBindings": [
+    {
+      "claimId": "claim_cccd567924c60ed10085a760",
+      "scopeRefs": [
+        "plan_1:scope_1",
+        "plan_1:scope_2",
+        "plan_1:scope_3",
+        "plan_1:scope_4"
+      ],
+      "disposition": "ANNOTATE_SCOPE"
+    },
+    {
+      "claimId": "claim_73ea29016ab8f6681e011cc1",
+      "scopeRefs": [],
+      "disposition": "RESOURCE_ONLY"
+    },
+    {
+      "claimId": "claim_d452a46016337021546292be",
+      "scopeRefs": [],
+      "disposition": "RESOURCE_ONLY"
+    },
+    {
+      "claimId": "claim_32cb50d7982a1997f6301ce3",
+      "scopeRefs": [
+        "plan_1:scope_1",
+        "plan_1:scope_2",
+        "plan_1:scope_3",
+        "plan_1:scope_4",
+        "plan_2:scope_1",
+        "plan_2:scope_2",
+        "plan_2:scope_3",
+        "plan_2:scope_4"
+      ],
+      "disposition": "ANNOTATE_SCOPE"
+    },
+    {
+      "claimId": "claim_f67cbde3c01551e5ff74f648",
+      "scopeRefs": [],
+      "disposition": "RESOURCE_ONLY"
+    },
+    {
+      "claimId": "claim_820679acb65e3687fbd679e1",
+      "scopeRefs": [
+        "plan_1:scope_1"
+      ],
+      "disposition": "ANNOTATE_SCOPE"
+    },
+    {
+      "claimId": "claim_8d0f5039eb5123cc58eee7f5",
+      "scopeRefs": [
+        "plan_1:scope_2"
+      ],
+      "disposition": "ANNOTATE_SCOPE"
+    },
+    {
+      "claimId": "claim_cb77a587abd8262f1ba9c155",
+      "scopeRefs": [
+        "plan_1:scope_3",
+        "plan_1:scope_4"
+      ],
+      "disposition": "ANNOTATE_SCOPE"
+    },
+    {
+      "claimId": "claim_8e083385893a7c0b4d25d767",
+      "scopeRefs": [
+        "plan_1:scope_3"
+      ],
+      "disposition": "ANNOTATE_SCOPE"
+    },
+    {
+      "claimId": "claim_749a8f4f54a9c0cf718d029c",
+      "scopeRefs": [
+        "plan_1:scope_1",
+        "plan_1:scope_2",
+        "plan_1:scope_3",
+        "plan_1:scope_4",
+        "plan_2:scope_1",
+        "plan_2:scope_3",
+        "plan_2:scope_4"
+      ],
+      "disposition": "ANNOTATE_SCOPE"
+    },
+    {
+      "claimId": "claim_5927e2a265893ed56216918a",
+      "scopeRefs": [],
+      "disposition": "RESOURCE_ONLY"
+    },
+    {
+      "claimId": "claim_250facf12e67e4ea8adda62d",
+      "scopeRefs": [
+        "plan_1:scope_1",
+        "plan_1:scope_2"
+      ],
+      "disposition": "ANNOTATE_SCOPE"
+    },
+    {
+      "claimId": "claim_28b8a50384eef0ed8cd96836",
+      "scopeRefs": [
+        "plan_1:scope_3",
+        "plan_1:scope_4"
+      ],
+      "disposition": "ANNOTATE_SCOPE"
+    },
+    {
+      "claimId": "claim_20f8349a2020eaa38289b371",
+      "scopeRefs": [],
+      "disposition": "RESOURCE_ONLY"
+    },
+    {
+      "claimId": "claim_ec3c360d2b4e9a7bf8938881",
+      "scopeRefs": [],
+      "disposition": "RESOURCE_ONLY"
+    },
+    {
+      "claimId": "claim_3666c9806a05cb747052b53d",
+      "scopeRefs": [],
+      "disposition": "RESOURCE_ONLY"
+    }
+  ]
+}

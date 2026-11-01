@@ -1,0 +1,36 @@
+{
+  "existingSchemaAndSecurityUnchanged": {
+    "tables": true,
+    "columns": true,
+    "columnTypes": true,
+    "constraints": true,
+    "indexes": true,
+    "triggers": true,
+    "policies": true,
+    "grants": true,
+    "enums": true,
+    "functions": true,
+    "defaults": true,
+    "roles": true,
+    "publication": true,
+    "extensions": true
+  },
+  "existingApplicationTablesCompared": 71,
+  "changedApplicationTables": [],
+  "originalOrphanViolationsUnchanged": true,
+  "newNotesTables": [
+    {
+      "schema": "public",
+      "name": "NotesConnection",
+      "rls": true
+    },
+    {
+      "schema": "public",
+      "name": "NotesOAuthState",
+      "rls": true
+    }
+  ],
+  "notesBrowserAccessDenied": true,
+  "pending": [],
+  "failed": []
+}

@@ -6,6 +6,8 @@
 // ADMIN_EMAILS is used strictly as a controlled bootstrap mechanism:
 // if a user is in ADMIN_EMAILS, their DB record is updated to isAdmin=true
 // so User.isAdmin remains the single authoritative permission going forward.
+// Only a verified address counts: registering or changing to a listed address
+// proves nothing, and ADMIN_EMAILS may name someone who has not signed up yet.
 // ============================================================================
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
@@ -61,6 +63,7 @@ export async function requireAdmin(req: Request): Promise<AdminAuthResult> {
         email: true,
         username: true,
         isAdmin: true,
+        verificationStatus: true,
       },
     });
 
@@ -74,7 +77,7 @@ export async function requireAdmin(req: Request): Promise<AdminAuthResult> {
     }
 
     // 2. Controlled bootstrap fallback via ADMIN_EMAILS
-    if (isEmailInAdminBootstrap(user.email)) {
+    if (user.verificationStatus === "VERIFIED" && isEmailInAdminBootstrap(user.email)) {
       // Promote the user in database so User.isAdmin becomes authoritative
       await prisma.user.update({
         where: { id: user.id },

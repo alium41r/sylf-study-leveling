@@ -1,0 +1,75 @@
+{
+  "verifiedAt": "2026-10-22T05:50:35.439Z",
+  "liveDiagnosis": {
+    "authenticatedDeploymentAliasPOSTStatus": 403,
+    "authenticatedConnectionGETStatus": 200,
+    "workingPermanentNotesURL": "https://sylf-alium41rs-projects.vercel.app/notes",
+    "googleAccountChooserReached": true,
+    "userConsentCompleted": false,
+    "googleTokenExchangeVerified": false,
+    "liveDriveSyncVerified": false,
+    "vercelSettingsChanged": false
+  },
+  "verification": {
+    "focusedTests": 63,
+    "typecheckPassed": true,
+    "lintPassed": true,
+    "webBuildPassed": true,
+    "webCompiler": "webpack",
+    "temporaryNodeHeapMB": 6144,
+    "mobileBuildPassed": true,
+    "mobileBoundaryAuditPassed": true,
+    "actualSharedScreenInspected": true,
+    "viewports": [
+      {
+        "width": 1440,
+        "height": 756,
+        "mode": "dark",
+        "variant": "alias"
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "mode": "dark",
+        "variant": "alias"
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "mode": "light",
+        "customColors": true,
+        "variant": "alias",
+        "horizontalOverflow": false
+      }
+    ],
+    "additionalStates": [
+      "Canonical connection enabled",
+      "Malformed destination disabled with explicit error"
+    ],
+    "viewportReset": true,
+    "sourceDeployed": false
+  },
+  "dataSafety": {
+    "noNotesDeleted": true,
+    "noAutomaticCrossOriginNavigation": true,
+    "noLocalStorageTransfer": true,
+    "noOriginGuardBypass": true,
+    "noNewGoogleScopes": true,
+    "noSchemaOrDependencyChanges": true
+  },
+  "followUp": {
+    "verifiedAt": "2026-10-22T07:13:39.794Z",
+    "userReportedConsentCompleted": true,
+    "signedInInspectionExplicitlyApproved": true,
+    "connectedLibraryObserved": true,
+    "existingNotesOpened": 2,
+    "freshTabOpenedExistingNote": true,
+    "editorAndEditableBodyObserved": true,
+    "openingFailureReproduced": false,
+    "noteContentEdited": false,
+    "noteContentDeleted": false,
+    "openingCodeChanged": false,
+    "liveProviderWriteReadbackTestPerformed": false,
+    "earlierFinalBrowserVerificationBlockedBy": "automatic approval review usage limit"
+  }
+}

@@ -15,9 +15,22 @@ import {
   failure,
 } from "@/lib/notes/server/http";
 import { PACK_BYTES, decodePack } from "@/lib/notes/pack";
+import {
+  organizeDrive,
+  cleanDuplicatePacks,
+} from "@/lib/notes/server/organize-drive";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 const command = z.discriminatedUnion("action", [
+  z
+    .object({
+      action: z.literal("organize"),
+      duplicateHashes: z
+        .array(z.string().regex(/^[a-f0-9]{64}$/))
+        .max(4)
+        .optional(),
+    })
+    .strict(),
   z
     .object({
       action: z.literal("list"),
@@ -50,15 +63,52 @@ export async function POST(req: Request) {
       if (sha(bytes) !== hash)
         throw new NotesServerError("Upload checksum mismatch.", 409, "CORRUPT");
       await decodePack(bytes, connection.libraryId);
-      const file = await drive.create(
-        connection.rootId!,
-        hash + ".sylfpack",
-        bytes,
-        { sylfNotes: "pack-v1", libraryId: connection.libraryId, sha256: hash }
+      // Lost-response retries must not create another physical copy of an
+      // identical immutable pack. Names and stale client receipts are not proof.
+      const existing = await drive.list(
+        `trashed = false and appProperties has { key='sylfNotes' and value='pack-v1' } and appProperties has { key='libraryId' and value='${connection.libraryId}' } and appProperties has { key='sha256' and value='${hash}' }`
       );
+      if (existing.nextPageToken || existing.files.length > 32)
+        throw new NotesServerError(
+          "Duplicate recovery files need review; originals were kept.",
+          409,
+          "LIMIT"
+        );
+      const previous = existing.files.sort((a, b) =>
+        a.id < b.id ? -1 : a.id > b.id ? 1 : 0
+      )[0];
+      if (previous) {
+        await drive.checkedPack(
+          connection.rootId!,
+          connection.libraryId,
+          previous.id
+        );
+        return json({
+          file: { id: previous.id, hash, version: previous.version || "" },
+        });
+      }
+      const system = await drive.systemFolder(
+        connection.rootId!,
+        connection.libraryId,
+        true
+      );
+      const file = await drive.create(system!.id, hash + ".sylfpack", bytes, {
+        sylfNotes: "pack-v1",
+        libraryId: connection.libraryId,
+        sha256: hash,
+      });
       return json({ file: { id: file.id, hash, version: file.version || "" } });
     }
     const input = command.parse(await body(req));
+    if (input.action === "organize") {
+      const moved = await organizeDrive(drive, connection);
+      const cleaned = await cleanDuplicatePacks(
+        drive,
+        connection,
+        input.duplicateHashes
+      );
+      return json({ moved, cleaned });
+    }
     if (input.action === "read")
       return new Response(
         (
@@ -76,8 +126,15 @@ export async function POST(req: Request) {
           },
         }
       );
+    const system = await drive.systemFolder(
+      connection.rootId!,
+      connection.libraryId
+    );
+    const parents = [connection.rootId!, ...(system ? [system.id] : [])]
+      .map((id) => `'${escapeQuery(id)}' in parents`)
+      .join(" or ");
     const result = await drive.list(
-      `'${escapeQuery(connection.rootId!)}' in parents and trashed = false and appProperties has { key='sylfNotes' and value='pack-v1' } and appProperties has { key='libraryId' and value='${connection.libraryId}' }`,
+      `(${parents}) and trashed = false and appProperties has { key='sylfNotes' and value='pack-v1' } and appProperties has { key='libraryId' and value='${connection.libraryId}' }`,
       input.cursor
     );
     return json({

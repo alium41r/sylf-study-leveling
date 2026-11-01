@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "status": "PASSED",
+  "node": "v24.21.0",
+  "postgres": "postgres (PostgreSQL) 18.4",
+  "migrations": [
+    "20261018000000_personal_calendar",
+    "20261018010000_calendar_scheduling",
+    "20261018020000_external_calendars",
+    "20261018030000_calendar_completion",
+    "20261028000000_planner_reviewed_publication"
+  ],
+  "paidCalls": 0,
+  "limitations": [
+    "Calendar service checks use the existing minimal Calendar schema bootstrap plus inert Planner table seams. Actual Planner publication guards and complete real Planner schema are exercised by the separate required Planner PostgreSQL harness."
+  ],
+  "finishedAt": "2026-10-28T02:18:02.540Z"
+}

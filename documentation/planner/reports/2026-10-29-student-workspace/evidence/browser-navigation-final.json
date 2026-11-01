@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "status": "PASSED",
+  "fixture": "actual workspace/editor/shared appearance, isolated scripted HTTP; no connected account or real model",
+  "paidCalls": 0,
+  "results": [
+    {
+      "name": "empty-desktop-light-final",
+      "overflow": false
+    },
+    {
+      "name": "authorization-desktop-light",
+      "overflow": false
+    },
+    {
+      "name": "clarification-phone-custom-light-final",
+      "overflow": false
+    },
+    {
+      "name": "strategy-desktop-dark-final",
+      "overflow": false
+    },
+    {
+      "name": "review-desktop-dark",
+      "overflow": false
+    },
+    {
+      "name": "confirmation-phone-custom-dark-final",
+      "overflow": false
+    },
+    {
+      "name": "progress-desktop-dark-final",
+      "overflow": false
+    },
+    {
+      "name": "recovery-phone-light",
+      "overflow": false
+    }
+  ],
+  "checks": [
+    "Friday rest mapping",
+    "accepted midnight boundary",
+    "explicit AI consent",
+    "clarification continuation",
+    "retained natural strategy",
+    "incomplete review visibility",
+    "human-readable changes",
+    "separate atomic confirmation action",
+    "durable cancellation action",
+    "identical mutation retry",
+    "no horizontal overflow"
+  ],
+  "finishedAt": "2026-10-29T06:52:03.225Z"
+}

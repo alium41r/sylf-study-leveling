@@ -1,0 +1,22 @@
+{
+  "localOnly": true,
+  "platformStubs": [
+    "auth.jwt",
+    "auth.uid",
+    "extensions.pgcrypto",
+    "extensions.uuid-ossp"
+  ],
+  "applied": [
+    "20260808000000_init",
+    "20260808010000_add_ai_models",
+    "20260808083947_update_effort_level",
+    "20260808084000_add_daily_briefing",
+    "20260820000000_add_achievement_ledger_source",
+    "20260821000000_add_user_stats_and_progression_rpc"
+  ],
+  "failure": {
+    "name": "20260821010000_add_economy_and_inventory_rpcs",
+    "sqlstate": "42704",
+    "message": "type \"ItemCategory\" does not exist"
+  }
+}

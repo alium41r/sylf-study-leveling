@@ -1,0 +1,86 @@
+{
+ "schemaVersion": 1,
+ "steps": [
+  {
+   "name": "every migration applied, or recovered with nothing left over",
+   "ok": true,
+   "detail": {
+    "migrations": 81,
+    "recovered": [
+     "20261002000000_planner_v2_durable_core",
+     "20261014000000_timer_durable_completion",
+     "20261015130000_ai_dispatch_telemetry",
+     "20261025000000_planner_ai_first_foundation",
+     "20261025010000_planner_compiler_version",
+     "20261026000000_planner_role_resources",
+     "20261026010000_planner_understanding",
+     "20261026020000_planner_calendar_capacity",
+     "20261026030000_planner_natural_learning",
+     "20261027000000_planner_reviewed_learning",
+     "20261028000000_planner_reviewed_publication"
+    ]
+   }
+  },
+  {
+   "name": "neither Phase 12 migration needed recovery",
+   "ok": true
+  },
+  {
+   "name": "both apply twice with no error",
+   "ok": true
+  },
+  {
+   "name": "an existing browser session is untouched, and its new columns are null",
+   "ok": true
+  },
+  {
+   "name": "every new column is nullable",
+   "ok": true
+  },
+  {
+   "name": "the constraint refuses an unknown kind",
+   "ok": true
+  },
+  {
+   "name": "two rows cannot share a refresh hash",
+   "ok": true
+  },
+  {
+   "name": "client roles cannot read a refresh hash",
+   "ok": true,
+   "detail": [
+    {
+     "role": "anon",
+     "can": false
+    },
+    {
+     "role": "authenticated",
+     "can": false
+    }
+   ]
+  },
+  {
+   "name": "AuthSession stays out of Realtime",
+   "ok": true
+  },
+  {
+   "name": "row level security stays on",
+   "ok": true
+  },
+  {
+   "name": "the open-session lookup uses the partial index",
+   "ok": true,
+   "detail": "Index Scan using \"StudySession_userId_open_idx\" on \"StudySession\"  (cost=0.12..8.14 rows=1 width=4)\n  Index Cond: (\"userId\" = 1)"
+  },
+  {
+   "name": "the documented rollback runs, and the older row survives it",
+   "ok": true
+  },
+  {
+   "name": "they apply again after a rollback",
+   "ok": true
+  }
+ ],
+ "scope": "Disposable PostgreSQL 17. Not the hosted database.",
+ "finishedAt": "2026-10-31T20:29:50.095Z"
+}

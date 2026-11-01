@@ -11,26 +11,40 @@ import { AttemptService, type LeaseToken } from "../server/attempts";
 import { ForegroundAccountingService, type ProviderUsage } from "../server/accounting";
 import { DurablePlannerError } from "../server/database";
 import { providerCategory, type ProviderPolicy } from "./provider-policy";
+import type { PlannerRole } from "./foundation/contracts";
+import type { ResourcePolicy } from "./foundation/resources";
+import type { RoleCall } from "./foundation/role-calls";
+import { hash } from "../server/database";
+import { retainVisibleOutput, VISIBLE_OUTPUT_CHARACTERS } from "../server/activity";
 
 type ResultMetadata = { finishReason?: "STOP" | "MAX_TOKENS" | "OTHER"; errorCode?: string; accepted?: boolean };
 export interface ProviderMeter {
-  reserve(route: ModelRouteSpec, inputTokens: number, outputTokens: number, policy: ProviderPolicy, signal: AbortSignal): Promise<string>;
+  reserve(route: ModelRouteSpec, inputTokens: number, outputTokens: number, policy: ProviderPolicy, signal: AbortSignal, roleCall?: RoleCall): Promise<string>;
+  rolePolicy?(role: PlannerRole): Promise<ResourcePolicy["roles"][PlannerRole] & { policyDigest: string }>;
+  recoverRole?(call: RoleCall): Promise<{ callId: string; text: string; finishReason: "STOP"; metadata?: { effectiveModel: string | null; fingerprint: string | null; reasoningTokens: number | null; finishReason: "STOP" | "MAX_TOKENS" | "OTHER" | null } } | null>;
+  retainUnaccountedResponse?(callId:string,response:Pick<LLMResponse,"text"|"reasoningText"|"finishReason"|"model"|"fingerprint">):Promise<void>;
   window(purpose: ProviderPolicy["purpose"]): Promise<{ now: number; deadline: number }>;
   settle(callId: string, usage: ProviderUsage): Promise<void>;
   close(callId: string, result: ResultMetadata): Promise<void>;
   lateUsage(callId: string, usage: ProviderUsage): Promise<void>;
+  visibleOutput?(callId:string,text:string,receivedCharacters:number):Promise<void>;
+  reasoningOutput?(callId:string,text:string,receivedCharacters:number):Promise<void>;
 }
 export function workerProviderMeter(attempts: AttemptService, token: LeaseToken): ProviderMeter {
   return {
-    reserve: async (route, inputTokens, outputTokens, policy, signal) => {
-      const category = providerCategory(policy.purpose);
-      const id = await attempts.reserveCall(token, { ...route, inputTokens, outputTokens, category, policy });
+    rolePolicy: role => attempts.rolePolicy(token, role), recoverRole: call => attempts.recoverRoleCall(token, call),
+    reserve: async (route, inputTokens, outputTokens, policy, signal, roleCall) => {
+      const category = roleCall ? roleCall.role === "RESEARCH" ? "RESEARCH" : "PLANNING" : providerCategory(policy.purpose);
+      const id = roleCall ? await attempts.reserveRoleCall(token, { ...route, inputTokens, outputTokens, roleCall }) : await attempts.reserveCall(token, { ...route, inputTokens, outputTokens, category, policy });
       if (signal.aborted) { await attempts.closeProviderCall(token, id, { errorCode: "CANCELLED" }); throw cancelled(); }
       await attempts.dispatchCall(token, id, category); return id;
     },
     window: purpose => attempts.providerWindow(token, purpose), settle: (id, usage) => attempts.settleCall(token, id, usage),
     close: (id, result) => attempts.closeProviderCall(token, id, result),
     lateUsage: (id, usage) => attempts.recordLateUsage(token.ownerId, token.attemptId, id, usage),
+    retainUnaccountedResponse:(id,response)=>attempts.retainUnaccountedResponse(token,id,response),
+    visibleOutput:(id,text,received)=>retainVisibleOutput(attempts,token,id,text,received),
+    reasoningOutput:(id,text,received)=>retainVisibleOutput(attempts,token,id,text,received,"reasoning"),
   };
 }
 export function foregroundProviderMeter(accounting: ForegroundAccountingService, ownerId: number, initialBudget: RuntimeBudgetV2, feature: QuotaFeature, maximumMs?:number) {
@@ -52,6 +66,7 @@ const cancelled = () => new DurablePlannerError("CANCELLED", "The model request 
 const failure = (code: "PROVIDER_FAILURE" | "INVALID_OUTPUT" | "OUTPUT_TRUNCATED" | "PROVIDER_TIMEOUT" | "BUDGET_EXHAUSTED", message: string) => new DurablePlannerError(code, message, "RECOVERY");
 
 export interface MeteredProviderRequest<T> {
+  role?: { role: PlannerRole; key: string };
   messages: NormalizedMessage[]; systemInstruction: string; policy: ProviderPolicy; outputTokens: number;
   workload?: WorkloadType; signal?: AbortSignal; callTimeoutMs?: number;
   /** Bounded stage-specific continuity requirements for an existing fallback. */
@@ -83,7 +98,7 @@ function delimiterFailure(text: string) {
   }
   return undefined;
 }
-function validationFeedback(error: unknown, rejectedText: string) {
+export function validationFeedback(error: unknown, rejectedText: string) {
   if (error instanceof z.ZodError) {
     return { code: "SCHEMA_MISMATCH", issues: error.issues.slice(0, 8).map(issue => ({
       code: issue.code, path: issue.path.slice(0, 8).map(part => typeof part === "number" ? part :
@@ -159,7 +174,9 @@ export async function dispatchMeteredProvider<T>(meter: ProviderMeter, request: 
   const fail = (code: Parameters<typeof failure>[0], message: string) => new DurablePlannerError(code,message,request.policy.purpose === "OCR" ? "RESEARCH" : request.policy.purpose);
   const workload = request.workload ?? (request.policy.purpose === "INTERPRETATION" ? "general_chat" : request.policy.purpose === "OCR" ? "multimodal_vision" : "syllabus");
   const config = WORKLOAD_ROUTING_TABLE[workload];
-  if (!Number.isSafeInteger(request.outputTokens) || request.outputTokens <= 0 || request.outputTokens > config.outputTokenCap ||
+  if (request.role && !meter.rolePolicy) throw fail("INVALID_OUTPUT", "This meter does not admit compiler v2 role calls.");
+  const role = request.role ? await meter.rolePolicy!(request.role.role) : undefined;
+  if (!Number.isSafeInteger(request.outputTokens) || request.outputTokens <= 0 || request.outputTokens > (role?.call.completionTokens ?? config.outputTokenCap) ||
     request.callTimeoutMs !== undefined && (!Number.isFinite(request.callTimeoutMs) || request.callTimeoutMs <= 0))
     throw fail("INVALID_OUTPUT", "Invalid bounded provider output or timeout allowance.");
   // A conservative UTF-8 upper bound avoids under-reserving an un-tokenized
@@ -172,13 +189,13 @@ export async function dispatchMeteredProvider<T>(meter: ProviderMeter, request: 
       throw new DurablePlannerError("QUALITY_INCOMPLETE", "Validation recovery exceeds its bounded continuity allowance.", request.policy.purpose === "OCR" ? "RESEARCH" : request.policy.purpose);
     recovery = { feedback, rejectedOutput: boundedRejectedOutput(text), ...(requirements === undefined ? {} : { requirements }) };
   };
-  const routes = [config.primary, config.fallback, config.secondaryFallback].filter((r): r is ModelRouteSpec => !!r);
+  const routes = role ? [{ provider: role.provider, model: role.model }] : [config.primary, config.fallback, config.secondaryFallback].filter((r): r is ModelRouteSpec => !!r);
   const attempts: { callId: string; provider: string; model: string; code?: string }[] = [];
   let lastError: DurablePlannerError = fail("PROVIDER_FAILURE", "No configured provider is available.");
   for (const configured of routes) {
-    // Existing DeepSeek/Groq adapters discard image parts. Keep the shared route
-    // table, but never send an OCR call to a text-only adapter.
-    if (request.messages.some(m=>m.parts?.some(p=>p.inlineData)) && configured.provider!=="gemini") continue;
+    // Legacy vision routing stays pinned. V2's explicit DeepSeek Flash grant
+    // uses the existing adapter's bounded image support, without a route switch.
+    if (request.messages.some(m=>m.parts?.some(p=>p.inlineData)) && configured.provider!=="gemini" && !(role && configured.provider==="deepseek" && configured.model==="deepseek-flash")) continue;
     if (request.signal?.aborted) throw cancelled();
     const messages = recovery ? [...request.messages, { role: "user" as const, content: JSON.stringify({
       kind: "DETERMINISTIC_VALIDATION_FEEDBACK", ...recovery,
@@ -187,6 +204,21 @@ export async function dispatchMeteredProvider<T>(meter: ProviderMeter, request: 
     // Every fallback reserves its actual augmented transport, under the same
     // root budget and holdbacks. Feedback never earns an extra provider call.
     const inputTokens = boundedProviderInput({ ...request, messages });
+    const roleCall: RoleCall | undefined = role && request.role ? { schemaVersion: 1, ...request.role, policyDigest: role.policyDigest,
+      format: role.format, effort: role.effort, purpose: request.policy.purpose as RoleCall["purpose"],
+      promptDigest: hash("role-prompt-v1", { messages, systemInstruction: request.systemInstruction }),
+      inputDigest: hash("role-input-v1", { messages, systemInstruction: request.systemInstruction, outputTokens: request.outputTokens }) } : undefined;
+    if (roleCall) {
+      const saved = await meter.recoverRole?.(roleCall);
+      if (saved) {
+        await meter.window(request.policy.purpose);
+        if (roleCall.format === "JSON") JSON.parse(saved.text);
+        const value = await request.validate(saved, request.signal ?? new AbortController().signal);
+        if (request.signal?.aborted) throw cancelled();
+        await meter.close(saved.callId, { accepted: true, finishReason: "STOP" });
+        return { value, provider: configured.provider, model: configured.model, callId: saved.callId, attempts: [{ callId: saved.callId, ...configured, code: undefined as string | undefined }], recovered: true, metadata: saved.metadata };
+      }
+    }
     let adapter: LLMAdapter; let route = { ...configured };
     try {
       adapter = (dependencies.adapter ?? (r => LLMFactory.getAdapter(r.provider, r.model)))(route);
@@ -195,6 +227,7 @@ export async function dispatchMeteredProvider<T>(meter: ProviderMeter, request: 
       if (route.provider === "deepseek" && "resolveModelName" in adapter && typeof adapter.resolveModelName === "function")
         route = { ...route, model: adapter.resolveModelName(route.model) as string };
     } catch { continue; } // Missing configuration made no external attempt.
+    if (role && route.model !== role.model) throw fail("INVALID_OUTPUT", "The configured model override is outside this role's authorization.");
     const before = await meter.window(request.policy.purpose);
     if (before.deadline <= before.now) throw fail("BUDGET_EXHAUSTED", "The model processing deadline expired.");
     const controller = new AbortController();
@@ -205,9 +238,37 @@ export async function dispatchMeteredProvider<T>(meter: ProviderMeter, request: 
     let poll: ReturnType<typeof setInterval> | undefined; let abandoned = false;
     let upstream: Promise<LLMResponse> | undefined; let abortListener: (() => void) | undefined;
     let finishReason: LLMResponse["finishReason"];
+    let preview="",receivedCharacters=0,lastPreviewAt=0,previewWrite:Promise<void>|undefined;
+    const canPreview=role?.format==="TEXT"&&request.role?.role==="STRATEGIST"&&!!meter.visibleOutput;
+    const flushPreview=async()=>{
+      if(!canPreview||!callId||!receivedCharacters)return;
+      if(previewWrite)await previewWrite;
+      lastPreviewAt=Date.now();
+      previewWrite=meter.visibleOutput!(callId,preview,receivedCharacters).catch(()=>{});
+      await previewWrite;previewWrite=undefined;
+    };
+    const onTextDelta=canPreview?(delta:string)=>{
+      receivedCharacters+=delta.length;
+      if(preview.length<VISIBLE_OUTPUT_CHARACTERS)preview=(preview+delta).slice(0,VISIBLE_OUTPUT_CHARACTERS);
+      // Presentation cannot fail, cancel or retry the authoritative provider
+      // operation. One bounded write at a time; no synthetic thinking events.
+      if(!previewWrite&&Date.now()-lastPreviewAt>=350)void flushPreview();
+    }:undefined;
+    let reasoningPreview="",reasoningCharacters=0,lastReasoningAt=0,reasoningWrite:Promise<void>|undefined,reasoningTimer:ReturnType<typeof setTimeout>|undefined;
+    const canReason=!!role&&route.provider==="deepseek"&&!!meter.reasoningOutput;
+    const flushReasoning=async()=>{
+      if(!canReason||!callId||!reasoningCharacters)return;
+      if(reasoningWrite)await reasoningWrite;lastReasoningAt=Date.now();
+      reasoningWrite=meter.reasoningOutput!(callId,reasoningPreview,reasoningCharacters).catch(()=>{});await reasoningWrite;reasoningWrite=undefined;
+    };
+    const onReasoningDelta=canReason?(delta:string)=>{
+      reasoningCharacters+=delta.length;if(reasoningPreview.length<VISIBLE_OUTPUT_CHARACTERS)reasoningPreview=(reasoningPreview+delta).slice(0,VISIBLE_OUTPUT_CHARACTERS);
+      if(!reasoningWrite&&Date.now()-lastReasoningAt>=350)void flushReasoning();
+      else if(!reasoningTimer)reasoningTimer=setTimeout(()=>{reasoningTimer=undefined;void flushReasoning();},350);
+    }:undefined;
     try {
       if (controller.signal.aborted) throw cancelled();
-      callId = await meter.reserve(route, inputTokens, request.outputTokens, request.policy, controller.signal);
+      callId = await meter.reserve(route, inputTokens, request.outputTokens, request.policy, controller.signal, roleCall);
       attempts.push({ callId, ...route });
       if (controller.signal.aborted) throw cancelled();
       const window = await meter.window(request.policy.purpose);
@@ -229,25 +290,39 @@ export async function dispatchMeteredProvider<T>(meter: ProviderMeter, request: 
       upstream = Promise.resolve().then(() => {
         if (controller.signal.aborted) throw controller.signal.reason;
         return adapter.generateResponse(messages, request.systemInstruction, [], {
-          maxTokens: request.outputTokens, responseFormat: "json_object", thinking: config.thinking, singleAttempt: true, telemetry: false, signal: controller.signal,
+          maxTokens: request.outputTokens, responseFormat: role?.format === "TEXT" ? "text" : "json_object", thinking: role ? role.effort === "DISABLED" ? "disabled" : role.effort === "PROVIDER_DEFAULT" ? undefined : "enabled" : config.thinking,
+          ...(role && ["LOW","HIGH","MAX"].includes(role.effort) ? { reasoningEffort: role.effort.toLowerCase() as "low" | "high" | "max" } : {}),
+          preserveText: !!role, singleAttempt: true, telemetry: false, signal: controller.signal,
+          ...(onTextDelta?{onTextDelta}:{}),
+          ...(onReasoningDelta?{onReasoningDelta}:{}),
         });
       });
       void upstream.then(response => {
-        if (abandoned && response.usage) {
-          try { void meter.lateUsage(callId!, pricedProviderUsage(route.model, response.usage)).catch(() => {}); } catch { /* Invalid usage stays unknown. */ }
+        if (abandoned) {
+          const retain=()=>role?meter.retainUnaccountedResponse?.(callId!,response).catch(()=>{}):undefined;
+          if(response.usage){
+            try { void meter.lateUsage(callId!, role ? roleUsage(route.model, response) : pricedProviderUsage(route.model, response.usage)).catch(()=>retain()); } catch { void retain(); }
+          }else void retain();
         }
       }).catch(() => {});
       const response = await Promise.race([upstream, aborted]);
       finishReason = response.finishReason;
       if (response.usage) {
-        const usage = pricedProviderUsage(route.model, response.usage);
+        let usage:ProviderUsage;
+        try{usage=role ? roleUsage(route.model, response) : pricedProviderUsage(route.model, response.usage);}
+        catch(error){if(role)await meter.retainUnaccountedResponse?.(callId,response);throw error;}
         try { await meter.settle(callId, usage); }
-        catch (error) { await meter.lateUsage(callId, usage); throw error; }
-      } else { await rejected(response.text ?? "", {code:"MISSING_ACCOUNTING_USAGE"}); throw fail("PROVIDER_FAILURE", "The provider did not return accounting usage."); }
+        catch (error) { if(role)await meter.retainUnaccountedResponse?.(callId,response);await meter.lateUsage(callId, usage); throw error; }
+      } else { if(role)await meter.retainUnaccountedResponse?.(callId,response);await rejected(response.text ?? "", {code:"MISSING_ACCOUNTING_USAGE"}); throw fail("PROVIDER_FAILURE", "The provider did not return accounting usage."); }
       if (controller.signal.aborted) throw controller.signal.reason;
       await meter.window(request.policy.purpose); // Cancellation, supersession or overrun wins over output.
+      if (role && Buffer.byteLength(response.text ?? "") > 2 * 1024 * 1024) throw new DurablePlannerError("PAYLOAD_TOO_LARGE", "The complete role response exceeds retained artifact capacity.", "RECOVERY");
+      if(role&&Buffer.byteLength(response.reasoningText??"")>2*1024*1024)throw new DurablePlannerError("PAYLOAD_TOO_LARGE","The provider reasoning exceeds retained trace capacity.","RECOVERY");
       if (response.finishReason === "MAX_TOKENS") { await rejected(response.text ?? "", { code: "OUTPUT_TRUNCATED" }); throw fail("OUTPUT_TRUNCATED", "The provider reached its output limit."); }
       if (response.finishReason !== "STOP" || !response.text?.trim()) { await rejected(response.text ?? "", { code: "INCOMPLETE_STRUCTURED_RESULT" }); throw fail("INVALID_OUTPUT", "The provider did not return a complete structured result."); }
+      if (role?.format === "JSON") {
+        try { JSON.parse(response.text); } catch { throw fail("INVALID_OUTPUT", "The structured role response is not complete JSON."); }
+      }
       const safe = { text: response.text, finishReason: response.finishReason, usage: response.usage };
       let value: T;
       try { value = await Promise.race([Promise.resolve(request.validate(safe, controller.signal)), aborted]); }
@@ -258,12 +333,14 @@ export async function dispatchMeteredProvider<T>(meter: ProviderMeter, request: 
       }
       if (controller.signal.aborted) throw controller.signal.reason;
       await meter.close(callId, { finishReason: response.finishReason, accepted: true });
-      return { value, provider: route.provider, model: route.model, callId, attempts };
+      if(canPreview){preview=(response.text??"").slice(0,VISIBLE_OUTPUT_CHARACTERS);receivedCharacters=(response.text??"").length;await flushPreview();}
+      if(canReason&&response.reasoningText!==undefined){reasoningPreview=response.reasoningText.slice(0,VISIBLE_OUTPUT_CHARACTERS);reasoningCharacters=response.reasoningText.length;await flushReasoning();}
+      return { value, provider: route.provider, model: route.model, callId, attempts, ...(role ? { metadata: { effectiveModel: response.model ?? null, fingerprint: response.fingerprint ?? null, reasoningTokens: response.usage?.reasoningTokens ?? null, finishReason: response.finishReason } } : {}) };
     } catch (error) {
       abandoned = true;
       // Error text/raw reasoning can contain private prompts or provider keys.
       // Persist and return only stable Planner error codes.
-      lastError = error instanceof DurablePlannerError ? error : fail("PROVIDER_FAILURE", "The model request failed.");
+      lastError = error instanceof DurablePlannerError ? error : Object.assign(fail("PROVIDER_FAILURE", "The model request failed."), { cause: error });
       if (callId) {
         attempts[attempts.length - 1].code = lastError.detail.code;
         await meter.close(callId, { finishReason, errorCode: lastError.detail.code }).catch(() => {});
@@ -271,10 +348,21 @@ export async function dispatchMeteredProvider<T>(meter: ProviderMeter, request: 
       controller.abort(lastError);
       if (!["PROVIDER_FAILURE", "PROVIDER_TIMEOUT", "OUTPUT_TRUNCATED", "INVALID_OUTPUT"].includes(lastError.detail.code)) throw lastError;
     } finally {
-      if (timer) clearTimeout(timer); if (poll) clearInterval(poll);
+      if (timer) clearTimeout(timer); if (poll) clearInterval(poll);if(reasoningTimer)clearTimeout(reasoningTimer);if(reasoningWrite)await reasoningWrite;
       if (abortListener) controller.signal.removeEventListener("abort", abortListener);
       request.signal?.removeEventListener("abort", onAbort);
     }
   }
   throw lastError;
+}
+
+function roleUsage(requestedModel: string, response: LLMResponse): ProviderUsage {
+  const usage = response.usage!;
+  const effectiveModel = response.model?.trim() && response.model.length <= 200 ? response.model : undefined;
+  const fingerprint = typeof response.fingerprint === "string" && response.fingerprint.length <= 200 ? response.fingerprint : null;
+  // Missing effective identity/cache detail cannot establish a precise cost.
+  const priced = pricedProviderUsage(effectiveModel ?? requestedModel, usage);
+  return { ...priced, costUsd: effectiveModel && usage.cacheHitTokens !== undefined ? priced.costUsd : null,
+    reasoningTokens: usage.reasoningTokens, cacheHitTokens: usage.cacheHitTokens, effectiveModel, fingerprint,
+    finishReason: response.finishReason, response: response.text,reasoningText:response.reasoningText };
 }

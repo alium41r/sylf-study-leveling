@@ -1,0 +1,31 @@
+# Verified Drive copy cleanup
+
+**23 October 2026. Deployed and live synthetic-note acceptance passed.**
+
+## Changes
+
+The old PDF publisher moved every acknowledged predecessor into the system folder and retained it forever. Pack uploads also created another physical file after a lost server response. These are different from unique immutable history packs, which contain original revisions/attachments needed for recovery.
+
+- After native discovery/publication/availability checks, keep the verified current named PDF in its matching Notes folder and retire proven superseded derived copies into recoverable Drive Trash. Process at most eight copies per reconciliation and resume remaining maintenance in later background passes. A 105-copy pagination regression verifies bounded completion.
+- Record source frontiers and compare transitive ancestry, including catalog context. Each cleanup claim includes the exact inspected source stamp. A reused rendering can advance its stamp conditionally, protecting newer context against old in-flight cleanup requests. Unmerged/equal or unknown branches are preserved. PDF receipts cannot acknowledge native jobs.
+- Reconcile completed/lost uploads and abandoned identical staging copies deterministically. New clients use compact upload capabilities and a separate final JSON reconciliation; long Unicode paths and cleanup claims stay out of HTTP upload headers. Existing client capabilities remain compatible.
+- Reuse a hash-verified immutable pack on upload retry. The existing complete transport listing finds identical physical duplicates; retain a deterministic verified survivor and retire at most four redundant physical copies per pass. Unique revision history and dependencies remain untouched. A cold-device fixture reconstructs exact content when another tab retires an identical pack during download.
+- Recheck scope, current provider checksums/size/location and candidate version before retirement. Conditional metadata changes preserve public/private properties. No permanent-delete, empty-Trash, native-history expiry, database migration, new dependency or editor rewrite was added. The earlier same-site startup/quiet-sync repair is included in the isolated release candidate.
+
+The precise limits, trust boundary and recovery rules are in the [current Drive contract](../../workspace.md#verified-drive-copy-cleanup).
+
+## Verification
+
+- **196 active Notes tests passed; one optional scalability profile skipped.** Existing crash/quota/corruption/account/portable/history/ink/PDF suites remain included. New tests cover causal retirement, stale source claims, independent branches then merge, replacement corruption, conditional races, absent ETags, out-of-root files, lost completion, native idempotency, pagination and compact large-path capabilities.
+- TypeScript, targeted lint, the isolated production webpack build, mobile build and mobile server/secret-boundary audit passed.
+- **Deployed live workflow:** the authenticated canonical site opened the existing library; only the authorized synthetic study note was edited. After leaving its editor, the actual Google inventory changed from two active old PDFs to **one current, source-tagged named PDF in the matching test folder** and two recoverable obsolete PDFs in Trash. The legacy native archive remained intact. See [before](evidence/live-before.json), [after](evidence/live-after-first.json) and [deployment](evidence/deployment.json). No personal note body was edited for testing.
+- A second deployed synthetic edit was preserved through a reload and later produced a different current PDF, leaving one active PDF and three obsolete PDFs in recoverable Trash. See the [settled second result](evidence/live-after-second-settled.json). The [opening repair](../2026-10-23-fast-opening/report.md) includes this cleanup and supersedes the initial deployment with its additional startup improvements.
+- **Actual Google API:** read-only checks verified the existing library/test-folder binding. The v3 response omitted ETags, and a stale v3 conditional rename returned 200. The equivalent v2 request correctly returned 412. The production conditional module then preserved private properties/content checksum and moved only the created synthetic qualification file to recoverable Trash. This prevented shipping an apparent but unenforced race guard. See [conditional qualification](evidence/live-conditional.json) and [production-method qualification](evidence/live-module.json). No personal note was changed by those direct provider checks.
+
+## Recovery and release limits
+
+Trash remains recoverable until Google removes it, normally after 30 days. It still consumes space until removal; this implementation never empties the user's Trash. Continued cleanup requires an authenticated running application; it is not a server cron job. Unique `.sylfpack` history is deliberately retained. A PDF cannot replace editable source, attachments or history. Unverified legacy native archives, unknown incomplete uploads, externally altered files and unmerged branches stay protected. There is no promise of exactly one physical file when a safe supersession proof is unavailable.
+
+The native-recovery flag is an authenticated library assertion supplied only after existing full discovery/publication/availability verification. The server independently verifies PDF integrity/scope and source-stamp/version guards, but does not render a note to prove semantic equivalence. It never uses that flag to discard unique native bytes. Independent physical-device recovery remains the earlier unperformed pilot gate. Browser clearing can destroy unsynchronized work; retained local encryption and provider-readable cloud assumptions are unchanged.
+
+Sources: [Google v2 conditional metadata resource](https://developers.google.com/workspace/drive/api/reference/rest/v2/files), [metadata patch](https://developers.google.com/workspace/drive/api/reference/rest/v2/files/patch), [private-property limits](https://developers.google.com/workspace/drive/api/guides/properties), [Trash behavior](https://developers.google.com/workspace/drive/api/guides/delete). API conditional behavior above is a measured finding, not an assumption from these references.

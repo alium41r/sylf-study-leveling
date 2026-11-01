@@ -1,0 +1,546 @@
+{
+ "label": "backend-postgres",
+ "passed": 107,
+ "failed": 0,
+ "skipped": 0,
+ "collectionFailures": [],
+ "finishedAt": "2026-10-31T21:19:20.780Z",
+ "scope": "Handlers in-process on disposable PostgreSQL 17. Hosted Supabase, Redis and storage were not used.",
+ "cases": [
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "OAuth account linking never links a provider to a user named only by the forgeable oauth_link_user cookie",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "OAuth account linking refuses a link cookie that names a different user from the signed-in session",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "OAuth account linking still links for the signed-in person who started the flow",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "device sessions lists a device from the moment it signs in",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "device sessions ends a revoked device at once",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "device sessions keeps a revoked device out after its token was reissued",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "device sessions ends a token for good when it logs out",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "device sessions cannot revoke another person's device",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "device sessions keeps accepting tokens issued before sessions were recorded",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "device sessions still revokes everything through tokenVersion",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "security codes refuses a second guess after too many wrong codes",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "security codes gives two people the same code without a collision",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "security codes does not let the public email endpoint consume a security code or disclose its owner",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "account identity does not make an administrator out of an unverified email address",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "account identity promotes a verified bootstrap address as before",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "account identity refuses an email that differs from an existing one only by case",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "pre-hijacking through an unverified sign-up removes a password nobody proved, and its sessions, when a verified provider claims the address",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "pre-hijacking through an unverified sign-up keeps the password of an account that already proved its address",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "pre-hijacking through an unverified sign-up does not call an address verified when the provider did not",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions lists a page, newest first, with a cursor that walks to the end",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions leaves out a running session, and anyone else's",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions refuses limit=0",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions refuses limit=-1",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions refuses limit=abc",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions refuses limit=1e3",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions caps a page rather than obeying a large limit",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions still restores one session by id, and still refuses a call with neither",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "detailed stats summary keeps the chart and drops the log",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "quests pages through every quest once",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "quests returns the web's plain array when no limit is asked for",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "quests refuses a malformed cursor",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "chats and messages pages chats, and keeps the web's shape without a limit",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "chats and messages caps an incremental message read, and a poller reaches the rest by asking again",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "leaderboard privacy leaves out a person who keeps their profile private, and shows it to nobody but them",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "leaderboard privacy leaves out a person who hides their rank from the public, but keeps them for friends",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "friends privacy withholds what a friend has set to private",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "friends privacy shows everything to a friend when nothing is hidden",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations cannot pull a stranger into a group",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations cannot make a shared-group relationship with a stranger",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations cannot add someone who blocked the group's creator",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations still lets friends make a group",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations rejects a participant list that is not user ids",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "timer trust boundary credits a claimed 20-day session no more than one sitting",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "rls and rpc refuses the leader-only RPC to a token with someone else's id, whichever layer stops it",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "audiences do not cross refuses a web token as a bearer, and a native token as a cookie",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "audiences do not cross carries only what revocation needs",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "audiences do not cross refuses forged, expired and incomplete native tokens",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "audiences do not cross refuses a native token pointing at a browser session row",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "audiences do not cross lets a cookie win, and never falls through from a bad cookie to a bearer token",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "a cookie can never buy a bearer token is refused by every native endpoint when a cookie is all it has",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "a cookie can never buy a bearer token has no route that mints a native session while reading the session cookie",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "a cookie can never buy a bearer token keeps browsers out of the native endpoints altogether",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "a browser cannot present a bearer token refuses Sec-Fetch-Site: same-origin",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "a browser cannot present a bearer token refuses Sec-Fetch-Site: same-site",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "a browser cannot present a bearer token refuses Sec-Fetch-Site: cross-site",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "a browser cannot present a bearer token refuses Sec-Fetch-Site: none",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "revocation parity signs every device out when one signs out everywhere",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "revocation parity ends native devices when a browser signs out everywhere",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "revocation parity keeps the native device that changes a password, and ends the others",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "revocation parity keeps the browser that changes a password, and ends native devices",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "revocation parity ends one device from Settings, in both directions",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "revocation parity ends only this device on sign-out, so a copied token is dead",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "revocation parity changes nothing when sign-out presents a wrong token",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "revocation parity ends native sessions when a verified provider claims an unverified address",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "revocation parity ends a native session when the account is deleted",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "revocation parity ends a session whose row reached its expiry, whatever the tokens say",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "refresh rotation stores only hashes, and extends the session 30 days from use",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "refresh rotation rotates on every use, and the new pair works",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "refresh rotation lets the old token work once in the grace window, and a second time ends the session",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "refresh rotation ends the session on reuse after the grace window",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "refresh rotation detects a token two generations old, which is what a thief who rotated twice leaves behind",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "refresh rotation refuses a refresh token whose secret was never issued, and ends that session",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "refresh rotation refuses when tokenVersion moved, even if nothing ended the row",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "refresh rotation leaves one usable chain when two refreshes race",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "no cookie for a bearer request sets none on the routes that reissue a session",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "no cookie for a bearer request sets none on first onboarding",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "no cookie for a bearer request sets none on a refused stats read, and still clears a browser's cookie there",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "no cookie for a bearer request still reissues a browser's cookie",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "ownership with a native token refuses another person's rows on owned routes",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "ownership with a native token refuses expectedOwnerId naming someone else when starting a session",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "ownership with a native token lists a native device beside browsers, with the current one marked and no token material",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "password sign-in and registration shares the web's account limit, across both routes",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "password sign-in and registration refuses a wrong password and opens no session",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "password sign-in and registration refuses control characters in a client name",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "password sign-in and registration refuses a missing client name",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "password sign-in and registration refuses an oversized client name",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "password sign-in and registration registers through the web's own profile code, with a session and no cookie",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "password sign-in and registration refuses a taken address, and registration closes in prelaunch",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "password sign-in and registration stamps a browser row as a browser",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE hands a code to the app, which redeems it once with its verifier",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE makes a stolen code useless without the verifier",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE refuses a code past its 60 seconds",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE stores only a hash of the code, under a prefix the public email route refuses",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE ignores a cookie in the system browser, and links nothing to that person",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE sets no cookie, on start or callback",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE refuses the redirect https://evil.invalid/auth",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE refuses the redirect sylf-native://evil",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE refuses the redirect http://localhost:4000/auth",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE refuses the redirect http://127.0.0.1:4000/other",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE refuses the redirect http://127.0.0.1:1/auth",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE accepts Electron's loopback port",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE refuses a malformed challenge",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE treats a forged state as a web flow, which its missing cookie refuses",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE refuses a state signed for another provider, and any redirect a signed state did not come with",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE is refused as a bearer token: the state is not a credential",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE reports a provider refusal to the app without a code",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/native-auth.postgres.ts",
+   "name": "OAuth with PKCE refuses an unverified provider address that matches an account, as the web does",
+   "status": "passed"
+  }
+ ]
+}

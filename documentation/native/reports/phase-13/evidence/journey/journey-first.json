@@ -1,0 +1,66 @@
+{
+ "stage": "first",
+ "passed": true,
+ "failed": [],
+ "checks": {
+  "the sign-in surface is the first thing shown": true,
+  "it says plainly that there is no password reset": true,
+  "nothing implies a reset link": true,
+  "a wrong password is refused, in the server's words": true,
+  "it was sent once": true,
+  "a new account opens Home": true,
+  "an empty day says so": true,
+  "no sample content: empty Today": true,
+  "empty history says what will appear": true,
+  "a signed-in person is told where time goes": true,
+  "no sample content: empty Focus": true,
+  "an empty circle says so": true,
+  "no sample content: empty Circle": true,
+  "Progress shows level 1 from the server": true,
+  "no sample content: empty Progress": true,
+  "the event is on the line, with a time": true,
+  "the quest is listed, with no invented time": true,
+  "the day has a summary worked out from real data": true,
+  "no sample content: Today with data": true,
+  "choosing a quest fills in Focus": true,
+  "one session, stamped with its owner and its subject": true,
+  "the note says where it goes": true,
+  "the dock shows the same session": true,
+  "the server holds it within seconds, as one active session": true,
+  "a running session makes no requests of its own": true,
+  "switching Spaces and reloading kept the session": true,
+  "Workspace's Timer shows the one session": true,
+  "the dock and the Timer agree": true,
+  "Planner shows the real quest": true,
+  "Planner says where AI plans live, and does not imitate them": true,
+  "Calendar shows the real event": true,
+  "a new event is added through the server, and appears": true,
+  "Audio lists the real catalog": true,
+  "Notes is honest about where notes are": true,
+  "no tool shows a sample badge": true,
+  "Sylvie answers through the real route, with no provider": true,
+  "Focus shows the same session after Workspace": true,
+  "a pause from Focus reaches the dock": true,
+  "World sees the pause too, through the model": true
+ },
+ "facts": {
+  "wrongPassword": "Invalid credentials",
+  "quest": {
+   "status": 201
+  },
+  "requestsToOpenToday": [
+   "/api/user/stats",
+   "/api/quests",
+   "/api/planner/capabilities",
+   "/api/calendar/personal"
+  ],
+  "activeSessionId": 1,
+  "requestsWhileIdleWithASession": 0,
+  "calendarWrites": [
+   200,
+   200
+  ],
+  "sylvie": "Lv. 1 — 0/182 XP (182 XP to Lv. 2)."
+ },
+ "consoleErrors": []
+}

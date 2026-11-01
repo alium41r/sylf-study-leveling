@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { addDays, localTimeToISO, weekStart } from "./dates";
-import { TimezoneService } from "@/lib/timezone-service";
+import { TimezoneService } from "../timezone-service";
 import type { CalendarEvent, EventInput } from "./contracts";
 
 export const recurrenceSchema = z

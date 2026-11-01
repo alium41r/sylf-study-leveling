@@ -1326,3 +1326,7 @@ html:where([data-surface-polarity="light"], [data-mode="light"]:not([data-surfac
 #faq {
   scroll-margin-top: 96px;
 }
+
+/* The unlocked Notes workspace owns navigation; documents also remove library chrome. */
+[data-sylf-shell]:has([data-notes-workspace]) > :not(main) { display: none; }
+body:has([data-notes-document="true"]) [data-testid="immersive-mode-btn-top-bar"] { display: none; }

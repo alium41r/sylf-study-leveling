@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-28T15:34:26.895047+00:00",
+  "status": "PASSED",
+  "scope": "Single stopped C01 observation; no complete educational qualification",
+  "preservation": {
+    "baselineFiles": 5546,
+    "baselineChanged": [],
+    "baselineMissing": [],
+    "preparedInputChanges": [],
+    "qualificationSourceChanges": [],
+    "executionSourceChanges": [],
+    "productionChanges": [],
+    "migrationsChanged": []
+  },
+  "static": {
+    "localLinksChecked": 18,
+    "brokenLinks": [],
+    "whitespace": [],
+    "exactCredentialLeakMatches": []
+  },
+  "verification": {
+    "guardTests": {
+      "passed": 7,
+      "failed": 0,
+      "observedExitCode": 0
+    },
+    "fullTypecheck": {
+      "observedExitCode": 0,
+      "log": "typecheck.txt"
+    },
+    "lint": {
+      "files": 5,
+      "errors": 0,
+      "warnings": 0
+    },
+    "scriptedPostgres": {
+      "pilot": 1,
+      "legacy": 225,
+      "status": "PASSED",
+      "externalCalls": 0
+    },
+    "longReviewPostgres": {
+      "pilot": 1,
+      "legacy": 225,
+      "status": "PASSED",
+      "externalCalls": 0
+    },
+    "liveObservationPostgres": {
+      "pilot": 1,
+      "legacy": 225,
+      "status": "PASSED",
+      "qualityConclusion": "NONE"
+    },
+    "baseline618": "Prior fresh source-matched preparation evidence; not represented as a fresh 618 rerun for this execution adapter"
+  },
+  "physicalPaidPotentialRequests": 4,
+  "completedResponses": 3,
+  "unknownSpendingRequests": 1,
+  "secondExperimentStarted": false,
+  "fixtureSemanticPreflight": "MISSED_BEFORE_PAID_DISPATCH; BLOCKING_CONFLICT_REPRODUCED_AFTERWARD",
+  "sleepPrevention": {
+    "sessionId": 61825,
+    "command": "caffeinate -i -s",
+    "release": "RELEASED_BY_INTERRUPT_AFTER_OBSERVATION_AND_AUDIT",
+    "observedExitCode": 1,
+    "releasedAt": "2026-10-28T15:35:13.945Z"
+  },
+  "credentialCapsuleCleanup": {
+    "status": "REMOVED",
+    "at": "2026-10-28T15:35:00.085Z",
+    "scope": "Only the disposable key capsule was removed; existing credentials and private metadata receipts are unchanged."
+  },
+  "statusMeaning": "Technical checks, evidence retention and preservation passed; fixture semantic preflight failed and educational qualification is incomplete."
+}

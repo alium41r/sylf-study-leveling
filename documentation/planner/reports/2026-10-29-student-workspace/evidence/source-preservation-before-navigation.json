@@ -1,0 +1,50 @@
+{
+  "startedAt": "2026-10-29T02:42:14.650495+00:00",
+  "finishedAt": "2026-10-29T03:38:29.218457+00:00",
+  "baselineFiles": 6023,
+  "unchanged": 6007,
+  "changed": [
+    "__tests__/planner-v2/postgres/understanding.postgres.ts",
+    "documentation/planner/AI_FIRST_FOUNDATION.md",
+    "lib/planner/v2/intelligence/schemas/understanding.ts",
+    "lib/planner/v2/server/understanding.ts",
+    "scripts/test/test-planner-ai-first-foundation.mjs",
+    "__tests__/planner/classic-coexistence.test.ts",
+    "__tests__/planner/classic-modes-coexistence.test.tsx",
+    "app/api/planner/capabilities/route.ts",
+    "app/system/components/PlannerTab.tsx",
+    "app/system/components/SystemScreen.tsx",
+    "documentation/performance/phase-0/artifacts/render-diagnostics.json",
+    "documentation/planner/README.md",
+    "lib/planner/transport.ts",
+    "lib/planner/v2/server/assistant.ts",
+    "lib/planner/v2/server/generation.ts",
+    "lib/planner/v2/server/worker.ts"
+  ],
+  "missing": [],
+  "unrelatedChanged": [
+    "documentation/performance/phase-0/artifacts/render-diagnostics.json"
+  ],
+  "newSourceFiles": [
+    "__tests__/planner-v2/postgres/student-workspace.postgres.ts",
+    "__tests__/planner-v2/workspace/contracts.test.ts",
+    "__tests__/planner-v2/workspace/fixtures.ts",
+    "__tests__/planner-v2/workspace/routes.test.ts",
+    "__tests__/planner-v2/workspace/workspace.test.tsx",
+    "app/api/planner/workspace/route.ts",
+    "app/components/planner/student/AcceptedDetailsEditor.tsx",
+    "app/components/planner/student/StudentPlannerWorkspace.module.css",
+    "app/components/planner/student/StudentPlannerWorkspace.tsx",
+    "documentation/planner/STUDENT_WORKSPACE.md",
+    "documentation/planner/reports/2026-10-29-student-workspace/README.md",
+    "lib/planner/v2/client/transport.ts",
+    "lib/planner/v2/client/workspace.ts",
+    "lib/planner/v2/server/student-workspace.ts",
+    "scripts/qa/planner-workspace/browser.mjs",
+    "scripts/qa/planner-workspace/index.html",
+    "scripts/qa/planner-workspace/main.tsx",
+    "scripts/qa/planner-workspace/vite.config.mjs"
+  ],
+  "unrelatedNew": [],
+  "status": "FAILED"
+}

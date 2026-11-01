@@ -1,0 +1,8 @@
+{
+  "wrongCARejected": true,
+  "verifiedConnections": 0,
+  "failureCodes": [
+    "SELF_SIGNED_CERT_IN_CHAIN"
+  ],
+  "realCredentialsSent": false
+}

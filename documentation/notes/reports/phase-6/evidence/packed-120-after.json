@@ -1,0 +1,41 @@
+{
+  "environment": "Node 24, fake IndexedDB, real AES-GCM/Yjs/repository/pack transport. Synthetic HTTP; zero live provider latency.",
+  "revisions": 120,
+  "packEvery": 10,
+  "saves": {
+    "p50Ms": 2.7150420000000395,
+    "p95Ms": 4.868499999999813,
+    "last20P95Ms": 3.692500000000109
+  },
+  "closure": {
+    "ms": 169.55083400000012,
+    "objectReads": 241,
+    "uniqueHashes": 241,
+    "objects": 241
+  },
+  "integrity": {
+    "skipped": true,
+    "ms": 0.0067089999997733685,
+    "objectReads": 0,
+    "uniqueHashes": 0
+  },
+  "publish": {
+    "ms": 1845.7813329999992,
+    "uploads": 12,
+    "packs": 12
+  },
+  "restore": {
+    "ms": 303.0191249999998,
+    "packReads": 12,
+    "downloadedBytes": 136061,
+    "uniquePackBytes": 136061
+  },
+  "storage": {
+    "objects": 241,
+    "objectBytes": 112939,
+    "revisions": 120,
+    "pending": 0,
+    "stagedAssets": 0
+  },
+  "heapUsed": 133854360
+}

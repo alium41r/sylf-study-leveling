@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ComponentProps } from "react";
+import Link from "next/link";
 import PlannerWorkspace from "../../components/planner/PlannerWorkspace";
 import type { PlannerSurfaceMode } from "../../components/planner/PlannerModesChooser";
 import { useExamCapabilities } from "../../components/planner/useExamCapabilities";
@@ -16,7 +17,7 @@ interface PlannerTabProps {
   sessionId: number | null;
   onQuotaRefresh: () => void;
   /** Called when a plan finishes generating (result carries the thread id). */
-  onComplete: (result: any) => void;
+  onComplete: NonNullable<ComponentProps<typeof AiPlannerPanel>["onComplete"]>;
   /** Jump into the conversation that received the generated plan. */
   onViewConversation: () => void;
 }
@@ -144,6 +145,7 @@ export default function PlannerTab({
                     : `${plannerQuota.used} / ${plannerQuota.limit} Free Weekly Plan`}
                 </span>
               )}
+              {capabilities?.studentWorkspace?.enabled && <Link href="/planner" className="min-h-11 inline-flex items-center px-3 rounded-xl border border-border-subtle text-sm text-text-primary">Open Planner preview</Link>}
               {/* The one deliberate way into the specialized workflows. Navigates directly
                   to Planner Modes (Ask Sylf recommendation + Manual Chooser). */}
               <button

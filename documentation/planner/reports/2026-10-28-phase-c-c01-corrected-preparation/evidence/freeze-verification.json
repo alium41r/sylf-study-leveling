@@ -1,0 +1,16 @@
+{
+  "status": "PASSED",
+  "checkedAt": "2026-10-29T01:51:17.555Z",
+  "manifestSha256": "a94847bfbca26fae504367fbb16b3e3b91c868af621a41f78942e5d82ab6b707",
+  "profileId": "C01-CORRECTED-2",
+  "sourcePins": 387,
+  "pinnedInputArtifacts": 6,
+  "sourceOrInputMismatches": [],
+  "approved": false,
+  "paidCalls": 0,
+  "oldAuthorizationRejected": true,
+  "oldAuthorizationDenial": "APPROVAL_OR_FRESH_PREFLIGHT_REQUIRED",
+  "unauthorizedOutputCreated": false,
+  "newAuthorizationConsumed": false,
+  "credentialLeakMatches": []
+}

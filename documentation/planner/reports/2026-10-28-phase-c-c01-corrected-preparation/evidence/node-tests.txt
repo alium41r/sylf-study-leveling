@@ -1,0 +1,31 @@
+✔ corrected explicit Monday-zero civil week matches all seven named days (3.039708ms)
+✔ old frozen encoding and schema-valid shifted windows/ceilings/rest cannot pass preparation (2.179208ms)
+✔ operator requests bind the exact run/root, require a reason and cannot be overwritten (3.399417ms)
+✔ fresh approval cannot reuse the old experiment or ignore its uncertain liability (0.570833ms)
+✔ integer peak-rate exposure includes the full dispatched reservation and settles actual usage once (1.450542ms)
+✔ unknown cost, unknown dispatch, an unauthorized model and exposure beyond $1.75 block admission (0.36225ms)
+✔ an unauthorized or underfunded call never reaches the adapter (3.204375ms)
+✔ HIGH/full-cap role settings cannot be silently reduced (0.128875ms)
+✔ a completed review that outlives calendar evidence is retained and stops before another invocation (2.174208ms)
+✔ a current complete review permits the existing lifecycle to validate it without an invented stop (0.630458ms)
+✔ repeated allocation-only review with unchanged substantive progress cannot buy another call (0.383083ms)
+✔ operator cancellation before admission never invokes the provider and keeps the operator reason (0.202167ms)
+✔ interrupted operator call is distinguished from an independent provider failure without fabricating usage (0.388834ms)
+✔ metadata preflight cannot dispatch to any generating, tool or foreign endpoint (1.453625ms)
+✔ metadata preflight uses only fixed-origin GET, forbids redirects and preserves no credential (34.52625ms)
+✔ unavailable model capability is incomplete even when both GETs succeed (0.400708ms)
+✔ HTTP rejection and transport uncertainty never retain echoed provider errors or claim success (0.557041ms)
+✔ oversized metadata is bounded and cannot become successful evidence (0.264042ms)
+✔ credential loading matches existing in-memory sanitation without changing files (1.532667ms)
+✔ frozen bank has diverse packets and excludes evaluator labels and keys from model input (1.102458ms)
+✔ a leaked hidden answer or third mutation target blocks preparation (0.559583ms)
+✔ conservative funding covers full downstream role escrows without a smaller generation cap (0.113583ms)
+✔ preparation CLI rejects paid/live flags before writing any manifest (59.866583ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 206.529208

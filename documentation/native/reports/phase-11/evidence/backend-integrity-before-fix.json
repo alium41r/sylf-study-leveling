@@ -1,0 +1,76 @@
+{
+ "label": "backend-integrity-before-fix",
+ "passed": 1,
+ "failed": 10,
+ "skipped": 0,
+ "collectionFailures": [],
+ "finishedAt": "2026-10-31T19:06:16.543Z",
+ "scope": "Handlers in-process on disposable PostgreSQL 17. Hosted Supabase, Redis and storage were not used.",
+ "cases": [
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "leaderboard privacy leaves out a person who keeps their profile private, and shows it to nobody but them",
+   "status": "failed",
+   "failure": "AssertionError: expected [ 1, 2 ] to not include 1     at Proxy.<anonymous> (file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/expect/dist/index.js:1319:15)     at Proxy.<anonymous> (file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/expect/dist/index.js:1156:15)"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "leaderboard privacy leaves out a person who hides their rank from the public, but keeps them for friends",
+   "status": "failed",
+   "failure": "AssertionError: expected [ 1, 3, 2, 4, 5 ] to not include 3     at Proxy.<anonymous> (file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/expect/dist/index.js:1319:15)     at Proxy.<anonymous> (file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/expect/dist/index.js:1156:15)"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "friends privacy withholds what a friend has set to private",
+   "status": "failed",
+   "failure": "AssertionError: expected { …(22) } to match object { id: 6, isOnline: false, …(5) } (20 matching properties omitted from actual)     at Proxy.<anonymous> (file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/expect/dist/index.js:1283:10)"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "friends privacy shows everything to a friend when nothing is hidden",
+   "status": "failed",
+   "failure": "AssertionError: expected { …(22) } to match object { id: 8, isOnline: true, …(3) } (22 matching properties omitted from actual)     at Proxy.<anonymous> (file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/expect/dist/index.js:1283:10)"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations cannot pull a stranger into a group",
+   "status": "failed",
+   "failure": "AssertionError: expected 201 to be 403 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/integrity.postgres.ts:69:29     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations cannot reach private profile fields by forcing a shared group",
+   "status": "failed",
+   "failure": "error: invalid input value for enum \"PrivacyLevel\": \"GROUPS\"     at /Users/aliumair/Desktop/sylf/node_modules/pg-pool/index.js:45:11     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations cannot add someone who blocked the group's creator",
+   "status": "failed",
+   "failure": "AssertionError: expected 200 to be 403 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/integrity.postgres.ts:85:29     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations still lets friends make a group",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations rejects a participant list that is not user ids",
+   "status": "failed",
+   "failure": "AssertionError: expected 500 to be 400 // Object.is equality     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/integrity.postgres.ts:99:183     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "timer trust boundary, as measured caps how far an offline start can claim the past",
+   "status": "failed",
+   "failure": "AssertionError: expected 1728000 to be less than or equal to 86400     at /Users/aliumair/Desktop/sylf/__tests__/backend/postgres/integrity.postgres.ts:113:33     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "rls and rpc does not let an authenticated token run the leader-only RPC with someone else's id",
+   "status": "failed",
+   "failure": "error: Unauthorized: user has no pending invitation to party 1     at /Users/aliumair/Desktop/sylf/node_modules/pg-pool/index.js:45:11     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  }
+ ]
+}

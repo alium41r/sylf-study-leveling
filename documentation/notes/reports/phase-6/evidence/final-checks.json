@@ -1,0 +1,89 @@
+{
+  "capturedAt": "2026-10-22T01:44:47.926856+00:00",
+  "focusedRegression": {
+    "exitCode": 0,
+    "files": 13,
+    "tests": 209,
+    "optInProfilesSkipped": 1,
+    "log": "regression.log"
+  },
+  "webBuild": {
+    "exitCode": 0,
+    "log": "web-build.log"
+  },
+  "mobileBuild": {
+    "exitCode": 0,
+    "log": "mobile-build.log"
+  },
+  "mobileBoundaryAudit": {
+    "exitCode": 0,
+    "log": "mobile-verify.log"
+  },
+  "rootTypecheck": {
+    "exitCode": 0,
+    "log": "typecheck.log"
+  },
+  "targetedLint": {
+    "exitCode": 0,
+    "warnings": 0,
+    "log": "lint.log"
+  },
+  "browserChecks": {
+    "exitCode": 0,
+    "richTextGroups": 15,
+    "inkGroups": 10,
+    "pdfGroups": 14,
+    "results": "browser-checks.json"
+  },
+  "performanceChecks": {
+    "exitCode": 0,
+    "results": "performance-checks.json"
+  },
+  "realChromiumBacklog": {
+    "exitCode": 0,
+    "revisions": 1000,
+    "result": "real-idb-backlog.json"
+  },
+  "sustainedWritingAndIndependentRestore": {
+    "exitCode": 0,
+    "strokes": 1200,
+    "samples": 39600,
+    "notebookRevisions": 1201,
+    "result": "soak-results.json"
+  },
+  "nativeInkCloudCatchupAndRecoveryViews": {
+    "exitCode": 0,
+    "result": "ink-cloud-catchup.json"
+  },
+  "closedImageResources": {
+    "exitCode": 0,
+    "result": "resources-final.json"
+  },
+  "independentPdfFidelity": {
+    "exitCode": 0,
+    "result": "export-fidelity-results.json"
+  },
+  "licenseResources": {
+    "passed": true,
+    "notices": 63,
+    "byteExactPdfJsFiles": 202,
+    "result": "license-source-verification.json"
+  },
+  "diffCheck": {
+    "exitCode": 0,
+    "log": "diff-check.log",
+    "preserveVendorCrlf": true
+  },
+  "liveGooglePerformed": false,
+  "physicalStylusPerformed": false,
+  "hostedDatabaseRead": false,
+  "migrationApplied": false,
+  "deploymentPerformed": false,
+  "oneDriveStarted": false,
+  "workspaceImplementationStarted": false,
+  "arbitraryHistoryScaleQualified": false,
+  "releaseEnvironment": "release-environment.json",
+  "sourceSnapshot": "source-snapshot.json",
+  "documentationChecks": "document-checks.json",
+  "ownedQaPreviewStopped": true
+}

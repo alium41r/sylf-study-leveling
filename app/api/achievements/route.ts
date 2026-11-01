@@ -137,10 +137,11 @@ export async function POST(request: Request) {
 
     invalidateRankingsCache();
     const updatedUser = await tx.user.findUnique({ where: { id: userId } });
+    const safeUser = updatedUser ? Object.fromEntries(Object.entries(updatedUser).filter(([k]) => k !== "password")) : null;
     return NextResponse.json({
       success: true,
       message: "Reward claimed!",
-      user: updatedUser,
+      user: safeUser,
     });
     });
   } catch (error: unknown) {

@@ -45,6 +45,22 @@ export class AssistantService {
   async read(ownerId:number,planId:string) {
     return this.db.coordinated(ownerId,async sql=>{const plan=await ownedPlan(sql,ownerId,planId);return {conversationVersion:plan.conversationVersion,conversation:ConversationSchema.parse(plan.conversation ?? emptyConversation())};});
   }
+  /** A free, explicitly student-authored note, stored in the existing owned
+   * conversation. It changes no accepted hard facts or verified evidence. */
+  async note(ownerId:number,planId:string,raw:unknown) {
+    const input=z.strictObject({key:z.string().regex(/^[A-Za-z0-9_-]{8,100}$/),text:ProseV2Schema,expectedConversationVersion:z.number().int().nonnegative()}).parse(raw);
+    return this.db.coordinated(ownerId,async sql=>{
+      const snap=await this.snapshot(sql,ownerId,planId,[planId]),digest=hash("student-note-v1",input.text),old=snap.conversation.events.find(e=>e.key===input.key);
+      if(old){if(old.requestDigest!==digest)reject("IDEMPOTENCY_MISMATCH","This note key belongs to different text.");return {conversationVersion:snap.plan.conversationVersion,replayed:true};}
+      if(snap.plan.conversationVersion!==input.expectedConversationVersion)reject("INTENT_CONFLICT","The conversation changed; reload before saving this note.");
+      const conversation=structuredClone(snap.conversation);
+      conversation.events.push({key:input.key,requestDigest:digest,at:(await clock(sql)).toISOString(),text:input.text,
+        response:{kind:"ANSWER",message:"Saved as your feedback for the next planning request. Accepted goals and an active plan stay unchanged."},
+        budget:newBudget("ADVICE"),targetBindings:snap.targets,mode:"ADVICE",questions:[]});
+      await sql.query('UPDATE "PlannerPlan" SET conversation=$2,"conversationVersion"="conversationVersion"+1 WHERE id=$1',[planId,boundConversation(conversation)]);
+      return {conversationVersion:snap.plan.conversationVersion+1,replayed:false};
+    });
+  }
   async respond(ownerId:number,planId:string,raw:unknown,signal?:AbortSignal) {
     const request=AssistantTurnRequestSchema.parse(raw);
     const requestDigest=hash("assistant-turn",{text:request.text,readPlanIds:request.readPlanIds,mode:request.mode,researchRequested:request.researchRequested});

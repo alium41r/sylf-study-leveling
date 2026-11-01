@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "status": "METADATA_REACHABLE",
+  "paidCalls": 0,
+  "fixedOrigin": "https://api.deepseek.com",
+  "credentialRecorded": false,
+  "metadataRequests": [
+    {
+      "path": "/models",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "path": "/user/balance",
+      "ok": true,
+      "status": 200
+    }
+  ],
+  "model": {
+    "id": "deepseek-flash",
+    "name": "DeepSeek-V4.1-Flash",
+    "contextWindow": 1048576,
+    "maxOutputTokens": 393216,
+    "effort": {
+      "supported_levels": [
+        "low",
+        "high",
+        "max"
+      ],
+      "default_level": "high"
+    }
+  },
+  "limitations": [
+    "Metadata GET success does not prove generation delivery, model quality, tool delivery or long-running streaming reliability."
+  ],
+  "checkedAt": "2026-10-29T18:59:27.931Z",
+  "sufficientForAuthorizedCeiling": true
+}

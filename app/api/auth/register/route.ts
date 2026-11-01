@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { initializeUserProfile } from "@/lib/auth-service";
 import { AUTH_COOKIE_OPTIONS } from "@/lib/auth";
-import { isPrelaunchMode } from "@/lib/prelaunch";
-import { rateLimit, getClientIp, ipKey } from "@/lib/rate-limit";
+import { registrationRefusal } from "@/lib/auth-password";
 
 const registerSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -19,26 +18,11 @@ const registerSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    // Prelaunch lockdown: no new accounts while the landing page is live.
-    if (isPrelaunchMode()) {
+    const refusal = await registrationRefusal(req);
+    if (refusal) {
       return NextResponse.json(
-        {
-          error:
-            "Registration is closed right now. Join the waitlist and we'll email you when the app is ready.",
-        },
-        { status: 403 }
-      );
-    }
-
-    // S4: per-IP registration throttle (account-farming friction).
-    const ipLimit = await rateLimit(`register:ip:${ipKey(getClientIp(req))}`, {
-      limit: 5,
-      windowMs: 15 * 60_000,
-    });
-    if (!ipLimit.allowed) {
-      return NextResponse.json(
-        { error: "Too many registration attempts. Please wait a few minutes." },
-        { status: 429, headers: { "Retry-After": String(ipLimit.retryAfterSeconds) } }
+        { error: refusal.error },
+        { status: refusal.status, ...(refusal.retryAfterSeconds ? { headers: { "Retry-After": String(refusal.retryAfterSeconds) } } : {}) }
       );
     }
 
@@ -61,6 +45,7 @@ export async function POST(req: NextRequest) {
       password,
       timezone,
       isOAuth: false,
+      request: req,
     });
 
     const response = NextResponse.json(

@@ -1,0 +1,29 @@
+[
+  {
+    "migration": "20261018010000_calendar_scheduling",
+    "operation": "resolve --applied",
+    "exitCode": 0,
+    "verifiedTlsConnections": 2,
+    "proof": "calendar-postconditions.json"
+  },
+  {
+    "migration": "20261018020000_external_calendars",
+    "operation": "resolve --applied",
+    "exitCode": 0,
+    "verifiedTlsConnections": 2,
+    "proof": "calendar-postconditions.json"
+  },
+  {
+    "migration": "20261018030000_calendar_completion",
+    "operation": "resolve --applied",
+    "exitCode": 0,
+    "verifiedTlsConnections": 2,
+    "proof": "calendar-postconditions.json"
+  },
+  {
+    "migration": "20261020000000_notes_connections",
+    "operation": "tracked SQL deploy",
+    "exitCode": 0,
+    "rehearsal": "schema-clone-rehearsal.json"
+  }
+]

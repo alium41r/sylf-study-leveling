@@ -407,116 +407,120 @@ export function TimerScreen() {
               </div>
             ) : (
               <div className={styles.itemList}>
-                {subjects.map((subject) => (
-                  <div
-                    key={subject.id}
-                    className={`${styles.itemCard} ${styles.subjectCard}`}
-                    style={{
-                      borderLeft: `3px solid ${subject.color || "var(--accent-strong)"}`,
-                    }}
-                  >
-                    <div className={styles.itemMain}>
-                      <button
-                        onClick={() => handleStartFocus(subject.id, subject.name)}
-                        className={styles.playBtn}
-                        title="Start focus session"
-                        aria-label={`Start focus session for ${subject.name}`}
-                      >
-                        <Play size={16} fill="currentColor" className={styles.playIcon} />
-                        <span className={styles.playLabel}>Focus</span>
-                      </button>
-                      <div className={styles.itemContent}>
-                        <div className={styles.itemTitleRow}>
-                          <h3 className={styles.itemTitle}>{subject.name}</h3>
-                          {subject.code && (
-                            <span
-                              className={styles.codeBadge}
-                              style={{
-                                backgroundColor: `${subject.color || "#86aaf4"}1a`,
-                                color: subject.color || "#86aaf4",
-                                border: `1px solid ${subject.color || "#86aaf4"}33`,
-                              }}
-                            >
-                              {subject.code}
-                            </span>
+                {subjects.map((subject) => {
+                  const isMenuOpen = openMenuSubjectId === subject.id;
+                  return (
+                    <div
+                      key={subject.id}
+                      className={`${styles.itemCard} ${styles.subjectCard}${
+                        isMenuOpen ? ` ${styles.itemCardOpenMenu}` : ""
+                      }`}
+                      style={{
+                        borderLeft: `3px solid ${subject.color || "var(--accent-strong)"}`,
+                      }}
+                    >
+                      <div className={styles.itemMain}>
+                        <button
+                          onClick={() => handleStartFocus(subject.id, subject.name)}
+                          className={styles.playBtn}
+                          title="Start focus session"
+                          aria-label={`Start focus session for ${subject.name}`}
+                        >
+                          <Play size={16} fill="currentColor" className={styles.playIcon} />
+                          <span className={styles.playLabel}>Focus</span>
+                        </button>
+                        <div className={styles.itemContent}>
+                          <div className={styles.itemTitleRow}>
+                            <h3 className={styles.itemTitle}>{subject.name}</h3>
+                            {subject.code && (
+                              <span
+                                className={styles.codeBadge}
+                                style={{
+                                  backgroundColor: `${subject.color || "#86aaf4"}1a`,
+                                  color: subject.color || "#86aaf4",
+                                  border: `1px solid ${subject.color || "#86aaf4"}33`,
+                                }}
+                              >
+                                {subject.code}
+                              </span>
+                            )}
+                          </div>
+                          {(subject.examBoard || subject.level) && (
+                            <p className={styles.itemMeta}>
+                              {subject.examBoard} {subject.level ? `• ${subject.level}` : ""}
+                            </p>
+                          )}
+                          {subject.syllabusNote && (
+                            <p className={styles.itemNote} title={subject.syllabusNote}>
+                              {subject.syllabusNote}
+                            </p>
                           )}
                         </div>
-                        {(subject.examBoard || subject.level) && (
-                          <p className={styles.itemMeta}>
-                            {subject.examBoard} {subject.level ? `• ${subject.level}` : ""}
-                          </p>
-                        )}
-                        {subject.syllabusNote && (
-                          <p className={styles.itemNote} title={subject.syllabusNote}>
-                            {subject.syllabusNote}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Right Area: Timer Readout & Action Menu Affordance */}
-                    <div className={styles.itemRight}>
-                      <div className={styles.timerReadout}>
-                        {formatTime(subject.todaySeconds || 0)}
                       </div>
 
-                      {/* Compact Affordance [•••] (Requirement 1 & 17) */}
-                      <div className={styles.menuContainer}>
-                        <button
-                          type="button"
-                          className={styles.btnMenuTrigger}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenMenuSubjectId(
-                              openMenuSubjectId === subject.id ? null : subject.id
-                            );
-                          }}
-                          aria-label={`Manage ${subject.name}`}
-                          aria-haspopup="menu"
-                          aria-expanded={openMenuSubjectId === subject.id}
-                        >
-                          <MoreVertical size={16} />
-                        </button>
+                      {/* Right Area: Timer Readout & Action Menu Affordance */}
+                      <div className={styles.itemRight}>
+                        <div className={styles.timerReadout}>
+                          {formatTime(subject.todaySeconds || 0)}
+                        </div>
 
-                        {/* Dropdown Menu */}
-                        {openMenuSubjectId === subject.id && (
-                          <div
-                            className={styles.dropdownMenu}
-                            role="menu"
-                            aria-label={`Actions for ${subject.name}`}
+                        {/* Compact Affordance [•••] (Requirement 1 & 17) */}
+                        <div className={styles.menuContainer}>
+                          <button
+                            type="button"
+                            className={styles.btnMenuTrigger}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenMenuSubjectId(isMenuOpen ? null : subject.id);
+                            }}
+                            aria-label={`Manage ${subject.name}`}
+                            aria-haspopup="menu"
+                            aria-expanded={isMenuOpen}
                           >
-                            <button
-                              type="button"
-                              role="menuitem"
-                              className={styles.menuItem}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setOpenMenuSubjectId(null);
-                                handleOpenEdit(subject);
-                              }}
+                            <MoreVertical size={16} />
+                          </button>
+
+                          {/* Dropdown Menu */}
+                          {isMenuOpen && (
+                            <div
+                              className={styles.dropdownMenu}
+                              role="menu"
+                              aria-label={`Actions for ${subject.name}`}
+                              onClick={(e) => e.stopPropagation()}
                             >
-                              <Pencil size={13} />
-                              <span>Edit subject</span>
-                            </button>
-                            <button
-                              type="button"
-                              role="menuitem"
-                              className={`${styles.menuItem} ${styles.menuItemDanger}`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setOpenMenuSubjectId(null);
-                                handleOpenDelete(subject);
-                              }}
-                            >
-                              <Trash2 size={13} />
-                              <span>Delete subject</span>
-                            </button>
-                          </div>
-                        )}
+                              <button
+                                type="button"
+                                role="menuitem"
+                                className={styles.menuItem}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setOpenMenuSubjectId(null);
+                                  handleOpenEdit(subject);
+                                }}
+                              >
+                                <Pencil size={13} />
+                                <span>Edit subject</span>
+                              </button>
+                              <button
+                                type="button"
+                                role="menuitem"
+                                className={`${styles.menuItem} ${styles.menuItemDanger}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setOpenMenuSubjectId(null);
+                                  handleOpenDelete(subject);
+                                }}
+                              >
+                                <Trash2 size={13} />
+                                <span>Delete subject</span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
             {!isLoading && subjects.length > 0 && (

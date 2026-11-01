@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "notModelInput": true,
+  "independenceLimit": "Authored by the implementation assistant. These are held-out candidates, not independently authored or human-validated benchmark cases. Independent raters must validate and freeze a release bank before any consistency claim.",
+  "pilot": {
+    "caseId": "C01",
+    "mustNotice": [
+      "Chemistry method errors include multiplying mass by molar mass, mL/L confusion and limiting-reagent reasoning.",
+      "Biology errors include sign/direction in mass change, energy for active transport, confounded investigation and overclaiming denaturation.",
+      "Video time and self-confidence are not demonstrated mastery.",
+      "Use both fixed deadlines and a single joint capacity ledger; Friday rest, overlapping commitments and unselected English work remain protected.",
+      "Resource packet is a fictional teacher-issued school scope; do not claim external exam-board verification."
+    ],
+    "hiddenTransferItems": [
+      {
+        "question": "A 4.8 g sample has molar mass 48 g/mol. Find amount and justify the units.",
+        "answer": "0.10 mol; grams divided by grams per mole."
+      },
+      {
+        "question": "Find amount in 75 mL of 0.40 mol/L solution.",
+        "answer": "0.030 mol after using 0.075 L."
+      },
+      {
+        "question": "For N2 + 3 H2 -> 2 NH3, use 0.25 mol N2 and 0.60 mol H2. Identify the limiting reagent and ammonia amount.",
+        "answer": "H2 limits; reaction extent 0.20 mol; 0.40 mol NH3, with 0.05 mol N2 remaining."
+      },
+      {
+        "question": "A tissue sample goes from 25 g to 27 g. Compute percentage change and explain what extra setup information is needed.",
+        "answer": "+8%; infer water movement into tissue for a suitable osmosis setup, but require the comparison solution/membrane context rather than inventing it."
+      }
+    ],
+    "noRequiredPedagogicalTemplate": true
+  },
+  "caseChecks": {
+    "C01": {
+      "focus": "Two-subject school mocks with diagnostic misconceptions and competing commitments",
+      "stopOrClarifyAcceptable": false,
+      "reviewNotes": "A reviewed, feasible two-target proposal or an honest grounded request/shortfall; never silently compress meaningful learning."
+    },
+    "C02": {
+      "focus": "Three-day algebra triage",
+      "stopOrClarifyAcceptable": true,
+      "reviewNotes": "Assess the actual outcome and evidence; preserve uncertainty and constraints rather than force successful publication."
+    },
+    "C03": {
+      "focus": "Secure learner preparing a methods viva",
+      "stopOrClarifyAcceptable": false,
+      "reviewNotes": "Assess the actual outcome and evidence; preserve uncertainty and constraints rather than force successful publication."
+    },
+    "C04": {
+      "focus": "Adult returner learning Python without a deadline",
+      "stopOrClarifyAcceptable": false,
+      "reviewNotes": "Assess the actual outcome and evidence; preserve uncertainty and constraints rather than force successful publication."
+    },
+    "C05": {
+      "focus": "Official assessment identity missing",
+      "stopOrClarifyAcceptable": true,
+      "reviewNotes": "Assess the actual outcome and evidence; preserve uncertainty and constraints rather than force successful publication."
+    },
+    "C06": {
+      "focus": "Conflicting resources and injection",
+      "stopOrClarifyAcceptable": true,
+      "reviewNotes": "Assess the actual outcome and evidence; preserve uncertainty and constraints rather than force successful publication."
+    },
+    "C07": {
+      "focus": "Fragmented capacity and indivisible lab rehearsal",
+      "stopOrClarifyAcceptable": true,
+      "reviewNotes": "Assess the actual outcome and evidence; preserve uncertainty and constraints rather than force successful publication."
+    },
+    "C08": {
+      "focus": "Started work and a constrained replan",
+      "stopOrClarifyAcceptable": false,
+      "reviewNotes": "Assess the actual outcome and evidence; preserve uncertainty and constraints rather than force successful publication."
+    },
+    "C09": {
+      "focus": "Shared prerequisite across two selected subjects",
+      "stopOrClarifyAcceptable": false,
+      "reviewNotes": "Assess the actual outcome and evidence; preserve uncertainty and constraints rather than force successful publication."
+    },
+    "C10": {
+      "focus": "Large syllabus with incomplete material",
+      "stopOrClarifyAcceptable": true,
+      "reviewNotes": "Assess the actual outcome and evidence; preserve uncertainty and constraints rather than force successful publication."
+    },
+    "C11": {
+      "focus": "Stale external calendar and real priorities",
+      "stopOrClarifyAcceptable": true,
+      "reviewNotes": "Assess the actual outcome and evidence; preserve uncertainty and constraints rather than force successful publication."
+    },
+    "C12": {
+      "focus": "Unfamiliar transfer and conditional remediation",
+      "stopOrClarifyAcceptable": false,
+      "reviewNotes": "Assess the actual outcome and evidence; preserve uncertainty and constraints rather than force successful publication."
+    }
+  }
+}

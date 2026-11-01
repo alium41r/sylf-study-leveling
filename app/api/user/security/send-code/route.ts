@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { sendSecurityOtpEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/rate-limit";
+import { issueSecurityCode } from "@/lib/security-code";
 
 export async function POST(req: NextRequest) {
   try {
@@ -42,28 +43,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Delete existing OTPs for this user and action using action prefix
-    await prisma.verificationToken.deleteMany({
-      where: {
-        userId: user.id,
-        token: {
-          startsWith: `${action}:`,
-        },
-      },
-    });
-
-    // Generate 6-digit numeric OTP code
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const tokenKey = `${action}:${code}`;
-
-    // Store in DB with 10-minute expiry
-    await prisma.verificationToken.create({
-      data: {
-        userId: user.id,
-        token: tokenKey,
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
-      },
-    });
+    const code = await issueSecurityCode(user.id, action);
 
     // Dispatch email
     const result = await sendSecurityOtpEmail({

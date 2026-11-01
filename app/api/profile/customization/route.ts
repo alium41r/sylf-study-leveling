@@ -65,33 +65,34 @@ async function handleCustomizationUpdate(req: NextRequest) {
     if (data.characterConfig !== undefined) updateData.characterConfig = data.characterConfig;
     if (data.socialLinks !== undefined) updateData.socialLinks = data.socialLinks;
 
+    const updateSelect = {
+      id: true,
+      username: true,
+      name: true,
+      email: true,
+      avatarUrl: true,
+      bannerUrl: true,
+      bio: true,
+      activeAvatar: true,
+      activeFrame: true,
+      activeTitle: true,
+      activeAura: true,
+      activeNameColor: true,
+      socialLinks: true,
+      characterConfig: true,
+      level: true,
+      hunterRank: true,
+      currentXP: true,
+    } as const;
+
     const updatedUser = await prisma.$transaction(async tx => {
       await lockCompanionOwner(tx, userId);
       await validateCompanionSelection(tx, userId, data.characterConfig);
       return tx.user.update({
-      where: { id: userId },
-      data: updateData,
-      select: {
-        id: true,
-        username: true,
-        name: true,
-        email: true,
-        avatarUrl: true,
-        bannerUrl: true,
-        bio: true,
-        activeAvatar: true,
-        activeFrame: true,
-        activeTitle: true,
-        activeAura: true,
-        activeNameColor: true,
-        socialLinks: true,
-        characterConfig: true,
-        level: true,
-        hunterRank: true,
-        currentXP: true,
-      },
-    });
-
+        where: { id: userId },
+        data: updateData,
+        select: updateSelect,
+      });
     });
 
     try {

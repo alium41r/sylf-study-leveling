@@ -17,13 +17,36 @@ import { exportNotes, importNotes } from "@/lib/notes/portable";
 import { initialRichTextUpdate } from "@/lib/notes/blocknote-adapter";
 import { retainedNotesRecovery } from "@/lib/notes/engine";
 import { InkModel } from "@/lib/notes/ink";
+import { PdfMarkup, pdfPageMaps } from "@/lib/notes/pdf";
+import { inspectPdf, openPdf } from "@/lib/notes/pdf-reader";
+import { exportAnnotatedPdf } from "@/lib/notes/pdf-export";
 import { InkRenderer } from "@/lib/notes/ink-renderer";
+import { PageBoxes } from "@/lib/notes/text-boxes";
+import { renderDrivePdf, renderNotesPagePreview } from "@/lib/notes/drive-pdf";
+import { IndexedDbNotesRepository } from "@/lib/notes/repository";
+import { createNotesVault } from "@/lib/notes/vault";
+import { NotesSession } from "@/lib/notes/session";
+import { NotesSynchronizer } from "@/lib/notes/sync";
+import { GoogleDriveTransport } from "@/lib/notes/drive-transport";
 import * as Y from "yjs";
 import "@/app/globals.css";
 const qa = window as unknown as { qa: Record<string, unknown> };
 qa.qa = {
+  IndexedDbNotesRepository,
+  createNotesVault,
+  NotesSession,
+  NotesSynchronizer,
+  GoogleDriveTransport,
+  PdfMarkup,
+  pdfPageMaps,
+  inspectPdf,
+  openPdf,
+  exportAnnotatedPdf,
   InkModel,
   InkRenderer,
+  renderDrivePdf,
+  renderNotesPagePreview,
+  PageBoxes,
   Y,
   exportNotes,
   importNotes,
@@ -32,8 +55,14 @@ qa.qa = {
   applyAppearance,
 };
 const unlock = NotesLibrary.unlock;
+const bootstrap = NotesLibrary.bootstrap;
+NotesLibrary.bootstrap = async (...args) => {
+  const lib = await bootstrap.apply(NotesLibrary, args);
+  if (lib) qa.qa.library = lib;
+  return lib;
+};
 NotesLibrary.unlock = async (...args) => {
-  const lib = await unlock(...args);
+  const lib = await unlock.apply(NotesLibrary, args);
   qa.qa.library = lib;
   return lib;
 };

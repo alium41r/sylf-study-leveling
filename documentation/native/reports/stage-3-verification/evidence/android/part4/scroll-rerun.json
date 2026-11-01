@@ -1,0 +1,64 @@
+{
+  "device": "SM-X510",
+  "width": 1440,
+  "height": 2304,
+  "window": [
+    120,
+    300,
+    1320,
+    1900
+  ],
+  "swipes": 16,
+  "results": [
+    {
+      "page": "showcase-control",
+      "valid": true,
+      "frames": 851,
+      "janky": 12,
+      "jankyPercent": 1.41,
+      "p50": 12,
+      "p90": 13,
+      "p99": 32
+    },
+    {
+      "page": "home-today",
+      "valid": true,
+      "frames": 753,
+      "janky": 36,
+      "jankyPercent": 4.78,
+      "p50": 13,
+      "p90": 23,
+      "p99": 38
+    },
+    {
+      "page": "home-focus",
+      "valid": true,
+      "frames": 813,
+      "janky": 18,
+      "jankyPercent": 2.21,
+      "p50": 13,
+      "p90": 14,
+      "p99": 27
+    },
+    {
+      "page": "home-circle",
+      "valid": true,
+      "frames": 821,
+      "janky": 19,
+      "jankyPercent": 2.31,
+      "p50": 13,
+      "p90": 14,
+      "p99": 30
+    },
+    {
+      "page": "home-progress",
+      "valid": true,
+      "frames": 811,
+      "janky": 22,
+      "jankyPercent": 2.71,
+      "p50": 13,
+      "p90": 19,
+      "p99": 34
+    }
+  ]
+}

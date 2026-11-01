@@ -1,0 +1,200 @@
+{
+  "summary": {
+    "passed": true,
+    "total": 73,
+    "failed": []
+  },
+  "checks": {
+    "opensWithEmptyCanvas": true,
+    "noPageOverflow": true,
+    "dragPansCanvas": true,
+    "wheelPans": true,
+    "pinchZooms": true,
+    "pinchHoldsPoint": true,
+    "panStopsAtWorldEdge": true,
+    "zoomStopsAtMinimum": true,
+    "zoomStopsAtMaximum": true,
+    "resetViewReturnsHome": true,
+    "fitShowsWholeWorldWhenEmpty": true,
+    "cameraSurvivesReload": true,
+    "dockHas_notes": true,
+    "dockHas_pdfs": true,
+    "dockHas_whiteboard": true,
+    "dockHas_planner": true,
+    "dockHas_calendar": true,
+    "dockHas_sylvie": true,
+    "dockHas_timer": true,
+    "dockHas_calculator": true,
+    "dockHas_audio": true,
+    "dockHas_resources": true,
+    "dockCentered": true,
+    "dockOpensTool": true,
+    "toolInView": true,
+    "singleToolNotDoubled": true,
+    "dockMenuOpens": true,
+    "dockMenuOpensNewWindow": true,
+    "dockListsInstances": true,
+    "zoomMenuOpens": true,
+    "closeButtonCloses": true,
+    "opens_notes": true,
+    "opens_pdfs": true,
+    "opens_whiteboard": true,
+    "opens_planner": true,
+    "opens_calendar": true,
+    "opens_sylvie": true,
+    "opens_timer": true,
+    "opens_calculator": true,
+    "opens_audio": true,
+    "opens_resources": true,
+    "calculatorUsesRealEngine": true,
+    "calculatorKeepsState": true,
+    "shelfOpensDocument": true,
+    "panHolds60": true,
+    "zoomHolds60": true,
+    "noOverflow_wide": true,
+    "dockFits_wide": true,
+    "noOverflow_expanded": true,
+    "dockFits_expanded": true,
+    "noOverflow_medium": true,
+    "dockFits_medium": true,
+    "noOverflow_short": true,
+    "dockFits_short": true,
+    "noOverflow_compact": true,
+    "dockFits_compact": true,
+    "renders_signature_light": true,
+    "renders_signature_dark": true,
+    "renders_studio_light": true,
+    "renders_studio_dark": true,
+    "renders_arcane_light": true,
+    "renders_arcane_dark": true,
+    "renders_voxel_light": true,
+    "renders_voxel_dark": true,
+    "renders_cozy_light": true,
+    "renders_cozy_dark": true,
+    "renders_student_light": true,
+    "renders_student_dark": true,
+    "windowsRetainNoNodes": true,
+    "windowsRetainNoHeap": true,
+    "spaceRetainsNoNodes": true,
+    "spaceRetainsNoHeap": true,
+    "noConsoleErrors": true
+  },
+  "results": {
+    "afterPan": {
+      "x": 3176.613832349221,
+      "y": 2008.4289914358044,
+      "zoom": 1
+    },
+    "afterPinch": {
+      "x": 3496.6155545710612,
+      "y": 2135.492240870668,
+      "zoom": 1.822118800390509
+    },
+    "atCorner": {
+      "x": 520,
+      "y": 253,
+      "zoom": 1
+    },
+    "dock": {
+      "x": 350.5170593261719,
+      "y": 673.995849609375,
+      "width": 578.9920654296875,
+      "height": 59.999267578125
+    },
+    "calculatorPreview": "8",
+    "panFrames": {
+      "frames": 145,
+      "p50": 16.7,
+      "p95": 18.2,
+      "p99": 18.7,
+      "max": 18.7
+    },
+    "zoomFrames": {
+      "frames": 145,
+      "p50": 16.7,
+      "p95": 17.9,
+      "p99": 18.6,
+      "max": 18.6
+    },
+    "windowRetention": [
+      {
+        "nodes": 546,
+        "listeners": 390,
+        "heapMb": 10.17
+      },
+      {
+        "nodes": 718,
+        "listeners": 420,
+        "heapMb": 10.88
+      },
+      {
+        "nodes": 718,
+        "listeners": 420,
+        "heapMb": 11.09
+      },
+      {
+        "nodes": 718,
+        "listeners": 420,
+        "heapMb": 11.26
+      },
+      {
+        "nodes": 718,
+        "listeners": 420,
+        "heapMb": 11.32
+      },
+      {
+        "nodes": 718,
+        "listeners": 420,
+        "heapMb": 11.37
+      },
+      {
+        "nodes": 718,
+        "listeners": 420,
+        "heapMb": 11.43
+      },
+      {
+        "nodes": 718,
+        "listeners": 420,
+        "heapMb": 11.48
+      }
+    ],
+    "spaceRetention": [
+      {
+        "nodes": 1124,
+        "listeners": 531,
+        "heapMb": 13.23
+      },
+      {
+        "nodes": 1124,
+        "listeners": 532,
+        "heapMb": 13.32
+      },
+      {
+        "nodes": 1124,
+        "listeners": 532,
+        "heapMb": 13.62
+      },
+      {
+        "nodes": 1124,
+        "listeners": 532,
+        "heapMb": 13.83
+      },
+      {
+        "nodes": 1124,
+        "listeners": 532,
+        "heapMb": 13.96
+      },
+      {
+        "nodes": 1124,
+        "listeners": 532,
+        "heapMb": 14.06
+      },
+      {
+        "nodes": 1124,
+        "listeners": 532,
+        "heapMb": 14.11
+      }
+    ],
+    "consoleErrors": []
+  }
+}

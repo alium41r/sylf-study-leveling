@@ -1,0 +1,288 @@
+[
+  {
+    "strokes": 0,
+    "elapsedMs": 21,
+    "heap": {
+      "usedSize": 11107188,
+      "totalSize": 12353536,
+      "embedderHeapUsedSize": 3178288,
+      "backingStorageSize": 1939675
+    },
+    "dom": {
+      "documents": 1,
+      "nodes": 833,
+      "jsEventListeners": 337
+    },
+    "storage": {
+      "objects": 6,
+      "objectBytes": 3187,
+      "revisions": 2,
+      "pending": 1,
+      "stagedAssets": 0
+    }
+  },
+  {
+    "strokes": 100,
+    "elapsedMs": 24988,
+    "heap": {
+      "usedSize": 14071808,
+      "totalSize": 15499264,
+      "embedderHeapUsedSize": 3646112,
+      "backingStorageSize": 1967480
+    },
+    "dom": {
+      "documents": 1,
+      "nodes": 846,
+      "jsEventListeners": 339
+    },
+    "storage": {
+      "objects": 208,
+      "objectBytes": 250700,
+      "revisions": 103,
+      "pending": 102,
+      "stagedAssets": 0
+    }
+  },
+  {
+    "strokes": 200,
+    "elapsedMs": 50179,
+    "heap": {
+      "usedSize": 15839548,
+      "totalSize": 17596416,
+      "embedderHeapUsedSize": 3723808,
+      "backingStorageSize": 1994680
+    },
+    "dom": {
+      "documents": 1,
+      "nodes": 846,
+      "jsEventListeners": 339
+    },
+    "storage": {
+      "objects": 408,
+      "objectBytes": 497352,
+      "revisions": 203,
+      "pending": 202,
+      "stagedAssets": 0
+    }
+  },
+  {
+    "strokes": 300,
+    "elapsedMs": 75405,
+    "heap": {
+      "usedSize": 17492528,
+      "totalSize": 18907136,
+      "embedderHeapUsedSize": 3540096,
+      "backingStorageSize": 2021880
+    },
+    "dom": {
+      "documents": 1,
+      "nodes": 846,
+      "jsEventListeners": 339
+    },
+    "storage": {
+      "objects": 608,
+      "objectBytes": 744124,
+      "revisions": 303,
+      "pending": 302,
+      "stagedAssets": 0
+    }
+  },
+  {
+    "strokes": 400,
+    "elapsedMs": 100692,
+    "heap": {
+      "usedSize": 18966860,
+      "totalSize": 20217856,
+      "embedderHeapUsedSize": 3556296,
+      "backingStorageSize": 2049080
+    },
+    "dom": {
+      "documents": 1,
+      "nodes": 846,
+      "jsEventListeners": 339
+    },
+    "storage": {
+      "objects": 808,
+      "objectBytes": 990776,
+      "revisions": 403,
+      "pending": 402,
+      "stagedAssets": 0
+    }
+  },
+  {
+    "strokes": 500,
+    "elapsedMs": 125836,
+    "heap": {
+      "usedSize": 20966088,
+      "totalSize": 22052864,
+      "embedderHeapUsedSize": 3873000,
+      "backingStorageSize": 2076280
+    },
+    "dom": {
+      "documents": 1,
+      "nodes": 846,
+      "jsEventListeners": 339
+    },
+    "storage": {
+      "objects": 1008,
+      "objectBytes": 1237524,
+      "revisions": 503,
+      "pending": 502,
+      "stagedAssets": 0
+    }
+  },
+  {
+    "strokes": 600,
+    "elapsedMs": 151018,
+    "heap": {
+      "usedSize": 22485840,
+      "totalSize": 23625728,
+      "embedderHeapUsedSize": 3536952,
+      "backingStorageSize": 2103480
+    },
+    "dom": {
+      "documents": 1,
+      "nodes": 846,
+      "jsEventListeners": 339
+    },
+    "storage": {
+      "objects": 1208,
+      "objectBytes": 1484152,
+      "revisions": 603,
+      "pending": 602,
+      "stagedAssets": 0
+    }
+  },
+  {
+    "strokes": 700,
+    "elapsedMs": 176175,
+    "heap": {
+      "usedSize": 24210964,
+      "totalSize": 25722880,
+      "embedderHeapUsedSize": 3843272,
+      "backingStorageSize": 2130680
+    },
+    "dom": {
+      "documents": 1,
+      "nodes": 846,
+      "jsEventListeners": 339
+    },
+    "storage": {
+      "objects": 1408,
+      "objectBytes": 1730924,
+      "revisions": 703,
+      "pending": 702,
+      "stagedAssets": 0
+    }
+  },
+  {
+    "strokes": 800,
+    "elapsedMs": 201343,
+    "heap": {
+      "usedSize": 25723940,
+      "totalSize": 27295744,
+      "embedderHeapUsedSize": 3845136,
+      "backingStorageSize": 2157880
+    },
+    "dom": {
+      "documents": 1,
+      "nodes": 846,
+      "jsEventListeners": 339
+    },
+    "storage": {
+      "objects": 1608,
+      "objectBytes": 1977576,
+      "revisions": 803,
+      "pending": 802,
+      "stagedAssets": 0
+    }
+  },
+  {
+    "strokes": 900,
+    "elapsedMs": 226501,
+    "heap": {
+      "usedSize": 26866316,
+      "totalSize": 28344320,
+      "embedderHeapUsedSize": 3847232,
+      "backingStorageSize": 2182992
+    },
+    "dom": {
+      "documents": 1,
+      "nodes": 846,
+      "jsEventListeners": 342
+    },
+    "storage": {
+      "objects": 1808,
+      "objectBytes": 2224324,
+      "revisions": 903,
+      "pending": 902,
+      "stagedAssets": 0
+    }
+  },
+  {
+    "strokes": 1000,
+    "elapsedMs": 251677,
+    "heap": {
+      "usedSize": 28312188,
+      "totalSize": 29917184,
+      "embedderHeapUsedSize": 3865552,
+      "backingStorageSize": 2210192
+    },
+    "dom": {
+      "documents": 1,
+      "nodes": 846,
+      "jsEventListeners": 339
+    },
+    "storage": {
+      "objects": 2008,
+      "objectBytes": 2470954,
+      "revisions": 1003,
+      "pending": 1002,
+      "stagedAssets": 0
+    }
+  },
+  {
+    "strokes": 1100,
+    "elapsedMs": 276819,
+    "heap": {
+      "usedSize": 29605000,
+      "totalSize": 31227904,
+      "embedderHeapUsedSize": 3939568,
+      "backingStorageSize": 2237392
+    },
+    "dom": {
+      "documents": 1,
+      "nodes": 846,
+      "jsEventListeners": 359
+    },
+    "storage": {
+      "objects": 2208,
+      "objectBytes": 2717826,
+      "revisions": 1103,
+      "pending": 1102,
+      "stagedAssets": 0
+    }
+  },
+  {
+    "strokes": 1200,
+    "elapsedMs": 301969,
+    "heap": {
+      "usedSize": 31472504,
+      "totalSize": 32800768,
+      "embedderHeapUsedSize": 3849392,
+      "backingStorageSize": 2264592
+    },
+    "dom": {
+      "documents": 1,
+      "nodes": 846,
+      "jsEventListeners": 339
+    },
+    "storage": {
+      "objects": 2408,
+      "objectBytes": 2964578,
+      "revisions": 1203,
+      "pending": 1202,
+      "stagedAssets": 0
+    }
+  }
+]

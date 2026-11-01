@@ -1,0 +1,18 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+group = 'expo.modules.sylfprobe'
+version = '0.1.0'
+android {
+  namespace "expo.modules.sylfprobe"
+  defaultConfig { versionCode 1; versionName '0.1.0' }
+}
+dependencies {
+  def ink = "1.0.0"
+  implementation "androidx.ink:ink-authoring:$ink"
+  implementation "androidx.ink:ink-brush:$ink"
+  implementation "androidx.ink:ink-geometry:$ink"
+  implementation "androidx.ink:ink-rendering:$ink"
+  implementation "androidx.ink:ink-strokes:$ink"
+}

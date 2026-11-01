@@ -1,0 +1,46 @@
+{
+  "scripts/qa/planner-phase-c/run-c01.mjs": {
+    "sha256": "211a1a5507e80d2ad7382e5fe4a848838d5b9d4c89c3421d13bda328b0cb8706",
+    "artifact": "evidence/executed-sources/scripts/qa/planner-phase-c/run-c01.mjs.txt"
+  },
+  "scripts/qa/planner-phase-c/c01-journey.ts": {
+    "sha256": "6fa1e5faa4f20d6d7644a2dd4f1a6744904afb5419a142dc96a228a59aa286ca",
+    "artifact": "evidence/executed-sources/scripts/qa/planner-phase-c/c01-journey.ts.txt"
+  },
+  "scripts/qa/planner-phase-c/execution-guard.mjs": {
+    "sha256": "14726482cdf587a6f56a5c760a909136c53fcc680a1a2608c65396497d67e085",
+    "artifact": "evidence/executed-sources/scripts/qa/planner-phase-c/execution-guard.mjs.txt"
+  },
+  "__tests__/planner-v2/postgres/phase-c-execution.phasec.ts": {
+    "sha256": "248dae73bc996325e6bcb00a79ec763c36bae10ffd7254cfde756feb8852cad0",
+    "artifact": "evidence/executed-sources/__tests__/planner-v2/postgres/phase-c-execution.phasec.ts.txt"
+  },
+  "scripts/qa/planner-phase-c/c01-calendar.ts": {
+    "sha256": "c18d9c137d456cd91ec9c2b272d3d20487965098ff541dc6ebb33b673ac96ec8",
+    "artifact": "evidence/executed-sources/scripts/qa/planner-phase-c/c01-calendar.ts.txt"
+  },
+  "scripts/qa/planner-phase-c/c01-profile.mjs": {
+    "sha256": "9142976377ccd6c4d2f81cea5e31f052fd2bfba98023cc30f574cb6926cfc6b1",
+    "artifact": "evidence/executed-sources/scripts/qa/planner-phase-c/c01-profile.mjs.txt"
+  },
+  "scripts/qa/planner-phase-c/operator-control.mjs": {
+    "sha256": "4b02acb4e2c48abfd9793623ef596c47222793566ec235a1c19e0f60c3e2fb68",
+    "artifact": "evidence/executed-sources/scripts/qa/planner-phase-c/operator-control.mjs.txt"
+  },
+  "lib/planner/v2/server/understanding.ts": {
+    "sha256": "9d3110dd0e298c34631abd02508cca357651904da74773812a8e9746b9157d69",
+    "artifact": "evidence/executed-sources/lib/planner/v2/server/understanding.ts.txt"
+  },
+  "lib/planner/v2/intelligence/schemas/understanding.ts": {
+    "sha256": "98816b0022a8a8e567baa4f7844c21f9bc88d44517b64da1f1278233c47dd0a6",
+    "artifact": "evidence/executed-sources/lib/planner/v2/intelligence/schemas/understanding.ts.txt"
+  },
+  "lib/planner/v2/intelligence/schemas/research-model.ts": {
+    "sha256": "02ccbb99f42630849308c223fde1072369d850c4f604b3d43e859188775aff50",
+    "artifact": "evidence/executed-sources/lib/planner/v2/intelligence/schemas/research-model.ts.txt"
+  },
+  "lib/planner/v2/intelligence/research-verification.ts": {
+    "sha256": "8556b54399539bdc2c6108354e0302b7cc1b876fba83b9a5cbfca77b1103e752",
+    "artifact": "evidence/executed-sources/lib/planner/v2/intelligence/research-verification.ts.txt"
+  }
+}

@@ -68,10 +68,10 @@ describe("Phase 1D-F: Canonical Shop & Inventory Alias Parity", () => {
       </NavigationProvider>
     );
 
-    // ShopScreen header contains "System Store" and category tabs
+    // ShopScreen header contains "Shop" and category tabs
     await waitFor(
       () => {
-        expect(screen.getByText("System Store")).toBeDefined();
+        expect(screen.getByRole("heading", { name: /^Shop|System Store$/i })).toBeDefined();
         expect(screen.getByRole("button", { name: /hunter forms/i })).toBeDefined();
         expect(screen.getByRole("button", { name: /pedestal cores/i })).toBeDefined();
       },
@@ -91,7 +91,7 @@ describe("Phase 1D-F: Canonical Shop & Inventory Alias Parity", () => {
     // In production, /inventory is an alias for ShopPage, so it renders ShopScreen
     await waitFor(
       () => {
-        expect(screen.getByText("System Store")).toBeDefined();
+        expect(screen.getByRole("heading", { name: /^Shop|System Store$/i })).toBeDefined();
         expect(screen.getByRole("button", { name: /hunter forms/i })).toBeDefined();
       },
       { timeout: 4000 }

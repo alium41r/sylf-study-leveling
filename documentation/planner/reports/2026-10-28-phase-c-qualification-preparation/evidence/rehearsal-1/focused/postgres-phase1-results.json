@@ -1,0 +1,27 @@
+{
+  "label": "phase1",
+  "files": 1,
+  "passed": 0,
+  "failed": 1,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [
+    {
+      "name": "rehearses the frozen two-subject pilot through real research, worker, capacity, strategy, translation, review, publication and disposable Apply with no external requests",
+      "messages": [
+        "ZodError: [\n  {\n    \"expected\": \"array\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"availability\",\n      \"blockedDates\"\n    ],\n    \"message\": \"Invalid input: expected array, received undefined\"\n  },\n  {\n    \"code\": \"invalid_value\",\n    \"values\": [\n      \"CONFIRMED_AVAILABILITY\",\n      \"DISCLOSED_PROVISIONAL_CEILING\"\n    ],\n    \"path\": [\n      \"availability\",\n      \"basis\"\n    ],\n    \"message\": \"Invalid option: expected one of \\\"CONFIRMED_AVAILABILITY\\\"|\\\"DISCLOSED_PROVISIONAL_CEILING\\\"\"\n  }\n]\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-8BsGMi/__tests__/planner-v2/postgres/phase-c-preparation.postgres.ts:38:143\n    at Array.map (<anonymous>)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-8BsGMi/__tests__/planner-v2/postgres/phase-c-preparation.postgres.ts:38:27\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-8BsGMi/__tests__/planner-v2/postgres/phase-c-preparation.postgres.ts",
+      "cases": [
+        {
+          "name": "rehearses the frozen two-subject pilot through real research, worker, capacity, strategy, translation, review, publication and disposable Apply with no external requests",
+          "status": "failed"
+        }
+      ]
+    }
+  ]
+}

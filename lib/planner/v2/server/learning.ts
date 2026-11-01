@@ -13,10 +13,15 @@ import { AttemptService,persistAttempt,loadAttempt,type LeaseToken,type AttemptP
 import { compileExecution,type CompilationTarget } from './compilation';
 import { CompilerIdentitiesSchema,CompilerRetrySchema,type CompilerIdentity } from '../intelligence/schemas/quality';
 import { ownedPlan,loadIntent } from './intents';
-import { loadRevision,RevisionService,qualityEvidenceDigest } from './revisions';
+import { loadRevision,loadRevisionDocument,RevisionService,qualityEvidenceDigest } from './revisions';
 import { civilDate,contentDigest,liveExecution,contextInputDigest,loadExecutionContext,externalActivityAlias,specDigest } from './context';
 import { hash,reject,rows,type Sql } from './database';
-import { verifyOwnedResearchDocuments } from './documents';
+import { verifyOwnedResearchDocuments, type DocumentRepository } from './documents';
+import { usableStudyWindows } from '../intelligence/foundation/calendar';
+import { LearningInputSchema, type LearningInput } from '../intelligence/schemas/natural-learning';
+import { loadAttemptArtifacts } from './foundation';
+import { NaturalLearningStage } from './natural-learning';
+import { retainedArtifact } from '../intelligence/foundation/readers';
 
 const dayAfter=(date:string,days:number)=>new Date(Date.parse(date)+days*86400000).toISOString().slice(0,10);
 /** A discretionary recovery change is explicit educational output. Recompute
@@ -24,14 +29,82 @@ const dayAfter=(date:string,days:number)=>new Date(Date.parse(date)+days*8640000
 export function learningEnvelope(owned:SchedulingEnvelope,days:14|28,adjustment?:PlanningSupport['recoveryAdjustment']):SchedulingEnvelope {
  if(adjustment&&adjustment.percent>owned.recoveryPercent)reject('INVALID_OUTPUT','A recovery adjustment cannot alter hard availability.','ADAPTATION');
  const recoveryPercent=adjustment?.percent??owned.recoveryPercent,end=dayAfter(owned.window.start,days-1);
- return SchedulingEnvelopeSchema.parse({...owned,window:{start:owned.window.start,end},recoveryPercent,days:owned.days.filter(d=>d.date<=end).map(day=>{const recoveryMinutes=Math.ceil(day.ceilingMinutes*recoveryPercent/100);return {...day,recoveryMinutes,availableMinutes:day.excluded?0:Math.max(0,day.ceilingMinutes-day.otherCommittedMinutes-day.protectedTargetMinutes-recoveryMinutes)};})});
+ const geometry=owned.calendar?usableStudyWindows(owned.calendar.snapshot,Date.parse(owned.calendar.snapshot.capturedAt)):null;
+ return SchedulingEnvelopeSchema.parse({...owned,window:{start:owned.window.start,end},recoveryPercent,days:owned.days.filter(d=>d.date<=end).map(day=>{const recoveryMinutes=Math.ceil(day.ceilingMinutes*recoveryPercent/100);
+  const calendarAvailableMinutes=geometry?Math.max(0,Math.floor((geometry.days.find(d=>d.date===day.date)?.windows??[]).reduce((n,w)=>n+(w.end-w.start)/60000,0))-owned.calendar!.reservations.filter(t=>t.date===day.date).reduce((n,t)=>n+t.minutes,0)-recoveryMinutes):undefined;
+  return {...day,recoveryMinutes,...(calendarAvailableMinutes===undefined?{}:{calendarAvailableMinutes}),availableMinutes:day.excluded?0:Math.min(calendarAvailableMinutes??Infinity,Math.max(0,day.ceilingMinutes-day.otherCommittedMinutes-day.protectedTargetMinutes-recoveryMinutes))};})});
 }
 
-/** Step 4 ends at allocated education. Step 5 owns independent review, repair,
- * sealing, publication and production handler composition. No Quest writes. */
+/** Shared learning owner. Compiler v2 retains unreviewed natural education;
+ * independent review and publication stay behind their later phase gates. */
 export class LearningCompilerService {
- constructor(readonly attempts:AttemptService,readonly dependencies:{provider?:Parameters<typeof dispatchMeteredProvider>[2];maximumSearchNodes?:number}={}){}
+ constructor(readonly attempts:AttemptService,readonly dependencies:{provider?:Parameters<typeof dispatchMeteredProvider>[2];maximumSearchNodes?:number;documents?:DocumentRepository}={}){}
+ natural(){return new NaturalLearningStage(this);}
  async capture(token:LeaseToken){return this.attempts.mutate(token,(sql,attempt,payload)=>this.captureOwned(sql,attempt,payload));}
+ /** Deliberate v2 boundary: retain canonical content/provenance, but take all
+  * availability/week/actual/protection facts from the bound Calendar owner. */
+ async captureNatural(token:LeaseToken,capacityRef:{id:string;digest:string}):Promise<LearningInput>{
+  return this.attempts.observe(token,(sql,attempt)=>this.captureNaturalAccepted(sql,attempt,capacityRef,false));
+ }
+ async captureNaturalAccepted(sql:Sql,attempt:PlannerAttemptV2,capacityRef:{id:string;digest:string},lockPlans=true):Promise<LearningInput>{
+   const read=await loadAttemptArtifacts(sql,attempt.ownerId,attempt.attemptId);
+   if(read.compilerVersion!==2||!attempt.budget.aiFirst)reject('INTENT_CONFLICT','Natural learning requires admitted compiler v2.','PREFLIGHT');
+   const artifact=retainedArtifact(read.archive,capacityRef,'CAPACITY');
+   if(artifact.value.schemaVersion!==2||artifact.value.status!=='READY'||!artifact.value.constraints||!artifact.value.facts)reject('QUALITY_INCOMPLETE','Natural learning requires real verified capacity.','PREFLIGHT');
+   const capacity=artifact.value,research=retainedArtifact(read.archive,capacity.research,'DOSSIER');
+   if(research.value.schemaVersion!==2)reject('INVALID_OUTPUT','Complete research correspondence is required.','PREFLIGHT');
+   const requested=attempt.targets.map((t,i)=>({planId:t.planId,planRef:`plan_${i+1}`,intentId:t.resolvedIntentVersionId!}));
+   const projection=await loadPlannerModelContext(sql,attempt.ownerId,requested,capacity.window,{maxBytes:4*1024*1024,historyExamples:0},lockPlans);
+   if(projection.contexts.some((c,i)=>contextInputDigest(c.context.dependencies)!==capacity.contextDigests[i]))reject('STALE_CONTEXT','Research learning context changed before strategy capture.','PREFLIGHT');
+   const context=projection.contexts[0].context,selected=new Map(requested.map(t=>[t.planId,t.planRef]));
+   const liveSpecs=context.quests.filter(q=>q.plannerSpec).map(q=>ExecutionTaskSpecV2Schema.parse(q.plannerSpec));
+   const originals=await this.originals(sql,attempt.ownerId,liveSpecs.filter(s=>selected.has(s.planId)));
+   const usedResources=new Set(liveSpecs.flatMap(s=>s.content.resources.map(r=>r.ref)));let sourceIndex=0;
+   const resources=research.value.understanding.sources.map(s=>{let ref:string;do{ref=`research_resource_${++sourceIndex}`;}while(usedResources.has(ref));usedResources.add(ref);return {ref,sourceRef:s.source.sourceId,contentHash:s.source.contentHash};});
+   const evidence:LearningInput['evidence']=[];
+   for(const [batchIndex,batch]of research.value.understanding.verified.entries()){
+    const final=research.value.understanding.actions.at(-1);if(final?.action!=='COMPLETE')reject('INVALID_OUTPUT','Research synthesis is missing.','PREFLIGHT');
+    const planRef=final.batches[batch.batchIndex].planRef;
+    const claims=(batch.evidence as {claims:{claimId:string;status:string}[]}).claims;
+    for(const claim of claims.filter(c=>c.status==='ADOPTED'))evidence.push({planRef,ref:`research_evidence_${evidence.length+1}`,batchIndex,claimRef:claim.claimId});
+   }
+   const facts=structuredClone(capacity.facts!);
+   for(const pin of facts.pins){const q=context.quests.find(q=>{const s=q.plannerSpec?ExecutionTaskSpecV2Schema.parse(q.plannerSpec):null;return s&&selected.get(s.planId)===pin.planRef&&s.blueprintActivityId===pin.activityRef;});if(q?.completedAt)pin.completionDate=civilDate(q.completedAt,context.timezone);}
+   for(const external of facts.externalActivities){const q=context.quests.find(q=>{const s=q.plannerSpec?ExecutionTaskSpecV2Schema.parse(q.plannerSpec):null;return s&&externalActivityAlias(s.activityKey)===external.ref;});if(q?.completedAt)external.date=civilDate(q.completedAt,context.timezone);}
+   const targets:LearningInput['targets']=[];const compilationTargets:LearningInput['compilationTargets']=[];const retainedResources:NonNullable<LearningInput['retainedResources']>=[];
+   for(const [i,target]of attempt.targets.entries()){
+    const intent=(await loadIntent(sql,attempt.ownerId,target.resolvedIntentVersionId!)).intent,plan=await ownedPlan(sql,attempt.ownerId,target.planId,lockPlans),planRef=requested[i].planRef;
+    if(intent.research)await verifyOwnedResearchDocuments(sql,attempt.ownerId,intent.research);
+    const own=liveSpecs.filter(s=>s.planId===target.planId),kept:LearningInput['targets'][number]['kept']=[],keptPhases:LearningInput['targets'][number]['keptPhases']=[],replaceable:LearningInput['targets'][number]['replaceable']=[];
+    const sourceMap=new Map(resources.map(r=>[r.ref,r.contentHash]));
+    for(const source of intent.research?.sources??[]){
+      const occupied=own.flatMap(s=>s.content.resources).some(r=>r.ref===source.sourceId&&r.versionDigest!==source.contentHash);
+      let ref=source.sourceId;
+      if(occupied){let index=0;do{ref=`accepted_resource_${++index}`;}while(sourceMap.has(ref)||usedResources.has(ref));usedResources.add(ref);retainedResources.push({planRef,ref,source});}
+      if(sourceMap.has(ref)&&sourceMap.get(ref)!==source.contentHash)reject('PROTECTED_EXECUTION','Accepted resource aliases have conflicting content.','PREFLIGHT');sourceMap.set(ref,source.contentHash);
+    }
+    for(const spec of own){
+     const quest=context.quests.find(q=>(q.plannerSpec as {activityKey?:string}|null)?.activityKey===spec.activityKey)!;
+     if(!projection.registry.some(r=>r.questId===quest.id))continue;
+     const original=originals.get(spec.activityKey);if(!original)reject('PROTECTED_EXECUTION','Retained education lacks its exact historical provenance.','PREFLIGHT');
+     const live=liveExecution(quest,context.sessions),pin={planRef,activityRef:spec.blueprintActivityId,date:quest.scheduledFor,...(quest.completedAt?{completionDate:civilDate(quest.completedAt,context.timezone)}:{}),remainingMinutes:live.remainingMinutesEstimate,alreadyReserved:live.state!=='UNSTARTED',contentDigest:contentDigest(spec),state:live.state,remainingDisposition:live.remainingDisposition,actualSeconds:live.actualSeconds,executionVersion:live.executionVersion};
+     if(live.state==='UNSTARTED')replaceable.push({activity:original.activity,phases:original.phases,pin});
+     else {kept.push(original.activity);for(const phase of original.phases.filter(p=>original.activity.outcomeRefs.includes(p.localId))){const old=keptPhases.find(p=>p.localId===phase.localId);if(old&&hash('phase',old)!==hash('phase',phase))reject('PROTECTED_EXECUTION','Retained phases collide across approved revisions.','PREFLIGHT');if(!old)keptPhases.push(phase);}}
+     for(const r of spec.content.resources){if(sourceMap.has(r.ref)&&sourceMap.get(r.ref)!==r.versionDigest)reject('PROTECTED_EXECUTION','Historical resource aliases have conflicting content.','PREFLIGHT');sourceMap.set(r.ref,r.versionDigest);
+       const source=original.resources.find(s=>s.ref===r.ref&&s.source.contentHash===r.versionDigest)?.source;
+       if(!source)reject('REFERENCE_NOT_OWNED','Retained educational resources require exact approved historical provenance.','PREFLIGHT');
+       if(!retainedResources.some(v=>v.planRef===planRef&&v.ref===r.ref))retainedResources.push({planRef,ref:r.ref,source});
+     }
+    }
+    if(new Set([...kept,...replaceable.map(r=>r.activity)].map(a=>a.localId)).size!==kept.length+replaceable.length)reject('PROTECTED_EXECUTION','Retained educational aliases collide.','PREFLIGHT');
+    targets.push({planRef,intent,kept,keptPhases,replaceable,readiness:intent.scope.map(s=>({scopeRef:s.modelRef,evidenceRefs:intent.evidence.filter(e=>e.demonstratesReadiness&&e.scopeKeys.includes(s.scopeKey)).map(e=>e.evidenceId)})),
+      allowed:{scopeRefs:intent.scope.map(s=>s.modelRef),excludedScopeRefs:intent.scope.filter(s=>s.inclusion==='EXCLUDED').map(s=>s.modelRef),evidenceRefs:[...new Set([...intent.evidence.map(e=>e.evidenceId),...intent.research?.claims.map(c=>c.claimId)??[],...evidence.filter(e=>e.planRef===planRef).map(e=>e.ref),...projection.view.plans[i].savedChecks.map(c=>c.ref),...own.flatMap(s=>originals.get(s.activityKey)?.activity.evidenceRefs??[])])],resourceRefs:[...sourceMap.keys()],externalActivityRefs:facts.externalActivities.map(a=>a.ref)}});
+    compilationTargets.push({planRef,planId:target.planId,goalId:plan.goalId??plan.reservedGoalId!,context:projection.contexts[i].context.dependencies,sources:[...sourceMap].map(([sourceId,contentHash])=>({sourceId,contentHash}))});
+   }
+   const sharedDependencies:LearningInput['sharedDependencies']=[];
+   for(const spec of liveSpecs.filter(s=>selected.has(s.planId)))for(const ref of spec.content.hardDependencies){const before=liveSpecs.find(s=>s.activityKey===ref);if(before&&before.planId!==spec.planId&&selected.has(before.planId))sharedDependencies.push({prerequisite:{planRef:selected.get(before.planId)!,activityId:before.blueprintActivityId},dependent:{planRef:selected.get(spec.planId)!,activityId:spec.blueprintActivityId},strength:'HARD',reason:'Preserve the exact owned shared prerequisite'});}
+   return LearningInputSchema.parse({schemaVersion:1,targets,facts,compilationTargets,liveSpecs,sharedDependencies,resources,evidence,...(retainedResources.length?{retainedResources}:{})});
+ }
  private async captureOwned(sql:Sql,attempt:PlannerAttemptV2,payload:AttemptPayload){
   if(!['PLAN','REPLAN','JOINT'].includes(attempt.kind)||!attempt.targets.length)reject('INTENT_CONFLICT','This operation does not authorize educational compilation.','PREFLIGHT');
   if(attempt.targets.some(t=>!t.resolvedIntentVersionId))reject('INTENT_CONFLICT','Resolve every selected intent before compilation.','PREFLIGHT');
@@ -124,9 +197,23 @@ export class LearningCompilerService {
  }
  private async originals(sql:Sql,ownerId:number,specs:ReturnType<typeof ExecutionTaskSpecV2Schema.parse>[]){
   const keys=specs.map(s=>s.activityKey),expected=new Map(specs.map(s=>[s.activityKey,specDigest(s)]));
-  const found=new Map<string,{activity:LearningBlueprintV2['activities'][number];phases:LearningBlueprintV2['strategy']['phases']}>();if(!keys.length)return found;
+  const found=new Map<string,{activity:LearningBlueprintV2['activities'][number];phases:LearningBlueprintV2['strategy']['phases'];resources:NonNullable<LearningInput['retainedResources']>}>();if(!keys.length)return found;
   const revisions=await rows<{id:string}>(sql,`SELECT r.id FROM "PlannerRevision" r JOIN "PlannerPlan" p ON p.id=r."planId" WHERE p."userId"=$1 AND r."schemaVersion"=2 AND EXISTS (SELECT 1 FROM jsonb_array_elements(r."v2Artifact"->'executable') s WHERE s->>'activityKey'=ANY($2::text[])) ORDER BY r."createdAt" DESC,r.id`,[ownerId,keys]);
-  for(const row of revisions){if(found.size===keys.length)break;const revision=await loadRevision(sql,ownerId,row.id);for(const spec of revision.executable)if(expected.get(spec.activityKey)===specDigest(spec)&&!found.has(spec.activityKey)){const activity=revision.blueprint.activities.find(a=>a.localId===spec.blueprintActivityId);if(activity)found.set(spec.activityKey,{activity,phases:revision.blueprint.strategy.phases});}}
+  for(const row of revisions){if(found.size===keys.length)break;const revision=await loadRevision(sql,ownerId,row.id),document=await loadRevisionDocument(sql,ownerId,row.id);
+    const retained=document.intelligence&&'ownedLearning' in document.intelligence?document.intelligence:null;
+    const intent=(await loadIntent(sql,ownerId,revision.resolvedIntentVersionId)).intent;
+    for(const spec of revision.executable)if(expected.get(spec.activityKey)===specDigest(spec)&&!found.has(spec.activityKey)){
+      const activity=revision.blueprint.activities.find(a=>a.localId===spec.blueprintActivityId),resources:NonNullable<LearningInput['retainedResources']>=[];
+      for(const resource of spec.content.resources){
+        const mapping=retained?.ownedLearning.resources.find(r=>r.ref===resource.ref&&r.contentHash===resource.versionDigest);
+        const source=(mapping?retained?.research.value.understanding.sources.find(s=>s.source.sourceId===mapping.sourceRef&&s.source.contentHash===mapping.contentHash)?.source:undefined)??
+          retained?.ownedLearning.retainedResources?.find(r=>r.planRef===retained.allocated.compiled.find(p=>p.planId===spec.planId)?.planRef&&r.ref===resource.ref&&r.source.contentHash===resource.versionDigest)?.source??
+          intent.research?.sources.find(s=>s.sourceId===resource.ref&&s.contentHash===resource.versionDigest);
+        if(source)resources.push({planRef:retained?.allocated.compiled.find(p=>p.planId===spec.planId)?.planRef??'plan_1',ref:resource.ref,source});
+      }
+      if(activity)found.set(spec.activityKey,{activity,phases:revision.blueprint.strategy.phases,resources});
+    }
+  }
   return found;
  }
  async run(token:LeaseToken,signal:AbortSignal):Promise<CompilerCheckpoint>{

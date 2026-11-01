@@ -6,7 +6,7 @@ import { SettingsRowGroup } from "../../components/SettingsRowGroup";
 import { SettingsRow } from "../../components/SettingsRow";
 import { useAuth } from "../../components/AuthProvider";
 import { useRouter } from "next/navigation";
-import { fetchCachedJSON } from "@/lib/client-data-cache";
+import { fetchCachedJSON, invalidateClientCache } from "@/lib/client-data-cache";
 import { getAccountCapability } from "./services/account-capability";
 import { Laptop, Smartphone, Globe, Monitor, AlertCircle } from "lucide-react";
 
@@ -87,6 +87,7 @@ export default function SessionsInformation() {
       const result = await getAccountCapability().revokeSession(modalState.sessionId);
 
       if (result.ok) {
+        invalidateClientCache("/api/user/sessions");
         if (result.data?.isCurrent) {
           await logout();
           router.push("/login");

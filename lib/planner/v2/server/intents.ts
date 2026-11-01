@@ -12,8 +12,8 @@ export interface PlanRow {
   creationHash: string; migrationEvidence: unknown;
   conversation?: unknown; researchDocuments?: unknown;
 }
-export async function ownedPlan(sql: Sql, ownerId: number, planId: string): Promise<PlanRow> {
-  const plan = (await rows<PlanRow>(sql, 'SELECT * FROM "PlannerPlan" WHERE id=$1::uuid AND "userId"=$2 FOR UPDATE', [planId, ownerId]))[0];
+export async function ownedPlan(sql: Sql, ownerId: number, planId: string, lock = true): Promise<PlanRow> {
+  const plan = (await rows<PlanRow>(sql, `SELECT * FROM "PlannerPlan" WHERE id=$1::uuid AND "userId"=$2${lock ? " FOR UPDATE" : ""}`, [planId, ownerId]))[0];
   if (!plan) reject("PLAN_NOT_FOUND", "This plan is unavailable.");
   return plan;
 }

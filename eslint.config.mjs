@@ -18,6 +18,8 @@ const eslintConfig = defineConfig([
     "dist/**",
     "mobile/dist/**",
     "tools/**",
+    // Sylf Native has its own workspace, dependencies and ESLint config.
+    "native/**",
     ".dsh-presets/**",
     ".playwright-mcp/**",
   ]),

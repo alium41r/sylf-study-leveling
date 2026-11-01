@@ -1,0 +1,57 @@
+==================================================
+🔬 STARTING CONFIRMATION AUDIT SUITE
+==================================================
+
+--- Creating 4 test users ---
+Users: u1(leader)=1, u2(member)=2, u3(friend)=3, u4(non-member)=4
+Party created: ID=1, leader=1
+u2 joined party 1 as regular (non-leader) member.
+
+==================================================
+1. TESTING INVITE CREATION AUTHORIZATION
+==================================================
+✅ CONFIRMED: Non-member u4 CANNOT create a Focus Party invite (blocked by database trigger trg_check_focus_party_invite_sender)
+✅ CONFIRMED: Regular party member u2 CAN create a Focus Party invite
+✅ CONFIRMED: Invite row accurately records regular member u2 as sender
+✅ CONFIRMED: Party leader u1 CAN create a Focus Party invite
+
+==================================================
+2. TESTING REJOIN CLEANUP & ZERO DUPLICATE ROWS
+==================================================
+✅ CONFIRMED: Both members in the same active session
+✅ CONFIRMED: Exactly 1 FocusSessionMember row on initial entry
+✅ CONFIRMED: Initial timerState is NOT_STARTED
+✅ CONFIRMED: Initial accumulatedSeconds is 0
+✅ CONFIRMED: Initial leftAt is NULL
+User 2 starting focus timer...
+User 2 leaving focus session...
+✅ CONFIRMED: Duration successfully banked on leave (accumulatedSeconds = 1s)
+✅ CONFIRMED: Session remains ACTIVE because u1 is still a participant
+✅ CONFIRMED: Still exactly 1 row while in LEFT state
+✅ CONFIRMED: Database row timerState is 'LEFT'
+✅ CONFIRMED: currentStartedAt is NULL while left
+✅ CONFIRMED: leftAt is populated with exit timestamp: 2026-10-21T21:37:01.887Z
+✅ CONFIRMED: Row primary key id has not changed
+User 2 REJOINING focus session...
+✅ CONFIRMED: Rejoined the SAME active session ID
+✅ CONFIRMED: CONFIRMED: Exactly ONE row in FocusSessionMember (ZERO duplicate rows created)
+✅ CONFIRMED: CONFIRMED: Same primary key row was updated in-place
+✅ CONFIRMED: CONFIRMED: old leftAt was wiped and reset to NULL
+✅ CONFIRMED: CONFIRMED: timerState transitioned cleanly from LEFT to PAUSED
+✅ CONFIRMED: CONFIRMED: Cumulative time preserved exactly (1s)
+✅ CONFIRMED: CONFIRMED: currentStartedAt is NULL waiting for user resume
+User 2 resuming timer...
+User 2 leaving and rejoining a second time...
+✅ CONFIRMED: Second leave: leftAt re-populated with new timestamp
+✅ CONFIRMED: Second leave: timerState is LEFT
+✅ CONFIRMED: Second rejoin: still exactly 1 row (no duplicate)
+✅ CONFIRMED: Second rejoin: leftAt is again cleanly wiped to NULL
+✅ CONFIRMED: Second rejoin: timerState reset to PAUSED
+✅ CONFIRMED: Second rejoin: cumulative duration accumulated both sessions
+
+==================================================
+🎉 ALL AUDIT CONFIRMATIONS PASSED 100%
+==================================================
+
+--- Cleaning up test artifacts ---
+Cleanup complete.

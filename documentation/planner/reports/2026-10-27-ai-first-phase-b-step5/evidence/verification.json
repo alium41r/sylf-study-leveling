@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "status": "PASSED",
+  "finishedAt": "2026-10-27T02:02:01.563634+00:00",
+  "scope": "Phase B Step 5 only; no paid qualification, deployment, UI, independent review/refinement or confirmation.",
+  "runtime": {
+    "node": "v24.21.0",
+    "postgres": "18.4 native"
+  },
+  "postgres": {
+    "command": "node scripts/test/test-planner-ai-first-foundation.mjs --native-bin /private/tmp/sylf-phase-a-runtime/package/native/bin --evidence-dir documentation/planner/reports/2026-10-27-ai-first-phase-b-step5/evidence/qualified-final",
+    "passed": 556,
+    "failed": 0,
+    "retainedRequired": 517,
+    "retainedMissing": 0,
+    "newNaturalLearningChecks": 39,
+    "requiredSkipped": 0,
+    "optionalPaidExcluded": 1,
+    "sourcePinStatus": "PASSED",
+    "changedDuringRun": [],
+    "evidence": "qualified-final/postgres-harness-run.json",
+    "limitations": [
+      "Audited disposable schema bootstrap rather than replay of the incomplete historical migration chain. Actual services, SQL, concurrency and ordered relevant migrations are exercised."
+    ]
+  },
+  "unit": {
+    "command": "npm run test -- --run __tests__/planner-v2 __tests__/planner/search-provider.test.ts __tests__/planner/source-fetch-security.test.ts __tests__/planner/research-evidence.test.ts __tests__/planner/comparison-service.test.ts __tests__/planner/comparison-contract.test.ts __tests__/planner/intake-telemetry.test.tsx __tests__/ai/deepseek-reasoning-controls.test.ts __tests__/ai/deepseek-tool-continuity.test.ts __tests__/ai/cost-summary.test.ts __tests__/ai/dispatch-telemetry.test.ts __tests__/calendar __tests__/ai/calendar-provider-schema.test.ts __tests__/ai/calendar-tools.test.ts __tests__/ai/sylvie-calendar-tools.test.ts __tests__/lib/timezone-service.test.ts --reporter=json --outputFile=documentation/planner/reports/2026-10-27-ai-first-phase-b-step5/evidence/final-unit-results.json",
+    "passed": 760,
+    "failed": 0,
+    "newNaturalLearningChecks": 12,
+    "activeFiles": 68,
+    "discoveredFiles": 71,
+    "optInCalendarDatabaseTests": 33,
+    "evidence": "final-unit-results.json"
+  },
+  "calendarDatabaseCoverage": {
+    "rerun": false,
+    "reason": "The 33 separately opt-in Calendar service checks passed Step 4 and their Calendar implementation/test sources remain byte-identical to the Step 5 baseline. Required Planner PostgreSQL coverage is fully rerun, including all retained Calendar capacity cases and new end-to-end authoring/reallocation cases.",
+    "priorEvidence": "../../2026-10-26-ai-first-phase-b-step4/evidence/calendar-postgres-results.json"
+  },
+  "typecheck": {
+    "command": "npx tsc --noEmit",
+    "exitCode": 0,
+    "afterFinalWebBuild": true,
+    "evidence": "typecheck.log"
+  },
+  "lint": {
+    "command": "npx eslint [17 scoped source/test/harness files] -f json",
+    "files": 17,
+    "errors": 0,
+    "warnings": 0,
+    "evidence": "lint.json"
+  },
+  "prisma": {
+    "command": "npx prisma validate",
+    "exitCode": 0,
+    "evidence": "prisma-validate.log",
+    "schemaFieldsChanged": false,
+    "migrationsDeployed": false
+  },
+  "worker": {
+    "command": "npm run planner:worker:build",
+    "exitCode": 0,
+    "evidence": "worker-build.log",
+    "imports": {
+      "schemaVersion": 1,
+      "status": "PASSED",
+      "node": "v24.21.0",
+      "modules": [
+        "planner/v2/server/compiler",
+        "planner/v2/server/learning",
+        "planner/v2/server/natural-learning",
+        "planner/v2/server/calendar-capacity",
+        "planner/v2/server/foundation",
+        "planner/v2/server/understanding",
+        "planner/v2/server/attempts",
+        "planner/v2/server/worker",
+        "planner/v2/server/revisions",
+        "planner/v2/server/apply",
+        "planner/v2/intelligence/natural-learning",
+        "planner/v2/intelligence/allocator",
+        "planner/v2/intelligence/capacity",
+        "planner/v2/intelligence/foundation/readers",
+        "calendar/planning",
+        "calendar/projection",
+        "calendar/recurrence",
+        "calendar/dates"
+      ],
+      "networkRequests": 0,
+      "credentialsInherited": false,
+      "finishedAt": "2026-10-27T01:55:43.058Z"
+    }
+  },
+  "web": {
+    "command": "NODE_OPTIONS=--max-old-space-size=6144 npx next build --webpack",
+    "exitCode": 0,
+    "evidence": "web-build.log"
+  },
+  "mobile": {
+    "run": false,
+    "reason": "Backend-only changes; shared client/mobile sources and imports are unchanged."
+  },
+  "preservation": {
+    "status": "PASSED",
+    "baselineFiles": 5325,
+    "preservedBaselineFiles": 5312,
+    "scopedChangedBaselineFiles": 13,
+    "newSourceFiles": 7,
+    "unexpectedChanges": [],
+    "evidence": "source-preservation.json",
+    "preExistingGlobalWhitespace": "Unrelated Notes license notices retain task-start bytes; task-scoped whitespace checks pass."
+  },
+  "paidCalls": 0,
+  "remainingBlockers": [],
+  "intentionalGates": [
+    "Independent complete-bundle review/refinement (Step 6).",
+    "Sealed confirmation/publication and full transactional v2 ApplyService integration (Step 7).",
+    "Separately authorized live educational qualification and any deployment."
+  ]
+}

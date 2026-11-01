@@ -52,56 +52,13 @@ describe("Planner surfaces", () => {
     expect(process.env.PLANNER_MODES_ENABLED).toBeUndefined();
   });
 
-  it("offers Planner modes from the header and opens the chooser", () => {
-    tab();
-    const trigger = screen.getByRole("button", { name: /Planner modes/ });
-    expect(trigger).toHaveAttribute("aria-haspopup", "dialog");
-    fireEvent.click(trigger);
-    const dialog = screen.getByRole("dialog", { name: "Planner modes" });
-    expect(dialog).toBeInTheDocument();
-    // Every advertised mode is a real choice, described as a workflow.
-    expect(screen.getByRole("button", { name: /Exam Planner/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Course \/ Syllabus Roadmap/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Chapter \/ Unit Mastery/ })).toBeInTheDocument();
-    // The Classic Planner is untouched behind the dialog.
-    expect(screen.getByText("Legacy planner panel")).toBeInTheDocument();
-  });
-
-  it("enters the chosen mode directly, without asking again", () => {
+  it("opens Planner Modes from the header, on its own chooser", () => {
     tab();
     fireEvent.click(screen.getByRole("button", { name: /Planner modes/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Exam Planner/ }));
-    expect(screen.getByText("Planner Modes surface: EXAM")).toBeInTheDocument();
+    // The header navigates: choosing a mode belongs to the surface it opens.
+    expect(screen.getByText("Planner Modes surface: chooser")).toBeInTheDocument();
     // The Classic panel is not rendered underneath.
     expect(screen.queryByText("Legacy planner panel")).toBeNull();
-  });
-
-  it("routes each mode to its own surface", () => {
-    for (const [label, mode] of [
-      [/Course \/ Syllabus Roadmap/, "ROADMAP"],
-      [/Chapter \/ Unit Mastery/, "MASTERY"],
-    ] as const) {
-      cleanup();
-      tab();
-      fireEvent.click(screen.getByRole("button", { name: /Planner modes/ }));
-      fireEvent.click(screen.getByRole("button", { name: label }));
-      expect(screen.getByText(`Planner Modes surface: ${mode}`)).toBeInTheDocument();
-    }
-  });
-
-  it("closes the chooser on Escape and returns focus to its trigger", () => {
-    tab();
-    const trigger = screen.getByRole("button", { name: /Planner modes/ });
-    // A real click focuses the trigger first; jsdom's fireEvent.click does not, and a
-    // dialog can only return focus to what actually had it.
-    trigger.focus();
-    fireEvent.click(trigger);
-    expect(screen.getByRole("dialog", { name: "Planner modes" })).toBeInTheDocument();
-    fireEvent.keyDown(document, { key: "Escape" });
-    // The dialog leaves through an exit animation, so the state change is what is
-    // asserted rather than the node's disappearance mid-animation.
-    expect(trigger).toHaveAttribute("aria-expanded", "false");
-    expect(document.activeElement).toBe(trigger);
   });
 
   it("keeps the quick modal on the Classic Planner", () => {

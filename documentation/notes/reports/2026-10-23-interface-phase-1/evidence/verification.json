@@ -1,0 +1,43 @@
+{
+  "phase": 1,
+  "notesTests": {
+    "passed": 218,
+    "skipped": 1
+  },
+  "typecheck": "passed",
+  "lint": "passed",
+  "productionBuild": "passed (Node 24, standard npm run build)",
+  "mobileBuild": "passed",
+  "mobileVerify": "passed",
+  "browser": "passed",
+  "viewports": [
+    [
+      1440,
+      960
+    ],
+    [
+      834,
+      1112
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      320,
+      740
+    ]
+  ],
+  "appearance": [
+    "light",
+    "dark",
+    "custom accent/background",
+    "light mode with dark custom background"
+  ],
+  "notRun": [
+    "live Google-account acceptance",
+    "physical stylus/palm-rejection hardware",
+    "opt-in scale profile"
+  ],
+  "deployment": "not performed"
+}

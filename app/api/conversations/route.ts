@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
-import { areUsersBlocked } from "@/lib/block-service";
+import { areUsersBlocked, mayAddToConversation } from "@/lib/block-service";
 
 /**
  * GET /api/conversations
@@ -121,6 +121,8 @@ export async function GET(req: NextRequest) {
  * Body: { participantIds: number[], name?: string, isGroup?: boolean }
  * For DMs, if one already exists between the two users, return it.
  */
+const MAX_PARTICIPANTS = 64;
+
 export async function POST(req: NextRequest) {
   try {
     const session = await getSession(req);
@@ -135,9 +137,12 @@ export async function POST(req: NextRequest) {
     if (!participantIds || !Array.isArray(participantIds) || participantIds.length === 0) {
       return NextResponse.json({ error: "At least one participant is required" }, { status: 400 });
     }
+    if (participantIds.length > MAX_PARTICIPANTS || !participantIds.every((id: unknown) => Number.isSafeInteger(id) && (id as number) > 0)) {
+      return NextResponse.json({ error: "Invalid participants" }, { status: 400 });
+    }
 
     // Always include the creator
-    const allParticipants = [...new Set([userId, ...participantIds])];
+    const allParticipants: number[] = [...new Set<number>([userId, ...participantIds])];
 
     // For DMs (2 people, not group), check if conversation already exists
     if (!isGroup && allParticipants.length === 2) {
@@ -193,6 +198,15 @@ export async function POST(req: NextRequest) {
       // Verify it's exactly 2 participants
       if (existingDM && existingDM.participants.length === 2) {
         return NextResponse.json({ id: existingDM.id, existing: true });
+      }
+    }
+
+    // A group reaches people as a direct message does, so it passes the same rules.
+    // Otherwise `isGroup: true` walks around blocks and allowDirectMessages for any user id.
+    if (isGroup || allParticipants.length > 2) {
+      const allowed = await Promise.all(allParticipants.map((id) => mayAddToConversation(userId, id)));
+      if (allowed.includes(false)) {
+        return NextResponse.json({ error: "You can only add friends who accept messages." }, { status: 403 });
       }
     }
 

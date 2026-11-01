@@ -1,0 +1,106 @@
+{
+  "chrome": "Google Chrome 156.0.8078.79",
+  "display": "Type: GPU\n          Display Type: Built-In Retina LCD\n          Resolution: 2560 x 1600 Retina\n          Connection Type: Internal",
+  "runs": {
+    "startup": {
+      "domContentLoadedMs": 36,
+      "loadMs": 37,
+      "fcpMs": 236,
+      "canvaskitInitMs": 48,
+      "heapUsedMB": 14.6,
+      "window": [
+        1366,
+        746,
+        2
+      ],
+      "reloadToReadyMs": 196,
+      "launchToTargetMs": 607
+    },
+    "engineText": [
+      "OK  api.nativeRuntimeBeforePolyfill: {\"crypto\":\"object\",\"subtle\":\"object\",\"randomUUID\":\"function\",\"getRandomValues\":\"function\",\"TextEncoder\":\"function\",\"TextDecoder\":\"function\",\"structuredClone\":\"function\",\"ReadableStream\":\"function\",\"atob\":\"function\"} (0ms)",
+      "OK  api.crypto.subtle: \"function\" (0ms)",
+      "OK  api.crypto.randomUUID: \"function\" (0ms)",
+      "OK  api.crypto.getRandomValues: \"function\" (0ms)",
+      "OK  api.TextEncoder: 5 (0ms)",
+      "OK  api.TextDecoder: \"π\" (0ms)",
+      "OK  api.structuredClone: \"function\" (0ms)",
+      "OK  api.ReadableStream: \"function\" (0ms)",
+      "OK  api.BroadcastChannel: \"function\" (0ms)",
+      "OK  api.navigator.locks: \"object\" (0ms)",
+      "OK  api.indexedDB: \"object\" (0ms)",
+      "OK  api.Intl.timeZone: \"30/10/2026, 17:00\" (6ms)",
+      "OK  api.Intl.resolvedTZ: \"Asia/Karachi\" (0ms)",
+      "OK  api.Intl.formatToParts.weekday: \"Friday\" (0ms)",
+      "OK  sylf.game-engine.rewards: \"78157743\" (0ms)",
+      "OK  sylf.color-utils.tokens: \"8b870931\" (1ms)",
+      "OK  sylf.calculator: \"7384805d\" (1ms)",
+      "OK  sylf.timezone-service: \"true|2026-10-31|Friday\" (0ms)",
+      "OK  sylf.timer-engine: \"4379c662\" (0ms)",
+      "OK  sylf.notes.ink.schema: 28 (1ms)",
+      "OK  sylf.notes.ink-geometry: \"a127da69\" (1ms)",
+      "OK  sylf.notes.graph: \"function\" (0ms)",
+      "OK  perfect-freehand.outline: \"466:aabf8074\" (1ms)",
+      "OK  yjs.build+encode: {\"bytes\":135188,\"applyMs\":3} (11ms)",
+      "OK  yjs.typing.1000: {\"ms\":8,\"bytes\":19740} (9ms)"
+    ],
+    "panelDrag": {
+      "log": [
+        "PANEL_BEGIN",
+        "RESIZE_BEGIN"
+      ],
+      "afterResize": "translateX(504px) translateY(292px) 508pxx391px",
+      "moved": true,
+      "before": "translateX(40px) translateY(60px) 360pxx280px",
+      "after": "translateX(504px) translateY(292px) 360pxx280px",
+      "frames": {
+        "frames": 120,
+        "medianMs": 16.7,
+        "p95Ms": 17.5,
+        "p99Ms": 17.6,
+        "maxMs": 17.7,
+        "longFramesOver1_5x": 0
+      }
+    },
+    "panelStress": {
+      "frames": 299,
+      "medianMs": 16.7,
+      "p95Ms": 17.7,
+      "p99Ms": 17.7,
+      "maxMs": 17.7,
+      "longFramesOver1_5x": 0,
+      "heapUsedMB": 17.2
+    },
+    "inkPen": {
+      "finishes": [
+        "INKFINISH samples=91 outlineMs=1",
+        "INKFINISH samples=91 outlineMs=0",
+        "INKFINISH samples=91 outlineMs=1",
+        "INKFINISH samples=91 outlineMs=1",
+        "INKFINISH samples=91 outlineMs=0",
+        "INKFINISH samples=91 outlineMs=1"
+      ],
+      "frames": {
+        "frames": 615,
+        "medianMs": 16.7,
+        "p95Ms": 17.2,
+        "p99Ms": 17.7,
+        "maxMs": 49.9,
+        "longFramesOver1_5x": 2
+      },
+      "stats": [
+        "{\"engine\":\"rngh+skia\",\"eventsPerSecond\":61,\"pressureMin\":0.2,\"pressureMax\":0.8,\"tiltMaxDeg\":20,\"ignoredNonStylus\":0,\"pointerTypes\":{\"1\":61},\"lastStrokeSamples\":91,\"finishMs\":1}",
+        "{\"engine\":\"rngh+skia\",\"eventsPerSecond\":61,\"pressureMin\":0.2,\"pressureMax\":0.748,\"tiltMaxDeg\":20,\"ignoredNonStylus\":0,\"pointerTypes\":{\"1\":61},\"lastStrokeSamples\":91,\"finishMs\":0}",
+        "{\"engine\":\"rngh+skia\",\"eventsPerSecond\":60,\"pressureMin\":0.263,\"pressureMax\":0.8,\"tiltMaxDeg\":20,\"ignoredNonStylus\":0,\"pointerTypes\":{\"1\":61},\"lastStrokeSamples\":91,\"finishMs\":0}"
+      ]
+    },
+    "richtext": [
+      "RICHTEXT_BRIDGE updates=100 bytes=1800 hostApplyMsTotal=2.10 hostChars=1873",
+      "RICHTEXT_BRIDGE updates=200 bytes=3743 hostApplyMsTotal=2.70 hostChars=1973",
+      "RICHTEXT_DOM {\"editorMountMs\":21.3,\"scriptedChars\":296,\"scriptedTypingMs\":83.9,\"perCharMs\":0.283,\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36\"} sinceAppStartMs=633"
+    ],
+    "processMemory": {
+      "processes": 6,
+      "totalRssMB": 1063
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "status": "ok",
+  "deployment": {
+    "id": "dpl_Uexqf8njDtsqeevvzqVTUpNYy4se",
+    "url": "https://sylf-ogbcuenyf-alium41rs-projects.vercel.app",
+    "productionUrl": "https://sylf.app",
+    "inspectorUrl": "https://vercel.com/alium41rs-projects/sylf/Uexqf8njDtsqeevvzqVTUpNYy4se",
+    "readyState": "READY",
+    "target": "production",
+    "deploymentApiUrl": "https://api.vercel.com/v13/deployments/dpl_Uexqf8njDtsqeevvzqVTUpNYy4se",
+    "buildMachine": {
+      "cores": 2,
+      "memory": 8192,
+      "machine": "basic",
+      "selectionType": "fixed",
+      "selectionSource": "plan-default"
+    },
+    "deploymentProtection": []
+  },
+  "canonicalNotesUrl": "https://sylf-alium41rs-projects.vercel.app/notes",
+  "candidateSourceFiles": 47,
+  "environmentFilesUploaded": false,
+  "unrelatedRootEditsUploaded": false
+}

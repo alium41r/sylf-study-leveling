@@ -1,0 +1,625 @@
+{
+  "device": {
+    "model": "SM-X510",
+    "android": "16",
+    "sdk": "36",
+    "oneUi": "80500",
+    "soc": "s5e8835",
+    "display": "Physical size: 1440x2304 / Physical density: 280"
+  },
+  "apkBytes": 50508971,
+  "engine": {
+    "engine": "hermes {\"Bytecode Version\":99,\"Static Hermes\":true,\"JIT Enabled\":false,\"Builtins Frozen\":false,\"VM Experiments\":0,\"Build\":\"Release\",\"GC\":\"hades (concurrent)\",\"OSS Rele",
+    "results": [
+      {
+        "name": "api.nativeRuntimeBeforePolyfill",
+        "ok": true,
+        "value": {
+          "crypto": "undefined",
+          "subtle": "undefined",
+          "randomUUID": "undefined",
+          "getRandomValues": "undefined",
+          "TextEncoder": "function",
+          "TextDecoder": "function",
+          "structuredClone": "function",
+          "ReadableStream": "function",
+          "atob": "function"
+        },
+        "ms": 0
+      },
+      {
+        "name": "api.crypto.subtle",
+        "ok": true,
+        "value": "undefined",
+        "ms": 0
+      },
+      {
+        "name": "api.crypto.randomUUID",
+        "ok": true,
+        "value": "function",
+        "ms": 0
+      },
+      {
+        "name": "api.crypto.getRandomValues",
+        "ok": true,
+        "value": "function",
+        "ms": 0
+      },
+      {
+        "name": "api.TextEncoder",
+        "ok": true,
+        "value": 5,
+        "ms": 0
+      },
+      {
+        "name": "api.TextDecoder",
+        "ok": true,
+        "value": "π",
+        "ms": 0
+      },
+      {
+        "name": "api.structuredClone",
+        "ok": true,
+        "value": "function",
+        "ms": 0
+      },
+      {
+        "name": "api.ReadableStream",
+        "ok": true,
+        "value": "function",
+        "ms": 0
+      },
+      {
+        "name": "api.BroadcastChannel",
+        "ok": true,
+        "value": "undefined",
+        "ms": 0
+      },
+      {
+        "name": "api.navigator.locks",
+        "ok": true,
+        "value": "undefined",
+        "ms": 0
+      },
+      {
+        "name": "api.indexedDB",
+        "ok": true,
+        "value": "undefined",
+        "ms": 0
+      },
+      {
+        "name": "api.Intl.timeZone",
+        "ok": true,
+        "value": "30/10/2026, 17:00",
+        "ms": 14
+      },
+      {
+        "name": "api.Intl.resolvedTZ",
+        "ok": true,
+        "value": "Asia/Karachi",
+        "ms": 3
+      },
+      {
+        "name": "api.Intl.formatToParts.weekday",
+        "ok": true,
+        "value": "Friday",
+        "ms": 3
+      },
+      {
+        "name": "sylf.game-engine.rewards",
+        "ok": true,
+        "value": "78157743",
+        "ms": 0
+      },
+      {
+        "name": "sylf.color-utils.tokens",
+        "ok": true,
+        "value": "8b870931",
+        "ms": 1
+      },
+      {
+        "name": "sylf.calculator",
+        "ok": true,
+        "value": "7384805d",
+        "ms": 0
+      },
+      {
+        "name": "sylf.timezone-service",
+        "ok": true,
+        "value": "true|2026-10-31|Friday",
+        "ms": 18
+      },
+      {
+        "name": "sylf.timer-engine",
+        "ok": true,
+        "value": "4379c662",
+        "ms": 0
+      },
+      {
+        "name": "sylf.notes.ink.schema",
+        "ok": true,
+        "value": 28,
+        "ms": 1
+      },
+      {
+        "name": "sylf.notes.ink-geometry",
+        "ok": true,
+        "value": "a127da69",
+        "ms": 18
+      },
+      {
+        "name": "sylf.notes.graph",
+        "ok": true,
+        "value": "function",
+        "ms": 0
+      },
+      {
+        "name": "perfect-freehand.outline",
+        "ok": true,
+        "value": "466:aabf8074",
+        "ms": 20
+      },
+      {
+        "name": "yjs.build+encode",
+        "ok": true,
+        "value": {
+          "bytes": 135188,
+          "applyMs": 28
+        },
+        "ms": 112
+      },
+      {
+        "name": "yjs.typing.1000",
+        "ok": true,
+        "value": {
+          "ms": 79,
+          "bytes": 19740
+        },
+        "ms": 80
+      }
+    ]
+  },
+  "deviceInfo": {
+    "model": "SM-X510",
+    "manufacturer": "samsung",
+    "sdk": 36,
+    "release": "16",
+    "soc": "s5e8835",
+    "totalMemMb": 7714,
+    "memoryClassMb": 256,
+    "refreshRate": 60,
+    "supportedRefreshRates": "60.0,30.0"
+  },
+  "engineMemory": {
+    "totalPssMB": 129,
+    "javaHeapMB": 15,
+    "nativeHeapMB": 26,
+    "graphicsMB": 30
+  },
+  "pdf": [
+    {
+      "id": "a4-plain",
+      "android": [
+        595,
+        842
+      ],
+      "pdfjs": [
+        595,
+        842
+      ],
+      "androidMarker": [
+        149,
+        253
+      ],
+      "pdfjsMarker": [
+        148.75,
+        252.6
+      ],
+      "errorPx": 0.47
+    },
+    {
+      "id": "letter-rot90",
+      "android": [
+        792,
+        612
+      ],
+      "pdfjs": [
+        792,
+        612
+      ],
+      "androidMarker": [
+        554,
+        153
+      ],
+      "pdfjsMarker": [
+        554.4,
+        153
+      ],
+      "errorPx": 0.4
+    },
+    {
+      "id": "crop-offset",
+      "android": [
+        450,
+        640
+      ],
+      "pdfjs": [
+        450,
+        640
+      ],
+      "androidMarker": [
+        112,
+        192
+      ],
+      "pdfjsMarker": [
+        112.5,
+        192
+      ],
+      "errorPx": 0.5
+    },
+    {
+      "id": "crop-rot270",
+      "android": [
+        710,
+        520
+      ],
+      "pdfjs": [
+        710,
+        520
+      ],
+      "androidMarker": [
+        213,
+        390
+      ],
+      "pdfjsMarker": [
+        213,
+        390
+      ],
+      "errorPx": 0
+    },
+    {
+      "id": "media-negative-origin",
+      "android": [
+        600,
+        800
+      ],
+      "pdfjs": [
+        600,
+        800
+      ],
+      "androidMarker": [
+        150,
+        240
+      ],
+      "pdfjsMarker": [
+        150,
+        240
+      ],
+      "errorPx": 0
+    },
+    {
+      "id": "rot180-crop",
+      "android": [
+        400,
+        600
+      ],
+      "pdfjs": [
+        400,
+        600
+      ],
+      "androidMarker": [
+        300,
+        420
+      ],
+      "pdfjsMarker": [
+        300,
+        420
+      ],
+      "errorPx": 0
+    },
+    {
+      "id": "userunit-2",
+      "android": [
+        300,
+        400
+      ],
+      "pdfjs": [
+        600,
+        800
+      ],
+      "androidMarker": [
+        75,
+        120
+      ],
+      "pdfjsMarker": [
+        150,
+        240
+      ],
+      "errorPx": 141.51
+    }
+  ],
+  "richtext": {
+    "dom": [
+      "{\"editorMountMs\":88.3,\"scriptedChars\":296,\"scriptedTypingMs\":481.4,\"perCharMs\":1.626,\"userAgent\":\"Mozilla/5.0 (Linux; Android 16; SM-X510 Build/BP4A.251205.006; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/156.0.8078.47 Safari/537.36\"} sinceAppStartMs=2017"
+    ],
+    "bridge": [
+      "updates=100 bytes=1800 hostApplyMsTotal=18.44 hostChars=1873",
+      "updates=200 bytes=3743 hostApplyMsTotal=31.06 hostChars=1973"
+    ],
+    "memory": {
+      "totalPssMB": 163,
+      "javaHeapMB": 23,
+      "nativeHeapMB": 38,
+      "graphicsMB": 31
+    }
+  },
+  "startup": {
+    "coldStartRuns": [
+      {
+        "totalTimeMs": 273,
+        "jsReady": "11ms window=1316.5714285714287x822.8571428571429 scale=1.75"
+      },
+      {
+        "totalTimeMs": 238,
+        "jsReady": "13ms window=1316.5714285714287x822.8571428571429 scale=1.75"
+      },
+      {
+        "totalTimeMs": 214,
+        "jsReady": "13ms window=1316.5714285714287x822.8571428571429 scale=1.75"
+      },
+      {
+        "totalTimeMs": 217,
+        "jsReady": "12ms window=1316.5714285714287x822.8571428571429 scale=1.75"
+      },
+      {
+        "totalTimeMs": 202,
+        "jsReady": "13ms window=1316.5714285714287x822.8571428571429 scale=1.75"
+      }
+    ],
+    "medianTotalTimeMs": 217
+  },
+  "panelsStress": {
+    "gfx": {
+      "totalFrames": 608,
+      "janky": "3 (0.49%)",
+      "p50": "21ms",
+      "p90": "32ms",
+      "p95": "32ms",
+      "p99": "36ms",
+      "missedVsync": 0,
+      "slowUi": 3,
+      "slowDraw": 0
+    },
+    "memory": {
+      "totalPssMB": 139,
+      "javaHeapMB": 16,
+      "nativeHeapMB": 36,
+      "graphicsMB": 23
+    }
+  },
+  "panelsDrag": {
+    "gfx": {
+      "totalFrames": 8,
+      "janky": "1 (12.50%)",
+      "p50": "15ms",
+      "p90": "30ms",
+      "p95": "30ms",
+      "p99": "30ms",
+      "missedVsync": 0,
+      "slowUi": 0,
+      "slowDraw": 1
+    },
+    "screen": "1440x2304"
+  },
+  "panelsDragUi": [
+    "[268,339][856,378]"
+  ],
+  "sqlite": {
+    "rounds": 25,
+    "ackedLines": 8936,
+    "roundsWithLostAck": 0,
+    "roundsWithPartial": 0,
+    "roundsWithDigestMismatch": 0,
+    "integrityFailures": 0,
+    "roundsWithGaps": 0,
+    "log": [
+      {
+        "r": 0,
+        "maxAck": 159,
+        "rows": 159,
+        "maxSeq": 159,
+        "verifyMs": 390
+      },
+      {
+        "r": 1,
+        "maxAck": 624,
+        "rows": 624,
+        "maxSeq": 624,
+        "verifyMs": 373,
+        "lat": "p50=4.224 p95=7.480 max=23.658 seq=559"
+      },
+      {
+        "r": 2,
+        "maxAck": 804,
+        "rows": 804,
+        "maxSeq": 804,
+        "verifyMs": 410
+      },
+      {
+        "r": 3,
+        "maxAck": 1304,
+        "rows": 1304,
+        "maxSeq": 1304,
+        "verifyMs": 415,
+        "lat": "p50=4.305 p95=7.807 max=24.428 seq=1204"
+      },
+      {
+        "r": 4,
+        "maxAck": 1781,
+        "rows": 1781,
+        "maxSeq": 1781,
+        "verifyMs": 428,
+        "lat": "p50=4.273 p95=7.491 max=22.796 seq=1704"
+      },
+      {
+        "r": 5,
+        "maxAck": 1970,
+        "rows": 1970,
+        "maxSeq": 1970,
+        "verifyMs": 426
+      },
+      {
+        "r": 6,
+        "maxAck": 2181,
+        "rows": 2181,
+        "maxSeq": 2181,
+        "verifyMs": 427,
+        "lat": "p50=4.596 p95=7.733 max=25.616 seq=2170"
+      },
+      {
+        "r": 7,
+        "maxAck": 2428,
+        "rows": 2428,
+        "maxSeq": 2428,
+        "verifyMs": 422,
+        "lat": "p50=4.397 p95=7.669 max=29.751 seq=2381"
+      },
+      {
+        "r": 8,
+        "maxAck": 2649,
+        "rows": 2649,
+        "maxSeq": 2649,
+        "verifyMs": 451,
+        "lat": "p50=4.161 p95=7.767 max=28.193 seq=2628"
+      },
+      {
+        "r": 9,
+        "maxAck": 2944,
+        "rows": 2944,
+        "maxSeq": 2944,
+        "verifyMs": 445,
+        "lat": "p50=4.548 p95=7.577 max=25.601 seq=2849"
+      },
+      {
+        "r": 10,
+        "maxAck": 3398,
+        "rows": 3398,
+        "maxSeq": 3398,
+        "verifyMs": 428,
+        "lat": "p50=4.304 p95=7.595 max=23.565 seq=3344"
+      },
+      {
+        "r": 11,
+        "maxAck": 3753,
+        "rows": 3753,
+        "maxSeq": 3753,
+        "verifyMs": 459,
+        "lat": "p50=4.319 p95=7.798 max=22.910 seq=3598"
+      },
+      {
+        "r": 12,
+        "maxAck": 4294,
+        "rows": 4294,
+        "maxSeq": 4294,
+        "verifyMs": 471,
+        "lat": "p50=4.395 p95=7.547 max=24.626 seq=4153"
+      },
+      {
+        "r": 13,
+        "maxAck": 4735,
+        "rows": 4735,
+        "maxSeq": 4735,
+        "verifyMs": 463,
+        "lat": "p50=4.139 p95=7.578 max=23.602 seq=4694"
+      },
+      {
+        "r": 14,
+        "maxAck": 5121,
+        "rows": 5121,
+        "maxSeq": 5121,
+        "verifyMs": 463,
+        "lat": "p50=4.157 p95=7.800 max=35.211 seq=4935"
+      },
+      {
+        "r": 15,
+        "maxAck": 5480,
+        "rows": 5480,
+        "maxSeq": 5480,
+        "verifyMs": 483,
+        "lat": "p50=4.173 p95=7.694 max=32.174 seq=5321"
+      },
+      {
+        "r": 16,
+        "maxAck": 5975,
+        "rows": 5975,
+        "maxSeq": 5975,
+        "verifyMs": 488,
+        "lat": "p50=4.313 p95=7.554 max=24.782 seq=5880"
+      },
+      {
+        "r": 17,
+        "maxAck": 6225,
+        "rows": 6226,
+        "maxSeq": 6226,
+        "verifyMs": 488,
+        "lat": "p50=4.230 p95=7.572 max=29.541 seq=6175"
+      },
+      {
+        "r": 18,
+        "maxAck": 6448,
+        "rows": 6448,
+        "maxSeq": 6448,
+        "verifyMs": 502,
+        "lat": "p50=4.341 p95=7.721 max=24.110 seq=6426"
+      },
+      {
+        "r": 19,
+        "maxAck": 6984,
+        "rows": 6984,
+        "maxSeq": 6984,
+        "verifyMs": 519,
+        "lat": "p50=4.154 p95=7.512 max=24.856 seq=6848"
+      },
+      {
+        "r": 20,
+        "maxAck": 7464,
+        "rows": 7464,
+        "maxSeq": 7464,
+        "verifyMs": 509,
+        "lat": "p50=4.197 p95=7.427 max=23.796 seq=7384"
+      },
+      {
+        "r": 21,
+        "maxAck": 7911,
+        "rows": 7911,
+        "maxSeq": 7911,
+        "verifyMs": 517,
+        "lat": "p50=4.204 p95=7.623 max=28.543 seq=7864"
+      },
+      {
+        "r": 22,
+        "maxAck": 8114,
+        "rows": 8114,
+        "maxSeq": 8114,
+        "verifyMs": 525,
+        "lat": "p50=4.093 p95=7.786 max=32.756 seq=8111"
+      },
+      {
+        "r": 23,
+        "maxAck": 8425,
+        "rows": 8425,
+        "maxSeq": 8425,
+        "verifyMs": 533,
+        "lat": "p50=4.564 p95=7.949 max=23.966 seq=8314"
+      },
+      {
+        "r": 24,
+        "maxAck": 8937,
+        "rows": 8937,
+        "maxSeq": 8937,
+        "verifyMs": 948,
+        "lat": "p50=4.175 p95=7.710 max=24.987 seq=8825"
+      }
+    ]
+  }
+}

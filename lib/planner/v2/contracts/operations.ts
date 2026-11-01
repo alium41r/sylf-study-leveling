@@ -33,6 +33,10 @@ export const PlannerErrorV2Schema = z.strictObject({
 });
 
 export const RuntimeBudgetV2Schema = z.strictObject({
+  /** Explicit compiler-v2 interpretation. Absent retains all legacy limits. */
+  aiFirst: z.strictObject({ schemaVersion: z.literal(1), policyDigest: DigestV2Schema,
+    processingMs: z.number().int().positive().max(86400000),
+    limits: z.strictObject({ calls: z.number().int().positive().max(10000), inputUnits: z.number().int().positive().max(100000000), completionTokens: z.number().int().positive().max(100000000) }) }).optional(),
   rootRequestId: DurableIdV2Schema,
   profile: z.enum(["ADVICE", "CALENDAR_ONLY", "EDUCATIONAL", "RESEARCH"]),
   foregroundProcessingMs: z.number().int().nonnegative(),
@@ -42,14 +46,14 @@ export const RuntimeBudgetV2Schema = z.strictObject({
     modelCalls: z.number().int().nonnegative(),
     inputTokens: z.number().int().nonnegative(),
     outputTokens: z.number().int().nonnegative(),
-    planningCalls: z.number().int().min(0).max(5),
-    researchSynthesisCalls: z.number().int().min(0).max(2),
-    researchQueries: z.number().int().min(0).max(E.researchQueries),
-    fetchAttempts: z.number().int().min(0).max(E.fetchAttempts),
-    selectedSourceCharacters: z.number().int().min(0).max(E.sourceCharacters),
-    extractedPages: z.number().int().min(0).max(E.extractedPages),
-    ocrPages: z.number().int().min(0).max(E.ocrPages),
-    followUps: z.number().int().min(0).max(E.followUps),
+    planningCalls: z.number().int().nonnegative(),
+    researchSynthesisCalls: z.number().int().nonnegative(),
+    researchQueries: z.number().int().nonnegative(),
+    fetchAttempts: z.number().int().nonnegative(),
+    selectedSourceCharacters: z.number().int().nonnegative(),
+    extractedPages: z.number().int().nonnegative(),
+    ocrPages: z.number().int().nonnegative(),
+    followUps: z.number().int().nonnegative(),
   }),
   reserved: z.strictObject({
     modelCalls: z.number().int().nonnegative(),
@@ -57,13 +61,16 @@ export const RuntimeBudgetV2Schema = z.strictObject({
     outputTokens: z.number().int().nonnegative(),
   }),
 }).superRefine((budget, ctx) => {
-  const limit = PLANNER_V2_BUDGETS[budget.profile];
+  const limit = budget.aiFirst ? { modelCalls: budget.aiFirst.limits.calls, inputTokens: budget.aiFirst.limits.inputUnits, outputTokens: budget.aiFirst.limits.completionTokens, executionSeconds: budget.aiFirst.processingMs / 1000 } : PLANNER_V2_BUDGETS[budget.profile];
+  if (!budget.aiFirst && (budget.consumed.planningCalls > 5 || budget.consumed.researchSynthesisCalls > 2)) issue(ctx, ["consumed"], "LEGACY_SPECIALIZED_CALL_BOUND");
+  if (!budget.aiFirst) for (const field of ["researchQueries", "fetchAttempts", "selectedSourceCharacters", "extractedPages", "ocrPages", "followUps"] as const)
+    if (budget.consumed[field] > (field === "selectedSourceCharacters" ? E.sourceCharacters : E[field])) issue(ctx, ["consumed",field], "LEGACY_RESEARCH_BOUND");
   if (budget.foregroundProcessingMs > limit.executionSeconds * 1000) issue(ctx, ["foregroundProcessingMs"], "Foreground processing exceeds the execution budget");
   for (const field of ["modelCalls", "inputTokens", "outputTokens"] as const) {
     const hasReservation = Object.values(budget.reserved).some(value => value > 0);
     // Actual provider usage may exceed its estimate; retain that fact in a terminal
     // failure rather than making truthful accounting impossible to serialize.
-    if ((field === "modelCalls" || hasReservation) && budget.consumed[field] + budget.reserved[field] > limit[field]) issue(ctx, ["consumed", field], "ROOT_BUDGET_EXHAUSTED");
+    if ((field === "modelCalls" || !budget.aiFirst && hasReservation) && budget.consumed[field] + budget.reserved[field] > limit[field]) issue(ctx, ["consumed", field], "ROOT_BUDGET_EXHAUSTED");
   }
   if (budget.consumed.planningCalls + budget.consumed.researchSynthesisCalls > budget.consumed.modelCalls) {
     issue(ctx, ["consumed"], "Specialized calls are included in the root model-call counter");
@@ -160,7 +167,7 @@ export const PlannerAttemptV2Schema = withPlannerEnvelope(z.strictObject({
 }).superRefine((attempt, ctx) => {
   unique(attempt.targets.map(target => target.planId), ctx, ["targets"]);
   const readOnly = attempt.kind === "RESEARCH_ADVICE";
-  const rootLimit = PLANNER_V2_BUDGETS[attempt.budget.profile];
+  const rootLimit = attempt.budget.aiFirst ? { inputTokens: attempt.budget.aiFirst.limits.inputUnits, outputTokens: attempt.budget.aiFirst.limits.completionTokens } : PLANNER_V2_BUDGETS[attempt.budget.profile];
   if ((attempt.budget.consumed.inputTokens > rootLimit.inputTokens || attempt.budget.consumed.outputTokens > rootLimit.outputTokens) &&
     !["FAILED", "CANCELLED", "SUPERSEDED"].includes(attempt.state)) issue(ctx, ["budget"], "Actual token overrun must terminate before further work or publication");
   if (readOnly && (attempt.targets.length !== 0 || attempt.applyReceipt !== null || attempt.result?.kind === "REVISIONS" ||
@@ -256,6 +263,7 @@ export function validateAttemptTransition(before: PlannerAttemptV2, after: Plann
   const profiles = ["ADVICE", "CALENDAR_ONLY", "EDUCATIONAL", "RESEARCH"];
   if (profiles.indexOf(after.budget.profile) < profiles.indexOf(before.budget.profile)) errors.push("ROOT_PROFILE_CANNOT_DOWNGRADE");
   if (before.budget.rootRequestId !== after.budget.rootRequestId) errors.push("ROOT_BUDGET_IDENTITY_IMMUTABLE");
+  if (JSON.stringify(before.budget.aiFirst) !== JSON.stringify(after.budget.aiFirst)) errors.push("RESOURCE_POLICY_IMMUTABLE");
   if (before.budget.processingStartedAt && before.budget.processingStartedAt !== after.budget.processingStartedAt) errors.push("PROCESSING_START_IMMUTABLE");
   if (after.budget.foregroundProcessingMs < before.budget.foregroundProcessingMs ||
     (before.budget.processingStartedAt && after.budget.foregroundProcessingMs !== before.budget.foregroundProcessingMs)) errors.push("FOREGROUND_PROCESSING_CANNOT_RESET");

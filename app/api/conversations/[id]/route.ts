@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
+import { mayAddToConversation } from "@/lib/block-service";
 
 /**
  * GET /api/conversations/[id]
@@ -175,17 +176,35 @@ export async function PATCH(
 
     // S3: group administration is creator-only. A normal participant must not
     // rename the group, change its avatar, or add/remove members (including
-    // promoting themselves). UI hiding is not a control — this is.
+    // promoting themselves), except removing only themselves to leave the group.
+    const isSelfLeaveOnly =
+      body.name === undefined &&
+      body.avatarUrl === undefined &&
+      (!Array.isArray(body.addMemberIds) || body.addMemberIds.length === 0) &&
+      Array.isArray(body.removeMemberIds) &&
+      body.removeMemberIds.length === 1 &&
+      body.removeMemberIds[0] === userId;
     const isGroupMutation =
       body.name !== undefined ||
       body.avatarUrl !== undefined ||
       (Array.isArray(body.addMemberIds) && body.addMemberIds.length > 0) ||
       (Array.isArray(body.removeMemberIds) && body.removeMemberIds.length > 0);
-    if (isGroupMutation && conversation.createdBy !== userId) {
+    if (isGroupMutation && !isSelfLeaveOnly && conversation.createdBy !== userId) {
       return NextResponse.json(
         { error: "Only the group creator can manage this group." },
         { status: 403 }
       );
+    }
+
+    // Adding answers to the same rules as creating: see mayAddToConversation.
+    if (Array.isArray(body.addMemberIds) && body.addMemberIds.length > 0) {
+      if (!body.addMemberIds.every((id: unknown) => Number.isSafeInteger(id) && (id as number) > 0)) {
+        return NextResponse.json({ error: "Invalid members" }, { status: 400 });
+      }
+      const allowed = await Promise.all(body.addMemberIds.map((id: number) => mayAddToConversation(userId, id)));
+      if (allowed.includes(false)) {
+        return NextResponse.json({ error: "You can only add friends who accept messages." }, { status: 403 });
+      }
     }
 
     // Atomically update conversation fields

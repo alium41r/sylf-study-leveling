@@ -1,0 +1,35 @@
+npm notice run sylf@0.1.0 prebuild
+npm notice run npm run calendar:recognition:build && node scripts/build/build-notes-notices.mjs && node scripts/build/build-notes-pdf-assets.mjs
+npm notice run sylf@0.1.0 calendar:recognition:build
+npm notice run node scripts/build/build-calendar-recognition.mjs
+Notes notices generated for 63 installed dependency packages; exact BlockNote source included.
+Pinned PDF.js worker and local resource/license files copied.
+npm notice run sylf@0.1.0 build
+npm notice run next build
+▲ Next.js 16.2.9 (Turbopack)
+- Environments: .env.local, .env
+- Experiments (use with caution):
+  · optimizePackageImports
+  · proxyClientMaxBodySize: "13mb"
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 15.4s
+  Running TypeScript ...
+
+  We detected TypeScript in your project and reconfigured your tsconfig.json file for you.
+  The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+
+  	- include was updated to add 'dist/notes-phase7-turbo-build/types/**/*.ts'
+  	- include was updated to add 'dist/notes-phase7-turbo-build/dev/types/**/*.ts'
+
+Failed to type check.
+
+./dist/notes-phase7-turbo-build/static/media/pdf-export.worker.0efd26j2d2gyc.ts:1:54
+Type error: Cannot find module './pdf-export-core' or its corresponding type declarations.
+
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { buildAnnotatedPdf, [36mtype[0m [33mPdfExportJob[0m } [36mfrom[0m [32m"./pdf-export-core"[0m;
+  [90m  |[0m                                                      [31m[1m^[0m
+  [90m2 |[0m [36mconst[0m scope = self [36mas[0m unknown [36mas[0m {
+  [90m3 |[0m   onmessage: ((event: [33mMessageEvent[0m<[33mPdfExportJob[0m>) => [36mvoid[0m) | [36mnull[0m;
+  [90m4 |[0m   postMessage: (value: unknown, transfer?: [33mTransferable[0m[]) => [36mvoid[0m;
+Next.js build worker exited with code: 1 and signal: null

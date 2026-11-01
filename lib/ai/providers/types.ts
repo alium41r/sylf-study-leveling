@@ -51,6 +51,10 @@ export interface LLMUsage {
 }
 
 export interface LLMResponse {
+  /** Explicit provider-supplied reasoning channel, captured only by opt-in callers. */
+  reasoningText?: string;
+  model?: string;
+  fingerprint?: string | null;
   /** Bounded completion metadata for callers that own structured-output validation. */
   finishReason?: "STOP" | "MAX_TOKENS" | "OTHER";
   text?: string;
@@ -74,8 +78,12 @@ export class LLMProviderError extends Error {
 }
 
 export interface LLMGenerateOptions {
+  /** Retain complete natural strategy whitespace; opt-in leaves legacy text unchanged. */
+  preserveText?: boolean;
   /** Visible answer deltas for text-only turns; tools/structured outputs remain buffered. */
   onTextDelta?: (text: string) => void;
+  /** Opt-in to a provider's documented public reasoning stream; never synthesized. */
+  onReasoningDelta?: (text:string)=>void;
   responseFormat?: "json_object" | "text";
   temperature?: number;
   maxTokens?: number;

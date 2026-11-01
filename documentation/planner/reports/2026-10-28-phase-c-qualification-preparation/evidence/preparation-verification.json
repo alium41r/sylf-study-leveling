@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "status": "PASSED",
+  "scope": "Phase C unpaid qualification preparation; paid execution and educational assessment have not run",
+  "phaseB": {
+    "freshPostgresPassed": 618,
+    "requiredSkipped": 0,
+    "all618PreviousCaseIdentitiesRetained": true,
+    "missingCases": [],
+    "focusedUnitsPassed": 35,
+    "originalEvidencePreserved": true
+  },
+  "rehearsal": {
+    "status": "SCRIPTED_REHEARSAL_PASSED",
+    "newPilotChecks": 1,
+    "legacyPostgresPassed": 225,
+    "externalRequests": 0,
+    "paidCalls": 0,
+    "sourcePins": 297,
+    "sourcePinChanges": [],
+    "preparedManifestChanges": [],
+    "largestScriptedRoleInputBytes": 219687,
+    "educationalConclusion": "NONE"
+  },
+  "preparationUnitTests": {
+    "passed": 10,
+    "failed": 0
+  },
+  "fullTypecheck": {
+    "status": "PASSED",
+    "log": "typecheck-qualified.log",
+    "observedExitCode": 0
+  },
+  "lint": {
+    "files": 5,
+    "errors": 0,
+    "warnings": 0
+  },
+  "preservation": {
+    "baselineFiles": 5488,
+    "unchangedBaselineFiles": 5486,
+    "expectedModifiedFiles": [
+      "scripts/test/test-planner-ai-first-foundation.mjs",
+      "documentation/planner/README.md"
+    ],
+    "newSourceFiles": [
+      "__tests__/planner-v2/postgres/phase-c-preparation.phasec.ts",
+      "scripts/qa/planner-phase-c/README.md",
+      "scripts/qa/planner-phase-c/preflight.mjs",
+      "scripts/qa/planner-phase-c/preparation.test.mjs",
+      "scripts/qa/planner-phase-c/prepare.mjs"
+    ],
+    "unexpectedModifiedFiles": [],
+    "unexpectedNewFiles": [],
+    "missingFiles": [],
+    "changedHistoricalReports": [],
+    "changedMigrations": []
+  },
+  "static": {
+    "scopedWhitespaceFiles": 10,
+    "whitespace": [],
+    "localLinksChecked": 129,
+    "brokenLinks": []
+  },
+  "paidAuthorization": false,
+  "paidExecutionEnabled": false,
+  "modelQualityConclusion": "UNASSESSED",
+  "remainingBeforePaidExecution": [
+    "Explicit human approval of frozen scope, rubric, resource profile and ceiling",
+    "Fresh metadata/rates/balance and unchanged source/input hashes",
+    "Narrow execution-stage real-adapter binding and unpaid verification of its long-review/currentness stopping behavior"
+  ],
+  "finishedAt": "2026-10-28T14:35:05.460334+00:00"
+}

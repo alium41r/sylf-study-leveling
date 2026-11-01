@@ -18,6 +18,9 @@ export type TimerPhase = "focus" | "short-break" | "long-break" | "rest" | "done
 
 const BREAK_PHASES: readonly TimerPhase[] = ["short-break", "long-break", "rest"];
 
+/** The most one study session can credit, in seconds. The server enforces it, and clients read it here to say so honestly. */
+export const MAX_SESSION_FOCUS_SECONDS = 43_200;
+
 export function isBreakPhase(phase: TimerPhase): boolean {
   return (BREAK_PHASES as readonly string[]).includes(phase);
 }

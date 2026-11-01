@@ -1,0 +1,28 @@
+{
+  "configurationPresenceOnly": {
+    "NOTES_PUBLIC_URL": false,
+    "NOTES_ENCRYPTION_KEY": true,
+    "GOOGLE_NOTES_CLIENT_ID": true,
+    "GOOGLE_NOTES_CLIENT_SECRET": true,
+    "GOOGLE_CLIENT_ID": true,
+    "GOOGLE_CLIENT_SECRET": true
+  },
+  "browsers": {
+    "chromium": {
+      "installed": true
+    },
+    "firefox": {
+      "installed": false
+    },
+    "webkit": {
+      "installed": false
+    }
+  },
+  "authorizedNotesGrantAvailable": false,
+  "physicalStylusAvailable": false,
+  "liveGooglePerformed": false,
+  "hostedDatabaseRead": false,
+  "deploymentPerformed": false,
+  "recheckedAt": "2026-10-22T01:44:18.746Z",
+  "presenceMethod": "Installed Next environment loader; presence only, no credential, consent or key-restore verification."
+}

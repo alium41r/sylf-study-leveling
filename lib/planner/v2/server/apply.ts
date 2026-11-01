@@ -5,11 +5,18 @@ import {
 } from "../contracts";
 import { calculateQuestRewards, calculateRecommendedDifficulty } from "../../../difficulty-engine";
 import { PlannerDatabase, rows, clock, reject, type Sql } from "./database";
-import { loadAttempt, persistAttempt, assertAttemptCurrent } from "./attempts";
+import { loadAttempt, persistAttempt, assertAttemptCurrent, AttemptService } from "./attempts";
 import { ownedPlan, loadIntent } from "./intents";
-import { loadRevision } from "./revisions";
+import { loadRevision, loadRevisionDocument } from "./revisions";
 import { loadExecutionContext, liveExecution, verifyPlacement, verifyContextCorrespondence, specDigest, contentDigest } from "./context";
 import { verifyExecutionGraph } from "./execution-validation";
+import { DocumentRepository } from "./documents";
+import { verifyReviewedDocuments, verifyReviewedDocumentMetadata, assertReviewedChangeSet } from "./reviewed-publication";
+import { readReviewedBundle } from "../intelligence/foundation/readers";
+import { loadAttemptArtifacts } from "./foundation";
+import { lockPlanningCalendar } from "../../../calendar/planning";
+import { PlannerCalendarCapacity } from "./calendar-capacity";
+import { loadCompilerVersion } from "./compiler-version";
 
 export type ApplyBoundary = "goal" | "quest" | "link" | "pointer" | "receipt";
 export const descriptionForSpec = (spec: ExecutionTaskSpecV2): string => `${spec.content.instructions}\n\nDone when: ${spec.content.completionCriterion}`;
@@ -17,13 +24,33 @@ const pointer = (spec: ExecutionTaskSpecV2 | null) => spec ? { spec, specDigest:
 interface LinkRow { id: string; planId: string; itemKey: string; questId: number | null; disposition: string; baseline: unknown; baselineSpecDigest: string | null }
 interface SpecWrite { spec: ExecutionTaskSpecV2; subjectId: number | null; questId: number | null; started: boolean; description?: string | null }
 export class ApplyService {
-  constructor(readonly db: PlannerDatabase, private readonly boundary?: (boundary: ApplyBoundary, sql: Sql) => Promise<void>) {}
+  constructor(readonly db: PlannerDatabase, private readonly boundary?: (boundary: ApplyBoundary, sql: Sql) => Promise<void>, readonly documents=new DocumentRepository(db)) {}
   async apply(ownerId: number, request: { attemptId: string; changeSetId: string; acknowledgements: string[] }): Promise<ApplyReceiptV2> {
+    const preflight=await this.db.coordinated(ownerId,async sql=>{
+      const {attempt,payload}=await loadAttempt(sql,ownerId,request.attemptId),changeSet=PlanChangeSetV2Schema.parse(payload.changeSet);
+      if(changeSet.changeSetId!==request.changeSetId)reject("IDEMPOTENCY_MISMATCH","This confirmation belongs to a different proposal.","APPLY");
+      if(attempt.applyReceipt)return {receipt:attempt.applyReceipt,intelligence:null};
+      if(await loadCompilerVersion(sql,attempt.attemptId)===1)return {receipt:null,intelligence:null};
+      const retained=await loadRevisionDocument(sql,ownerId,changeSet.targets[0].revisionId);
+      const archive=await loadAttemptArtifacts(sql,ownerId,attempt.attemptId);
+      if(retained.compilerVersion!==2||retained.intelligence?.bundle.schemaVersion!==2||archive.compilerVersion!==2)reject("INVALID_OUTPUT","Only exact reviewed bundle-v2 candidates may confirm.","APPLY");
+      return {receipt:null,intelligence:readReviewedBundle(retained.intelligence.bundle,archive.archive)};
+    });
+    if(preflight.receipt)return preflight.receipt;
+    if(preflight.intelligence)await verifyReviewedDocuments(preflight.intelligence,ownerId,this.documents);
     return this.db.coordinated(ownerId, async sql => {
       const { attempt, payload } = await loadAttempt(sql, ownerId, request.attemptId);
       const changeSet = PlanChangeSetV2Schema.parse(payload.changeSet);
       if (changeSet.changeSetId !== request.changeSetId) reject("IDEMPOTENCY_MISMATCH", "This confirmation belongs to a different proposal.", "APPLY");
       if (attempt.applyReceipt) return attempt.applyReceipt;
+      if(preflight.intelligence){
+        assertReviewedChangeSet(preflight.intelligence,changeSet);
+        await lockPlanningCalendar(sql,ownerId);
+        const current=await loadRevisionDocument(sql,ownerId,changeSet.targets[0].revisionId);
+        if(current.compilerVersion!==2||current.intelligence?.bundle.digest!==preflight.intelligence.bundle.digest)reject("STALE_CONTEXT","The reviewed bundle changed before confirmation.","APPLY");
+        await verifyReviewedDocumentMetadata(sql,preflight.intelligence,ownerId);
+        await new PlannerCalendarCapacity(new AttemptService(this.db)).assertCurrentAccepted(sql,ownerId,attempt.attemptId,{id:preflight.intelligence.capacity.id,digest:preflight.intelligence.capacity.digest});
+      }
       await assertAttemptCurrent(sql, attempt);
       const revisions = [];
       for (const target of changeSet.targets) revisions.push(await loadRevision(sql, ownerId, target.revisionId));

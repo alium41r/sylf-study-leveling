@@ -1,0 +1,33 @@
+{
+  "taskScope": "Migration repair; baseline retained separately",
+  "sha256": {
+    ".gitignore": "0772a919dcb9cdc8a3c1b02c8e39c5abedb323ccbaff2e2efceaa10dd561b6c4",
+    "prisma.config.ts": "eece98cc8e841e44c3b3d7f2da6bb415a993a570c1dcbd3393e3d91e3570ed57",
+    "prisma/schema.prisma": "f2a50ea3b52e72cdfdeb519373fe9e2614fb642d46becffd513be29f35255da1",
+    "prisma/migrations/20261020000000_notes_connections/migration.sql": "cfd4d5fe4cb50bfe849bc7f7770ec6f3217b080fa4a2e6da53c3a247d138b43f",
+    "lib/prisma.ts": "e38a0c9c5edd7e16dc27d1ce983e43b3e2962e9419bdba03acaf7097b7d1893e",
+    "scripts/db/apply-migration.mjs": "a997da63334cb2cb6fbd92dae0bc11f907755d3531b1daa9c6facc0199dfdc61",
+    "scripts/db/verified-prisma.mjs": "42fd413669dcfb00cda06107079ba09c36030c12c3d2cdc7f9e20ad833f22bc9",
+    "scripts/db/disposable-database.mjs": "bcfc02b19433110306f45ec5d32302d3f55cd562292b175bf9477fa979fe7c72",
+    "scripts/db/confirm-invites-and-rejoin.mjs": "a9a6c049d897e43166a2ec67debaaa69373497a7310af2a8f4ab2ad218e9b572",
+    "scripts/verify/verify-focus-party.mjs": "d3572caba925c51accfcf3bf184b7a9e0ebf1cac4539948f594f1df60615c225",
+    "__tests__/database-migrations.test.mjs": "dbac97d2428eccd1a43423f86b4ee41ad38c33aa0966b46c676390d99345909a",
+    "config/database/README.md": "ef15e252838dacad3d405ce64303981a65aedf5372cce494fd08d27b64863647",
+    "config/database/supabase-root-2021.crt": "700723581420dd1ac98fd7e9ac529f0ef210eadcaf87fc868a3ad7d114c2f3b7",
+    "scripts/README.md": "bdfc6d30564f93e8f5bd409923aaa4613d94279808743742cc5a5d1535fac053",
+    "documentation/README.md": "278742720bc376ee4b24da4f240ffde68db56899e84e24f0bea3b5574f58a42f",
+    "documentation/calendar/README.md": "f5867e8444e30c7f0fa9f512a9d216a5eb96e5c64a4b696011c11768f85715c1",
+    "documentation/notes/README.md": "89b5af0f8cf07d1e0452e43d87182f97b8855fff6fad3af7c54e694a15c81aa8",
+    "documentation/notes/workspace.md": "bc7c489a32839326309b6ef3c7b8f523fca2fd540c5df5d2ef21e1bd8d1acad6",
+    "documentation/notes/reports/phase-3/setup.md": "826c77f1e0c3d838ff550ba278cccae0e7748417ca9fca6be08907bca5eda00f",
+    "documentation/infrastructure/reports/2026-10-22-database-migrations/report.md": "8f7a9f3d8282060829f08eb475fd675336d663afff26cf32ba0ad49fd29048c6",
+    "documentation/infrastructure/reports/2026-10-22-database-migrations/orphan-repair-proposal.sql": "b54c5e9c8b67ddb4dfd97fe3f69ffbfb2a57ab629cb9b54b76130f4d97708b2d"
+  },
+  "modifiedHistoricalSQL": [
+    "prisma/migrations/20261020000000_notes_connections/migration.sql"
+  ],
+  "allPreviouslyAppliedSQLUnchanged": true,
+  "dependencyFilesUnchanged": true,
+  "noEnvironmentSecretValuesInTaskEvidence": true,
+  "unrelatedDirtyPathsRetained": 72
+}

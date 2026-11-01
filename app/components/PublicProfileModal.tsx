@@ -416,12 +416,12 @@ export function PublicProfileModal() {
     if (!dossier || actionLoading) return;
     setActionLoading(true);
     try {
-      const res = await fetch("/api/friends/request", {
+      const res = await fetch("/api/friends/requests", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ receiverId: dossier.id }),
+        body: JSON.stringify({ username: dossier.username, receiverId: dossier.id }),
       });
       if (res.ok) {
         setRelationship("PENDING_SENT");

@@ -1,0 +1,22 @@
+{
+  "legacyFilesMoved": 7,
+  "checkedAt": "2026-10-22T14:28:23.885Z",
+  "authorizedSyntheticTest": true,
+  "databaseReadOnly": true,
+  "oauthRefreshSucceeded": false,
+  "productionGoogleDriveModule": true,
+  "sessionShape": [
+    {
+      "origin": "https://www.googleapis.com",
+      "path": "/upload/drive/v3/files/<file-id>",
+      "uploadType": "resumable",
+      "hasUploadId": true
+    }
+  ],
+  "bytes": 4456479,
+  "chunks": 2,
+  "providerChecksumVerified": true,
+  "independentBytesReadbackVerified": true,
+  "originalsDeleted": false,
+  "testArtifactMovedToSystem": true
+}

@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-22",
+  "source": "Authorized synthetic tests through actual deployed Sylf and Google Drive UI",
+  "deploymentId": "dpl_2TbeS7gQextmCpogJ8zGrSZyibGy",
+  "googleDriveNamedRichTextPdfPreview": true,
+  "latestSyntheticEditAndOriginalParagraphsVisible": true,
+  "matchingFolderHierarchyObserved": true,
+  "nestedNamedEmptyNotePdfObserved": true,
+  "blankUntitledDraftCopySuppressed": true,
+  "namedHandwritingPdfListed": true,
+  "actualLiveHandwritingInput": "desktop mouse, not physical stylus",
+  "publicationRequests": {
+    "count": 24,
+    "statusCounts": {
+      "200": 24
+    },
+    "scope": "captured bounded final-deployment request window"
+  },
+  "pdfImportMenuPresent": true,
+  "livePdfPickerUploadCompleted": false,
+  "livePdfPickerBlocker": "Chrome extension file-access permission; not changed or bypassed",
+  "independentFreshProfileCloudRecovery": false,
+  "userAvailableForFreshProfileTest": false,
+  "personalNoteContentEdited": false,
+  "notesDeleted": false,
+  "browserStorageCleared": false,
+  "screenshotsKeptPrivateOutsideRepository": true
+}

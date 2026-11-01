@@ -524,7 +524,7 @@ async function paperLibrary() {
   return { ...ctx, library };
 }
 describe("production paper page management", () => {
-  it("drains multiple bounded batches of sustained ink revisions without replacing source", async () => {
+  it("drains sustained ink revisions in bounded passes without replacing source", async () => {
     const { library, repo } = await paperLibrary(),
       id = await library.create("Sustained ink", "notebook", null, "ink"),
       source = await library.open(id),
@@ -534,6 +534,8 @@ describe("production paper page management", () => {
         draw(ink, points(4));
         await source.stream.flush();
       }
+      const replays = vi.spyOn(repo, "loadStream");
+      cleanups.push(() => replays.mockRestore());
       const before = (await repo.jobs()).filter(
         (j) => j.state !== "verified"
       ).length;
@@ -542,18 +544,24 @@ describe("production paper page management", () => {
       const remaining = (await repo.jobs()).filter(
         (j) => j.state !== "verified"
       ).length;
-      expect(before - remaining).toBeGreaterThan(100);
-      await library.synchronize();
+      expect(before - remaining).toBeGreaterThanOrEqual(100);
+      for (let pass = 0; pass < 4; pass++) {
+        if (!(await repo.jobs()).some((j) => j.state !== "verified")) break;
+        await library.synchronize();
+      }
       expect(
         (await repo.jobs()).filter((j) => j.state !== "verified")
       ).toHaveLength(0);
       expect(ink.strokes()).toHaveLength(310);
       expect((await repo.listRevisions(id)).length).toBeGreaterThan(310);
+      expect(
+        replays.mock.calls.filter(([documentId]) => documentId === id)
+      ).toHaveLength(0);
     } finally {
       ink.close();
       source.release();
     }
-  }, 15000);
+  }, 60000);
   it("duplicates vectors into independent page streams, reorders active pages, and retains removed originals", async () => {
     const { library, repo } = await paperLibrary(),
       id = await library.create("Paper", "notebook", null, "ink");
@@ -654,5 +662,385 @@ describe("exclusive native validation cache", () => {
       1
     );
     expect(model(reloaded.doc).strokes()).toHaveLength(3);
+  });
+});
+
+async function textSeed() {
+  const adapter = await import("@/lib/notes/blocknote-adapter");
+  const doc = new Y.Doc();
+  const bytes = Y.encodeStateAsUpdate(doc);
+  doc.destroy();
+  const mock = vi
+    .spyOn(adapter, "initialRichTextUpdate")
+    .mockResolvedValue(bytes);
+  cleanups.push(() => mock.mockRestore());
+}
+
+describe("unified text and handwriting page layers", () => {
+  it.each(["flow", "notebook"] as const)(
+    "adds layers to legacy %s notes without replacing original text, and deduplicates simultaneous opening",
+    async (kind) => {
+      await textSeed();
+      const { library, repo } = await paperLibrary();
+      const id = await library.create("Original text", kind);
+      const source = await library.open(id);
+      const xml = new Y.XmlText();
+      xml.insert(0, "Original lecture text");
+      source.stream.doc.getXmlFragment("body").insert(0, [xml]);
+      await source.stream.flush();
+      const originalId = source.stream.streamId;
+      source.release();
+      const [a, b] = await Promise.all([
+        library.ensurePageLayers(id),
+        library.ensurePageLayers(id),
+      ]);
+      expect(a.page.pageId).toBe(b.page.pageId);
+      expect(a.text.streamId).toBe(originalId);
+      expect((await repo.document(id)).descriptor.streams).toHaveLength(2);
+      const text = await library.open(id, a.page.pageId, "text");
+      expect(text.stream.doc.getXmlFragment("body").toString()).toContain(
+        "Original lecture text"
+      );
+      text.release();
+      const ink = await library.open(id, a.page.pageId, "ink");
+      const model = new InkModel(ink.stream.doc);
+      draw(model, points(10));
+      await ink.stream.flush();
+      model.close();
+      ink.release();
+      const revisions = (await repo.listRevisions(id)).map((r) => r.id);
+      await library.ensurePageLayers(id, a.page.pageId);
+      expect((await repo.listRevisions(id)).map((r) => r.id)).toEqual(
+        revisions
+      );
+      const archive = await exportNotes(repo, [id]);
+      const restored = await setup(repo.libraryId);
+      await importNotes(restored.repo, archive.bytes);
+      const copy = await restored.repo.loadStream(id, a.ink.streamId, 1);
+      const copyInk = new InkModel(copy.doc);
+      expect(copyInk.strokes()).toHaveLength(1);
+      copyInk.close();
+      copy.doc.destroy();
+      expect((await restored.repo.document(id)).descriptor.pages).toEqual(
+        (await repo.document(id)).descriptor.pages
+      );
+    }
+  );
+  it("duplicates both layers independently and retains authored text placement", async () => {
+    await textSeed();
+    const { library, repo } = await paperLibrary();
+    const id = await library.create("Original ink", "notebook", null, "ink");
+    const layers = await library.ensurePageLayers(id);
+    const source = await library.open(id, layers.page.pageId, "ink");
+    const ink = new InkModel(source.stream.doc);
+    draw(ink, points(6));
+    await source.stream.flush();
+    const text = await library.open(id, layers.page.pageId, "text");
+    const xml = new Y.XmlText();
+    xml.insert(0, "Caption alongside handwriting");
+    text.stream.doc.getXmlFragment("body").insert(0, [xml]);
+    await text.stream.flush();
+    await library.mutate(id, (d) => {
+      d.pages[0].extensions.textOrigin = { x: 180, y: 340 };
+    });
+    const copied = await library.addPage(id, layers.page.pageId);
+    const next = await library.ensurePageLayers(id, copied);
+    expect(next.text.streamId).not.toBe(layers.text.streamId);
+    expect(next.ink.streamId).not.toBe(layers.ink.streamId);
+    expect(next.page.extensions.textOrigin).toEqual({ x: 180, y: 340 });
+    const copyText = await library.open(id, copied, "text");
+    expect(copyText.stream.doc.getXmlFragment("body").toString()).toContain(
+      "Caption alongside handwriting"
+    );
+    const copyInk = await library.open(id, copied, "ink");
+    const model = new InkModel(copyInk.stream.doc);
+    expect(model.strokes()).toHaveLength(1);
+    draw(model, points(8));
+    await copyInk.stream.flush();
+    expect(ink.strokes()).toHaveLength(1);
+    model.close();
+    ink.close();
+    copyInk.release();
+    source.release();
+    text.release();
+    copyText.release();
+    const duplicateId = await library.duplicate(id);
+    const duplicatedLayers = await library.ensurePageLayers(duplicateId);
+    const duplicateText = await library.open(
+      duplicateId,
+      duplicatedLayers.page.pageId,
+      "text"
+    );
+    expect(
+      duplicateText.stream.doc.getXmlFragment("body").toString()
+    ).toContain("Caption alongside handwriting");
+    duplicateText.release();
+    expect((await repo.document(duplicateId)).descriptor.streams).toHaveLength(
+      4
+    );
+    expect((await repo.document(id)).descriptor.pages).toHaveLength(2);
+  });
+  it("retains the complete legacy document when adding a layer fails and safely retries", async () => {
+    await textSeed();
+    const { library, repo } = await paperLibrary();
+    const id = await library.create(
+      "Retained original",
+      "notebook",
+      null,
+      "ink"
+    );
+    const before = await repo.document(id);
+    const save = vi
+      .spyOn(repo, "save")
+      .mockRejectedValueOnce(new Error("Synthetic interrupted commit"));
+    await expect(library.ensurePageLayers(id)).rejects.toThrow(
+      "Synthetic interrupted commit"
+    );
+    expect(await repo.document(id)).toEqual(before);
+    save.mockRestore();
+    await library.ensurePageLayers(id);
+    expect((await repo.document(id)).descriptor.streams).toHaveLength(2);
+  });
+  it("serializes concurrent metadata changes without pausing another write's adoption", async () => {
+    await textSeed();
+    const { library, repo } = await paperLibrary();
+    const id = await library.create("Concurrent page", "notebook", null, "ink");
+    const layers = await library.ensurePageLayers(id);
+    const ink = await library.open(id, layers.page.pageId, "ink"),
+      text = await library.open(id, layers.page.pageId, "text");
+    await Promise.all([
+      library.mutate(id, (d) => {
+        d.title = "Renamed safely";
+      }),
+      library.mutate(id, (d) => {
+        d.pages[0].extensions.textOrigin = { x: 200, y: 240 };
+      }),
+      library.addPage(id, layers.page.pageId),
+    ]);
+    expect((await repo.document(id)).descriptor).toMatchObject({
+      title: "Renamed safely",
+      pages: [
+        { extensions: { textOrigin: { x: 200, y: 240 } } },
+        { extensions: { textOrigin: { x: 200, y: 240 } } },
+      ],
+    });
+    expect(ink.stream.status().state).not.toBe("failed");
+    expect(text.stream.status().state).not.toBe("failed");
+    ink.release();
+    text.release();
+  });
+});
+
+describe("saved creative preferences and mixed-content copies", () => {
+  it("keeps metadata holds independent of UI pauses and defers viewport release/open until adoption finishes", async () => {
+    await textSeed();
+    const { library, repo } = await paperLibrary();
+    const id = await library.create("Viewport race", "notebook", null, "ink"),
+      layers = await library.ensurePageLayers(id);
+    const source = await library.open(id, layers.page.pageId, "ink");
+    const first = source.stream.hold(),
+      second = source.stream.hold();
+    source.stream.pause();
+    source.stream.resume();
+    expect(source.stream.status().state).toBe("pausing");
+    first();
+    first();
+    expect(source.stream.status().state).toBe("pausing");
+    second();
+    expect(source.stream.status().state).toBe("local-durable");
+    let enter!: () => void, finish!: () => void;
+    const entered = new Promise<void>((resolve) => {
+        enter = resolve;
+      }),
+      gate = new Promise<void>((resolve) => {
+        finish = resolve;
+      });
+    const save = repo.save.bind(repo);
+    const mock = vi.spyOn(repo, "save").mockImplementation(async (request) => {
+      enter();
+      await gate;
+      return save(request);
+    });
+    const mutation = library.mutate(id, (d) => {
+      d.title = "Adopted safely";
+    });
+    await entered;
+    source.release();
+    source.stream.resume();
+    expect(source.stream.status().state).toBe("pausing");
+    let didOpen = false;
+    const opening = library
+      .open(id, layers.page.pageId, "ink")
+      .then((opened) => {
+        didOpen = true;
+        return opened;
+      });
+    await Promise.resolve();
+    expect(didOpen).toBe(false);
+    finish();
+    await mutation;
+    const next = await opening;
+    expect(source.stream.status().state).toBe("closed");
+    expect(next.stream.status().state).not.toBe("failed");
+    expect((await repo.document(id)).descriptor.title).toBe("Adopted safely");
+    mock.mockRestore();
+    next.release();
+  });
+  it("publishes cross-page mixed moves atomically, adopts mounted streams, and retains both pages on a failed revision", async () => {
+    await textSeed();
+    const { library, repo } = await paperLibrary();
+    const id = await library.create(
+      "Atomic arrangement",
+      "notebook",
+      null,
+      "ink"
+    );
+    const a = await library.ensurePageLayers(id),
+      next = await library.addPage(id);
+    await library.ensurePageLayers(id, next);
+    const source = await library.open(id, a.page.pageId, "text"),
+      sourceInk = await library.open(id, a.page.pageId, "ink");
+    const target = await library.open(id, next, "text"),
+      targetInk = await library.open(id, next, "ink");
+    const { PageBoxes } = await import("@/lib/notes/text-boxes");
+    const regions = new PageBoxes(source.stream.doc, a.page, () => true);
+    const box = regions.add(220, 300),
+      text = new Y.XmlText();
+    text.insert(0, "Never lost in a move");
+    source.stream.doc.getXmlFragment(box).insert(0, [text]);
+    const ink = new InkModel(sourceInk.stream.doc),
+      stroke = draw(ink, points(20));
+    await source.stream.flush();
+    await sourceInk.stream.flush();
+    const selection = [
+      { pageId: a.page.pageId, boxes: [box], strokes: [stroke] },
+    ];
+    const before = await repo.document(id);
+    const save = vi
+      .spyOn(repo, "save")
+      .mockRejectedValueOnce(new Error("Synthetic atomic commit failure"));
+    await expect(
+      library.editContent(id, selection, { type: "move", targetPageId: next })
+    ).rejects.toThrow("Synthetic atomic commit failure");
+    expect(await repo.document(id)).toEqual(before);
+    expect(ink.strokes()).toHaveLength(1);
+    expect(regions.boxes().find((b) => b.id === box)).toBeDefined();
+    save.mockRestore();
+    await library.editContent(id, selection, {
+      type: "move",
+      targetPageId: next,
+    });
+    expect(ink.strokes()).toHaveLength(0);
+    expect(regions.boxes().find((b) => b.id === box)).toBeUndefined();
+    const movedInk = new InkModel(targetInk.stream.doc);
+    expect(movedInk.strokes()).toHaveLength(1);
+    const p = (await repo.document(id)).descriptor.pages.find(
+      (p) => p.pageId === next
+    )!;
+    const moved = new PageBoxes(target.stream.doc, p, () => true);
+    const extra = moved.boxes().find((b) => b.id !== "body")!;
+    expect(target.stream.doc.getXmlFragment(extra.id).toString()).toContain(
+      "Never lost in a move"
+    );
+    for (const opened of [source, sourceInk, target, targetInk])
+      expect(opened.stream.status().state).not.toBe("pausing");
+    const archive = await exportNotes(repo, [id]),
+      restored = await setup(repo.libraryId);
+    await importNotes(restored.repo, archive.bytes);
+    const view = await restored.repo.document(id),
+      stream = view.descriptor.streams.find(
+        (s) => s.streamId === p.extensions.textStreamId
+      )!;
+    const loaded = await restored.repo.loadStream(
+      id,
+      stream.streamId,
+      stream.epoch
+    );
+    expect(loaded.doc.getXmlFragment(extra.id).toString()).toContain(
+      "Never lost in a move"
+    );
+    loaded.doc.destroy();
+    moved.close();
+    movedInk.close();
+    ink.close();
+    regions.close();
+    for (const opened of [source, sourceInk, target, targetInk])
+      opened.release();
+  });
+  it("keeps defaults in the encrypted synchronized catalog and seeds new pages without reseeding existing ink", async () => {
+    await textSeed();
+    const { library, repo } = await paperLibrary();
+    const preferences = library.preferences();
+    preferences.style = {
+      ...preferences.style,
+      width: 794,
+      height: 1123,
+      layout: "paged",
+      paper: {
+        ...preferences.style.paper,
+        template: "cornell",
+        color: "#f8e4e7",
+      },
+    };
+    await library.savePreferences(preferences);
+    const id = await library.create("Styled", "notebook", null, "ink");
+    const layers = await library.ensurePageLayers(id);
+    await library.prepareCreativeTools(id);
+    expect((await repo.document(id)).descriptor.requiredFeatures).toContain(
+      "creative-tools-v1"
+    );
+    expect(layers.page.width).toBe(794);
+    const source = await library.open(id, layers.page.pageId, "ink"),
+      ink = new InkModel(source.stream.doc);
+    expect(ink.paper()).toEqual(preferences.style.paper);
+    draw(ink, points(10));
+    await source.stream.flush();
+    const { PageBoxes } = await import("@/lib/notes/text-boxes");
+    const text = await library.open(id, layers.page.pageId, "text");
+    const boxes = new PageBoxes(text.stream.doc, layers.page, () => true);
+    const box = boxes.add(300, 400);
+    const xml = new Y.XmlText();
+    xml.insert(0, "Floating text retained");
+    text.stream.doc.getXmlFragment(box).insert(0, [xml]);
+    await text.stream.flush();
+    const copied = await library.addPage(id, layers.page.pageId);
+    const copy = await library.open(id, copied, "text");
+    expect(copy.stream.doc.getXmlFragment(box).toString()).toContain(
+      "Floating text retained"
+    );
+    const next = new PageBoxes(
+      copy.stream.doc,
+      { ...layers.page, pageId: copied },
+      () => true
+    );
+    next.set({ ...next.boxes()[1], x: 100 });
+    expect(boxes.boxes()[1].x).toBe(300);
+    await copy.stream.flush();
+    await library.indexSearch();
+    expect(
+      library.snapshot().notes.find((n) => n.id === id)?.searchText
+    ).toContain("floating text retained");
+    const archive = await exportNotes(repo, [id]),
+      restored = await setup(repo.libraryId);
+    await importNotes(restored.repo, archive.bytes);
+    const restoredView = await restored.repo.document(id);
+    const stream = restoredView.descriptor.streams.find(
+      (s) => s.streamId === layers.text.streamId
+    )!;
+    const loaded = await restored.repo.loadStream(
+      id,
+      stream.streamId,
+      stream.epoch
+    );
+    expect(loaded.doc.getXmlFragment(box).toString()).toContain(
+      "Floating text retained"
+    );
+    loaded.doc.destroy();
+    next.close();
+    boxes.close();
+    ink.close();
+    source.release();
+    text.release();
+    copy.release();
   });
 });

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "status": "METADATA_REACHABLE",
+  "checkedAt": "2026-10-29T01:41:53.266Z",
+  "paidCalls": 0,
+  "metadataRequests": [
+    {
+      "path": "/models",
+      "ok": true,
+      "status": 200
+    },
+    {
+      "path": "/user/balance",
+      "ok": true,
+      "status": 200
+    }
+  ],
+  "model": {
+    "id": "deepseek-flash",
+    "name": "DeepSeek-V4.1-Flash",
+    "contextWindow": 1048576,
+    "maxOutputTokens": 393216,
+    "effort": {
+      "supported_levels": [
+        "low",
+        "high",
+        "max"
+      ],
+      "default_level": "high"
+    }
+  },
+  "officialOrigin": "https://api.deepseek.com",
+  "balanceAvailable": true,
+  "balanceCoversProposedCeilingAndPriorReserve": true,
+  "priorLiabilityUsd": 0.10328219999999999,
+  "minimumAvailableBalanceUsd": 1.8532822,
+  "approved": false,
+  "limitations": [
+    "Metadata does not authorize generation or establish request-level settlement. Refresh again after a fresh spending approval and before execution."
+  ]
+}

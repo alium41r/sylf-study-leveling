@@ -1,6 +1,7 @@
 import type { SchedulingEnvelope } from './schemas/scheduling';
 import type { AllocationFacts } from './schemas/planning';
 import { weekKey } from '../server/context';
+import { usableStudyWindows } from './foundation/calendar';
 import { reject } from '../server/database';
 /** Daily and weekly ceilings are concurrent upper bounds, not two debits.
  * Reserve a single disclosed percentage at each bound. In a partial week only
@@ -22,10 +23,11 @@ export function goalRemainingCapacity(envelope:SchedulingEnvelope,planRef:string
  * reservations. This chooses only whether declared pieces need expansion. */
 export function maximumNewTimebox(envelope:SchedulingEnvelope,facts:AllocationFacts,planRef:string){
  const target=envelope.targets.find(t=>t.planRef===planRef);if(!target)reject('REFERENCE_NOT_OWNED','Unknown split target.','BLUEPRINT');
+ const geometry=envelope.calendar?usableStudyWindows(envelope.calendar.snapshot,Date.parse(envelope.calendar.snapshot.capturedAt)):null;
  const kept=facts.pins.filter(p=>!p.alreadyReserved),maximum=facts.preferences.find(p=>p.planRef===planRef)?.maximumTimeboxMinutes??240;
  return Math.min(maximum,Math.max(0,...envelope.days.filter(d=>!d.excluded&&d.date>=envelope.today&&(target.deadline.kind!=='FIXED'||d.date<target.deadline.date||d.date===target.deadline.date&&target.deadline.examDayStudyAllowed)).map(day=>{
   const week=facts.weeks.find(w=>w.week===weekKey(day.date));if(!week)reject('INVALID_OUTPUT','Owned weekly split facts are missing.','BLUEPRINT');
   const dailyKept=kept.filter(p=>p.date===day.date).reduce((n,p)=>n+p.remainingMinutes,0),weeklyKept=kept.filter(p=>weekKey(p.date)===week.week).reduce((n,p)=>n+p.remainingMinutes,0),goalKept=kept.filter(p=>p.planRef===planRef&&weekKey(p.date)===week.week).reduce((n,p)=>n+p.remainingMinutes,0);
-  return Math.max(0,Math.min(day.availableMinutes-dailyKept,weeklyRemainingCapacity(envelope,week)-weeklyKept,goalRemainingCapacity(envelope,planRef,week)-goalKept));
+  return Math.max(0,Math.min(geometry?Math.floor(Math.max(0,...(geometry.days.find(d=>d.date===day.date)?.windows??[]).map(w=>(w.end-w.start)/60000))):Infinity,day.availableMinutes-dailyKept,weeklyRemainingCapacity(envelope,week)-weeklyKept,goalRemainingCapacity(envelope,planRef,week)-goalKept));
  })));
 }

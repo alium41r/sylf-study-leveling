@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { execSync } from "node:child_process";
 
 /**
  * Permanent coexistence requirement: Planner Modes never replace or rewire the
@@ -79,7 +80,9 @@ describe("Classic Planner coexistence", () => {
     const tab = read("app/system/components/PlannerTab.tsx");
     // Classic is what opens, and it is not behind a capability check or another click.
     expect(tab).toMatch(/<AiPlannerPanel/);
-    expect(tab).toMatch(/useState<View>\(\{ surface: "CLASSIC" \}\)/);
+    // The accepted Sylvie handoff already opened Modes before Phase 3. Pin
+    // that explicit exception as well as the no-handoff Classic default.
+    expect(tab).toMatch(/useState<View>\(handoff \? \{ surface: "MODES", mode: handoff.mode \} : \{ surface: "CLASSIC" \}\)/);
     expect(tab).not.toMatch(/capabilities\?\.enabled|capabilities\.enabled/);
     // Planner Modes are reached deliberately, from a named button.
     expect(tab).toMatch(/Planner modes/);
@@ -90,7 +93,6 @@ describe("Classic Planner coexistence", () => {
     // The flag is gone as a product concept, so a reintroduction shows up here rather
     // than as a quietly disabled planner. Historical phase reports are excluded on
     // purpose: they are immutable documentation of how the gate once worked.
-    const { execSync } = require("node:child_process") as typeof import("node:child_process");
     const hits = execSync(
       "grep -rl PLANNER_MODES_ENABLED app lib scripts prisma .env .env.example 2>/dev/null || true",
       { cwd: root, encoding: "utf8" }

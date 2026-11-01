@@ -1,0 +1,97 @@
+{
+ "label": "backend-bounded",
+ "passed": 16,
+ "failed": 1,
+ "skipped": 0,
+ "collectionFailures": [],
+ "finishedAt": "2026-11-01T01:07:22.611Z",
+ "scope": "Handlers in-process on disposable PostgreSQL 17. Hosted Supabase, Redis and storage were not used.",
+ "cases": [
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions lists a page, newest first, with a cursor that walks to the end",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions leaves out a running session, and anyone else's",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions refuses limit=0",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions refuses limit=-1",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions refuses limit=abc",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions refuses limit=1e3",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions caps a page rather than obeying a large limit",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "recent sessions still restores one session by id, and still refuses a call with neither",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "detailed stats summary keeps the chart and drops the log",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "quests pages through every quest once",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "quests returns the web's plain array when no limit is asked for",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "quests refuses a malformed cursor",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "chats and messages pages chats, and keeps the web's shape without a limit",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "chats and messages caps an incremental message read, and a poller reaches the rest by asking again",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "what the ledgers credited this week (Phase 13, G-5) sums income since the student's Monday, for them alone, and ignores spending",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "what the ledgers credited this week (Phase 13, G-5) answers an empty account with zero, and nobody without a session",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/bounded-reads.postgres.ts",
+   "name": "a friend's hidden fields (Phase 13) tells a client which values are hidden, because hidden numbers read as zero",
+   "status": "failed",
+   "failure": "error: duplicate key value violates unique constraint \"UserPrivacy_userId_key\"     at /Users/aliumair/Desktop/sylf/node_modules/pg-pool/index.js:45:11     at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+  }
+ ]
+}

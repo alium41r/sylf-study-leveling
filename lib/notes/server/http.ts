@@ -30,9 +30,11 @@ export async function connectionFor(userId: number) {
     );
   return connection;
 }
-export async function body(req: Request) {
+export async function body(req: Request, maximum = 10000) {
   return JSON.parse(
-    new TextDecoder("utf-8", { fatal: true }).decode(await limitedRequest(req))
+    new TextDecoder("utf-8", { fatal: true }).decode(
+      await limitedRequest(req, maximum)
+    )
   );
 }
 export function failure(error: unknown) {

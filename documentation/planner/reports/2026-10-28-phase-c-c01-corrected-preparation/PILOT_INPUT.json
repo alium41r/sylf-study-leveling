@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 2,
+  "status": "CORRECTED_PREPARATION_NOT_AUTHORIZED",
+  "anchor": "2026-10-30",
+  "timezone": "Asia/Karachi",
+  "student": {
+    "name": "Amina",
+    "stage": "Upper-secondary school",
+    "background": "English is a comfortable second language. School has covered the topics once. No private tutor or paid question bank. A phone, paper, calculator and the three supplied teacher packets are available.",
+    "claims": [
+      "I feel confident about moles because I watched explanations for three hours.",
+      "I often recognize a worked example but get stuck when numbers or wording change."
+    ],
+    "preferences": [
+      "Explain why a method applies, then let me try independently.",
+      "Sessions of about 35–50 minutes suit me; avoid fragmented five-minute checklist tasks.",
+      "Keep Friday free. Do not fill spare time with unnecessary work."
+    ]
+  },
+  "acceptedInstructions": "Use the exact teacher packets and my diagnostic work to prepare chemistry first and biology three days later. Keep both outcomes, Friday rest and the existing English deadline task. Prefer useful explanation and independent application over rereading or arbitrary question counts. I authorize reading these uploads only; do not browse the web or buy resources. Preserve uncertainty about transfer and show when support is conditional. If full useful work does not fit, explain the conflict rather than deleting education or increasing my availability.",
+  "goals": [
+    {
+      "title": "Chemistry mock preparation",
+      "outcome": "Independently solve and explain mole, concentration, balanced-equation and limiting-reagent problems, including unfamiliar numbers and error checks.",
+      "scope": [
+        "Amount of substance and molar mass",
+        "Concentration and volume conversion",
+        "Balanced equations and reacting amounts",
+        "Limiting reagents and checking plausibility"
+      ],
+      "policy": "GENERAL",
+      "deadline": {
+        "kind": "FIXED",
+        "date": "2026-11-20",
+        "examDayStudyAllowed": false
+      }
+    },
+    {
+      "title": "Biology mock preparation",
+      "outcome": "Explain cell transport and enzyme investigations, interpret unfamiliar data and justify an independent experimental conclusion.",
+      "scope": [
+        "Diffusion, osmosis and active transport",
+        "Percentage change and graph interpretation",
+        "Enzyme conditions and rates",
+        "Controls, variables and evidence-based conclusions"
+      ],
+      "policy": "GENERAL",
+      "deadline": {
+        "kind": "FIXED",
+        "date": "2026-11-23",
+        "examDayStudyAllowed": false
+      }
+    }
+  ],
+  "availability": {
+    "timezone": "Asia/Karachi",
+    "studyWindows": [
+      {
+        "weekday": 0,
+        "startMinute": 1020,
+        "endMinute": 1140
+      },
+      {
+        "weekday": 1,
+        "startMinute": 1020,
+        "endMinute": 1140
+      },
+      {
+        "weekday": 2,
+        "startMinute": 1020,
+        "endMinute": 1140
+      },
+      {
+        "weekday": 3,
+        "startMinute": 1020,
+        "endMinute": 1140
+      },
+      {
+        "weekday": 5,
+        "startMinute": 540,
+        "endMinute": 720
+      },
+      {
+        "weekday": 6,
+        "startMinute": 600,
+        "endMinute": 720
+      }
+    ],
+    "dailyCeilingMinutes": [
+      120,
+      120,
+      120,
+      120,
+      0,
+      180,
+      120
+    ],
+    "weeklyCeilingMinutes": 660,
+    "restWeekdays": [
+      4
+    ],
+    "recoveryPercent": 10,
+    "blockedDates": [],
+    "basis": "CONFIRMED_AVAILABILITY"
+  },
+  "calendarEvents": [
+    {
+      "title": "Travel",
+      "date": "2026-10-31",
+      "startsAt": "2026-10-31T05:00:00.000Z",
+      "endsAt": "2026-10-31T06:00:00.000Z",
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "title": "Family appointment overlapping travel",
+      "date": "2026-10-31",
+      "startsAt": "2026-10-31T05:30:00.000Z",
+      "endsAt": "2026-10-31T06:30:00.000Z",
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "title": "Family responsibility",
+      "date": "2026-11-03",
+      "startsAt": "2026-11-03T12:30:00.000Z",
+      "endsAt": "2026-11-03T13:30:00.000Z",
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "title": "Sports commitment",
+      "date": "2026-11-04",
+      "startsAt": "2026-11-04T13:00:00.000Z",
+      "endsAt": "2026-11-04T14:00:00.000Z",
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "title": "Travel",
+      "date": "2026-11-07",
+      "startsAt": "2026-11-07T05:00:00.000Z",
+      "endsAt": "2026-11-07T06:00:00.000Z",
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "title": "Family appointment overlapping travel",
+      "date": "2026-11-07",
+      "startsAt": "2026-11-07T05:30:00.000Z",
+      "endsAt": "2026-11-07T06:30:00.000Z",
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "title": "Family responsibility",
+      "date": "2026-11-10",
+      "startsAt": "2026-11-10T12:30:00.000Z",
+      "endsAt": "2026-11-10T13:30:00.000Z",
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "title": "Sports commitment",
+      "date": "2026-11-11",
+      "startsAt": "2026-11-11T13:00:00.000Z",
+      "endsAt": "2026-11-11T14:00:00.000Z",
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "title": "Travel",
+      "date": "2026-11-14",
+      "startsAt": "2026-11-14T05:00:00.000Z",
+      "endsAt": "2026-11-14T06:00:00.000Z",
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "title": "Family appointment overlapping travel",
+      "date": "2026-11-14",
+      "startsAt": "2026-11-14T05:30:00.000Z",
+      "endsAt": "2026-11-14T06:30:00.000Z",
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "title": "Family responsibility",
+      "date": "2026-11-17",
+      "startsAt": "2026-11-17T12:30:00.000Z",
+      "endsAt": "2026-11-17T13:30:00.000Z",
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "title": "Sports commitment",
+      "date": "2026-11-18",
+      "startsAt": "2026-11-18T13:00:00.000Z",
+      "endsAt": "2026-11-18T14:00:00.000Z",
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "title": "Travel",
+      "date": "2026-11-21",
+      "startsAt": "2026-11-21T05:00:00.000Z",
+      "endsAt": "2026-11-21T06:00:00.000Z",
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "title": "Family appointment overlapping travel",
+      "date": "2026-11-21",
+      "startsAt": "2026-11-21T05:30:00.000Z",
+      "endsAt": "2026-11-21T06:30:00.000Z",
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "title": "Family responsibility",
+      "date": "2026-11-24",
+      "startsAt": "2026-11-24T12:30:00.000Z",
+      "endsAt": "2026-11-24T13:30:00.000Z",
+      "timezone": "Asia/Karachi"
+    },
+    {
+      "title": "Sports commitment",
+      "date": "2026-11-25",
+      "startsAt": "2026-11-25T13:00:00.000Z",
+      "endsAt": "2026-11-25T14:00:00.000Z",
+      "timezone": "Asia/Karachi"
+    }
+  ],
+  "existingTasks": [
+    {
+      "title": "English reading submission",
+      "weekday": 0,
+      "minutes": 35,
+      "selected": false,
+      "protected": false,
+      "date": "2026-11-01"
+    }
+  ],
+  "materials": [
+    {
+      "id": "teacher-scope",
+      "title": "Teacher-issued school mock scope and assessment notice",
+      "text": "These are school mock assessments, not an external exam-board specification. Chemistry is 21 days after the frozen study anchor, biology 24 days after it; both begin at 09:00 local time. Exam-day study is not available. Chemistry: amount of substance, molar mass, solution concentration, balancing equations, reacting amounts, limiting reagents. Biology: diffusion, osmosis, active transport, interpreting mass changes and rates, enzyme conditions, controls and conclusions. Each paper mixes explanation, calculation and unfamiliar-data questions. No other chapters are assessed. Students may use a calculator. The teacher expects method justification and units, not memorized worked answers. The student has already supplied the school and exact scope; do not ask which external exam board applies."
+    },
+    {
+      "id": "diagnostic",
+      "title": "Student diagnostic answers and teacher annotations",
+      "text": "Student work, not inferred mastery from study time. Chemistry: Q1, amount in 12 g magnesium with molar mass 24 g/mol: student wrote 288 mol, multiplying mass and molar mass. Q2, amount in 250 mL of 0.20 mol/L solution: student wrote 50 mol; no mL-to-L conversion. Q3, 2 H2 + O2 -> 2 H2O, supplied 0.60 mol H2 and 0.20 mol O2: student wrote 0.60 mol water and said hydrogen limits because its coefficient is larger. Correctly balanced three simpler equations without help. Biology: correctly described diffusion down a concentration gradient. For potato mass 20.0 g becoming 18.0 g, student wrote +10% and claimed water moved into the tissue. Said active transport needs no energy. In an enzyme-temperature investigation, student proposed changing both temperature and enzyme concentration, then concluded every decrease in rate proves denaturation. Teacher's annotated judgments: chemical arithmetic, unit conversion, limiting reagent reasoning, osmosis direction, controlled variables and overclaiming from data need work. Three hours of videos is a student report and supplies no performance credit."
+    },
+    {
+      "id": "practice-pack",
+      "title": "Available teacher practice pack and original worked material",
+      "text": "The student owns this packet; no paid website or undisclosed textbook is needed. Chemistry worked example: 6.0 g carbon, molar mass 12.0 g/mol, gives 0.50 mol; show g divided by g/mol. A 100 mL sample of 0.50 mol/L solution contains 0.050 mol after converting to 0.100 L. For 2 H2 + O2 -> 2 H2O, compare supplied amount divided by coefficient, then use the smaller reaction extent. The pack also has eight unworked mixed questions, but eight is an inventory, not mandatory workload. Biology worked example: percentage change = (final - initial)/initial x 100. Distinguish an observed rate trend from its mechanism; temperature can affect rate and extreme conditions may alter enzyme structure, but an observed fall alone does not establish that explanation. Preserve enzyme amount, substrate, pH, timing and measurement method while changing the intended independent variable. The planner may author additional self-contained examples and independent checks, provided givens, answers/feedback and stopping criteria are clear."
+    }
+  ],
+  "webPermission": false,
+  "weekdayConvention": "MONDAY_ZERO"
+}

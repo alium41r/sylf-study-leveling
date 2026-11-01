@@ -4,6 +4,7 @@ import { prisma } from "./prisma";
 import { xpForNextLevel } from "./game-engine";
 import { formatScholarId, generateRandomScholarId } from "./scholar-id";
 import { signToken, type AuthTokenPayload } from "./auth";
+import { openAuthSession } from "./auth-session-service";
 import type { NormalizedOAuthUser } from "./oauth";
 import { TimezoneService } from "./timezone-service";
 
@@ -17,6 +18,10 @@ export interface RegisterParams {
   provider?: string;
   providerAccountId?: string;
   timezone?: string;
+  /** Whether the OAuth provider vouched for the address. Password sign-ups prove it by link instead. */
+  emailVerified?: boolean;
+  /** The request that is signing in, so the first token is tied to a device session. */
+  request?: Request;
 }
 
 export function validateUsername(username: string): { valid: boolean; error?: string; sanitized: string } {
@@ -93,7 +98,8 @@ export async function initializeUserProfile(params: RegisterParams) {
   }
 
   // 5. Determine verification status
-  const verificationStatus = isOAuth ? "VERIFIED" : "UNVERIFIED";
+  // An OAuth account is only as verified as its provider says: some return addresses they never checked.
+  const verificationStatus = isOAuth && params.emailVerified !== false ? "VERIFIED" : "UNVERIFIED";
 
   // 6. Pre-generate candidate Scholar ID or let DB transaction assign formatted ID
   const tempScholarId = generateRandomScholarId();
@@ -180,8 +186,9 @@ export async function initializeUserProfile(params: RegisterParams) {
     tokenVersion: result.tokenVersion,
     timezone: result.timezone || "UTC",
   };
+  const sid = params.request ? await openAuthSession(result.id, params.request) : undefined;
 
-  const token = await signToken(tokenPayload);
+  const token = await signToken({ ...tokenPayload, ...(sid ? { sid } : {}) });
   return { user: result, token };
 }
 
@@ -234,7 +241,7 @@ export async function linkOAuthAccountToUser(userId: number, oauthUser: Normaliz
  * 2. If User with email exists -> Link ConnectedAccount & Login.
  * 3. Otherwise -> Initialize new user profile & Login.
  */
-export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser) {
+export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser, request?: Request) {
   const providerUpper = oauthUser.provider.toUpperCase();
 
   // 1. Check existing connected account
@@ -271,7 +278,8 @@ export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser
       hasCompletedOnboarding: user.hasCompletedOnboarding,
       hasPassword: !!user.password,
     };
-    const token = await signToken(tokenPayload);
+    const sid = request ? await openAuthSession(user.id, request) : undefined;
+    const token = await signToken({ ...tokenPayload, ...(sid ? { sid } : {}) });
     return { user, token, isNewUser: false };
   }
 
@@ -316,12 +324,19 @@ export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser
         },
       });
 
-      // Verified OAuth upgrades the account to VERIFIED.
+      // Verified OAuth upgrades the account to VERIFIED. Until now nobody had
+      // proved they own this address, so a password set on it may belong to
+      // someone who registered it first, waiting for the real owner to arrive
+      // (pre-hijacking). The provider has just proved the owner: that password
+      // goes, and so does every session it opened.
       let updatedUser = existingUser;
       if (existingUser.verificationStatus !== "VERIFIED") {
         updatedUser = await prisma.user.update({
           where: { id: existingUser.id },
-          data: { verificationStatus: "VERIFIED" },
+          data: {
+            verificationStatus: "VERIFIED",
+            ...(existingUser.password ? { password: null, tokenVersion: { increment: 1 } } : {}),
+          },
         });
       }
 
@@ -339,7 +354,8 @@ export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser
         tokenVersion: updatedUser.tokenVersion,
         timezone: updatedUser.timezone || "UTC",
       };
-      const token = await signToken(tokenPayload);
+      const sid = request ? await openAuthSession(updatedUser.id, request) : undefined;
+      const token = await signToken({ ...tokenPayload, ...(sid ? { sid } : {}) });
       return { user: updatedUser, token, isNewUser: false };
     }
   }
@@ -356,6 +372,9 @@ export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser
     provider: providerUpper,
     providerAccountId: oauthUser.providerAccountId,
     providerUsername: oauthUser.providerUsername || null,
+    // With no address from the provider, the placeholder below has nothing to prove.
+    emailVerified: oauthUser.email ? oauthUser.emailVerified : true,
+    request,
   } as any);
 
   return { user: result.user, token: result.token, isNewUser: true };
@@ -365,9 +384,10 @@ export async function handleOAuthSignInOrRegister(oauthUser: NormalizedOAuthUser
  * Creates or refreshes an email verification token for a user.
  */
 export async function generateEmailVerificationToken(userId: number): Promise<string> {
-  // Clear any existing verification tokens for this user
+  // Clear earlier verification links for this user. Security codes share this
+  // table, and asking for a new link must not cancel one.
   await prisma.verificationToken.deleteMany({
-    where: { userId },
+    where: { userId, NOT: { token: { contains: ":" } } },
   });
 
   // Generate cryptographic token
@@ -389,6 +409,12 @@ export async function generateEmailVerificationToken(userId: number): Promise<st
  * Confirms an email verification token.
  */
 export async function confirmEmailVerificationToken(token: string): Promise<{ success: boolean; error?: string; email?: string }> {
+  // Security codes live in the same table as `ACTION:123456`. They are six digits, and this
+  // endpoint is public, so it must never be able to find one: only a link token gets past here.
+  if (token.includes(":")) {
+    return { success: false, error: "Invalid or expired verification token." };
+  }
+
   const record = await prisma.verificationToken.findUnique({
     where: { token },
     include: { user: true },

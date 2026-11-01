@@ -1,0 +1,45 @@
+{
+ "when": "2026-11-01T14:22:24.187Z",
+ "results": [
+  {
+   "label": "party list",
+   "status": 200,
+   "answer": "{\"activeParty\":{\"id\":2,\"name\":\"Probe\",\"leaderId\":2,\"createdAt\":\"2026-11-01T14:21:26.451Z\",\"updatedAt\":\"2026-11-01T14:21:26.451Z\",\"disbandedAt\":null,\"isCurrentUserLeader\":true,\"memberCount\":1},\"pendingInvites\":[]}"
+  },
+  {
+   "label": "invited",
+   "status": 200,
+   "answer": "{\"activeParty\":null,\"pendingInvites\":[{\"id\":1,\"partyId\":2,\"partyName\":\"Probe\",\"senderId\":2,\"senderName\":\"Probe b\",\"senderUsername\":\"p1_b_mvxx27jn\",\"senderAvatarUrl\":null,\"createdAt\":\"2026-11-01T14:21:26.463Z\",\"status\":\"PENDING\"}]}"
+  },
+  {
+   "label": "accept invite",
+   "status": 200,
+   "answer": "{\"success\":true,\"partyId\":2}"
+  },
+  {
+   "label": "session",
+   "status": 200,
+   "answer": "{\"session\":{\"id\":1,\"startedAt\":\"2026-11-01T14:21:26.493Z\",\"collectiveSeconds\":57,\"members\":[{\"userId\":2,\"timerState\":\"FOCUSING\",\"accumulatedSeconds\":0,\"currentStartedAt\":\"2026-11-01T14:21:26.504Z\",\"joinedAt\":\"2026-11-01T14:21:26.493Z\",\"leftAt\":null,\"liveSeconds\":57,\"isFocusing\":true}]}}"
+  },
+  {
+   "label": "member joins timer",
+   "status": 200,
+   "answer": "{\"userId\":3,\"success\":true,\"sessionId\":1,\"timerState\":\"FOCUSING\",\"currentStartedAt\":\"2026-11-01T14:22:24.165\",\"accumulatedSeconds\":0}"
+  },
+  {
+   "label": "B starts a solo session while FOCUSING in a party",
+   "status": 400,
+   "answer": "{\"error\":\"A timer identity and start time are required together.\"}"
+  },
+  {
+   "label": "open solo session as stats sees it",
+   "status": 200,
+   "answer": "{\"id\":2,\"email\":\"p1_b_mvxx27jn@example.test\",\"username\":\"p1_b_mvxx27jn\",\"name\":\"Probe b\",\"scholarId\":\"#000002\",\"verificationStatus\":\"UNVERIFIED\",\"avatarUrl\":null,\"bannerUrl\":null,\"bio\":null,\"activeAvatar\":\"class_scholar\",\"activeFrame\":\"none\",\"activeTitle\":\"Novice\",\"activeAura\":\"none\",\"activeNameColor\":\"default\",\"activeTheme\":\"default\",\"activeBackground\":\"none\",\"characterConfig\":null,\"socialLinks\":null,\"hunterRank\":\"E\",\"level\":1,\"currentXP\":0,\"hp\":100,\"maxHp\":100,\"streakDays\":0,\"totalStudyMinutes"
+  },
+  {
+   "label": "party state with solo open",
+   "status": 200,
+   "answer": "{\"session\":{\"id\":1,\"startedAt\":\"2026-11-01T14:21:26.493Z\",\"collectiveSeconds\":57,\"members\":[{\"userId\":2,\"timerState\":\"FOCUSING\",\"accumulatedSeconds\":0,\"currentStartedAt\":\"2026-11-01T14:21:26.504Z\",\"joinedAt\":\"2026-11-01T14:21:26.493Z\",\"leftAt\":null,\"liveSeconds\":57,\"isFocusing\":true},{\"userId\":3,\"timerState\":\"FOCUSING\",\"accumulatedSeconds\":0,\"currentStartedAt\":\"2026-11-01T14:22:24.165Z\",\"joinedAt\":\"2026-11-01T14:22:24.163Z\",\"leftAt\":null,\"liveSeconds\":0,\"isFocusing\":true}]}}"
+  }
+ ]
+}

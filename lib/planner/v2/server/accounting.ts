@@ -5,7 +5,9 @@ import { PlannerDatabase, rows, reject, clock, hash, type Sql } from "./database
 import { reserveProviderCapacity, type ProviderPolicy, type ProviderGuard } from "../intelligence/provider-policy";
 
 type Call = ReturnType<typeof ProviderCallReservationV2Schema.parse>;
-export type ProviderUsage = { inputTokens: number; outputTokens: number; costUsd: number | null };
+export type ProviderUsage = { inputTokens: number; outputTokens: number; costUsd: number | null;
+  reasoningTokens?: number; cacheHitTokens?: number; effectiveModel?: string; fingerprint?: string | null;
+  finishReason?: "STOP" | "MAX_TOKENS" | "OTHER"; response?: string; reasoningText?:string };
 export async function reserveAttemptQuota(sql: Sql, ownerId: number, feature: QuotaFeature, now: Date) {
   const receipt = await reserveOwnedQuota(sql, ownerId, feature, now);
   if (!receipt) reject("BUDGET_EXHAUSTED", "The study-planning usage allowance is exhausted.", "PREFLIGHT");

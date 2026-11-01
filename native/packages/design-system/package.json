@@ -1,0 +1,27 @@
+{
+  "name": "@sylf/design-system",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Sylf Native design system: the theme engine (axes, presets, palette solver, appearance store), semantic tokens, interaction primitives and reusable components. See documentation/native/design/.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@sylf/platform": "*",
+    "@sylf/shared": "*"
+  },
+  "peerDependencies": {
+    "expo-font": "*",
+    "expo-system-ui": "*",
+    "react": "*",
+    "react-native": "*",
+    "react-native-gesture-handler": "*",
+    "react-native-reanimated": "*",
+    "react-native-safe-area-context": "*",
+    "react-native-svg": "*",
+    "react-native-worklets": "*"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./fonts.json": "./src/theme/font-files.json"
+  }
+}

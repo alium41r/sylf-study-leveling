@@ -1,0 +1,12 @@
+{
+  "status": "PASSED",
+  "files": [
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/README.md",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/STEP_5_HANDOFF.md",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/README.md",
+    "documentation/planner/AI_FIRST_FOUNDATION.md",
+    "documentation/planner/README.md",
+    "documentation/calendar/README.md"
+  ],
+  "brokenLocalLinks": []
+}

@@ -1,0 +1,328 @@
+{
+  "schemaVersion": 1,
+  "status": "REPRODUCED_ACTUAL_VALIDATION_FAILURE",
+  "paidCalls": 0,
+  "actualProviderTextUnmodified": true,
+  "responseIsValidJson": true,
+  "responseIsComplete": true,
+  "responseSha256": "d2913e6feefb42a8ca1f2abc608dbd802863c5beccf8d0f606374641916d9a75",
+  "actualSourceSchema": "lib/planner/v2/intelligence/schemas/research-model.ts -> ScopeBindingSchema -> LocalIdV2Schema",
+  "localIdPattern": "^[a-z][a-z0-9_-]*$",
+  "selectedPlan": "plan_1",
+  "allowedScopeAliases": [
+    "scope_1",
+    "scope_2",
+    "scope_3",
+    "scope_4"
+  ],
+  "totalScopeReferences": 28,
+  "invalidAliasOccurrences": 28,
+  "uniqueInvalidAliases": [
+    "plan_1:scope_1",
+    "plan_1:scope_2",
+    "plan_1:scope_3",
+    "plan_1:scope_4",
+    "plan_2:scope_1",
+    "plan_2:scope_2",
+    "plan_2:scope_3",
+    "plan_2:scope_4"
+  ],
+  "crossPlanReferences": [
+    "plan_2:scope_1",
+    "plan_2:scope_2",
+    "plan_2:scope_3",
+    "plan_2:scope_4",
+    "plan_2:scope_1",
+    "plan_2:scope_3",
+    "plan_2:scope_4"
+  ],
+  "issues": [
+    {
+      "path": [
+        "scopeBindings",
+        0,
+        "scopeRefs",
+        0
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        0,
+        "scopeRefs",
+        1
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        0,
+        "scopeRefs",
+        2
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        0,
+        "scopeRefs",
+        3
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        3,
+        "scopeRefs",
+        0
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        3,
+        "scopeRefs",
+        1
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        3,
+        "scopeRefs",
+        2
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        3,
+        "scopeRefs",
+        3
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        3,
+        "scopeRefs",
+        4
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        3,
+        "scopeRefs",
+        5
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        3,
+        "scopeRefs",
+        6
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        3,
+        "scopeRefs",
+        7
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        5,
+        "scopeRefs",
+        0
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        6,
+        "scopeRefs",
+        0
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        7,
+        "scopeRefs",
+        0
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        7,
+        "scopeRefs",
+        1
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        8,
+        "scopeRefs",
+        0
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        9,
+        "scopeRefs",
+        0
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        9,
+        "scopeRefs",
+        1
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        9,
+        "scopeRefs",
+        2
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        9,
+        "scopeRefs",
+        3
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        9,
+        "scopeRefs",
+        4
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        9,
+        "scopeRefs",
+        5
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        9,
+        "scopeRefs",
+        6
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        11,
+        "scopeRefs",
+        0
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        11,
+        "scopeRefs",
+        1
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        12,
+        "scopeRefs",
+        0
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    },
+    {
+      "path": [
+        "scopeBindings",
+        12,
+        "scopeRefs",
+        1
+      ],
+      "code": "invalid_format",
+      "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]*$/"
+    }
+  ],
+  "secondaryObservedConcern": {
+    "conflicts": [
+      "The student's self-reported confidence after three hours of videos conflicts with the diagnostic errors in molar-mass arithmetic, concentration conversion and limiting-reagent reasoning; source_2 states that video time supplies no performance credit."
+    ],
+    "interpretation": "The reported confidence-versus-diagnostic discrepancy is ordinary learning evidence, not by itself an unresolved learner choice. No downstream clarification occurred; the output failed schema validation first."
+  },
+  "safety": "No colon-prefix stripping, cross-plan remapping, saved-response alteration, provider retry, new Attempt or publication was performed."
+}

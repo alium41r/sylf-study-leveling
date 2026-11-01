@@ -192,10 +192,14 @@ export function LevelUpProvider({ children }: { children: ReactNode }) {
   );
 }
 
+const FALLBACK_LEVEL_UP_CONTEXT: LevelUpContextValue = {
+  triggerLevelUp: () => {},
+  dismissLevelUp: () => {},
+  isLevelUpVisible: false,
+  lastLevelUp: null,
+};
+
 export function useLevelUp() {
   const context = useContext(LevelUpContext);
-  if (context === undefined) {
-    throw new Error("useLevelUp must be used within a LevelUpProvider");
-  }
-  return context;
+  return context ?? FALLBACK_LEVEL_UP_CONTEXT;
 }

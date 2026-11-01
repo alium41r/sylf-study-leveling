@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "productionCsp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src-attr 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; media-src 'self' data: blob:; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://huggingface.co https://*.hf.co https://*.huggingface.co; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'",
+  "generatedFactory": {
+    "file": "21wq7gclxke5d.js",
+    "bootstrap": "static/chunks/turbopack-worker-2gqdcwp7k90ea.js",
+    "chunks": [
+      "static/chunks/0xu_yx6n7_zx4.js",
+      "static/chunks/1mlbdqwa-42oa.js",
+      "static/chunks/2-3f1p4geboky.js",
+      "static/chunks/0i4badut_yd-3.js",
+      "static/chunks/turbopack-19cl_ioex76pk.js"
+    ]
+  },
+  "outputPages": 2,
+  "bytes": 1823,
+  "errors": [],
+  "scope": "Actual compiled export worker; isolated static host. Not deployed OAuth/cookies or full production-route acceptance."
+}

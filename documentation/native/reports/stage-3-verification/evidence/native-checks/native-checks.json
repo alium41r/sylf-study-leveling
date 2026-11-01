@@ -1,0 +1,14 @@
+{
+ "schemaVersion": 1,
+ "startedAt": "2026-11-01T12:49:48.468Z",
+ "steps": [],
+ "schema": {
+  "migrations": 81,
+  "recovered": 11,
+  "unresolved": 0
+ },
+ "nativeIntegration": true,
+ "electron": true,
+ "serverErrors": [],
+ "finishedAt": "2026-11-01T12:51:15.922Z"
+}

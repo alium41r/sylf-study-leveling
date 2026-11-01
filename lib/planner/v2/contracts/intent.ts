@@ -7,6 +7,19 @@ import {
   VersionV2Schema, issue, unique, validateDag,
 } from "./primitives";
 
+/** Interpretation of the existing availability contract, never new consent. */
+export const plannerAvailabilitySemantics = "Calendar semantics: Planner availability.dailyCeilingMinutes, restWeekdays and studyWindows.weekly.weekday use Monday=0 through Sunday=6. Account restDays uses Sunday=0 through Saturday=6; these are different index systems, not a contradiction. Dated envelope days are the resolved planning authority. availableMinutes is NET of otherCommittedMinutes, protectedTargetMinutes and recoveryMinutes; do not subtract those commitments or recovery again. Excluded dates have no bookable time. Calendar constraints and accepted workload ceilings both apply; a model's rest-day or arithmetic inference cannot change them.";
+
+const studyWindow = z.strictObject({ startMinute: z.number().int().min(0).max(1439), endMinute: z.number().int().min(1).max(1440) })
+  .refine(w => w.endMinute > w.startMinute, "STUDY_WINDOW_EMPTY");
+/** Explicitly accepted civil windows. Absence preserves historical intents;
+ * neither Calendar's display hours nor an AI inference supplies consent. */
+export const StudyWindowsSchema = z.strictObject({
+  schemaVersion: z.literal(1),
+  weekly: z.array(studyWindow.safeExtend({ weekday: z.number().int().min(0).max(6) })).max(100),
+  overrides: z.array(z.strictObject({ date: DateV2Schema, windows: z.array(studyWindow).max(100) })).max(500),
+}).superRefine((value, ctx) => unique(value.overrides.map(d => d.date), ctx, ["overrides"]));
+
 export const AvailabilityIntentV2Schema = z.strictObject({
   timezone: TimezoneV2Schema,
   dailyCeilingMinutes: z.array(z.number().int().min(0).max(E.dailyCapacityMinutes)).length(7),
@@ -16,6 +29,7 @@ export const AvailabilityIntentV2Schema = z.strictObject({
   blockedDates: z.array(DateV2Schema).max(E.scopeNodes),
   recoveryPercent: z.number().min(0).max(50),
   basis: z.enum(["CONFIRMED_AVAILABILITY", "DISCLOSED_PROVISIONAL_CEILING"]),
+  studyWindows: StudyWindowsSchema.optional(),
 }).superRefine((value, ctx) => {
   unique(value.restWeekdays.map(String), ctx, ["restWeekdays"]);
   unique(value.blockedDates, ctx, ["blockedDates"]);

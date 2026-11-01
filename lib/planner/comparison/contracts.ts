@@ -200,7 +200,7 @@ export const CurriculumComparisonSchema = z.strictObject({
    */
   providerVersion: z.string().min(1).max(60),
   /** The specific search provider that answered, as a closed enum — never a key. */
-  searchProvider: z.enum(["brave", "serper", "searxng", "none"]),
+  searchProvider: z.enum(["brave", "serper", "searxng", "deepseek", "none"]),
   createdAt: z.string().max(40),
   units: z.array(ComparisonUnitSchema).max(COMPARISON_LIMITS.units),
   sources: z.array(ResearchSourceSchema).max(COMPARISON_LIMITS.sources),

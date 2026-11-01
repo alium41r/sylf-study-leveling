@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { TimezoneService } from "@/lib/timezone-service";
+import { TimezoneService } from "../timezone-service";
 import { inkV2Schema } from "./ink";
-import { GOAL_COLOR_TOKENS } from "@/lib/goal-theme";
+import { GOAL_COLOR_TOKENS } from "../goal-theme";
 import { recurrenceSchema, recurrenceDates } from "./recurrence";
 
 export const calendarColors = GOAL_COLOR_TOKENS;

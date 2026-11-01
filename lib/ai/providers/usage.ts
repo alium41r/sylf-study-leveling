@@ -9,7 +9,7 @@ export function openAIUsage(raw?: WireUsage): LLMUsage | undefined {
   const completion = raw.completion_tokens_details as WireUsage | undefined;
   return { promptTokens: input, completionTokens: output, totalTokens: number(raw.total_tokens) ?? input + output,
     cacheHitTokens: number(raw.prompt_cache_hit_tokens) ?? number(prompt?.cached_tokens),
-    reasoningTokens: number(completion?.reasoning_tokens) };
+    reasoningTokens: number(completion?.reasoning_tokens) ?? number(raw.reasoning_tokens) };
 }
 export function geminiUsage(raw?: WireUsage): LLMUsage | undefined {
   if (!raw || number(raw.promptTokenCount) === undefined) return undefined;

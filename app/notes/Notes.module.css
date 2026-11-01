@@ -1597,3 +1597,334 @@
   background: #0005;
   z-index: 23;
 }
+
+/* Dedicated Notes library and document workspace. */
+.root {
+  padding: 18px 24px 24px;
+}
+.workspace {
+  border-radius: 22px;
+  box-shadow: 0 12px 48px #00000005;
+  grid-template-columns: 240px minmax(0, 1fr);
+}
+.libraryNav {
+  padding: 24px 14px 14px;
+  background: var(--surface-2);
+  border-right: 0;
+}
+.navItem {
+  border-radius: 12px;
+  min-height: 46px;
+  gap: 12px;
+  font-size: 13px;
+}
+.navActive {
+  background: var(--surface-1);
+  color: var(--accent-text);
+}
+.navSection {
+  margin-top: 20px;
+}
+.libraryHeader {
+  border-bottom: 0;
+  padding: 22px 32px 8px;
+}
+.libraryHeader[hidden] {
+  display: none;
+}
+.collectionHeading {
+  padding: 24px 32px 20px;
+}
+.collectionHeading h2 {
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+}
+.collectionHeading p {
+  margin-top: 9px;
+}
+.searchToolbar {
+  padding: 0 32px 24px;
+}
+.search {
+  border-radius: 12px;
+  min-height: 44px;
+  background: var(--surface-2);
+  border: 0;
+}
+.collectionScroll {
+  padding: 0 32px 32px;
+}
+.noteGrid {
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 30px 24px;
+}
+.noteCard {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+.cardOpen {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 12px;
+}
+.documentPreview {
+  position: relative;
+  height: 230px;
+  width: 100%;
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  background: var(--surface-2);
+  padding: 24px 20px;
+  box-shadow: 0 4px 12px #00000008;
+  align-items: flex-start;
+}
+.documentPreview > span:has(canvas) {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  box-shadow: none;
+  border-radius: inherit;
+}
+.documentPreview canvas {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: top;
+}
+.notebookPreview:before {
+  display: none;
+}
+.previewHeading {
+  font-size: 13px;
+}
+.documentPreview p {
+  font-size: 10px;
+  line-height: 1.9;
+  text-align: left;
+  white-space: pre-wrap;
+}
+.documentPreview .layerPreview {
+  position: absolute;
+  inset: 22px 18px auto;
+  margin: 0;
+  color: #242830;
+  display: -webkit-box;
+  -webkit-line-clamp: 8;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cardText {
+  padding: 13px 30px 4px 2px;
+  width: 100%;
+  text-align: left;
+}
+.cardText h3 {
+  font-size: 14px;
+  font-weight: 550;
+  line-height: 1.5;
+  margin-right: 0;
+}
+.cardText p {
+  font-size: 10px;
+  margin-top: 6px;
+}
+.cardActions {
+  bottom: 17px;
+  right: -5px;
+}
+.cardActions button:first-child {
+  display: none;
+}
+.noteCard:hover .cardOpen {
+  transform: translateY(-2px);
+}
+.folderGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.folderGrid:empty {
+  display: none;
+}
+.folderCard {
+  min-width: 0;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  padding: 18px;
+  border-radius: 16px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.folderCard svg {
+  color: var(--accent-text);
+  fill: var(--accent-primary-dim);
+  margin-bottom: 4px;
+}
+.folderCard strong {
+  font-size: 13px;
+  font-weight: 550;
+  overflow-wrap: anywhere;
+}
+.folderCard span {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.folderCard:hover {
+  border-color: var(--accent-text);
+}
+.root[data-notes-document="true"] {
+  position: relative;
+  padding: env(safe-area-inset-top, 0px) 0 0;
+}
+.root[data-notes-document="true"] > .pageHeader {
+  display: none;
+}
+.root[data-notes-document="true"] > .notice {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 56px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(680px, calc(100% - 24px));
+  z-index: 40;
+  margin: 0;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+}
+.root[data-notes-document="true"] .workspace {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.embeddedEditor {
+  overflow: visible;
+  display: block;
+}
+.embeddedEditor .paperScroll {
+  overflow: visible;
+  background: transparent;
+}
+.embeddedEditor .paper {
+  padding: var(--notes-text-top, 56px) 64px 80px var(--notes-text-left, 64px);
+  min-height: 0;
+  max-width: none;
+  color: inherit;
+}
+.embeddedEditor .paper :global(.bn-container) {
+  --bn-colors-editor-text: currentColor;
+}
+.embeddedEditor .paper :global(.bn-editor) {
+  color: inherit;
+  font-size: 16px;
+}
+.embeddedEditor .paper :global(.bn-container) {
+  color: inherit;
+}
+@media (max-width: 1100px) {
+  .workspace {
+    grid-template-columns: 205px minmax(0, 1fr);
+  }
+  .noteGrid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 24px 18px;
+  }
+  .documentPreview {
+    height: 210px;
+  }
+}
+@media (max-width: 767px) {
+  .root {
+    padding: 12px 10px;
+  }
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+    border-radius: 18px;
+  }
+  .libraryHeader {
+    padding: 14px 16px 0;
+  }
+  .collectionHeading {
+    padding: 26px 20px 18px;
+  }
+  .searchToolbar {
+    padding: 0 20px 22px;
+  }
+  .collectionScroll {
+    padding: 0 20px 24px;
+  }
+  .noteGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 14px;
+  }
+  .documentPreview {
+    height: 200px;
+    padding: 20px 14px;
+  }
+  .cardText {
+    padding: 12px 26px 2px 1px;
+  }
+  .cardText h3 {
+    font-size: 13px;
+  }
+  .folderGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .folderCard {
+    padding: 14px;
+  }
+  .searchToolbar > select {
+    width: 78px;
+  }
+}
+.folderExpand {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 44px;
+  border: 0;
+  color: var(--text-secondary);
+  background: transparent;
+  border-radius: 8px;
+}
+.folderRow > .navItem {
+  min-width: 0;
+}
+.folderRow > .navItem > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.imagePreview {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--surface-2);
+}
+.imagePreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.libraryBrand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.root[data-notes-workspace] {
+  padding-top: max(18px, env(safe-area-inset-top));
+}
+.root[data-notes-document="true"] {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Independently positioned rich-text boxes own their page-local inset. */
+.embeddedEditor[data-notes-box] .paper {padding:0;}

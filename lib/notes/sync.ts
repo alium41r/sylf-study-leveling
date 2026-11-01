@@ -137,17 +137,20 @@ export class NotesSynchronizer {
     }
   }
 
-  async publish(limit = 16): Promise<number> {
+  async publish(
+    limit = 16,
+    excluded: ReadonlySet<string> = new Set()
+  ): Promise<number> {
     if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100)
       throw new NotesError("LIMIT", "Invalid upload work budget.");
     await this.guard();
     if (this.transport.createMany) {
-      const jobs = [];
-      for (let i = 0; i < limit; i++) {
-        const job = await this.repository.claimJob();
-        if (!job) break;
-        jobs.push(job);
-      }
+      const jobs = await this.repository.claimJobs(
+        limit,
+        Date.now(),
+        60000,
+        excluded
+      );
       if (!jobs.length) return 0;
       try {
         const objects = await this.repository.closure(jobs.map((j) => j.id));
@@ -203,7 +206,9 @@ export class NotesSynchronizer {
     let completed = 0;
     const verified = new Set<string>();
     while (completed < limit) {
-      const job = await this.repository.claimJob();
+      const job = (
+        await this.repository.claimJobs(1, Date.now(), 60000, excluded)
+      )[0];
       if (!job) break;
       try {
         const objects = await this.repository.closure([job.id]);
@@ -263,7 +268,11 @@ export class NotesSynchronizer {
     return completed;
   }
   /** A failed page never advances its cursor or activates partial history. Absence never means deletion. */
-  async pull(channel = "primary", maximumPages = 100): Promise<number> {
+  async pull(
+    channel = "primary",
+    maximumPages = 100,
+    onPage?: (completedPages: number) => Promise<void>
+  ): Promise<number> {
     this.downloadIncomplete = true;
     if (
       !Number.isSafeInteger(maximumPages) ||
@@ -276,6 +285,10 @@ export class NotesSynchronizer {
       pages = 0,
       reset = false;
     const seen = new Set<string>();
+    // Proof lasts only for this bounded pull, after successful atomic activation.
+    // Historical receipts alone never establish present provider availability.
+    const verifiedRevisions = new Set<string>(),
+      verifiedObjects = new Set<string>();
     while (pages < maximumPages) {
       await this.guard();
       let page: Awaited<ReturnType<NotesTransport["enumerate"]>>;
@@ -292,6 +305,9 @@ export class NotesSynchronizer {
         ) {
           cursor = undefined;
           reset = true;
+          seen.clear();
+          verifiedRevisions.clear();
+          verifiedObjects.clear();
           continue;
         }
         throw error;
@@ -312,7 +328,9 @@ export class NotesSynchronizer {
       let total = 0;
       const read = async (hash: string): Promise<Uint8Array> => {
         if (objects.has(hash)) return objects.get(hash)!;
-        const bytes = await this.candidate(hash);
+        const bytes = verifiedObjects.has(hash)
+          ? await this.repository.readObject(hash)
+          : await this.candidate(hash);
         if (!bytes)
           throw new NotesError(
             "CORRUPT",
@@ -331,7 +349,7 @@ export class NotesSynchronizer {
         const pending = [...page.revisionIds];
         while (pending.length) {
           const id = pending.pop()!;
-          if (revisionIds.has(id)) continue;
+          if (revisionIds.has(id) || verifiedRevisions.has(id)) continue;
           const commit = commitSchema.parse(decodeJson(await read(id)));
           if (commit.libraryId !== this.repository.libraryId)
             throw new NotesError(
@@ -361,6 +379,15 @@ export class NotesSynchronizer {
           page.cursor,
           this.repository.session.signal
         );
+        if (
+          verifiedRevisions.size + revisionIds.size > 50000 ||
+          verifiedObjects.size + objects.size > 60000
+        ) {
+          verifiedRevisions.clear();
+          verifiedObjects.clear();
+        }
+        for (const id of revisionIds) verifiedRevisions.add(id);
+        for (const hash of objects.keys()) verifiedObjects.add(hash);
       } catch (error) {
         if (!this.repository.session.signal.aborted)
           await this.repository.quarantine(
@@ -369,6 +396,9 @@ export class NotesSynchronizer {
         throw error;
       }
       pages++;
+      // A page is now atomically verified and activated. Expose it without
+      // waiting for unrelated history or publishing any new cloud data.
+      await onPage?.(pages);
       cursor = page.cursor;
       if (!page.more) {
         this.downloadIncomplete = false;

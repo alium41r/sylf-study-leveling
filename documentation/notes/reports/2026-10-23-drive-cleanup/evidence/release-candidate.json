@@ -1,0 +1,204 @@
+{
+  "baseCommit": "f5a900b2f6e6d92dce4e81abac1010e089169cf9",
+  "candidatePath": "/private/tmp/sylf-notes-drive-cleanup-release-111299ae",
+  "priorRepairIncluded": true,
+  "sourceFiles": [
+    {
+      "path": "app/api/notes/connection/route.ts",
+      "sha256": "0f89d612c68c597c8a57cacf3c99cccc113b5fb8a13be4d2ebd97804b38ed3b4"
+    },
+    {
+      "path": "app/api/notes/drive/route.ts",
+      "sha256": "9f23399f6790a96aee24909957bb6ff3292a4bc9501883a94afd45438723c577"
+    },
+    {
+      "path": "app/api/notes/unlock/route.ts",
+      "sha256": "6bbde86f193ecf1621cf858f9d744112f7cbfb33edf5a1582d2b188703f4a4ee"
+    },
+    {
+      "path": "app/notes/components/NotesActions.tsx",
+      "sha256": "e7c7d36e5b5c6a98bb7c3b8b35ba2ec5555f541b280c6380d131822b95802bb6"
+    },
+    {
+      "path": "app/notes/components/NotesEditor.tsx",
+      "sha256": "03ae0529623483f7a4505356c6c3624f3f47aa05a13f45e7431250f2fd163348"
+    },
+    {
+      "path": "app/notes/components/NotesScreen.tsx",
+      "sha256": "b47b1c4906b9f64b7f0e1e66d7566808d8d57451ca5e57a188bf52e629e81371"
+    },
+    {
+      "path": "lib/notes/drive-transport.ts",
+      "sha256": "5b7e7fa504ec98214ba13611b7b00ee3af62f472e170fe334c5fba6a6a7b3199"
+    },
+    {
+      "path": "lib/notes/engine.ts",
+      "sha256": "17b898bfd10b36e1a712114f1772f031c8e41dc8a814677c745dfea6cda4a3c2"
+    },
+    {
+      "path": "lib/notes/ink-controller.ts",
+      "sha256": "e79f9003125df30fae5bbbe714e82799987fc30ce4245228bc52f64ba63070a8"
+    },
+    {
+      "path": "lib/notes/ink-renderer.ts",
+      "sha256": "efa72f6c53c18084020ac23b131140b2607470f8a555edf74f3dcacd139909e8"
+    },
+    {
+      "path": "lib/notes/ink.ts",
+      "sha256": "8b2f0e1e5ad3e75ef7be1609c10a0e77f7117a46c8fbc28be4b89ea8b9eb6903"
+    },
+    {
+      "path": "lib/notes/library.ts",
+      "sha256": "17781331ec7cc8e507adfb9bdc513fe7da9439b5f85c8f2d5d907e197a81640b"
+    },
+    {
+      "path": "lib/notes/portable.ts",
+      "sha256": "a5a60b95dc79c0d944d386dd31a3cfe8ec166b0d7d9cbd4a52b9cb5fc5bc118c"
+    },
+    {
+      "path": "lib/notes/repository.ts",
+      "sha256": "9505313651e94580ddc0c00e4f54a3ff68629106039cb640e5e11dc8d0faf348"
+    },
+    {
+      "path": "lib/notes/server/connections.ts",
+      "sha256": "494beb4736aa3e0e73795b65bbdb22b5f269fb49dbdcfd79ad29b5aadddf9132"
+    },
+    {
+      "path": "lib/notes/server/google-drive.ts",
+      "sha256": "7df962243190bcf6b0fcdc90311ba6e7b3a41daf1c113587c90e2f4f6dcd913b"
+    },
+    {
+      "path": "lib/notes/server/security.ts",
+      "sha256": "b23aa42e7c49e7a3d89a9d66964470e7b897f569e9714421cac8b35fdfca52ef"
+    },
+    {
+      "path": "lib/notes/sync.ts",
+      "sha256": "e1ed07b307cfa07c2911b1eaa078c46c7773f541a6d536019f0664cc926479ff"
+    },
+    {
+      "path": "lib/prisma.ts",
+      "sha256": "e38a0c9c5edd7e16dc27d1ce983e43b3e2962e9419bdba03acaf7097b7d1893e"
+    },
+    {
+      "path": "lib/resources.ts",
+      "sha256": "3c90c10ac6638d4faaae79624e2aa1ecc3a900c95ff7ad55278e9eefddf7da45"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "4515307ef7d1dc0fc7848f7af6b9e92a4ce7c2a1450804dd360543607706a744"
+    },
+    {
+      "path": "package.json",
+      "sha256": "5ae9c983eab9dd5ea01e07752614b185a239d092a13d47a9413d7a513edaaef4"
+    },
+    {
+      "path": "prisma.config.ts",
+      "sha256": "eece98cc8e841e44c3b3d7f2da6bb415a993a570c1dcbd3393e3d91e3570ed57"
+    },
+    {
+      "path": "prisma/migrations/20261020000000_notes_connections/migration.sql",
+      "sha256": "cfd4d5fe4cb50bfe849bc7f7770ec6f3217b080fa4a2e6da53c3a247d138b43f"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "sha256": "f2a50ea3b52e72cdfdeb519373fe9e2614fb642d46becffd513be29f35255da1"
+    },
+    {
+      "path": "public/notes-licenses/notices.txt",
+      "sha256": "7f8ff2607c22a2bf3ff673387630f67d9b20077f80524fb1b8f6198dedfd605d"
+    },
+    {
+      "path": "scripts/build/build-notes-notices.mjs",
+      "sha256": "6403eebc5e52f3ec07cc6639cea965afc52edf9617d94138fbb9df9cfd9d6875"
+    },
+    {
+      "path": "app/api/notes/publications/route.ts",
+      "sha256": "32b523bae536fea74c859864e3354b0a6e06be09103bdf88d462b495e916b238"
+    },
+    {
+      "path": "app/notes/Pdf.module.css",
+      "sha256": "b5d1401cb201b214c801bcdd547ef7a0c165c9dd85ec7456799c12a4e7b71f34"
+    },
+    {
+      "path": "app/notes/components/PdfPage.tsx",
+      "sha256": "abe06c15bc01936279046d3ad7500ffdb7980f7d4f6281dffc92d37f00df90ce"
+    },
+    {
+      "path": "app/notes/components/PdfThumbnail.tsx",
+      "sha256": "bb20df1b46f69f8f8431b310a2731318455ac350432f6588cf1f1fd91755413a"
+    },
+    {
+      "path": "app/notes/components/PdfWorkspace.tsx",
+      "sha256": "9c862ab4886adfe37b67e4d662e5b68fa1e88a7e1308b68e5333c12777a53396"
+    },
+    {
+      "path": "lib/notes/cloud-policy.ts",
+      "sha256": "c7767c157aef739e4e04dd8cc75efc71ed4c5818d8a931c1f9e2bef60441bd01"
+    },
+    {
+      "path": "lib/notes/connection-location.ts",
+      "sha256": "56a6b3ce66f63dacaab8c28ea540a710288b3521003da35528c4784a3ed7eb08"
+    },
+    {
+      "path": "lib/notes/drive-publication.ts",
+      "sha256": "148db37fa0b3a1bdce61f350899ddf0adc99abcf6080d5660bfac606259951df"
+    },
+    {
+      "path": "lib/notes/pdf-export-core.ts",
+      "sha256": "211dc5730ea280e48561257e5867efc6f9c678b5f944c0aba912ee6379b0d346"
+    },
+    {
+      "path": "lib/notes/pdf-export.ts",
+      "sha256": "153223cf0622198f1b487f3362a03cf8ee6ae2f0b78f74eb593702d39d818d15"
+    },
+    {
+      "path": "lib/notes/pdf-export.worker.ts",
+      "sha256": "9b2f5d0fadc2c593014c7be4a6a4bf65338621b962b01427fb7901d7a88641ba"
+    },
+    {
+      "path": "lib/notes/pdf-reader.ts",
+      "sha256": "c12b2e8a3616e369cfed620001c50533a9980304cc0adc56ca207610c4b846ba"
+    },
+    {
+      "path": "lib/notes/pdf.ts",
+      "sha256": "8c5efed1443e926fd963cd96a599a9ced70bef76163c00157cb5d2db588bb92e"
+    },
+    {
+      "path": "lib/notes/server/organize-drive.ts",
+      "sha256": "04cf9fd7ff27d0432d1acf94fa742ccc2cb7604bfb3a456f6f8340873bfcc4f4"
+    },
+    {
+      "path": "lib/notes/server/publications.ts",
+      "sha256": "d10052ccc9252a66758764412eeac655cd4c6789e84483725a789659248580c1"
+    },
+    {
+      "path": "scripts/build/build-notes-pdf-assets.mjs",
+      "sha256": "c0e5ce8227ba6bb59de94cf4b4ec877d5ac00e84ccff9b598859b931383a0cca"
+    },
+    {
+      "path": "lib/notes/drive-pdf.ts",
+      "sha256": "6391f8821bdaa20f9f65c480eff43fc490d2fb76bd584e9607b502036353fc5f"
+    },
+    {
+      "path": "lib/notes/navigation.ts",
+      "sha256": "ff18a835351553e74ee70f5d224ed9a3a8b4f8bf80fa5aa425e486f267b605ce"
+    },
+    {
+      "path": "app/notes/components/InkEditor.tsx",
+      "sha256": "e6151be3d8d0208dc34e2432dfeeb7fb7be9c0b95ebd4a4fab4d19c1ebd15b7b"
+    },
+    {
+      "path": "lib/notes/server/http.ts",
+      "sha256": "1c60e9681a4e681c088e7f8e7661b31f9ed41e8d097c5d0436d8b02977f3eca2"
+    }
+  ],
+  "environmentFilesCopied": false,
+  "unrelatedRootEditsIncluded": false,
+  "productionUploaded": true,
+  "deploymentIgnore": {
+    "path": ".vercelignore",
+    "sha256": "53244c3928172351032252b09a38bd7afd52b444616c543930f1a73ddfc7fecb"
+  },
+  "deploymentId": "dpl_Uexqf8njDtsqeevvzqVTUpNYy4se",
+  "deploymentUrl": "https://sylf-ogbcuenyf-alium41rs-projects.vercel.app"
+}

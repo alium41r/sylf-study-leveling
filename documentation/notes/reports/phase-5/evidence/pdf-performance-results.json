@@ -1,0 +1,34 @@
+{
+  "environment": "Headless Chromium desktop, 1440x960; synthetic 300-page source with vectors and a repeated 6MP image. No physical stylus, native, or live provider latency claim.",
+  "id": "5e54409b-a6c0-47ad-868d-7242976c7e3f",
+  "pages": 300,
+  "sourceBytes": 4248490,
+  "inspectMs": 172.80000000447035,
+  "importCommitMs": 249.89999999850988,
+  "firstPageMs": 562,
+  "navigation": {
+    "samples": [
+      137,
+      168,
+      143,
+      105,
+      113,
+      100
+    ],
+    "medianMs": 125,
+    "maxMs": 168
+  },
+  "searchMs": 2364,
+  "bounded": {
+    "mountedPages": 2,
+    "canvases": 6,
+    "attachedCanvasPixels": 4926660,
+    "heapUsed": 72200000,
+    "scope": "Attached canvas backing and main-window JS heap only; offscreen rasters, worker heap, GPU/process memory excluded."
+  },
+  "exported": {
+    "bytes": 4291990,
+    "durationMs": 2329.5
+  },
+  "errors": []
+}

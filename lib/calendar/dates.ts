@@ -1,4 +1,4 @@
-import { TimezoneService } from "@/lib/timezone-service";
+import { TimezoneService } from "../timezone-service";
 import type { CalendarEvent } from "./contracts";
 
 /** Civil date arithmetic deliberately never uses the device's timezone. */

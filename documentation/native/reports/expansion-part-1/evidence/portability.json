@@ -1,0 +1,236 @@
+{
+ "lib/achievements-catalog.ts": {
+  "files": 4,
+  "lines": 1827,
+  "external": [],
+  "flags": []
+ },
+ "lib/archive-catalog.ts": {
+  "files": 7,
+  "lines": 2791,
+  "external": [],
+  "flags": []
+ },
+ "lib/cognitive-stats.ts": {
+  "files": 4,
+  "lines": 1793,
+  "external": [],
+  "flags": []
+ },
+ "lib/skill-tree.ts": {
+  "files": 1,
+  "lines": 570,
+  "external": [],
+  "flags": []
+ },
+ "lib/game-engine.ts": {
+  "files": 3,
+  "lines": 1542,
+  "external": [],
+  "flags": []
+ },
+ "lib/difficulty-engine.ts": {
+  "files": 4,
+  "lines": 1633,
+  "external": [],
+  "flags": []
+ },
+ "lib/session-math.ts": {
+  "files": 1,
+  "lines": 137,
+  "external": [],
+  "flags": []
+ },
+ "lib/timer-engine.ts": {
+  "files": 1,
+  "lines": 206,
+  "external": [],
+  "flags": [
+   "browser:lib/timer-engine.ts"
+  ]
+ },
+ "lib/privacy-types.ts": {
+  "files": 1,
+  "lines": 13,
+  "external": [],
+  "flags": []
+ },
+ "lib/study-schedule-types.ts": {
+  "files": 1,
+  "lines": 104,
+  "external": [],
+  "flags": []
+ },
+ "lib/focus-background-types.ts": {
+  "files": 1,
+  "lines": 233,
+  "external": [],
+  "flags": []
+ },
+ "lib/calendar/contracts.ts": {
+  "files": 6,
+  "lines": 1385,
+  "external": [
+   "zod"
+  ],
+  "flags": [
+   "browser:lib/calendar/contracts.ts",
+   "browser:lib/calendar/ink.ts"
+  ]
+ },
+ "lib/calendar/recurrence.ts": {
+  "files": 3,
+  "lines": 718,
+  "external": [
+   "zod"
+  ],
+  "flags": []
+ },
+ "lib/calendar/dates.ts": {
+  "files": 2,
+  "lines": 458,
+  "external": [],
+  "flags": []
+ },
+ "lib/calendar/quick-add.ts": {
+  "files": 7,
+  "lines": 1538,
+  "external": [
+   "zod"
+  ],
+  "flags": [
+   "browser:lib/calendar/contracts.ts",
+   "browser:lib/calendar/ink.ts"
+  ]
+ },
+ "lib/calendar/projection.ts": {
+  "files": 7,
+  "lines": 1491,
+  "external": [
+   "zod"
+  ],
+  "flags": [
+   "browser:lib/calendar/contracts.ts",
+   "browser:lib/calendar/ink.ts"
+  ]
+ },
+ "lib/calendar/scheduling.ts": {
+  "files": 3,
+  "lines": 703,
+  "external": [],
+  "flags": []
+ },
+ "lib/calendar/event-operations.ts": {
+  "files": 11,
+  "lines": 2067,
+  "external": [
+   "zod"
+  ],
+  "flags": [
+   "browser:lib/calendar/contracts.ts",
+   "browser:lib/calendar/event-operations.ts",
+   "browser:lib/calendar/ink.ts",
+   "browser:lib/client-data-cache.ts",
+   "browser:lib/notes/session.ts"
+  ]
+ },
+ "lib/ai/sylvie/action.ts": {
+  "files": 2,
+  "lines": 19,
+  "external": [],
+  "flags": []
+ },
+ "lib/ai/sylvie/event-stream.ts": {
+  "files": 1,
+  "lines": 34,
+  "external": [],
+  "flags": []
+ },
+ "lib/ai/sylvie/image-contract.ts": {
+  "files": 1,
+  "lines": 13,
+  "external": [],
+  "flags": []
+ },
+ "lib/ai/sylvie/chat-client.ts": {
+  "files": 4,
+  "lines": 204,
+  "external": [],
+  "flags": []
+ },
+ "lib/ai/sylvie/planner-handoff-client.ts": {
+  "files": 28,
+  "lines": 7840,
+  "external": [
+   "zod"
+  ],
+  "flags": [
+   "browser:lib/ai/sylvie/planner-handoff-client.ts"
+  ]
+ },
+ "lib/ai/sylvie/quick-replies.ts": {
+  "files": 1,
+  "lines": 6,
+  "external": [],
+  "flags": []
+ },
+ "lib/planner/v2/client/workspace.ts": {
+  "files": 1,
+  "lines": 89,
+  "external": [],
+  "flags": []
+ },
+ "lib/planner/v2/client/transport.ts": {
+  "files": 6,
+  "lines": 674,
+  "external": [],
+  "flags": [
+   "browser:lib/client-data-cache.ts",
+   "browser:lib/notes/session.ts"
+  ]
+ },
+ "lib/planner/v2/contracts.ts": {
+  "exists": false
+ },
+ "lib/planner/contracts.ts": {
+  "files": 21,
+  "lines": 5605,
+  "external": [
+   "zod"
+  ],
+  "flags": []
+ },
+ "lib/focus-party-types.ts": {
+  "files": 1,
+  "lines": 218,
+  "external": [],
+  "flags": []
+ },
+ "lib/system-collection.ts": {
+  "files": 4,
+  "lines": 1219,
+  "external": [],
+  "flags": []
+ },
+ "lib/cosmetics-catalog.ts": {
+  "files": 1,
+  "lines": 184,
+  "external": [],
+  "flags": []
+ },
+ "lib/character-traits.ts": {
+  "files": 1,
+  "lines": 136,
+  "external": [],
+  "flags": []
+ },
+ "lib/acoustics/types.ts": {
+  "exists": false
+ },
+ "lib/pixel-display/engine/index.ts": {
+  "files": 6,
+  "lines": 1006,
+  "external": [],
+  "flags": []
+ }
+}

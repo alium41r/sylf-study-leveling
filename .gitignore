@@ -87,3 +87,14 @@ android/captures/
 
 # Reproducible optional handwriting worker/WASM assets.
 /public/calendar-recognition/
+
+# Reproducible pinned PDF.js worker, codecs, fonts and their resource licenses.
+/public/notes-pdf/
+
+# Sanitized database-migration audit command evidence.
+!documentation/infrastructure/reports/2026-10-22-database-migrations/evidence/*.log
+
+# Sanitized Notes connection qualification logs.
+!documentation/notes/reports/2026-10-22-connection-origin/evidence/*.log
+
+!documentation/notes/reports/phase-7/evidence/*.log

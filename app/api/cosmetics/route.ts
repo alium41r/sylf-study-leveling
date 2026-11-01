@@ -80,8 +80,9 @@ export async function POST(req: NextRequest) {
       where: { id: session.userId },
       data: updateData,
     });
+    const safeUser = user ? Object.fromEntries(Object.entries(user).filter(([k]) => k !== "password")) : null;
 
-    return NextResponse.json({ success: true, user }, { status: 200 });
+    return NextResponse.json({ success: true, user: safeUser }, { status: 200 });
   } catch (error) {
     console.error("POST /api/cosmetics error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

@@ -1,0 +1,6 @@
+{
+  "localOnly": true,
+  "archiveRowsVerifiedThroughActualPostgresRowTypes": 96,
+  "activeReinsertionRequiresAuthenticMissingParents": true,
+  "rawDataRestoreInitiallyFailedOnPreexistingOrphans": true
+}

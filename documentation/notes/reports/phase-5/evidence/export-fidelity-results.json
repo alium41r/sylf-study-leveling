@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "sourceFilesUnchanged": {
+    "lecture.pdf": "fa08bcbf9de3ddc6c854c7b871b78cc1a57b34fb5c098ab9f471136f34ff1994",
+    "large-300.pdf": "d1c0b9a619266b01213f767f5956baee1791ce2e0568d38662af4b7b1e87d6a9",
+    "password.pdf": "08d3405b9203b28ef3c261c931f54634bed3469ce190468897a03e889938f816"
+  },
+  "studyPages": 3,
+  "originalTextCropAndUserUnitPreserved": true,
+  "unannotatedSourcePagePixelExact": true,
+  "rotatedBlueMarkerBounds": [
+    430,
+    80,
+    520,
+    140
+  ],
+  "rotatedInkAtSourceMarker": true,
+  "largePages": 300,
+  "largeRepeatedImageObjects": 1,
+  "largePixelExactPages": [
+    1,
+    200,
+    300
+  ],
+  "largeCopyBytes": 4291990,
+  "scope": "Synthetic PDFs; independent pypdf/Poppler verification plus visual inspection. Not all fonts, forms or signatures."
+}

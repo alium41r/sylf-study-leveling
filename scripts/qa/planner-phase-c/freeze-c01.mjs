@@ -1,0 +1,20 @@
+/** Immutable corrected preparation manifest; never authorizes or invokes an AI. */
+import {readFileSync,readdirSync,writeFileSync} from 'node:fs';
+import {resolve,join} from 'node:path';
+import {reportPath,profileId,readC01,funding} from './c01-profile.mjs';
+import {sha,maximumModelUsd} from './prepare.mjs';
+if(process.argv.length!==2)throw new Error('FREEZE_ONLY_NO_EXECUTION_FLAGS');
+const root=process.cwd(),folder=resolve(root,reportPath),read=p=>JSON.parse(readFileSync(p,'utf8'));
+const c=readC01(),verified=read(join(folder,'evidence/final-verification.json'));
+if(verified.status!=='UNPAID_READY'||verified.paidCalls!==0||verified.baselinePostgres.failed!==0||verified.baselinePostgres.passed<619||verified.rehearsal.failed!==0||verified.rehearsal.passed!==5||verified.static.typecheck!=='PASSED'||verified.static.lintErrors!==0||verified.static.lintWarnings!==0||verified.preservation.unexpectedChanges.length)throw new Error('COMPLETE_UNPAID_VERIFICATION_REQUIRED');
+const sources=read(join(folder,'evidence/baseline-postgres/postgres-source-pins.json'));
+if(sources.status!=='PASSED')throw new Error('POSTGRES_SOURCE_PINS_REQUIRED');
+for(const [name,digest]of Object.entries(sources.sources))if(sha(readFileSync(resolve(root,name)))!==digest)throw new Error('VERIFIED_SOURCE_CHANGED');
+const files=dir=>readdirSync(resolve(root,dir),{withFileTypes:true}).flatMap(e=>e.isDirectory()?files(join(dir,e.name)):[join(dir,e.name)]);
+const names=[`${reportPath}/PILOT_INPUT.json`,`${reportPath}/PROTOCOL.md`,`${reportPath}/APPROVAL_REQUEST.md`,'documentation/planner/reports/2026-10-28-phase-c-qualification-preparation/RUBRIC.json','documentation/planner/reports/2026-10-28-phase-c-qualification-preparation/EVALUATOR_ONLY.json','documentation/planner/reports/2026-10-28-phase-c-c01-live/ACCOUNTING.json'];
+const qualificationNames=[...Object.keys(sources.sources),...files('scripts/qa/planner-phase-c'),...files('lib/ai'),'lib/resources.ts','lib/prisma.ts','lib/timezone-service.ts','lib/study-schedule-service.ts','lib/subject-service.ts','__tests__/planner-v2/postgres/phase-c-execution.phasec.ts','tsconfig.json'];
+const qualificationSources=Object.fromEntries([...new Set(qualificationNames)].map(p=>[p,sha(readFileSync(resolve(root,p)))]));
+const prior=read(resolve(root,'documentation/planner/reports/2026-10-28-phase-c-c01-live/ACCOUNTING.json'));
+const manifest={schemaVersion:2,profileId,caseId:'C01',status:'PREPARED_NOT_AUTHORIZED',approved:false,repetitions:1,paidCalls:0,paidExecutionAuthorized:false,frozenAnchor:c.anchor,timezone:c.timezone,weekdayConvention:c.weekdayConvention,hashes:Object.fromEntries(names.map(p=>[p,sha(readFileSync(resolve(root,p)))])),qualificationSources,resourcePolicy:{...funding,maximumModelUsd:maximumModelUsd(),model:'deepseek-flash',reasoningEffort:'HIGH',strategistFormat:'TEXT',otherFormats:'JSON',externalPaidTools:false},priorSpending:{status:'UNKNOWN_SPEND',requestId:prior.calls.find(c=>!c.usageKnown).callId,liabilityUsd:prior.unknownPeakLiabilityUsd,acknowledgementRequiredBeforeNewRun:true,minimumAvailableBalanceUsd:funding.proposedAuthorizationUsd+prior.unknownPeakLiabilityUsd},verification:'evidence/final-verification.json',beforeLive:['Fresh explicit approval for this profile/hash, one new C01 and $1.75','Fresh official metadata, model/rates and balance covering new ceiling plus prior unknown liability','Unchanged source/input hashes and valid dated anchor','Private single-use authorization and key capsule; no production credentials','Active sleep prevention; operator cancellation and uncertainty stops'],createdAt:new Date().toISOString()};
+writeFileSync(join(folder,'evidence/prepared-manifest.json'),JSON.stringify(manifest,null,2)+'\n',{flag:'wx'});
+console.log(JSON.stringify({status:manifest.status,profileId,approved:false,paidCalls:0,proposedCeilingUsd:1.75,maximumModelUsd:maximumModelUsd(),sourcePins:Object.keys(qualificationSources).length}));

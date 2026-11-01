@@ -20,16 +20,17 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Find all quests that are still PENDING or IN_PROGRESS
+    // Find all quests that are still PENDING, ACTIVE, or IN_PROGRESS
     const pendingQuests = await prisma.quest.findMany({
       where: {
-        status: { in: ["PENDING", "IN_PROGRESS"] },
+        status: { in: ["PENDING", "ACTIVE", "IN_PROGRESS"] },
       },
       include: { user: true }
     });
 
     // Filter quests that are overdue in the user's specific local timezone
     const overdueQuests = pendingQuests.filter((quest) => {
+      if (!quest.scheduledFor) return false;
       const userTimezone = quest.user.timezone || "UTC";
       const userLocalDate = TimezoneService.getUserLocalDate(userTimezone);
       return quest.scheduledFor < userLocalDate;
@@ -43,7 +44,7 @@ export async function GET(req: NextRequest) {
         await tx.$queryRaw`SELECT id FROM "StudySession" WHERE "userId"=${snapshot.userId} ORDER BY id FOR UPDATE`;
         await tx.$queryRaw`SELECT id FROM "Quest" WHERE id=${snapshot.id} AND "userId"=${snapshot.userId} FOR UPDATE`;
         const quest = await tx.quest.findFirst({ where: { id: snapshot.id, userId: snapshot.userId }, include: { user: true } });
-        if (!quest || !["PENDING", "IN_PROGRESS"].includes(quest.status) ||
+        if (!quest || !quest.scheduledFor || !["PENDING", "ACTIVE", "IN_PROGRESS"].includes(quest.status) ||
           quest.scheduledFor >= TimezoneService.getUserLocalDate(quest.user.timezone || "UTC")) return false;
         if (quest.plannedMinutes !== null) {
           const running = await tx.studySession.findFirst({ where: { questId: quest.id, endedAt: null,

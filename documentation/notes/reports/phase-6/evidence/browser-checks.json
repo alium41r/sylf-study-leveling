@@ -1,0 +1,32 @@
+[
+  {
+    "name": "rich-text",
+    "script": "notes-workspace/browser.mjs",
+    "exitCode": 0,
+    "seconds": 14.279780864715576
+  },
+  {
+    "name": "handwriting",
+    "script": "notes-ink/browser.mjs",
+    "exitCode": 0,
+    "seconds": 11.815149068832397
+  },
+  {
+    "name": "pdf",
+    "script": "notes-pdf/browser.mjs",
+    "exitCode": 0,
+    "seconds": 12.943553924560547
+  },
+  {
+    "name": "accessibility",
+    "script": "notes-workspace/accessibility.mjs",
+    "exitCode": 0,
+    "seconds": 2.6313390731811523
+  },
+  {
+    "name": "offline",
+    "script": "notes-workspace/offline.mjs",
+    "exitCode": 0,
+    "seconds": 0.4396049976348877
+  }
+]

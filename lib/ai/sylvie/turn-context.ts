@@ -145,7 +145,8 @@ export function isSylvieCalendarRequest(
   if (
     request &&
     (relevant.test(message) ||
-      (dates.test(message) &&
+      (!CONTINUATION.test(message.trim()) &&
+        dates.test(message) &&
         !/\b(?:how (?:does|do)|explain)\b/i.test(message)))
   )
     return true;

@@ -9,7 +9,11 @@ export interface IconProps extends React.SVGProps<SVGSVGElement> {
  * Minimalist geometric quest rhombus with tactical cross-aperture.
  * Canonical icon for all Quests across the entire application.
  */
-export function QuestEmblemIcon({ size = 18, className = "", ...props }: IconProps) {
+export function QuestEmblemIcon({
+  size = 18,
+  className = "",
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -40,7 +44,11 @@ export function QuestEmblemIcon({ size = 18, className = "", ...props }: IconPro
  * Canonical icon for Objectives & Goals across the entire application.
  * Replaces misplaced lightning bolts and generic concentric circles.
  */
-export function ObjectiveTargetIcon({ size = 18, className = "", ...props }: IconProps) {
+export function ObjectiveTargetIcon({
+  size = 18,
+  className = "",
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -75,7 +83,11 @@ export function ObjectiveTargetIcon({ size = 18, className = "", ...props }: Ico
  * Razor-sharp stylized flame replacing bulbous generic clip-art.
  * Canonical icon for Streaks, Weekly consistency, and study momentum.
  */
-export function StreakFlameIcon({ size = 13, className = "", ...props }: IconProps) {
+export function StreakFlameIcon({
+  size = 13,
+  className = "",
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -102,7 +114,11 @@ export function StreakFlameIcon({ size = 13, className = "", ...props }: IconPro
  * Modern, simplistic Scholar Level & Rank Insignia.
  * Ascending chevron vector replacing generic AI sparkles.
  */
-export function LevelInsigniaIcon({ size = 16, className = "", ...props }: IconProps) {
+export function LevelInsigniaIcon({
+  size = 16,
+  className = "",
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -132,7 +148,11 @@ export function LevelInsigniaIcon({ size = 16, className = "", ...props }: IconP
  * 300° completion track with precision checkpoint check.
  * Replaces generic concentric bullseye for quotas.
  */
-export function DailyQuotaIcon({ size = 16, className = "", ...props }: IconProps) {
+export function DailyQuotaIcon({
+  size = 16,
+  className = "",
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -159,7 +179,11 @@ export function DailyQuotaIcon({ size = 16, className = "", ...props }: IconProp
  * Sylvie Telemetry & Insights Scanner Aperture.
  * Holographic scanning lens replacing maritime compass needle.
  */
-export function SystemInsightsIcon({ size = 18, className = "", ...props }: IconProps) {
+export function SystemInsightsIcon({
+  size = 18,
+  className = "",
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -188,7 +212,11 @@ export function SystemInsightsIcon({ size = 18, className = "", ...props }: Icon
  * Modern, simplistic Tactical Warning Delta.
  * Crisp alert triangle replacing generic round exclamation point.
  */
-export function SystemWarningIcon({ size = 11, className = "", ...props }: IconProps) {
+export function SystemWarningIcon({
+  size = 11,
+  className = "",
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -217,7 +245,11 @@ export function SystemWarningIcon({ size = 11, className = "", ...props }: IconP
  * Modern, simplistic System Transmission / Briefing Beacon.
  * Holographic broadcast indicator.
  */
-export function SystemBriefingIcon({ size = 16, className = "", ...props }: IconProps) {
+export function SystemBriefingIcon({
+  size = 16,
+  className = "",
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -247,7 +279,11 @@ export function SystemBriefingIcon({ size = 16, className = "", ...props }: Icon
  * Modern, simplistic Focus Duration Clock.
  * Clean vector replacing stopwatch emojis.
  */
-export function FocusClockIcon({ size = 13, className = "", ...props }: IconProps) {
+export function FocusClockIcon({
+  size = 13,
+  className = "",
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -273,7 +309,11 @@ export function FocusClockIcon({ size = 13, className = "", ...props }: IconProp
  * Clean geometric tome replacing generic clip-art books.
  * Canonical icon for Subjects & Academic Disciplines across the application.
  */
-export function SubjectGrimoireIcon({ size = 18, className = "", ...props }: IconProps) {
+export function SubjectGrimoireIcon({
+  size = 18,
+  className = "",
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -293,7 +333,70 @@ export function SubjectGrimoireIcon({ size = 18, className = "", ...props }: Ico
       {/* Right tome wing */}
       <path d="M20 19.5V5.5C20 4.4 19.1 3.5 18 3.5H13C12.4 3.5 12 3.9 12 4.5V20.5C12 19.9 12.4 19.5 13 19.5H18C19.1 19.5 20 20.4 20 21.5" />
       {/* Central discipline diamond marker */}
-      <polygon points="12 6.5 13.5 8.5 12 10.5 10.5 8.5" fill="currentColor" strokeWidth="0" />
+      <polygon
+        points="12 6.5 13.5 8.5 12 10.5 10.5 8.5"
+        fill="currentColor"
+        strokeWidth="0"
+      />
+    </svg>
+  );
+}
+
+const strokeProps = {
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.75,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+  "aria-hidden": true as const,
+};
+
+/**
+ * Deadline marker: a calendar page carrying a target flag.
+ * Used by Planner for goal deadlines.
+ */
+export function DeadlineIcon({
+  size = 16,
+  className = "",
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      className={className}
+      {...strokeProps}
+      {...props}
+    >
+      <rect x="3.5" y="5" width="17" height="15.5" rx="3" />
+      <line x1="3.5" y1="10" x2="20.5" y2="10" />
+      <line x1="8" y1="3" x2="8" y2="6.5" />
+      <line x1="16" y1="3" x2="16" y2="6.5" />
+      <path d="M9 17v-4.2l5 1.6-5 1.6" fill="currentColor" strokeWidth="1.25" />
+    </svg>
+  );
+}
+
+/**
+ * Review seal: a shield-less hexagonal seal with a verification tick.
+ * Used by Planner for independent review.
+ */
+export function ReviewSealIcon({
+  size = 16,
+  className = "",
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      className={className}
+      {...strokeProps}
+      {...props}
+    >
+      <polygon points="12 2.8 19.8 7.4 19.8 16.6 12 21.2 4.2 16.6 4.2 7.4" />
+      <polyline points="8.6 12.2 11 14.6 15.6 9.6" />
     </svg>
   );
 }

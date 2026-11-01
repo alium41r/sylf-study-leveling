@@ -1,0 +1,59 @@
+{
+  "checkedAt": "2026-10-23T12:49:52.550Z",
+  "documentId": "03128312-0307-447c-a095-15bd3d44d83c",
+  "copies": [
+    {
+      "id": "1WG_04b7-yAhRLSJlhaoID4II8RXaweah",
+      "name": "Phase 7 — synthetic study notes.pdf",
+      "trashed": true,
+      "sha256": "1e91ab5605593eeae861c1a1a76cc4c7c3eabcc2d8dc0b965e3c3beeee398b87",
+      "fingerprint": "4a6df7a0653e54edd65ba0b0f2b4cb72e80cf1e59e8c0b963e03e3941644b019",
+      "sourceCount": "2",
+      "parents": [
+        "14f2OQC4HnVIYMzCCsMkUNRkGlXxrGOIW"
+      ]
+    },
+    {
+      "id": "1He0j-RqkYhQIxQU3DJfaHu53Aie-FyrX",
+      "name": "Phase 7 — synthetic study notes.pdf",
+      "trashed": false,
+      "sha256": "1d76be50fc2d7a68a4cb53630fc06e950bc1d11a93f125afec68db6385502888",
+      "fingerprint": "491df141a72fc8c60db9418f1e4cd42e472449a32116eb44ab84c3da16a39dc9",
+      "sourceCount": "2",
+      "parents": [
+        "14f2OQC4HnVIYMzCCsMkUNRkGlXxrGOIW"
+      ]
+    },
+    {
+      "id": "14-sK7R_kDUUloEyOQkHB33h6ikoWMR3J",
+      "name": "Phase 7 — synthetic study notes.pdf",
+      "trashed": true,
+      "sha256": "ae3a59274b05706f5e32ea8ece1b099319bcbc3fe79c70cbe5ecdb7322c4e386",
+      "fingerprint": "12d880b91d85315f66f7b8c1a4496da42e60eb090eb23586dae1d8bb5aaa8df8",
+      "parents": [
+        "14f2OQC4HnVIYMzCCsMkUNRkGlXxrGOIW"
+      ]
+    },
+    {
+      "id": "1-Xj39SAUrq9oFb2XbJbh_gkSRVkZbSov",
+      "name": "Phase 7 — synthetic study notes.pdf",
+      "trashed": true,
+      "sha256": "548086da5fb247caae752de3066e6aa80ef6bfc38f98874e8d16a1f19f945203",
+      "fingerprint": "32134643752a82a055272e563f9fdf35f8962f41af461ca8086c5bf07f0d6aee",
+      "parents": [
+        "1uuMl7ob5ZbE3Ys-IOPw-UhBXnhqv6ZW-"
+      ]
+    },
+    {
+      "id": "1SU1_O-gmdb4Acsmqi9vYPmZEK4Jvz6wz",
+      "name": "Phase 7 — synthetic study notes.sylfnote",
+      "trashed": false,
+      "sha256": "58d08ff4671080536880b2de39734e88814451c007b7dc8b0ac9c6b24a944922",
+      "fingerprint": "92bec62f63a86a9db952604cbe163ee1a943f94f8118e6e13256c36b03fbb241",
+      "parents": [
+        "1uuMl7ob5ZbE3Ys-IOPw-UhBXnhqv6ZW-"
+      ]
+    }
+  ],
+  "more": false
+}

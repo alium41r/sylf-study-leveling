@@ -5,6 +5,62 @@ import { BlueprintSnapshotSchema } from "./schemas/checkpoint";
 import type { z } from "zod";
 import { weekKey } from "../server/context";
 import { hash,reject } from "../server/database";
+import { CalendarReservationSchema, usableStudyWindows, validateCalendarAllocation, type CalendarCapacity, type CalendarReservation, type CalendarAllocation } from "./foundation/calendar";
+
+/** Joint interval packing is part of the existing deterministic allocator. It
+ * also verifies existing reservations before any educational blueprint exists.
+ * A bounded search failure is never a mathematical shortage proof. */
+export function allocateCalendarReservations(snapshot: CalendarCapacity, rawTasks: readonly CalendarReservation[], options: { maximumSearchNodes?: number; now?: number } = {}): CalendarAllocation {
+  const tasks = rawTasks.map(t => CalendarReservationSchema.parse(t)), limit = options.maximumSearchNodes ?? 20000, now = options.now ?? Date.parse(snapshot.capturedAt);
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100000 || new Set(tasks.map(t => t.key)).size !== tasks.length) throw new Error("INVALID_CALENDAR_SEARCH");
+  const projection = usableStudyWindows(snapshot, now);
+  if (projection.status !== "KNOWN") throw new Error("CALENDAR_NOT_CURRENT");
+  const byKey = new Map(tasks.map(t => [t.key, t]));
+  const visiting = new Set<string>(), visited = new Set<string>();
+  const visit = (task: CalendarReservation) => {
+    if (visiting.has(task.key)) throw new Error("CALENDAR_DEPENDENCY_CYCLE");
+    if (visited.has(task.key)) return;
+    visiting.add(task.key);
+    for (const ref of task.after) { const before = byKey.get(ref); if (!before || before.date > task.date) throw new Error("INVALID_CALENDAR_DEPENDENCY"); visit(before); }
+    visiting.delete(task.key); visited.add(task.key);
+  };
+  tasks.forEach(visit);
+  let searchedNodes = 0;
+  const witness: CalendarAllocation["witness"] = [];
+  const result = (status: CalendarAllocation["status"], proof: CalendarAllocation["proof"] = null) => validateCalendarAllocation(snapshot, { schemaVersion: 1, status, searchedNodes, tasks, witness: status === "FEASIBLE" ? witness : [], proof }, now);
+  for (const date of [...new Set(tasks.map(t => t.date))].sort()) {
+    const work = tasks.filter(t => t.date === date), windows = projection.days.find(d => d.date === date)?.windows ?? [];
+    const free = Math.floor(windows.reduce((n, w) => n + w.end - w.start, 0) / 60000), largest = Math.floor(Math.max(0, ...windows.map(w => w.end - w.start)) / 60000);
+    const required = work.reduce((n, t) => n + t.minutes, 0), oversized = work.find(t => t.minutes > largest);
+    if (required > free || oversized) return result("CAPACITY_SHORTFALL", { date, requiredMinutes: oversized?.minutes ?? required, availableMinutes: oversized ? largest : free,
+      explanation: oversized ? "An indivisible remaining task exceeds every uninterrupted accepted free interval on its fixed date." : "Existing indivisible reservations exceed the union of accepted free intervals on this date." });
+  }
+  for (const date of [...new Set(tasks.map(t => t.date))].sort()) {
+    const work = tasks.filter(t => t.date === date), windows = projection.days.find(d => d.date === date)?.windows ?? [];
+    const placed = new Map<string, { start: number; end: number }>();
+    const search = (free: { start: number; end: number }[]): boolean => {
+      if (placed.size === work.length) return true;
+      if (++searchedNodes > limit) return false;
+      const ready = work.filter(t => !placed.has(t.key) && t.after.every(ref => byKey.get(ref)!.date < date || placed.has(ref))).sort((a, b) => b.minutes - a.minutes || a.key.localeCompare(b.key));
+      for (const task of ready) {
+        const earliest = Math.max(0, ...task.after.map(ref => placed.get(ref)?.end ?? 0));
+        for (let i = 0; i < free.length; i++) {
+          const span = free[i], start = Math.max(span.start, earliest), end = start + task.minutes * 60000;
+          if (end > span.end) continue;
+          placed.set(task.key, { start, end });
+          const next = [...free.slice(0, i), ...(start > span.start ? [{ start: span.start, end: start }] : []), ...(end < span.end ? [{ start: end, end: span.end }] : []), ...free.slice(i + 1)];
+          if (search(next)) return true;
+          placed.delete(task.key);
+          if (searchedNodes >= limit) return false;
+        }
+      }
+      return false;
+    };
+    if (!search(windows)) return result("ALLOCATION_UNRESOLVED");
+    witness.push(...[...placed].map(([key, w]) => ({ key, start: new Date(w.start).toISOString(), end: new Date(w.end).toISOString() })));
+  }
+  return result("FEASIBLE");
+}
 
 export type BlueprintSnapshot=z.infer<typeof BlueprintSnapshotSchema>;
 type Activity=BlueprintSnapshot["plans"][number]["blueprint"]["activities"][number];
@@ -19,10 +75,25 @@ export interface BindingConstraint {
   alreadyReserved:boolean;sessionMaximumMinutes:number;maximumIndivisibleMinutes:number;
   eligibleDays:{date:string;dayMinutes:number;weekMinutes:number;goalMinutes:number|null;upperBoundMinutes:number;remainingAfterPlacementsMinutes:number}[];
 }
+/** Existing workload bounds shared by pre-strategy capacity and allocation. */
+export function existingCapacityProof(envelope:SchedulingEnvelope,facts:AllocationFacts):AllocationReport["capacityProof"] {
+  let capacityProof:AllocationReport["capacityProof"]=null;
+  for(const day of envelope.days)if(day.otherCommittedMinutes+day.protectedTargetMinutes>day.ceilingMinutes){capacityProof={planRefs:envelope.targets.map(t=>t.planRef),dates:[day.date],requiredMinutes:Math.ceil(day.otherCommittedMinutes+day.protectedTargetMinutes),availableMinutes:day.ceilingMinutes,explanation:"Existing actual/remaining commitments already exceed the accepted daily ceiling. They have not been trimmed."};break;}
+  for(const week of facts.weeks.filter(w=>envelope.days.some(d=>weekKey(d.date)===w.week))){const existing=Math.ceil(week.otherCommittedMinutes)+week.protectedTargetMinutes;
+    if(!capacityProof&&existing>envelope.weeklyCeilingMinutes)capacityProof={planRefs:envelope.targets.map(t=>t.planRef),dates:envelope.days.filter(d=>weekKey(d.date)===week.week).map(d=>d.date).length?envelope.days.filter(d=>weekKey(d.date)===week.week).map(d=>d.date):[envelope.window.start],requiredMinutes:existing,availableMinutes:envelope.weeklyCeilingMinutes,explanation:"Owned same-week actual and protected commitments already exceed the global ceiling; none was removed."};
+    for(const t of envelope.targets){const used=Math.ceil(week.perGoalCommittedMinutes.find(p=>p.planRef===t.planRef)?.minutes??0)+envelope.protectedExecution.filter(p=>p.planRef===t.planRef&&weekKey(p.date)===week.week).reduce((n,p)=>n+p.remainingMinutes,0);
+      if(!capacityProof&&t.perGoalWeeklyCeilingMinutes!==null&&used>t.perGoalWeeklyCeilingMinutes)capacityProof={planRefs:[t.planRef],dates:[week.week],requiredMinutes:used,availableMinutes:t.perGoalWeeklyCeilingMinutes,explanation:"Owned per-goal same-week commitments exceed the accepted goal ceiling; no effort was counted twice or trimmed."};
+    }
+  }
+  return capacityProof;
+}
 /** Remaining/actual/week facts come from the Phase 1 owner, never model output. */
 export function allocateLearning(raw:BlueprintSnapshot,rawEnvelope:SchedulingEnvelope,rawFacts:AllocationFacts,options:{maximumSearchNodes?:number;onBindingConstraints?:(constraints:BindingConstraint[])=>void}={}):AllocationReport {
   const snapshot=BlueprintSnapshotSchema.parse(raw),envelope=SchedulingEnvelopeSchema.parse(rawEnvelope),facts=AllocationFactsSchema.parse(rawFacts);
   const limit=options.maximumSearchNodes??20000;if(!Number.isSafeInteger(limit)||limit<1||limit>100000)reject("INVALID_OUTPUT","Invalid bounded allocation search allowance.","ALLOCATION");
+  const calendarDays=envelope.calendar ? usableStudyWindows(envelope.calendar.snapshot,Date.parse(envelope.calendar.snapshot.capturedAt)) : null;
+  if(calendarDays?.status==="NEEDS_DECISION")reject("STALE_CONTEXT","Calendar capacity is unavailable.","ALLOCATION");
+  const largestGap=(date:string)=>calendarDays ? Math.floor(Math.max(0,...(calendarDays.days.find(d=>d.date===date)?.windows??[]).map(w=>(w.end-w.start)/60000))) : Infinity;
   const target=new Map(envelope.targets.map(t=>[t.planRef,t]));
   if(snapshot.plans.length!==target.size||snapshot.plans.some(p=>!target.has(p.planRef)))reject("INVALID_OUTPUT","Allocation targets differ from the accepted envelope.","ALLOCATION");
   const pins=new Map(facts.pins.map(p=>[key(p.planRef,p.activityRef),p]));
@@ -58,7 +129,7 @@ export function allocateLearning(raw:BlueprintSnapshot,rawEnvelope:SchedulingEnv
     const deadline=target.get(node.planRef)!.deadline;
     const allowed=envelope.days.filter(d=>!d.excluded&&d.date>=envelope.today&&(deadline.kind!=="FIXED"||d.date<deadline.date||d.date===deadline.date&&deadline.examDayStudyAllowed)).map(d=>d.date).sort();
     const candidates=(node.pin?.remainingMinutes??node.activity.timeboxMinutes)>(facts.preferences.find(p=>p.planRef===node.planRef)?.maximumTimeboxMinutes??240)?[]:node.pin?.state==="COMPLETED"?[node.pin.date]:node.pin?allowed.filter(date=>date===node.pin!.date):allowed;
-    domains.set(node.key,candidates.filter(date=>externalEdges.filter(e=>e.node===node.key).every(edge=>{const interval=gap(external.get(edge.ref)!.date,date);return interval>=edge.minimum&&(edge.maximum===undefined||interval<=edge.maximum);})));
+    domains.set(node.key,candidates.filter(date=>(node.pin?.state==="COMPLETED" || (node.pin?.remainingMinutes??node.activity.timeboxMinutes)<=largestGap(date)) && externalEdges.filter(e=>e.node===node.key).every(edge=>{const interval=gap(external.get(edge.ref)!.date,date);return interval>=edge.minimum&&(edge.maximum===undefined||interval<=edge.maximum);})));
   }
   // Arc consistency narrows necessary date sets; it never changes pedagogy.
   let changed=true;while(changed){changed=false;for(const edge of edges){const a=domains.get(edge.before)!,b=domains.get(edge.after)!;
@@ -86,19 +157,25 @@ export function allocateLearning(raw:BlueprintSnapshot,rawEnvelope:SchedulingEnv
     if(required>capacity)return {planRefs:[...new Set(subset.map(n=>n.planRef))],dates:dates.length?dates:envelope.days.map(d=>d.date).length?envelope.days.map(d=>d.date):[envelope.window.start],requiredMinutes:required,availableMinutes:Math.floor(capacity),
       explanation:`${required} remaining minutes require ${single?"one indivisible valid day":"the constrained dates"}; the necessary upper bound is ${Math.floor(capacity)} minutes under the disclosed ${envelope.recoveryPercent}% recovery margin. This is a capacity bound, not a failed heuristic.`};return null;
   };
-  let capacityProof:AllocationReport["capacityProof"]=null;
-  for(const day of envelope.days)if(day.otherCommittedMinutes+day.protectedTargetMinutes>day.ceilingMinutes){capacityProof={planRefs:envelope.targets.map(t=>t.planRef),dates:[day.date],requiredMinutes:Math.ceil(day.otherCommittedMinutes+day.protectedTargetMinutes),availableMinutes:day.ceilingMinutes,explanation:"Existing actual/remaining commitments already exceed the accepted daily ceiling. They have not been trimmed."};break;}
-  for(const week of facts.weeks.filter(w=>envelope.days.some(d=>weekKey(d.date)===w.week))){const existing=Math.ceil(week.otherCommittedMinutes)+week.protectedTargetMinutes;
-    if(!capacityProof&&existing>envelope.weeklyCeilingMinutes)capacityProof={planRefs:envelope.targets.map(t=>t.planRef),dates:envelope.days.filter(d=>weekKey(d.date)===week.week).map(d=>d.date).length?envelope.days.filter(d=>weekKey(d.date)===week.week).map(d=>d.date):[envelope.window.start],requiredMinutes:existing,availableMinutes:envelope.weeklyCeilingMinutes,explanation:"Owned same-week actual and protected commitments already exceed the global ceiling; none was removed."};
-    for(const t of envelope.targets){const used=Math.ceil(week.perGoalCommittedMinutes.find(p=>p.planRef===t.planRef)?.minutes??0)+envelope.protectedExecution.filter(p=>p.planRef===t.planRef&&weekKey(p.date)===week.week).reduce((n,p)=>n+p.remainingMinutes,0);
-      if(!capacityProof&&t.perGoalWeeklyCeilingMinutes!==null&&used>t.perGoalWeeklyCeilingMinutes)capacityProof={planRefs:[t.planRef],dates:[week.week],requiredMinutes:used,availableMinutes:t.perGoalWeeklyCeilingMinutes,explanation:"Owned per-goal same-week commitments exceed the accepted goal ceiling; no effort was counted twice or trimmed."};
-    }
-  }
+  let capacityProof=existingCapacityProof(envelope,facts);
   for(const node of chargeable)capacityProof??=proof([node],true);
   capacityProof??=proof(chargeable);
   for(const plan of snapshot.plans)capacityProof??=proof(chargeable.filter(n=>n.planRef===plan.planRef));
   for(const end of [...new Set(chargeable.map(n=>domains.get(n.key)!.at(-1)).filter((d):d is string=>!!d))])capacityProof??=proof(chargeable.filter(n=>(domains.get(n.key)!.at(-1)??"")<=end));
   const assigned=new Map<string,string>();let best=new Map<string,string>();let attempts=0;
+  let calendarAllocation:CalendarAllocation|undefined;
+  const pack=():CalendarAllocation|undefined=>{
+    if(!envelope.calendar)return;
+    const tasks=new Map(envelope.calendar.reservations.map(t=>[t.key,t]));
+    for(const [id,date] of assigned){const node=nodes.get(id)!,minutes=node.pin?.remainingMinutes??node.activity.timeboxMinutes;if(!minutes)continue;
+      const prior=tasks.get(id);if(prior&&(prior.date!==date||prior.minutes!==minutes))reject("PROTECTED_EXECUTION","Calendar reservation differs from retained work.","ALLOCATION");
+      tasks.set(id,{key:id,date,minutes,after:[...new Set([...(prior?.after??[]),...externalEdges.filter(e=>e.node===id&&external.get(e.ref)?.reservationKey).map(e=>external.get(e.ref)!.reservationKey!),...edges.filter(e=>e.after===id&&assigned.has(e.before)&&(nodes.get(e.before)!.pin?.remainingMinutes??nodes.get(e.before)!.activity.timeboxMinutes)>0).map(e=>e.before)])]});
+    }
+    const value=allocateCalendarReservations(envelope.calendar.snapshot,[...tasks.values()],{maximumSearchNodes:Math.max(1,limit-attempts)});attempts+=value.searchedNodes;return value;
+  };
+  if(envelope.calendar){const baseline=allocateCalendarReservations(envelope.calendar.snapshot,envelope.calendar.reservations,{maximumSearchNodes:limit});attempts+=baseline.searchedNodes;
+    if(baseline.proof)capacityProof??={requiredMinutes:baseline.proof.requiredMinutes,availableMinutes:baseline.proof.availableMinutes,explanation:baseline.proof.explanation,planRefs:envelope.targets.map(t=>t.planRef),dates:[baseline.proof.date]};
+  }
   const validEdges=(id:string,date:string)=>edges.every(edge=>{
     const before=edge.before===id?date:assigned.get(edge.before),after=edge.after===id?date:assigned.get(edge.after);if(!before||!after)return true;
     const interval=gap(anchorDate(nodes.get(edge.before)!,before),after);return interval>=edge.minimum&&(edge.maximum===undefined||interval<=edge.maximum);
@@ -106,7 +183,7 @@ export function allocateLearning(raw:BlueprintSnapshot,rawEnvelope:SchedulingEnv
   // Exact pins are immutable. Started minutes are already subtracted by the
   // envelope; unstarted kept work is charged here once.
   for(const node of nodes.values())if(node.pin&&domains.get(node.key)!.length){const date=node.pin.date;if(available(node,date)>=node.charge&&validEdges(node.key,date)){assigned.set(node.key,date);consume(node,date,1);}}
-  best=new Map(assigned);
+  best=envelope.calendar?new Map():new Map(assigned);
   const candidateDates=(node:Node)=>domains.get(node.key)!.filter(date=>available(node,date)>=node.charge&&validEdges(node.key,date)).sort((a,b)=>{
     const window=node.activity.learningWindow;
     const known=(ref:string)=>{const own=nodes.get(key(node.planRef,ref));return own&&assigned.has(own.key)?anchorDate(own,assigned.get(own.key)!):external.get(ref)?.date;};
@@ -118,7 +195,9 @@ export function allocateLearning(raw:BlueprintSnapshot,rawEnvelope:SchedulingEnv
     return a.localeCompare(b);
   });
   const search=():boolean=>{
-    if(assigned.size>best.size)best=new Map(assigned);if(assigned.size===nodes.size)return true;if(++attempts>limit)return false;
+    if(!envelope.calendar&&assigned.size>best.size)best=new Map(assigned);
+    if(assigned.size===nodes.size){const packed=pack();if(!packed||packed.status==="FEASIBLE"){best=new Map(assigned);calendarAllocation=packed;return true;}return false;}
+    if(++attempts>limit)return false;
     const ready=[...nodes.values()].filter(n=>!assigned.has(n.key)&&!n.pin&&edges.filter(e=>e.after===n.key).every(e=>assigned.has(e.before)));
     ready.sort((a,b)=>domains.get(a.key)!.length-domains.get(b.key)!.length||a.priority-b.priority||a.key.localeCompare(b.key));
     const node=ready[0];if(!node)return false;for(const date of candidateDates(node)){assigned.set(node.key,date);consume(node,date,1);if(search())return true;consume(node,date,-1);assigned.delete(node.key);if(attempts>=limit)break;}return false;
@@ -127,7 +206,7 @@ export function allocateLearning(raw:BlueprintSnapshot,rawEnvelope:SchedulingEnv
   dayUsed.clear();weekUsed.clear();goalUsed.clear();for(const [id,date] of assigned)consume(nodes.get(id)!,date,1);
   // One bounded local improvement pass toward the accepted pacing and the
   // AI-declared advisory windows. Exact pins and all hard constraints survive.
-  for(const node of [...nodes.values()].reverse())if(!node.pin&&assigned.has(node.key)){
+  for(const node of [...nodes.values()].reverse())if(!envelope.calendar&&!node.pin&&assigned.has(node.key)){
     const old=assigned.get(node.key)!;consume(node,old,-1);assigned.delete(node.key);
     const date=candidateDates(node)[0]??old;assigned.set(node.key,date);consume(node,date,1);
   }
@@ -146,10 +225,11 @@ export function allocateLearning(raw:BlueprintSnapshot,rawEnvelope:SchedulingEnv
       alreadyReserved:node.pin?.alreadyReserved??false,sessionMaximumMinutes,
       maximumIndivisibleMinutes:Math.max(0,...eligibleDays.map(d=>d.upperBoundMinutes)),eligibleDays};
   }));
+  const calendarUnresolved=!!envelope.calendar&&!calendarAllocation;
   const findings:AllocationReport["findings"]=[];
   const finding=(category:AllocationReport["findings"][number]["category"],consequential:boolean,planRefs:string[],activityRefs:string[],evidence:string,consequence:string)=>findings.push({findingId:`finding_${hash("allocation-finding",{category,planRefs,evidence}).slice(0,20)}`,category,consequential,planRefs,activityRefs:activityRefs.slice(0,60),evidence:evidence.slice(0,1000),consequence});
   if(capacityProof)finding("SHORTFALL",true,capacityProof.planRefs,unscheduled.map(t=>t.activityRef),capacityProof.explanation,"The AI must explain triage, use declared meaningful chunks, or request an explicit constraint decision. No work or timebox was silently removed.");
-  else if(unscheduled.length)finding("LEARNING_WINDOW",true,envelope.targets.map(t=>t.planRef),unscheduled.map(t=>t.activityRef),`${unscheduled.length} committed activities remain unplaced after bounded dependency/window/capacity search (${attempts} nodes, limit ${limit}). ${unscheduled.slice(0,8).map(t=>{const n=nodes.get(key(t.planRef,t.activityRef))!;return `${t.planRef}/${t.activityRef}: approved ${t.minutes} minutes, ${domains.get(n.key)!.length} hard-valid dates${n.pin?`, exact owned placement ${n.pin.date}`:""}, accepted maximum ${facts.preferences.find(p=>p.planRef===t.planRef)?.maximumTimeboxMinutes??240}`;}).join("; ")}`,"This is ALLOCATION_UNRESOLVED, not proof of an impossible deadline. Consider a declared split or a targeted educational change.");
+  else if(unscheduled.length||calendarUnresolved)finding("LEARNING_WINDOW",true,envelope.targets.map(t=>t.planRef),unscheduled.map(t=>t.activityRef),`${unscheduled.length} committed activities remain unplaced after bounded dependency/window/capacity search (${attempts} nodes, limit ${limit}). ${unscheduled.slice(0,8).map(t=>{const n=nodes.get(key(t.planRef,t.activityRef))!;return `${t.planRef}/${t.activityRef}: approved ${t.minutes} minutes, ${domains.get(n.key)!.length} hard-valid dates${n.pin?`, exact owned placement ${n.pin.date}`:""}, accepted maximum ${facts.preferences.find(p=>p.planRef===t.planRef)?.maximumTimeboxMinutes??240}`;}).join("; ")}`,"This is ALLOCATION_UNRESOLVED, not proof of an impossible deadline. Consider a declared split or a targeted educational change.");
   for(const plan of snapshot.plans){const own=[...nodes.values()].filter(n=>n.planRef===plan.planRef&&assigned.has(n.key));const compromises:string[]=[];const order:string[]=[];
     for(const node of own){const date=assigned.get(node.key)!;const refDate=(ref:string)=>{const owned=nodes.get(key(node.planRef,ref));const date=assigned.get(key(node.planRef,ref));return owned&&date?anchorDate(owned,date):external.get(ref)?.date;};const window=node.activity.learningWindow;
       if(window){const anchor=refDate(window.anchorActivityId);if(anchor){const interval=gap(anchor,date);if(window.strength==="ADVISORY"&&(window.minimumGapDays!==undefined&&interval<window.minimumGapDays||window.maximumGapDays!==undefined&&interval>window.maximumGapDays)||window.preferredGapDays!==undefined&&interval!==window.preferredGapDays)compromises.push(`${node.activity.localId}: actual gap ${interval} days versus ${JSON.stringify(window)}`);}}
@@ -165,5 +245,5 @@ export function allocateLearning(raw:BlueprintSnapshot,rawEnvelope:SchedulingEnv
   if(crowded.length)finding("DENSITY",true,envelope.targets.map(t=>t.planRef),[],crowded.map(d=>`${d.date}: multiple AI-declared heavy activities share the day`).join("; "),"This is cognitive/intensity feedback for educational judgment, not a new capacity limit or mandatory practice rule.");
   const switching=envelope.days.filter(day=>new Set([...nodes.values()].filter(n=>assigned.get(n.key)===day.date).flatMap(n=>n.activity.scopeRefs.map(ref=>`${n.planRef}/${ref}`))).size>3);
   if(switching.length)finding("SWITCHING",false,envelope.targets.map(t=>t.planRef),[],switching.map(d=>d.date).join(", ")+": several scope contexts share these dates.","The AI can assess switching cost; no work is dropped or added.");
-  return AllocationReportSchema.parse({schemaVersion:2,status:capacityProof?"CAPACITY_SHORTFALL":unscheduled.length?"ALLOCATION_UNRESOLVED":"FEASIBLE",placements,unscheduled,committedMinutes:[...nodes.values()].reduce((n,t)=>n+t.activity.timeboxMinutes,0),capacityProof,findings});
+  return AllocationReportSchema.parse({schemaVersion:2,status:capacityProof?"CAPACITY_SHORTFALL":unscheduled.length||calendarUnresolved?"ALLOCATION_UNRESOLVED":"FEASIBLE",placements,unscheduled,committedMinutes:[...nodes.values()].reduce((n,t)=>n+t.activity.timeboxMinutes,0),capacityProof,findings,...(calendarAllocation?{calendarAllocation}:{})});
 }

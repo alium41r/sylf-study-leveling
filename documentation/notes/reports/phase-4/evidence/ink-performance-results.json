@@ -1,24 +1,24 @@
 {
   "strokes": 5000,
   "samples": 320000,
-  "encodedBytes": 14335513,
-  "buildMs": 988,
-  "hydrateMs": 592.1999999992549,
-  "coldRenderMs": 145.80000000074506,
+  "encodedBytes": 14335514,
+  "buildMs": 1489.5,
+  "hydrateMs": 920.6999999955297,
+  "coldRenderMs": 224.89999999850988,
   "pan": {
-    "p50Ms": 1.0999999977648258,
-    "p95Ms": 2.199999999254942,
-    "maxMs": 2.199999999254942
+    "p50Ms": 1.7000000029802322,
+    "p95Ms": 3.1999999955296516,
+    "maxMs": 3.1999999955296516
   },
   "activeLayer": {
     "p50Ms": 0,
     "p95Ms": 0.10000000149011612,
-    "maxMs": 0.5
+    "maxMs": 0.7999999970197678
   },
   "active4096Samples": {
-    "p50Ms": 0.5,
-    "p95Ms": 0.9000000022351742,
-    "maxMs": 1.699999999254942
+    "p50Ms": 0.7000000029802322,
+    "p95Ms": 1.4000000059604645,
+    "maxMs": 2
   },
   "cache": {
     "cachedPaths": 384,
@@ -28,18 +28,18 @@
   },
   "environment": "Headless Chromium desktop; 5,000 strokes / 320,000 original samples; isolated production model/renderer. No physical input-to-display claim.",
   "encryptedNativeSaves": {
-    "p50Ms": 2.7999999970197678,
-    "p95Ms": 5.100000001490116,
-    "maxMs": 5.100000001490116
+    "p50Ms": 3.8000000044703484,
+    "p95Ms": 12.899999998509884,
+    "maxMs": 12.899999998509884
   },
   "afterMetadataSaves": {
-    "p50Ms": 3.199999999254942,
-    "p95Ms": 4.5,
-    "maxMs": 4.5
+    "p50Ms": 3.7000000029802322,
+    "p95Ms": 4.199999995529652,
+    "maxMs": 4.199999995529652
   },
   "storage": {
     "objects": 73,
-    "objectBytes": 14388359,
+    "objectBytes": 14388360,
     "revisions": 34,
     "pending": 33,
     "stagedAssets": 0
@@ -47,9 +47,9 @@
   "pageNavigation": {
     "pages": 300,
     "measurements": {
-      "p50Ms": 10,
-      "p95Ms": 304.5,
-      "maxMs": 304.5
+      "p50Ms": 10.300000004470348,
+      "p95Ms": 13.199999995529652,
+      "maxMs": 13.199999995529652
     },
     "scope": "300 empty independent page streams; no dense-page or cloud latency extrapolation"
   }

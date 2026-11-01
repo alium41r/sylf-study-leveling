@@ -1,0 +1,3 @@
+{"label":"control","passed":86,"failed":2,"skipped":0,"collectionFailures":[]}
+FAIL durable independent complete-result review serializes SYNC_CACHE changes with the final planning lock and rejects their obsolete capacity
+FAIL compiler v2 role resources on genuine PostgreSQL streams actual provider deltas through durable SQL and SSE while the paid-shaped response is still pending

@@ -6,6 +6,7 @@ import {
   type SearchProviderId,
   type SearchResult,
 } from "./contracts";
+import { cleanDeepSeekApiKey } from "../../../ai/providers/deepseek";
 
 /**
  * External web search for Planner research.
@@ -22,10 +23,45 @@ import {
  */
 
 export class SearchProviderError extends Error {
-  constructor(public code: SearchErrorCode) {
+  constructor(public code: SearchErrorCode, public httpStatus?: number) {
     super(code);
     this.name = "SearchProviderError";
   }
+}
+
+/** Official raw Search API. Returned summaries/authority scores are discovery
+ * hints only; direct safe retrieval still owns evidence and issuer verification. */
+export function deepseekSearch(apiKey: string): SearchProvider {
+  apiKey = cleanDeepSeekApiKey(apiKey);
+  return { id: "deepseek", async search({ query, limit, signal, beforeRequest }) {
+    if (!apiKey) throw new SearchProviderError("SEARCH_UNAUTHORIZED");
+    if (!query.trim() || Array.from(query).length > 128 || !Number.isInteger(limit) || limit < 1) throw new SearchProviderError("SEARCH_BAD_RESPONSE");
+    await beforeRequest?.("deepseek");
+    const payload = await requestJson("https://api.deepseek.com/v1/tools/search", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({ query, count: Math.min(limit,50), need_content: false }) }, signal);
+    if (!payload || typeof payload !== "object" || !Array.isArray(Reflect.get(payload,"results"))) throw new SearchProviderError("SEARCH_BAD_RESPONSE");
+    const entries = Reflect.get(payload,"results");
+    const results = toResults(entries,"deepseek",limit,entry=>({url:entry.url,title:entry.title,snippet:entry.snippet}));
+    if (!results.length) throw new SearchProviderError(entries.length ? "SEARCH_BAD_RESPONSE" : "SEARCH_ZERO_RESULTS");
+    return results;
+  } };
+}
+
+/** One observation per real upstream, including a fallback. Unknown transport
+ * outcomes remain uncertain; the durable caller decides whether more work is safe. */
+export function observeSearchProvider(provider: SearchProvider): SearchProvider {
+  return { id: provider.id, async search(input) {
+    if(provider.id==="deepseek"&&(!input.query.trim()||Array.from(input.query).length>128))throw new SearchProviderError("SEARCH_BAD_RESPONSE");
+    await input.beforeRequest?.(provider.id);
+    let result: SearchResult[];
+    try { result = await provider.search({ ...input, beforeRequest: undefined, afterRequest: undefined }); }
+    catch(error) {
+      const outcome = error instanceof SearchProviderError && error.code === "SEARCH_ZERO_RESULTS" ? "EMPTY" :
+        error instanceof SearchProviderError && (provider.id==="deepseek"&&error.httpStatus!==undefined || ["SEARCH_UNAUTHORIZED","SEARCH_RATE_LIMITED"].includes(error.code)) ? "REJECTED" : "UNKNOWN";
+      await input.afterRequest?.({provider:provider.id,outcome}); throw error;
+    }
+    await input.afterRequest?.({provider:provider.id,outcome:result.length ? "RESULT" : "EMPTY"}); return result;
+  } };
 }
 
 /**
@@ -86,7 +122,7 @@ async function requestJson(url: string, init: RequestInit, signal?: AbortSignal)
     if (error instanceof Error && error.name === "TimeoutError") throw new SearchProviderError("SEARCH_TIMEOUT");
     throw new SearchProviderError("SEARCH_UNAVAILABLE");
   }
-  if (!response.ok) throw new SearchProviderError(codeForStatus(response.status));
+  if (!response.ok) throw new SearchProviderError(codeForStatus(response.status),response.status);
   const maximumBytes = 1024 * 1024;
   if (Number(response.headers.get("content-length") ?? 0) > maximumBytes || !response.body) {
     await response.body?.cancel();
@@ -248,15 +284,15 @@ export function fallbackSearchProvider(primary: SearchProvider, secondary: Searc
   ]);
   return {
     id: primary.id,
-    async search({ query, limit, signal, beforeRequest }) {
+    async search({ query, limit, signal, beforeRequest, afterRequest }) {
       try {
-        return await primary.search({ query, limit, signal, beforeRequest });
+        return await primary.search({ query, limit, signal, beforeRequest, afterRequest });
       } catch (error) {
         if (error instanceof SearchProviderError && fallbackCodes.has(error.code)) {
           // The student's own cancellation is not a provider fault, and retrying it would
           // ignore the request to stop.
           if (signal?.aborted) throw error;
-          return await secondary.search({ query, limit, signal, beforeRequest });
+          return await secondary.search({ query, limit, signal, beforeRequest, afterRequest });
         }
         throw error;
       }
@@ -277,16 +313,24 @@ export function fallbackSearchProvider(primary: SearchProvider, secondary: Searc
  * When more than one is available they are composed into a fallback chain rather than chosen
  * between, so a quota error degrades instead of failing.
  */
-export function selectSearchProvider(env: Record<string, string | undefined> = process.env): SearchProvider | null {
+export function selectSearchProvider(env: Record<string, string | undefined> = process.env, options: { preferDeepSeek?: boolean } = {}): SearchProvider | null {
   const explicit = env.SEARCH_PROVIDER?.trim().toLowerCase();
   const braveKey = env.BRAVE_SEARCH_API_KEY?.trim();
   const serperKey = env.SERPER_API_KEY?.trim();
   const searxngUrl = env.SEARXNG_URL?.trim();
   if (explicit && !(SEARCH_PROVIDERS as readonly string[]).includes(explicit)) return null;
 
-  const searxng = searxngUrl ? searxngSearch(searxngUrl) : null;
-  const brave = braveKey ? braveSearch(braveKey) : null;
-  const serper = serperKey ? serperSearch(serperKey) : null;
+  const observed = (provider: SearchProvider) => options.preferDeepSeek ? observeSearchProvider(provider) : provider;
+  const searxng = searxngUrl ? observed(searxngSearch(searxngUrl)) : null;
+  const brave = braveKey ? observed(braveSearch(braveKey)) : null;
+  const serper = serperKey ? observed(serperSearch(serperKey)) : null;
+  const deepseekKey = cleanDeepSeekApiKey(env.DEEPSEEK_API_KEY);
+  const deepseek = deepseekKey ? observed(deepseekSearch(deepseekKey)) : null;
+
+  if (explicit === "deepseek") return withFallbacks(deepseek,[brave,serper,searxng]);
+  // V2's trusted composition explicitly selects the preferred research backend.
+  // SEARCH_PROVIDER keeps choosing the previous backend/fallback; v1 is unchanged.
+  if (options.preferDeepSeek && deepseek) return withFallbacks(deepseek,explicit==="serper"?[serper,brave,searxng]:explicit==="searxng"?[searxng,brave,serper]:[brave,serper,searxng]);
 
   if (explicit === "serper") return withFallbacks(serper, [brave, searxng]);
   if (explicit === "brave") return withFallbacks(brave, [searxng, serper]);

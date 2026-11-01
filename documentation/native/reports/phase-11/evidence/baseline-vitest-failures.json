@@ -1,0 +1,218 @@
+{
+ "failed": [
+  {
+   "file": "scratch/calendar-postgres-check.test.ts",
+   "name": "persists, replays creates, isolates owners, detects stale writes and deletes, and preserves multiple date notes",
+   "msg": "PrismaClientKnownRequestError: "
+  },
+  {
+   "file": "scratch/calendar-postgres-check.test.ts",
+   "name": "queries timed overlaps in the viewer zone and all-day overlaps by civil dates",
+   "msg": "PrismaClientKnownRequestError: "
+  },
+  {
+   "file": "__tests__/ai/e2e-conversation.test.ts",
+   "name": "Sylvie conversation integration with the real tool executor retains cheap-answer continuity only in the adopted conversation",
+   "msg": "TypeError: Cannot read properties of undefined (reading '2')"
+  },
+  {
+   "file": "__tests__/ai/model-migration.test.ts",
+   "name": "DeepSeek model migration has no active reference to the retired model anywhere in the tree",
+   "msg": "AssertionError: expected [ { …(4) } ] to deeply equal []"
+  },
+  {
+   "file": "__tests__/auth/account-settings.test.ts",
+   "name": "Phase 3: Account Settings Data Binding & Profile Management PATCH /api/user/account successfully updates username & name, signs fresh session token, and sets cookie",
+   "msg": "AssertionError: expected 500 to be 200 // Object.is equality"
+  },
+  {
+   "file": "__tests__/auth/account-settings.test.ts",
+   "name": "Phase 3: Account Settings Data Binding & Profile Management PATCH /api/user/account resets verificationStatus to UNVERIFIED when email address changes",
+   "msg": "AssertionError: expected 500 to be 200 // Object.is equality"
+  },
+  {
+   "file": "__tests__/auth/routes.test.ts",
+   "name": "Phase 1: API Route Handlers GET /api/user/stats returns authenticated user stats and formatted scholar ID",
+   "msg": "AssertionError: expected 500 to be 200 // Object.is equality"
+  },
+  {
+   "file": "__tests__/dashboard/pixel-auth-mutation.test.tsx",
+   "name": "Auth customization and refresh ordering cannot restore the previous account from a delayed read after login changes owner",
+   "msg": "TypeError: finish is not a function"
+  },
+  {
+   "file": "__tests__/economy/cognitive-stats.test.ts",
+   "name": "Cognitive Stats — invest API invests Sylph into a stat (+5, deducts 60, audits the ledger)",
+   "msg": "AssertionError: expected 500 to be 200 // Object.is equality"
+  },
+  {
+   "file": "__tests__/economy/cognitive-stats.test.ts",
+   "name": "Cognitive Stats — invest API invests SP into a stat (+5, deducts 1 SP)",
+   "msg": "AssertionError: expected 500 to be 200 // Object.is equality"
+  },
+  {
+   "file": "__tests__/economy/cognitive-stats.test.ts",
+   "name": "Cognitive Stats — invest API rejects when Sylph balance is too low",
+   "msg": "AssertionError: expected 500 to be 400 // Object.is equality"
+  },
+  {
+   "file": "__tests__/economy/cognitive-stats.test.ts",
+   "name": "Cognitive Stats — invest API rejects a stat at its cap",
+   "msg": "AssertionError: expected 500 to be 400 // Object.is equality"
+  },
+  {
+   "file": "__tests__/mobile/settings-navigation.test.tsx",
+   "name": "Phase 1D-G: Canonical Settings & System Hub Family Navigation renders AccountSettingsScreen when navigating to /settings/account",
+   "msg": "Error: Unable to find role=\"heading\" and name \"Account\""
+  },
+  {
+   "file": "__tests__/mobile/shop-navigation.test.tsx",
+   "name": "Phase 1D-F: Canonical Shop & Inventory Alias Parity renders canonical ShopScreen when navigating to /shop",
+   "msg": "Error: Unable to find an element with the text: System Store. This could be because the text is broken up by multiple elements. In this case, you can provide a "
+  },
+  {
+   "file": "__tests__/mobile/shop-navigation.test.tsx",
+   "name": "Phase 1D-F: Canonical Shop & Inventory Alias Parity renders canonical ShopScreen when navigating to /inventory (canonical production alias)",
+   "msg": "Error: Unable to find an element with the text: System Store. This could be because the text is broken up by multiple elements. In this case, you can provide a "
+  },
+  {
+   "file": "__tests__/notes/ink.test.ts",
+   "name": "production paper page management drains sustained ink revisions in bounded passes without replacing source",
+   "msg": "Error: STACK_TRACE_ERROR"
+  },
+  {
+   "file": "__tests__/profile/profile-api.test.ts",
+   "name": "Profile System APIs GET /api/profile/[username] returns public dossier with characterConfig, cognitive stats and social links",
+   "msg": "AssertionError: expected 500 to be 200 // Object.is equality"
+  },
+  {
+   "file": "__tests__/profile/profile-api.test.ts",
+   "name": "Profile System APIs GET /api/profile/[username] enforces granular privacy controls (hidden rank, hidden study hours & stats, hidden achievements)",
+   "msg": "AssertionError: expected 500 to be 200 // Object.is equality"
+  },
+  {
+   "file": "__tests__/profile/profile-api.test.ts",
+   "name": "Profile System APIs PATCH /api/profile/customization updates characterConfig, bio, banner, and social links for authenticated user",
+   "msg": "AssertionError: expected 500 to be 200 // Object.is equality"
+  },
+  {
+   "file": "__tests__/security/s4-ai-tool-clamps.test.ts",
+   "name": "S4: AI tool reward-inflation clamps clamps a huge requiredMinutes (1,000,000) to the 240 ceiling",
+   "msg": "TypeError: Cannot read properties of undefined (reading '0')"
+  },
+  {
+   "file": "__tests__/security/s4-ai-tool-clamps.test.ts",
+   "name": "S4: AI tool reward-inflation clamps clamps tiny/zero requiredMinutes to the 15 floor",
+   "msg": "TypeError: Cannot read properties of undefined (reading '0')"
+  },
+  {
+   "file": "__tests__/security/s4-ai-tool-clamps.test.ts",
+   "name": "S4: AI tool reward-inflation clamps treats malformed minutes as the 30 default (never NaN/Infinity)",
+   "msg": "TypeError: Cannot read properties of undefined (reading '0')"
+  },
+  {
+   "file": "__tests__/settings/system-achievements-api.test.ts",
+   "name": "System milestone source of truth validates redemption using the same live facts and awards only supported atomic XP/Sylph rewards",
+   "msg": "AssertionError: expected 500 to be 200 // Object.is equality"
+  },
+  {
+   "file": "__tests__/settings/system-achievements-api.test.ts",
+   "name": "System milestone source of truth retains claims and prevents a duplicate reward when the atomic race backstop fires",
+   "msg": "AssertionError: expected 500 to be 400 // Object.is equality"
+  },
+  {
+   "file": "__tests__/settings/system-collection.test.tsx",
+   "name": "Current System collection distinguishes available styles, saved personal images, official availability and local audio",
+   "msg": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Character styles/`"
+  },
+  {
+   "file": "__tests__/planner/exam-entry.test.tsx",
+   "name": "Planner surfaces offers Planner modes from the header and opens the chooser",
+   "msg": "Error: \u001b[2mexpect(\u001b[22m\u001b[31melement\u001b[39m\u001b[2m).toHaveAttribute(\u001b[22m\u001b[32m\u001b[32m\"aria-haspopup\"\u001b[32m\u001b[39m\u001b[2m, \u001b[22m\u001b[32m\u001b[32m\"dialog\"\u001b[32m\u001b[39m\u001b[2m) // element.ge"
+  },
+  {
+   "file": "__tests__/planner/exam-entry.test.tsx",
+   "name": "Planner surfaces enters the chosen mode directly, without asking again",
+   "msg": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Exam Planner/`"
+  },
+  {
+   "file": "__tests__/planner/exam-entry.test.tsx",
+   "name": "Planner surfaces routes each mode to its own surface",
+   "msg": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/Course \\/ Syllabus Roadmap/`"
+  },
+  {
+   "file": "__tests__/planner/exam-entry.test.tsx",
+   "name": "Planner surfaces closes the chooser on Escape and returns focus to its trigger",
+   "msg": "TestingLibraryElementError: Unable to find an accessible element with the role \"dialog\" and name \"Planner modes\""
+  },
+  {
+   "file": "__tests__/social/connected-accounts.test.ts",
+   "name": "Connected Accounts & Public Dossier Privacy GET /api/profile/[username] returns verified connected accounts and STRICTLY omits Google email",
+   "msg": "AssertionError: expected 500 to be 200 // Object.is equality"
+  },
+  {
+   "file": "__tests__/social/connected-accounts.test.ts",
+   "name": "Connected Accounts & Public Dossier Privacy GET /api/profile/[username] strictly ignores legacy unverified manual socialLinks",
+   "msg": "AssertionError: expected 500 to be 200 // Object.is equality"
+  },
+  {
+   "file": "__tests__/timer/coordinator-pooler.test.ts",
+   "name": "keeps all coordination state inside one backend-bound transaction and releases it at commit",
+   "msg": "TypeError: sql.on is not a function"
+  },
+  {
+   "file": "__tests__/timer/coordinator-pooler.test.ts",
+   "name": "rolls a busy snapshot back and starts fresh before running work, returning its connection before retry",
+   "msg": "TypeError: sql.on is not a function"
+  },
+  {
+   "file": "__tests__/timer/coordinator-pooler.test.ts",
+   "name": "rolls failed writes back without leaving any session-level lock or settings behind",
+   "msg": "Error: expected [Function] to throw error including 'injected failure' but got 'sql.on is not a function'"
+  },
+  {
+   "file": "__tests__/surface/shop-surface.test.ts",
+   "name": "Surface Overhaul Phase 1 — Interactive System Store (`/shop`) Atomic Shop Purchase API Endpoint (`POST /api/shop/purchase`) executes purchase inside atomic transaction and returns remaining currency",
+   "msg": "AssertionError: expected 500 to be 200 // Object.is equality"
+  },
+  {
+   "file": "documentation/performance/phase-0/render-diagnostics.test.tsx",
+   "name": "measures the party subscription dependency mismatch with stable and inline callbacks",
+   "msg": "AssertionError: expected 0 to be greater than or equal to 5"
+  }
+ ],
+ "suiteFail": [
+  {
+   "file": "scripts/qa/planner-phase-c/c01-corrected.test.mjs",
+   "msg": "No test suite found in file /Users/aliumair/Desktop/sylf/scripts/qa/planner-phase-c/c01-corrected.test.mjs"
+  },
+  {
+   "file": "scripts/qa/planner-phase-c/execution-guard.test.mjs",
+   "msg": "No test suite found in file /Users/aliumair/Desktop/sylf/scripts/qa/planner-phase-c/execution-guard.test.mjs"
+  },
+  {
+   "file": "scripts/qa/planner-phase-c/preparation.test.mjs",
+   "msg": "No test suite found in file /Users/aliumair/Desktop/sylf/scripts/qa/planner-phase-c/preparation.test.mjs"
+  },
+  {
+   "file": "documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/initial-block/guard.test.cjs",
+   "msg": "No test suite found in file /Users/aliumair/Desktop/sylf/documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/initial-block/guard.test.cjs"
+  },
+  {
+   "file": "documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/initial-block/postgres.test.ts",
+   "msg": "Required genuine PostgreSQL suite: use scripts/test/test-planner-v2-phase0-postgres.mjs; missing disposable harness identity."
+  },
+  {
+   "file": "documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/review-low/guard.test.cjs",
+   "msg": "No test suite found in file /Users/aliumair/Desktop/sylf/documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/review-low/guard.test.cjs"
+  },
+  {
+   "file": "documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/review-low/postgres.test.ts",
+   "msg": "Required genuine PostgreSQL suite: use scripts/test/test-planner-v2-phase0-postgres.mjs; missing disposable harness identity."
+  },
+  {
+   "file": "documentation/notes/reports/phase-1/prototype/tests/contracts.test.mjs",
+   "msg": "No test suite found in file /Users/aliumair/Desktop/sylf/documentation/notes/reports/phase-1/prototype/tests/contracts.test.mjs"
+  }
+ ]
+}

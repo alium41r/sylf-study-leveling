@@ -50,6 +50,7 @@ export async function POST(
         level: true,
         syllabusNote: true,
         lastCompiledAt: true,
+        archivedAt: true,
         user: {
           select: {
             username: true,
@@ -60,6 +61,10 @@ export async function POST(
 
     if (!subject) {
       return NextResponse.json({ error: "Subject not found" }, { status: 404 });
+    }
+
+    if (subject.archivedAt) {
+      return NextResponse.json({ error: "SUBJECT_ARCHIVED" }, { status: 409 });
     }
 
     // 2. ONE-COMPILE-PER-SUBJECT (forever): once a subject's syllabus has
@@ -157,12 +162,12 @@ export async function POST(
       lastCompiledAt: new Date().toISOString(),
     });
   } catch (error) {
-    if (error instanceof PlannerError) return NextResponse.json({ error: error.code }, { status: error.status });
-    console.error("POST /api/subjects/[id]/compile error:", error);
     // S4: refund the reservation on any failure after it was made.
     try {
       if (typeof userId !== "undefined") await releaseQuota(userId, "compile");
     } catch {}
+    if (error instanceof PlannerError) return NextResponse.json({ error: error.code }, { status: error.status });
+    console.error("POST /api/subjects/[id]/compile error:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

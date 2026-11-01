@@ -1,0 +1,7 @@
+{
+  "tool": "macOS footprint (physical footprint), isolated Chrome 156 profile in --app mode, 1366x900 window, M1 MacBook Air 8 GB, 60 Hz Retina",
+  "note": "Chrome app mode is a proxy for an Electron 45 shell (same Chromium M156). Totals include browser, GPU, network/storage utility and spare renderer processes. Not an Electron measurement.",
+  "engineScreen": { "processes": 10, "summaryFootprintMB": 405 },
+  "panelsStressScreen": { "processes": 10, "summaryFootprintMB": 518 },
+  "rssComparison": { "processes": 6, "totalRssMB": 1063, "caveat": "RSS double-counts shared pages; use footprint values." }
+}

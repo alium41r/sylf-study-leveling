@@ -1,0 +1,2421 @@
+{
+  "schemaVersion": 2,
+  "profileId": "C01-CORRECTED-2",
+  "runId": "unpaid-PROVIDER_FAILURE",
+  "mode": "PROVIDER_FAILURE",
+  "status": "FINAL_OBSERVATION_RETAINED",
+  "owner": 4,
+  "rootRequestId": "89f1182a-6b4d-59b3-ae5b-c9f05728ad5e",
+  "activeAttemptId": "ee1214e2-90ad-4ac4-b2c9-620e88e86b82",
+  "stopReason": "PROVIDER_OR_PROTOCOL_FAILURE",
+  "physicalRequests": 0,
+  "paidCalls": 0,
+  "attempts": [
+    {
+      "id": "ee1214e2-90ad-4ac4-b2c9-620e88e86b82",
+      "artifact": {
+        "kind": "JOINT",
+        "error": null,
+        "fence": 1,
+        "lease": null,
+        "stage": "RESEARCH",
+        "state": "CANCELLED",
+        "budget": {
+          "aiFirst": {
+            "limits": {
+              "calls": 48,
+              "inputUnits": 3000000,
+              "completionTokens": 700000
+            },
+            "policyDigest": "0b60ab0fd45fb1301cc4b9e7a5b4356b8d81934da0981bbc43c4e31810eac95f",
+            "processingMs": 14400000,
+            "schemaVersion": 1
+          },
+          "profile": "RESEARCH",
+          "consumed": {
+            "ocrPages": 0,
+            "followUps": 0,
+            "modelCalls": 4,
+            "inputTokens": 300,
+            "outputTokens": 300,
+            "fetchAttempts": 0,
+            "planningCalls": 0,
+            "extractedPages": 0,
+            "researchQueries": 0,
+            "researchSynthesisCalls": 4,
+            "selectedSourceCharacters": 2925
+          },
+          "reserved": {
+            "modelCalls": 0,
+            "inputTokens": 47049,
+            "outputTokens": 65536
+          },
+          "rootRequestId": "89f1182a-6b4d-59b3-ae5b-c9f05728ad5e",
+          "executionDeadlineAt": "2026-10-28T20:37:42.300Z",
+          "processingStartedAt": "2026-10-28T16:37:42.300Z",
+          "foregroundProcessingMs": 0
+        },
+        "result": null,
+        "ownerId": 4,
+        "targets": [
+          {
+            "planId": "e0f3949b-8260-49c1-907d-39f1dd917d28",
+            "resolution": null,
+            "contextDigest": null,
+            "planningVersion": 0,
+            "baseActiveRevisionId": null,
+            "resolvedIntentVersionId": null,
+            "resolvedPlanningVersion": null,
+            "requestedIntentVersionId": "2e48dba6-7f7d-4794-a3f4-391d01c4fd9b",
+            "sourceCandidateRevisionId": null
+          },
+          {
+            "planId": "194da3ec-41bf-4871-b41a-6686a7f7f4d6",
+            "resolution": null,
+            "contextDigest": null,
+            "planningVersion": 0,
+            "baseActiveRevisionId": null,
+            "resolvedIntentVersionId": null,
+            "resolvedPlanningVersion": null,
+            "requestedIntentVersionId": "b6f2d401-86cb-45c0-9ec2-c876a50d3180",
+            "sourceCandidateRevisionId": null
+          }
+        ],
+        "question": null,
+        "attemptId": "ee1214e2-90ad-4ac4-b2c9-620e88e86b82",
+        "checkpoint": null,
+        "requestHash": "e3f1c82d873799088850f261d59f3f17230249ce97252c06642406ce6114f9a6",
+        "requestedAt": "2026-10-28T16:37:42.288Z",
+        "applyReceipt": null,
+        "schemaVersion": 2,
+        "idempotencyKey": "ecfcdf31-115e-44cb-9545-4ea3ee21f622",
+        "acceptedRequest": {
+          "text": "Use the exact teacher packets and my diagnostic work to prepare chemistry first and biology three days later. Keep both outcomes, Friday rest and the existing English deadline task. Prefer useful explanation and independent application over rereading or arbitrary question counts. I authorize reading these uploads only; do not browse the web or buy resources. Preserve uncertainty about transfer and show when support is conditional. If full useful work does not fit, explain the conflict rather than deleting education or increasing my availability.\nStudent context: {\"name\":\"Amina\",\"stage\":\"Upper-secondary school\",\"background\":\"English is a comfortable second language. School has covered the topics once. No private tutor or paid question bank. A phone, paper, calculator and the three supplied teacher packets are available.\",\"claims\":[\"I feel confident about moles because I watched explanations for three hours.\",\"I often recognize a worked example but get stuck when numbers or wording change.\"],\"preferences\":[\"Explain why a method applies, then let me try independently.\",\"Sessions of about 35–50 minutes suit me; avoid fragmented five-minute checklist tasks.\",\"Keep Friday free. Do not fill spare time with unnecessary work.\"]}\nAccepted study anchor: 2026-10-29 (Asia/Karachi). These are school-issued mock assessments under GENERAL policy, not certified external-board specifications.",
+          "authorization": "PLAN_ACTION",
+          "researchRequested": true,
+          "targetAuthorizationDigest": "b054f74214f1d3c53671f18c4a9f36ac08fdcb7517d6b54f1b80ad80b54941e9"
+        },
+        "parentAttemptId": null
+      },
+      "payload": {
+        "calls": [
+          {
+            "fence": 1,
+            "model": "deepseek-flash",
+            "stage": "RESEARCH",
+            "state": "SETTLED",
+            "callId": "310b2355-d153-47d6-93e8-19fbfb86a3b6",
+            "costUsd": 0.00015,
+            "pricing": "KNOWN",
+            "provider": "deepseek",
+            "attemptId": "ee1214e2-90ad-4ac4-b2c9-620e88e86b82",
+            "rootRequestId": "89f1182a-6b4d-59b3-ae5b-c9f05728ad5e",
+            "schemaVersion": 2,
+            "settlementKey": "310b2355-d153-47d6-93e8-19fbfb86a3b6",
+            "actualInputTokens": 100,
+            "actualOutputTokens": 100,
+            "reservedInputTokens": 34932,
+            "reservedOutputTokens": 65536
+          },
+          {
+            "fence": 1,
+            "model": "deepseek-flash",
+            "stage": "RESEARCH",
+            "state": "SETTLED",
+            "callId": "dfa153d9-46b6-43a6-b9c8-d1da9a96e1a3",
+            "costUsd": 0.00015,
+            "pricing": "KNOWN",
+            "provider": "deepseek",
+            "attemptId": "ee1214e2-90ad-4ac4-b2c9-620e88e86b82",
+            "rootRequestId": "89f1182a-6b4d-59b3-ae5b-c9f05728ad5e",
+            "schemaVersion": 2,
+            "settlementKey": "dfa153d9-46b6-43a6-b9c8-d1da9a96e1a3",
+            "actualInputTokens": 100,
+            "actualOutputTokens": 100,
+            "reservedInputTokens": 37442,
+            "reservedOutputTokens": 65536
+          },
+          {
+            "fence": 1,
+            "model": "deepseek-flash",
+            "stage": "RESEARCH",
+            "state": "SETTLED",
+            "callId": "074e9957-bb48-486b-9508-6f93511f4c24",
+            "costUsd": 0.00015,
+            "pricing": "KNOWN",
+            "provider": "deepseek",
+            "attemptId": "ee1214e2-90ad-4ac4-b2c9-620e88e86b82",
+            "rootRequestId": "89f1182a-6b4d-59b3-ae5b-c9f05728ad5e",
+            "schemaVersion": 2,
+            "settlementKey": "074e9957-bb48-486b-9508-6f93511f4c24",
+            "actualInputTokens": 100,
+            "actualOutputTokens": 100,
+            "reservedInputTokens": 37400,
+            "reservedOutputTokens": 65536
+          },
+          {
+            "fence": 1,
+            "model": "deepseek-flash",
+            "stage": "RESEARCH",
+            "state": "UNKNOWN_SPEND",
+            "callId": "6f24845e-2c53-4e24-8ede-66ca2d6e1155",
+            "costUsd": null,
+            "pricing": "UNKNOWN",
+            "provider": "deepseek",
+            "attemptId": "ee1214e2-90ad-4ac4-b2c9-620e88e86b82",
+            "rootRequestId": "89f1182a-6b4d-59b3-ae5b-c9f05728ad5e",
+            "schemaVersion": 2,
+            "settlementKey": "6f24845e-2c53-4e24-8ede-66ca2d6e1155",
+            "actualInputTokens": null,
+            "actualOutputTokens": null,
+            "reservedInputTokens": 47049,
+            "reservedOutputTokens": 65536
+          }
+        ],
+        "quotaReceipt": {
+          "state": "SETTLED",
+          "userId": 4,
+          "dateKey": "2026-10-26",
+          "feature": "plannerRebalance",
+          "resetsAt": "2026-11-01T19:00:00.000Z",
+          "settledAt": "2026-10-28T16:37:42.393Z",
+          "unlimited": false,
+          "reservedAt": "2026-10-28T16:37:42.385Z",
+          "schemaVersion": 1
+        },
+        "providerCalls": {
+          "074e9957-bb48-486b-9508-6f93511f4c24": {
+            "purpose": "RESEARCH",
+            "reservedAt": "2026-10-28T16:37:42.493Z",
+            "completedAt": "2026-10-28T16:37:42.517Z",
+            "dispatchedAt": "2026-10-28T16:37:42.499Z",
+            "finishReason": "STOP"
+          },
+          "310b2355-d153-47d6-93e8-19fbfb86a3b6": {
+            "purpose": "RESEARCH",
+            "reservedAt": "2026-10-28T16:37:42.385Z",
+            "completedAt": "2026-10-28T16:37:42.410Z",
+            "dispatchedAt": "2026-10-28T16:37:42.391Z",
+            "finishReason": "STOP"
+          },
+          "6f24845e-2c53-4e24-8ede-66ca2d6e1155": {
+            "purpose": "RESEARCH",
+            "reservedAt": "2026-10-28T16:37:42.543Z",
+            "dispatchedAt": "2026-10-28T16:37:42.550Z"
+          },
+          "dfa153d9-46b6-43a6-b9c8-d1da9a96e1a3": {
+            "purpose": "RESEARCH",
+            "reservedAt": "2026-10-28T16:37:42.447Z",
+            "completedAt": "2026-10-28T16:37:42.471Z",
+            "dispatchedAt": "2026-10-28T16:37:42.453Z",
+            "finishReason": "STOP"
+          }
+        },
+        "providerGuard": {},
+        "understanding": {
+          "gaps": [],
+          "step": 0,
+          "calls": [
+            {
+              "key": "understand_ee1214e290ad4ac4b2c9620e88e86b82_0",
+              "callId": "310b2355-d153-47d6-93e8-19fbfb86a3b6",
+              "responseDigest": "ce10cb0be7f55e75c064a9788a429e63789ceb372deca9e4049d765a58ab1c83",
+              "interpretationDigest": "4ae1c16209024f3c3c71f8d33a189225dc0e6d5c9389f9d0fd2f9e12df0d4e4b"
+            },
+            {
+              "key": "verify_ee1214e290ad4ac4b2c9620e88e86b82_0_0",
+              "callId": "dfa153d9-46b6-43a6-b9c8-d1da9a96e1a3",
+              "responseDigest": "7217cebddbab0536f2f4b256fd4d9a955f956e0307b4383d285135e861edc0da",
+              "interpretationDigest": "0fb5c1af18bf509d60b4715ff5b00192039e75c112e5a50d14731080f2ea7059"
+            },
+            {
+              "key": "verify_ee1214e290ad4ac4b2c9620e88e86b82_0_1",
+              "callId": "074e9957-bb48-486b-9508-6f93511f4c24",
+              "responseDigest": "b0f2b1409e792bb415b39e1d4b6d071c376c336f59df80067c791047b2363470",
+              "interpretationDigest": "4b7d1a6dd5647a1098f5f0b6a672fe83707eab76ed5d2dce825191f0ba238aca"
+            }
+          ],
+          "input": {
+            "plans": [
+              {
+                "intent": {
+                  "scope": [
+                    {
+                      "title": "Amount of substance and molar mass",
+                      "modelRef": "scope_1",
+                      "scopeKey": "16425e32-4623-470d-b6dc-f7fedadb3b12",
+                      "inclusion": "REQUESTED",
+                      "parentKey": null,
+                      "sourceClaimIds": []
+                    },
+                    {
+                      "title": "Concentration and volume conversion",
+                      "modelRef": "scope_2",
+                      "scopeKey": "1b182287-46e3-4bde-9520-d66ab2dda5ea",
+                      "inclusion": "REQUESTED",
+                      "parentKey": null,
+                      "sourceClaimIds": []
+                    },
+                    {
+                      "title": "Balanced equations and reacting amounts",
+                      "modelRef": "scope_3",
+                      "scopeKey": "d6978a20-d9de-439e-a4a3-ebdcf8915771",
+                      "inclusion": "REQUESTED",
+                      "parentKey": null,
+                      "sourceClaimIds": []
+                    },
+                    {
+                      "title": "Limiting reagents and checking plausibility",
+                      "modelRef": "scope_4",
+                      "scopeKey": "8910ad49-071d-4171-9e46-b4322be8ac19",
+                      "inclusion": "REQUESTED",
+                      "parentKey": null,
+                      "sourceClaimIds": []
+                    }
+                  ],
+                  "title": "Chemistry mock preparation",
+                  "policy": "GENERAL",
+                  "outcome": "Independently solve and explain mole, concentration, balanced-equation and limiting-reagent problems, including unfamiliar numbers and error checks.",
+                  "deadline": {
+                    "date": "2026-11-19",
+                    "kind": "FIXED",
+                    "examDayStudyAllowed": false
+                  },
+                  "evidence": [],
+                  "assumptions": [],
+                  "preferences": {
+                    "pacing": "SPREAD",
+                    "desiredIntensity": "MODERATE",
+                    "maximumTimeboxMinutes": 60,
+                    "preferredTimeboxMinutes": 40
+                  },
+                  "availability": {
+                    "basis": "CONFIRMED_AVAILABILITY",
+                    "timezone": "Asia/Karachi",
+                    "blockedDates": [],
+                    "restWeekdays": [
+                      4
+                    ],
+                    "studyWindows": {
+                      "weekly": [
+                        {
+                          "weekday": 0,
+                          "endMinute": 1140,
+                          "startMinute": 1020
+                        },
+                        {
+                          "weekday": 1,
+                          "endMinute": 1140,
+                          "startMinute": 1020
+                        },
+                        {
+                          "weekday": 2,
+                          "endMinute": 1140,
+                          "startMinute": 1020
+                        },
+                        {
+                          "weekday": 3,
+                          "endMinute": 1140,
+                          "startMinute": 1020
+                        },
+                        {
+                          "weekday": 5,
+                          "endMinute": 720,
+                          "startMinute": 540
+                        },
+                        {
+                          "weekday": 6,
+                          "endMinute": 720,
+                          "startMinute": 600
+                        }
+                      ],
+                      "overrides": [
+                        {
+                          "date": "2026-10-28",
+                          "windows": []
+                        }
+                      ],
+                      "schemaVersion": 1
+                    },
+                    "recoveryPercent": 10,
+                    "dailyCeilingMinutes": [
+                      120,
+                      120,
+                      120,
+                      120,
+                      0,
+                      180,
+                      120
+                    ],
+                    "weeklyCeilingMinutes": 660
+                  },
+                  "schemaVersion": 2,
+                  "policySelection": "USER_OVERRIDE",
+                  "unresolvedQuestions": []
+                },
+                "planRef": "plan_1",
+                "conversation": null,
+                "requestedIntentId": "2e48dba6-7f7d-4794-a3f4-391d01c4fd9b",
+                "conversationVersion": 0
+              },
+              {
+                "intent": {
+                  "scope": [
+                    {
+                      "title": "Diffusion, osmosis and active transport",
+                      "modelRef": "scope_1",
+                      "scopeKey": "d58d37a8-6316-4887-9fa6-cb086df3a0d0",
+                      "inclusion": "REQUESTED",
+                      "parentKey": null,
+                      "sourceClaimIds": []
+                    },
+                    {
+                      "title": "Percentage change and graph interpretation",
+                      "modelRef": "scope_2",
+                      "scopeKey": "09f7616c-b8c3-4305-8ec3-db3bb815ec50",
+                      "inclusion": "REQUESTED",
+                      "parentKey": null,
+                      "sourceClaimIds": []
+                    },
+                    {
+                      "title": "Enzyme conditions and rates",
+                      "modelRef": "scope_3",
+                      "scopeKey": "a231638d-b60b-472e-b45d-f21c0dbec957",
+                      "inclusion": "REQUESTED",
+                      "parentKey": null,
+                      "sourceClaimIds": []
+                    },
+                    {
+                      "title": "Controls, variables and evidence-based conclusions",
+                      "modelRef": "scope_4",
+                      "scopeKey": "4bddd011-6520-4282-b8c6-e866fc37c1d4",
+                      "inclusion": "REQUESTED",
+                      "parentKey": null,
+                      "sourceClaimIds": []
+                    }
+                  ],
+                  "title": "Biology mock preparation",
+                  "policy": "GENERAL",
+                  "outcome": "Explain cell transport and enzyme investigations, interpret unfamiliar data and justify an independent experimental conclusion.",
+                  "deadline": {
+                    "date": "2026-11-22",
+                    "kind": "FIXED",
+                    "examDayStudyAllowed": false
+                  },
+                  "evidence": [],
+                  "assumptions": [],
+                  "preferences": {
+                    "pacing": "SPREAD",
+                    "desiredIntensity": "MODERATE",
+                    "maximumTimeboxMinutes": 60,
+                    "preferredTimeboxMinutes": 40
+                  },
+                  "availability": {
+                    "basis": "CONFIRMED_AVAILABILITY",
+                    "timezone": "Asia/Karachi",
+                    "blockedDates": [],
+                    "restWeekdays": [
+                      4
+                    ],
+                    "studyWindows": {
+                      "weekly": [
+                        {
+                          "weekday": 0,
+                          "endMinute": 1140,
+                          "startMinute": 1020
+                        },
+                        {
+                          "weekday": 1,
+                          "endMinute": 1140,
+                          "startMinute": 1020
+                        },
+                        {
+                          "weekday": 2,
+                          "endMinute": 1140,
+                          "startMinute": 1020
+                        },
+                        {
+                          "weekday": 3,
+                          "endMinute": 1140,
+                          "startMinute": 1020
+                        },
+                        {
+                          "weekday": 5,
+                          "endMinute": 720,
+                          "startMinute": 540
+                        },
+                        {
+                          "weekday": 6,
+                          "endMinute": 720,
+                          "startMinute": 600
+                        }
+                      ],
+                      "overrides": [
+                        {
+                          "date": "2026-10-28",
+                          "windows": []
+                        }
+                      ],
+                      "schemaVersion": 1
+                    },
+                    "recoveryPercent": 10,
+                    "dailyCeilingMinutes": [
+                      120,
+                      120,
+                      120,
+                      120,
+                      0,
+                      180,
+                      120
+                    ],
+                    "weeklyCeilingMinutes": 660
+                  },
+                  "schemaVersion": 2,
+                  "policySelection": "USER_OVERRIDE",
+                  "unresolvedQuestions": []
+                },
+                "planRef": "plan_2",
+                "conversation": null,
+                "requestedIntentId": "b6f2d401-86cb-45c0-9ec2-c876a50d3180",
+                "conversationVersion": 0
+              }
+            ],
+            "context": {
+              "plans": [
+                {
+                  "scope": [
+                    {
+                      "ref": "scope_1",
+                      "title": "Amount of substance and molar mass",
+                      "inclusion": "REQUESTED",
+                      "parentRef": null,
+                      "sourceClaimIds": []
+                    },
+                    {
+                      "ref": "scope_2",
+                      "title": "Concentration and volume conversion",
+                      "inclusion": "REQUESTED",
+                      "parentRef": null,
+                      "sourceClaimIds": []
+                    },
+                    {
+                      "ref": "scope_3",
+                      "title": "Balanced equations and reacting amounts",
+                      "inclusion": "REQUESTED",
+                      "parentRef": null,
+                      "sourceClaimIds": []
+                    },
+                    {
+                      "ref": "scope_4",
+                      "title": "Limiting reagents and checking plausibility",
+                      "inclusion": "REQUESTED",
+                      "parentRef": null,
+                      "sourceClaimIds": []
+                    }
+                  ],
+                  "intent": {
+                    "title": "Chemistry mock preparation",
+                    "policy": "GENERAL",
+                    "outcome": "Independently solve and explain mole, concentration, balanced-equation and limiting-reagent problems, including unfamiliar numbers and error checks.",
+                    "deadline": {
+                      "date": "2026-11-19",
+                      "kind": "FIXED",
+                      "examDayStudyAllowed": false
+                    },
+                    "assumptions": [],
+                    "preferences": {
+                      "pacing": "SPREAD",
+                      "desiredIntensity": "MODERATE",
+                      "maximumTimeboxMinutes": 60,
+                      "preferredTimeboxMinutes": 40
+                    },
+                    "availability": {
+                      "basis": "CONFIRMED_AVAILABILITY",
+                      "timezone": "Asia/Karachi",
+                      "blockedDates": [],
+                      "restWeekdays": [
+                        4
+                      ],
+                      "studyWindows": {
+                        "weekly": [
+                          {
+                            "weekday": 0,
+                            "endMinute": 1140,
+                            "startMinute": 1020
+                          },
+                          {
+                            "weekday": 1,
+                            "endMinute": 1140,
+                            "startMinute": 1020
+                          },
+                          {
+                            "weekday": 2,
+                            "endMinute": 1140,
+                            "startMinute": 1020
+                          },
+                          {
+                            "weekday": 3,
+                            "endMinute": 1140,
+                            "startMinute": 1020
+                          },
+                          {
+                            "weekday": 5,
+                            "endMinute": 720,
+                            "startMinute": 540
+                          },
+                          {
+                            "weekday": 6,
+                            "endMinute": 720,
+                            "startMinute": 600
+                          }
+                        ],
+                        "overrides": [
+                          {
+                            "date": "2026-10-28",
+                            "windows": []
+                          }
+                        ],
+                        "schemaVersion": 1
+                      },
+                      "recoveryPercent": 10,
+                      "dailyCeilingMinutes": [
+                        120,
+                        120,
+                        120,
+                        120,
+                        0,
+                        180,
+                        120
+                      ],
+                      "weeklyCeilingMinutes": 660
+                    },
+                    "schemaVersion": 2,
+                    "policySelection": "USER_OVERRIDE",
+                    "unresolvedQuestions": []
+                  },
+                  "planRef": "plan_1",
+                  "learning": [],
+                  "research": null,
+                  "savedChecks": [],
+                  "contradictions": []
+                },
+                {
+                  "scope": [
+                    {
+                      "ref": "scope_1",
+                      "title": "Diffusion, osmosis and active transport",
+                      "inclusion": "REQUESTED",
+                      "parentRef": null,
+                      "sourceClaimIds": []
+                    },
+                    {
+                      "ref": "scope_2",
+                      "title": "Percentage change and graph interpretation",
+                      "inclusion": "REQUESTED",
+                      "parentRef": null,
+                      "sourceClaimIds": []
+                    },
+                    {
+                      "ref": "scope_3",
+                      "title": "Enzyme conditions and rates",
+                      "inclusion": "REQUESTED",
+                      "parentRef": null,
+                      "sourceClaimIds": []
+                    },
+                    {
+                      "ref": "scope_4",
+                      "title": "Controls, variables and evidence-based conclusions",
+                      "inclusion": "REQUESTED",
+                      "parentRef": null,
+                      "sourceClaimIds": []
+                    }
+                  ],
+                  "intent": {
+                    "title": "Biology mock preparation",
+                    "policy": "GENERAL",
+                    "outcome": "Explain cell transport and enzyme investigations, interpret unfamiliar data and justify an independent experimental conclusion.",
+                    "deadline": {
+                      "date": "2026-11-22",
+                      "kind": "FIXED",
+                      "examDayStudyAllowed": false
+                    },
+                    "assumptions": [],
+                    "preferences": {
+                      "pacing": "SPREAD",
+                      "desiredIntensity": "MODERATE",
+                      "maximumTimeboxMinutes": 60,
+                      "preferredTimeboxMinutes": 40
+                    },
+                    "availability": {
+                      "basis": "CONFIRMED_AVAILABILITY",
+                      "timezone": "Asia/Karachi",
+                      "blockedDates": [],
+                      "restWeekdays": [
+                        4
+                      ],
+                      "studyWindows": {
+                        "weekly": [
+                          {
+                            "weekday": 0,
+                            "endMinute": 1140,
+                            "startMinute": 1020
+                          },
+                          {
+                            "weekday": 1,
+                            "endMinute": 1140,
+                            "startMinute": 1020
+                          },
+                          {
+                            "weekday": 2,
+                            "endMinute": 1140,
+                            "startMinute": 1020
+                          },
+                          {
+                            "weekday": 3,
+                            "endMinute": 1140,
+                            "startMinute": 1020
+                          },
+                          {
+                            "weekday": 5,
+                            "endMinute": 720,
+                            "startMinute": 540
+                          },
+                          {
+                            "weekday": 6,
+                            "endMinute": 720,
+                            "startMinute": 600
+                          }
+                        ],
+                        "overrides": [
+                          {
+                            "date": "2026-10-28",
+                            "windows": []
+                          }
+                        ],
+                        "schemaVersion": 1
+                      },
+                      "recoveryPercent": 10,
+                      "dailyCeilingMinutes": [
+                        120,
+                        120,
+                        120,
+                        120,
+                        0,
+                        180,
+                        120
+                      ],
+                      "weeklyCeilingMinutes": 660
+                    },
+                    "schemaVersion": 2,
+                    "policySelection": "USER_OVERRIDE",
+                    "unresolvedQuestions": []
+                  },
+                  "planRef": "plan_2",
+                  "learning": [],
+                  "research": null,
+                  "savedChecks": [],
+                  "contradictions": []
+                }
+              ],
+              "weeks": [
+                {
+                  "week": "2026-10-26",
+                  "otherCommittedMinutes": 35,
+                  "protectedTargetMinutes": 0,
+                  "perGoalCommittedMinutes": [
+                    {
+                      "minutes": 0,
+                      "planRef": "plan_1"
+                    },
+                    {
+                      "minutes": 0,
+                      "planRef": "plan_2"
+                    }
+                  ]
+                },
+                {
+                  "week": "2026-11-02",
+                  "otherCommittedMinutes": 0,
+                  "protectedTargetMinutes": 0,
+                  "perGoalCommittedMinutes": [
+                    {
+                      "minutes": 0,
+                      "planRef": "plan_1"
+                    },
+                    {
+                      "minutes": 0,
+                      "planRef": "plan_2"
+                    }
+                  ]
+                },
+                {
+                  "week": "2026-11-09",
+                  "otherCommittedMinutes": 0,
+                  "protectedTargetMinutes": 0,
+                  "perGoalCommittedMinutes": [
+                    {
+                      "minutes": 0,
+                      "planRef": "plan_1"
+                    },
+                    {
+                      "minutes": 0,
+                      "planRef": "plan_2"
+                    }
+                  ]
+                },
+                {
+                  "week": "2026-11-16",
+                  "otherCommittedMinutes": 0,
+                  "protectedTargetMinutes": 0,
+                  "perGoalCommittedMinutes": [
+                    {
+                      "minutes": 0,
+                      "planRef": "plan_1"
+                    },
+                    {
+                      "minutes": 0,
+                      "planRef": "plan_2"
+                    }
+                  ]
+                },
+                {
+                  "week": "2026-11-23",
+                  "otherCommittedMinutes": 0,
+                  "protectedTargetMinutes": 0,
+                  "perGoalCommittedMinutes": [
+                    {
+                      "minutes": 0,
+                      "planRef": "plan_1"
+                    },
+                    {
+                      "minutes": 0,
+                      "planRef": "plan_2"
+                    }
+                  ]
+                }
+              ],
+              "actuals": [
+                {
+                  "date": "2026-10-28",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-10-29",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-10-30",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-10-31",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-01",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-02",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-03",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-04",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-05",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-06",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-07",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-08",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-09",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-10",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-11",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-12",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-13",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-14",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-15",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-16",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-17",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-18",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-19",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-20",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-21",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-22",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-23",
+                  "acceptedSeconds": 0
+                },
+                {
+                  "date": "2026-11-24",
+                  "acceptedSeconds": 0
+                }
+              ],
+              "history": {
+                "source": "ACTIVITY_COMPLETION_AND_ACCEPTED_PACE",
+                "byScope": [
+                  {
+                    "planRef": "plan_1",
+                    "scopeRef": "scope_1",
+                    "completedCount": 0,
+                    "acceptedSeconds": 0,
+                    "demonstratesReadiness": false,
+                    "approvedEstimateMinutes": 0
+                  },
+                  {
+                    "planRef": "plan_1",
+                    "scopeRef": "scope_2",
+                    "completedCount": 0,
+                    "acceptedSeconds": 0,
+                    "demonstratesReadiness": false,
+                    "approvedEstimateMinutes": 0
+                  },
+                  {
+                    "planRef": "plan_1",
+                    "scopeRef": "scope_3",
+                    "completedCount": 0,
+                    "acceptedSeconds": 0,
+                    "demonstratesReadiness": false,
+                    "approvedEstimateMinutes": 0
+                  },
+                  {
+                    "planRef": "plan_1",
+                    "scopeRef": "scope_4",
+                    "completedCount": 0,
+                    "acceptedSeconds": 0,
+                    "demonstratesReadiness": false,
+                    "approvedEstimateMinutes": 0
+                  },
+                  {
+                    "planRef": "plan_2",
+                    "scopeRef": "scope_1",
+                    "completedCount": 0,
+                    "acceptedSeconds": 0,
+                    "demonstratesReadiness": false,
+                    "approvedEstimateMinutes": 0
+                  },
+                  {
+                    "planRef": "plan_2",
+                    "scopeRef": "scope_2",
+                    "completedCount": 0,
+                    "acceptedSeconds": 0,
+                    "demonstratesReadiness": false,
+                    "approvedEstimateMinutes": 0
+                  },
+                  {
+                    "planRef": "plan_2",
+                    "scopeRef": "scope_3",
+                    "completedCount": 0,
+                    "acceptedSeconds": 0,
+                    "demonstratesReadiness": false,
+                    "approvedEstimateMinutes": 0
+                  },
+                  {
+                    "planRef": "plan_2",
+                    "scopeRef": "scope_4",
+                    "completedCount": 0,
+                    "acceptedSeconds": 0,
+                    "demonstratesReadiness": false,
+                    "approvedEstimateMinutes": 0
+                  }
+                ],
+                "examples": [],
+                "reliability": "OBSERVED_EXECUTION",
+                "sourceDigest": "2403b26f50b93242ceeda2cce4cf276ba4b37c2d29f37927b10074fd789206f2",
+                "acceptedSeconds": 0,
+                "observedAtRange": {
+                  "last": null,
+                  "first": null
+                },
+                "omittedExamples": 0,
+                "demonstratesReadiness": false,
+                "relevantCompletedCount": 0,
+                "unattributedOrOtherCompletedCount": 0
+              },
+              "envelope": {
+                "days": [
+                  {
+                    "date": "2026-10-28",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-10-29",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-10-30",
+                    "excluded": true,
+                    "ceilingMinutes": 0,
+                    "recoveryMinutes": 0,
+                    "availableMinutes": 0,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-10-31",
+                    "excluded": false,
+                    "ceilingMinutes": 180,
+                    "recoveryMinutes": 18,
+                    "availableMinutes": 162,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-01",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 73,
+                    "otherCommittedMinutes": 35,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-02",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-03",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-04",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-05",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-06",
+                    "excluded": true,
+                    "ceilingMinutes": 0,
+                    "recoveryMinutes": 0,
+                    "availableMinutes": 0,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-07",
+                    "excluded": false,
+                    "ceilingMinutes": 180,
+                    "recoveryMinutes": 18,
+                    "availableMinutes": 162,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-08",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-09",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-10",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-11",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-12",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-13",
+                    "excluded": true,
+                    "ceilingMinutes": 0,
+                    "recoveryMinutes": 0,
+                    "availableMinutes": 0,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-14",
+                    "excluded": false,
+                    "ceilingMinutes": 180,
+                    "recoveryMinutes": 18,
+                    "availableMinutes": 162,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-15",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-16",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-17",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-18",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-19",
+                    "excluded": false,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 108,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-20",
+                    "excluded": true,
+                    "ceilingMinutes": 0,
+                    "recoveryMinutes": 0,
+                    "availableMinutes": 0,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-21",
+                    "excluded": false,
+                    "ceilingMinutes": 180,
+                    "recoveryMinutes": 18,
+                    "availableMinutes": 162,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-22",
+                    "excluded": true,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 0,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-23",
+                    "excluded": true,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 0,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  },
+                  {
+                    "date": "2026-11-24",
+                    "excluded": true,
+                    "ceilingMinutes": 120,
+                    "recoveryMinutes": 12,
+                    "availableMinutes": 0,
+                    "otherCommittedMinutes": 0,
+                    "protectedTargetMinutes": 0
+                  }
+                ],
+                "basis": "CONFIRMED_AVAILABILITY",
+                "today": "2026-10-28",
+                "window": {
+                  "end": "2026-11-24",
+                  "start": "2026-10-28"
+                },
+                "targets": [
+                  {
+                    "planRef": "plan_1",
+                    "deadline": {
+                      "date": "2026-11-19",
+                      "kind": "FIXED",
+                      "examDayStudyAllowed": false
+                    },
+                    "perGoalWeeklyCeilingMinutes": null
+                  },
+                  {
+                    "planRef": "plan_2",
+                    "deadline": {
+                      "date": "2026-11-22",
+                      "kind": "FIXED",
+                      "examDayStudyAllowed": false
+                    },
+                    "perGoalWeeklyCeilingMinutes": null
+                  }
+                ],
+                "timezone": "Asia/Karachi",
+                "timeboxRange": {
+                  "maxMinutes": 240,
+                  "minMinutes": 5
+                },
+                "schemaVersion": 2,
+                "capacityDigest": "f49b07ba07db9c19f8689358a56bc0876ef776b6f1430140a621dac2f84c5ecf",
+                "recoveryPercent": 10,
+                "protectedExecution": [],
+                "weeklyCeilingMinutes": 660
+              },
+              "restDays": [],
+              "timezone": "Asia/Karachi",
+              "authority": "EXECUTION_CONTEXT",
+              "execution": [
+                {
+                  "ref": "execution_1",
+                  "date": "2026-11-01",
+                  "state": "UNSTARTED",
+                  "title": "English reading submission",
+                  "source": "LEGACY_EXECUTION",
+                  "planRef": null,
+                  "protected": false,
+                  "instructions": "Keep this unselected commitment",
+                  "actualSeconds": 0,
+                  "executionVersion": 0,
+                  "remainingMinutes": 35,
+                  "remainingDisposition": "OPEN"
+                }
+              ],
+              "projectedAt": "2026-10-28T16:37:42.312Z",
+              "floatingDates": [],
+              "legacyHistory": {
+                "byPlan": [
+                  {
+                    "planRef": "plan_1",
+                    "completedCount": 0,
+                    "acceptedSeconds": 0,
+                    "lastCompletedAt": null,
+                    "firstCompletedAt": null,
+                    "unknownEstimateCount": 0,
+                    "approvedEstimateMinutes": 0
+                  },
+                  {
+                    "planRef": "plan_2",
+                    "completedCount": 0,
+                    "acceptedSeconds": 0,
+                    "lastCompletedAt": null,
+                    "firstCompletedAt": null,
+                    "unknownEstimateCount": 0,
+                    "approvedEstimateMinutes": 0
+                  }
+                ],
+                "source": "LEGACY_COMPLETION_AND_ACCEPTED_PACE",
+                "examples": [],
+                "reliability": "OBSERVED_EXECUTION",
+                "sourceDigest": "8394c587702d994dda2bb7825149e87598ce6359820a8278d4a6f8db3f50e4d5",
+                "completedCount": 0,
+                "omittedExamples": 0,
+                "scopeResolution": "UNRESOLVED",
+                "demonstratesReadiness": false
+              },
+              "schemaVersion": 2,
+              "capacityStatus": "ACCEPTED_CEILING",
+              "academicSources": [],
+              "runningSessions": [],
+              "unresolvedCommitments": []
+            },
+            "documents": [
+              {
+                "ref": "upload_1",
+                "title": "Teacher-issued school mock scope and assessment notice",
+                "documentId": "74bde414-5104-42e3-83b6-1db7004cb293",
+                "contentHash": "671785b7bd726732df32e8f9abcb0f3a53eddbf4eb387c7fb911576468b9cb69"
+              },
+              {
+                "ref": "upload_2",
+                "title": "Student diagnostic answers and teacher annotations",
+                "documentId": "b1988e5e-a9c9-4d42-9ebe-3b26887bb229",
+                "contentHash": "3be5bbc37683ce394dea41512f8e7bc990d8b20c2e82ecbe66a35190bdef75a4"
+              },
+              {
+                "ref": "upload_3",
+                "title": "Available teacher practice pack and original worked material",
+                "documentId": "e0942721-4eba-428c-bd1a-bfdc7bf05e8b",
+                "contentHash": "af6868dccef7bc93409ea8758055b44527d0c3bce126a97306c3842adc1ac503"
+              }
+            ],
+            "contextDigests": [
+              "d605c893d5fc5ca3ad315c561f5751faeffdf78e9009e8d22085687e895381e9",
+              "32989e827c835bb7fa77157c3a7be6a140dfc62c6f2506d1b3572212001ffa86"
+            ],
+            "acceptedRequest": {
+              "text": "Use the exact teacher packets and my diagnostic work to prepare chemistry first and biology three days later. Keep both outcomes, Friday rest and the existing English deadline task. Prefer useful explanation and independent application over rereading or arbitrary question counts. I authorize reading these uploads only; do not browse the web or buy resources. Preserve uncertainty about transfer and show when support is conditional. If full useful work does not fit, explain the conflict rather than deleting education or increasing my availability.\nStudent context: {\"name\":\"Amina\",\"stage\":\"Upper-secondary school\",\"background\":\"English is a comfortable second language. School has covered the topics once. No private tutor or paid question bank. A phone, paper, calculator and the three supplied teacher packets are available.\",\"claims\":[\"I feel confident about moles because I watched explanations for three hours.\",\"I often recognize a worked example but get stuck when numbers or wording change.\"],\"preferences\":[\"Explain why a method applies, then let me try independently.\",\"Sessions of about 35–50 minutes suit me; avoid fragmented five-minute checklist tasks.\",\"Keep Friday free. Do not fill spare time with unnecessary work.\"]}\nAccepted study anchor: 2026-10-29 (Asia/Karachi). These are school-issued mock assessments under GENERAL policy, not certified external-board specifications.",
+              "authorization": "PLAN_ACTION",
+              "researchRequested": true,
+              "targetAuthorizationDigest": "b054f74214f1d3c53671f18c4a9f36ac08fdcb7517d6b54f1b80ad80b54941e9"
+            },
+            "verificationVersion": 2
+          },
+          "phase": "VERIFY",
+          "digest": "1af3825320ee2690e5d9f06e81b05d5aea860ba50311b8f0849e06dcf62c3b4d",
+          "actions": [],
+          "answers": [],
+          "pending": {
+            "action": "COMPLETE",
+            "batches": [
+              {
+                "planRef": "plan_1",
+                "extraction": {
+                  "gaps": [],
+                  "answer": "Local school content and limited diagnostic results retained without official certification",
+                  "claims": [
+                    {
+                      "kind": "COURSE_OUTCOME",
+                      "anchor": {
+                        "section": "Document"
+                      },
+                      "excerpt": "Chemistry: amount of substance, molar mass, solution concentration, balancing equations, reacting amounts, limiting reagents.",
+                      "sourceId": "source_1",
+                      "statement": "The local Chemistry mock covers the accepted Chemistry topics."
+                    },
+                    {
+                      "kind": "RESOURCE",
+                      "anchor": {
+                        "section": "Document"
+                      },
+                      "excerpt": "Correctly balanced three simpler equations without help.",
+                      "sourceId": "source_2",
+                      "statement": "The diagnostic records correct independent balancing of three simpler equations."
+                    },
+                    {
+                      "kind": "PREREQUISITE_RECOMMENDATION",
+                      "anchor": {
+                        "section": "Document"
+                      },
+                      "excerpt": "Teacher's annotated judgments: chemical arithmetic, unit conversion, limiting reagent reasoning, osmosis direction, controlled variables and overclaiming from data need work.",
+                      "sourceId": "source_2",
+                      "statement": "The annotated diagnostic records specific Chemistry and Biology weaknesses without establishing global mastery."
+                    },
+                    {
+                      "kind": "RESOURCE",
+                      "anchor": {
+                        "section": "Document"
+                      },
+                      "excerpt": "The planner may author additional self-contained examples and independent checks, provided givens, answers/feedback and stopping criteria are clear.",
+                      "sourceId": "source_3",
+                      "statement": "The actual packet permits self-contained examples with givens, feedback and stopping criteria."
+                    }
+                  ],
+                  "identities": [],
+                  "completeSourceIds": [
+                    "source_1",
+                    "source_2",
+                    "source_3"
+                  ]
+                },
+                "sourceRefs": [
+                  "source_1",
+                  "source_2",
+                  "source_3"
+                ]
+              },
+              {
+                "planRef": "plan_2",
+                "extraction": {
+                  "gaps": [],
+                  "answer": "Local school content and limited diagnostic results retained without official certification",
+                  "claims": [
+                    {
+                      "kind": "COURSE_OUTCOME",
+                      "anchor": {
+                        "section": "Document"
+                      },
+                      "excerpt": "Biology: diffusion, osmosis, active transport, interpreting mass changes and rates, enzyme conditions, controls and conclusions.",
+                      "sourceId": "source_1",
+                      "statement": "The local Biology mock covers the accepted Biology topics."
+                    },
+                    {
+                      "kind": "RESOURCE",
+                      "anchor": {
+                        "section": "Document"
+                      },
+                      "excerpt": "Biology: correctly described diffusion down a concentration gradient.",
+                      "sourceId": "source_2",
+                      "statement": "The diagnostic records a correct diffusion description."
+                    },
+                    {
+                      "kind": "PREREQUISITE_RECOMMENDATION",
+                      "anchor": {
+                        "section": "Document"
+                      },
+                      "excerpt": "Teacher's annotated judgments: chemical arithmetic, unit conversion, limiting reagent reasoning, osmosis direction, controlled variables and overclaiming from data need work.",
+                      "sourceId": "source_2",
+                      "statement": "The annotated diagnostic records specific Chemistry and Biology weaknesses without establishing global mastery."
+                    },
+                    {
+                      "kind": "RESOURCE",
+                      "anchor": {
+                        "section": "Document"
+                      },
+                      "excerpt": "The planner may author additional self-contained examples and independent checks, provided givens, answers/feedback and stopping criteria are clear.",
+                      "sourceId": "source_3",
+                      "statement": "The actual packet permits self-contained examples with givens, feedback and stopping criteria."
+                    }
+                  ],
+                  "identities": [],
+                  "completeSourceIds": [
+                    "source_1",
+                    "source_2",
+                    "source_3"
+                  ]
+                },
+                "sourceRefs": [
+                  "source_1",
+                  "source_2",
+                  "source_3"
+                ]
+              }
+            ],
+            "summary": {
+              "goals": "Independently solve and explain mole, concentration, balanced-equation and limiting-reagent problems, including unfamiliar numbers and error checks.; Explain cell transport and enzyme investigations, interpret unfamiliar data and justify an independent experimental conclusion.",
+              "resources": "Three original uploaded packets",
+              "strengths": "Some elementary work is correct; transfer remains uncertain",
+              "background": "English is a comfortable second language. School has covered the topics once. No private tutor or paid question bank. A phone, paper, calculator and the three supplied teacher packets are available.",
+              "weaknesses": "Chemical methods and biological interpretation require correction",
+              "constraints": "Fixed deadlines and joint Calendar availability",
+              "preferences": "Useful independent application without filler",
+              "uncertainty": "Claims and video time do not establish mastery"
+            },
+            "unresolved": []
+          },
+          "sources": [
+            {
+              "source": {
+                "title": "Teacher-issued school mock scope and assessment notice",
+                "location": {
+                  "kind": "OWNED_DOCUMENT",
+                  "ownerId": 4,
+                  "documentId": "74bde414-5104-42e3-83b6-1db7004cb293"
+                },
+                "sourceId": "source_1",
+                "authority": "UNKNOWN",
+                "extraction": {
+                  "gaps": [],
+                  "status": "COMPLETE_RELEVANT_SECTIONS",
+                  "ocrPages": [],
+                  "selectedPages": []
+                },
+                "contentHash": "671785b7bd726732df32e8f9abcb0f3a53eddbf4eb387c7fb911576468b9cb69",
+                "retrievedAt": "2026-10-28T16:37:42.335Z",
+                "applicability": {},
+                "authorityBasis": "Private ownership and content were verified; issuer authority was not independently established."
+              },
+              "sections": [
+                {
+                  "text": "These are school mock assessments, not an external exam-board specification. Chemistry is 21 days after the frozen study anchor, biology 24 days after it; both begin at 09:00 local time. Exam-day study is not available. Chemistry: amount of substance, molar mass, solution concentration, balancing equations, reacting amounts, limiting reagents. Biology: diffusion, osmosis, active transport, interpreting mass changes and rates, enzyme conditions, controls and conclusions. Each paper mixes explanation, calculation and unfamiliar-data questions. No other chapters are assessed. Students may use a calculator. The teacher expects method justification and units, not memorized worked answers. The student has already supplied the school and exact scope; do not ask which external exam board applies.",
+                  "section": "Document"
+                }
+              ]
+            },
+            {
+              "source": {
+                "title": "Student diagnostic answers and teacher annotations",
+                "location": {
+                  "kind": "OWNED_DOCUMENT",
+                  "ownerId": 4,
+                  "documentId": "b1988e5e-a9c9-4d42-9ebe-3b26887bb229"
+                },
+                "sourceId": "source_2",
+                "authority": "UNKNOWN",
+                "extraction": {
+                  "gaps": [],
+                  "status": "COMPLETE_RELEVANT_SECTIONS",
+                  "ocrPages": [],
+                  "selectedPages": []
+                },
+                "contentHash": "3be5bbc37683ce394dea41512f8e7bc990d8b20c2e82ecbe66a35190bdef75a4",
+                "retrievedAt": "2026-10-28T16:37:42.348Z",
+                "applicability": {},
+                "authorityBasis": "Private ownership and content were verified; issuer authority was not independently established."
+              },
+              "sections": [
+                {
+                  "text": "Student work, not inferred mastery from study time. Chemistry: Q1, amount in 12 g magnesium with molar mass 24 g/mol: student wrote 288 mol, multiplying mass and molar mass. Q2, amount in 250 mL of 0.20 mol/L solution: student wrote 50 mol; no mL-to-L conversion. Q3, 2 H2 + O2 -> 2 H2O, supplied 0.60 mol H2 and 0.20 mol O2: student wrote 0.60 mol water and said hydrogen limits because its coefficient is larger. Correctly balanced three simpler equations without help. Biology: correctly described diffusion down a concentration gradient. For potato mass 20.0 g becoming 18.0 g, student wrote +10% and claimed water moved into the tissue. Said active transport needs no energy. In an enzyme-temperature investigation, student proposed changing both temperature and enzyme concentration, then concluded every decrease in rate proves denaturation. Teacher's annotated judgments: chemical arithmetic, unit conversion, limiting reagent reasoning, osmosis direction, controlled variables and overclaiming from data need work. Three hours of videos is a student report and supplies no performance credit.",
+                  "section": "Document"
+                }
+              ]
+            },
+            {
+              "source": {
+                "title": "Available teacher practice pack and original worked material",
+                "location": {
+                  "kind": "OWNED_DOCUMENT",
+                  "ownerId": 4,
+                  "documentId": "e0942721-4eba-428c-bd1a-bfdc7bf05e8b"
+                },
+                "sourceId": "source_3",
+                "authority": "UNKNOWN",
+                "extraction": {
+                  "gaps": [],
+                  "status": "COMPLETE_RELEVANT_SECTIONS",
+                  "ocrPages": [],
+                  "selectedPages": []
+                },
+                "contentHash": "af6868dccef7bc93409ea8758055b44527d0c3bce126a97306c3842adc1ac503",
+                "retrievedAt": "2026-10-28T16:37:42.362Z",
+                "applicability": {},
+                "authorityBasis": "Private ownership and content were verified; issuer authority was not independently established."
+              },
+              "sections": [
+                {
+                  "text": "The student owns this packet; no paid website or undisclosed textbook is needed. Chemistry worked example: 6.0 g carbon, molar mass 12.0 g/mol, gives 0.50 mol; show g divided by g/mol. A 100 mL sample of 0.50 mol/L solution contains 0.050 mol after converting to 0.100 L. For 2 H2 + O2 -> 2 H2O, compare supplied amount divided by coefficient, then use the smaller reaction extent. The pack also has eight unworked mixed questions, but eight is an inventory, not mandatory workload. Biology worked example: percentage change = (final - initial)/initial x 100. Distinguish an observed rate trend from its mechanism; temperature can affect rate and extreme conditions may alter enzyme structure, but an observed fall alone does not establish that explanation. Preserve enzyme amount, substrate, pH, timing and measurement method while changing the intended independent variable. The planner may author additional self-contained examples and independent checks, provided givens, answers/feedback and stopping criteria are clear.",
+                  "section": "Document"
+                }
+              ]
+            }
+          ],
+          "verified": [
+            {
+              "review": {
+                "answer": "Applicable local course contents and anonymous diagnostic evidence, not official-board certification",
+                "claims": [
+                  {
+                    "reason": "Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context",
+                    "claimId": "claim_e20cdbdf18fb048f5f6784f5",
+                    "support": "SUPPORTED",
+                    "applicability": "MATCHED"
+                  },
+                  {
+                    "reason": "Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context",
+                    "claimId": "claim_7b5ecc72de8328cf543d8a03",
+                    "support": "SUPPORTED",
+                    "applicability": "MATCHED"
+                  },
+                  {
+                    "reason": "Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context",
+                    "claimId": "claim_aae0cc45d3ccf3d893363d22",
+                    "support": "SUPPORTED",
+                    "applicability": "MATCHED"
+                  },
+                  {
+                    "reason": "Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context",
+                    "claimId": "claim_7a7797bbf0124655b7c6c907",
+                    "support": "SUPPORTED",
+                    "applicability": "MATCHED"
+                  }
+                ],
+                "conflicts": [],
+                "identities": [],
+                "scopeBindings": [
+                  {
+                    "claimId": "claim_e20cdbdf18fb048f5f6784f5",
+                    "scopeRefs": [
+                      "scope_1",
+                      "scope_2",
+                      "scope_3",
+                      "scope_4"
+                    ],
+                    "disposition": "ANNOTATE_SCOPE"
+                  },
+                  {
+                    "claimId": "claim_7b5ecc72de8328cf543d8a03",
+                    "scopeRefs": [],
+                    "disposition": "RESOURCE_ONLY"
+                  },
+                  {
+                    "claimId": "claim_aae0cc45d3ccf3d893363d22",
+                    "scopeRefs": [],
+                    "disposition": "RESOURCE_ONLY"
+                  },
+                  {
+                    "claimId": "claim_7a7797bbf0124655b7c6c907",
+                    "scopeRefs": [],
+                    "disposition": "RESOURCE_ONLY"
+                  }
+                ],
+                "followUpClaims": [],
+                "completeSourceIds": [
+                  "source_1",
+                  "source_2",
+                  "source_3"
+                ],
+                "followUpIdentities": []
+              },
+              "decision": null,
+              "evidence": {
+                "claims": [
+                  {
+                    "kind": "COURSE_OUTCOME",
+                    "anchor": {
+                      "section": "Document"
+                    },
+                    "status": "ADOPTED",
+                    "claimId": "claim_e20cdbdf18fb048f5f6784f5",
+                    "excerpt": "Chemistry: amount of substance, molar mass, solution concentration, balancing equations, reacting amounts, limiting reagents.",
+                    "sourceId": "source_1",
+                    "statement": "The local Chemistry mock covers the accepted Chemistry topics.",
+                    "verification": {
+                      "excerpt": "VERIFIED",
+                      "support": "SUPPORTED",
+                      "applicability": "MATCHED"
+                    }
+                  },
+                  {
+                    "kind": "RESOURCE",
+                    "anchor": {
+                      "section": "Document"
+                    },
+                    "status": "ADOPTED",
+                    "claimId": "claim_7b5ecc72de8328cf543d8a03",
+                    "excerpt": "Correctly balanced three simpler equations without help.",
+                    "sourceId": "source_2",
+                    "statement": "The diagnostic records correct independent balancing of three simpler equations.",
+                    "verification": {
+                      "excerpt": "VERIFIED",
+                      "support": "SUPPORTED",
+                      "applicability": "MATCHED"
+                    }
+                  },
+                  {
+                    "kind": "PREREQUISITE_RECOMMENDATION",
+                    "anchor": {
+                      "section": "Document"
+                    },
+                    "status": "CANDIDATE",
+                    "claimId": "claim_aae0cc45d3ccf3d893363d22",
+                    "excerpt": "Teacher's annotated judgments: chemical arithmetic, unit conversion, limiting reagent reasoning, osmosis direction, controlled variables and overclaiming from data need work.",
+                    "sourceId": "source_2",
+                    "statement": "The annotated diagnostic records specific Chemistry and Biology weaknesses without establishing global mastery.",
+                    "uncertainty": "Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context",
+                    "verification": {
+                      "excerpt": "VERIFIED",
+                      "support": "SUPPORTED",
+                      "applicability": "MATCHED"
+                    }
+                  },
+                  {
+                    "kind": "RESOURCE",
+                    "anchor": {
+                      "section": "Document"
+                    },
+                    "status": "ADOPTED",
+                    "claimId": "claim_7a7797bbf0124655b7c6c907",
+                    "excerpt": "The planner may author additional self-contained examples and independent checks, provided givens, answers/feedback and stopping criteria are clear.",
+                    "sourceId": "source_3",
+                    "statement": "The actual packet permits self-contained examples with givens, feedback and stopping criteria.",
+                    "verification": {
+                      "excerpt": "VERIFIED",
+                      "support": "SUPPORTED",
+                      "applicability": "MATCHED"
+                    }
+                  }
+                ],
+                "sources": [
+                  {
+                    "title": "Teacher-issued school mock scope and assessment notice",
+                    "location": {
+                      "kind": "OWNED_DOCUMENT",
+                      "ownerId": 4,
+                      "documentId": "74bde414-5104-42e3-83b6-1db7004cb293"
+                    },
+                    "sourceId": "source_1",
+                    "authority": "UNKNOWN",
+                    "extraction": {
+                      "gaps": [],
+                      "status": "COMPLETE_RELEVANT_SECTIONS",
+                      "ocrPages": [],
+                      "selectedPages": []
+                    },
+                    "contentHash": "671785b7bd726732df32e8f9abcb0f3a53eddbf4eb387c7fb911576468b9cb69",
+                    "retrievedAt": "2026-10-28T16:37:42.335Z",
+                    "applicability": {},
+                    "authorityBasis": "Private ownership and content were verified; issuer authority was not independently established."
+                  },
+                  {
+                    "title": "Student diagnostic answers and teacher annotations",
+                    "location": {
+                      "kind": "OWNED_DOCUMENT",
+                      "ownerId": 4,
+                      "documentId": "b1988e5e-a9c9-4d42-9ebe-3b26887bb229"
+                    },
+                    "sourceId": "source_2",
+                    "authority": "UNKNOWN",
+                    "extraction": {
+                      "gaps": [],
+                      "status": "COMPLETE_RELEVANT_SECTIONS",
+                      "ocrPages": [],
+                      "selectedPages": []
+                    },
+                    "contentHash": "3be5bbc37683ce394dea41512f8e7bc990d8b20c2e82ecbe66a35190bdef75a4",
+                    "retrievedAt": "2026-10-28T16:37:42.348Z",
+                    "applicability": {},
+                    "authorityBasis": "Private ownership and content were verified; issuer authority was not independently established."
+                  },
+                  {
+                    "title": "Available teacher practice pack and original worked material",
+                    "location": {
+                      "kind": "OWNED_DOCUMENT",
+                      "ownerId": 4,
+                      "documentId": "e0942721-4eba-428c-bd1a-bfdc7bf05e8b"
+                    },
+                    "sourceId": "source_3",
+                    "authority": "UNKNOWN",
+                    "extraction": {
+                      "gaps": [],
+                      "status": "COMPLETE_RELEVANT_SECTIONS",
+                      "ocrPages": [],
+                      "selectedPages": []
+                    },
+                    "contentHash": "af6868dccef7bc93409ea8758055b44527d0c3bce126a97306c3842adc1ac503",
+                    "retrievedAt": "2026-10-28T16:37:42.362Z",
+                    "applicability": {},
+                    "authorityBasis": "Private ownership and content were verified; issuer authority was not independently established."
+                  }
+                ],
+                "assessment": {},
+                "schemaVersion": 2,
+                "unresolvedGaps": [
+                  "No issuer-verified applicable assessed scope was established."
+                ],
+                "completeAssessedScope": false
+              },
+              "batchIndex": 0
+            },
+            {
+              "review": {
+                "answer": "Applicable local course contents and anonymous diagnostic evidence, not official-board certification",
+                "claims": [
+                  {
+                    "reason": "Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context",
+                    "claimId": "claim_3db46e0808b9029870fa406f",
+                    "support": "SUPPORTED",
+                    "applicability": "MATCHED"
+                  },
+                  {
+                    "reason": "Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context",
+                    "claimId": "claim_400bcbf11ab1d53384da378c",
+                    "support": "SUPPORTED",
+                    "applicability": "MATCHED"
+                  },
+                  {
+                    "reason": "Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context",
+                    "claimId": "claim_aae0cc45d3ccf3d893363d22",
+                    "support": "SUPPORTED",
+                    "applicability": "MATCHED"
+                  },
+                  {
+                    "reason": "Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context",
+                    "claimId": "claim_7a7797bbf0124655b7c6c907",
+                    "support": "SUPPORTED",
+                    "applicability": "MATCHED"
+                  }
+                ],
+                "conflicts": [],
+                "identities": [],
+                "scopeBindings": [
+                  {
+                    "claimId": "claim_3db46e0808b9029870fa406f",
+                    "scopeRefs": [
+                      "scope_1",
+                      "scope_2",
+                      "scope_3",
+                      "scope_4"
+                    ],
+                    "disposition": "ANNOTATE_SCOPE"
+                  },
+                  {
+                    "claimId": "claim_400bcbf11ab1d53384da378c",
+                    "scopeRefs": [],
+                    "disposition": "RESOURCE_ONLY"
+                  },
+                  {
+                    "claimId": "claim_aae0cc45d3ccf3d893363d22",
+                    "scopeRefs": [],
+                    "disposition": "RESOURCE_ONLY"
+                  },
+                  {
+                    "claimId": "claim_7a7797bbf0124655b7c6c907",
+                    "scopeRefs": [],
+                    "disposition": "RESOURCE_ONLY"
+                  }
+                ],
+                "followUpClaims": [],
+                "completeSourceIds": [
+                  "source_1",
+                  "source_2",
+                  "source_3"
+                ],
+                "followUpIdentities": []
+              },
+              "decision": null,
+              "evidence": {
+                "claims": [
+                  {
+                    "kind": "COURSE_OUTCOME",
+                    "anchor": {
+                      "section": "Document"
+                    },
+                    "status": "ADOPTED",
+                    "claimId": "claim_3db46e0808b9029870fa406f",
+                    "excerpt": "Biology: diffusion, osmosis, active transport, interpreting mass changes and rates, enzyme conditions, controls and conclusions.",
+                    "sourceId": "source_1",
+                    "statement": "The local Biology mock covers the accepted Biology topics.",
+                    "verification": {
+                      "excerpt": "VERIFIED",
+                      "support": "SUPPORTED",
+                      "applicability": "MATCHED"
+                    }
+                  },
+                  {
+                    "kind": "RESOURCE",
+                    "anchor": {
+                      "section": "Document"
+                    },
+                    "status": "ADOPTED",
+                    "claimId": "claim_400bcbf11ab1d53384da378c",
+                    "excerpt": "Biology: correctly described diffusion down a concentration gradient.",
+                    "sourceId": "source_2",
+                    "statement": "The diagnostic records a correct diffusion description.",
+                    "verification": {
+                      "excerpt": "VERIFIED",
+                      "support": "SUPPORTED",
+                      "applicability": "MATCHED"
+                    }
+                  },
+                  {
+                    "kind": "PREREQUISITE_RECOMMENDATION",
+                    "anchor": {
+                      "section": "Document"
+                    },
+                    "status": "CANDIDATE",
+                    "claimId": "claim_aae0cc45d3ccf3d893363d22",
+                    "excerpt": "Teacher's annotated judgments: chemical arithmetic, unit conversion, limiting reagent reasoning, osmosis direction, controlled variables and overclaiming from data need work.",
+                    "sourceId": "source_2",
+                    "statement": "The annotated diagnostic records specific Chemistry and Biology weaknesses without establishing global mastery.",
+                    "uncertainty": "Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context",
+                    "verification": {
+                      "excerpt": "VERIFIED",
+                      "support": "SUPPORTED",
+                      "applicability": "MATCHED"
+                    }
+                  },
+                  {
+                    "kind": "RESOURCE",
+                    "anchor": {
+                      "section": "Document"
+                    },
+                    "status": "ADOPTED",
+                    "claimId": "claim_7a7797bbf0124655b7c6c907",
+                    "excerpt": "The planner may author additional self-contained examples and independent checks, provided givens, answers/feedback and stopping criteria are clear.",
+                    "sourceId": "source_3",
+                    "statement": "The actual packet permits self-contained examples with givens, feedback and stopping criteria.",
+                    "verification": {
+                      "excerpt": "VERIFIED",
+                      "support": "SUPPORTED",
+                      "applicability": "MATCHED"
+                    }
+                  }
+                ],
+                "sources": [
+                  {
+                    "title": "Teacher-issued school mock scope and assessment notice",
+                    "location": {
+                      "kind": "OWNED_DOCUMENT",
+                      "ownerId": 4,
+                      "documentId": "74bde414-5104-42e3-83b6-1db7004cb293"
+                    },
+                    "sourceId": "source_1",
+                    "authority": "UNKNOWN",
+                    "extraction": {
+                      "gaps": [],
+                      "status": "COMPLETE_RELEVANT_SECTIONS",
+                      "ocrPages": [],
+                      "selectedPages": []
+                    },
+                    "contentHash": "671785b7bd726732df32e8f9abcb0f3a53eddbf4eb387c7fb911576468b9cb69",
+                    "retrievedAt": "2026-10-28T16:37:42.335Z",
+                    "applicability": {},
+                    "authorityBasis": "Private ownership and content were verified; issuer authority was not independently established."
+                  },
+                  {
+                    "title": "Student diagnostic answers and teacher annotations",
+                    "location": {
+                      "kind": "OWNED_DOCUMENT",
+                      "ownerId": 4,
+                      "documentId": "b1988e5e-a9c9-4d42-9ebe-3b26887bb229"
+                    },
+                    "sourceId": "source_2",
+                    "authority": "UNKNOWN",
+                    "extraction": {
+                      "gaps": [],
+                      "status": "COMPLETE_RELEVANT_SECTIONS",
+                      "ocrPages": [],
+                      "selectedPages": []
+                    },
+                    "contentHash": "3be5bbc37683ce394dea41512f8e7bc990d8b20c2e82ecbe66a35190bdef75a4",
+                    "retrievedAt": "2026-10-28T16:37:42.348Z",
+                    "applicability": {},
+                    "authorityBasis": "Private ownership and content were verified; issuer authority was not independently established."
+                  },
+                  {
+                    "title": "Available teacher practice pack and original worked material",
+                    "location": {
+                      "kind": "OWNED_DOCUMENT",
+                      "ownerId": 4,
+                      "documentId": "e0942721-4eba-428c-bd1a-bfdc7bf05e8b"
+                    },
+                    "sourceId": "source_3",
+                    "authority": "UNKNOWN",
+                    "extraction": {
+                      "gaps": [],
+                      "status": "COMPLETE_RELEVANT_SECTIONS",
+                      "ocrPages": [],
+                      "selectedPages": []
+                    },
+                    "contentHash": "af6868dccef7bc93409ea8758055b44527d0c3bce126a97306c3842adc1ac503",
+                    "retrievedAt": "2026-10-28T16:37:42.362Z",
+                    "applicability": {},
+                    "authorityBasis": "Private ownership and content were verified; issuer authority was not independently established."
+                  }
+                ],
+                "assessment": {},
+                "schemaVersion": 2,
+                "unresolvedGaps": [
+                  "No issuer-verified applicable assessed scope was established."
+                ],
+                "completeAssessedScope": false
+              },
+              "batchIndex": 1
+            }
+          ],
+          "candidates": [],
+          "inputDigest": "0273244ad3f5d97f1074128d5640c7ce23aac09404b19b31ee42dc3a94a8a278",
+          "toolPending": false,
+          "schemaVersion": 1,
+          "synthesisReview": null
+        },
+        "callCategories": {
+          "074e9957-bb48-486b-9508-6f93511f4c24": "RESEARCH",
+          "310b2355-d153-47d6-93e8-19fbfb86a3b6": "RESEARCH",
+          "6f24845e-2c53-4e24-8ede-66ca2d6e1155": "RESEARCH",
+          "dfa153d9-46b6-43a6-b9c8-d1da9a96e1a3": "RESEARCH"
+        },
+        "resourcePolicy": {
+          "root": {
+            "calls": 48,
+            "inputUnits": 3000000,
+            "completionTokens": 700000
+          },
+          "roles": {
+            "RESEARCH": {
+              "call": {
+                "calls": 1,
+                "inputUnits": 500000,
+                "completionTokens": 65536
+              },
+              "model": "deepseek-flash",
+              "effort": "HIGH",
+              "format": "JSON",
+              "holdback": {
+                "calls": 1,
+                "inputUnits": 500000,
+                "completionTokens": 65536
+              },
+              "provider": "deepseek"
+            },
+            "REVIEWER": {
+              "call": {
+                "calls": 1,
+                "inputUnits": 500000,
+                "completionTokens": 65536
+              },
+              "model": "deepseek-flash",
+              "effort": "HIGH",
+              "format": "JSON",
+              "holdback": {
+                "calls": 3,
+                "inputUnits": 1500000,
+                "completionTokens": 196608
+              },
+              "provider": "deepseek"
+            },
+            "STRATEGIST": {
+              "call": {
+                "calls": 1,
+                "inputUnits": 500000,
+                "completionTokens": 65536
+              },
+              "model": "deepseek-flash",
+              "effort": "HIGH",
+              "format": "TEXT",
+              "holdback": {
+                "calls": 1,
+                "inputUnits": 500000,
+                "completionTokens": 65536
+              },
+              "provider": "deepseek"
+            },
+            "TRANSLATOR": {
+              "call": {
+                "calls": 1,
+                "inputUnits": 500000,
+                "completionTokens": 65536
+              },
+              "model": "deepseek-flash",
+              "effort": "HIGH",
+              "format": "JSON",
+              "holdback": {
+                "calls": 2,
+                "inputUnits": 1000000,
+                "completionTokens": 131072
+              },
+              "provider": "deepseek"
+            }
+          },
+          "policyId": "f70f9c25-14d5-486f-b349-7fd598f98142",
+          "processingMs": 14400000,
+          "researchTools": {
+            "ocrPages": 0,
+            "followUps": 100,
+            "fetchAttempts": 1,
+            "extractedPages": 1000,
+            "researchQueries": 1,
+            "selectedSourceCharacters": 500000
+          },
+          "schemaVersion": 1,
+          "journeyVersion": 1,
+          "authorizationDigest": "b054f74214f1d3c53671f18c4a9f36ac08fdcb7517d6b54f1b80ad80b54941e9"
+        },
+        "researchRequest": {
+          "documentIds": [
+            "74bde414-5104-42e3-83b6-1db7004cb293",
+            "b1988e5e-a9c9-4d42-9ebe-3b26887bb229",
+            "e0942721-4eba-428c-bd1a-bfdc7bf05e8b"
+          ],
+          "readTargets": [
+            {
+              "planId": "e0f3949b-8260-49c1-907d-39f1dd917d28",
+              "intentId": "2e48dba6-7f7d-4794-a3f4-391d01c4fd9b",
+              "intentDigest": "d86e9c12b7484f5212dab67ae481fb69b38f4988518d288384e7877d1c19e457"
+            },
+            {
+              "planId": "194da3ec-41bf-4871-b41a-6686a7f7f4d6",
+              "intentId": "b6f2d401-86cb-45c0-9ec2-c876a50d3180",
+              "intentDigest": "d746b0639d27d010dfd0abbda46f45d8f91b104be674e7f50da22fd32589bba7"
+            }
+          ]
+        },
+        "generationRequestDigest": "fca7f0eb56730516e1f21c84f94b7d944bf5544ac9e167eec01aae8c462b384a"
+      },
+      "intelligenceArtifacts": null
+    }
+  ],
+  "usageLogs": [
+    {
+      "id": 37,
+      "userId": 4,
+      "feature": "planner",
+      "workload": "planner_v2",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "promptTokens": 100,
+      "completionTokens": 100,
+      "cacheHitTokens": 0,
+      "estimatedCostUsd": 0.00015,
+      "createdAt": "2026-10-28T11:37:42.384Z",
+      "requestId": "310b2355-d153-47d6-93e8-19fbfb86a3b6",
+      "rootRequestId": "89f1182a-6b4d-59b3-ae5b-c9f05728ad5e",
+      "reservation": {
+        "call": {
+          "fence": 1,
+          "model": "deepseek-flash",
+          "stage": "RESEARCH",
+          "state": "RESERVED",
+          "callId": "310b2355-d153-47d6-93e8-19fbfb86a3b6",
+          "costUsd": null,
+          "pricing": "UNKNOWN",
+          "provider": "deepseek",
+          "attemptId": "ee1214e2-90ad-4ac4-b2c9-620e88e86b82",
+          "rootRequestId": "89f1182a-6b4d-59b3-ae5b-c9f05728ad5e",
+          "schemaVersion": 2,
+          "settlementKey": "310b2355-d153-47d6-93e8-19fbfb86a3b6",
+          "actualInputTokens": null,
+          "actualOutputTokens": null,
+          "reservedInputTokens": 34932,
+          "reservedOutputTokens": 65536
+        },
+        "usage": {
+          "fingerprint": "scripted-unpaid-execution-binding",
+          "finishReason": "STOP",
+          "cacheHitTokens": 0,
+          "effectiveModel": "deepseek-flash",
+          "reasoningTokens": 50
+        },
+        "result": {
+          "text": "{\"action\":\"COMPLETE\",\"summary\":{\"goals\":\"Independently solve and explain mole, concentration, balanced-equation and limiting-reagent problems, including unfamiliar numbers and error checks.; Explain cell transport and enzyme investigations, interpret unfamiliar data and justify an independent experimental conclusion.\",\"background\":\"English is a comfortable second language. School has covered the topics once. No private tutor or paid question bank. A phone, paper, calculator and the three supplied teacher packets are available.\",\"strengths\":\"Some elementary work is correct; transfer remains uncertain\",\"weaknesses\":\"Chemical methods and biological interpretation require correction\",\"resources\":\"Three original uploaded packets\",\"constraints\":\"Fixed deadlines and joint Calendar availability\",\"preferences\":\"Useful independent application without filler\",\"uncertainty\":\"Claims and video time do not establish mastery\"},\"batches\":[{\"planRef\":\"plan_1\",\"sourceRefs\":[\"source_1\",\"source_2\",\"source_3\"],\"extraction\":{\"identities\":[],\"claims\":[{\"sourceId\":\"source_1\",\"statement\":\"The local Chemistry mock covers the accepted Chemistry topics.\",\"excerpt\":\"Chemistry: amount of substance, molar mass, solution concentration, balancing equations, reacting amounts, limiting reagents.\",\"anchor\":{\"section\":\"Document\"},\"kind\":\"COURSE_OUTCOME\"},{\"sourceId\":\"source_2\",\"statement\":\"The diagnostic records correct independent balancing of three simpler equations.\",\"excerpt\":\"Correctly balanced three simpler equations without help.\",\"anchor\":{\"section\":\"Document\"},\"kind\":\"RESOURCE\"},{\"sourceId\":\"source_2\",\"statement\":\"The annotated diagnostic records specific Chemistry and Biology weaknesses without establishing global mastery.\",\"excerpt\":\"Teacher's annotated judgments: chemical arithmetic, unit conversion, limiting reagent reasoning, osmosis direction, controlled variables and overclaiming from data need work.\",\"anchor\":{\"section\":\"Document\"},\"kind\":\"PREREQUISITE_RECOMMENDATION\"},{\"sourceId\":\"source_3\",\"statement\":\"The actual packet permits self-contained examples with givens, feedback and stopping criteria.\",\"excerpt\":\"The planner may author additional self-contained examples and independent checks, provided givens, answers/feedback and stopping criteria are clear.\",\"anchor\":{\"section\":\"Document\"},\"kind\":\"RESOURCE\"}],\"completeSourceIds\":[\"source_1\",\"source_2\",\"source_3\"],\"gaps\":[],\"answer\":\"Local school content and limited diagnostic results retained without official certification\"}},{\"planRef\":\"plan_2\",\"sourceRefs\":[\"source_1\",\"source_2\",\"source_3\"],\"extraction\":{\"identities\":[],\"claims\":[{\"sourceId\":\"source_1\",\"statement\":\"The local Biology mock covers the accepted Biology topics.\",\"excerpt\":\"Biology: diffusion, osmosis, active transport, interpreting mass changes and rates, enzyme conditions, controls and conclusions.\",\"anchor\":{\"section\":\"Document\"},\"kind\":\"COURSE_OUTCOME\"},{\"sourceId\":\"source_2\",\"statement\":\"The diagnostic records a correct diffusion description.\",\"excerpt\":\"Biology: correctly described diffusion down a concentration gradient.\",\"anchor\":{\"section\":\"Document\"},\"kind\":\"RESOURCE\"},{\"sourceId\":\"source_2\",\"statement\":\"The annotated diagnostic records specific Chemistry and Biology weaknesses without establishing global mastery.\",\"excerpt\":\"Teacher's annotated judgments: chemical arithmetic, unit conversion, limiting reagent reasoning, osmosis direction, controlled variables and overclaiming from data need work.\",\"anchor\":{\"section\":\"Document\"},\"kind\":\"PREREQUISITE_RECOMMENDATION\"},{\"sourceId\":\"source_3\",\"statement\":\"The actual packet permits self-contained examples with givens, feedback and stopping criteria.\",\"excerpt\":\"The planner may author additional self-contained examples and independent checks, provided givens, answers/feedback and stopping criteria are clear.\",\"anchor\":{\"section\":\"Document\"},\"kind\":\"RESOURCE\"}],\"completeSourceIds\":[\"source_1\",\"source_2\",\"source_3\"],\"gaps\":[],\"answer\":\"Local school content and limited diagnostic results retained without official certification\"}}],\"unresolved\":[]}",
+          "digest": "ce10cb0be7f55e75c064a9788a429e63789ceb372deca9e4049d765a58ab1c83",
+          "finishReason": "STOP"
+        },
+        "accepted": true,
+        "roleCall": {
+          "key": "understand_ee1214e290ad4ac4b2c9620e88e86b82_0",
+          "role": "RESEARCH",
+          "effort": "HIGH",
+          "format": "JSON",
+          "purpose": "RESEARCH",
+          "inputDigest": "518a4178a290655d44df2acc1d62cffe2644b967c71637f7b37fcaaae3122374",
+          "policyDigest": "0b60ab0fd45fb1301cc4b9e7a5b4356b8d81934da0981bbc43c4e31810eac95f",
+          "promptDigest": "196672893f0e8704c2893cc0224df7307ff5ea68195cbdea41cc584c13cacd59",
+          "schemaVersion": 1
+        },
+        "schemaVersion": 2
+      },
+      "attemptId": "ee1214e2-90ad-4ac4-b2c9-620e88e86b82",
+      "stage": "RESEARCH",
+      "accountingState": "SETTLED",
+      "requestedModel": null,
+      "modelVerified": true,
+      "usageKnown": true,
+      "cacheUsageKnown": true,
+      "reasoningTokens": 50,
+      "latencyMs": null,
+      "dispatchIndex": null,
+      "retryIndex": null,
+      "outcome": null,
+      "finishReason": "STOP",
+      "pricingVersion": null,
+      "grounding": null
+    },
+    {
+      "id": 39,
+      "userId": 4,
+      "feature": "planner",
+      "workload": "planner_v2",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "promptTokens": 100,
+      "completionTokens": 100,
+      "cacheHitTokens": 0,
+      "estimatedCostUsd": 0.00015,
+      "createdAt": "2026-10-28T11:37:42.447Z",
+      "requestId": "dfa153d9-46b6-43a6-b9c8-d1da9a96e1a3",
+      "rootRequestId": "89f1182a-6b4d-59b3-ae5b-c9f05728ad5e",
+      "reservation": {
+        "call": {
+          "fence": 1,
+          "model": "deepseek-flash",
+          "stage": "RESEARCH",
+          "state": "RESERVED",
+          "callId": "dfa153d9-46b6-43a6-b9c8-d1da9a96e1a3",
+          "costUsd": null,
+          "pricing": "UNKNOWN",
+          "provider": "deepseek",
+          "attemptId": "ee1214e2-90ad-4ac4-b2c9-620e88e86b82",
+          "rootRequestId": "89f1182a-6b4d-59b3-ae5b-c9f05728ad5e",
+          "schemaVersion": 2,
+          "settlementKey": "dfa153d9-46b6-43a6-b9c8-d1da9a96e1a3",
+          "actualInputTokens": null,
+          "actualOutputTokens": null,
+          "reservedInputTokens": 37442,
+          "reservedOutputTokens": 65536
+        },
+        "usage": {
+          "fingerprint": "scripted-unpaid-execution-binding",
+          "finishReason": "STOP",
+          "cacheHitTokens": 0,
+          "effectiveModel": "deepseek-flash",
+          "reasoningTokens": 50
+        },
+        "result": {
+          "text": "{\"claims\":[{\"claimId\":\"claim_e20cdbdf18fb048f5f6784f5\",\"support\":\"SUPPORTED\",\"applicability\":\"MATCHED\",\"reason\":\"Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context\"},{\"claimId\":\"claim_7b5ecc72de8328cf543d8a03\",\"support\":\"SUPPORTED\",\"applicability\":\"MATCHED\",\"reason\":\"Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context\"},{\"claimId\":\"claim_aae0cc45d3ccf3d893363d22\",\"support\":\"SUPPORTED\",\"applicability\":\"MATCHED\",\"reason\":\"Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context\"},{\"claimId\":\"claim_7a7797bbf0124655b7c6c907\",\"support\":\"SUPPORTED\",\"applicability\":\"MATCHED\",\"reason\":\"Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context\"}],\"identities\":[],\"completeSourceIds\":[\"source_1\",\"source_2\",\"source_3\"],\"conflicts\":[],\"answer\":\"Applicable local course contents and anonymous diagnostic evidence, not official-board certification\",\"scopeBindings\":[{\"claimId\":\"claim_e20cdbdf18fb048f5f6784f5\",\"scopeRefs\":[\"scope_1\",\"scope_2\",\"scope_3\",\"scope_4\"],\"disposition\":\"ANNOTATE_SCOPE\"},{\"claimId\":\"claim_7b5ecc72de8328cf543d8a03\",\"scopeRefs\":[],\"disposition\":\"RESOURCE_ONLY\"},{\"claimId\":\"claim_aae0cc45d3ccf3d893363d22\",\"scopeRefs\":[],\"disposition\":\"RESOURCE_ONLY\"},{\"claimId\":\"claim_7a7797bbf0124655b7c6c907\",\"scopeRefs\":[],\"disposition\":\"RESOURCE_ONLY\"}]}",
+          "digest": "7217cebddbab0536f2f4b256fd4d9a955f956e0307b4383d285135e861edc0da",
+          "finishReason": "STOP"
+        },
+        "accepted": true,
+        "roleCall": {
+          "key": "verify_ee1214e290ad4ac4b2c9620e88e86b82_0_0",
+          "role": "RESEARCH",
+          "effort": "HIGH",
+          "format": "JSON",
+          "purpose": "RESEARCH",
+          "inputDigest": "2e1fd52257bf6907802e86427c593eb9a77c5e1f0390a5fa0f6cc256c22cda98",
+          "policyDigest": "0b60ab0fd45fb1301cc4b9e7a5b4356b8d81934da0981bbc43c4e31810eac95f",
+          "promptDigest": "7d0aecac1705f56de9df5d422251ac1d8b79d0f20031f2e878e1d241d9c9692c",
+          "schemaVersion": 1
+        },
+        "schemaVersion": 2
+      },
+      "attemptId": "ee1214e2-90ad-4ac4-b2c9-620e88e86b82",
+      "stage": "RESEARCH",
+      "accountingState": "SETTLED",
+      "requestedModel": null,
+      "modelVerified": true,
+      "usageKnown": true,
+      "cacheUsageKnown": true,
+      "reasoningTokens": 50,
+      "latencyMs": null,
+      "dispatchIndex": null,
+      "retryIndex": null,
+      "outcome": null,
+      "finishReason": "STOP",
+      "pricingVersion": null,
+      "grounding": null
+    },
+    {
+      "id": 41,
+      "userId": 4,
+      "feature": "planner",
+      "workload": "planner_v2",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "promptTokens": 100,
+      "completionTokens": 100,
+      "cacheHitTokens": 0,
+      "estimatedCostUsd": 0.00015,
+      "createdAt": "2026-10-28T11:37:42.492Z",
+      "requestId": "074e9957-bb48-486b-9508-6f93511f4c24",
+      "rootRequestId": "89f1182a-6b4d-59b3-ae5b-c9f05728ad5e",
+      "reservation": {
+        "call": {
+          "fence": 1,
+          "model": "deepseek-flash",
+          "stage": "RESEARCH",
+          "state": "RESERVED",
+          "callId": "074e9957-bb48-486b-9508-6f93511f4c24",
+          "costUsd": null,
+          "pricing": "UNKNOWN",
+          "provider": "deepseek",
+          "attemptId": "ee1214e2-90ad-4ac4-b2c9-620e88e86b82",
+          "rootRequestId": "89f1182a-6b4d-59b3-ae5b-c9f05728ad5e",
+          "schemaVersion": 2,
+          "settlementKey": "074e9957-bb48-486b-9508-6f93511f4c24",
+          "actualInputTokens": null,
+          "actualOutputTokens": null,
+          "reservedInputTokens": 37400,
+          "reservedOutputTokens": 65536
+        },
+        "usage": {
+          "fingerprint": "scripted-unpaid-execution-binding",
+          "finishReason": "STOP",
+          "cacheHitTokens": 0,
+          "effectiveModel": "deepseek-flash",
+          "reasoningTokens": 50
+        },
+        "result": {
+          "text": "{\"claims\":[{\"claimId\":\"claim_3db46e0808b9029870fa406f\",\"support\":\"SUPPORTED\",\"applicability\":\"MATCHED\",\"reason\":\"Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context\"},{\"claimId\":\"claim_400bcbf11ab1d53384da378c\",\"support\":\"SUPPORTED\",\"applicability\":\"MATCHED\",\"reason\":\"Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context\"},{\"claimId\":\"claim_aae0cc45d3ccf3d893363d22\",\"support\":\"SUPPORTED\",\"applicability\":\"MATCHED\",\"reason\":\"Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context\"},{\"claimId\":\"claim_7a7797bbf0124655b7c6c907\",\"support\":\"SUPPORTED\",\"applicability\":\"MATCHED\",\"reason\":\"Literal private content applies to the accepted GENERAL school goal; student attribution comes separately from accepted context\"}],\"identities\":[],\"completeSourceIds\":[\"source_1\",\"source_2\",\"source_3\"],\"conflicts\":[],\"answer\":\"Applicable local course contents and anonymous diagnostic evidence, not official-board certification\",\"scopeBindings\":[{\"claimId\":\"claim_3db46e0808b9029870fa406f\",\"scopeRefs\":[\"scope_1\",\"scope_2\",\"scope_3\",\"scope_4\"],\"disposition\":\"ANNOTATE_SCOPE\"},{\"claimId\":\"claim_400bcbf11ab1d53384da378c\",\"scopeRefs\":[],\"disposition\":\"RESOURCE_ONLY\"},{\"claimId\":\"claim_aae0cc45d3ccf3d893363d22\",\"scopeRefs\":[],\"disposition\":\"RESOURCE_ONLY\"},{\"claimId\":\"claim_7a7797bbf0124655b7c6c907\",\"scopeRefs\":[],\"disposition\":\"RESOURCE_ONLY\"}]}",
+          "digest": "b0f2b1409e792bb415b39e1d4b6d071c376c336f59df80067c791047b2363470",
+          "finishReason": "STOP"
+        },
+        "accepted": true,
+        "roleCall": {
+          "key": "verify_ee1214e290ad4ac4b2c9620e88e86b82_0_1",
+          "role": "RESEARCH",
+          "effort": "HIGH",
+          "format": "JSON",
+          "purpose": "RESEARCH",
+          "inputDigest": "b85a0149fc810c8afea2fe20a0a3844667020bb69deb5a39bd4b7e565c1c61b5",
+          "policyDigest": "0b60ab0fd45fb1301cc4b9e7a5b4356b8d81934da0981bbc43c4e31810eac95f",
+          "promptDigest": "7ac04f98fa28016a877df5f7fd228f12e9ebf744010dc0ada380a83f6a2b758e",
+          "schemaVersion": 1
+        },
+        "schemaVersion": 2
+      },
+      "attemptId": "ee1214e2-90ad-4ac4-b2c9-620e88e86b82",
+      "stage": "RESEARCH",
+      "accountingState": "SETTLED",
+      "requestedModel": null,
+      "modelVerified": true,
+      "usageKnown": true,
+      "cacheUsageKnown": true,
+      "reasoningTokens": 50,
+      "latencyMs": null,
+      "dispatchIndex": null,
+      "retryIndex": null,
+      "outcome": null,
+      "finishReason": "STOP",
+      "pricingVersion": null,
+      "grounding": null
+    },
+    {
+      "id": 43,
+      "userId": 4,
+      "feature": "planner",
+      "workload": "planner_v2",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "promptTokens": 0,
+      "completionTokens": 0,
+      "cacheHitTokens": 0,
+      "estimatedCostUsd": null,
+      "createdAt": "2026-10-28T11:37:42.542Z",
+      "requestId": "6f24845e-2c53-4e24-8ede-66ca2d6e1155",
+      "rootRequestId": "89f1182a-6b4d-59b3-ae5b-c9f05728ad5e",
+      "reservation": {
+        "call": {
+          "fence": 1,
+          "model": "deepseek-flash",
+          "stage": "RESEARCH",
+          "state": "RESERVED",
+          "callId": "6f24845e-2c53-4e24-8ede-66ca2d6e1155",
+          "costUsd": null,
+          "pricing": "UNKNOWN",
+          "provider": "deepseek",
+          "attemptId": "ee1214e2-90ad-4ac4-b2c9-620e88e86b82",
+          "rootRequestId": "89f1182a-6b4d-59b3-ae5b-c9f05728ad5e",
+          "schemaVersion": 2,
+          "settlementKey": "6f24845e-2c53-4e24-8ede-66ca2d6e1155",
+          "actualInputTokens": null,
+          "actualOutputTokens": null,
+          "reservedInputTokens": 47049,
+          "reservedOutputTokens": 65536
+        },
+        "roleCall": {
+          "key": "synthesis_ee1214e290ad4ac4b2c9620e88e86b82_0",
+          "role": "RESEARCH",
+          "effort": "HIGH",
+          "format": "JSON",
+          "purpose": "RESEARCH",
+          "inputDigest": "9feea077af62ad463fa4951e60b02f6a9a61bb82ef7761917c1a9010d1b8fecc",
+          "policyDigest": "0b60ab0fd45fb1301cc4b9e7a5b4356b8d81934da0981bbc43c4e31810eac95f",
+          "promptDigest": "df7d2162bd2447583a013bdb1aa50437bcde4671c4f8c6de2e7e02f6c6ea5269",
+          "schemaVersion": 1
+        },
+        "schemaVersion": 2
+      },
+      "attemptId": "ee1214e2-90ad-4ac4-b2c9-620e88e86b82",
+      "stage": "RESEARCH",
+      "accountingState": "UNKNOWN_SPEND",
+      "requestedModel": null,
+      "modelVerified": null,
+      "usageKnown": null,
+      "cacheUsageKnown": null,
+      "reasoningTokens": null,
+      "latencyMs": null,
+      "dispatchIndex": null,
+      "retryIndex": null,
+      "outcome": null,
+      "finishReason": null,
+      "pricingVersion": null,
+      "grounding": null
+    }
+  ],
+  "revisions": [],
+  "apply": null,
+  "unselectedTaskPreserved": true,
+  "frozenInputSha256": "66160eabe9fcc155e4a46dd528aba2e3b95a66de050cf975f97ba47bb1a066cb",
+  "capturedAt": "2026-10-28T16:37:42.964Z"
+}

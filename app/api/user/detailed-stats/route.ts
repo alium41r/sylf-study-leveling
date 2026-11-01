@@ -8,6 +8,7 @@ import { TimezoneService } from "@/lib/timezone-service";
  * Returns comprehensive stats for the Settings → Stats page.
  * Includes: user profile, session history (last 30 days), quest stats,
  * subject breakdown, rank progression info, and study streaks.
+ * `?summary=true` leaves out sessionLog, for a chart that does not need every row: /api/sessions?limit= lists those.
  */
 export async function GET(req: NextRequest) {
   try {
@@ -17,6 +18,7 @@ export async function GET(req: NextRequest) {
     }
 
     const userId = session.userId;
+    const summaryOnly = req.nextUrl.searchParams.get("summary") === "true";
 
     // Get user with basic stats
     const user = await prisma.user.findUnique({
@@ -65,14 +67,17 @@ export async function GET(req: NextRequest) {
           startedAt: true,
           endedAt: true,
           subject: { select: { id: true, name: true, color: true } },
-          quest: { select: { id: true, title: true } },
+          quest: summaryOnly ? false : { select: { id: true, title: true } },
         },
         orderBy: { startedAt: "asc" },
       }),
-      prisma.quest.findMany({
-        where: { userId },
-        select: { status: true, xpReward: true, requiredMinutes: true },
-      }),
+      // A summary counts quests in the database. The full report's readers keep the original read.
+      summaryOnly
+        ? Promise.resolve([])
+        : prisma.quest.findMany({
+            where: { userId },
+            select: { status: true, xpReward: true, requiredMinutes: true },
+          }),
       prisma.goal.findMany({
         where: { userId },
         select: { status: true },
@@ -134,7 +139,7 @@ export async function GET(req: NextRequest) {
 
     // Individual session log (most recent first) — one entry per completed
     // focus block so users can review "30 min in the morning, 50 min at night".
-    const sessionLog = sessions
+    const sessionLog = summaryOnly ? undefined : sessions
       .map((s) => ({
         id: s.id,
         startedAt: s.startedAt,
@@ -150,15 +155,23 @@ export async function GET(req: NextRequest) {
       .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime());
 
     // Quest stats
+    const questGroups = summaryOnly
+      ? await prisma.quest.groupBy({ by: ["status"], where: { userId }, _count: { _all: true }, _sum: { xpReward: true } })
+      : null;
+    const questCount = (status: string) => questGroups
+      ? questGroups.find((group) => group.status === status)?._count._all ?? 0
+      : allQuests.filter((q) => q.status === status).length;
     const questStats = {
-      total: allQuests.length,
-      completed: allQuests.filter((q) => q.status === "COMPLETED").length,
-      failed: allQuests.filter((q) => q.status === "FAILED").length,
-      pending: allQuests.filter((q) => q.status === "PENDING").length,
-      inProgress: allQuests.filter((q) => q.status === "IN_PROGRESS").length,
-      totalXPEarned: allQuests
-        .filter((q) => q.status === "COMPLETED")
-        .reduce((sum, q) => sum + q.xpReward, 0),
+      total: questGroups ? questGroups.reduce((sum, group) => sum + group._count._all, 0) : allQuests.length,
+      completed: questCount("COMPLETED"),
+      failed: questCount("FAILED"),
+      pending: questCount("PENDING"),
+      inProgress: questCount("IN_PROGRESS"),
+      totalXPEarned: questGroups
+        ? questGroups.find((group) => group.status === "COMPLETED")?._sum.xpReward ?? 0
+        : allQuests
+            .filter((q) => q.status === "COMPLETED")
+            .reduce((sum, q) => sum + q.xpReward, 0),
     };
 
     // Goals stats

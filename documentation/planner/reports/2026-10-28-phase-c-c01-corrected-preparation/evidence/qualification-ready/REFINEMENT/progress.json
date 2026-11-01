@@ -1,0 +1,66 @@
+{
+  "runId": "unpaid-REFINEMENT",
+  "mode": "REFINEMENT",
+  "owner": 5,
+  "rootRequestId": "924f7af4-7a65-5026-a2e5-ef9971a9e157",
+  "activeAttemptId": "f9d3dcc8-c575-4137-8d9a-f993f8efa79d",
+  "state": "RESPONSE_RECEIVED",
+  "physicalRequests": 0,
+  "stopReason": null,
+  "roles": [
+    {
+      "sequence": 1,
+      "role": "RESEARCH",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 2,
+      "role": "VERIFICATION",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 3,
+      "role": "VERIFICATION",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 4,
+      "role": "SYNTHESIS",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 5,
+      "role": "STRATEGIST",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 6,
+      "role": "TRANSLATOR",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 7,
+      "role": "REVIEWER",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 8,
+      "role": "TRANSLATOR",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 9,
+      "role": "REVIEWER",
+      "finished": true,
+      "stopReason": null
+    }
+  ]
+}

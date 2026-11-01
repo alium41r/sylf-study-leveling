@@ -1,0 +1,76 @@
+{
+  "hostedMigrations": {
+    "successful": 70,
+    "pending": 0,
+    "unresolvedFailures": 0,
+    "checksumMismatches": 0,
+    "officialStatusPassed": true
+  },
+  "preservation": {
+    "preexistingApplicationTablesUnchanged": 71,
+    "existingSchemaAndSecurityUnchanged": true,
+    "hostedDataDeleted": true,
+    "hostedDeletionLimitedToApprovedArchivedTestRecords": 96,
+    "allUnselectedRowsPreservedAcrossPublicTables": 74
+  },
+  "prisma": {
+    "generated": true,
+    "sqlCloneSourceVerified": true,
+    "supportedSemanticDiffEmpty": true,
+    "sqlOwnedAdditionalCompositeFKs": 9,
+    "sqlOwnedPartialIndexes": 5,
+    "generatedClientHostedReadOnlyModels": 7,
+    "schemaBuildVersion": 38
+  },
+  "verification": {
+    "calendarPostgresTests": 33,
+    "notesPostgresPassed": true,
+    "regressionTestsPassed": 266,
+    "existingOptInProfileSkipped": 1,
+    "finalSafeguardTestsPassed": 11,
+    "legacyFocusPartySuitesPassed": 2,
+    "focusPartyFullSuiteAssertions": 67,
+    "fixtureRowsRemaining": 0,
+    "typecheckPassed": true,
+    "typecheckTemporaryHeapMB": 6144,
+    "lintPassed": true,
+    "productionBuildPassed": true,
+    "productionCompiler": "webpack",
+    "productionBuildTemporaryHeapMB": 6144,
+    "defaultTurbopackBuild": "stalled and explicitly terminated",
+    "firstWebpackBuild": "TypeScript default 2 GB heap exhausted",
+    "mobileBuildPassed": true,
+    "mobileBoundaryAuditPassed": true,
+    "wrongCARejectedBeforeAuthentication": true,
+    "postCleanupPublicSchemaAndDataRestorePassed": true,
+    "restoredApplicationTablesMatch": 73,
+    "restoredForeignKeysValidated": 116
+  },
+  "approvalBoundary": {
+    "orphanedTestRecords": 96,
+    "archivedPrivately": true,
+    "localRepairAndRecoveryRehearsalsPassed": true,
+    "hostedRepairApproved": true,
+    "hostedRepairExecuted": true,
+    "committed": true,
+    "actualForeignKeysChecked": 116,
+    "foreignKeyViolationsRemaining": 0,
+    "initialAttemptFullyRolledBack": true
+  },
+  "remaining": [
+    "Historical empty-database SQL replay missing ItemCategory",
+    "Existing application TLS configuration and hosted pooler-backend hop require separate qualification/hardening",
+    "Management token returns 401",
+    "Vercel environment and exact Google callback registration need verification; live consent/Drive operations unperformed"
+  ],
+  "notesCredentialsPresenceOnly": true,
+  "notesLocalConfiguration": {
+    "configured": true,
+    "publicOrigin": "https://sylf-alium41rs-projects.vercel.app",
+    "redirectUri": "https://sylf-alium41rs-projects.vercel.app/api/notes/callback",
+    "existingBindingsBeforeChange": 0,
+    "googleConsoleVerified": false,
+    "vercelEnvironmentVerified": false,
+    "liveConsentOrDriveFilesTested": false
+  }
+}

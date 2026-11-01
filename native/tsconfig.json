@@ -1,0 +1,21 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "types": ["node"],
+    "paths": {
+      "yjs": ["./node_modules/yjs"],
+      "zod": ["./node_modules/zod"]
+    }
+  },
+  "include": [
+    "apps/sylf/**/*.ts",
+    "apps/sylf/**/*.tsx",
+    "packages/*/src/**/*.ts",
+    "packages/*/src/**/*.tsx",
+    "packages/*/integration/**/*.ts",
+    "tooling/**/*.ts"
+  ],
+  "exclude": ["node_modules", "**/node_modules", "apps/sylf/android", "apps/sylf/ios", "apps/sylf/dist", "apps/desktop"]
+}

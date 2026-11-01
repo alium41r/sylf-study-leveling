@@ -1,0 +1,53 @@
+{
+  "workspace": "/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-student-workspace-build-5ke0g62p",
+  "steps": [
+    {
+      "name": "worker-build",
+      "exitCode": 0,
+      "seconds": 6.29
+    },
+    {
+      "name": "web-build",
+      "exitCode": 0,
+      "seconds": 78.1
+    },
+    {
+      "name": "post-build-typecheck",
+      "exitCode": 0,
+      "seconds": 35.43
+    },
+    {
+      "name": "mobile-build",
+      "exitCode": 0,
+      "seconds": 6.21
+    },
+    {
+      "name": "mobile-verify",
+      "exitCode": 0,
+      "seconds": 0.24
+    },
+    {
+      "name": "web-after-entry",
+      "exitCode": 0,
+      "seconds": 52.68
+    },
+    {
+      "name": "typecheck-after-entry",
+      "exitCode": 0,
+      "seconds": 7.01
+    },
+    {
+      "name": "mobile-after-entry",
+      "exitCode": 0,
+      "seconds": 4.47
+    },
+    {
+      "name": "mobile-verify-after-entry",
+      "exitCode": 0,
+      "seconds": 0.21
+    }
+  ],
+  "status": "PASSED",
+  "paidCalls": 0,
+  "credentials": "stripped; no environment files copied"
+}

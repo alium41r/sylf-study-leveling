@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-23",
+  "notesTests": {
+    "passed": 229,
+    "skipped": 1,
+    "scope": "Existing opt-in scale profile skipped"
+  },
+  "typecheck": "passed",
+  "lint": "passed",
+  "webBuild": "passed",
+  "mobileBuild": "passed",
+  "mobileAudit": "passed",
+  "browser": "passed",
+  "performance": {
+    "strokes": 5000,
+    "samples": 320000,
+    "panP95Ms": 2.199999988079071,
+    "brushP95MaxMs": 1.5999999940395355,
+    "frameBudgetMs": 16.7,
+    "pathCacheWithinBudget": true
+  },
+  "notPerformed": [
+    "Deployment",
+    "Live Google-account acceptance",
+    "Physical stylus/palm rejection",
+    "Academic-year scale qualification"
+  ]
+}

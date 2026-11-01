@@ -12,7 +12,7 @@ import { loadExecutionContext, verifyContextCorrespondence } from "@/lib/planner
 import { projectPlannerContext } from "@/lib/planner/v2/intelligence/context";
 import { loadPlannerModelContext } from "@/lib/planner/v2/intelligence/context";
 import { dispatchMeteredProvider, workerProviderMeter, foregroundProviderMeter, type MeteredProviderRequest } from "@/lib/planner/v2/intelligence/provider";
-import { intentFixture } from "../contracts/fixtures";
+import { intentFixture } from "./intent-fixture";
 import type { LLMResponse } from "@/lib/ai/providers/types";
 import { TimezoneService } from "@/lib/timezone-service";
 
@@ -46,6 +46,7 @@ describe("Phase 2 context and metered boundary on genuine PostgreSQL", () => {
   it("loads 1500 historical rows without losing authoritative history/capacity or overflowing the dependency registry", async () => {
     const f = await fixture(false); const intent = { ...f.created.intent.intent, availability: { timezone: "UTC", dailyCeilingMinutes: [120,120,120,120,120,120,120], restWeekdays: [], blockedDates: [], recoveryPercent: 15, basis: "CONFIRMED_AVAILABILITY" as const } };
     await db.coordinated(f.ownerId, async sql => {
+      await sql.query('UPDATE "User" SET "restDays"=\'{}\' WHERE id=$1', [f.ownerId]);
       await sql.query('INSERT INTO "Quest" ("userId",title,status,"scheduledFor","targetMinutes","requiredMinutes","completedAt","remainingDisposition") SELECT $1,\'Historical work\',\'COMPLETED\',\'2026-10-01\',30,30,now(),\'COMPLETED\' FROM generate_series(1,1500)', [f.ownerId]);
       await sql.query('INSERT INTO "Quest" ("userId",title,status,"scheduledFor","targetMinutes","requiredMinutes") VALUES ($1,\'Other open work\',\'PENDING\',$2::date,20,20)', [f.ownerId, TimezoneService.getUserLocalDate("UTC")]);
     });
@@ -139,15 +140,18 @@ describe("Phase 2 context and metered boundary on genuine PostgreSQL", () => {
     });
     await ready;
     const input = { provider: "fixture", model: "unpriced", inputTokens: 1000, outputTokens: 1000, category: "PLANNING" as const, policy };
+    const connections = vi.spyOn(pool, "connect");
     const pending = Promise.allSettled(Array.from({ length: 5 }, () => attempts.reserveCall(f.token!, input)));
     try {
       for (let n = 0; n < 100; n++) {
-        const waiters = (await connection.query("SELECT count(*)::int AS count FROM pg_locks WHERE locktype='advisory' AND classid=73641::oid AND objid=$1::oid AND NOT granted", [f.ownerId])).rows[0].count;
-        if (waiters === 5) break;
-        if (n === 99) throw new Error("Five independent reservation connections never entered owner-lock wait");
+        // Coordination deliberately retries nonblocking transaction locks with
+        // fresh snapshots, rather than holding five stale serializable waits.
+        if (connections.mock.calls.length >= 10) break;
+        if (n === 99) throw new Error("Concurrent reservations never retried the occupied owner lock");
         await new Promise(resolve => setTimeout(resolve, 10));
       }
-    } finally { release(); await blocker; }
+      expect((await stored(f.attempt!.attemptId)).payload.calls ?? []).toHaveLength(0);
+    } finally { connections.mockRestore(); release(); await blocker; }
     const results = await pending;
     const rejected = results.filter((r): r is PromiseRejectedResult => r.status === "rejected");
     expect(rejected.map(r => r.reason instanceof DurablePlannerError ? r.reason.detail.code : r.reason.code)).toEqual(["BUDGET_EXHAUSTED"]);
@@ -236,7 +240,9 @@ describe("Phase 2 context and metered boundary on genuine PostgreSQL", () => {
     expect(Date.parse(claimed.budget.executionDeadlineAt!) - Date.parse(claimed.budget.processingStartedAt!)).toBe(180000 - budget.foregroundProcessingMs);
     expect((await stored(a.attemptId)).payload.providerGuard.reviewReserve).toEqual(policy.reviewReserve);
     await expect(attempts.enqueue(f.ownerId, { ...f.enqueue, key: randomUUID(), budget })).rejects.toMatchObject({ detail: { code: "IDEMPOTENCY_MISMATCH" } });
-    await accounting.recordLateUsage(f.ownerId, result.callId, { inputTokens: 100, outputTokens: 30, costUsd: null });
+    const actualCost = (await connection.query('SELECT "estimatedCostUsd" FROM "AiUsageLog" WHERE "requestId"=$1', [result.callId])).rows[0].estimatedCostUsd;
+    await accounting.recordLateUsage(f.ownerId, result.callId, { inputTokens: 100, outputTokens: 30, costUsd: actualCost });
+    await expect(accounting.recordLateUsage(f.ownerId, result.callId, { inputTokens: 101, outputTokens: 30, costUsd: actualCost })).rejects.toMatchObject({ detail: { code: "IDEMPOTENCY_MISMATCH" } });
     expect((await connection.query('SELECT used FROM "UserQuota" WHERE "userId"=$1', [f.ownerId])).rows).toEqual([{ used: 1 }]); await attempts.cancel(f.ownerId, token.attemptId);
   });
 });

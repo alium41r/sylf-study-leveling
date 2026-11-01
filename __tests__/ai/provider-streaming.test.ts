@@ -14,9 +14,16 @@ afterEach(() => { vi.clearAllMocks(); vi.unstubAllGlobals(); });
 async function* chunks(values: unknown[]) { for (const value of values) yield value; }
 
 describe("provider text streaming preserves dispatch accounting", () => {
+  it("opt-ins to DeepSeek reasoning deltas while buffering structured JSON separately",async()=>{
+    const raw=[{model:"deepseek-flash",choices:[{delta:{reasoning_content:"Compare the accepted constraints. "}}]},{choices:[{delta:{reasoning_content:"Then check the dependencies."}}]},{choices:[{delta:{content:'{"ok":true}'},finish_reason:"stop"}],usage:{prompt_tokens:10,completion_tokens:20,reasoning_tokens:15,prompt_cache_hit_tokens:0}}].map(chunk=>`data: ${JSON.stringify(chunk)}\n\n`).join("")+"data: [DONE]\n\n";
+    const fetch=vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>{expect(String(input)).toBe("https://api.deepseek.com/chat/completions");expect(init?.method).toBe("POST");return new Response(raw);});vi.stubGlobal("fetch",fetch);const reasoning:string[]=[];
+    const result=await new DeepSeekAdapter("synthetic").generateResponse(message,"Fixture",[],{onReasoningDelta:text=>reasoning.push(text),responseFormat:"json_object",singleAttempt:true,telemetry:false});
+    expect(reasoning).toEqual(["Compare the accepted constraints. ","Then check the dependencies."]);expect(result.reasoningText).toBe(reasoning.join(""));expect(result.text).toBe('{"ok":true}');expect(result.usage).toMatchObject({completionTokens:20,reasoningTokens:15});
+    expect(fetch).toHaveBeenCalledTimes(1);expect(JSON.parse(fetch.mock.calls[0][1]!.body as string)).toMatchObject({stream:true,response_format:{type:"json_object"},stream_options:{include_usage:true}});
+  });
   it("streams DeepSeek visible text and settles one receipt using final usage", async () => {
     const raw = [
-      { model: "deepseek-flash", choices: [{ delta: { reasoning_content: "PRIVATE" } }] },
+      { model: "deepseek-flash", system_fingerprint:"synthetic-fingerprint", choices: [{ delta: { reasoning_content: "PRIVATE" } }] },
       { model: "deepseek-flash", choices: [{ delta: { content: "Hello " } }] },
       { model: "deepseek-flash", choices: [{ delta: { content: "world" }, finish_reason: "stop" }], usage: { prompt_tokens: 10, completion_tokens: 8, prompt_cache_hit_tokens: 5, completion_tokens_details: { reasoning_tokens: 3 } } },
     ].map(value => `data: ${JSON.stringify(value)}\n\n`).join("") + 'data: [DONE]\n\n';
@@ -24,6 +31,7 @@ describe("provider text streaming preserves dispatch accounting", () => {
     const text: string[] = [];
     const result = await withAiRequest({ userId: 7, feature: "chat", workload: "test" }, () => new DeepSeekAdapter("synthetic").generateResponse(message, "Instructions", [], { onTextDelta: value => text.push(value), singleAttempt: true }));
     expect(text).toEqual(["Hello ", "world"]); expect(result.text).toBe("Hello world");
+    expect(result.fingerprint).toBe("synthetic-fingerprint");
     expect(result.usage).toMatchObject({ promptTokens: 10, completionTokens: 8, reasoningTokens: 3, cacheHitTokens: 5 });
     expect(wire.upsert).toHaveBeenCalledTimes(2);
     expect(JSON.stringify(wire.upsert.mock.calls)).not.toContain("PRIVATE");

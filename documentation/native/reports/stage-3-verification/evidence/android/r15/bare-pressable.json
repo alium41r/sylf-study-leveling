@@ -1,0 +1,132 @@
+{
+  "scenario": "pressable",
+  "inApp": false,
+  "minutes": 6,
+  "device": "SM-X510",
+  "crashed": false,
+  "lastLog": "11-01 17:29:32.194 10428 10454 I ReactNativeJS: SYLF_R15 {\"scenario\":\"idle\",\"cycles\":50,\"count\":300}",
+  "nativeGrowthFirstToLast": -15.2,
+  "nativeGrowthSecondHalf": -4,
+  "samples": [
+    {
+      "label": "start",
+      "totalPss": 185.6,
+      "nativeHeap": 88.2,
+      "javaHeap": 32.5,
+      "graphics": 22.3,
+      "views": 310
+    },
+    {
+      "label": "30s",
+      "totalPss": 193.6,
+      "nativeHeap": 89.3,
+      "javaHeap": 22.5,
+      "graphics": 22.3,
+      "views": 10
+    },
+    {
+      "label": "60s",
+      "totalPss": 166,
+      "nativeHeap": 78.1,
+      "javaHeap": 20.2,
+      "graphics": 22.1,
+      "views": 10
+    },
+    {
+      "label": "90s",
+      "totalPss": 146.6,
+      "nativeHeap": 66.8,
+      "javaHeap": 16.8,
+      "graphics": 22.1,
+      "views": 166
+    },
+    {
+      "label": "120s",
+      "totalPss": 156,
+      "nativeHeap": 73.8,
+      "javaHeap": 18.6,
+      "graphics": 22.1,
+      "views": 310
+    },
+    {
+      "label": "150s",
+      "totalPss": 155.5,
+      "nativeHeap": 73.2,
+      "javaHeap": 18.6,
+      "graphics": 22.1,
+      "views": 10
+    },
+    {
+      "label": "180s",
+      "totalPss": 155.4,
+      "nativeHeap": 73.1,
+      "javaHeap": 18,
+      "graphics": 22.1,
+      "views": 13
+    },
+    {
+      "label": "210s",
+      "totalPss": 164.2,
+      "nativeHeap": 78.1,
+      "javaHeap": 20.1,
+      "graphics": 22.1,
+      "views": 310
+    },
+    {
+      "label": "240s",
+      "totalPss": 148.5,
+      "nativeHeap": 66.6,
+      "javaHeap": 15.9,
+      "graphics": 22.1,
+      "views": 310
+    },
+    {
+      "label": "270s",
+      "totalPss": 156.7,
+      "nativeHeap": 72.6,
+      "javaHeap": 18.2,
+      "graphics": 22.1,
+      "views": 10
+    },
+    {
+      "label": "300s",
+      "totalPss": 151.3,
+      "nativeHeap": 69.6,
+      "javaHeap": 15.8,
+      "graphics": 22.1,
+      "views": 310
+    },
+    {
+      "label": "330s",
+      "totalPss": 165.2,
+      "nativeHeap": 78.4,
+      "javaHeap": 20.9,
+      "graphics": 22.1,
+      "views": 310
+    },
+    {
+      "label": "360s",
+      "totalPss": 158.8,
+      "nativeHeap": 74.1,
+      "javaHeap": 18.8,
+      "graphics": 22.1,
+      "views": 10
+    },
+    {
+      "label": "idle-30s",
+      "totalPss": 113,
+      "nativeHeap": 39.6,
+      "javaHeap": 7.5,
+      "graphics": 22.1,
+      "views": 10
+    },
+    {
+      "label": "trim",
+      "totalPss": 110.8,
+      "nativeHeap": 39.6,
+      "javaHeap": 5.3,
+      "graphics": 22.1,
+      "views": 10
+    }
+  ]
+}

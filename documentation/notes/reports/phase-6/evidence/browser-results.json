@@ -1,0 +1,22 @@
+{
+  "results": [
+    "Mandatory cloud onboarding",
+    "Create rich text; encrypted IndexedDB save; verified synthetic cloud transfer",
+    "Rename; bold; heading; checklist; undo/redo; link; durable image upload",
+    "Offline durable save and lost-upload-response reconciliation",
+    "Folders; subject association; favorites; content search; list view; Trash restore; history",
+    "Typed notebooks with independent pages and nested folders",
+    "Raw persisted records contain no title/body plaintext; portable archive export",
+    "Fresh browser profile reconstructs text, image and organization from cloud packs",
+    "Concurrent text edits on independent devices merge through the actual editor and cloud adapter",
+    "Importing older portable history preserves newer edits; metadata updates preserve an already paused stream",
+    "Acknowledged encrypted state survives renderer crash",
+    "Desktop/tablet/phone appearance matrices and responsive navigation",
+    "Injected journal quota failure pauses editing, blocks logout/OAuth navigation, exports active/retained recovery after view reopening, retries safely",
+    "Externally removed cloud copies cannot receive a false verified status",
+    "Account switching hides previous-owner content and locks its retained vault"
+  ],
+  "errors": [],
+  "cloudFiles": 9,
+  "archiveBytes": 58511
+}

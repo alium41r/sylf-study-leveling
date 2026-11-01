@@ -1,0 +1,102 @@
+
+<--- Last few GCs --->
+
+[72361:0x84880c000]    32394 ms: Scavenge (interleaved) 2034.2 (2050.2) -> 2030.4 (2058.2) MB, pooled: 0 MB, 1.88 / 0.00 ms  (average mu = 0.336, current mu = 0.326) allocation failure; 
+[72361:0x84880c000]    32709 ms: Mark-Compact (reduce) 2038.7 (2059.2) -> 2034.1 (2047.0) MB, pooled: 0 MB, 292.75 / 0.00 ms  (+ 8.2 ms in 124 steps since start of marking, biggest step 5.0 ms, walltime since start of marking 314 ms) (average mu = 0.291, 
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0x100b559f4 node::OOMErrorHandler(char const*, v8::OOMDetails const&) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 2: 0x100dd0000 v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 3: 0x10102f4b4 v8::internal::Heap::stack() [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 4: 0x101032888 v8::internal::Heap::HasLowYoungGenerationAllocationRate() [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 5: 0x101043a7c v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags)::$_1::operator()() const [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 6: 0x101043350 void heap::base::Stack::SetMarkerAndCallbackImpl<v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags)::$_1>(heap::base::Stack*, void*, void const*) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 7: 0x1019f7be0 PushAllRegistersAndIterateStack [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 8: 0x10102d1b8 v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+ 9: 0x101021ec4 v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+10: 0x1010035a4 v8::internal::Factory::NewFillerObject(int, v8::internal::AllocationAlignment, v8::internal::AllocationType, v8::internal::AllocationOrigin) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+11: 0x101492d9c v8::internal::Runtime_AllocateInYoungGeneration(int, unsigned long*, v8::internal::Isolate*) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+12: 0x101aea234 Builtins_CEntry_Return1_ArgvOnStack_NoBuiltinExit [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+13: 0x129fb9b74 
+14: 0x12b161f3c 
+15: 0x12a5d0704 
+16: 0x129e40e80 
+17: 0x12a418c1c 
+18: 0x12a65037c 
+19: 0x12a6873c8 
+20: 0x129e502cc 
+21: 0x12a5dbda8 
+22: 0x129e44640 
+23: 0x129e482cc 
+24: 0x129e43dec 
+25: 0x129e47888 
+26: 0x129e43dec 
+27: 0x12a4601a8 
+28: 0x12b091a08 
+29: 0x12b18a888 
+30: 0x12a41a61c 
+31: 0x12b62bae8 
+32: 0x12b2f825c 
+33: 0x12b0ac06c 
+34: 0x12b1d8794 
+35: 0x12b05cac4 
+36: 0x12b6a898c 
+37: 0x12b0f068c 
+38: 0x12b144674 
+39: 0x12b0cb758 
+40: 0x101ace05c Builtins_SetPrototypeForEach [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+41: 0x12a5c91c4 
+42: 0x12b6d37e0 
+43: 0x12b1b4d14 
+44: 0x12b108c24 
+45: 0x129fabf98 
+46: 0x12b1b49b8 
+47: 0x12a5b761c 
+48: 0x12a4c1304 
+49: 0x12a49b214 
+50: 0x12b692bf8 
+51: 0x12a5a1f2c 
+52: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+53: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+54: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+55: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+56: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+57: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+58: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+59: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+60: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+61: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+62: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+63: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+64: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+65: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+66: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+67: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+68: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+69: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+70: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+71: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+72: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+73: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+74: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+75: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+76: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+77: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+78: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+79: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+80: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+81: 0x101a4cbec Builtins_InterpreterEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+82: 0x101a4a8cc Builtins_JSEntryTrampoline [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+83: 0x101a4a570 Builtins_JSEntry [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+84: 0x100f736d8 v8::internal::(anonymous namespace)::Invoke(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+85: 0x100f7303c v8::internal::Execution::Call(v8::internal::Isolate*, v8::internal::DirectHandle<v8::internal::Object>, v8::internal::DirectHandle<v8::internal::Object>, v8::base::Vector<v8::internal::DirectHandle<v8::internal::Object> const>) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+86: 0x100de79c0 v8::Function::Call(v8::Isolate*, v8::Local<v8::Context>, v8::Local<v8::Value>, int, v8::Local<v8::Value>*) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+87: 0x100b25610 node::builtins::BuiltinLoader::CompileAndCall(v8::Local<v8::Context>, char const*, node::Realm*) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+88: 0x100c09f94 node::Realm::ExecuteBootstrapper(char const*) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+89: 0x100afeda4 node::StartExecution(node::Environment*, char const*) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+90: 0x100afecf8 node::StartExecution(node::Environment*, std::__1::function<v8::MaybeLocal<v8::Value> (node::StartExecutionCallbackInfoWithModule const&)>) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+91: 0x100a398a0 node::LoadEnvironment(node::Environment*, std::__1::function<v8::MaybeLocal<v8::Value> (node::StartExecutionCallbackInfoWithModule const&)>, std::__1::function<void (node::Environment*, v8::Local<v8::Value>, v8::Local<v8::Value>)>) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+92: 0x100bb0774 node::NodeMainInstance::Run() [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+93: 0x100b027e0 node::Start(int, char**) [/Users/aliumair/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node]
+94: 0x18eb6fe00 start [/usr/lib/dyld]

@@ -1,0 +1,15 @@
+✔ integer peak-rate exposure includes the full dispatched reservation and settles actual usage once (1.468667ms)
+✔ unknown cost, unknown dispatch, an unauthorized model and exposure beyond $1.75 block admission (0.2785ms)
+✔ an unauthorized or underfunded call never reaches the adapter (5.619625ms)
+✔ HIGH/full-cap role settings cannot be silently reduced (0.125667ms)
+✔ a completed review that outlives calendar evidence is retained and stops before another invocation (1.855458ms)
+✔ a current complete review permits the existing lifecycle to validate it without an invented stop (0.164417ms)
+✔ repeated allocation-only review with unchanged substantive progress cannot buy another call (0.117042ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 75.245334

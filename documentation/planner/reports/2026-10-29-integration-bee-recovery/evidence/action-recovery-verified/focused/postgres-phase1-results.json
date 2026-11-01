@@ -1,0 +1,108 @@
+{
+  "label": "phase1",
+  "files": 1,
+  "passed": 23,
+  "failed": 0,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [],
+  "suites": [
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-jXnJly/__tests__/planner-v2/postgres/understanding.postgres.ts",
+      "cases": [
+        {
+          "name": "durable compiler-v2 Research & Understanding corrects one rejected action shape, retains both receipts, and recovers its settled correction without redispatch",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding stops after one still-invalid correction with both charges retained",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding completes a context-only dossier without unnecessary questions or web research",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding reads owned uploaded contents and independently checks support without upgrading private issuer authority",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding retains exact accepted student attribution and local school scope through versioned verification without official authority",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding keeps fabricated literal evidence rejected and asks about unresolved assessment identity",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding returns unsupported synthesis to Research for substantive correction before dossier acceptance",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding retains consequential clarification and continues with original root, deadline, exact instructions and accounting",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding requires explicit student-accepted canonical changes for hard facts and retains old immutable intent history",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding rejects foreign ownership, stale decision digests, incomplete answers and concurrent sibling decisions",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding does not ask already answered information again without explaining a new consequential conflict",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding recovers the exact saved model response after a crash without a duplicate call",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding rejects a saved response after concurrent commitments change the protected context",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding blocks silent repeats and continuations after an uncertain search dispatch",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding retains real search provenance, safe fetch hops and known per-request DeepSeek cost",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding routes bounded OCR through the existing DeepSeek adapter and the same role receipts",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding refuses invented fetch URLs and does not dispatch research without accepted permission",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding rejects changed uploaded bytes before recovering a saved dossier",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding keeps cancellation, original deadline and closed downstream compiler gates authoritative",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding admits explicit deep tool allowances and inherits them instead of the old eight-query/one-follow-up caps",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding bounds a noncooperative search by the absolute deadline and accepts only its late financial settlement",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding database guards reject changed research input and financial receipt identity",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding fences a Step 2 worker from new research interpretation during mixed deployment",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

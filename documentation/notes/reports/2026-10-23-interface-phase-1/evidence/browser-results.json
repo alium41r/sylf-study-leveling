@@ -1,0 +1,60 @@
+{
+  "open": {
+    "url": "http://127.0.0.1:4390/#/notes?library=7f3c2864-639a-4d6f-9d5f-fefee54261d8&document=b638f71f-3e21-41e3-a294-8a4266874669&page=c83efb4a-e37d-4971-9334-74412935efd3",
+    "errors": [],
+    "state": {
+      "id": "b638f71f-3e21-41e3-a294-8a4266874669",
+      "page": "c83efb4a-e37d-4971-9334-74412935efd3",
+      "strokes": 1,
+      "streams": 2
+    },
+    "text": "Electromagnetic induction\n\nA changing magnetic field produces an electromotive force."
+  },
+  "exercise": {
+    "results": [
+      "Mixed text/ink survives reload",
+      "Bounded 60–400% desktop zoom and fit width",
+      "Positioned rich text on the same ink page",
+      "Independent mixed-layer page duplication",
+      "Focus mode and bottom toolbar",
+      "Tablet and phone layout, custom appearance, ink options, library return"
+    ],
+    "positioned": {
+      "id": "b638f71f-3e21-41e3-a294-8a4266874669",
+      "strokes": 1,
+      "pages": 1,
+      "streams": 2,
+      "origin": {
+        "x": 120,
+        "y": 200
+      }
+    }
+  },
+  "workflows": {
+    "results": [
+      "Nested folders, folder cards, grid/list and actual text previews",
+      "Image import through original encrypted attachment pipeline",
+      "Real PDF import, local worker rendering and selectable source text",
+      "Composite text/ink Drive PDF, synthetic sync and sustained typing with caret navigation",
+      "Readable copies preserve unopened original ink pages alongside new text layers"
+    ],
+    "imageState": {
+      "assets": 1,
+      "streams": 2,
+      "strokes": 1
+    },
+    "exported": {
+      "bytes": 36104,
+      "pages": 2,
+      "pending": 0
+    },
+    "legacyExport": {
+      "changed": true,
+      "pages": 2
+    },
+    "caret": {
+      "bottom": 1024,
+      "hostBottom": 1112
+    }
+  }
+}

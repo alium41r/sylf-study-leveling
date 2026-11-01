@@ -1,0 +1,10 @@
+{
+  "status": "ACTIVE",
+  "credentialRevision": 13,
+  "accessTokenExpired": false,
+  "refreshCredentialPresent": true,
+  "refreshLeaseActive": false,
+  "verifiedLibraryPresent": true,
+  "readOnly": true,
+  "scope": "Observed before the separate controlled refresh check"
+}

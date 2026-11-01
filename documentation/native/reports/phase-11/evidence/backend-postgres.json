@@ -1,0 +1,161 @@
+{
+ "label": "backend-postgres",
+ "passed": 30,
+ "failed": 0,
+ "skipped": 0,
+ "collectionFailures": [],
+ "finishedAt": "2026-10-31T19:27:00.713Z",
+ "scope": "Handlers in-process on disposable PostgreSQL 17. Hosted Supabase, Redis and storage were not used.",
+ "cases": [
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "OAuth account linking never links a provider to a user named only by the forgeable oauth_link_user cookie",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "OAuth account linking refuses a link cookie that names a different user from the signed-in session",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "OAuth account linking still links for the signed-in person who started the flow",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "device sessions lists a device from the moment it signs in",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "device sessions ends a revoked device at once",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "device sessions keeps a revoked device out after its token was reissued",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "device sessions ends a token for good when it logs out",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "device sessions cannot revoke another person's device",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "device sessions keeps accepting tokens issued before sessions were recorded",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "device sessions still revokes everything through tokenVersion",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "security codes refuses a second guess after too many wrong codes",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "security codes gives two people the same code without a collision",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "security codes does not let the public email endpoint consume a security code or disclose its owner",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "account identity does not make an administrator out of an unverified email address",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "account identity promotes a verified bootstrap address as before",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "account identity refuses an email that differs from an existing one only by case",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "pre-hijacking through an unverified sign-up removes a password nobody proved, and its sessions, when a verified provider claims the address",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "pre-hijacking through an unverified sign-up keeps the password of an account that already proved its address",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/auth-defects.postgres.ts",
+   "name": "pre-hijacking through an unverified sign-up does not call an address verified when the provider did not",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "leaderboard privacy leaves out a person who keeps their profile private, and shows it to nobody but them",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "leaderboard privacy leaves out a person who hides their rank from the public, but keeps them for friends",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "friends privacy withholds what a friend has set to private",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "friends privacy shows everything to a friend when nothing is hidden",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations cannot pull a stranger into a group",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations cannot make a shared-group relationship with a stranger",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations cannot add someone who blocked the group's creator",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations still lets friends make a group",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "group conversations rejects a participant list that is not user ids",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "timer trust boundary credits a claimed 20-day session no more than one sitting",
+   "status": "passed"
+  },
+  {
+   "file": "__tests__/backend/postgres/integrity.postgres.ts",
+   "name": "rls and rpc refuses the leader-only RPC to a token with someone else's id, whichever layer stops it",
+   "status": "passed"
+  }
+ ]
+}

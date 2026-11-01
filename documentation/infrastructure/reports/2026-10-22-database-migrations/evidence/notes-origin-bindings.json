@@ -1,0 +1,8 @@
+{
+  "checkedAt": "2026-10-22T05:10:15.608Z",
+  "connections": 0,
+  "verified_connections": 0,
+  "pendingOAuthStates": 0,
+  "requestedChange": "Local origin from https://sylf.app to the user-supplied working Vercel origin",
+  "originChangeSafeBeforeProvisioning": true
+}

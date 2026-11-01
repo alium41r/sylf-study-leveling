@@ -61,6 +61,33 @@ export async function clock(sql: Sql): Promise<Date> {
 }
 export class PlannerDatabase {
   constructor(readonly pool: Pool) {}
+  /** Coherent projections and control checks must not hold the owner's writer
+   * lock while rendering history. Every mutation still uses coordinated(). */
+  async observed<T>(ownerId: number, work: (sql: Sql) => Promise<T>): Promise<T> {
+    if (!Number.isSafeInteger(ownerId) || ownerId <= 0) reject("REFERENCE_NOT_OWNED", "An authenticated owner is required.");
+    const sql = await this.pool.connect();
+    let discard = false;
+    let connectionError: Error | undefined;
+    const disconnected = (error: Error) => { discard = true; connectionError = error; };
+    // pg-pool only handles idle clients. A checked-out connection can emit an
+    // asynchronous socket error between statements; retain it as a transaction
+    // failure rather than an unhandled process error or successful checkpoint.
+    sql.on("error", disconnected);
+    try {
+      await sql.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
+      await sql.query("SET LOCAL TIME ZONE 'UTC'");
+      await sql.query("SET LOCAL statement_timeout = '10s'");
+      await sql.query("SET LOCAL idle_in_transaction_session_timeout = '15s'");
+      await sql.query("SELECT set_config('sylf.planner_v2_core_owner',$1,true)", [String(ownerId)]);
+      const result = await work(sql);
+      if (connectionError) throw connectionError;
+      await sql.query("COMMIT");
+      return result;
+    } catch (error) {
+      await sql.query("ROLLBACK").catch(() => { discard = true; });
+      throw error;
+    } finally { sql.release(discard); sql.removeListener("error", disconnected); }
+  }
   async coordinated<T>(ownerId: number, work: (sql: Sql) => Promise<T>): Promise<T> {
     if (!Number.isSafeInteger(ownerId) || ownerId <= 0) reject("REFERENCE_NOT_OWNED", "An authenticated owner is required.");
     const lockDeadline = Date.now() + 10_000;
@@ -68,6 +95,9 @@ export class PlannerDatabase {
     for (;;) {
       const sql = await this.pool.connect();
       let discard = false;
+      let connectionError: Error | undefined;
+      const disconnected = (error: Error) => { discard = true; connectionError = error; };
+      sql.on("error", disconnected);
       let retryDelay: number | undefined;
       try {
         // A session lock acquired before BEGIN leaks across backend connections
@@ -82,6 +112,7 @@ export class PlannerDatabase {
         if (locked !== true) throw Object.assign(new Error("The account is busy. Please retry shortly."), { code: "55P03" });
         await sql.query("SELECT set_config('sylf.planner_v2_core_owner',$1,true)", [String(ownerId)]);
         const result = await work(sql);
+        if (connectionError) throw connectionError;
         await sql.query("COMMIT");
         return result;
       } catch (error) {
@@ -98,6 +129,7 @@ export class PlannerDatabase {
         // COMMIT/ROLLBACK releases every coordination lock. Destroy a client
         // with an uncertain rollback; return healthy clients before waiting.
         sql.release(discard);
+        sql.removeListener("error", disconnected);
       }
       if (retryDelay !== undefined) await new Promise(resolve => setTimeout(resolve, retryDelay));
     }

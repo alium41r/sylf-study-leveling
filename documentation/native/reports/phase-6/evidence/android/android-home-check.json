@@ -1,0 +1,225 @@
+{
+  "passed": true,
+  "results": {
+    "opensOnToday": true,
+    "fourNamedDestinations": true,
+    "sampleDataLabelled": true,
+    "railTargetsAtLeast44": {
+      "ok": true,
+      "detail": {
+        "w": 68,
+        "h": 58.9
+      }
+    },
+    "railCenteredUnderSpacesIcon": {
+      "ok": true,
+      "detail": {
+        "icon": 60,
+        "rail": 60
+      }
+    },
+    "touchOpens-today": true,
+    "hiddenPagesLeaveTree-today": true,
+    "sampleLabel-today": true,
+    "noUnnamedControls-today": true,
+    "touchOpens-focus": true,
+    "hiddenPagesLeaveTree-focus": true,
+    "sampleLabel-focus": true,
+    "noUnnamedControls-focus": true,
+    "touchOpens-circle": true,
+    "hiddenPagesLeaveTree-circle": true,
+    "sampleLabel-circle": true,
+    "noUnnamedControls-circle": true,
+    "touchOpens-progress": true,
+    "hiddenPagesLeaveTree-progress": true,
+    "sampleLabel-progress": true,
+    "noUnnamedControls-progress": true,
+    "eachDestinationMountsOnce": {
+      "ok": true,
+      "detail": [
+        "SYLF_HOME_MOUNT today 18",
+        "SYLF_HOME_MOUNT focus 9",
+        "SYLF_HOME_MOUNT circle 11",
+        "SYLF_HOME_MOUNT progress 9"
+      ]
+    },
+    "returningMountsNothing": true,
+    "beginDisabled": true,
+    "beginDoesNothing": true,
+    "inviteDisabled": true,
+    "barOpensOverHome": true,
+    "outsideTapDoesNotReachRail": true,
+    "prepareGoesToFocus": true,
+    "homeUnmountsWhenLeft": true,
+    "destinationSurvivesSpaceChange": true,
+    "scrollSurvivesSpaceChange": {
+      "ok": true,
+      "detail": {
+        "scrolled": {
+          "today": 846,
+          "focus": 847,
+          "circle": 846,
+          "progress": 782
+        },
+        "afterSwitch": {
+          "today": 846,
+          "focus": 847,
+          "circle": 846,
+          "progress": 782
+        }
+      }
+    },
+    "destinationSurvivesProcessKill": true,
+    "scrollSurvivesProcessKill": {
+      "ok": true,
+      "detail": {
+        "today": 846,
+        "focus": 847,
+        "circle": 846,
+        "progress": 782
+      }
+    },
+    "backThenReturnRestores": true,
+    "popUpWindowResized": {
+      "ok": true,
+      "detail": {
+        "wide": {
+          "rect": [
+            150,
+            90,
+            1950,
+            1300
+          ],
+          "reported": "SYLF_WINDOW 1029x691 class=expanded fontScale=1.149999976158142",
+          "items": 4,
+          "inside": true,
+          "axis": "vertical"
+        },
+        "medium": {
+          "rect": [
+            150,
+            90,
+            1450,
+            1300
+          ],
+          "reported": "SYLF_WINDOW 743x691 class=medium fontScale=1.149999976158142",
+          "items": 4,
+          "inside": true,
+          "axis": "vertical"
+        },
+        "compact": {
+          "rect": [
+            150,
+            90,
+            1000,
+            1300
+          ],
+          "reported": "SYLF_WINDOW 486x691 class=compact fontScale=1.149999976158142",
+          "items": 4,
+          "inside": true,
+          "axis": "horizontal"
+        },
+        "narrow": {
+          "rect": [
+            150,
+            90,
+            760,
+            1300
+          ],
+          "reported": "SYLF_WINDOW 349x691 class=compact fontScale=1.149999976158142",
+          "items": 4,
+          "inside": true,
+          "axis": "horizontal"
+        }
+      }
+    },
+    "railInsideEveryWindow": true,
+    "bottomBarOnlyWhenCompact": true,
+    "resizeRemountsNothing": true,
+    "noCrashes": true
+  },
+  "windows": {
+    "wide": {
+      "rect": [
+        150,
+        90,
+        1950,
+        1300
+      ],
+      "reported": "SYLF_WINDOW 1029x691 class=expanded fontScale=1.149999976158142",
+      "items": 4,
+      "inside": true,
+      "axis": "vertical"
+    },
+    "medium": {
+      "rect": [
+        150,
+        90,
+        1450,
+        1300
+      ],
+      "reported": "SYLF_WINDOW 743x691 class=medium fontScale=1.149999976158142",
+      "items": 4,
+      "inside": true,
+      "axis": "vertical"
+    },
+    "compact": {
+      "rect": [
+        150,
+        90,
+        1000,
+        1300
+      ],
+      "reported": "SYLF_WINDOW 486x691 class=compact fontScale=1.149999976158142",
+      "items": 4,
+      "inside": true,
+      "axis": "horizontal"
+    },
+    "narrow": {
+      "rect": [
+        150,
+        90,
+        760,
+        1300
+      ],
+      "reported": "SYLF_WINDOW 349x691 class=compact fontScale=1.149999976158142",
+      "items": 4,
+      "inside": true,
+      "axis": "horizontal"
+    }
+  },
+  "railFrames": {
+    "label": "rail",
+    "total": "1233",
+    "janky": [
+      "9",
+      "0.73"
+    ],
+    "p50": "8",
+    "p90": "9",
+    "p95": "10",
+    "p99": "13"
+  },
+  "scrollFrames": {
+    "label": "scroll",
+    "total": "618",
+    "janky": [
+      "23",
+      "3.72"
+    ],
+    "p50": "14",
+    "p90": "24",
+    "p95": "27",
+    "p99": "34"
+  },
+  "totalPssMb": 221,
+  "firstMounts": [
+    "SYLF_HOME_MOUNT today 18",
+    "SYLF_HOME_MOUNT focus 9",
+    "SYLF_HOME_MOUNT circle 11",
+    "SYLF_HOME_MOUNT progress 9"
+  ],
+  "device": "SM-X510",
+  "wm": "Physical size: 1440x2304",
+  "fontScale": "1.15"
+}

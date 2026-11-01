@@ -1,0 +1,85 @@
+{
+  "strokes": 5000,
+  "samples": 320000,
+  "encodedBytes": 14335514,
+  "buildMs": 972.5,
+  "hydrateMs": 582.8000000119209,
+  "coldRenderMs": 146,
+  "pan": {
+    "p50Ms": 1.0999999940395355,
+    "p95Ms": 2.199999988079071,
+    "maxMs": 2.199999988079071
+  },
+  "activeLayer": {
+    "p50Ms": 0,
+    "p95Ms": 0.10000002384185791,
+    "maxMs": 0.699999988079071
+  },
+  "active4096Samples": {
+    "p50Ms": 0.5,
+    "p95Ms": 1,
+    "maxMs": 1.9000000059604645
+  },
+  "cache": {
+    "cachedPaths": 384,
+    "cachedPoints": 24576,
+    "canvasPixels": 1572864,
+    "rasterPixels": 3520000
+  },
+  "environment": "Headless Chromium desktop; 5,000 strokes / 320,000 original samples; isolated production model/renderer. No physical input-to-display claim.",
+  "encryptedNativeSaves": {
+    "p50Ms": 2.7000000178813934,
+    "p95Ms": 11,
+    "maxMs": 11
+  },
+  "afterMetadataSaves": {
+    "p50Ms": 2.699999988079071,
+    "p95Ms": 2.9000000059604645,
+    "maxMs": 2.9000000059604645
+  },
+  "brush4096Samples": {
+    "ballpoint": {
+      "p50Ms": 0.5,
+      "p95Ms": 1.5999999940395355,
+      "maxMs": 3.5999999940395355
+    },
+    "fountain": {
+      "p50Ms": 0.5,
+      "p95Ms": 0.9000000059604645,
+      "maxMs": 1.0999999940395355
+    },
+    "brush": {
+      "p50Ms": 0.4000000059604645,
+      "p95Ms": 0.5,
+      "maxMs": 1.2000000178813934
+    },
+    "pencil": {
+      "p50Ms": 0.5,
+      "p95Ms": 1,
+      "maxMs": 1.100000023841858
+    },
+    "fineliner": {
+      "p50Ms": 0.5,
+      "p95Ms": 1.0999999940395355,
+      "maxMs": 1.2000000178813934
+    }
+  },
+  "precision40StrokeCutMs": 55.400000005960464,
+  "denseNativePreviewMs": 1115.5999999940395,
+  "storage": {
+    "objects": 75,
+    "objectBytes": 14391968,
+    "revisions": 35,
+    "pending": 34,
+    "stagedAssets": 0
+  },
+  "pageNavigation": {
+    "pages": 300,
+    "measurements": {
+      "p50Ms": 6.9000000059604645,
+      "p95Ms": 8.900000005960464,
+      "maxMs": 8.900000005960464
+    },
+    "scope": "300 empty independent page streams; no dense-page or cloud latency extrapolation"
+  }
+}

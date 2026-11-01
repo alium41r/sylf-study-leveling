@@ -49,6 +49,8 @@ export async function GET(
       where: { conversationId, id: { gt: parseInt(afterParam) } },
       include: { sender: { select: SENDER_SELECT } },
       orderBy: { id: "asc" },
+      // Oldest first, so a poller that gets a full page simply asks again from its last id.
+      take: 200,
     });
 
     return NextResponse.json({ messages }, { status: 200 });

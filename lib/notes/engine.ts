@@ -137,6 +137,10 @@ export class NotesStream {
   private descriptorRef: ObjectRef;
   private failure?: unknown;
   private pausing = false;
+  private pauseHolds = 0;
+  private isPaused() {
+    return this.pausing || this.pauseHolds > 0;
+  }
   private timer?: ReturnType<typeof setTimeout>;
   private poll?: ReturnType<typeof setInterval>;
   private refreshing?: Promise<void>;
@@ -221,7 +225,15 @@ export class NotesStream {
       view.state !== "active" ||
       view.descriptor.requiredFeatures.some(
         (f) =>
-          !["rich-text-v1", "paged-v1", "attachments-v1", "ink-v1"].includes(f)
+          ![
+            "rich-text-v1",
+            "paged-v1",
+            "attachments-v1",
+            "ink-v1",
+            "page-layers-v1",
+            "creative-tools-v1",
+            "pdf-v1",
+          ].includes(f)
       )
     )
       throw new NotesError(
@@ -297,7 +309,7 @@ export class NotesStream {
     this.activityVersion++;
     this.buffer.push(bytes.slice());
     if (this.failure) return;
-    this.setState(this.pausing ? "pausing" : "saving");
+    this.setState(this.isPaused() ? "pausing" : "saving");
     if (!this.timer) this.timer = setTimeout(() => this.enqueue(), 20);
   };
   private enqueue(): void {
@@ -332,7 +344,7 @@ export class NotesStream {
     if (this.state !== "closed") {
       this.failure = undefined;
       this.setState(
-        this.pausing
+        this.isPaused()
           ? "pausing"
           : this.buffer.length
             ? "saving"
@@ -370,16 +382,42 @@ export class NotesStream {
     this.setState(
       this.failure
         ? "failed"
-        : this.pending.length || this.buffer.length
-          ? "saving"
-          : "local-durable"
+        : this.isPaused()
+          ? "pausing"
+          : this.pending.length || this.buffer.length
+            ? "saving"
+            : "local-durable"
     );
+  }
+  /** Metadata owns an independent pause while viewport leases mount/unmount.
+   * A UI leave/resume cannot unlock a stream during atomic metadata adoption. */
+  hold(): () => void {
+    this.repository.session.assert();
+    this.captureInput();
+    this.pauseHolds++;
+    if (!this.failure) this.setState("pausing");
+    let released = false;
+    return () => {
+      if (released) return;
+      released = true;
+      this.pauseHolds--;
+      if (this.state !== "closed")
+        this.setState(
+          this.failure
+            ? "failed"
+            : this.isPaused()
+              ? "pausing"
+              : this.pending.length || this.buffer.length
+                ? "saving"
+                : "local-durable"
+        );
+    };
   }
   /** Explicitly accept a repository metadata mutation after the caller paused and drained this stream. */
   async acceptMetadata(): Promise<void> {
     this.repository.session.assert();
     if (
-      !this.pausing ||
+      !this.isPaused() ||
       this.pending.length ||
       this.buffer.length ||
       this.failure
@@ -391,7 +429,7 @@ export class NotesStream {
     const activity = this.activityVersion;
     const stable = () =>
       this.state !== "closed" &&
-      this.pausing &&
+      this.isPaused() &&
       !this.pending.length &&
       !this.buffer.length &&
       !this.failure &&
@@ -475,7 +513,7 @@ export class NotesStream {
       await this.chain;
       if (
         this.state === "closed" ||
-        this.pausing ||
+        this.isPaused() ||
         this.pending.length ||
         this.buffer.length ||
         this.failure
@@ -484,7 +522,7 @@ export class NotesStream {
       const activity = this.activityVersion;
       const unchanged = () =>
         this.state !== "closed" &&
-        !this.pausing &&
+        !this.isPaused() &&
         !this.failure &&
         !this.pending.length &&
         !this.buffer.length &&
@@ -503,6 +541,13 @@ export class NotesStream {
         );
         return;
       }
+      // Outbox receipts and polling also notify subscribers. Replaying an
+      // unchanged frontier would hydrate the entire page for every receipt.
+      if (
+        view.heads.length === this.heads.length &&
+        view.heads.every((id) => this.heads.includes(id))
+      )
+        return;
       const loaded = await this.repository.loadStream(
         this.documentId,
         this.streamId,

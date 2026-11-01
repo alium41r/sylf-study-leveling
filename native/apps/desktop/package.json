@@ -1,0 +1,24 @@
+{
+  "name": "@sylf/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Electron host for Sylf Native on macOS and Windows. Loads the @sylf/app web build; no feature UI.",
+  "main": "src/main.mjs",
+  "scripts": {
+    "start": "electron .",
+    "dev": "SYLF_DESKTOP_DEV_URL=http://localhost:8081 electron .",
+    "self-test": "electron . --sylf-self-test",
+    "design-check": "electron . --sylf-design-check",
+    "spaces-check": "electron . --sylf-spaces-check",
+    "home-check": "electron . --sylf-home-check",
+    "workspace-check": "electron . --sylf-workspace-check",
+    "world-check": "electron . --sylf-world-check",
+    "session-check": "electron . --sylf-session-check",
+    "backend-check": "electron . --sylf-backend-check",
+    "journey-check": "electron . --sylf-journey-check",
+    "review-capture": "electron . --sylf-review-capture"
+  },
+  "devDependencies": {
+    "electron": "45.1.0"
+  }
+}

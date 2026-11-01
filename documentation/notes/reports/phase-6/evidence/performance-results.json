@@ -1,0 +1,17 @@
+{
+  "documents": 1000,
+  "seedMs": 2992.10000000149,
+  "coldCatalogMs": 1488.2999999970198,
+  "warmCatalogMs": 103,
+  "saveP50Ms": 6.0999999940395355,
+  "saveP95Ms": 19.899999998509884,
+  "stats": {
+    "objects": 2104,
+    "objectBytes": 1418978,
+    "revisions": 1051,
+    "pending": 1050,
+    "stagedAssets": 0
+  },
+  "renderedCards": 50,
+  "environment": "Chromium desktop headless; synthetic empty documents; actual encrypted production repository; no network latency, tablet or IME claim"
+}

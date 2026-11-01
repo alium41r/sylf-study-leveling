@@ -1,0 +1,17 @@
+{
+ "when": "2026-11-01T14:22:39.619Z",
+ "label": "solo session accepted while FOCUSING in a party",
+ "soloStatus": 201,
+ "soloAnswer": "{\"id\":1,\"userId\":2,\"questId\":null,\"subjectId\":null,\"durationMinutes\":0,\"durationSeconds\":0,\"breakSeconds\":0,\"startedAt\":\"2026-11-01T14:22:39.549Z\",\"endedAt\":null,\"execution\":{\"schemaVersion\":2,\"sessionId\":1,\"ownerId\":2,\"questId\":null,\"state\":\"RUNNING\",\"executionVersion\":1,\"acceptedFocusSeconds\":0,\"acceptedBreakSeconds\":0,\"startedAt\":\"2026-11-01T14:22:39.549Z\",\"endedAt\":null,\"actualCivilDate\":\"2026-11-01\",\"timezone\":\"Asia/Karachi\"}}",
+ "partyMembers": [
+  {
+   "userId": 2,
+   "timerState": "FOCUSING"
+  },
+  {
+   "userId": 3,
+   "timerState": "FOCUSING"
+  }
+ ],
+ "activeSessionId": 1
+}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { exchangeOAuthCode, isOAuthProvider, type OAuthProvider } from "@/lib/oauth";
 import { handleOAuthSignInOrRegister, linkOAuthAccountToUser } from "@/lib/auth-service";
+import { completeNativeOAuth, readNativeOAuthState } from "@/lib/auth-native";
 import { getSession } from "@/lib/auth-server";
 import { AUTH_COOKIE_OPTIONS } from "@/lib/auth";
 import { isPrelaunchMode } from "@/lib/prelaunch";
@@ -30,10 +31,21 @@ export async function GET(
 
     const provider = providerStr as OAuthProvider;
 
-    // Check if this was a linking flow from settings
+    // Sylf Native's flow is named only by a state this server signed. It has no web session, cookie or link to consider.
+    const nativeFlow = await readNativeOAuthState(state, provider);
+    if (nativeFlow) return completeNativeOAuth(nativeFlow, origin, code, errorParam);
+
+    // Check if this was a linking flow from settings. The verified session is the
+    // only authority on who is linking: the cookie is readable and writable by
+    // whoever holds the browser, so a value that disagrees with the session
+    // (or arrives with no session) is an attempt to attach a provider to
+    // someone else's account, and nothing is linked or signed in.
     const linkUserIdCookie = req.cookies.get(`oauth_link_user_${provider}`)?.value;
     const currentSession = await getSession(req);
-    const linkingUserId = linkUserIdCookie ? Number(linkUserIdCookie) : currentSession?.userId;
+    if (linkUserIdCookie && linkUserIdCookie !== String(currentSession?.userId)) {
+      return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent("Sign in again to connect this account.")}`);
+    }
+    const linkingUserId = currentSession?.userId;
 
     const failureRedirect = linkingUserId
       ? `${origin}/settings/account`
@@ -104,7 +116,7 @@ export async function GET(
     }
 
     // Guest scenario: Register, Login, or Link existing account
-    const { user, token } = await handleOAuthSignInOrRegister(oauthUser);
+    const { user, token } = await handleOAuthSignInOrRegister(oauthUser, req);
 
     const destination = !user.hasCompletedOnboarding ? "/onboarding" : "/dashboard";
     const response = NextResponse.redirect(`${origin}${destination}`);

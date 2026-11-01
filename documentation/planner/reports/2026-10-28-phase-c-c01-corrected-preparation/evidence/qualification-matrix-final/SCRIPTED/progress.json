@@ -1,0 +1,54 @@
+{
+  "runId": "unpaid-SCRIPTED",
+  "mode": "SCRIPTED",
+  "owner": 1,
+  "rootRequestId": "cefda258-6bfd-5adf-ae8b-e01358e975e6",
+  "activeAttemptId": "9999bfc2-9eea-462b-8c92-5389ebb475af",
+  "state": "RESPONSE_RECEIVED",
+  "physicalRequests": 0,
+  "stopReason": null,
+  "roles": [
+    {
+      "sequence": 1,
+      "role": "RESEARCH",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 2,
+      "role": "VERIFICATION",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 3,
+      "role": "VERIFICATION",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 4,
+      "role": "SYNTHESIS",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 5,
+      "role": "STRATEGIST",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 6,
+      "role": "TRANSLATOR",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 7,
+      "role": "REVIEWER",
+      "finished": true,
+      "stopReason": null
+    }
+  ]
+}

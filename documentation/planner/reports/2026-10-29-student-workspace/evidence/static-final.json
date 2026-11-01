@@ -1,0 +1,6 @@
+{
+  "status": "PASSED",
+  "scopedDiffExitCode": 0,
+  "missingNewDocumentLinks": [],
+  "globalRetainedBlocker": "Global diff-check reports pre-existing trailing whitespace in public/notes-licenses/notices.txt, outside this task; preserved unchanged by this task. See static-global-retained.json."
+}

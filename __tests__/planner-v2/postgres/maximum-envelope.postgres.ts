@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import pg from 'pg';
 import { connect,user } from './database';
-import { intentFixture } from '../contracts/fixtures';
+import { intentFixture } from './intent-fixture';
 import { prepareProposal } from './proposal-fixture';
 import { PlannerDatabase,DurablePlannerError } from '@/lib/planner/v2/server/database';
 import { IntentService,ownedPlan } from '@/lib/planner/v2/server/intents';

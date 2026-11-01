@@ -1,0 +1,9 @@
+{
+  "localOnly": true,
+  "finalReviewSQLExecuted": true,
+  "standaloneRollbackPreservedAll96Records": true,
+  "commitRehearsalPassed": true,
+  "all114ActualForeignKeysValidated": true,
+  "triggersEnabled": true,
+  "hostedDeletionPerformed": false
+}

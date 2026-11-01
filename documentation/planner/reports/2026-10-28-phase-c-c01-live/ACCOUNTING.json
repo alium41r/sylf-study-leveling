@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "caseId": "C01",
+  "runId": "28d07541-4655-450d-a0cc-59dbdca750ab",
+  "rootRequestId": "e84d4fc9-e8b3-57f8-a704-cc6f8e41d7d9",
+  "authorizationUsd": 1.75,
+  "physicalRequests": 4,
+  "completedResponses": 3,
+  "unknownRequests": 1,
+  "knownUsage": {
+    "promptTokens": 18632,
+    "completionTokens": 45780,
+    "totalTokens": 64412,
+    "reasoningTokens": 38612,
+    "completionTokensOtherThanReasoning": 7168,
+    "cacheHitTokens": 128
+  },
+  "knownLedgerPeakEstimateUsd": 0.060487968,
+  "knownPublishedOffPeakEstimateUsd": 0.030243984,
+  "unknownPeakLiabilityUsd": 0.10328219999999999,
+  "conservativeTotalExposureUsd": 0.163809,
+  "publishedOffPeakScenarioMaximumUsd": 0.081885084,
+  "actualInvoiceTotalUsd": null,
+  "roundedAccountBalanceDeltaUsd": 0.02,
+  "prices": {
+    "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+    "checkedAt": "2026-10-28T15:31:37.133Z",
+    "peakPerMillion": {
+      "inputCacheMiss": 0.3,
+      "inputCacheHit": 0.006,
+      "completion": 1.2
+    },
+    "offPeakPerMillion": {
+      "inputCacheMiss": 0.15,
+      "inputCacheHit": 0.003,
+      "completion": 0.6
+    },
+    "observedCallWindowUtc": "2026-10-28 15:21–15:26; outside the published UTC peak-hour windows"
+  },
+  "limits": [
+    "Interrupted synthesis actual usage, completion, model fingerprint and final charge are unknown; zero ledger token placeholders are not zero usage.",
+    "Reasoning tokens are included in completion, counted only once.",
+    "The production meter estimate uses conservative peak rates. Off-peak calculation is a published-rate estimate, not an invoice.",
+    "Account metadata is rounded and account-wide; $0.02 delta cannot reconcile this root or settle the unknown request.",
+    "No replay, second root or further paid request is authorized."
+  ],
+  "calls": [
+    {
+      "sequence": 1,
+      "role": "RESEARCH",
+      "callId": "4e69ef18-11e6-413c-96aa-13eb08854fbd",
+      "attemptId": "ef103fa8-6f40-4e24-9a83-c233d714b40c",
+      "startedAt": "2026-10-28T15:21:47.272Z",
+      "finishedAt": "2026-10-28T15:23:00.168Z",
+      "durationSeconds": 72.896,
+      "modelRequested": "deepseek-flash",
+      "modelEffective": "deepseek-flash",
+      "fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "finishReason": "STOP",
+      "accountingState": "SETTLED",
+      "usageKnown": true,
+      "actualUsage": {
+        "promptTokens": 8510,
+        "completionTokens": 13780,
+        "totalTokens": 22290,
+        "cacheHitTokens": 0,
+        "reasoningTokens": 10305
+      },
+      "ledgerPeakEstimateUsd": 0.019089,
+      "unknownReservation": null,
+      "error": null
+    },
+    {
+      "sequence": 2,
+      "role": "VERIFICATION",
+      "callId": "b4d2df36-06ae-470d-8131-5b525f97be8c",
+      "attemptId": "ef103fa8-6f40-4e24-9a83-c233d714b40c",
+      "startedAt": "2026-10-28T15:23:00.286Z",
+      "finishedAt": "2026-10-28T15:24:34.075Z",
+      "durationSeconds": 93.789,
+      "modelRequested": "deepseek-flash",
+      "modelEffective": "deepseek-flash",
+      "fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "finishReason": "STOP",
+      "accountingState": "SETTLED",
+      "usageKnown": true,
+      "actualUsage": {
+        "promptTokens": 5486,
+        "completionTokens": 17970,
+        "totalTokens": 23456,
+        "cacheHitTokens": 0,
+        "reasoningTokens": 15775
+      },
+      "ledgerPeakEstimateUsd": 0.0232098,
+      "unknownReservation": null,
+      "error": null
+    },
+    {
+      "sequence": 3,
+      "role": "VERIFICATION",
+      "callId": "94d2aa38-0591-4a5e-a730-e14671607b48",
+      "attemptId": "ef103fa8-6f40-4e24-9a83-c233d714b40c",
+      "startedAt": "2026-10-28T15:24:34.181Z",
+      "finishedAt": "2026-10-28T15:25:44.603Z",
+      "durationSeconds": 70.422,
+      "modelRequested": "deepseek-flash",
+      "modelEffective": "deepseek-flash",
+      "fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "finishReason": "STOP",
+      "accountingState": "SETTLED",
+      "usageKnown": true,
+      "actualUsage": {
+        "promptTokens": 4636,
+        "completionTokens": 14030,
+        "totalTokens": 18666,
+        "cacheHitTokens": 128,
+        "reasoningTokens": 12532
+      },
+      "ledgerPeakEstimateUsd": 0.018189168000000002,
+      "unknownReservation": null,
+      "error": null
+    },
+    {
+      "sequence": 4,
+      "role": "SYNTHESIS",
+      "callId": "5c93ed22-cf9e-4b06-84a3-2a39b655353c",
+      "attemptId": "ef103fa8-6f40-4e24-9a83-c233d714b40c",
+      "startedAt": "2026-10-28T15:25:44.694Z",
+      "finishedAt": "2026-10-28T15:26:34.619Z",
+      "durationSeconds": 49.925,
+      "modelRequested": "deepseek-flash",
+      "modelEffective": null,
+      "fingerprint": null,
+      "finishReason": null,
+      "accountingState": "UNKNOWN_SPEND",
+      "usageKnown": false,
+      "actualUsage": null,
+      "ledgerPeakEstimateUsd": null,
+      "unknownReservation": {
+        "inputUnits": 82130,
+        "completionTokens": 65536,
+        "peakExposureUsd": 0.10328219999999999
+      },
+      "error": {
+        "type": "LLMProviderError",
+        "code": "network_error",
+        "status": null
+      }
+    }
+  ]
+}

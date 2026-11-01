@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth-server";
-import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { clearAuthSessions, expireSessionCookie } from "@/lib/auth-session-service";
 import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
       where: { id: user.id },
       data: { tokenVersion: { increment: 1 } },
     });
+    await clearAuthSessions(user.id);
 
     const response = NextResponse.json(
       { success: true, message: "All sessions have been revoked across all devices." },
@@ -63,13 +64,7 @@ export async function POST(req: NextRequest) {
     );
 
     // Clear session cookie on this device
-    response.cookies.set(AUTH_COOKIE_NAME, "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 0,
-      path: "/",
-    });
+    expireSessionCookie(response, req, session);
 
     return response;
   } catch (error) {

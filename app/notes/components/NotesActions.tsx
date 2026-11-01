@@ -1,5 +1,5 @@
 "use client";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   Download,
   Copy,
@@ -16,12 +16,14 @@ import type {
   DocumentDescriptor,
   AssetDescriptor,
 } from "@/lib/notes/contracts";
+import { textFragments } from "@/lib/notes/text-boxes";
 import { exportNotes, exportNotesRecovery } from "@/lib/notes/portable";
 import { exportLockedNotesDevice } from "@/lib/notes/device-recovery";
 import NotesDialog from "./NotesDialog";
 import { downloadNotesBytes as downloadBytes } from "@/lib/notes/download";
 import s from "../Notes.module.css";
 const InkThumbnail = lazy(() => import("./InkThumbnail"));
+const PdfThumbnail = lazy(() => import("./PdfThumbnail"));
 export interface NotesModal {
   type: "folder" | "notebook" | "manage" | "history" | "recovery" | "conflict";
   id?: string;
@@ -70,6 +72,7 @@ export default function NotesActions({
       { hash: string; descriptor: DocumentDescriptor }[]
     >([]),
     [integrity, setIntegrity] = useState<string>(),
+    [scanning, setScanning] = useState(false),
     [recoveryInfo, setRecoveryInfo] = useState<{
       stages: AssetDescriptor[];
       pending: number;
@@ -78,6 +81,8 @@ export default function NotesActions({
       used?: number;
       quota?: number;
     }>();
+  const scan = useRef<AbortController | undefined>(undefined);
+  useEffect(() => () => scan.current?.abort(), []);
   useEffect(() => {
     let active = true;
     const id = modal.id;
@@ -177,7 +182,10 @@ export default function NotesActions({
     <NotesDialog
       title={title}
       onClose={() => {
-        if (!busy) onClose();
+        if (scan.current) {
+          scan.current.abort();
+          onClose();
+        } else if (!busy) onClose();
       }}
     >
       {error && (
@@ -204,6 +212,7 @@ export default function NotesActions({
               else if (note)
                 await library.mutate(note.id, (descriptor) => {
                   descriptor.title = name.trim() || "Untitled note";
+                  descriptor.extensions.sylfTitleSet = !!name.trim();
                   descriptor.folderId = parent || null;
                   descriptor.subjectId = subject || null;
                 });
@@ -384,12 +393,13 @@ export default function NotesActions({
                           (stream) => stream.adapter === "blocknote/0.56.0"
                         );
                       setInkPreview(undefined);
-                      if (!definition) {
+                      {
                         const inkPage = descriptor.pages.find((p) =>
                           descriptor.streams.some(
                             (s) =>
-                              s.streamId === p.streamId &&
-                              s.adapter === "sylf-ink/1"
+                              (s.streamId === p.streamId ||
+                                s.streamId === p.extensions.inkStreamId) &&
+                              ["sylf-ink/1", "sylf-pdf/1"].includes(s.adapter)
                           )
                         );
                         if (inkPage) {
@@ -408,13 +418,15 @@ export default function NotesActions({
                           });
                           setInkPreviewPage(inkPage.pageId);
                           setPreview(
-                            "Retained handwriting at this revision. Restoring creates a separate notebook."
+                            descriptor.kind === "pdf"
+                              ? "Retained PDF pages and annotations. Restoring creates a separate document."
+                              : "Retained handwriting at this revision. Restoring creates a separate notebook."
                           );
-                        } else
+                        } else if (!definition)
                           setPreview(
                             "This revision requires its original reader."
                           );
-                        return;
+                        if (!definition) return;
                       }
                       const loaded = await library.repository.loadStream(
                         revision.commit.documentId,
@@ -424,9 +436,11 @@ export default function NotesActions({
                       );
                       try {
                         setPreview(
-                          loaded.doc
-                            .getXmlFragment("body")
-                            .toString()
+                          textFragments(loaded.doc)
+                            .map((name) =>
+                              loaded.doc.getXmlFragment(name).toString()
+                            )
+                            .join(" ")
                             .replace(/<[^>]*>/g, " ")
                             .slice(0, 10000) || "Empty document"
                         );
@@ -491,12 +505,21 @@ export default function NotesActions({
                     </select>
                   </label>
                   <Suspense fallback={<p>Loading retained ink…</p>}>
-                    <InkThumbnail
-                      library={library}
-                      note={inkPreview}
-                      pageId={inkPreviewPage}
-                      size={200}
-                    />
+                    {inkPreview.view.descriptor.kind === "pdf" ? (
+                      <PdfThumbnail
+                        library={library}
+                        note={inkPreview}
+                        pageId={inkPreviewPage}
+                        size={200}
+                      />
+                    ) : (
+                      <InkThumbnail
+                        library={library}
+                        note={inkPreview}
+                        pageId={inkPreviewPage}
+                        size={200}
+                      />
+                    )}
                   </Suspense>
                 </div>
               )}
@@ -681,18 +704,43 @@ export default function NotesActions({
               disabled={busy}
               onClick={() =>
                 void run(async () => {
-                  const result = await library.repository.inspectIntegrity();
-                  setIntegrity(
-                    result.issues.length
-                      ? `${result.issues.length} source objects need recovery. Keep local data and restore original bytes from Drive or a portable copy.`
-                      : "All retained revision dependencies passed their integrity checks."
-                  );
+                  const controller = new AbortController();
+                  scan.current = controller;
+                  setScanning(true);
+                  setIntegrity("Reading local history…");
+                  try {
+                    const result = await library.repository.inspectIntegrity({
+                      signal: controller.signal,
+                      onProgress: ({ stage, completed, total }) =>
+                        setIntegrity(
+                          stage === "history"
+                            ? `Read ${completed} retained revisions…`
+                            : `Checked ${completed} of ${total} revision dependencies…`
+                        ),
+                    });
+                    setIntegrity(
+                      result.issues.length
+                        ? `${result.issues.length} source objects need recovery. Keep local data and restore original bytes from Drive or a portable copy.`
+                        : "The retained revisions in this check passed their integrity checks."
+                    );
+                  } catch (error) {
+                    if (!controller.signal.aborted) throw error;
+                    setIntegrity("Check cancelled. No originals were changed.");
+                  } finally {
+                    scan.current = undefined;
+                    setScanning(false);
+                  }
                 }, false)
               }
             >
               <History size={18} />
               Check local data
             </button>
+            {scanning && (
+              <button onClick={() => scan.current?.abort()}>
+                Cancel check
+              </button>
+            )}
             <button
               disabled={busy}
               onClick={() =>

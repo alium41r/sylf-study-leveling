@@ -1,4 +1,4 @@
-import { aiSignal, observeAiDispatch } from "../telemetry";
+import { aiSignal, observeAiDispatch } from "../telemetry-runtime";
 import { openAIUsage } from "./usage";
 import { collectTextChunks } from "./text-stream";
 import Groq from "groq-sdk";

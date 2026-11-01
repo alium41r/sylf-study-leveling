@@ -1,0 +1,21 @@
+{
+  "baselineSourceProof": [
+    {
+      "path": "app/system/components/PlannerTab.tsx",
+      "headMatchesTaskStart": true
+    },
+    {
+      "path": "app/components/planner/PlannerWorkspace.tsx",
+      "headMatchesTaskStart": true
+    }
+  ],
+  "changes": [
+    "Fresh Research capture marker changes 2 to 3; old-marker exact prompt/packet tests remain",
+    "Classic default assertion now includes the already-existing explicit Sylvie handoff exception",
+    "Classic/Modes interaction selectors use existing Prepare for an Exam, Plan a Course and Master a Unit buttons; navigation, capability, telemetry and return assertions retained"
+  ],
+  "productionFixes": [
+    "The gated StudentPlannerEntry alone consumes AuthProvider/refreshStats; the existing SystemScreen remains unchanged and Classic does not acquire this dependency",
+    "Shared Planner cache invalidation runs only after acknowledged Apply or its identical receipt replay"
+  ]
+}

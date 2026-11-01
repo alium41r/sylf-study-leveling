@@ -7,7 +7,7 @@ import { SessionService } from "@/lib/planner/v2/server/sessions";
 import { IntentService } from "@/lib/planner/v2/server/intents";
 import { ApplyService } from "@/lib/planner/v2/server/apply";
 import { prepareProposal } from "./proposal-fixture";
-import { intentFixture } from "../contracts/fixtures";
+import { intentFixture } from "./intent-fixture";
 import { settleWeeklyMission } from "@/lib/planner/v2/server/settlement";
 import { getWeeklyBounds } from "@/lib/game-engine";
 

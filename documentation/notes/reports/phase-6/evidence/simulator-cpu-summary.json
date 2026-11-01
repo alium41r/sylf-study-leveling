@@ -1,0 +1,337 @@
+{
+  "scope": "Node CPU samples of failed 1000-revision fake-indexeddb stress run. This simulator retains finished transactions and repeatedly scans them. Profiles end before runner timeout. Not Chromium storage performance; see real-idb-backlog.json.",
+  "profiles": [
+    {
+      "profile": "CPU.20261021.203829.56753.0.001.cpuprofile",
+      "recordedSeconds": 205.514708,
+      "selfTop": [
+        {
+          "seconds": 88.3745,
+          "functionName": "processImmediate",
+          "scriptId": "10",
+          "url": "node:internal/timers",
+          "lineNumber": 485,
+          "columnNumber": 27
+        },
+        {
+          "seconds": 74.5996,
+          "functionName": "",
+          "scriptId": "494",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/fake-indexeddb/build/esm/lib/Database.js",
+          "lineNumber": 13,
+          "columnNumber": 14
+        },
+        {
+          "seconds": 10.6611,
+          "functionName": "transaction",
+          "scriptId": "459",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/fake-indexeddb/build/esm/FDBDatabase.js",
+          "lineNumber": 123,
+          "columnNumber": 13
+        },
+        {
+          "seconds": 2.6938,
+          "functionName": "valueToKeyWithoutThrowing",
+          "scriptId": "467",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/fake-indexeddb/build/esm/lib/valueToKeyWithoutThrowing.js",
+          "lineNumber": 7,
+          "columnNumber": 34
+        },
+        {
+          "seconds": 2.6654,
+          "functionName": "transaction",
+          "scriptId": "459",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/fake-indexeddb/build/esm/FDBDatabase.js",
+          "lineNumber": 123,
+          "columnNumber": 13
+        },
+        {
+          "seconds": 2.5899,
+          "functionName": "transaction",
+          "scriptId": "459",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/fake-indexeddb/build/esm/FDBDatabase.js",
+          "lineNumber": 123,
+          "columnNumber": 13
+        },
+        {
+          "seconds": 2.2666,
+          "functionName": "transaction",
+          "scriptId": "459",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/fake-indexeddb/build/esm/FDBDatabase.js",
+          "lineNumber": 123,
+          "columnNumber": 13
+        },
+        {
+          "seconds": 2.1266,
+          "functionName": "transaction",
+          "scriptId": "459",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/fake-indexeddb/build/esm/FDBDatabase.js",
+          "lineNumber": 123,
+          "columnNumber": 13
+        },
+        {
+          "seconds": 1.7955,
+          "functionName": "(idle)",
+          "scriptId": "0",
+          "url": "",
+          "lineNumber": -1,
+          "columnNumber": -1
+        },
+        {
+          "seconds": 1.3917,
+          "functionName": "(program)",
+          "scriptId": "0",
+          "url": "",
+          "lineNumber": -1,
+          "columnNumber": -1
+        },
+        {
+          "seconds": 1.0868,
+          "functionName": "valueToKeyWithoutThrowing",
+          "scriptId": "467",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/fake-indexeddb/build/esm/lib/valueToKeyWithoutThrowing.js",
+          "lineNumber": 7,
+          "columnNumber": 34
+        },
+        {
+          "seconds": 0.7416,
+          "functionName": "",
+          "scriptId": "494",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/fake-indexeddb/build/esm/lib/Database.js",
+          "lineNumber": 14,
+          "columnNumber": 47
+        },
+        {
+          "seconds": 0.6553,
+          "functionName": "structuredClone",
+          "scriptId": "28",
+          "url": "node:internal/worker/js_transferable",
+          "lineNumber": 112,
+          "columnNumber": 24
+        },
+        {
+          "seconds": 0.562,
+          "functionName": "",
+          "scriptId": "494",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/fake-indexeddb/build/esm/lib/Database.js",
+          "lineNumber": 15,
+          "columnNumber": 47
+        },
+        {
+          "seconds": 0.5615,
+          "functionName": "transaction",
+          "scriptId": "459",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/fake-indexeddb/build/esm/FDBDatabase.js",
+          "lineNumber": 123,
+          "columnNumber": 13
+        },
+        {
+          "seconds": 0.4519,
+          "functionName": "(garbage collector)",
+          "scriptId": "0",
+          "url": "",
+          "lineNumber": -1,
+          "columnNumber": -1
+        },
+        {
+          "seconds": 0.2644,
+          "functionName": "",
+          "scriptId": "467",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/fake-indexeddb/build/esm/lib/valueToKeyWithoutThrowing.js",
+          "lineNumber": 66,
+          "columnNumber": 7
+        },
+        {
+          "seconds": 0.2632,
+          "functionName": "digest",
+          "scriptId": "630",
+          "url": "file:///Users/aliumair/Desktop/sylf/lib/notes/bytes.ts",
+          "lineNumber": 34,
+          "columnNumber": 21
+        },
+        {
+          "seconds": 0.2301,
+          "functionName": "cmp",
+          "scriptId": "464",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/fake-indexeddb/build/esm/lib/cmp.js",
+          "lineNumber": 22,
+          "columnNumber": 12
+        },
+        {
+          "seconds": 0.2286,
+          "functionName": "transaction",
+          "scriptId": "459",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/fake-indexeddb/build/esm/FDBDatabase.js",
+          "lineNumber": 123,
+          "columnNumber": 13
+        }
+      ]
+    },
+    {
+      "profile": "CPU.20261021.203828.56715.0.001.cpuprofile",
+      "recordedSeconds": 206.12525,
+      "selfTop": [
+        {
+          "seconds": 205.4913,
+          "functionName": "(idle)",
+          "scriptId": "0",
+          "url": "",
+          "lineNumber": -1,
+          "columnNumber": -1
+        },
+        {
+          "seconds": 0.0818,
+          "functionName": "readFileUtf8",
+          "scriptId": "0",
+          "url": "",
+          "lineNumber": -1,
+          "columnNumber": -1
+        },
+        {
+          "seconds": 0.0519,
+          "functionName": "(program)",
+          "scriptId": "0",
+          "url": "",
+          "lineNumber": -1,
+          "columnNumber": -1
+        },
+        {
+          "seconds": 0.0358,
+          "functionName": "(garbage collector)",
+          "scriptId": "0",
+          "url": "",
+          "lineNumber": -1,
+          "columnNumber": -1
+        },
+        {
+          "seconds": 0.0199,
+          "functionName": "compileSourceTextModule",
+          "scriptId": "75",
+          "url": "node:internal/modules/esm/utils",
+          "lineNumber": 315,
+          "columnNumber": 32
+        },
+        {
+          "seconds": 0.0151,
+          "functionName": "compileSourceTextModule",
+          "scriptId": "75",
+          "url": "node:internal/modules/esm/utils",
+          "lineNumber": 315,
+          "columnNumber": 32
+        },
+        {
+          "seconds": 0.0141,
+          "functionName": "#build",
+          "scriptId": "219",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/rolldown/dist/shared/rolldown-B-jRyK4b.mjs",
+          "lineNumber": 123,
+          "columnNumber": 13
+        },
+        {
+          "seconds": 0.012,
+          "functionName": "",
+          "scriptId": "215",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/rolldown/dist/shared/create-bundler-option-kXHnIt4b.mjs",
+          "lineNumber": 0,
+          "columnNumber": 0
+        },
+        {
+          "seconds": 0.0089,
+          "functionName": "dlopen",
+          "scriptId": "0",
+          "url": "",
+          "lineNumber": -1,
+          "columnNumber": -1
+        },
+        {
+          "seconds": 0.0077,
+          "functionName": "RegExp: (?:\\/\\/[@#][ \\t]+?sourceMappingURL=([^\\s'\"`]+?)[ \\t]*?$)|(?:\\/\\*[@#][ \\t]+sourceMappingURL=([^*]+?)[ \\t]*?(?:\\*\\/){1}[ \\t]*?$)",
+          "scriptId": "0",
+          "url": "",
+          "lineNumber": -1,
+          "columnNumber": -1
+        },
+        {
+          "seconds": 0.006,
+          "functionName": "jsonParseAst",
+          "scriptId": "171",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/rolldown/dist/shared/parse-BtiCBYra.mjs",
+          "lineNumber": 24,
+          "columnNumber": 21
+        },
+        {
+          "seconds": 0.006,
+          "functionName": "compileSourceTextModule",
+          "scriptId": "75",
+          "url": "node:internal/modules/esm/utils",
+          "lineNumber": 315,
+          "columnNumber": 32
+        },
+        {
+          "seconds": 0.006,
+          "functionName": "wrapSafe",
+          "scriptId": "68",
+          "url": "node:internal/modules/cjs/loader",
+          "lineNumber": 1761,
+          "columnNumber": 17
+        },
+        {
+          "seconds": 0.006,
+          "functionName": "dlopen",
+          "scriptId": "0",
+          "url": "",
+          "lineNumber": -1,
+          "columnNumber": -1
+        },
+        {
+          "seconds": 0.0059,
+          "functionName": "internalModuleStat",
+          "scriptId": "0",
+          "url": "",
+          "lineNumber": -1,
+          "columnNumber": -1
+        },
+        {
+          "seconds": 0.0054,
+          "functionName": "transformSync",
+          "scriptId": "177",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/rolldown/dist/shared/resolve-tsconfig-jh43hFM_.mjs",
+          "lineNumber": 94,
+          "columnNumber": 22
+        },
+        {
+          "seconds": 0.0052,
+          "functionName": "transform",
+          "scriptId": "168",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/vite/dist/node/chunks/node.js",
+          "lineNumber": 8139,
+          "columnNumber": 16
+        },
+        {
+          "seconds": 0.005,
+          "functionName": "read",
+          "scriptId": "0",
+          "url": "",
+          "lineNumber": -1,
+          "columnNumber": -1
+        },
+        {
+          "seconds": 0.0041,
+          "functionName": "encodeInteger",
+          "scriptId": "168",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/vite/dist/node/chunks/node.js",
+          "lineNumber": 867,
+          "columnNumber": 22
+        },
+        {
+          "seconds": 0.0038,
+          "functionName": "jsTokens_1$1",
+          "scriptId": "126",
+          "url": "file:///Users/aliumair/Desktop/sylf/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js",
+          "lineNumber": 1353,
+          "columnNumber": 25
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "native-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "native", "run", "web"],
+      "port": 8081
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "status": "PASSED",
+  "command": [
+    "/private/tmp/sylf-phase-a-runtime/node-v24.21.0-darwin-arm64/bin/node",
+    "node_modules/next/dist/bin/next",
+    "build",
+    "--webpack"
+  ],
+  "node": "v24.21.0",
+  "nodeOptions": "--max-old-space-size=6144",
+  "startedAt": "2026-10-28T10:36:35.221711+00:00",
+  "finishedAt": "2026-10-28T10:37:30.420335+00:00",
+  "exitCode": 0,
+  "log": "web-build.log",
+  "logSha256": "ad66362e808422091fab42b4314606bb13d829b5a788bbaa42059919b3dc2ab9"
+}

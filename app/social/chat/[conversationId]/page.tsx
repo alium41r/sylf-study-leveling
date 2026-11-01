@@ -10,7 +10,7 @@ import { ChatInputBar } from "../../components/ChatInputBar";
 import { ChatDetailsDrawer } from "../../components/ChatDetailsDrawer";
 import { ChatEmptyState } from "../../components/ChatEmptyState";
 import { AlertCircle, X } from "lucide-react";
-import { fetchCachedJSON } from "@/lib/client-data-cache";
+import { fetchCachedJSON, invalidateClientCache } from "@/lib/client-data-cache";
 import { usePostgresChanges } from "@/app/hooks/usePostgresChanges";
 
 export default function ModernChatPage({
@@ -134,15 +134,8 @@ export default function ModernChatPage({
       );
       if (data && data.conversation) {
         setConversation(data.conversation);
-        // Ingest server messages (track max server id for polling)
-        setMessages((prev) => {
-          const pendingOptimistic = prev.filter((m) => m.isOptimistic);
-          const serverMsgs: ChatMessage[] = data.messages || [];
-          for (const m of serverMsgs) {
-            if (m.id > lastServerIdRef.current) lastServerIdRef.current = m.id;
-          }
-          return [...serverMsgs, ...pendingOptimistic];
-        });
+        // Ingest server messages (merge so newer messages from Realtime/send are preserved)
+        mergeServerMessages(data.messages || []);
       } else if (!silent) {
         router.push("/social");
       }
@@ -167,6 +160,11 @@ export default function ModernChatPage({
       console.error("Failed to poll messages", err);
     }
   };
+
+  useEffect(() => {
+    lastServerIdRef.current = 0;
+    hasInitialScrolledRef.current = false;
+  }, [conversationId]);
 
   useEffect(() => {
     if (user) {
@@ -250,6 +248,8 @@ export default function ModernChatPage({
       // order) can never render the message twice.
       setMessages((prev) => prev.filter((m) => m.id !== tempId));
       mergeServerMessages([realMsg]);
+      invalidateClientCache(`/api/conversations/${conversationId}`);
+      invalidateClientCache("/api/conversations");
     } catch (err: any) {
       console.error("Send message error:", err);
       // Rollback optimistic message
@@ -284,6 +284,8 @@ export default function ModernChatPage({
 
       const updatedMsg = await res.json();
       setMessages((prev) => prev.map((m) => (m.id === messageId ? updatedMsg : m)));
+      invalidateClientCache(`/api/conversations/${conversationId}`);
+      invalidateClientCache("/api/conversations");
     } catch (err: any) {
       console.error("Edit message error:", err);
       setMessages(prevMessages); // Rollback
@@ -306,6 +308,8 @@ export default function ModernChatPage({
       if (!res.ok) {
         throw new Error("Failed to delete message");
       }
+      invalidateClientCache(`/api/conversations/${conversationId}`);
+      invalidateClientCache("/api/conversations");
     } catch (err: any) {
       console.error("Delete message error:", err);
       setMessages(prevMessages); // Rollback
@@ -324,6 +328,8 @@ export default function ModernChatPage({
         body: JSON.stringify({ addMemberIds: [memberId] }),
       });
       if (res.ok) {
+        invalidateClientCache(`/api/conversations/${conversationId}`);
+        invalidateClientCache("/api/conversations");
         fetchChat(true);
       } else {
         setErrorToast("Failed to add member to group.");
@@ -343,6 +349,8 @@ export default function ModernChatPage({
         body: JSON.stringify({ removeMemberIds: [memberId] }),
       });
       if (res.ok) {
+        invalidateClientCache(`/api/conversations/${conversationId}`);
+        invalidateClientCache("/api/conversations");
         fetchChat(true);
       } else {
         setErrorToast("Failed to remove member.");
@@ -362,6 +370,8 @@ export default function ModernChatPage({
         body: JSON.stringify({ name }),
       });
       if (res.ok) {
+        invalidateClientCache(`/api/conversations/${conversationId}`);
+        invalidateClientCache("/api/conversations");
         fetchChat(true);
       } else {
         setErrorToast("Failed to rename group.");
@@ -383,6 +393,8 @@ export default function ModernChatPage({
         body: JSON.stringify({ avatarUrl }),
       });
       if (res.ok) {
+        invalidateClientCache(`/api/conversations/${conversationId}`);
+        invalidateClientCache("/api/conversations");
         const data = await res.json().catch(() => ({}));
         if (data.conversation?.avatarUrl !== undefined) {
           setConversation((prev) => (prev ? { ...prev, avatarUrl: data.conversation.avatarUrl } : prev));
@@ -410,6 +422,8 @@ export default function ModernChatPage({
         body: JSON.stringify({ removeMemberIds: [user.id] }),
       });
       if (res.ok) {
+        invalidateClientCache(`/api/conversations/${conversationId}`);
+        invalidateClientCache("/api/conversations");
         router.push("/social");
       } else {
         setErrorToast("Failed to leave group.");

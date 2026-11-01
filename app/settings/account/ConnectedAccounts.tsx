@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
-import { fetchCachedJSON } from "@/lib/client-data-cache";
+import { fetchCachedJSON, invalidateClientCache } from "@/lib/client-data-cache";
 import { getAccountCapability } from "./services/account-capability";
 import styles from "../components/SystemHubPage.module.css";
 import { Check, AlertCircle } from "lucide-react";
@@ -108,6 +108,7 @@ export default function ConnectedAccounts() {
         const url = new URL(window.location.href);
         url.searchParams.delete("connected");
         window.history.replaceState({}, "", url.toString());
+        invalidateClientCache("/api/user/connections");
         fetchConnections();
       }
       if (error) {
@@ -142,6 +143,7 @@ export default function ConnectedAccounts() {
       const result = await getAccountCapability().disconnectProvider(providerId);
 
       if (result.ok) {
+        invalidateClientCache("/api/user/connections");
         await fetchConnections();
       } else {
         setErrorMessage(result.error || "Could not disconnect account.");

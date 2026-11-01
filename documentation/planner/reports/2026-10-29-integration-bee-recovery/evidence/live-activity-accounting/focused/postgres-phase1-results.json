@@ -1,0 +1,112 @@
+{
+  "label": "phase1",
+  "files": 1,
+  "passed": 24,
+  "failed": 0,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [],
+  "suites": [
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-aDGGJx/__tests__/planner-v2/postgres/role-resources.postgres.ts",
+      "cases": [
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL shows actual streamed strategy text under the owned fence without exposing credentials or changing accounting",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL refuses structured-role output as public streaming text",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL renews through a coherent read snapshot and validates a fresh committed lease afterwards",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL rejects a snapshot prepared across cancellation instead of returning stale worker authority",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL survives heartbeat lock contention during a real long checkpoint without extending or losing its valid lease",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL reads progress and provider controls while an owner writer is open, without authorizing mutation",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL read-only provider controls still reject foreign owners, stale fences and expired deadlines",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL serializes simultaneous dollar reservations without exceeding the root ceiling",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL preserves known spending and the dollar ceiling across linked continuation",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL blocks further paid reservations when settled usage still has unknown cost",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL retains natural TEXT exactly, sends explicit effort/cap, and records reasoning once with effective identity",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL supports JSON translation/review and more than the legacy six/five-call ceiling",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL serializes concurrent reservations and preserves translation plus review/verification holdbacks",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL continues one root without resetting counters, quota or deadline and prevents sibling branches",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL retains uncertain spend through stopping and permits continuation only after actual reconciliation",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL resumes a complete response after takeover and never repeats its provider call",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL retains incomplete output and actual usage without approval, silent repetition or provider fallback",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL expires role work even when the provider ignores abort and reconciles late spend without changing failed history",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL enforces ownership and immutable policy/deadline at both service and SQL boundaries",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL keeps truthful actual overrun and unknown price while stopping further work",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL binds saved checkpoint text to its actual role receipt rather than a fabricated response",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL admits only one child under simultaneous continuations",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL keeps missing accounting usage uncertain and blocks subsequent role dispatch",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL retains actual spend on physical response overflow without clipping the education",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

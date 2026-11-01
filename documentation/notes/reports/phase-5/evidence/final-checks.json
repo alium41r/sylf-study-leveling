@@ -1,0 +1,104 @@
+{
+  "capturedAt": "2026-10-21T03:36:51.618606+00:00",
+  "productionWebBuild": {
+    "command": "npm run build",
+    "exitCode": 0,
+    "log": "web-build.log"
+  },
+  "productionMobileBuild": {
+    "command": "npm run mobile:build",
+    "exitCode": 0,
+    "log": "mobile-build.log"
+  },
+  "mobileBoundaryAudit": {
+    "command": "npm run mobile:verify",
+    "exitCode": 0,
+    "log": "mobile-verify.log"
+  },
+  "typecheck": {
+    "command": "npx tsc --noEmit",
+    "exitCode": 0,
+    "log": "typecheck.log"
+  },
+  "targetedLint": {
+    "exitCode": 0,
+    "warnings": 0,
+    "log": "lint.log"
+  },
+  "focusedRegression": {
+    "exitCode": 0,
+    "tests": 201,
+    "files": 12,
+    "pdfTests": 14,
+    "log": "regression.log"
+  },
+  "pdfBrowser": {
+    "exitCode": 0,
+    "groups": 14,
+    "pageErrors": 0,
+    "result": "pdf-browser-results.json"
+  },
+  "handwritingBrowser": {
+    "exitCode": 0,
+    "groups": 10,
+    "pageErrors": 0,
+    "result": "ink-browser-results.json"
+  },
+  "richTextLibraryBrowser": {
+    "exitCode": 0,
+    "groups": 15,
+    "pageErrors": 0,
+    "result": "browser-results.json"
+  },
+  "focusedAccessibility": {
+    "passed": true,
+    "fullAssistiveTechnologyAudit": false,
+    "results": [
+      "pdf-accessibility-results.json",
+      "ink-accessibility-results.json",
+      "accessibility-results.json"
+    ]
+  },
+  "offlineWorker": {
+    "passed": true,
+    "result": "offline-results.json"
+  },
+  "independentExportFidelity": {
+    "passed": true,
+    "result": "export-fidelity-results.json"
+  },
+  "productionCompiledExportWorker": {
+    "passed": true,
+    "result": "next-worker-results.json",
+    "scope": "Isolated static host with production CSP; not deployed-route/OAuth acceptance"
+  },
+  "largePdfPerformance": {
+    "exitCode": 0,
+    "pages": 300,
+    "result": "pdf-performance-results.json",
+    "physicalDeviceLatencyQualified": false,
+    "totalProcessMemoryMeasured": false
+  },
+  "sourceDiffCheck": {
+    "command": "git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --check",
+    "exitCode": 0,
+    "log": "diff-check.log"
+  },
+  "generatedNoticeCrlfPreserved": true,
+  "licenseResources": {
+    "passed": true,
+    "dependencyNotices": 63,
+    "byteExactPdfJsFiles": 202,
+    "result": "license-source-verification.json"
+  },
+  "liveGoogleTestPerformed": false,
+  "physicalStylusTestPerformed": false,
+  "hostedDatabaseRead": false,
+  "migrationApplied": false,
+  "deployed": false,
+  "phase6Started": false,
+  "workspaceImplementationStarted": false,
+  "releaseEnvironment": "release-environment.json",
+  "sourceSnapshot": "source-snapshot.json",
+  "documentationChecks": "document-checks.json"
+}

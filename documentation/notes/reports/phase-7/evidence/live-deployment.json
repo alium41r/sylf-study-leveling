@@ -1,0 +1,13 @@
+{
+  "deploymentId": "dpl_2TbeS7gQextmCpogJ8zGrSZyibGy",
+  "deploymentUrl": "https://sylf-9pb3sd0dc-alium41rs-projects.vercel.app",
+  "canonicalOrigin": "https://sylf-alium41rs-projects.vercel.app",
+  "readyState": "READY",
+  "buildDurationMs": 169570,
+  "userApproved": true,
+  "environmentFilesUploaded": false,
+  "environmentVariablesChanged": false,
+  "sourceOverlayFiles": 44,
+  "databaseMigrationsApplied": 0,
+  "priorFailedUploadFilterCorrected": true
+}

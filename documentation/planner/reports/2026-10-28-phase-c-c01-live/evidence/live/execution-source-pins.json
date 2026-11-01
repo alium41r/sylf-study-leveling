@@ -1,0 +1,14 @@
+{
+  "mode": "LIVE",
+  "sources": {
+    "scripts/qa/planner-phase-c/run-c01.mjs": "94698ede7cce1c3d04e5b5c8cbc0ce6b63c38c79b2d6d682cbd1fa2e12c02d5f",
+    "scripts/qa/planner-phase-c/c01-journey.ts": "379a7bf4541ec390d551f59ebc7e824453151f0cfc2e7e7fcd27c58acd10c38b",
+    "scripts/qa/planner-phase-c/execution-guard.mjs": "50dbf33c4e27137430adad48a173b9da7abe2b36c98789ed2b94666395b5297c",
+    "__tests__/planner-v2/postgres/phase-c-execution.phasec.ts": "fcb1bd9f31b88099289dc0265789c6745c65a2029a17017ca4e8b379f76f2d15"
+  },
+  "preparedManifestSha256": "3249fc94aee12f7f4f422e0cdf9a0b58c852aa3f350dc97072826f221026ddfc",
+  "wrapperSha256": "b4c0cd6315865303c4ba905735dd8b824fc93f4d253e48de19d8fdb0e8f2080f",
+  "paidAuthorized": true,
+  "caseId": "C01",
+  "ceilingUsd": 1.75
+}

@@ -21,6 +21,7 @@ import { loadExecutionContext,contextInputDigest } from "./context";
 import { RevisionService,qualityEvidenceDigest } from "./revisions";
 import { hash,reject,rows,clock,DurablePlannerError } from "./database";
 import type { WorkerHandler } from "./worker";
+import { ResearchUnderstanding } from "./understanding";
 
 const RequestSchema=z.strictObject({readTargets:z.array(z.strictObject({planId:DurableIdV2Schema,intentId:DurableIdV2Schema,intentDigest:DigestV2Schema})).min(1).max(2),documentIds:z.array(DurableIdV2Schema).max(9)});
 const ExtractionBatch=z.strictObject({plans:z.array(z.strictObject({planRef:z.string(),extraction:ResearchExtractionSchema})).min(1).max(2)});
@@ -40,6 +41,7 @@ const verificationInstruction=`Independently verify the claims against the actua
 export class ResearchService {
   readonly documents:DocumentRepository;
   constructor(readonly attempts:AttemptService,readonly dependencies:{search?:SearchProvider|null;fetch?:typeof fetchSource;documents?:DocumentRepository;render?:typeof renderOcrPages;provider?:Parameters<typeof dispatchMeteredProvider>[2]}={}) {this.documents=dependencies.documents??new DocumentRepository(attempts.db);}
+  understanding() { return new ResearchUnderstanding(this.attempts,this.dependencies,this.documents); }
   async enqueueAdvice(ownerId:number,input:{key:string;text:string;readPlanIds:string[];documentIds:string[];budget?:RuntimeBudgetV2;parentAttemptId?:string}) {
     return this.attempts.db.coordinated(ownerId,sql=>this.enqueueAdviceAccepted(sql,ownerId,input));
   }

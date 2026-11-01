@@ -52,6 +52,7 @@ const SystemScreen = React.lazy(() =>
 
 const GoalsScreen = React.lazy(() => import("@/app/goals/components/GoalsScreen"));
 
+const StudentPlannerScreen = React.lazy(() => import("@/app/components/planner/student/StudentPlannerScreen"));
 const QuestsScreen = React.lazy(() => import("@/app/quests/components/QuestsScreen"));
 
 const NotesScreen = React.lazy(() => import("@/app/notes/components/NotesScreen"));
@@ -189,6 +190,7 @@ const MIGRATED_EXACT_ROUTES: Record<string, () => React.ReactNode> = {
   "/social": () => <SocialScreen />,
   "/locker": () => <LockerScreen />,
   "/system": () => <SystemScreen />,
+  "/planner": () => <StudentPlannerScreen />,
   "/goals": () => <GoalsScreen />,
   "/quests": () => <QuestsScreen />,
   "/calendar": () => <CalendarScreen />,
@@ -341,6 +343,9 @@ export function MobileRouteOutlet() {
   if (exactRenderer) {
     return <Suspense fallback={<RouteLoadingSpinner />}>{exactRenderer()}</Suspense>;
   }
+
+  const plannerId=pathname.match(/^\/planner\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i)?.[1];
+  if(plannerId)return <Suspense fallback={<RouteLoadingSpinner/>}><StudentPlannerScreen initialPlanId={plannerId}/></Suspense>;
 
   // 2. Deferred dynamic/nested routes — clear "not migrated" message
   for (const deferred of DEFERRED_DYNAMIC_PREFIXES) {

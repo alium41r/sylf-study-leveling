@@ -1,0 +1,33 @@
+{
+  "runId": "28d07541-4655-450d-a0cc-59dbdca750ab",
+  "mode": "LIVE",
+  "state": "STOP_REQUESTED",
+  "stopReason": "PROVIDER_OR_PROTOCOL_FAILURE",
+  "physicalRequests": 4,
+  "roles": [
+    {
+      "sequence": 1,
+      "role": "RESEARCH",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 2,
+      "role": "VERIFICATION",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 3,
+      "role": "VERIFICATION",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 4,
+      "role": "SYNTHESIS",
+      "finished": true,
+      "stopReason": null
+    }
+  ]
+}

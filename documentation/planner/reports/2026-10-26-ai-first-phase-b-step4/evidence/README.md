@@ -1,0 +1,14 @@
+# Step 4 evidence
+
+All runtime qualification uses Node 24.21.0 and synthetic local PostgreSQL 18.4. No hosted data, migration deployment or paid API request is involved. Scripts/fixtures are mechanical qualification, not educational model quality evidence.
+
+- `verification.json`: final commands/results and boundaries.
+- `qualified-final/postgres-harness-run.json`, `postgres-phase1-results.json`, `postgres-current-results.json`, `postgres-source-pins.json`: final 292 V2 + 225 retained current checks, zero required skips, unchanged source pins during the run. All 488 prior required cases remain; 29 new cases cover Step 4.
+- `final-unit-results.json`: 748 passing checks in 67 active files; the 33 discovered opt-in Calendar PostgreSQL checks are qualified separately below.
+- `calendar-postgres-results.json`: all 33 existing Calendar PostgreSQL checks pass, zero skips. `calendar-postgres-runner.mjs` preserves the temporary adaptation of the existing Docker Calendar harness to native PostgreSQL and the existing `pg` client, using exactly its schema/migrations and test selection. It inherits no application/provider credentials, uses a fresh loopback cluster and removes it afterward. `calendar-postgres.log` records the result. `calendar-runner-initial-diagnostic.log` records the absent `psql` prerequisite before the runner switched to `pg`; it is not a production defect.
+- `typecheck.log`, `lint.json`, `worker-build.log`, `worker-imports.json`, `prisma-validate.log`, `web-build.log`, `mobile-build.log`, `mobile-verify.log`: static/runtime/build checks. Worker import qualification forbids fetch and inherits no credentials.
+- `preservation.json`, `documentation-checks.json`, `scoped-whitespace.json`: task-start hashes, local links and task-scoped whitespace; unrelated dirty work and all prior migrations/evidence remain unchanged.
+
+Development runs are retained, not overwritten as success: `initial/focused/` exposes new guard precedence ahead of the older research-specific fence; `expanded/focused/` passes 105 selected checks after the correction and protected/recovery additions; `full/` passes all 488 retained checks but fails one newly added JSON-object-order assertion; `final/` passes 513 checks before the final reserved/dispatched refresh and correspondence regressions; `final-gate/` passes 516 checks including reserved/dispatched refresh and forged-lineage regressions; `qualified-final/` adds the account-wide timezone regression and is authoritative for the completed implementation.
+
+The existing optional paid provider qualification is explicitly excluded. General Vitest configuration/deprecation notices and native provider warnings are not paid calls. The repository-wide whitespace audit reports existing CRLF/trailing whitespace in `public/notes-licenses/notices.txt`; task-start hashing proves it was preserved and task-scoped whitespace passes.

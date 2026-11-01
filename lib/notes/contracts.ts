@@ -115,6 +115,36 @@ export const documentSchema = z
         code: "custom",
         message: "Page references an absent stream or original",
       });
+    for (const page of doc.pages) {
+      if (
+        page.extensions.backgroundAssetId !== undefined &&
+        (!doc.requiredFeatures.includes("creative-tools-v1") ||
+          typeof page.extensions.backgroundAssetId !== "string" ||
+          !assets.has(page.extensions.backgroundAssetId))
+      )
+        ctx.addIssue({
+          code: "custom",
+          message:
+            "Page background requires a retained asset and a compatible reader",
+        });
+      const text = page.extensions.textStreamId,
+        ink = page.extensions.inkStreamId;
+      if (text === undefined && ink === undefined) continue;
+      if (
+        !doc.requiredFeatures.includes("page-layers-v1") ||
+        !doc.streams.some(
+          (s) => s.streamId === text && s.adapter === "blocknote/0.56.0"
+        ) ||
+        !doc.streams.some(
+          (s) => s.streamId === ink && s.adapter === "sylf-ink/1"
+        )
+      )
+        ctx.addIssue({
+          code: "custom",
+          message:
+            "Page layers require compatible, retained text and ink streams",
+        });
+    }
   });
 export const librarySchema = z
   .object({

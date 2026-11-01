@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-10-22T05:14:36.677Z",
+  "publicSchemaAndDataRestoredSuccessfully": true,
+  "backupSHA256": "6414922668108eb7f189eaa2f9e1aaae15efed52522b1203db2d01bcd8b07815",
+  "allForeignKeysValidated": 116,
+  "publicApplicationTablesCompared": 73,
+  "allApplicationTableFingerprintsMatchHostedPostCleanupSnapshot": true,
+  "mismatchedTables": [],
+  "triggersAndConstraintsNotDisabled": true,
+  "notesSchemaIncluded": true,
+  "managedPlatformStubsOnly": [
+    "auth.jwt",
+    "auth.uid",
+    "extensions.pgcrypto",
+    "extensions.uuid-ossp"
+  ],
+  "notAFullManagedSupabaseOrStorageBytesRestore": true,
+  "hostedDataModified": false
+}

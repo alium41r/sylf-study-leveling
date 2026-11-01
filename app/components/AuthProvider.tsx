@@ -101,8 +101,8 @@ export function AuthProvider({
 
   // Fetch fresh stats from the server (httpOnly cookie authenticates; no JWT
   // in JS and no Bearer headers anywhere).
-  const refreshStats = useCallback(async () => {
-    const epoch = updateEpoch.current, sequence = ++refreshSequence.current;
+  const refreshStats = useCallback(async (overrideEpoch?: number) => {
+    const epoch = overrideEpoch ?? updateEpoch.current, sequence = ++refreshSequence.current;
     try {
       const res = await fetchWithTimeout(fetch, resolveApiUrl("/api/user/stats"), { credentials: "include", cache: "no-store" });
       if (res.ok) {
@@ -132,9 +132,8 @@ export function AuthProvider({
   // On mount: validate the cookie session with the server.
   useEffect(() => {
     let cancelled = false;
-    queueMicrotask(() => {
-      if (!cancelled) void refreshStats().finally(() => { if (!cancelled) setIsLoading(false); });
-    });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void refreshStats().finally(() => { if (!cancelled) setIsLoading(false); });
     const retry = () => { if (needsRetry.current) void refreshStats(); };
     const visible = () => { if (document.visibilityState === "visible") retry(); };
     const interval = setInterval(retry, 30_000);

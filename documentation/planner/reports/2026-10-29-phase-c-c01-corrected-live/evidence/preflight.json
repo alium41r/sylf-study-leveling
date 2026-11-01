@@ -1,0 +1,70 @@
+{
+  "status": "PASSED",
+  "runId": "ab24df69-8acd-46e1-a5fc-9be0c653b664",
+  "profileId": "C01-CORRECTED-2",
+  "paidCalls": 0,
+  "node": "v24.21.0",
+  "sourcePins": 387,
+  "inputPins": 6,
+  "sourceOrInputChanges": [],
+  "calendarAndDeadlineAudit": "Fresh genuine PostgreSQL rehearsal passed with 16 commitments, Friday rest, full joint witness and disposable Apply/replay",
+  "guardTests": {
+    "passed": 23,
+    "failed": 0
+  },
+  "retainedTechnicalBaseline": {
+    "postgres": 619,
+    "units": 488,
+    "sourceMatched": true,
+    "typecheckAndBuild": "PASSED"
+  },
+  "metadata": {
+    "checkedAt": "2026-10-29T01:56:29.581Z",
+    "status": "METADATA_REACHABLE",
+    "requests": [
+      {
+        "path": "/models",
+        "ok": true,
+        "status": 200
+      },
+      {
+        "path": "/user/balance",
+        "ok": true,
+        "status": 200
+      }
+    ],
+    "model": {
+      "id": "deepseek-flash",
+      "name": "DeepSeek-V4.1-Flash",
+      "contextWindow": 1048576,
+      "maxOutputTokens": 393216,
+      "effort": {
+        "supported_levels": [
+          "low",
+          "high",
+          "max"
+        ],
+        "default_level": "high"
+      }
+    }
+  },
+  "funding": {
+    "balanceCoversNewCeilingAndPriorLiability": true,
+    "priorLiabilityUsd": 0.10328219999999999,
+    "checkedAt": "2026-10-29T01:56:29.581Z"
+  },
+  "pricing": {
+    "checkedAt": "2026-10-29T01:59:12.545Z",
+    "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+    "publishedModelVersion": "DeepSeek-V4.1-Flash-1017",
+    "peakInputPerMillion": 0.3,
+    "peakCompletionPerMillion": 1.2,
+    "maximumRootLiabilityUsd": 1.74,
+    "approvedAdditionalCeilingUsd": 1.75
+  },
+  "sleepPrevention": {
+    "sessionId": 19409,
+    "active": true
+  },
+  "authorizedAt": "2026-10-29T01:59:12.542Z"
+}

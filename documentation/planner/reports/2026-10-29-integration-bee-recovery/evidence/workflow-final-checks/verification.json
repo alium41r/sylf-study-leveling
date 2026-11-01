@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "completedAt": "2026-10-30T02:16:27.716Z",
+  "runtime": "Node 24.21.0; PostgreSQL 18.4",
+  "unit": {
+    "status": "PASSED",
+    "tests": 513,
+    "files": 50
+  },
+  "postgres": {
+    "status": "PASSED",
+    "v2": 422,
+    "legacy": 225,
+    "requiredTotal": 647,
+    "requiredSkipped": 0,
+    "sourcePins": "PASSED",
+    "changedDuringRun": [],
+    "provider": "scripted; no external dispatch",
+    "limitations": [
+      "Audited schema bootstrap, not replay of the incomplete historical migration chain.",
+      "Phase 1 actual services/SQL are exercised; no hosted data is touched."
+    ]
+  },
+  "checks": {
+    "webBuild": "PASSED",
+    "workerBuild": "PASSED",
+    "mobileBuild": "PASSED",
+    "mobileVerify": "PASSED; zero server-only symbols or secrets",
+    "typecheck": "PASSED",
+    "scopedLint": "PASSED; no warnings",
+    "providerScopedLint": "PASSED with existing no-explicit-any disabled; historical errors remain on untouched lines"
+  },
+  "visual": {
+    "scriptedFixture": true,
+    "viewportCases": [
+      "1440x980 dark",
+      "390x844 dark with light custom background",
+      "1440x980 light with dark custom background"
+    ],
+    "horizontalOverflow": false,
+    "expandedProviderTrace": "verified with explicitly labelled scripted content",
+    "actualAccount": "owned expired request, historical trace, enabled New planning request; no submission",
+    "temporaryViewportReset": true
+  },
+  "paidCallsDuringWorkflowChanges": 0,
+  "historicalEstimatedSpendingUsd": 0.481002696,
+  "realPlanGenerated": false,
+  "productionDeployment": false,
+  "migrationsDeployed": false,
+  "logSha256": {
+    "unit-tests.log": "443d8b8dc4479278f1d4df67824cdac53ee87c38a29aff267aa249eb010cd476",
+    "web-build.log": "00f0ed28fdc806cd3f2abc60583087a1428fb7f25d19054269be2aa6b67509ec",
+    "worker-build.log": "8b70d157511a31e7521da33991f158db9bed96a36aeacfee26825fbd32b6f4ce",
+    "mobile-build.log": "dbd9d84a4611dae57a49d478a7b0592ea2be8e71711e7867d6c26f1fc6cd29f1",
+    "mobile-verify.log": "25d467a0e4c97ce295c1c38f795a8076c7d95b02b943a65447aca5afabeae174",
+    "typecheck.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scoped-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "provider-scoped-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

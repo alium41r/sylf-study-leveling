@@ -64,7 +64,7 @@ export function ChatDetailsDrawer({
   const [isSearching, setIsSearching] = useState(false);
   const [isAddingId, setIsAddingId] = useState<number | null>(null);
 
-  const isGroupAdmin = conversation.isGroup && (conversation.createdBy === currentUserId || !conversation.createdBy);
+  const isGroupAdmin = conversation.isGroup && conversation.createdBy === currentUserId;
   const otherParticipant = !conversation.isGroup
     ? conversation.participants.find((p) => p.id !== currentUserId)
     : null;
@@ -652,6 +652,7 @@ export function ChatDetailsDrawer({
                   </div>
 
                   {/* Add Member Search Deck */}
+                  {isGroupAdmin && (
                   <div className="p-4 rounded-2xl bg-bg-abyss/80 border border-white/10 flex flex-col gap-2">
                     <span className="text-xs font-bold font-['Rajdhani'] uppercase tracking-wider text-accent-text-light flex items-center gap-1.5">
                       <UserPlus className="w-3.5 h-3.5" />
@@ -694,6 +695,7 @@ export function ChatDetailsDrawer({
                       <p className="text-xs text-text-muted font-['Rajdhani']">No matching scholars found.</p>
                     ) : null}
                   </div>
+                  )}
 
                   {/* Leave Group Action */}
                   <div className="pt-2">

@@ -1,0 +1,103 @@
+{
+  "date": "2026-11-01",
+  "timezone": "Asia/Karachi",
+  "runtime": "Node 24.22.1",
+  "paidCalls": 0,
+  "hostedMigrations": 0,
+  "nativeOrMobileBuilds": 0,
+  "checks": [
+    {
+      "command": "npm run test -- --run __tests__/planner-v2 __tests__/ai/provider-streaming.test.ts",
+      "exitCode": 0,
+      "files": 48,
+      "passed": 512,
+      "receipt": "unit-tests.log"
+    },
+    {
+      "command": "npx tsc --noEmit",
+      "exitCode": 0,
+      "receipt": "typecheck.log",
+      "environment": {
+        "NODE_OPTIONS": "--max-old-space-size=8192"
+      }
+    },
+    {
+      "command": "npx eslint <changed Planner owners and regression tests>",
+      "exitCode": 0,
+      "receipt": "lint.log"
+    },
+    {
+      "command": "npm run planner:worker:build",
+      "exitCode": 0,
+      "receipt": "worker-build.log"
+    },
+    {
+      "command": "node node_modules/next/dist/bin/next build",
+      "exitCode": 0,
+      "receipt": "web-build.log",
+      "environment": {
+        "NODE_OPTIONS": "--max-old-space-size=8192"
+      }
+    }
+  ],
+  "frontendNativePreservation": {
+    "files": 529,
+    "changed": [],
+    "scope": [
+      "app/components/planner/student",
+      "app/planner",
+      "native",
+      "mobile"
+    ]
+  },
+  "browserCheck": {
+    "source": "authenticated actual local app",
+    "plan": "LUMS integration bee",
+    "view": "new-request authorization dialog",
+    "submitted": false,
+    "observations": [
+      "Saved failed request still retained",
+      "New request uses LOW Research/translation and HIGH strategy/review",
+      "Existing 65536 completion-token allowance retained",
+      "Current frontend design retained"
+    ]
+  },
+  "localOperation": {
+    "webPort": 3000,
+    "workerHealthPort": 8082,
+    "nativeExpoPort": 8081,
+    "workerReady": true,
+    "compilerVersions": [
+      1,
+      2
+    ],
+    "activeAttemptsBeforeRestart": 0,
+    "productionChanged": false
+  },
+  "postgresFullStatus": "PENDING",
+  "scriptedDisplayChecks": {
+    "paidCalls": 0,
+    "source": "isolated labelled existing UI fixture; not real-model proof",
+    "cases": [
+      {
+        "viewport": "desktop default",
+        "appearance": "dark",
+        "receivedIncrementalText": true,
+        "horizontalOverflow": false
+      },
+      {
+        "viewport": "390x844",
+        "appearance": "dark mode, custom light background, purple accent",
+        "receivedIncrementalText": true,
+        "horizontalOverflow": false
+      },
+      {
+        "viewport": "1440x900",
+        "appearance": "light mode, custom dark background, pink accent",
+        "receivedIncrementalText": true,
+        "horizontalOverflow": false
+      }
+    ],
+    "temporaryBrowserViewportReset": true
+  }
+}

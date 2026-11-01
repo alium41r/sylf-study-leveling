@@ -22,7 +22,7 @@ const operationSchema = z.object({
   focus: z.number().int().nonnegative(), breaks: z.number().int().nonnegative(), at: z.string().datetime(),
 });
 type Operation = z.infer<typeof operationSchema>;
-type JournalStorage = Pick<Storage, "length" | "key" | "getItem" | "setItem" | "removeItem">;
+export type JournalStorage = Pick<Storage, "length" | "key" | "getItem" | "setItem" | "removeItem">;
 class TimerSyncError extends Error {}
 export const TIMER_SYNC_EVENT = "sylf:timer-sync";
 export interface TimerSyncStatus { pending: number; error: string | null }
@@ -266,7 +266,8 @@ export class TimerSync {
   private emit(meta: TimerJournal, focus: number, breaks: number, execution?: SessionExecutionV2, authoritative = false, endedAt?: string | null) {
     if (!this.active) return;
     this.acceptedListeners.forEach(fn => { try { fn({ clientKey: meta.clientKey, sessionId: meta.sessionId!, focus, breaks, execution, authoritative, endedAt }); } catch { /* Stats refresh is independent of settlement. */ } });
-    if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent(TIMER_SYNC_EVENT, { detail: { ownerId: this.ownerId } }));
+    // React Native defines `window` with no dispatchEvent, and this runs after the server accepted, so it must not throw there.
+    if (typeof window !== "undefined" && typeof window.dispatchEvent === "function" && typeof CustomEvent === "function") window.dispatchEvent(new CustomEvent(TIMER_SYNC_EVENT, { detail: { ownerId: this.ownerId } }));
   }
 }
 

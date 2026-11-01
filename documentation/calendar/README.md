@@ -1,5 +1,7 @@
 # Calendar
 
+**22 October deployment update:** all Calendar SQL migrations are recorded as applied following the [database audit](../infrastructure/reports/2026-10-22-database-migrations/report.md). Existing columns, indexes, generated projections, triggers, permissions and data were verified before history reconciliation. The current shared Prisma schema cache version is 38; provider-account and scheduler acceptance below remain separate requirements.
+
 Sylf's calendar combines personal events, connected calendars and daily notes with the existing study schedule. The shared web/mobile entry point remains `app/components/Calendar/StudyCalendar.tsx`; it composes `app/calendar/components/CalendarWorkspace.tsx`.
 
 ## Current contract
@@ -82,3 +84,9 @@ The implementation and mocked/isolated validation are in this checkout. Real pro
 The existing Sylvie gains `searchCalendarNotes` (up to eight private excerpts) and shared destinations/roles in `getCalendarConnections`. Existing read/event/proposal tools understand shared metadata and permissions. Shared writes retain signed confirmation and disclose the destination to the user. Search uses bounded canonical services; no new assistant, model routing or AI backend exists.
 
 Migration `20261018030000_calendar_completion`, generated Prisma client and schema cache version **36** are required. `npm run dev`, `npm run build` and mobile build scripts prepare the separate optional recognition worker/runtime through `scripts/build/build-calendar-recognition.mjs`; these generated assets must be deployed with `public/`. See [Phase 6 implementation, security, performance and final handoff](reports/phase-6/report.md). **The six implementation phases do not establish full production readiness: Phase 5 credentials, deployment/scheduler configuration and real Google/Outlook account tests remain mandatory.** Model-card licensing and physical stylus/WebView qualification are also recorded in that report.
+
+## Headless Planner V2 capacity
+
+[Planner Phase B Step 4](../planner/reports/2026-10-26-ai-first-phase-b-step4/README.md) adds a compiler-v2-only capacity consumer. The production/v1 behavior described above stays unchanged. With explicitly accepted study windows, `lib/calendar/planning.ts` reads existing private/shared/external tables inside the Planner transaction, reusing Calendar's DTO, recurrence, override, civil-time and 30-minute coverage rules. It never requests sync, reads credentials/notes, writes Calendar data or calls a provider. Planning inclusion is independent of visibility; active shared membership is required. Pending external mutations and incomplete/stale/disconnected included sources prevent free-time claims.
+
+Planner retains opaque source fingerprints and busy intervals, then combines them with its existing actual/remaining/protected workload ledgers and allocator. Calendar events remain Calendar records; time blocks do not confer study-window consent. Internal interval witnesses are feasibility evidence, not appointments. Explicit versioned refresh and live source/currentness checks retain historical capacity without rewriting it. V2 publication and atomic ApplyService remain gated pending their later full live validation. See the [current capacity contract](../planner/AI_FIRST_FOUNDATION.md#calendar-capacity).

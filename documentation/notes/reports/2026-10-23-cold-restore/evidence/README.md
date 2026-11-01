@@ -1,0 +1,10 @@
+# Cold-restore evidence
+
+- `release-candidate.json`, `source-verification.json`: scoped source hashes; concurrent frontend/library features excluded from the isolated release, preserved in the shared checkout.
+- `local-handoff-checks.json`: all 47 scoped source hashes matched; 310 compiled client files and the scoped sources passed the configured-private-value scan. No root environment files were copied. Temporary authorization ended without credentials, its private directory and the candidate dependency symlink were removed. No live upload plan or deployment ran.
+- `drive-metadata.json`: real Google connectivity and aggregate pack inventory only. No body downloads or provider mutations.
+- `baseline-regression.log`: the new empty-destination regression against the preceding deployed transport, with only module import paths adapted for isolation. Expected failure records 34 physical reads for twelve packs. The earlier fixture-authoring error is not used as evidence.
+- `notes-tests.log`, `web-build.log`, `lint.log`, `mobile-build.log`, `mobile-verify.log`: final isolated runtime checks; 210 passing active tests and one skipped optional profile. The unrelated in-progress page-layer tests were excluded with their implementation from this candidate; no existing Notes suite was disabled.
+- `drive-unavailable-desktop.png`, `retry-recovered-desktop.png`, `drive-unavailable-phone-light.png`: real Chromium synthetic-provider outage/retry, dark desktop and custom-light phone. The phone reports 390-pixel viewport and content widths. This does not establish Google cold-download timing or physical-device compatibility.
+
+The user reported their original immutable URL eventually loaded in three to four minutes. No live full-library reconstruction was performed after automatic review rejected that diagnostic's private-data scope. Deployment is intentionally deferred by the user's latest instruction. No candidate was uploaded; fresh deployed observations remain future release checks, as recorded in the report.

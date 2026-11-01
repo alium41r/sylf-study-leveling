@@ -3,7 +3,8 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
-import { signToken, AUTH_COOKIE_OPTIONS, type AuthTokenPayload } from "@/lib/auth";
+import { type AuthTokenPayload } from "@/lib/auth";
+import { attachReissuedSession, clearAuthSessions } from "@/lib/auth-session-service";
 
 const passwordSchema = z.object({
   currentPassword: z.string().min(1, "Current password is required"),
@@ -61,7 +62,7 @@ export async function PATCH(req: NextRequest) {
       const passwordMatches = await bcrypt.compare(currentPassword, user.password);
       if (!passwordMatches) {
         // Generic response for incorrect current password to avoid leaking specifics
-        return NextResponse.json({ error: "Incorrect current password." }, { status: 401 });
+        return NextResponse.json({ error: "Incorrect current password.", code: "password_incorrect" }, { status: 401 });
       }
 
       // Hash the new password securely
@@ -88,17 +89,14 @@ export async function PATCH(req: NextRequest) {
         tokenVersion: updatedUser.tokenVersion,
         timezone: updatedUser.timezone || "UTC",
       };
-      const newToken = await signToken(tokenPayload);
+      await clearAuthSessions(updatedUser.id, payload.sid);
 
       const response = NextResponse.json(
         { message: "Password changed successfully." },
         { status: 200 }
       );
 
-      response.cookies.set({
-        ...AUTH_COOKIE_OPTIONS,
-        value: newToken,
-      });
+      await attachReissuedSession(response, payload, tokenPayload);
 
       return response;
 

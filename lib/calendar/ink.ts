@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GOAL_COLOR_TOKENS } from "@/lib/goal-theme";
+import { GOAL_COLOR_TOKENS } from "../goal-theme";
 
 export const inkColors = ["INK", ...GOAL_COLOR_TOKENS] as const;
 export const inkPointSchema = z.tuple([

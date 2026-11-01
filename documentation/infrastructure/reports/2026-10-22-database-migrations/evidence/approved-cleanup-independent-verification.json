@@ -1,0 +1,24 @@
+{
+  "schemaAndSecurityUnchanged": {
+    "tables": true,
+    "columns": true,
+    "columnTypes": true,
+    "constraints": true,
+    "indexes": true,
+    "triggers": true,
+    "policies": true,
+    "grants": true,
+    "functions": true,
+    "defaults": true,
+    "enums": true,
+    "roles": true,
+    "publication": true,
+    "extensions": true
+  },
+  "actualForeignKeysChecked": 116,
+  "violations": [],
+  "disabledInternalTriggers": [],
+  "staleCalendarSearchRows": 0,
+  "successfulMigrations": 70,
+  "unresolvedFailures": 0
+}

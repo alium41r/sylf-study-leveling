@@ -221,7 +221,7 @@ describe("Phase 1D-G: Canonical Settings & System Hub Family Navigation", () => 
     );
 
     await waitFor(() => {
-      expect(screen.getByRole("heading", { level: 1, name: "Account" })).toBeDefined();
+      expect(screen.getByRole("heading", { level: 1, name: /^Account( Settings)?$/i })).toBeDefined();
       expect(screen.getByText("Account Information")).toBeDefined();
     }, { timeout: 3000 });
   });

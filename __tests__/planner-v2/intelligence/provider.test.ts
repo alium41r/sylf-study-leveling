@@ -10,6 +10,7 @@ import { z } from "zod";
 import { JsonExtractionError } from "@/lib/ai/json-extractor";
 import { boundedProviderInput, boundedRejectedOutput } from "@/lib/planner/v2/intelligence/provider";
 import { budgetFixture } from "../contracts/fixtures";
+import { offlineResourcePolicy } from "@/lib/planner/v2/intelligence/foundation/role-calls";
 
 const response = (): LLMResponse => ({ text: '{"ok":true}', finishReason: "STOP", usage: { promptTokens: 100, completionTokens: 20, totalTokens: 120 } });
 const request = (): MeteredProviderRequest<{ ok: boolean }> => ({ messages: [{ role: "user", content: "Plan my practice" }], systemInstruction: "Return JSON", outputTokens: 100,
@@ -27,6 +28,13 @@ function fakeMeter() {
   return { meter, events, settled, closed, late, stop: () => { stopped = true; } };
 }
 describe("shared metered provider dispatch", () => {
+  it("keeps one settled provider call when best-effort visible progress cannot be written",async()=>{
+    const m=fakeMeter(),p=offlineResourcePolicy("a".repeat(64),"00000000-0000-4000-8000-000000000001"),visible=vi.fn().mockRejectedValue(new Error("display unavailable"));
+    m.meter.rolePolicy=async role=>({...p.roles[role],policyDigest:"a".repeat(64)});m.meter.visibleOutput=visible;
+    const generate=vi.fn(async(_messages,_system,_tools,options)=>{options.onTextDelta("Visible strategy");return {text:"Visible strategy",finishReason:"STOP" as const,model:"deepseek-flash",usage:{promptTokens:10,completionTokens:10,totalTokens:20,cacheHitTokens:0}};});
+    const result=await dispatchMeteredProvider(m.meter,{...request(),role:{role:"STRATEGIST",key:"live_display_failure"},validate:r=>r.text},{adapter:()=>({generateResponse:generate})});
+    expect(result.value).toBe("Visible strategy");expect(generate).toHaveBeenCalledTimes(1);expect(m.settled).toHaveLength(1);expect(visible).toHaveBeenCalled();
+  });
   it("commits each dispatch before exactly one upstream attempt and charges fallback independently", async () => {
     const m = fakeMeter(); let n = 0;
     const generate = vi.fn(async (_messages, _system, _tools, options) => {

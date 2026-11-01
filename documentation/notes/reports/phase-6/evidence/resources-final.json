@@ -1,0 +1,501 @@
+{
+  "label": "final",
+  "scope": "Actual shared rich-text editor; 8 owned padded valid PNG fixtures, 2 MiB each, 24 open/close cycles. Real encrypted IndexedDB. Synthetic HTTP, not a physical device or total-process memory bound.",
+  "initial": {
+    "urls": {
+      "count": 0,
+      "bytes": 0,
+      "created": 0,
+      "revoked": 0
+    },
+    "heap": {
+      "usedSize": 9184396,
+      "totalSize": 10452992,
+      "embedderHeapUsedSize": 3531808,
+      "backingStorageSize": 1901332
+    },
+    "dom": {
+      "documents": 1,
+      "nodes": 575,
+      "jsEventListeners": 272
+    }
+  },
+  "cycles": [
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 1,
+        "revoked": 1
+      },
+      "heap": {
+        "usedSize": 13503980,
+        "totalSize": 14450688,
+        "embedderHeapUsedSize": 3224816,
+        "backingStorageSize": 2818065
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 735,
+        "jsEventListeners": 309
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 2,
+        "revoked": 2
+      },
+      "heap": {
+        "usedSize": 14237400,
+        "totalSize": 15499264,
+        "embedderHeapUsedSize": 3336384,
+        "backingStorageSize": 2819042
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 899,
+        "jsEventListeners": 332
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 3,
+        "revoked": 3
+      },
+      "heap": {
+        "usedSize": 14577632,
+        "totalSize": 15499264,
+        "embedderHeapUsedSize": 3468048,
+        "backingStorageSize": 2820006
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1063,
+        "jsEventListeners": 355
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 4,
+        "revoked": 4
+      },
+      "heap": {
+        "usedSize": 14762476,
+        "totalSize": 16023552,
+        "embedderHeapUsedSize": 3621384,
+        "backingStorageSize": 2820970
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1227,
+        "jsEventListeners": 378
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 5,
+        "revoked": 5
+      },
+      "heap": {
+        "usedSize": 15121204,
+        "totalSize": 16285696,
+        "embedderHeapUsedSize": 3746112,
+        "backingStorageSize": 2821934
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1391,
+        "jsEventListeners": 401
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 6,
+        "revoked": 6
+      },
+      "heap": {
+        "usedSize": 15224184,
+        "totalSize": 16547840,
+        "embedderHeapUsedSize": 3866344,
+        "backingStorageSize": 2822898
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1555,
+        "jsEventListeners": 424
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 7,
+        "revoked": 7
+      },
+      "heap": {
+        "usedSize": 15411284,
+        "totalSize": 16547840,
+        "embedderHeapUsedSize": 4176616,
+        "backingStorageSize": 2827434
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1719,
+        "jsEventListeners": 467
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 8,
+        "revoked": 8
+      },
+      "heap": {
+        "usedSize": 15439100,
+        "totalSize": 16547840,
+        "embedderHeapUsedSize": 4119544,
+        "backingStorageSize": 2824175
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 9,
+        "revoked": 9
+      },
+      "heap": {
+        "usedSize": 15697816,
+        "totalSize": 16809984,
+        "embedderHeapUsedSize": 4115680,
+        "backingStorageSize": 2823706
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 10,
+        "revoked": 10
+      },
+      "heap": {
+        "usedSize": 15728920,
+        "totalSize": 16809984,
+        "embedderHeapUsedSize": 4119288,
+        "backingStorageSize": 2823242
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 11,
+        "revoked": 11
+      },
+      "heap": {
+        "usedSize": 15764612,
+        "totalSize": 16809984,
+        "embedderHeapUsedSize": 4127312,
+        "backingStorageSize": 2822674
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 12,
+        "revoked": 12
+      },
+      "heap": {
+        "usedSize": 15764752,
+        "totalSize": 16809984,
+        "embedderHeapUsedSize": 4124888,
+        "backingStorageSize": 2822314
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 13,
+        "revoked": 13
+      },
+      "heap": {
+        "usedSize": 15791472,
+        "totalSize": 16809984,
+        "embedderHeapUsedSize": 4128440,
+        "backingStorageSize": 2821850
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 14,
+        "revoked": 14
+      },
+      "heap": {
+        "usedSize": 15790504,
+        "totalSize": 16809984,
+        "embedderHeapUsedSize": 4131280,
+        "backingStorageSize": 2821386
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 15,
+        "revoked": 15
+      },
+      "heap": {
+        "usedSize": 15808716,
+        "totalSize": 16809984,
+        "embedderHeapUsedSize": 4134856,
+        "backingStorageSize": 2820922
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 16,
+        "revoked": 16
+      },
+      "heap": {
+        "usedSize": 15817932,
+        "totalSize": 16809984,
+        "embedderHeapUsedSize": 4137752,
+        "backingStorageSize": 2819702
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 17,
+        "revoked": 17
+      },
+      "heap": {
+        "usedSize": 15858224,
+        "totalSize": 17072128,
+        "embedderHeapUsedSize": 4146424,
+        "backingStorageSize": 2819638
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 18,
+        "revoked": 18
+      },
+      "heap": {
+        "usedSize": 15858108,
+        "totalSize": 17334272,
+        "embedderHeapUsedSize": 4143992,
+        "backingStorageSize": 2819638
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 19,
+        "revoked": 19
+      },
+      "heap": {
+        "usedSize": 15877892,
+        "totalSize": 17334272,
+        "embedderHeapUsedSize": 4147544,
+        "backingStorageSize": 2819638
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 20,
+        "revoked": 20
+      },
+      "heap": {
+        "usedSize": 15863448,
+        "totalSize": 16809984,
+        "embedderHeapUsedSize": 4150376,
+        "backingStorageSize": 2819638
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 21,
+        "revoked": 21
+      },
+      "heap": {
+        "usedSize": 15885968,
+        "totalSize": 16809984,
+        "embedderHeapUsedSize": 4153992,
+        "backingStorageSize": 2819638
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 22,
+        "revoked": 22
+      },
+      "heap": {
+        "usedSize": 15883604,
+        "totalSize": 16809984,
+        "embedderHeapUsedSize": 4156744,
+        "backingStorageSize": 2819638
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 23,
+        "revoked": 23
+      },
+      "heap": {
+        "usedSize": 15913372,
+        "totalSize": 16809984,
+        "embedderHeapUsedSize": 4160360,
+        "backingStorageSize": 2819638
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    },
+    {
+      "urls": {
+        "count": 0,
+        "bytes": 0,
+        "created": 24,
+        "revoked": 24
+      },
+      "heap": {
+        "usedSize": 15909032,
+        "totalSize": 16809984,
+        "embedderHeapUsedSize": 4164176,
+        "backingStorageSize": 2819702
+      },
+      "dom": {
+        "documents": 1,
+        "nodes": 1883,
+        "jsEventListeners": 470
+      }
+    }
+  ],
+  "final": {
+    "urls": {
+      "count": 0,
+      "bytes": 0,
+      "created": 24,
+      "revoked": 24
+    },
+    "heap": {
+      "usedSize": 15909016,
+      "totalSize": 16809984,
+      "embedderHeapUsedSize": 4164176,
+      "backingStorageSize": 2819702
+    },
+    "dom": {
+      "documents": 1,
+      "nodes": 1883,
+      "jsEventListeners": 470
+    }
+  },
+  "errors": []
+}

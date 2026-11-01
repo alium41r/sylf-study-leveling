@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "status": "RELEASED",
+  "command": "caffeinate -i -s",
+  "sessionId": 11491,
+  "releaseRequired": false,
+  "releaseMethod": "SIGINT through the task-owned execution session",
+  "exitCode": 130,
+  "confirmedAt": "2026-10-28T11:02:11.972234+00:00"
+}

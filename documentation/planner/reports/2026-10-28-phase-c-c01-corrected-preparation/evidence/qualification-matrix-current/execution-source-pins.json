@@ -1,0 +1,18 @@
+{
+  "mode": "REHEARSE",
+  "sources": {
+    "scripts/qa/planner-phase-c/run-c01.mjs": "211a1a5507e80d2ad7382e5fe4a848838d5b9d4c89c3421d13bda328b0cb8706",
+    "scripts/qa/planner-phase-c/c01-journey.ts": "6fa1e5faa4f20d6d7644a2dd4f1a6744904afb5419a142dc96a228a59aa286ca",
+    "scripts/qa/planner-phase-c/execution-guard.mjs": "14726482cdf587a6f56a5c760a909136c53fcc680a1a2608c65396497d67e085",
+    "__tests__/planner-v2/postgres/phase-c-execution.phasec.ts": "248dae73bc996325e6bcb00a79ec763c36bae10ffd7254cfde756feb8852cad0",
+    "scripts/qa/planner-phase-c/c01-calendar.ts": "c18d9c137d456cd91ec9c2b272d3d20487965098ff541dc6ebb33b673ac96ec8",
+    "scripts/qa/planner-phase-c/c01-profile.mjs": "bcd6be80a39a0b3b9b958accaef9200d77ddbf76d57c76ffa93373b323ee6b8c",
+    "scripts/qa/planner-phase-c/operator-control.mjs": "4b02acb4e2c48abfd9793623ef596c47222793566ec235a1c19e0f60c3e2fb68"
+  },
+  "preparedManifestSha256": null,
+  "profileId": "C01-CORRECTED-2",
+  "wrapperSha256": "910252854ed89f71ce66aef9370cb94311240dd3e675fdd8a50b48dc35b3a803",
+  "paidAuthorized": false,
+  "caseId": "C01",
+  "ceilingUsd": 1.75
+}

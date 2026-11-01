@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "status": "PROPOSED_FOR_APPROVAL_BEFORE_RESPONSES",
+  "scale": {
+    "minimum": 1,
+    "maximum": 5,
+    "halfPointsAllowed": true
+  },
+  "dimensions": [
+    {
+      "id": "correctness",
+      "title": "Educational correctness and source applicability",
+      "weight": 15,
+      "anchors": {
+        "1": "Consequential teaching/example error or invented source/assessment claim.",
+        "2": "Substantial deficiencies between anchors 1 and 3; cannot be trusted without major revision.",
+        "3": "Generally correct but an important explanation/check is incomplete or weakly supported.",
+        "4": "Strong, usable result with no material defect; only limited non-consequential improvement remains.",
+        "5": "Correct, scoped, source-aware explanations and checked examples; no consequential uncertainty is concealed."
+      }
+    },
+    {
+      "id": "personalization",
+      "title": "Personalization and evidence use",
+      "weight": 15,
+      "anchors": {
+        "1": "Ignores diagnostic errors or treats confidence, videos or completion as mastery.",
+        "2": "Substantial deficiencies between anchors 1 and 3; cannot be trusted without major revision.",
+        "3": "Mentions the student but priorities/methods change little in response to actual evidence.",
+        "4": "Strong, usable result with no material defect; only limited non-consequential improvement remains.",
+        "5": "Distinctive priorities and support follow the actual errors, strengths, resources, preferences and demonstrated evidence."
+      }
+    },
+    {
+      "id": "depth",
+      "title": "Educational depth, independent transfer and stopping",
+      "weight": 15,
+      "anchors": {
+        "1": "Generic reread/practice instructions, unusable materials or invalid success criteria.",
+        "2": "Substantial deficiencies between anchors 1 and 3; cannot be trusted without major revision.",
+        "3": "Useful methods but examples, feedback, transfer or stopping criteria need material improvement.",
+        "4": "Strong, usable result with no material defect; only limited non-consequential improvement remains.",
+        "5": "Actionable explanation, complete givens, useful feedback and genuinely independent application; stop/support rules serve the outcome."
+      }
+    },
+    {
+      "id": "coverage",
+      "title": "Coverage, prioritization and necessary workload",
+      "weight": 10,
+      "anchors": {
+        "1": "Silently drops accepted scope or prescribes unjustified mandatory work.",
+        "2": "Substantial deficiencies between anchors 1 and 3; cannot be trusted without major revision.",
+        "3": "Scope is mostly covered but priorities, prerequisite logic or practice necessity are weak.",
+        "4": "Strong, usable result with no material defect; only limited non-consequential improvement remains.",
+        "5": "Complete justified coverage/deferral, coherent prerequisites and necessary workload; secure areas avoid filler."
+      }
+    },
+    {
+      "id": "practicality",
+      "title": "Workload, calendar and practical execution",
+      "weight": 15,
+      "anchors": {
+        "1": "Impossible workload, invented availability, double-booking, deadline violation or changed protected work.",
+        "2": "Substantial deficiencies between anchors 1 and 3; cannot be trusted without major revision.",
+        "3": "Technically feasible but fragile pacing, disproportionate effort or unclear study logistics.",
+        "4": "Strong, usable result with no material defect; only limited non-consequential improvement remains.",
+        "5": "Executable within genuine capacity, commitments and deadlines, with defensible effort ranges, recovery and realistic student actions."
+      }
+    },
+    {
+      "id": "fidelity",
+      "title": "Natural strategy to execution fidelity",
+      "weight": 15,
+      "anchors": {
+        "1": "Loses consequential conditions/examples/criteria, invents compulsory education or books optional work as required.",
+        "2": "Substantial deficiencies between anchors 1 and 3; cannot be trusted without major revision.",
+        "3": "Mechanically mapped but a material detail or distinction is weakened.",
+        "4": "Strong, usable result with no material defect; only limited non-consequential improvement remains.",
+        "5": "Every consequential educational element survives in execution or explicit guidance; dependencies, resources, uncertainty and stopping retain their meaning."
+      }
+    },
+    {
+      "id": "review",
+      "title": "Independent review accuracy and substantive improvement",
+      "weight": 10,
+      "anchors": {
+        "1": "Approves a serious defect, raises an unsupported blocker or claims a false objection was repaired.",
+        "2": "Substantial deficiencies between anchors 1 and 3; cannot be trusted without major revision.",
+        "3": "Finds some issues but misses a material one or only checks named changes.",
+        "4": "Strong, usable result with no material defect; only limited non-consequential improvement remains.",
+        "5": "Correctly grounded whole-result judgment; valid improvements are independently rechecked and false concerns are withdrawn. Unobserved refinement/sensitivity stays unobserved."
+      }
+    },
+    {
+      "id": "uncertainty",
+      "title": "Clarification, uncertainty and student authority",
+      "weight": 5,
+      "anchors": {
+        "1": "Guesses essential facts/permissions or conceals missing material.",
+        "2": "Substantial deficiencies between anchors 1 and 3; cannot be trusted without major revision.",
+        "3": "Discloses gaps but asks avoidable questions or gives weak decision support.",
+        "4": "Strong, usable result with no material defect; only limited non-consequential improvement remains.",
+        "5": "Asks only consequential missing facts, uses actual answers, distinguishes claims/evidence and preserves student decisions and uncertainty."
+      }
+    }
+  ],
+  "proposedIndividualThreshold": {
+    "weightedMeanAtLeast": 4.5,
+    "eachCoreDimensionAtLeast": 4.0,
+    "seriousDefectsAllowed": 0,
+    "incompleteCoreObservation": "No exceptional-quality pass; retain unobserved facets separately, without dropping them from the denominator."
+  },
+  "mechanicalGates": [
+    "Exact owned accepted-intent/source/strategy/translation/review bindings",
+    "Feasible deterministic actual allocation and unchanged protected/unselected work",
+    "Complete STOP responses and truthful role/root accounting",
+    "No uncertain dispatch, missing permissions or stale Calendar/source clearance",
+    "Actual reviewed publication before separate disposable Apply, with receipt replay"
+  ],
+  "raterProtocol": {
+    "qualificationRaters": 2,
+    "qualificationRaterType": "Independent subject-competent humans; disagreement adjudicated against evidence, not by the runtime reviewer",
+    "initialPilotAssessment": "Provisional source-based audit by this assistant/user is permitted but is not independent human qualification. This assistant also authored the cases.",
+    "blindTo": [
+      "Provider/model label where feasible",
+      "Runtime verdict and issue history until an initial independent defect list is locked",
+      "Other rater scores",
+      "Author expectations until initial judgment"
+    ]
+  },
+  "consistencyClaim": "One pilot is formative. Release ambition remains independently authored, at least 100 stratified held-out cases, repeated samples, matched strong reference workflows, per-stratum results and uncertainty; separately funded."
+}

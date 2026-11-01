@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     const weekStart = new Date(dayStart.getTime() - 6 * 24 * 60 * 60 * 1000);
 
     const rows = await prisma.aiUsageLog.findMany({
-      where: { userId, createdAt: { gte: weekStart } },
+      where: { userId, createdAt: { gte: weekStart }, accountingState: { notIn: ["RESERVED", "CANCELLED_BEFORE_DISPATCH"] } },
       select: {
         feature: true,
         workload: true,

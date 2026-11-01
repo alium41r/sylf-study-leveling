@@ -48,8 +48,8 @@ afterEach(() => {
 
 describe("production AuthProvider Notes boundary", () => {
   it("fails closed when the initial cross-tab storage barrier cannot be reserved", () => {
-    localStorage.removeItem("sylf_notes_session_barrier_v1");
-    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+    window.localStorage.removeItem("sylf_notes_session_barrier_v1");
+    vi.spyOn(window.localStorage, "setItem").mockImplementation(() => {
       throw new DOMException("full", "QuotaExceededError");
     });
     expect(() => createBrowserNotesSession("1", () => true)).toThrowError(

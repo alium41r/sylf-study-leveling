@@ -1,0 +1,165 @@
+{
+ "total": 4788,
+ "passed": 4451,
+ "failed": 36,
+ "skipped": 301,
+ "failures": [
+  {
+   "file": "scratch/calendar-postgres-check.test.ts",
+   "name": "persists, replays creates, isolates owners, detects stale writes and deletes, and preserves multiple date notes"
+  },
+  {
+   "file": "scratch/calendar-postgres-check.test.ts",
+   "name": "queries timed overlaps in the viewer zone and all-day overlaps by civil dates"
+  },
+  {
+   "file": "__tests__/auth/account-settings.test.ts",
+   "name": "Phase 3: Account Settings Data Binding & Profile Management PATCH /api/user/account successfully updates username & name, signs fresh session token, and sets cookie"
+  },
+  {
+   "file": "__tests__/auth/account-settings.test.ts",
+   "name": "Phase 3: Account Settings Data Binding & Profile Management PATCH /api/user/account resets verificationStatus to UNVERIFIED when email address changes"
+  },
+  {
+   "file": "__tests__/auth/routes.test.ts",
+   "name": "Phase 1: API Route Handlers GET /api/user/stats returns authenticated user stats and formatted scholar ID"
+  },
+  {
+   "file": "__tests__/ai/e2e-conversation.test.ts",
+   "name": "Sylvie conversation integration with the real tool executor retains cheap-answer continuity only in the adopted conversation"
+  },
+  {
+   "file": "__tests__/ai/model-migration.test.ts",
+   "name": "DeepSeek model migration has no active reference to the retired model anywhere in the tree"
+  },
+  {
+   "file": "__tests__/dashboard/pixel-auth-mutation.test.tsx",
+   "name": "Auth customization and refresh ordering cannot restore the previous account from a delayed read after login changes owner"
+  },
+  {
+   "file": "__tests__/economy/cognitive-stats.test.ts",
+   "name": "Cognitive Stats \u2014 invest API invests Sylph into a stat (+5, deducts 60, audits the ledger)"
+  },
+  {
+   "file": "__tests__/economy/cognitive-stats.test.ts",
+   "name": "Cognitive Stats \u2014 invest API invests SP into a stat (+5, deducts 1 SP)"
+  },
+  {
+   "file": "__tests__/economy/cognitive-stats.test.ts",
+   "name": "Cognitive Stats \u2014 invest API rejects when Sylph balance is too low"
+  },
+  {
+   "file": "__tests__/economy/cognitive-stats.test.ts",
+   "name": "Cognitive Stats \u2014 invest API rejects a stat at its cap"
+  },
+  {
+   "file": "__tests__/mobile/settings-navigation.test.tsx",
+   "name": "Phase 1D-G: Canonical Settings & System Hub Family Navigation renders AccountSettingsScreen when navigating to /settings/account"
+  },
+  {
+   "file": "__tests__/mobile/shop-navigation.test.tsx",
+   "name": "Phase 1D-F: Canonical Shop & Inventory Alias Parity renders canonical ShopScreen when navigating to /shop"
+  },
+  {
+   "file": "__tests__/mobile/shop-navigation.test.tsx",
+   "name": "Phase 1D-F: Canonical Shop & Inventory Alias Parity renders canonical ShopScreen when navigating to /inventory (canonical production alias)"
+  },
+  {
+   "file": "__tests__/notes/ink.test.ts",
+   "name": "production paper page management drains sustained ink revisions in bounded passes without replacing source"
+  },
+  {
+   "file": "__tests__/security/s4-ai-tool-clamps.test.ts",
+   "name": "S4: AI tool reward-inflation clamps clamps a huge requiredMinutes (1,000,000) to the 240 ceiling"
+  },
+  {
+   "file": "__tests__/security/s4-ai-tool-clamps.test.ts",
+   "name": "S4: AI tool reward-inflation clamps clamps tiny/zero requiredMinutes to the 15 floor"
+  },
+  {
+   "file": "__tests__/security/s4-ai-tool-clamps.test.ts",
+   "name": "S4: AI tool reward-inflation clamps treats malformed minutes as the 30 default (never NaN/Infinity)"
+  },
+  {
+   "file": "__tests__/profile/profile-api.test.ts",
+   "name": "Profile System APIs GET /api/profile/[username] returns public dossier with characterConfig, cognitive stats and social links"
+  },
+  {
+   "file": "__tests__/profile/profile-api.test.ts",
+   "name": "Profile System APIs GET /api/profile/[username] enforces granular privacy controls (hidden rank, hidden study hours & stats, hidden achievements)"
+  },
+  {
+   "file": "__tests__/profile/profile-api.test.ts",
+   "name": "Profile System APIs PATCH /api/profile/customization updates characterConfig, bio, banner, and social links for authenticated user"
+  },
+  {
+   "file": "__tests__/planner/exam-entry.test.tsx",
+   "name": "Planner surfaces offers Planner modes from the header and opens the chooser"
+  },
+  {
+   "file": "__tests__/planner/exam-entry.test.tsx",
+   "name": "Planner surfaces enters the chosen mode directly, without asking again"
+  },
+  {
+   "file": "__tests__/planner/exam-entry.test.tsx",
+   "name": "Planner surfaces routes each mode to its own surface"
+  },
+  {
+   "file": "__tests__/planner/exam-entry.test.tsx",
+   "name": "Planner surfaces closes the chooser on Escape and returns focus to its trigger"
+  },
+  {
+   "file": "__tests__/settings/system-achievements-api.test.ts",
+   "name": "System milestone source of truth validates redemption using the same live facts and awards only supported atomic XP/Sylph rewards"
+  },
+  {
+   "file": "__tests__/settings/system-achievements-api.test.ts",
+   "name": "System milestone source of truth retains claims and prevents a duplicate reward when the atomic race backstop fires"
+  },
+  {
+   "file": "__tests__/settings/system-collection.test.tsx",
+   "name": "Current System collection distinguishes available styles, saved personal images, official availability and local audio"
+  },
+  {
+   "file": "__tests__/social/connected-accounts.test.ts",
+   "name": "Connected Accounts & Public Dossier Privacy GET /api/profile/[username] returns verified connected accounts and STRICTLY omits Google email"
+  },
+  {
+   "file": "__tests__/social/connected-accounts.test.ts",
+   "name": "Connected Accounts & Public Dossier Privacy GET /api/profile/[username] strictly ignores legacy unverified manual socialLinks"
+  },
+  {
+   "file": "__tests__/surface/shop-surface.test.ts",
+   "name": "Surface Overhaul Phase 1 \u2014 Interactive System Store (`/shop`) Atomic Shop Purchase API Endpoint (`POST /api/shop/purchase`) executes purchase inside atomic transaction and returns remaining currency"
+  },
+  {
+   "file": "__tests__/timer/coordinator-pooler.test.ts",
+   "name": "keeps all coordination state inside one backend-bound transaction and releases it at commit"
+  },
+  {
+   "file": "__tests__/timer/coordinator-pooler.test.ts",
+   "name": "rolls a busy snapshot back and starts fresh before running work, returning its connection before retry"
+  },
+  {
+   "file": "__tests__/timer/coordinator-pooler.test.ts",
+   "name": "rolls failed writes back without leaving any session-level lock or settings behind"
+  },
+  {
+   "file": "documentation/performance/phase-0/render-diagnostics.test.tsx",
+   "name": "measures the party subscription dependency mismatch with stable and inline callbacks"
+  }
+ ],
+ "collectionFailures": [
+  "scripts/qa/planner-phase-c/c01-corrected.test.mjs",
+  "scripts/qa/planner-phase-c/execution-guard.test.mjs",
+  "scripts/qa/planner-phase-c/preparation.test.mjs",
+  "documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/initial-block/guard.test.cjs",
+  "documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/initial-block/postgres.test.ts",
+  "documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/review-low/guard.test.cjs",
+  "documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/review-low/postgres.test.ts",
+  "documentation/notes/reports/phase-1/prototype/tests/contracts.test.mjs"
+ ],
+ "scope": "Root test run, hosted variables overridden, compared with phase-11/evidence/baseline-vitest-failures.json",
+ "newFailures": 0,
+ "goneFailures": 0
+}

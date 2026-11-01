@@ -1,0 +1,5 @@
+{
+  "physicalRequests": 2,
+  "paidPotentialRequests": 2,
+  "endpoint": "https://api.deepseek.com/chat/completions"
+}

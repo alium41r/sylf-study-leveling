@@ -818,7 +818,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false, o
       <div className="px-0.5 pt-2 mt-auto border-t border-[var(--border-subtle)] relative z-10">
         <div className="relative group">
           <button
-            onClick={() => { void logout().catch(() => { /* AuthProvider displays the durable Notes recovery notice. */ }); }}
+            onClick={() => { void Promise.resolve(logout()).catch(() => { /* AuthProvider displays the durable Notes recovery notice. */ }); }}
             className={`flex items-center text-sm rounded-2xl bg-[var(--surface-2)] hover:bg-rose-500/15 border border-[var(--border-subtle)] hover:border-rose-500/30 text-[var(--text-muted)] hover:text-rose-500 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/50 shadow-sm overflow-hidden ${
               isCollapsed ? "justify-center" : ""
             }`}

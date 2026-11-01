@@ -1,0 +1,156 @@
+{
+  "status": "PASSED",
+  "baselineFiles": 5280,
+  "unchangedExistingFiles": 5256,
+  "changedExisting": {
+    "__tests__/planner-v2/postgres/understanding.postgres.ts": {
+      "before": "bdfddb4841c661a56031b49890fb7433dd577f9907f7bc5729c53409110daca2",
+      "after": "a09e0ab152903a59d449a3d9f3ae1a0925dbad1a6138ab4360ce07141e5c80c6"
+    },
+    "documentation/planner/AI_FIRST_FOUNDATION.md": {
+      "before": "e905375bab51d046c1a8f9a77233abc78d7362ec7d4f1898ae248be6655a58fb",
+      "after": "82749c0937b1283d664f1cda4c9c41e1a10e875f742bbda4d916d34616595553"
+    },
+    "lib/planner/v2/intelligence/foundation/calendar.ts": {
+      "before": "b917505a2501521817be4d13a8c0d79c11aecb06f7e1561e19e7c195c394b42e",
+      "after": "a5cdc6e55bb53e27ab34716bdc8cc9bd22e2be2be46213401716f780b4d0bb70"
+    },
+    "lib/planner/v2/intelligence/foundation/contracts.ts": {
+      "before": "e3c99181b6bcd4da61b07aa505ea764c83ec58607ad3f44a0bfa2c1ab52d7196",
+      "after": "e450485d2a711d42cdcce607cb0090abafd0ca54c167c5474b531cb3316160ce"
+    },
+    "lib/planner/v2/intelligence/foundation/validation.ts": {
+      "before": "545151cb7455ef42aa9fa1e79d29cbfe4002d54c6aa7624e5bd2760b00acf055",
+      "after": "0422cde7bc2590086d04627b49bbf85a4f33a03c749a16de8a049e2782afdd1a"
+    },
+    "lib/planner/v2/server/foundation.ts": {
+      "before": "7559bd1fc67371058453b801424968d4d3c03a1373bdd534e43ba2bdf3f6bcc1",
+      "after": "05b03f8423a4acd27d663cd284bcc52399b9ea80df6f241a94af45a6b1b967cd"
+    },
+    "scripts/test/test-planner-ai-first-foundation.mjs": {
+      "before": "0f02f2f5524adf5b8719d6432e8fe70d3fa152418b1be39d7c7dfdf10264bb40",
+      "after": "059ff1297a7955fb5a6a5efb0dd25028127e98177cc0bd91bdb7c23e800970f8"
+    },
+    "documentation/calendar/README.md": {
+      "before": "f5867e8444e30c7f0fa9f512a9d216a5eb96e5c64a4b696011c11768f85715c1",
+      "after": "658eeadb7b3c84476c76fdc2be91ecd60dc09e8d8fdb2113a428ff4f37a2b842"
+    },
+    "documentation/planner/README.md": {
+      "before": "64531837ad22ad4808087ec3638a2105acc85d49075ee738f5e400cfb9ac7a07",
+      "after": "0f8750bc96d3bdde787f9e127071b6af45004d27cfb56c90cd8c312c8ca74a21"
+    },
+    "lib/calendar/contracts.ts": {
+      "before": "a3f425f5f2201370df86b83fe33a19689a874a656491534cd1310b58fdf1a6c9",
+      "after": "59a5180592bd5b9372c3a4310d0f21714e3e6000443330f20e56f9e8992ad407"
+    },
+    "lib/calendar/dates.ts": {
+      "before": "f8291dd3caedb1df06c8ab7a7780cc01b477047a84ed34be20e5c3038696bca1",
+      "after": "d0c15872f02d5dd650fe7461532164ff292052a579e7d51da8f4163e170167d3"
+    },
+    "lib/calendar/external/providers.ts": {
+      "before": "082c5e003cdfccab6003f887dc3717e7f3caa856d55aa5a84b58441786a0b6bd",
+      "after": "4bdca90f27c5dfbdedc436fd51cc3322ae46b40569f587f3377ba3cc2af1d2cd"
+    },
+    "lib/calendar/external/service.ts": {
+      "before": "c569d321c6c71abc782425b5828bcef27880098189e921fe6767d67bb440f5f8",
+      "after": "5cbfb0afde783090eb472058569d3f54769b0d1af6ebca3326a602508da0f09e"
+    },
+    "lib/calendar/ink.ts": {
+      "before": "a467a06156b458eae0550a2622bac71e395f44b9f2c41afd2a64b5f0ce8194ed",
+      "after": "d3819d99e1469f4df15ccdb0c6245a7262be2bd9f0e4a143169524863a468355"
+    },
+    "lib/calendar/personal-service.ts": {
+      "before": "1c57ca1b4c671b74a918c5ed90400b8f5a4c9ef8bc75ece13ebae009032a9d69",
+      "after": "bdcd525da7a75657adfe4cfeabddc9e0149ee394fb89ad803c4a6de026ff0c63"
+    },
+    "lib/calendar/recurrence.ts": {
+      "before": "8ec2164964ab046b0f7ec107944d6a9d392806dbf9d8f95d88ef31aa9e6f7a85",
+      "after": "d3e425e87d13f17f13a7650caa1c33cf7af4546b600a5d2255a1d03f601b2e16"
+    },
+    "lib/planner/v2/contracts/intent.ts": {
+      "before": "474d8847506ab5f3ee886e375ac3390a9b2e5a805c85343e559fe761dded9b51",
+      "after": "a6871230f5b9e614cdaf0de5551917fab0d0b2368c8526aabd1569c5074a8c36"
+    },
+    "lib/planner/v2/intelligence/allocator.ts": {
+      "before": "81bc5f691e9993f8ea3ad2f1ce798a79952622271346108f7a1eaa96d19c5499",
+      "after": "0affe54dd7af0cc669cc8cced1c8a11f18141d5cfb1a914b55c451ee6d19a4a0"
+    },
+    "lib/planner/v2/intelligence/capacity.ts": {
+      "before": "56989fb9d74637b6536a952dfa63b57fb4e5cdd9b19968807052de0c5cb2f4ad",
+      "after": "08a95f8f964a1e4173cbe0855e007f024e0082fcb614b66eecc1c5397dba954e"
+    },
+    "lib/planner/v2/intelligence/schemas/planning.ts": {
+      "before": "e8c2976f642352176241be527ee4461ab2521081ae850e8d2ac4f385e6cc7576",
+      "after": "ce731ad3c150be2687f071bcc813056814d2cbff416b2113522e5dd2dcb5c3f9"
+    },
+    "lib/planner/v2/intelligence/schemas/scheduling.ts": {
+      "before": "482f75e33ca156ddb01142257904c8a624596b784a486e43e791ce19d19768da",
+      "after": "7339c4402f1865766b950ee004200bb987418ade58c33ef8844f354eeb73c25a"
+    },
+    "lib/planner/v2/server/attempts.ts": {
+      "before": "a3d60a89e9a13e94675746137024e12be18da461ae14b466776986b3f4b07aff",
+      "after": "3c672b05f27b20687272800f3ca713ed77a8e9b1a175ab52e6d901a87e36b078"
+    },
+    "lib/planner/v2/server/compiler.ts": {
+      "before": "d1bb38a999937bd57089daaadbdcfa8505f3711518a4708a8e0a36aa1c87d698",
+      "after": "c768aab0fc16093095a738ece6a4572e5768c0fab69ceaf830b1a0db7e560a23"
+    },
+    "lib/planner/v2/server/worker.ts": {
+      "before": "a63344996e76418fdb8eee6f850851b9f2d095263911fc395132ce7c842f4eb4",
+      "after": "e64ad1b280b702141dc541376f32e2158f4ad8056e67516bf36ed02e841a60a5"
+    }
+  },
+  "newTaskFiles": [
+    "__tests__/planner-v2/intelligence/calendar-capacity.test.ts",
+    "__tests__/planner-v2/postgres/calendar-capacity.postgres.ts",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/README.md",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/STEP_5_HANDOFF.md",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/README.md",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/calendar-postgres-results.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/calendar-postgres-runner.mjs",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/documentation-checks.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/expanded/focused/postgres-current-results.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/expanded/focused/postgres-harness-run.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/expanded/focused/postgres-phase1-results.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/expanded/focused/postgres-source-pins.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/final-gate/postgres-current-results.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/final-gate/postgres-harness-run.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/final-gate/postgres-phase1-results.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/final-gate/postgres-source-pins.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/final-unit-results.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/final/postgres-current-results.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/final/postgres-harness-run.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/final/postgres-phase1-results.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/final/postgres-source-pins.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/full/postgres-current-results.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/full/postgres-harness-run.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/full/postgres-phase1-command-error.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/full/postgres-phase1-results.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/full/postgres-source-pins.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/initial/focused/postgres-current-results.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/initial/focused/postgres-harness-run.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/initial/focused/postgres-phase1-command-error.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/initial/focused/postgres-phase1-results.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/initial/focused/postgres-source-pins.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/lint.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/preservation.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/qualified-final/postgres-current-results.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/qualified-final/postgres-harness-run.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/qualified-final/postgres-phase1-results.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/qualified-final/postgres-source-pins.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/scoped-whitespace.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/unit-results.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/verification.json",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/worker-imports.json",
+    "lib/calendar/planning.ts",
+    "lib/calendar/projection.ts",
+    "lib/planner/v2/server/calendar-capacity.ts",
+    "prisma/migrations/20261026020000_planner_calendar_capacity/migration.sql"
+  ],
+  "unexpectedChanged": [],
+  "unexpectedNew": [],
+  "removedExisting": [],
+  "priorMigrationChanges": [],
+  "earlierEvidenceChanges": [],
+  "note": "Hashes captured at Step 4 task start include tracked and untracked prior work. Existing unrelated work and prior migrations/evidence remain byte-identical."
+}

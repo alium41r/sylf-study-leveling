@@ -1,9 +1,10 @@
 import { executionTransaction } from "@/lib/execution-coordination";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth-server";
-import { AUTH_COOKIE_NAME } from "@/lib/auth";
+import { expireSessionCookie } from "@/lib/auth-session-service";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { checkSecurityCode } from "@/lib/security-code";
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,23 +44,15 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const tokenKey = `DELETE_ACCOUNT:${code.trim()}`;
-      const validToken = await prisma.verificationToken.findFirst({
-        where: {
-          userId: session.userId,
-          token: tokenKey,
-          expiresAt: { gt: new Date() },
-        },
-      });
-
-      if (!validToken) {
+      const check = await checkSecurityCode(session.userId, "DELETE_ACCOUNT", code.trim());
+      if (!check.valid) {
         return NextResponse.json(
-          { error: "Invalid or expired security code. Please request a new one." },
-          { status: 400 }
+          { error: check.retryAfterSeconds ? "Too many wrong codes. Request a new one." : "Invalid or expired security code. Please request a new one." },
+          { status: check.retryAfterSeconds ? 429 : 400 }
         );
       }
 
-      verifiedTokenId = validToken.id;
+      verifiedTokenId = check.tokenId;
     }
 
     // Delete user (cascades to all child relations)
@@ -81,13 +74,7 @@ export async function POST(req: NextRequest) {
     );
 
     // Clear session cookie
-    response.cookies.set(AUTH_COOKIE_NAME, "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 0,
-      path: "/",
-    });
+    expireSessionCookie(response, req, session);
 
     return response;
   } catch (error) {

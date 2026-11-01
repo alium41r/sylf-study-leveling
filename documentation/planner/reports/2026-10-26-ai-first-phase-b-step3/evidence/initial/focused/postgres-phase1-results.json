@@ -1,0 +1,354 @@
+{
+  "label": "phase1",
+  "files": 6,
+  "passed": 73,
+  "failed": 2,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [
+    {
+      "name": "durable compiler-v2 Research & Understanding reads owned uploaded contents and independently checks support without upgrading private issuer authority",
+      "messages": [
+        "AssertionError: expected { schemaVersion: 2, …(5) } to match object { claims: [ { …(2) } ] }\n(13 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/aliumair/Desktop/sylf/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-b5hO2s/__tests__/planner-v2/postgres/understanding.postgres.ts:74:38\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable compiler-v2 Research & Understanding recovers the exact saved model response after a crash without a duplicate call",
+      "messages": [
+        "Error: A logical role call cannot change inputs or operation.\n    at reject (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-b5hO2s/lib/planner/v2/server/database.ts:24:9)\n    at recoverRoleReceipt (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-b5hO2s/lib/planner/v2/server/role-accounting.ts:111:117)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at PlannerDatabase.coordinated (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-b5hO2s/lib/planner/v2/server/database.ts:84:24)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-b5hO2s/lib/planner/v2/intelligence/provider.ts:205:21)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-b5hO2s/lib/planner/v2/server/understanding.ts:194:24)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-b5hO2s/__tests__/planner-v2/postgres/understanding.postgres.ts:108:19\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-b5hO2s/__tests__/planner-v2/postgres/ai-first-foundation.postgres.ts",
+      "cases": [
+        {
+          "name": "AI-first retained artifacts on the actual durable core retains exact strategy bytes and versions, with replay and CAS",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core rejects foreign owners and forged accepted-intent correspondence",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core database backstops reject rewriting retained entries or appending without a fence",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core retains archives and accounting through lease takeover, rejecting stale and cancelled writers",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core cannot enter the legacy compiler/publication path or mutate execution",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core rejects unknown checkpoint interpretations even without a new archive",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core persists pending call identity and the complete accepted response before takeover assembly",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core keeps research-only work read-only",
+          "status": "passed"
+        },
+        {
+          "name": "AI-first retained artifacts on the actual durable core checks new storage guards at worker startup and preserves account erasure",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-b5hO2s/__tests__/planner-v2/postgres/compiler-versions.postgres.ts",
+      "cases": [
+        {
+          "name": "compiler admission, dispatch and historical compatibility admits v2 only from trusted service configuration and binds exact replay",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility defaults old admission to v1, retains it through recovery and forbids conversion",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility prevents a pre-versioning worker from claiming v2 during a mixed deployment",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility dispatches v2 in the existing worker without legacy calls or publication",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility keeps legacy checkpoint and resource writers closed for v2",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility recovers a fenced v2 checkpoint without resetting its version, deadline or archive",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility retains exact historical strategy and correspondence after newer drafts, cancellation and ownership checks",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility preserves canonical v1 publication, historical read, apply replay and protected execution",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility retains hard exam deadlines when fixtures intentionally exceed them",
+          "status": "passed"
+        },
+        {
+          "name": "compiler admission, dispatch and historical compatibility reads pre-V2 historical snapshots without fabricating a blueprint or reviewer approval",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-b5hO2s/__tests__/planner-v2/postgres/generation-integration.postgres.ts",
+      "cases": [
+        {
+          "name": "existing generation requires authentication and enabled V2 admission before writes",
+          "status": "passed"
+        },
+        {
+          "name": "strict server admission rejects client budget and permission and forged mastery before writes",
+          "status": "passed"
+        },
+        {
+          "name": "queues without execution and durable operation/workspace reads recover the accepted target",
+          "status": "passed"
+        },
+        {
+          "name": "replays exact canonical input without duplicate creation and rejects changed-key reuse",
+          "status": "passed"
+        },
+        {
+          "name": "existing foreign target returns ownership failure without creating a first new joint target",
+          "status": "passed"
+        },
+        {
+          "name": "joint final-intent saving and enqueue roll back together on a late enqueue failure",
+          "status": "passed"
+        },
+        {
+          "name": "new plan and reserved intent roll back when enqueue is unavailable",
+          "status": "passed"
+        },
+        {
+          "name": "checks both current baselines before editing and rejects duplicate targets",
+          "status": "passed"
+        },
+        {
+          "name": "abort after final intent saving rolls the whole admission back",
+          "status": "passed"
+        },
+        {
+          "name": "the HTTP supervised compiler produces a sealed candidate that canonical confirmation applies exactly once",
+          "status": "passed"
+        },
+        {
+          "name": "final edited intent enqueues and replay survives the version increment",
+          "status": "passed"
+        },
+        {
+          "name": "joint compiled candidates apply all or none and the canonical route recovers after transaction rollback",
+          "status": "passed"
+        },
+        {
+          "name": "zero-new-work reviewed candidate confirms without manufacturing a Quest",
+          "status": "passed"
+        },
+        {
+          "name": "actual started execution is KEPT across compiler and canonical apply",
+          "status": "passed"
+        },
+        {
+          "name": "capacity changes after actual compiler publication block canonical apply without execution writes",
+          "status": "passed"
+        },
+        {
+          "name": "maximum HTTP transport and over-count targets fail explicitly with no partial admission",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-b5hO2s/__tests__/planner-v2/postgres/role-resources.postgres.ts",
+      "cases": [
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL retains natural TEXT exactly, sends explicit effort/cap, and records reasoning once with effective identity",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL supports JSON translation/review and more than the legacy six/five-call ceiling",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL serializes concurrent reservations and preserves translation plus review/verification holdbacks",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL continues one root without resetting counters, quota or deadline and prevents sibling branches",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL retains uncertain spend through stopping and permits continuation only after actual reconciliation",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL resumes a complete response after takeover and never repeats its provider call",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL retains incomplete output and actual usage without approval, silent repetition or provider fallback",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL expires role work even when the provider ignores abort and reconciles late spend without changing failed history",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL enforces ownership and immutable policy/deadline at both service and SQL boundaries",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL keeps truthful actual overrun and unknown price while stopping further work",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL binds saved checkpoint text to its actual role receipt rather than a fabricated response",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL admits only one child under simultaneous continuations",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL keeps missing accounting usage uncertain and blocks subsequent role dispatch",
+          "status": "passed"
+        },
+        {
+          "name": "compiler v2 role resources on genuine PostgreSQL retains actual spend on physical response overflow without clipping the education",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-b5hO2s/__tests__/planner-v2/postgres/timer-lifecycle.postgres.ts",
+      "cases": [
+        {
+          "name": "timer lifecycle on genuine PostgreSQL settles delayed Focus Party exits once and ignores a replay after rejoining",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL cuts off an in-flight party pause/resume at the original saved exit and preserves the prior participation base",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL closes a Focus Party when its last members leave concurrently",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL denies direct public economic RPC calls with a fabricated timer owner",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL uses authoritative pause/resume and receipt replay for an ordinary timer",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL pays zero-delta final settlement exactly once after all time was checkpointed",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL freezes final time, rewards and end timestamp against late higher/lower heartbeats and retries",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL replays a lost start response after END and converges concurrent creation on one row",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL recovers a long offline creation without the old 30-minute truncation",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL does not silently close another subject's unsaved active session",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL keeps focus plus break inside one wall budget when stale writers disagree",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL recovers a delayed weekly mission once and repairs the streak without rewinding its latest week",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL rejects foreign sessions and forged Quest linkage without changing any ledger",
+          "status": "passed"
+        },
+        {
+          "name": "timer lifecycle on genuine PostgreSQL replays offline V2 pause/resume/end intervals with exact accounting and durable receipts",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-b5hO2s/__tests__/planner-v2/postgres/understanding.postgres.ts",
+      "cases": [
+        {
+          "name": "durable compiler-v2 Research & Understanding completes a context-only dossier without unnecessary questions or web research",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding reads owned uploaded contents and independently checks support without upgrading private issuer authority",
+          "status": "failed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding retains consequential clarification and continues with original root, deadline, exact instructions and accounting",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding requires explicit student-accepted canonical changes for hard facts and retains old immutable intent history",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding rejects foreign ownership, stale decision digests, incomplete answers and concurrent sibling decisions",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding recovers the exact saved model response after a crash without a duplicate call",
+          "status": "failed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding blocks silent repeats and continuations after an uncertain search dispatch",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding retains real search provenance, safe fetch hops and known per-request DeepSeek cost",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding refuses invented fetch URLs and does not dispatch research without accepted permission",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding rejects changed uploaded bytes before recovering a saved dossier",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding keeps cancellation, original deadline and closed downstream compiler gates authoritative",
+          "status": "passed"
+        },
+        {
+          "name": "durable compiler-v2 Research & Understanding database guards reject changed research input and financial receipt identity",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

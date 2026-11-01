@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 import { localToday } from "@/lib/planner/dates";
+import { studentWorkspaceEnabled } from "@/lib/planner/v2/server/student-workspace";
 export const dynamic = "force-dynamic";
 
 /**
@@ -36,6 +37,7 @@ export async function GET(req: Request) {
         today: localToday(user.timezone),
         restDays: user.restDays,
         subjects,
+        studentWorkspace: { enabled: studentWorkspaceEnabled() },
       },
       { headers }
     );

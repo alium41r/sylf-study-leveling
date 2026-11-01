@@ -1,0 +1,100 @@
+{
+  "open": {
+    "url": "http://127.0.0.1:4390/#/notes?library=f2a46f6d-52fc-4a7e-92e7-0b19e51b4f30&document=800e6778-e2df-4348-b6f0-2731b6635d96&page=3ec9aaa4-fbb5-4ad7-b5ac-70c75a8027e5",
+    "errors": [],
+    "state": {
+      "id": "800e6778-e2df-4348-b6f0-2731b6635d96",
+      "page": "3ec9aaa4-fbb5-4ad7-b5ac-70c75a8027e5",
+      "strokes": 1,
+      "streams": 2
+    },
+    "text": "Electromagnetic induction\n\nA changing magnetic field produces an electromotive force."
+  },
+  "regression": {
+    "results": [
+      "Mixed text/ink survives reload",
+      "Bounded 60–400% desktop zoom and fit width",
+      "Positioned rich text on the same ink page",
+      "Independent mixed-layer page duplication",
+      "Focus mode and bottom toolbar",
+      "Tablet and phone layout, custom appearance, ink options, library return"
+    ],
+    "positioned": {
+      "id": "800e6778-e2df-4348-b6f0-2731b6635d96",
+      "strokes": 1,
+      "pages": 1,
+      "streams": 2,
+      "origin": {
+        "id": "body",
+        "x": 108,
+        "y": 200,
+        "width": 672,
+        "height": 100,
+        "kind": "text"
+      }
+    }
+  },
+  "creative": {
+    "results": [
+      "Independent rich-text boxes retain typing, drag, resize and keyboard nudges across reload",
+      "Pressure-aware fountain brush, saved favorite, dashed shapes and precision erasing with undo/redo persist",
+      "Template gallery, encrypted defaults, arranged images, composite PDF, dark adaptation and responsive panels verified"
+    ],
+    "exported": {
+      "bytes": 93998,
+      "pages": 2,
+      "pens": 4,
+      "style": {
+        "paper": {
+          "template": "weekly",
+          "color": "#dfebe5",
+          "rule": "#d9dfea",
+          "spacing": 28
+        },
+        "width": 800,
+        "height": 1100,
+        "layout": "paged",
+        "adaptDark": true
+      }
+    },
+    "defaults": {
+      "adaptDark": true,
+      "height": 1100,
+      "layout": "paged",
+      "paper": {
+        "color": "#dfebe5",
+        "rule": "#d9dfea",
+        "spacing": 28,
+        "template": "weekly"
+      },
+      "width": 800
+    }
+  },
+  "workflows": {
+    "results": [
+      "Nested folders, folder cards, grid/list and actual text previews",
+      "Image import through original encrypted attachment pipeline",
+      "Real PDF import, local worker rendering and selectable source text",
+      "Composite text/ink Drive PDF, synthetic sync and sustained typing with caret navigation",
+      "Readable copies preserve unopened original ink pages alongside new text layers"
+    ],
+    "imageState": {
+      "assets": 1,
+      "streams": 2,
+      "strokes": 1
+    },
+    "exported": {
+      "bytes": 93998,
+      "pages": 2,
+      "pending": 0
+    },
+    "legacyExport": {
+      "changed": true,
+      "pages": 2
+    },
+    "caret": {
+      "bottom": 1024,
+      "hostBottom": 1112
+    }
+  }
+}

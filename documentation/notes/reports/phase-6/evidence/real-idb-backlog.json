@@ -1,0 +1,82 @@
+{
+  "scope": "Chromium real IndexedDB/AES-GCM/production repository and Google pack transport. Synthetic HTTP, no live Drive.",
+  "revisions": 1000,
+  "saves": {
+    "p50Ms": 3.600000001490116,
+    "p95Ms": 12.299999997019768
+  },
+  "closure": {
+    "ms": 1060.8000000044703,
+    "reads": 2001,
+    "unique": 2001,
+    "objects": 2001
+  },
+  "integrity": {
+    "ms": 940.6000000014901,
+    "reads": 2001,
+    "unique": 2001,
+    "issues": []
+  },
+  "publish": {
+    "ms": 14716.5,
+    "batches": [
+      {
+        "count": 100,
+        "ms": 2944.39999999851
+      },
+      {
+        "count": 100,
+        "ms": 1610.8999999985099
+      },
+      {
+        "count": 100,
+        "ms": 1307.7999999970198
+      },
+      {
+        "count": 100,
+        "ms": 1461
+      },
+      {
+        "count": 100,
+        "ms": 1623.5
+      },
+      {
+        "count": 100,
+        "ms": 1025.7999999970198
+      },
+      {
+        "count": 100,
+        "ms": 1012.8000000044703
+      },
+      {
+        "count": 100,
+        "ms": 947.2000000029802
+      },
+      {
+        "count": 100,
+        "ms": 1548.2000000029802
+      },
+      {
+        "count": 100,
+        "ms": 1189.1000000014901
+      },
+      {
+        "count": 0,
+        "ms": 42.5
+      }
+    ],
+    "published": 1000
+  },
+  "restore": {
+    "ms": 5537,
+    "revisions": 1000
+  },
+  "storage": {
+    "objects": 2001,
+    "objectBytes": 940128,
+    "revisions": 1000,
+    "pending": 0,
+    "stagedAssets": 0
+  },
+  "errors": []
+}

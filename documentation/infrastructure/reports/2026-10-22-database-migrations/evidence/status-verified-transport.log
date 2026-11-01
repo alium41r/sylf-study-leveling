@@ -1,0 +1,25 @@
+{
+  "pending": [
+    "20261018010000_calendar_scheduling",
+    "20261018020000_external_calendars",
+    "20261018030000_calendar_completion",
+    "20261020000000_notes_connections"
+  ],
+  "unresolved": [
+    "20261018010000_calendar_scheduling"
+  ]
+}
+Datasource "db": PostgreSQL database "postgres", schema "public" at "127.0.0.1:59944"
+
+70 migrations found in prisma/migrations
+Following migrations have not yet been applied:
+20261018020000_external_calendars
+20261018030000_calendar_completion
+20261020000000_notes_connections
+
+To apply migrations in development run prisma migrate dev.
+To apply migrations in production run prisma migrate deploy.
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Verified remote TLS connections: 2

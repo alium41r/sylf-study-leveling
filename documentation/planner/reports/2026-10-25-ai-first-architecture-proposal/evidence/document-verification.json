@@ -1,0 +1,80 @@
+{
+  "recordedAtUtc": "2026-10-25T05:42:41.208077+00:00",
+  "clientDate": "2026-10-25",
+  "status": "PROPOSED_FOR_REVIEW_NOT_IMPLEMENTED",
+  "scope": "Reviewed local source/document snapshot and document-reference verification; not technical regression or educational qualification",
+  "sourceAndEvidencePins": {
+    "lib/planner/v2/intelligence/blueprint.ts": "4d4d8eed0a14f9c21809045096c8afd3df7839550dbc1ea9bc8b85ff822082a0",
+    "lib/planner/v2/intelligence/schemas/blueprint-response.ts": "0609a7061f86ace43cc769d32f4a3639ccb78aa486f7e9f8d7355fb74a89719e",
+    "lib/planner/v2/intelligence/quality.ts": "df851468196c5d7c60a9d78dffa1cd83fde4e3c555ba1276a20d60849c9b7b68",
+    "lib/planner/v2/intelligence/provider.ts": "cfe507e6fee3b2a5a235bc67fa58149ae13e49190edfeae6312a2a53e7a36f80",
+    "lib/planner/v2/intelligence/provider-policy.ts": "2a91cef9945f74eedaeb48bfd0e4e60422ff512dfe711cbff4650a15a6cb2f0b",
+    "lib/planner/v2/intelligence/allocator.ts": "81bc5f691e9993f8ea3ad2f1ce798a79952622271346108f7a1eaa96d19c5499",
+    "lib/planner/v2/intelligence/context.ts": "2dbf57c3e1d95f1040f8bd51fe46d0a3ee7d0eb612af24fb87eb96d18f096c66",
+    "lib/planner/v2/intelligence/schemas/checkpoint.ts": "23105b162ec131963cbc0fa9e068d4a54f6bdcda22ef4192c1728da39a015f29",
+    "lib/planner/v2/intelligence/schemas/quality.ts": "ef151337c7f23dcceba5b6a10a6b637522470af9222f8b662b7b0d070e85595d",
+    "lib/planner/v2/intelligence/schemas/scheduling.ts": "482f75e33ca156ddb01142257904c8a624596b784a486e43e791ce19d19768da",
+    "lib/planner/v2/contracts/envelope.ts": "3d8bedf93e5d8bf29ad80841f1f11205c576d25f13e7bafe159f0fb3921e382b",
+    "lib/planner/v2/contracts/operations.ts": "22579b5f3f3b3aeee0e5d8c2db5412d9e8b7e31e1c19d38a95a6ebc340e60e8c",
+    "lib/planner/v2/contracts/artifacts.ts": "2d28f60affbab80b0b674f1b35e975f63974bccbe45b5dcfd2a42015bba0fd75",
+    "lib/planner/v2/contracts/blueprint.ts": "409fbcaeaa15acb8dc9d1bee80e8612abb4553ecc7381d2e7965536ac649f4ab",
+    "lib/planner/v2/server/compiler.ts": "75751e5dedf83b99b10fdd0a77da5c79e523cda2e310fba93dbd7d6321109d34",
+    "lib/planner/v2/server/learning.ts": "22387116207eeaa81629f4687129088fcf28886d1305bf8b73016662a36ed702",
+    "lib/planner/v2/server/assistant.ts": "e1969ed65e3b411cbaa00555bd5856f74826bfda056f47efba41231f7e1344c9",
+    "lib/planner/v2/server/research.ts": "b203a1322a42332abe6f91bbbb944d73bf6e99e6f74a3a09c7d37443252d6477",
+    "lib/planner/v2/server/context.ts": "01c320a948f244ffc19c603a27fa6b10c77f75c624708b2a7897992a1b7971c6",
+    "lib/planner/v2/server/compilation.ts": "7884b7ded89a61fd5e60544f154c1b12ba80d18c59005ec8ee9fb3e17dcd3674",
+    "lib/planner/v2/server/revisions.ts": "b4c259b1d7e22f3af7d9d2299b7bc9ae3780f420cb4400db767b1239fe3fbba0",
+    "lib/planner/v2/server/apply.ts": "7c264f096499bf543379b9ce82ad9b55898bf40341638a86968bad6636430357",
+    "lib/planner/v2/server/attempts.ts": "c33e17ddc1eec5b67d3c25e36ded7cbbf1412235380ee8438ea3a2db798c64b1",
+    "lib/planner/v2/server/accounting.ts": "23645a46cfa7acd0d4a5deaaf79fda500094ef19f9bde0ec7ad4f39229dc9f57",
+    "lib/ai/agent-router.ts": "a74b2ac1cdcf3a01bd354769d2e5a2a6910d82cd243ded91266f578bf24c96f8",
+    "lib/ai/providers/deepseek.ts": "02af8918db90130681c32b2d50f5caa1d919aef647c0e3016028fab2e07d889f",
+    "lib/calendar/scheduling.ts": "d36e5af8b88491326ee26ffc731243e0fcc7c59e3efa197e7f100fbf7bd142db",
+    "lib/calendar/intelligence.ts": "56b1160f289459087399661668d3df8e4751ef040b00fee368b7067650e2e454",
+    "lib/calendar/personal-service.ts": "1c57ca1b4c671b74a918c5ed90400b8f5a4c9ef8bc75ece13ebae009032a9d69",
+    "documentation/planner/PLANNER_TARGET_ARCHITECTURE.md": "899a31f164c481907a89286507a71c613e5a27813140b2eaf951e7ec718ca365",
+    "documentation/calendar/README.md": "f5867e8444e30c7f0fa9f512a9d216a5eb96e5c64a4b696011c11768f85715c1",
+    "documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/inputs/ASTRA_INTELLIGENCE_AUDIT.md": "1068fa85dd67bb1d7cbef447ab79f9fd7f34a023bc3dab4f8ec236479d763a42",
+    "documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/inputs/ASTRA_REVISION_PLAN.md": "8090ad52db817688f5a605d8e4c95965a9dbb7334cd0db922230de43b83f13bd",
+    "documentation/planner/reports/2026-10-09-step6-interface-changeset1/README.md": "bfb789490d9283bc7b7664d26a8f4aa556854a6c6188edbb6465cddf8926603d",
+    "documentation/planner/reports/2026-10-09-step6-interface-changeset2/README.md": "cfbfb26686afb40c5399bbf1e6166d8159b56ee063b5d01e9e6d4fb91c485f07",
+    "documentation/planner/reports/2026-10-09-step6-interface-changeset3/README.md": "33414b8081d877af21ddd9c429dfc47f5b5de6311f66ab1604740cfffaa560d4",
+    "documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/initial-block/EXECUTION_REPORT.md": "4c2b9327b838a0366c6c7ae92748a4a93f5968f61a68b900f7f2f9b864f8bed6",
+    "documentation/planner/reports/2026-10-09-step6-controlled-diagnostics/review-low/EXECUTION_REPORT.md": "505158e6f444274609f70cb0a157e81811d7a802b473686184dec07a81031e58",
+    "documentation/planner/reports/2026-10-10-step6-free-plan-experiment/EXECUTION_REPORT.md": "c63e90571292e2e3eaf6e2f4b5cf6858a7fd6e6c73b40bb6434f7c13764fb46d"
+  },
+  "proposalSha256": "6d4117ce2485d9febfb29f6f38e20be422890a2a6e82036b8ee065309826de1e",
+  "localLinksChecked": 13,
+  "missingLinks": [],
+  "whitespace": "PASS",
+  "implementationChanged": false,
+  "productionConfigurationChanged": false,
+  "paidCalls": 0,
+  "testsRun": false,
+  "externalSources": [
+    {
+      "url": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "checkedOnClientDate": "2026-10-25",
+      "observedFlashVersion": "DeepSeek-V4.1-Flash-1017",
+      "peakUsdPerMillion": {
+        "inputCacheMiss": 0.3,
+        "inputCacheHit": 0.006,
+        "completionIncludingReasoning": 1.2
+      }
+    },
+    {
+      "url": "https://api-docs.deepseek.com/guides/thinking_mode/",
+      "checkedOnClientDate": "2026-10-25"
+    },
+    {
+      "url": "https://api-docs.deepseek.com/api/create-chat-completion/",
+      "checkedOnClientDate": "2026-10-25"
+    }
+  ],
+  "limits": [
+    "Source snapshot is not a freeze for future implementation",
+    "No independent agent or human expert assessed this architecture proposal",
+    "No empirical claim that natural planning or additional agents improve quality"
+  ]
+}

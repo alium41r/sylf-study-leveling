@@ -27,6 +27,7 @@ const PROTECTED_ROUTES = [
   "/timer",
   "/social",
   "/system",
+  "/planner",
   "/goals",
   "/quests",
   "/locker",

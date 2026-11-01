@@ -1,0 +1,33 @@
+{
+  "runId": "unpaid-CANCEL_IN_FLIGHT",
+  "mode": "CANCEL_IN_FLIGHT",
+  "state": "STOP_REQUESTED",
+  "stopReason": "OPERATOR_CANCELLED",
+  "physicalRequests": 0,
+  "roles": [
+    {
+      "sequence": 1,
+      "role": "RESEARCH",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 2,
+      "role": "VERIFICATION",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 3,
+      "role": "VERIFICATION",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 4,
+      "role": "SYNTHESIS",
+      "finished": true,
+      "stopReason": "OPERATOR_CANCELLED"
+    }
+  ]
+}

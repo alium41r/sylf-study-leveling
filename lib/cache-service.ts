@@ -13,6 +13,8 @@ export interface CachedLeaderboardEntry {
   studyHours: number;
   streakDays: number;
   questsCompleted: number;
+  /** The person's own settings, kept with the entry because this list is shared and each viewer sees it differently. */
+  privacy: { profileVisibility: string; showRank: string; showStudyHours: string };
 }
 
 /**
@@ -23,7 +25,7 @@ export const getCachedGlobalRankings = unstable_cache(
   async (): Promise<CachedLeaderboardEntry[]> => {
     // Redis (or in-process fallback) absorbs the leaderboard reads across
     // serverless instances; the DB only recomputes every 120s per key.
-    const allUsers = await cachedWithRedis("rankings:global", 120, async () => {
+    const allUsers = await cachedWithRedis("rankings:global:v2", 120, async () => {
       return prisma.user.findMany({
         select: {
           id: true,
@@ -34,10 +36,8 @@ export const getCachedGlobalRankings = unstable_cache(
           currentXP: true,
           totalStudyMinutes: true,
           streakDays: true,
-          quests: {
-            where: { status: "COMPLETED" },
-            select: { id: true },
-          },
+          privacy: { select: { profileVisibility: true, showRank: true, showStudyHours: true } },
+          _count: { select: { quests: { where: { status: "COMPLETED" } } } },
         },
       });
     });
@@ -52,7 +52,9 @@ export const getCachedGlobalRankings = unstable_cache(
       totalStudyMinutes: u.totalStudyMinutes,
       studyHours: Math.floor(u.totalStudyMinutes / 60),
       streakDays: u.streakDays,
-      questsCompleted: u.quests.length,
+      questsCompleted: u._count.quests,
+      // Older accounts may have no privacy row, and every other route reads that as public.
+      privacy: u.privacy ?? { profileVisibility: "PUBLIC", showRank: "PUBLIC", showStudyHours: "PUBLIC" },
     }));
   },
   ["global-rankings-cache-key"],

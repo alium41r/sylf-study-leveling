@@ -1,0 +1,30 @@
+{
+  "planTitle": "LUMS integration bee",
+  "planId": "873e178a-3c60-46f9-b1ff-7a90878c58e8",
+  "attemptId": "be1c03d4-4852-43b4-9a6f-b8ef1ca06715",
+  "rootRequestId": "e5fd7027-de34-52b4-ad08-e6c013292edd",
+  "state": "FAILED",
+  "stage": "RESEARCH",
+  "failureCode": "INVALID_OUTPUT",
+  "modelCalls": 14,
+  "searchCalls": 3,
+  "inputTokens": 146795,
+  "completionTokens": 38290,
+  "reportedReasoningTokens": 27195,
+  "estimatedCostUsd": 0.081774804,
+  "allSettled": true,
+  "failures": [
+    {
+      "ledgerId": 348,
+      "callKey": "understand_be1c03d4485243b49a6fb8ef1ca06715_7",
+      "responseDigest": "e4e995907efa09c4f700f0840dbfe5e8a38fec9dabe223deb1ea987973d85059",
+      "reasoningDigest": "c46d2335286cc2f1738c41d0516a7c703f47e6b3c7567394704d5be771a52422"
+    },
+    {
+      "ledgerId": 350,
+      "callKey": "understand_be1c03d4485243b49a6fb8ef1ca06715_7_repair1",
+      "responseDigest": "cfa27be5accde8c950b104bd8a746a650f83f4f3c702266401275b592a3bc38f",
+      "reasoningDigest": "e5b41270969afc6dd5da0119be2d5c83da0079c84c40adef9513eb1a00445933"
+    }
+  ]
+}

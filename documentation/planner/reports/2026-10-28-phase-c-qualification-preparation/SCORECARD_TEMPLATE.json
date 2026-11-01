@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "caseId": "C01",
+  "repetition": 1,
+  "status": "NOT_RUN",
+  "providerResponseCount": 0,
+  "scores": {
+    "correctness": null,
+    "personalization": null,
+    "depth": null,
+    "coverage": null,
+    "practicality": null,
+    "fidelity": null,
+    "review": null,
+    "uncertainty": null
+  },
+  "independentDefects": [],
+  "seriousDefect": null,
+  "weightedScore": null,
+  "qualityConclusion": "UNASSESSED",
+  "refinementWitness": "NOT_OBSERVED",
+  "reviewSensitivity": "UNOBSERVED",
+  "raterIdentity": null,
+  "evidenceReferences": []
+}

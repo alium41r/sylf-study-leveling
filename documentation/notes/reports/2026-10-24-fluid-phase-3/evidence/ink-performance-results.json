@@ -1,0 +1,85 @@
+{
+  "strokes": 5000,
+  "samples": 320000,
+  "encodedBytes": 14335514,
+  "buildMs": 1062.199999988079,
+  "hydrateMs": 607,
+  "coldRenderMs": 151.80000001192093,
+  "pan": {
+    "p50Ms": 1.0999999940395355,
+    "p95Ms": 2.0999999940395355,
+    "maxMs": 2.0999999940395355
+  },
+  "activeLayer": {
+    "p50Ms": 0,
+    "p95Ms": 0.10000002384185791,
+    "maxMs": 0.5999999940395355
+  },
+  "active4096Samples": {
+    "p50Ms": 0.5,
+    "p95Ms": 1,
+    "maxMs": 1.2999999821186066
+  },
+  "cache": {
+    "cachedPaths": 384,
+    "cachedPoints": 24576,
+    "canvasPixels": 1572864,
+    "rasterPixels": 3520000
+  },
+  "environment": "Headless Chromium desktop; 5,000 strokes / 320,000 original samples; isolated production model/renderer. No physical input-to-display claim.",
+  "encryptedNativeSaves": {
+    "p50Ms": 3.399999976158142,
+    "p95Ms": 14.800000011920929,
+    "maxMs": 14.800000011920929
+  },
+  "afterMetadataSaves": {
+    "p50Ms": 3,
+    "p95Ms": 3.199999988079071,
+    "maxMs": 3.199999988079071
+  },
+  "brush4096Samples": {
+    "ballpoint": {
+      "p50Ms": 0.5,
+      "p95Ms": 1.300000011920929,
+      "maxMs": 2.800000011920929
+    },
+    "fountain": {
+      "p50Ms": 0.5,
+      "p95Ms": 0.5999999940395355,
+      "maxMs": 1.100000023841858
+    },
+    "brush": {
+      "p50Ms": 0.5999999940395355,
+      "p95Ms": 1.0999999940395355,
+      "maxMs": 1.399999976158142
+    },
+    "pencil": {
+      "p50Ms": 0.5,
+      "p95Ms": 1.2000000178813934,
+      "maxMs": 1.2000000178813934
+    },
+    "fineliner": {
+      "p50Ms": 0.5,
+      "p95Ms": 1.2000000178813934,
+      "maxMs": 1.300000011920929
+    }
+  },
+  "precision40StrokeCutMs": 60.79999998211861,
+  "denseNativePreviewMs": 1124.7000000178814,
+  "storage": {
+    "objects": 75,
+    "objectBytes": 14391968,
+    "revisions": 35,
+    "pending": 34,
+    "stagedAssets": 0
+  },
+  "pageNavigation": {
+    "pages": 300,
+    "measurements": {
+      "p50Ms": 7.5999999940395355,
+      "p95Ms": 9.099999994039536,
+      "maxMs": 9.099999994039536
+    },
+    "scope": "300 empty independent page streams; no dense-page or cloud latency extrapolation"
+  }
+}

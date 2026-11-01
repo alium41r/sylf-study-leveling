@@ -1,0 +1,2750 @@
+{
+ "when": "2026-11-01T14:19:38.603Z",
+ "server": "local disposable, production build",
+ "results": [
+  {
+   "label": "read /api/user/stats",
+   "method": "GET",
+   "path": "/api/user/stats",
+   "status": 200,
+   "ms": 29,
+   "bytes": 939,
+   "cookie": false,
+   "shape": {
+    "id": "number",
+    "email": "string",
+    "username": "string",
+    "name": "string",
+    "scholarId": "string",
+    "verificationStatus": "string",
+    "avatarUrl": "null",
+    "bannerUrl": "null",
+    "bio": "null",
+    "activeAvatar": "string",
+    "activeFrame": "string",
+    "activeTitle": "string",
+    "activeAura": "string",
+    "activeNameColor": "string",
+    "activeTheme": "string",
+    "activeBackground": "string",
+    "characterConfig": "null",
+    "socialLinks": "null",
+    "hunterRank": "string",
+    "level": "number",
+    "currentXP": "number",
+    "hp": "number",
+    "maxHp": "number",
+    "streakDays": "number",
+    "totalStudyMinutes": "number",
+    "totalStudySeconds": "number",
+    "lastActiveDate": "string",
+    "createdAt": "string",
+    "sylph": "number",
+    "timezone": "string",
+    "hasCompletedOnboarding": "boolean",
+    "isAdmin": "boolean",
+    "xpToNextLevel": "number",
+    "hasPassword": "boolean",
+    "effectiveMaxHp": "number",
+    "completedTodaySeconds": "number",
+    "todayStudySeconds": "number",
+    "todayStudyMinutes": "number",
+    "activeSessionStartedAt": "null",
+    "activeSessionId": "null"
+   }
+  },
+  {
+   "label": "read /api/user/detailed-stats",
+   "method": "GET",
+   "path": "/api/user/detailed-stats",
+   "status": 200,
+   "ms": 24,
+   "bytes": 1687,
+   "cookie": false,
+   "shape": {
+    "user": {
+     "id": "number",
+     "username": "string",
+     "name": "string",
+     "hunterRank": "string",
+     "level": "number",
+     "currentXP": "number",
+     "xpToNextLevel": "number",
+     "hp": "number",
+     "maxHp": "number",
+     "streakDays": "number",
+     "totalStudyMinutes": "number",
+     "totalStudySeconds": "number",
+     "createdAt": "string",
+     "timezone": "string"
+    },
+    "dailyStudy": [
+     {
+      "date": "string",
+      "minutes": "number"
+     }
+    ],
+    "subjectBreakdown": [],
+    "sessionLog": [],
+    "questStats": {
+     "total": "number",
+     "completed": "number",
+     "failed": "number",
+     "pending": "number",
+     "inProgress": "number",
+     "totalXPEarned": "number"
+    },
+    "goalStats": {
+     "total": "number",
+     "active": "number",
+     "completed": "number"
+    },
+    "todayDate": "string",
+    "summary": {
+     "totalSessions": "number",
+     "avgSessionMinutes": "number",
+     "avgSessionSeconds": "number",
+     "activeDaysLast30": "number",
+     "longestSession": "number",
+     "longestSessionSeconds": "number",
+     "accountAgeDays": "number",
+     "completionRate": "number"
+    }
+   }
+  },
+  {
+   "label": "read /api/user/detailed-stats?summary=true",
+   "method": "GET",
+   "path": "/api/user/detailed-stats?summary=true",
+   "status": 200,
+   "ms": 16,
+   "bytes": 1671,
+   "cookie": false,
+   "shape": {
+    "user": {
+     "id": "number",
+     "username": "string",
+     "name": "string",
+     "hunterRank": "string",
+     "level": "number",
+     "currentXP": "number",
+     "xpToNextLevel": "number",
+     "hp": "number",
+     "maxHp": "number",
+     "streakDays": "number",
+     "totalStudyMinutes": "number",
+     "totalStudySeconds": "number",
+     "createdAt": "string",
+     "timezone": "string"
+    },
+    "dailyStudy": [
+     {
+      "date": "string",
+      "minutes": "number"
+     }
+    ],
+    "subjectBreakdown": [],
+    "questStats": {
+     "total": "number",
+     "completed": "number",
+     "failed": "number",
+     "pending": "number",
+     "inProgress": "number",
+     "totalXPEarned": "number"
+    },
+    "goalStats": {
+     "total": "number",
+     "active": "number",
+     "completed": "number"
+    },
+    "todayDate": "string",
+    "summary": {
+     "totalSessions": "number",
+     "avgSessionMinutes": "number",
+     "avgSessionSeconds": "number",
+     "activeDaysLast30": "number",
+     "longestSession": "number",
+     "longestSessionSeconds": "number",
+     "accountAgeDays": "number",
+     "completionRate": "number"
+    }
+   }
+  },
+  {
+   "label": "read /api/user/rankings",
+   "method": "GET",
+   "path": "/api/user/rankings",
+   "status": 200,
+   "ms": 14,
+   "bytes": 466,
+   "cookie": false,
+   "shape": {
+    "global": [
+     {
+      "id": "number",
+      "username": "string",
+      "name": "string",
+      "hunterRank": "string",
+      "level": "number",
+      "currentXP": "number",
+      "totalStudyMinutes": "number",
+      "studyHours": "number",
+      "streakDays": "number",
+      "questsCompleted": "number",
+      "isCurrentUser": "boolean",
+      "rank": "number"
+     }
+    ],
+    "friends": [
+     {
+      "id": "number",
+      "username": "string",
+      "name": "string",
+      "hunterRank": "string",
+      "level": "number",
+      "currentXP": "number",
+      "totalStudyMinutes": "number",
+      "studyHours": "number",
+      "streakDays": "number",
+      "questsCompleted": "number",
+      "isCurrentUser": "boolean",
+      "rank": "number",
+      "friendRank": "number"
+     }
+    ],
+    "currentUserRank": "number",
+    "totalPlayers": "number"
+   }
+  },
+  {
+   "label": "read /api/user/rankings?sortBy=focusHours",
+   "method": "GET",
+   "path": "/api/user/rankings?sortBy=focusHours",
+   "status": 200,
+   "ms": 5,
+   "bytes": 862,
+   "cookie": false,
+   "shape": {
+    "global": [
+     {
+      "id": "number",
+      "username": "string",
+      "name": "string",
+      "hunterRank": "string",
+      "level": "number",
+      "currentXP": "number",
+      "totalStudyMinutes": "number",
+      "studyHours": "number",
+      "streakDays": "number",
+      "questsCompleted": "number",
+      "isCurrentUser": "boolean",
+      "rank": "number"
+     }
+    ],
+    "friends": [
+     {
+      "id": "number",
+      "username": "string",
+      "name": "string",
+      "hunterRank": "string",
+      "level": "number",
+      "currentXP": "number",
+      "totalStudyMinutes": "number",
+      "studyHours": "number",
+      "streakDays": "number",
+      "questsCompleted": "number",
+      "isCurrentUser": "boolean",
+      "rank": "number",
+      "friendRank": "number"
+     }
+    ],
+    "currentUserRank": "number",
+    "totalPlayers": "number"
+   }
+  },
+  {
+   "label": "read /api/user/privacy",
+   "method": "GET",
+   "path": "/api/user/privacy",
+   "status": 200,
+   "ms": 7,
+   "bytes": 243,
+   "cookie": false,
+   "shape": {
+    "id": "number",
+    "userId": "number",
+    "profileVisibility": "string",
+    "showOnlineStatus": "string",
+    "showCurrentSession": "string",
+    "showStudyHours": "string",
+    "showRank": "string",
+    "showAchievements": "string",
+    "allowFriendRequests": "string",
+    "allowDirectMessages": "string"
+   }
+  },
+  {
+   "label": "read /api/user/study-schedule",
+   "method": "GET",
+   "path": "/api/user/study-schedule",
+   "status": 200,
+   "ms": 6,
+   "bytes": 62,
+   "cookie": false,
+   "shape": {
+    "dailyGoalMinutes": "number",
+    "restDays": [
+     "number"
+    ],
+    "enableHpPenalty": "boolean"
+   }
+  },
+  {
+   "label": "read /api/user/study-schedule/floating-rest-day",
+   "method": "GET",
+   "path": "/api/user/study-schedule/floating-rest-day",
+   "status": 400,
+   "ms": 5,
+   "bytes": 49,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Invalid dateKey. Expected YYYY-MM-DD."
+   }
+  },
+  {
+   "label": "read /api/user/sessions",
+   "method": "GET",
+   "path": "/api/user/sessions",
+   "status": 200,
+   "ms": 12,
+   "bytes": 222,
+   "cookie": false,
+   "shape": {
+    "sessions": [
+     {
+      "id": "string",
+      "device": "string",
+      "platform": "string",
+      "location": "string",
+      "lastActive": "string",
+      "isCurrent": "boolean",
+      "icon": "string",
+      "createdAt": "string"
+     }
+    ]
+   }
+  },
+  {
+   "label": "read /api/user/connections",
+   "method": "GET",
+   "path": "/api/user/connections",
+   "status": 200,
+   "ms": 6,
+   "bytes": 177,
+   "cookie": false,
+   "shape": {
+    "connections": [
+     {
+      "provider": "string",
+      "isLinked": "boolean"
+     }
+    ]
+   }
+  },
+  {
+   "label": "read /api/user/focus-backgrounds",
+   "method": "GET",
+   "path": "/api/user/focus-backgrounds",
+   "status": 200,
+   "ms": 7,
+   "bytes": 46,
+   "cookie": false,
+   "shape": {
+    "backgrounds": [],
+    "quota": {
+     "used": "number",
+     "max": "number"
+    }
+   }
+  },
+  {
+   "label": "read /api/user/onboarding",
+   "method": "GET",
+   "path": "/api/user/onboarding",
+   "status": 405,
+   "ms": 3,
+   "bytes": 0,
+   "cookie": false,
+   "shape": "",
+   "answer": ""
+  },
+  {
+   "label": "read /api/user/p1_a_mvxx27jn",
+   "method": "GET",
+   "path": "/api/user/p1_a_mvxx27jn",
+   "status": 200,
+   "ms": 10,
+   "bytes": 343,
+   "cookie": false,
+   "shape": {
+    "profile": {
+     "id": "number",
+     "username": "string",
+     "name": "string",
+     "hunterRank": "string",
+     "level": "number",
+     "currentXP": "number",
+     "streakDays": "number",
+     "totalStudyMinutes": "number",
+     "activeAvatar": "string",
+     "activeTitle": "string",
+     "lastActiveDate": "string",
+     "createdAt": "string"
+    },
+    "relationship": "string",
+    "permissions": {
+     "canSendFriendRequest": "boolean",
+     "canSendMessage": "boolean"
+    }
+   }
+  },
+  {
+   "label": "read /api/profile/p1_a_mvxx27jn",
+   "method": "GET",
+   "path": "/api/profile/p1_a_mvxx27jn",
+   "status": 200,
+   "ms": 28,
+   "bytes": 1477,
+   "cookie": false,
+   "shape": {
+    "profile": {
+     "id": "number",
+     "name": "string",
+     "username": "string",
+     "scholarId": "string",
+     "verificationStatus": "string",
+     "avatarUrl": "null",
+     "bannerUrl": "null",
+     "bio": "null",
+     "hunterRank": "string",
+     "level": "number",
+     "currentXP": "number",
+     "xpToNextLevel": "number",
+     "levelProgress": "number",
+     "hp": "number",
+     "maxHp": "number",
+     "streakDays": "number",
+     "totalStudyMinutes": "number",
+     "totalStudySeconds": "number",
+     "todayStudyMinutes": "number",
+     "todayStudySeconds": "number",
+     "completedTodaySeconds": "number",
+     "isStudying": "boolean",
+     "isOnline": "boolean",
+     "activeSessionStartedAt": "null",
+     "activeAvatar": "string",
+     "activeFrame": "string",
+     "activeTitle": "string",
+     "activeAura": "string",
+     "activeNameColor": "string",
+     "characterConfig": "null",
+     "socialLinks": {},
+     "connectedAccounts": {
+      "github": "null",
+      "discord": "null",
+      "instagram": "null"
+     },
+     "stats": {
+      "endurance": "number",
+      "tenacity": "number",
+      "velocity": "number",
+      "discipline": "number",
+      "synthesis": "number"
+     },
+     "userStats": {
+      "level": "number",
+      "xp": "number",
+      "rank": "string",
+      "currency": "number",
+      "skillPoints": "number",
+      "endurance": "number",
+      "tenacity": "number",
+      "velocity": "number",
+      "discipline": "number",
+      "synthesis": "number"
+     },
+     "inventory": [],
+     "completedQuestsCount": "number",
+     "achievementsCount": "number",
+     "recentAchievements": [],
+     "lastActiveDate": "string",
+     "createdAt": "string"
+    },
+    "relationship": "string",
+    "isSelf": "boolean",
+    "permissions": {
+     "canSendFriendRequest": "boolean",
+     "canSendMessage": "boolean",
+     "canRemoveFriend": "boolean",
+     "canBlock": "boolean",
+     "canUnblock": "boolean"
+    },
+    "privacySettings": {
+     "isProfileVisible": "boolean",
+     "showRank": "boolean",
+     "showStudyHours": "boolean",
+     "showAchievements": "boolean"
+    }
+   }
+  },
+  {
+   "label": "read /api/profile/stats?username=p1_a_mvxx27jn",
+   "method": "GET",
+   "path": "/api/profile/stats?username=p1_a_mvxx27jn",
+   "status": 200,
+   "ms": 9,
+   "bytes": 189,
+   "cookie": false,
+   "shape": {
+    "stats": {
+     "totalStudyHours": "number",
+     "questsCompleted": "number",
+     "achievementsEarned": "number",
+     "joinedDate": "string",
+     "streakDays": "number"
+    },
+    "nextUnlock": {
+     "currentXP": "number",
+     "requiredXP": "number",
+     "nextLevel": "number"
+    }
+   }
+  },
+  {
+   "label": "read /api/achievements",
+   "method": "GET",
+   "path": "/api/achievements",
+   "status": 200,
+   "ms": 21,
+   "bytes": 8442,
+   "cookie": false,
+   "shape": {
+    "achievements": [
+     {
+      "id": "string",
+      "category": "string",
+      "metric": "string",
+      "title": "string",
+      "description": "string",
+      "target": "number",
+      "rarity": "string",
+      "reward": "{\u2026}",
+      "currentProgress": "number",
+      "isClaimed": "boolean"
+     }
+    ],
+    "retiredClaimedCount": "number"
+   }
+  },
+  {
+   "label": "read /api/skills",
+   "method": "GET",
+   "path": "/api/skills",
+   "status": 200,
+   "ms": 8,
+   "bytes": 6433,
+   "cookie": false,
+   "shape": {
+    "catalog": [
+     {
+      "id": "string",
+      "tier": "number",
+      "x": "number",
+      "y": "number",
+      "shape": "string",
+      "costSP": "number",
+      "label": "string",
+      "description": "string"
+     }
+    ],
+    "unlockedSkills": [],
+    "activeClass": "string",
+    "masteredClasses": [],
+    "stats": {
+     "level": "number",
+     "xp": "number",
+     "rank": "string",
+     "currency": "number",
+     "skillPoints": "number",
+     "endurance": "number",
+     "tenacity": "number",
+     "velocity": "number",
+     "discipline": "number",
+     "synthesis": "number"
+    }
+   }
+  },
+  {
+   "label": "read /api/insights",
+   "method": "GET",
+   "path": "/api/insights",
+   "status": 200,
+   "ms": 7,
+   "bytes": 2,
+   "cookie": false,
+   "shape": []
+  },
+  {
+   "label": "read /api/currency/stats",
+   "method": "GET",
+   "path": "/api/currency/stats",
+   "status": 200,
+   "ms": 8,
+   "bytes": 95,
+   "cookie": false,
+   "shape": {
+    "currentBalance": "number",
+    "totalEarned": "number",
+    "totalSpent": "number",
+    "totalHpLost": "number",
+    "currentHp": "number",
+    "maxHp": "number"
+   }
+  },
+  {
+   "label": "read /api/cosmetics",
+   "method": "GET",
+   "path": "/api/cosmetics",
+   "status": 200,
+   "ms": 8,
+   "bytes": 202,
+   "cookie": false,
+   "shape": {
+    "cosmetics": [],
+    "active": {
+     "activeTheme": "string",
+     "activeBackground": "string",
+     "activeAvatar": "string",
+     "activeFrame": "string",
+     "activeTitle": "string",
+     "activeAura": "string",
+     "activeNameColor": "string"
+    }
+   }
+  },
+  {
+   "label": "read /api/inventory",
+   "method": "GET",
+   "path": "/api/inventory",
+   "status": 200,
+   "ms": 7,
+   "bytes": 162,
+   "cookie": false,
+   "shape": {
+    "inventory": [],
+    "stats": {
+     "level": "number",
+     "xp": "number",
+     "rank": "string",
+     "currency": "number",
+     "skillPoints": "number",
+     "endurance": "number",
+     "tenacity": "number",
+     "velocity": "number",
+     "discipline": "number",
+     "synthesis": "number"
+    }
+   }
+  },
+  {
+   "label": "read /api/shop",
+   "method": "GET",
+   "path": "/api/shop",
+   "status": 200,
+   "ms": 8,
+   "bytes": 175,
+   "cookie": false,
+   "shape": {
+    "catalog": [],
+    "inventory": [],
+    "stats": {
+     "level": "number",
+     "xp": "number",
+     "rank": "string",
+     "currency": "number",
+     "skillPoints": "number",
+     "endurance": "number",
+     "tenacity": "number",
+     "velocity": "number",
+     "discipline": "number",
+     "synthesis": "number"
+    }
+   }
+  },
+  {
+   "label": "read /api/subjects",
+   "method": "GET",
+   "path": "/api/subjects",
+   "status": 200,
+   "ms": 11,
+   "bytes": 2,
+   "cookie": false,
+   "shape": []
+  },
+  {
+   "label": "read /api/goals",
+   "method": "GET",
+   "path": "/api/goals",
+   "status": 200,
+   "ms": 8,
+   "bytes": 2,
+   "cookie": false,
+   "shape": []
+  },
+  {
+   "label": "read /api/quests",
+   "method": "GET",
+   "path": "/api/quests",
+   "status": 200,
+   "ms": 10,
+   "bytes": 2,
+   "cookie": false,
+   "shape": []
+  },
+  {
+   "label": "read /api/quests?all=true&limit=10",
+   "method": "GET",
+   "path": "/api/quests?all=true&limit=10",
+   "status": 200,
+   "ms": 9,
+   "bytes": 31,
+   "cookie": false,
+   "shape": {
+    "quests": [],
+    "nextCursor": "null"
+   }
+  },
+  {
+   "label": "read /api/quests/weekly",
+   "method": "GET",
+   "path": "/api/quests/weekly",
+   "status": 200,
+   "ms": 12,
+   "bytes": 353,
+   "cookie": false,
+   "shape": {
+    "targetMinutes": "number",
+    "targetSeconds": "number",
+    "progressMinutes": "number",
+    "progressSeconds": "number",
+    "percentComplete": "number",
+    "isCompleted": "boolean",
+    "weekKey": "string",
+    "weekStart": "string",
+    "weekEnd": "string",
+    "timeRemainingMs": "number",
+    "daysRemaining": "number",
+    "xpReward": "number",
+    "sylphReward": "number",
+    "streakWeeks": "number",
+    "hasStreakFreeze": "boolean",
+    "freezeCount": "number"
+   }
+  },
+  {
+   "label": "read /api/calendar/month",
+   "method": "GET",
+   "path": "/api/calendar/month",
+   "status": 200,
+   "ms": 22,
+   "bytes": 8335,
+   "cookie": false,
+   "shape": {
+    "year": "number",
+    "month": "number",
+    "monthName": "string",
+    "dailyGoalMinutes": "number",
+    "restDays": [
+     "number"
+    ],
+    "enableHpPenalty": "boolean",
+    "days": [
+     {
+      "date": "string",
+      "dayOfWeek": "number",
+      "isRestDay": "boolean",
+      "dailyGoalMinutes": "number",
+      "totalMinutes": "number",
+      "totalSeconds": "number",
+      "completionPercentage": "number",
+      "goalMet": "boolean",
+      "sessionsCount": "number",
+      "sessions": [],
+      "questsCount": "number",
+      "questsCompleted": "number",
+      "xpGained": "number",
+      "subjectBreakdown": [],
+      "quests": []
+     }
+    ],
+    "milestones": [],
+    "floatingRestDays": [],
+    "monthStats": {
+     "totalMinutes": "number",
+     "totalSeconds": "number",
+     "totalSessions": "number",
+     "activeDays": "number",
+     "totalDays": "number",
+     "goalsMetDays": "number",
+     "restDaysCount": "number",
+     "totalXpEarned": "number",
+     "totalQuestsCompleted": "number"
+    }
+   }
+  },
+  {
+   "label": "read /api/calendar/preferences",
+   "method": "GET",
+   "path": "/api/calendar/preferences",
+   "status": 200,
+   "ms": 6,
+   "bytes": 282,
+   "cookie": false,
+   "shape": {
+    "settings": {
+     "timePlanning": "boolean",
+     "workload": "boolean",
+     "organization": "boolean",
+     "detailedEvents": "boolean",
+     "view": "string",
+     "filters": {
+      "personal": "boolean",
+      "objectives": "boolean",
+      "study": "boolean",
+      "blocks": "boolean",
+      "notes": "boolean",
+      "annotations": "boolean",
+      "categories": [
+       "string"
+      ]
+     }
+    },
+    "revision": "number"
+   }
+  },
+  {
+   "label": "read /api/calendar/shared",
+   "method": "GET",
+   "path": "/api/calendar/shared",
+   "status": 200,
+   "ms": 8,
+   "bytes": 16,
+   "cookie": false,
+   "shape": {
+    "calendars": []
+   }
+  },
+  {
+   "label": "read /api/calendar/connections",
+   "method": "GET",
+   "path": "/api/calendar/connections",
+   "status": 200,
+   "ms": 9,
+   "bytes": 82,
+   "cookie": false,
+   "shape": {
+    "configured": {
+     "google": "boolean",
+     "microsoft": "boolean"
+    },
+    "connections": [],
+    "operations": []
+   }
+  },
+  {
+   "label": "read /api/calendar/notebooks?query=a",
+   "method": "GET",
+   "path": "/api/calendar/notebooks?query=a",
+   "status": 200,
+   "ms": 8,
+   "bytes": 30,
+   "cookie": false,
+   "shape": {
+    "notes": [],
+    "nextCursor": "null"
+   }
+  },
+  {
+   "label": "read /api/calendar/personal?start=2026-11-01&end=2026-12-01",
+   "method": "GET",
+   "path": "/api/calendar/personal?start=2026-11-01&end=2026-12-01",
+   "status": 200,
+   "ms": 20,
+   "bytes": 105,
+   "cookie": false,
+   "shape": {
+    "events": [],
+    "notes": [],
+    "externalCoverage": {
+     "complete": "boolean",
+     "warnings": [],
+     "connected": "number"
+    },
+    "sharedCount": "number"
+   }
+  },
+  {
+   "label": "read /api/notifications",
+   "method": "GET",
+   "path": "/api/notifications",
+   "status": 200,
+   "ms": 16,
+   "bytes": 260,
+   "cookie": false,
+   "shape": [
+    {
+     "id": "number",
+     "content": "string",
+     "type": "string",
+     "read": "boolean",
+     "createdAt": "string"
+    }
+   ]
+  },
+  {
+   "label": "read /api/notifications/preferences",
+   "method": "GET",
+   "path": "/api/notifications/preferences",
+   "status": 200,
+   "ms": 9,
+   "bytes": 265,
+   "cookie": false,
+   "shape": {
+    "preferences": {
+     "masterEnabled": "boolean",
+     "levelRankPromotions": "boolean",
+     "streakMilestones": "boolean",
+     "unlockedAchievements": "boolean",
+     "aiStudyPlans": "boolean",
+     "questAssignments": "boolean",
+     "scheduledFocusReminders": "boolean",
+     "incomingFriendRequests": "boolean",
+     "directMessages": "boolean",
+     "groupActivity": "boolean"
+    }
+   }
+  },
+  {
+   "label": "read /api/conversations",
+   "method": "GET",
+   "path": "/api/conversations",
+   "status": 200,
+   "ms": 18,
+   "bytes": 2,
+   "cookie": false,
+   "shape": []
+  },
+  {
+   "label": "read /api/friends",
+   "method": "GET",
+   "path": "/api/friends",
+   "status": 200,
+   "ms": 10,
+   "bytes": 2,
+   "cookie": false,
+   "shape": []
+  },
+  {
+   "label": "read /api/friends/requests",
+   "method": "GET",
+   "path": "/api/friends/requests",
+   "status": 200,
+   "ms": 7,
+   "bytes": 2,
+   "cookie": false,
+   "shape": []
+  },
+  {
+   "label": "read /api/invites",
+   "method": "GET",
+   "path": "/api/invites",
+   "status": 200,
+   "ms": 8,
+   "bytes": 2,
+   "cookie": false,
+   "shape": []
+  },
+  {
+   "label": "read /api/focus-party",
+   "method": "GET",
+   "path": "/api/focus-party",
+   "status": 200,
+   "ms": 9,
+   "bytes": 40,
+   "cookie": false,
+   "shape": {
+    "activeParty": "null",
+    "pendingInvites": []
+   }
+  },
+  {
+   "label": "read /api/focus-backgrounds",
+   "method": "GET",
+   "path": "/api/focus-backgrounds",
+   "status": 200,
+   "ms": 5,
+   "bytes": 1184,
+   "cookie": false,
+   "shape": {
+    "categories": [
+     {
+      "id": "number",
+      "slug": "string",
+      "name": "string",
+      "description": "string",
+      "layoutKey": "string",
+      "sortOrder": "number",
+      "isActive": "boolean",
+      "createdAt": "string",
+      "updatedAt": "string",
+      "backgrounds": []
+     }
+    ]
+   }
+  },
+  {
+   "label": "read /api/focus-backgrounds/preference",
+   "method": "GET",
+   "path": "/api/focus-backgrounds/preference",
+   "status": 200,
+   "ms": 8,
+   "bytes": 119,
+   "cookie": false,
+   "shape": {
+    "initialized": "boolean",
+    "version": "number",
+    "source": "string",
+    "backgroundId": "null",
+    "categorySlug": "string",
+    "isClassic": "boolean"
+   }
+  },
+  {
+   "label": "read /api/acoustics",
+   "method": "GET",
+   "path": "/api/acoustics",
+   "status": 200,
+   "ms": 5,
+   "bytes": 4590,
+   "cookie": false,
+   "shape": {
+    "tracks": [
+     {
+      "id": "number",
+      "title": "string",
+      "category": "string",
+      "frequency": "string",
+      "audioUrl": "string",
+      "duration": "number",
+      "defaultVolume": "number",
+      "description": "string",
+      "tags": [
+       "string"
+      ],
+      "isPreset": "boolean",
+      "orderIndex": "number"
+     }
+    ]
+   }
+  },
+  {
+   "label": "read /api/realtime/token",
+   "method": "GET",
+   "path": "/api/realtime/token",
+   "status": 200,
+   "ms": 3,
+   "bytes": 63,
+   "cookie": false,
+   "shape": {
+    "enabled": "boolean",
+    "reason": "string"
+   }
+  },
+  {
+   "label": "read /api/chats?limit=20",
+   "method": "GET",
+   "path": "/api/chats?limit=20",
+   "status": 200,
+   "ms": 5,
+   "bytes": 33,
+   "cookie": false,
+   "shape": {
+    "sessions": [],
+    "nextCursor": "null"
+   }
+  },
+  {
+   "label": "read /api/system-messages?type=DAILY_BRIEFING&global=true&limit=1&unreadOnly=true",
+   "method": "GET",
+   "path": "/api/system-messages?type=DAILY_BRIEFING&global=true&limit=1&unreadOnly=true",
+   "status": 200,
+   "ms": 7,
+   "bytes": 31,
+   "cookie": false,
+   "shape": {
+    "messages": [],
+    "unreadCount": "number"
+   }
+  },
+  {
+   "label": "read /api/planner/capabilities",
+   "method": "GET",
+   "path": "/api/planner/capabilities",
+   "status": 200,
+   "ms": 6,
+   "bytes": 114,
+   "cookie": false,
+   "shape": {
+    "timezone": "string",
+    "today": "string",
+    "restDays": [
+     "number"
+    ],
+    "subjects": [],
+    "studentWorkspace": {
+     "enabled": "boolean"
+    }
+   }
+  },
+  {
+   "label": "read /api/planner/workspace",
+   "method": "GET",
+   "path": "/api/planner/workspace",
+   "status": 200,
+   "ms": 24,
+   "bytes": 179,
+   "cookie": false,
+   "shape": {
+    "readiness": {
+     "enabled": "boolean",
+     "ready": "boolean",
+     "reason": "string",
+     "profile": "string"
+    },
+    "plans": [],
+    "next": "null"
+   }
+  },
+  {
+   "label": "read /api/pixel-creations",
+   "method": "GET",
+   "path": "/api/pixel-creations",
+   "status": 200,
+   "ms": 6,
+   "bytes": 16,
+   "cookie": false,
+   "shape": {
+    "creations": []
+   }
+  },
+  {
+   "label": "read /api/users/search?q=p1",
+   "method": "GET",
+   "path": "/api/users/search?q=p1",
+   "status": 200,
+   "ms": 9,
+   "bytes": 195,
+   "cookie": false,
+   "shape": [
+    {
+     "id": "number",
+     "name": "string",
+     "username": "string",
+     "hunterRank": "string",
+     "level": "number",
+     "isFriend": "boolean"
+    }
+   ]
+  },
+  {
+   "label": "bearer with Sec-Fetch-Site refused",
+   "method": "GET",
+   "path": "/api/user/stats",
+   "status": 401,
+   "ms": 2,
+   "bytes": 24,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Unauthorized"
+   }
+  },
+  {
+   "label": "complete onboarding",
+   "method": "POST",
+   "path": "/api/user/onboarding",
+   "status": 200,
+   "ms": 51,
+   "bytes": 400,
+   "cookie": false,
+   "shape": {
+    "success": "boolean",
+    "user": {
+     "id": "number",
+     "email": "string",
+     "username": "string",
+     "name": "string",
+     "scholarId": "string",
+     "verificationStatus": "string",
+     "hunterRank": "string",
+     "level": "number",
+     "currentXP": "number",
+     "xpToNextLevel": "number",
+     "hp": "number",
+     "maxHp": "number",
+     "streakDays": "number",
+     "totalStudyMinutes": "number",
+     "hasCompletedOnboarding": "boolean",
+     "createdAt": "string",
+     "avatarUrl": "null",
+     "timezone": "string"
+    }
+   },
+   "answer": {
+    "success": true,
+    "user": {
+     "id": 1,
+     "email": "p1_a_mvxx27jn@example.test",
+     "username": "p1_a_mvxx27jn",
+     "name": "Probe a",
+     "scholarId": "#000001",
+     "verificationStatus": "UNVERIFIED",
+     "hunterRank": "E",
+     "level": 1,
+     "currentXP": 0,
+     "xpToNextLevel": 182,
+     "hp": 100,
+     "maxHp": 100,
+     "streakDays": 0,
+     "totalStudyMinutes": 0,
+     "hasCompletedOnboarding": true,
+     "createdAt": "2026-11-01T14:19:36.883Z",
+     "avatarUrl": null,
+     "timezone": "Asia/Karachi"
+    }
+   }
+  },
+  {
+   "label": "stats after onboarding",
+   "method": "GET",
+   "path": "/api/user/stats",
+   "status": 200,
+   "ms": 6,
+   "bytes": 942,
+   "cookie": false,
+   "shape": {
+    "id": "number",
+    "email": "string",
+    "username": "string",
+    "name": "string",
+    "scholarId": "string",
+    "verificationStatus": "string",
+    "avatarUrl": "null",
+    "bannerUrl": "null",
+    "bio": "null",
+    "activeAvatar": "string",
+    "activeFrame": "string",
+    "activeTitle": "string",
+    "activeAura": "string",
+    "activeNameColor": "string",
+    "activeTheme": "string",
+    "activeBackground": "string",
+    "characterConfig": "null",
+    "socialLinks": "null",
+    "hunterRank": "string",
+    "level": "number",
+    "currentXP": "number",
+    "hp": "number",
+    "maxHp": "number",
+    "streakDays": "number",
+    "totalStudyMinutes": "number",
+    "totalStudySeconds": "number",
+    "lastActiveDate": "string",
+    "createdAt": "string",
+    "sylph": "number",
+    "timezone": "string",
+    "hasCompletedOnboarding": "boolean",
+    "isAdmin": "boolean",
+    "xpToNextLevel": "number",
+    "hasPassword": "boolean",
+    "effectiveMaxHp": "number",
+    "completedTodaySeconds": "number",
+    "todayStudySeconds": "number",
+    "todayStudyMinutes": "number",
+    "activeSessionStartedAt": "null",
+    "activeSessionId": "null"
+   }
+  },
+  {
+   "label": "subjects after onboarding",
+   "method": "GET",
+   "path": "/api/subjects",
+   "status": 200,
+   "ms": 9,
+   "bytes": 421,
+   "cookie": false,
+   "shape": [
+    {
+     "id": "number",
+     "name": "string",
+     "code": "string",
+     "examBoard": "string",
+     "level": "string",
+     "color": "string",
+     "syllabusNote": "null",
+     "createdAt": "string",
+     "lastCompiledAt": "null",
+     "nodesCount": "number",
+     "todaySeconds": "number"
+    }
+   ],
+   "answer": [
+    {
+     "id": 1,
+     "name": "Physics",
+     "code": "PHYSICS",
+     "examBoard": "CAIE",
+     "level": "A-Level",
+     "color": "#8B5CF6",
+     "syllabusNote": null,
+     "createdAt": "2026-11-01T14:19:37.659Z",
+     "lastCompiledAt": null,
+     "nodesCount": 48,
+     "todaySeconds": 0
+    },
+    {
+     "id": 2,
+     "name": "Maths",
+     "code": "MATHS",
+     "examBoard": "CAIE",
+     "level": "A-Level",
+     "color": "#8B5CF6",
+     "syllabusNote": null,
+     "createdAt": "2026-11-01T14:19:37.673Z",
+     "lastCompiledAt": null,
+     "nodesCount": 48,
+     "todaySeconds": 0
+    }
+   ]
+  },
+  {
+   "label": "create subject",
+   "method": "POST",
+   "path": "/api/subjects",
+   "status": 400,
+   "ms": 3,
+   "bytes": 46,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Subject name and code are required"
+   }
+  },
+  {
+   "label": "set schedule",
+   "method": "PATCH",
+   "path": "/api/user/study-schedule",
+   "status": 200,
+   "ms": 9,
+   "bytes": 61,
+   "cookie": false,
+   "shape": {
+    "dailyGoalMinutes": "number",
+    "restDays": [
+     "number"
+    ],
+    "enableHpPenalty": "boolean"
+   },
+   "answer": {
+    "dailyGoalMinutes": 90,
+    "restDays": [
+     6
+    ],
+    "enableHpPenalty": true
+   }
+  },
+  {
+   "label": "heartbeat",
+   "method": "POST",
+   "path": "/api/user/heartbeat",
+   "status": 200,
+   "ms": 10,
+   "bytes": 11,
+   "cookie": false,
+   "shape": {
+    "ok": "boolean"
+   },
+   "answer": {
+    "ok": true
+   }
+  },
+  {
+   "label": "quest on a rest day refused",
+   "method": "POST",
+   "path": "/api/quests",
+   "status": 400,
+   "ms": 6,
+   "bytes": 106,
+   "cookie": false,
+   "shape": {
+    "error": "string",
+    "message": "string"
+   },
+   "answer": {
+    "error": "REST_DAY_ALLOCATION_PROHIBITED",
+    "message": "Quests cannot be scheduled on designated rest days."
+   }
+  },
+  {
+   "label": "create quest",
+   "method": "POST",
+   "path": "/api/quests",
+   "status": 201,
+   "ms": 19,
+   "bytes": 711,
+   "cookie": false,
+   "shape": {
+    "id": "number",
+    "userId": "number",
+    "goalId": "null",
+    "subjectId": "number",
+    "subjectNodeId": "null",
+    "title": "string",
+    "description": "null",
+    "targetMinutes": "number",
+    "requiredMinutes": "number",
+    "elapsedSeconds": "number",
+    "scopeWeight": "number",
+    "status": "string",
+    "difficulty": "string",
+    "scheduledFor": "string",
+    "isKamishWardActive": "boolean",
+    "isGateKeyApplied": "boolean",
+    "createdByAi": "boolean",
+    "xpReward": "number",
+    "sylphReward": "number",
+    "createdAt": "string",
+    "completedAt": "null",
+    "plannedMinutes": "null",
+    "remainingMinutesEstimate": "null",
+    "remainingEstimateBasisActualSeconds": "null",
+    "remainingDisposition": "string",
+    "executionVersion": "number",
+    "plannerSpec": "null",
+    "plannerSpecDigest": "null",
+    "subjectNode": "null",
+    "subject": {
+     "id": "number",
+     "name": "string",
+     "code": "string",
+     "color": "string"
+    },
+    "goal": "null"
+   },
+   "answer": {
+    "id": 1,
+    "userId": 1,
+    "goalId": null,
+    "subjectId": 1,
+    "subjectNodeId": null,
+    "title": "Probe quest",
+    "description": null,
+    "targetMinutes": 30,
+    "requiredMinutes": 30,
+    "elapsedSeconds": 0,
+    "scopeWeight": 0.25,
+    "status": "ACTIVE",
+    "difficulty": "NORMAL",
+    "scheduledFor": "2026-11-02",
+    "isKamishWardActive": false,
+    "isGateKeyApplied": false,
+    "createdByAi": false,
+    "xpReward": 150,
+    "sylphReward": 15,
+    "createdAt": "2026-11-01T14:19:37.747Z",
+    "completedAt": null,
+    "plannedMinutes": null,
+    "remainingMinutesEstimate": null,
+    "remainingEstimateBasisActualSeconds": null,
+    "remainingDisposition": "OPEN",
+    "executionVersion": 0,
+    "plannerSpec": null,
+    "plannerSpecDigest": null,
+    "subjectNode": null,
+    "subject": {
+     "id": 1,
+     "name": "Physics",
+     "code": "PHYSICS",
+     "color": "#8B5CF6"
+    },
+    "goal": null
+   }
+  },
+  {
+   "label": "create goal",
+   "method": "POST",
+   "path": "/api/goals",
+   "status": 201,
+   "ms": 9,
+   "bytes": 191,
+   "cookie": false,
+   "shape": {
+    "id": "number",
+    "userId": "number",
+    "title": "string",
+    "description": "null",
+    "targetWeeks": "number",
+    "effortLevel": "string",
+    "status": "string",
+    "targetDate": "null",
+    "color": "string",
+    "createdAt": "string"
+   },
+   "answer": {
+    "id": 1,
+    "userId": 1,
+    "title": "Probe goal",
+    "description": null,
+    "targetWeeks": 4,
+    "effortLevel": "NORMAL",
+    "status": "ACTIVE",
+    "targetDate": null,
+    "color": "EMERALD",
+    "createdAt": "2026-11-01T14:19:37.759Z"
+   }
+  },
+  {
+   "label": "B reads A's quest",
+   "method": "GET",
+   "path": "/api/quests/1",
+   "status": 404,
+   "ms": 7,
+   "bytes": 27,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Quest not found"
+   }
+  },
+  {
+   "label": "B patches A's quest",
+   "method": "PATCH",
+   "path": "/api/quests/1",
+   "status": 404,
+   "ms": 9,
+   "bytes": 27,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Quest not found"
+   }
+  },
+  {
+   "label": "B deletes A's quest",
+   "method": "DELETE",
+   "path": "/api/quests/1",
+   "status": 404,
+   "ms": 5,
+   "bytes": 27,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Quest not found"
+   }
+  },
+  {
+   "label": "B reads A's goal",
+   "method": "GET",
+   "path": "/api/goals/1",
+   "status": 404,
+   "ms": 7,
+   "bytes": 26,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Goal not found"
+   }
+  },
+  {
+   "label": "B patches A's goal",
+   "method": "PATCH",
+   "path": "/api/goals/1",
+   "status": 404,
+   "ms": 5,
+   "bytes": 26,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Goal not found"
+   }
+  },
+  {
+   "label": "B adjusts A's goal",
+   "method": "POST",
+   "path": "/api/goals/1/adjust",
+   "status": 404,
+   "ms": 10,
+   "bytes": 26,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Goal not found"
+   }
+  },
+  {
+   "label": "B reads A's subject",
+   "method": "GET",
+   "path": "/api/subjects/1",
+   "status": 404,
+   "ms": 7,
+   "bytes": 45,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Subject not found or unauthorized"
+   }
+  },
+  {
+   "label": "B patches A's subject",
+   "method": "PATCH",
+   "path": "/api/subjects/1",
+   "status": 404,
+   "ms": 9,
+   "bytes": 45,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Subject not found or unauthorized"
+   }
+  },
+  {
+   "label": "B reads A's nodes",
+   "method": "GET",
+   "path": "/api/subjects/1/nodes",
+   "status": 404,
+   "ms": 5,
+   "bytes": 29,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Subject not found"
+   }
+  },
+  {
+   "label": "friend request",
+   "method": "POST",
+   "path": "/api/friends/requests",
+   "status": 201,
+   "ms": 13,
+   "bytes": 94,
+   "cookie": false,
+   "shape": {
+    "id": "number",
+    "senderId": "number",
+    "receiverId": "number",
+    "status": "string",
+    "createdAt": "string"
+   },
+   "answer": {
+    "id": 1,
+    "senderId": 1,
+    "receiverId": 2,
+    "status": "PENDING",
+    "createdAt": "2026-11-01T14:19:37.837Z"
+   }
+  },
+  {
+   "label": "requests for B",
+   "method": "GET",
+   "path": "/api/friends/requests",
+   "status": 200,
+   "ms": 6,
+   "bytes": 481,
+   "cookie": false,
+   "shape": [
+    {
+     "id": "number",
+     "senderId": "number",
+     "receiverId": "number",
+     "status": "string",
+     "createdAt": "string",
+     "sender": {
+      "id": "number",
+      "name": "string",
+      "username": "string",
+      "hunterRank": "string",
+      "level": "number",
+      "avatarUrl": "null",
+      "activeAvatar": "string",
+      "activeFrame": "string",
+      "activeTitle": "string",
+      "characterConfig": "null",
+      "createdAt": "string",
+      "companion": "{\u2026}"
+     }
+    }
+   ]
+  },
+  {
+   "label": "accept",
+   "method": "PATCH",
+   "path": "/api/friends/requests/1",
+   "status": 200,
+   "ms": 13,
+   "bytes": 34,
+   "cookie": false,
+   "shape": {
+    "success": "boolean",
+    "action": "string"
+   },
+   "answer": {
+    "success": true,
+    "action": "ACCEPT"
+   }
+  },
+  {
+   "label": "open DM",
+   "method": "POST",
+   "path": "/api/conversations",
+   "status": 201,
+   "ms": 14,
+   "bytes": 8,
+   "cookie": false,
+   "shape": {
+    "id": "number"
+   },
+   "answer": {
+    "id": 1
+   }
+  },
+  {
+   "label": "send message",
+   "method": "POST",
+   "path": "/api/conversations/1/messages",
+   "status": 201,
+   "ms": 16,
+   "bytes": 257,
+   "cookie": false,
+   "shape": {
+    "id": "number",
+    "conversationId": "number",
+    "senderId": "number",
+    "content": "string",
+    "createdAt": "string",
+    "sender": {
+     "id": "number",
+     "name": "string",
+     "username": "string",
+     "hunterRank": "string",
+     "level": "number",
+     "avatarUrl": "null",
+     "activeAvatar": "string",
+     "activeTitle": "string"
+    }
+   }
+  },
+  {
+   "label": "read conversation",
+   "method": "GET",
+   "path": "/api/conversations/1?before=#",
+   "status": 200,
+   "ms": 10,
+   "bytes": 1042,
+   "cookie": false,
+   "shape": {
+    "conversation": {
+     "id": "number",
+     "name": "null",
+     "avatarUrl": "null",
+     "isGroup": "boolean",
+     "createdBy": "number",
+     "createdAt": "string",
+     "participants": [
+      "{\u2026}"
+     ]
+    },
+    "messages": [
+     {
+      "id": "number",
+      "conversationId": "number",
+      "senderId": "number",
+      "content": "string",
+      "createdAt": "string",
+      "sender": "{\u2026}"
+     }
+    ],
+    "hasMore": "boolean"
+   }
+  },
+  {
+   "label": "new messages after",
+   "method": "GET",
+   "path": "/api/conversations/1/messages?after=0",
+   "status": 200,
+   "ms": 6,
+   "bytes": 272,
+   "cookie": false,
+   "shape": {
+    "messages": [
+     {
+      "id": "number",
+      "conversationId": "number",
+      "senderId": "number",
+      "content": "string",
+      "createdAt": "string",
+      "sender": "{\u2026}"
+     }
+    ]
+   }
+  },
+  {
+   "label": "outsider reads conversation",
+   "method": "GET",
+   "path": "/api/conversations/1",
+   "status": 403,
+   "ms": 4,
+   "bytes": 29,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Not a participant"
+   }
+  },
+  {
+   "label": "outsider posts",
+   "method": "POST",
+   "path": "/api/conversations/1/messages",
+   "status": 403,
+   "ms": 4,
+   "bytes": 29,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Not a participant"
+   }
+  },
+  {
+   "label": "edit another's message",
+   "method": "PATCH",
+   "path": "/api/conversations/1/messages/1",
+   "status": 403,
+   "ms": 7,
+   "bytes": 58,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Forbidden: You can only edit your own messages"
+   }
+  },
+  {
+   "label": "one million character message",
+   "method": "POST",
+   "path": "/api/conversations/1/messages",
+   "status": 201,
+   "ms": 60,
+   "bytes": 1000252,
+   "cookie": false,
+   "shape": {
+    "id": "number",
+    "conversationId": "number",
+    "senderId": "number",
+    "content": "string",
+    "createdAt": "string",
+    "sender": {
+     "id": "number",
+     "name": "string",
+     "username": "string",
+     "hunterRank": "string",
+     "level": "number",
+     "avatarUrl": "null",
+     "activeAvatar": "string",
+     "activeTitle": "string"
+    }
+   }
+  },
+  {
+   "label": "40 messages in a burst",
+   "accepted": 40,
+   "ms": 337
+  },
+  {
+   "label": "block",
+   "method": "POST",
+   "path": "/api/friends/block",
+   "status": 200,
+   "ms": 8,
+   "bytes": 74,
+   "cookie": false,
+   "shape": {
+    "success": "boolean",
+    "isBlocked": "boolean",
+    "message": "string"
+   },
+   "answer": {
+    "success": true,
+    "isBlocked": true,
+    "message": "Scholar blocked successfully"
+   }
+  },
+  {
+   "label": "message after block",
+   "method": "POST",
+   "path": "/api/conversations/1/messages",
+   "status": 403,
+   "ms": 4,
+   "bytes": 29,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Not a participant"
+   }
+  },
+  {
+   "label": "unblock",
+   "method": "POST",
+   "path": "/api/friends/unblock",
+   "status": 200,
+   "ms": 6,
+   "bytes": 77,
+   "cookie": false,
+   "shape": {
+    "success": "boolean",
+    "isBlocked": "boolean",
+    "message": "string"
+   }
+  },
+  {
+   "label": "owned cosmetics",
+   "method": "GET",
+   "path": "/api/cosmetics",
+   "status": 200,
+   "ms": 5,
+   "bytes": 202,
+   "cookie": false,
+   "shape": {
+    "cosmetics": [],
+    "active": {
+     "activeTheme": "string",
+     "activeBackground": "string",
+     "activeAvatar": "string",
+     "activeFrame": "string",
+     "activeTitle": "string",
+     "activeAura": "string",
+     "activeNameColor": "string"
+    }
+   }
+  },
+  {
+   "label": "shop catalog",
+   "method": "GET",
+   "path": "/api/shop",
+   "status": 200,
+   "ms": 4,
+   "bytes": 175,
+   "cookie": false,
+   "shape": {
+    "catalog": [],
+    "inventory": [],
+    "stats": {
+     "level": "number",
+     "xp": "number",
+     "rank": "string",
+     "currency": "number",
+     "skillPoints": "number",
+     "endurance": "number",
+     "tenacity": "number",
+     "velocity": "number",
+     "discipline": "number",
+     "synthesis": "number"
+    }
+   }
+  },
+  {
+   "label": "equip an unowned frame by cosmetics",
+   "method": "POST",
+   "path": "/api/cosmetics",
+   "status": 200,
+   "ms": 8,
+   "bytes": 1122,
+   "cookie": false,
+   "shape": {
+    "success": "boolean",
+    "user": {
+     "id": "number",
+     "email": "string",
+     "username": "string",
+     "name": "string",
+     "scholarId": "string",
+     "verificationStatus": "string",
+     "avatarUrl": "null",
+     "hunterRank": "string",
+     "level": "number",
+     "currentXP": "number",
+     "xpToNextLevel": "number",
+     "hp": "number",
+     "maxHp": "number",
+     "streakDays": "number",
+     "totalStudyMinutes": "number",
+     "totalStudySeconds": "number",
+     "lastActiveDate": "string",
+     "lastSeenAt": "null",
+     "sylph": "number",
+     "activeTheme": "string",
+     "activeBackground": "string",
+     "activeAvatar": "string",
+     "tokenVersion": "number",
+     "activeFrame": "string",
+     "activeTitle": "string",
+     "activeNameColor": "string",
+     "activeAura": "string",
+     "bannerUrl": "null",
+     "bio": "null",
+     "characterConfig": "null",
+     "socialLinks": "null",
+     "isAdmin": "boolean",
+     "notificationPreferences": "null",
+     "focusBackgroundSource": "string",
+     "selectedFocusBackgroundId": "null",
+     "selectedCustomBackgroundId": "null",
+     "focusBackgroundPreferenceVersion": "number",
+     "statEndurance": "number",
+     "statTenacity": "number",
+     "statVelocity": "number"
+    }
+   }
+  },
+  {
+   "label": "equip an unowned title by customization",
+   "method": "PATCH",
+   "path": "/api/profile/customization",
+   "status": 200,
+   "ms": 10,
+   "bytes": 476,
+   "cookie": false,
+   "shape": {
+    "success": "boolean",
+    "message": "string",
+    "characterConfig": "null",
+    "user": {
+     "id": "number",
+     "username": "string",
+     "name": "string",
+     "email": "string",
+     "avatarUrl": "null",
+     "bannerUrl": "null",
+     "bio": "null",
+     "activeAvatar": "string",
+     "activeFrame": "string",
+     "activeTitle": "string",
+     "activeAura": "string",
+     "activeNameColor": "string",
+     "socialLinks": "null",
+     "characterConfig": "null",
+     "level": "number",
+     "hunterRank": "string",
+     "currentXP": "number"
+    }
+   }
+  },
+  {
+   "label": "stats after unbought equip",
+   "method": "GET",
+   "path": "/api/user/stats",
+   "status": 200,
+   "ms": 6,
+   "bytes": 977,
+   "cookie": false,
+   "shape": {
+    "id": "number",
+    "email": "string",
+    "username": "string",
+    "name": "string",
+    "scholarId": "string",
+    "verificationStatus": "string",
+    "avatarUrl": "null",
+    "bannerUrl": "null",
+    "bio": "null",
+    "activeAvatar": "string",
+    "activeFrame": "string",
+    "activeTitle": "string",
+    "activeAura": "string",
+    "activeNameColor": "string",
+    "activeTheme": "string",
+    "activeBackground": "string",
+    "characterConfig": "null",
+    "socialLinks": "null",
+    "hunterRank": "string",
+    "level": "number",
+    "currentXP": "number",
+    "hp": "number",
+    "maxHp": "number",
+    "streakDays": "number",
+    "totalStudyMinutes": "number",
+    "totalStudySeconds": "number",
+    "lastActiveDate": "string",
+    "createdAt": "string",
+    "sylph": "number",
+    "timezone": "string",
+    "hasCompletedOnboarding": "boolean",
+    "isAdmin": "boolean",
+    "xpToNextLevel": "number",
+    "hasPassword": "boolean",
+    "effectiveMaxHp": "number",
+    "completedTodaySeconds": "number",
+    "todayStudySeconds": "number",
+    "todayStudyMinutes": "number",
+    "activeSessionStartedAt": "null",
+    "activeSessionId": "null"
+   }
+  },
+  {
+   "label": "unbought cosmetics now active",
+   "activeTitle": "Emperor",
+   "activeFrame": "frame_mythic_probe",
+   "activeAura": "aura_mythic_probe",
+   "activeNameColor": "name_mythic_probe"
+  },
+  {
+   "label": "banner as javascript url",
+   "method": "PATCH",
+   "path": "/api/profile/customization",
+   "status": 200,
+   "ms": 7,
+   "bytes": 524,
+   "cookie": false,
+   "shape": {
+    "success": "boolean",
+    "message": "string",
+    "characterConfig": "null",
+    "user": {
+     "id": "number",
+     "username": "string",
+     "name": "string",
+     "email": "string",
+     "avatarUrl": "string",
+     "bannerUrl": "string",
+     "bio": "null",
+     "activeAvatar": "string",
+     "activeFrame": "string",
+     "activeTitle": "string",
+     "activeAura": "string",
+     "activeNameColor": "string",
+     "socialLinks": "null",
+     "characterConfig": "null",
+     "level": "number",
+     "hunterRank": "string",
+     "currentXP": "number"
+    }
+   }
+  },
+  {
+   "label": "public profile shows that url",
+   "method": "GET",
+   "path": "/api/user/p1_c_mvxx27jn",
+   "status": 200,
+   "ms": 8,
+   "bytes": 347,
+   "cookie": false,
+   "shape": {
+    "profile": {
+     "id": "number",
+     "username": "string",
+     "name": "string",
+     "hunterRank": "string",
+     "level": "number",
+     "currentXP": "number",
+     "streakDays": "number",
+     "totalStudyMinutes": "number",
+     "activeAvatar": "string",
+     "activeTitle": "string",
+     "lastActiveDate": "string",
+     "createdAt": "string"
+    },
+    "relationship": "string",
+    "permissions": {
+     "canSendFriendRequest": "boolean",
+     "canSendMessage": "boolean"
+    }
+   }
+  },
+  {
+   "label": "stored urls served to others"
+  },
+  {
+   "label": "change email with no password",
+   "method": "PATCH",
+   "path": "/api/user/account",
+   "status": 200,
+   "ms": 13,
+   "bytes": 474,
+   "cookie": false,
+   "shape": {
+    "message": "string",
+    "user": {
+     "id": "number",
+     "email": "string",
+     "username": "string",
+     "name": "string",
+     "scholarId": "string",
+     "verificationStatus": "string",
+     "hunterRank": "string",
+     "level": "number",
+     "currentXP": "number",
+     "xpToNextLevel": "number",
+     "hp": "number",
+     "maxHp": "number",
+     "streakDays": "number",
+     "totalStudyMinutes": "number",
+     "hasCompletedOnboarding": "boolean",
+     "createdAt": "string",
+     "avatarUrl": "string",
+     "timezone": "string"
+    }
+   },
+   "answer": {
+    "message": "Account information updated successfully.",
+    "user": {
+     "id": 3,
+     "email": "changed_mvxx27jn@example.test",
+     "username": "p1_c_mvxx27jn",
+     "name": "Probe c",
+     "scholarId": "#000003",
+     "verificationStatus": "UNVERIFIED",
+     "hunterRank": "E",
+     "level": 1,
+     "currentXP": 0,
+     "xpToNextLevel": 182,
+     "hp": 100,
+     "maxHp": 100,
+     "streakDays": 0,
+     "totalStudyMinutes": 0,
+     "hasCompletedOnboarding": false,
+     "createdAt": "2026-11-01T14:19:37.095Z",
+     "avatarUrl": "http://attacker.invalid/track.png",
+     "timezone": "Asia/Karachi"
+    }
+   }
+  },
+  {
+   "label": "change timezone",
+   "method": "PATCH",
+   "path": "/api/user/account",
+   "status": 200,
+   "ms": 11,
+   "bytes": 472,
+   "cookie": false,
+   "shape": {
+    "message": "string",
+    "user": {
+     "id": "number",
+     "email": "string",
+     "username": "string",
+     "name": "string",
+     "scholarId": "string",
+     "verificationStatus": "string",
+     "hunterRank": "string",
+     "level": "number",
+     "currentXP": "number",
+     "xpToNextLevel": "number",
+     "hp": "number",
+     "maxHp": "number",
+     "streakDays": "number",
+     "totalStudyMinutes": "number",
+     "hasCompletedOnboarding": "boolean",
+     "createdAt": "string",
+     "avatarUrl": "string",
+     "timezone": "string"
+    }
+   }
+  },
+  {
+   "label": "delete account, unverified, wrong password",
+   "method": "POST",
+   "path": "/api/user/account/delete",
+   "status": 400,
+   "ms": 79,
+   "bytes": 59,
+   "cookie": false,
+   "shape": {
+    "error": "string"
+   },
+   "answer": {
+    "error": "Incorrect password. Account deletion cancelled."
+   }
+  },
+  {
+   "label": "send security code with no mail configured",
+   "method": "POST",
+   "path": "/api/user/security/send-code",
+   "status": 200,
+   "ms": 8,
+   "bytes": 106,
+   "cookie": false,
+   "shape": {
+    "success": "boolean",
+    "message": "string",
+    "provider": "string"
+   },
+   "answer": {
+    "success": true,
+    "message": "Security code sent to changed_mvxx27jn@example.test.",
+    "provider": "console_dev"
+   }
+  },
+  {
+   "label": "planner create, flag off",
+   "method": "POST",
+   "path": "/api/planner/workspace",
+   "status": 503,
+   "ms": 12,
+   "bytes": 332,
+   "cookie": false,
+   "shape": {
+    "error": {
+     "code": "string"
+    },
+    "detail": {
+     "schemaVersion": "number",
+     "code": "string",
+     "stage": "string",
+     "message": "string",
+     "traceId": "string",
+     "retryable": "boolean",
+     "resumable": "boolean",
+     "fieldRefs": [],
+     "activityRefs": [],
+     "dates": [],
+     "recoveryAction": "string"
+    }
+   },
+   "answer": {
+    "error": {
+     "code": "WORKER_UNAVAILABLE"
+    },
+    "detail": {
+     "schemaVersion": 2,
+     "code": "WORKER_UNAVAILABLE",
+     "stage": "INTAKE",
+     "message": "The student Planner preview is not enabled.",
+     "traceId": "5edc8344-91e5-46cf-b713-869aaa06252b",
+     "retryable": true,
+     "resumable": false,
+     "fieldRefs": [],
+     "activityRefs": [],
+     "dates": [],
+     "recoveryAction": "WAIT_FOR_WORKER"
+    }
+   }
+  },
+  {
+   "label": "planner document, no plan",
+   "method": "POST",
+   "path": "/api/planner/#-0000-4000-8000-#/documents",
+   "status": 503,
+   "ms": 6,
+   "bytes": 339,
+   "cookie": false,
+   "shape": {
+    "error": {
+     "code": "string"
+    },
+    "detail": {
+     "schemaVersion": "number",
+     "code": "string",
+     "stage": "string",
+     "message": "string",
+     "traceId": "string",
+     "retryable": "boolean",
+     "resumable": "boolean",
+     "fieldRefs": [],
+     "activityRefs": [],
+     "dates": [],
+     "recoveryAction": "string"
+    }
+   },
+   "answer": {
+    "error": {
+     "code": "WORKER_UNAVAILABLE"
+    },
+    "detail": {
+     "schemaVersion": 2,
+     "code": "WORKER_UNAVAILABLE",
+     "stage": "PERSISTENCE",
+     "message": "Planner V2 is not enabled in this deployment.",
+     "traceId": "7a7e4c2c-966a-4547-9fba-53b271ac5b01",
+     "retryable": true,
+     "resumable": false,
+     "fieldRefs": [],
+     "activityRefs": [],
+     "dates": [],
+     "recoveryAction": "WAIT_FOR_WORKER"
+    }
+   }
+  },
+  {
+   "label": "classic plan list",
+   "method": "GET",
+   "path": "/api/planner",
+   "status": 200,
+   "ms": 6,
+   "bytes": 2,
+   "cookie": false,
+   "shape": []
+  },
+  {
+   "label": "friend again check",
+   "method": "GET",
+   "path": "/api/friends",
+   "status": 200,
+   "ms": 5,
+   "bytes": 2,
+   "cookie": false,
+   "shape": []
+  },
+  {
+   "label": "create party",
+   "method": "POST",
+   "path": "/api/focus-party",
+   "status": 201,
+   "ms": 6,
+   "bytes": 62,
+   "cookie": false,
+   "shape": {
+    "name": "string",
+    "partyId": "number",
+    "success": "boolean",
+    "leaderId": "number"
+   },
+   "answer": {
+    "name": "Probe party",
+    "partyId": 1,
+    "success": true,
+    "leaderId": 1
+   }
+  },
+  {
+   "label": "invite B",
+   "method": "POST",
+   "path": "/api/focus-party/undefined/invite",
+   "status": 400,
+   "ms": 5,
+   "bytes": 53,
+   "cookie": false,
+   "shape": {
+    "error": "string",
+    "code": "string"
+   },
+   "answer": {
+    "error": "Invalid party ID",
+    "code": "PARTY_NOT_FOUND"
+   }
+  },
+  {
+   "label": "B's party view",
+   "method": "GET",
+   "path": "/api/focus-party",
+   "status": 200,
+   "ms": 5,
+   "bytes": 40,
+   "cookie": false,
+   "shape": {
+    "activeParty": "null",
+    "pendingInvites": []
+   },
+   "answer": {
+    "activeParty": null,
+    "pendingInvites": []
+   }
+  },
+  {
+   "label": "outsider reads party",
+   "method": "GET",
+   "path": "/api/focus-party/undefined",
+   "status": 400,
+   "ms": 4,
+   "bytes": 53,
+   "cookie": false,
+   "shape": {
+    "error": "string",
+    "code": "string"
+   },
+   "answer": {
+    "error": "Invalid party ID",
+    "code": "PARTY_NOT_FOUND"
+   }
+  },
+  {
+   "label": "outsider joins party",
+   "method": "POST",
+   "path": "/api/focus-party/undefined/join",
+   "status": 400,
+   "ms": 5,
+   "bytes": 53,
+   "cookie": false,
+   "shape": {
+    "error": "string",
+    "code": "string"
+   },
+   "answer": {
+    "error": "Invalid party ID",
+    "code": "PARTY_NOT_FOUND"
+   }
+  },
+  {
+   "label": "start party session",
+   "method": "POST",
+   "path": "/api/focus-party/undefined/session",
+   "status": 400,
+   "ms": 5,
+   "bytes": 53,
+   "cookie": false,
+   "shape": {
+    "error": "string",
+    "code": "string"
+   },
+   "answer": {
+    "error": "Invalid party ID",
+    "code": "PARTY_NOT_FOUND"
+   }
+  },
+  {
+   "label": "party session read",
+   "method": "GET",
+   "path": "/api/focus-party/undefined/session",
+   "status": 400,
+   "ms": 3,
+   "bytes": 53,
+   "cookie": false,
+   "shape": {
+    "error": "string",
+    "code": "string"
+   },
+   "answer": {
+    "error": "Invalid party ID",
+    "code": "PARTY_NOT_FOUND"
+   }
+  },
+  {
+   "label": "Sylvie JSON with no provider",
+   "method": "POST",
+   "path": "/api/system-messages/chat",
+   "status": 200,
+   "ms": 33,
+   "bytes": 802,
+   "cookie": false,
+   "shape": {
+    "userMessage": {
+     "id": "number",
+     "userId": "number",
+     "sessionId": "number",
+     "content": "string",
+     "type": "string",
+     "read": "boolean",
+     "attachmentUrl": "null",
+     "modelUsed": "null",
+     "createdAt": "string"
+    },
+    "aiMessage": {
+     "id": "number",
+     "userId": "number",
+     "sessionId": "number",
+     "content": "string",
+     "type": "string",
+     "read": "boolean",
+     "attachmentUrl": "null",
+     "modelUsed": "string",
+     "createdAt": "string",
+     "truncated": "boolean"
+    },
+    "reply": "string",
+    "message": "string",
+    "sessionId": "number",
+    "session": {
+     "id": "number",
+     "userId": "number",
+     "title": "string",
+     "createdAt": "string",
+     "updatedAt": "string"
+    },
+    "modelUsed": "string",
+    "modelDisplayName": "string"
+   },
+   "answer": {
+    "userMessage": {
+     "id": 7,
+     "userId": 1,
+     "sessionId": 1,
+     "content": "hello",
+     "type": "USER",
+     "read": true,
+     "attachmentUrl": null,
+     "modelUsed": null,
+     "createdAt": "2026-11-01T14:19:38.577Z"
+    },
+    "aiMessage": {
+     "id": 8,
+     "userId": 1,
+     "sessionId": 1,
+     "content": "The AI service is temporarily unavailable. Please try again later.",
+     "type": "INFO",
+     "read": false,
+     "attachmentUrl": null,
+     "modelUsed": "GEMINI (gemini-2.5-flash)",
+     "createdAt": "2026-11-01T14:19:38.589Z",
+     "truncated": false
+    },
+    "reply": "The AI service is temporarily unavailable. Please try again later.",
+    "message": "The AI service is temporarily unavailable. Please try again later.",
+    "sessionId": 1,
+    "session": {
+     "id": 1,
+     "userId": 1,
+     "title": "hello",
+     "createdAt": "2026-11-01T14:19:38.569Z",
+     "updatedAt": "2026-11-01T14:19:38.569Z"
+    },
+    "modelUsed": "GEMINI",
+    "modelDisplayName": "GEMINI (gemini-2.5-flash)"
+   }
+  },
+  {
+   "label": "after logout-all",
+   "method": "GET",
+   "path": "/api/user/stats",
+   "status": 200,
+   "ms": 6,
+   "bytes": 939,
+   "cookie": false,
+   "shape": {
+    "id": "number",
+    "email": "string",
+    "username": "string",
+    "name": "string",
+    "scholarId": "string",
+    "verificationStatus": "string",
+    "avatarUrl": "null",
+    "bannerUrl": "null",
+    "bio": "null",
+    "activeAvatar": "string",
+    "activeFrame": "string",
+    "activeTitle": "string",
+    "activeAura": "string",
+    "activeNameColor": "string",
+    "activeTheme": "string",
+    "activeBackground": "string",
+    "characterConfig": "null",
+    "socialLinks": "null",
+    "hunterRank": "string",
+    "level": "number",
+    "currentXP": "number",
+    "hp": "number",
+    "maxHp": "number",
+    "streakDays": "number",
+    "totalStudyMinutes": "number",
+    "totalStudySeconds": "number",
+    "lastActiveDate": "string",
+    "createdAt": "string",
+    "sylph": "number",
+    "timezone": "string",
+    "hasCompletedOnboarding": "boolean",
+    "isAdmin": "boolean",
+    "xpToNextLevel": "number",
+    "hasPassword": "boolean",
+    "effectiveMaxHp": "number",
+    "completedTodaySeconds": "number",
+    "todayStudySeconds": "number",
+    "todayStudyMinutes": "number",
+    "activeSessionStartedAt": "null",
+    "activeSessionId": "null"
+   },
+   "answer": {
+    "id": 2,
+    "email": "p1_b_mvxx27jn@example.test",
+    "username": "p1_b_mvxx27jn",
+    "name": "Probe b",
+    "scholarId": "#000002",
+    "verificationStatus": "UNVERIFIED",
+    "avatarUrl": null,
+    "bannerUrl": null,
+    "bio": null,
+    "activeAvatar": "class_scholar",
+    "activeFrame": "none",
+    "activeTitle": "Novice",
+    "activeAura": "none",
+    "activeNameColor": "default",
+    "activeTheme": "default",
+    "activeBackground": "none",
+    "characterConfig": null,
+    "socialLinks": null,
+    "hunterRank": "E",
+    "level": 1,
+    "currentXP": 0,
+    "hp": 100,
+    "maxHp": 100,
+    "streakDays": 0,
+    "totalStudyMinutes": 0,
+    "totalStudySeconds": 0,
+    "lastActiveDate": "",
+    "createdAt": "2026-11-01T14:19:36.995Z",
+    "sylph": 0,
+    "timezone": "Asia/Karachi",
+    "hasCompletedOnboarding": false,
+    "isAdmin": false,
+    "xpToNextLevel": 182,
+    "hasPassword": true,
+    "effectiveMaxHp": 100,
+    "completedTodaySeconds": 0,
+    "todayStudySeconds": 0,
+    "todayStudyMinutes": 0,
+    "activeSessionStartedAt": null,
+    "activeSessionId": null,
+    "activeSessionSubjectId": null,
+    "activeSessionQuestId": null,
+    "activeSessionStudySeconds": 0
+   }
+  }
+ ]
+}

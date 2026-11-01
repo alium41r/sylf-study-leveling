@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "profileId": "C01-CORRECTED-2",
+  "runId": "ab24df69-8acd-46e1-a5fc-9be0c653b664",
+  "rootRequestId": "fc26dac8-e8ed-506e-a2b2-dd72a701c3bb",
+  "ceilingUsd": 1.75,
+  "physicalRequests": 2,
+  "completedResponses": 2,
+  "knownUsage": {
+    "promptTokens": 21216,
+    "completionTokens": 25482,
+    "reasoningTokens": 19776,
+    "completionTokensOtherThanReasoning": 5706,
+    "totalTokens": 46698,
+    "cacheHitTokens": 768
+  },
+  "estimatedPublishedPeakCostUsd": 0.036717408,
+  "conservativeCacheMissUpperBoundUsd": 0.036944,
+  "actualInvoiceCostUsd": null,
+  "unknownSpendRequests": 0,
+  "uncertainLiabilityThisRootUsd": 0,
+  "priorUncertainLiabilityUsd": 0.10328219999999999,
+  "priorSpendingStateUnchanged": "UNKNOWN_SPEND",
+  "billingBasis": {
+    "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+    "peakInputCacheMissUsdPerMillion": 0.3,
+    "peakInputCacheHitUsdPerMillion": 0.006,
+    "peakCompletionUsdPerMillion": 1.2,
+    "callWindow": "2026-10-29 01:59–02:01 UTC, published peak hours",
+    "reasoningCountedOnceWithinCompletion": true
+  },
+  "actualRootFinalState": [
+    {
+      "attemptId": "28461f85-f0b6-499d-a442-14b36bc68733",
+      "state": "FAILED",
+      "stage": "RESEARCH",
+      "originalDeadline": "2026-10-29T05:59:37.455Z",
+      "consumed": {
+        "ocrPages": 0,
+        "followUps": 0,
+        "modelCalls": 2,
+        "inputTokens": 21216,
+        "outputTokens": 25482,
+        "fetchAttempts": 0,
+        "planningCalls": 0,
+        "extractedPages": 0,
+        "researchQueries": 0,
+        "researchSynthesisCalls": 2,
+        "selectedSourceCharacters": 2925
+      },
+      "reserved": {
+        "modelCalls": 0,
+        "inputTokens": 0,
+        "outputTokens": 0
+      }
+    }
+  ],
+  "calls": [
+    {
+      "sequence": 1,
+      "role": "RESEARCH",
+      "callId": "85e320be-3133-4786-ae9e-924a003e2fc4",
+      "attemptId": "28461f85-f0b6-499d-a442-14b36bc68733",
+      "startedAt": "2026-10-29T01:59:37.595Z",
+      "finishedAt": "2026-10-29T02:00:46.207Z",
+      "durationSeconds": 68.612,
+      "requestedModel": "deepseek-flash",
+      "effort": "HIGH",
+      "maxCompletionTokens": 65536,
+      "responseFormat": "json_object",
+      "effectiveModel": "deepseek-flash",
+      "fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "finishReason": "STOP",
+      "actualUsage": {
+        "promptTokens": 8913,
+        "completionTokens": 12540,
+        "totalTokens": 21453,
+        "cacheHitTokens": 640,
+        "reasoningTokens": 9088
+      },
+      "accountingState": "SETTLED",
+      "usageKnown": true,
+      "acceptedForExecution": true,
+      "estimatedCostUsd": 0.017533740000000003,
+      "responseSha256": "2a9f501de4054edd39b531e9397ad39b18cade3e77846446e4c65e3937470afc"
+    },
+    {
+      "sequence": 2,
+      "role": "VERIFICATION",
+      "callId": "bd245bfe-207d-4848-be16-6e49380d07e2",
+      "attemptId": "28461f85-f0b6-499d-a442-14b36bc68733",
+      "startedAt": "2026-10-29T02:00:46.318Z",
+      "finishedAt": "2026-10-29T02:01:57.248Z",
+      "durationSeconds": 70.93,
+      "requestedModel": "deepseek-flash",
+      "effort": "HIGH",
+      "maxCompletionTokens": 65536,
+      "responseFormat": "json_object",
+      "effectiveModel": "deepseek-flash",
+      "fingerprint": "bc19ba97cbe016479903222bb1578db6",
+      "finishReason": "STOP",
+      "actualUsage": {
+        "promptTokens": 12303,
+        "completionTokens": 12942,
+        "totalTokens": 25245,
+        "cacheHitTokens": 128,
+        "reasoningTokens": 10688
+      },
+      "accountingState": "SETTLED",
+      "usageKnown": true,
+      "acceptedForExecution": false,
+      "estimatedCostUsd": 0.019183667999999997,
+      "responseSha256": "d2913e6feefb42a8ca1f2abc608dbd802863c5beccf8d0f606374641916d9a75"
+    }
+  ],
+  "limits": [
+    "Estimate is computed from actual complete provider usage and published peak rates; it is not an invoice.",
+    "Rejected verification was settled once without a refund or retry.",
+    "Prior interrupted request is separate and remains unknown; no prior allowance was reused."
+  ]
+}

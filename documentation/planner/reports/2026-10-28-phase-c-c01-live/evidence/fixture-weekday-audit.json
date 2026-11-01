@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-28T15:32:15.263Z",
+  "status": "BLOCKING_CONFLICT",
+  "classification": "Qualification fixture/preflight bug, not evidence of a production allocator regression",
+  "inputSha256": "c498feb9b349dff43c31842045e711cbaf0dcf14d96a2ea7121d2f78c602de5b",
+  "canonicalOwner": "lib/planner/v2/server/context.ts:mondayIndex",
+  "canonicalDefinition": "(Date.getUTCDay()+6)%7; Monday=0, Friday=4, Saturday=5, Sunday=6",
+  "windowOwner": "lib/planner/v2/server/calendar-capacity.ts:89",
+  "ceilingsOwner": "lib/planner/v2/server/context.ts:245",
+  "restOwner": "lib/planner/v2/server/calendar-capacity.ts:97",
+  "explicitAcceptedRest": "Keep Friday free",
+  "actualRestWeekdays": [
+    {
+      "index": 5,
+      "civilWeekday": "Saturday"
+    }
+  ],
+  "actualCanonicalWeek": [
+    {
+      "civilWeekday": "Monday",
+      "mondayIndex": 0,
+      "ceilingMinutes": 120,
+      "rest": false,
+      "windows": [
+        {
+          "startMinute": 600,
+          "endMinute": 720
+        }
+      ]
+    },
+    {
+      "civilWeekday": "Tuesday",
+      "mondayIndex": 1,
+      "ceilingMinutes": 120,
+      "rest": false,
+      "windows": [
+        {
+          "startMinute": 1020,
+          "endMinute": 1140
+        }
+      ]
+    },
+    {
+      "civilWeekday": "Wednesday",
+      "mondayIndex": 2,
+      "ceilingMinutes": 120,
+      "rest": false,
+      "windows": [
+        {
+          "startMinute": 1020,
+          "endMinute": 1140
+        }
+      ]
+    },
+    {
+      "civilWeekday": "Thursday",
+      "mondayIndex": 3,
+      "ceilingMinutes": 120,
+      "rest": false,
+      "windows": [
+        {
+          "startMinute": 1020,
+          "endMinute": 1140
+        }
+      ]
+    },
+    {
+      "civilWeekday": "Friday",
+      "mondayIndex": 4,
+      "ceilingMinutes": 120,
+      "rest": false,
+      "windows": [
+        {
+          "startMinute": 1020,
+          "endMinute": 1140
+        }
+      ]
+    },
+    {
+      "civilWeekday": "Saturday",
+      "mondayIndex": 5,
+      "ceilingMinutes": 0,
+      "rest": true,
+      "windows": []
+    },
+    {
+      "civilWeekday": "Sunday",
+      "mondayIndex": 6,
+      "ceilingMinutes": 180,
+      "rest": false,
+      "windows": [
+        {
+          "startMinute": 540,
+          "endMinute": 720
+        }
+      ]
+    }
+  ],
+  "actualUnpaidServiceWitness": {
+    "source": "evidence/unpaid-binding-1/calls/006-REVIEWER.json -> input.context.capacity.calendar.days",
+    "friday": {
+      "allDayBlocked": false,
+      "approved": [
+        {
+          "end": "2026-10-30T14:00:00.000Z",
+          "start": "2026-10-30T12:00:00.000Z"
+        }
+      ],
+      "busy": [],
+      "date": "2026-10-30",
+      "excluded": false
+    },
+    "saturday": {
+      "allDayBlocked": false,
+      "approved": [],
+      "busy": [
+        {
+          "end": "2026-10-31T06:00:00.000Z",
+          "start": "2026-10-31T05:00:00.000Z"
+        },
+        {
+          "end": "2026-10-31T06:30:00.000Z",
+          "start": "2026-10-31T05:30:00.000Z"
+        }
+      ],
+      "date": "2026-10-31",
+      "excluded": true
+    }
+  },
+  "intendedWeeklyCivilInput": {
+    "Monday": "17:00–19:00",
+    "Tuesday": "17:00–19:00",
+    "Wednesday": "17:00–19:00",
+    "Thursday": "17:00–19:00",
+    "Friday": "REST",
+    "Saturday": "09:00–12:00",
+    "Sunday": "10:00–12:00"
+  },
+  "proposedFutureNormalization": {
+    "notApplied": true,
+    "requiresNewFrozenManifestAndAuthorization": true,
+    "weekdayConversion": "Sunday-zero -> (value+6)%7 at the single fixture input boundary",
+    "canonicalDailyCeilings": [
+      120,
+      120,
+      120,
+      120,
+      0,
+      180,
+      120
+    ],
+    "canonicalRestWeekdays": [
+      4
+    ],
+    "canonicalWeeklyIndices": [
+      0,
+      1,
+      2,
+      3,
+      5,
+      6
+    ]
+  },
+  "preflightGap": "Schema checks and scripted service success checked numeric range and internal feasibility but not civil-date correspondence with accepted prose. Hash integrity faithfully preserved the wrong encoding.",
+  "liveConsequence": "Operator cancelled during Research. No live strategy, capacity candidate, translation, review, revision or Apply was generated; no Friday-violating plan was published."
+}

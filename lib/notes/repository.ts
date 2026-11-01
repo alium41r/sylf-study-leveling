@@ -34,7 +34,7 @@ import {
   joinContent,
   prepareContent,
 } from "./bytes";
-import { NotesError, storageError } from "./errors";
+import { NotesError, storageError, type NotesErrorCode } from "./errors";
 import {
   ancestors,
   frontier,
@@ -152,6 +152,9 @@ const KNOWN_FEATURES = new Set([
   "paged-v1",
   "attachments-v1",
   "ink-v1",
+  "page-layers-v1",
+            "creative-tools-v1",
+  "pdf-v1",
 ]);
 const zCatalog = z.object({
   documentId: idSchema,
@@ -209,6 +212,77 @@ export function validateUpdate(bytes: Uint8Array): void {
       { cause }
     );
   }
+}
+
+/** Per-operation proof only: sharing immutable dependencies must not repeat decryption,
+ * whole-asset hashing or schema decoding for every historical revision. */
+function revisionVerifier(
+  libraryId: string,
+  read: (hash: string) => Promise<Uint8Array>
+) {
+  const descriptors = new Map<
+      string,
+      { value: DocumentDescriptor; size: number }
+    >(),
+    contents = new Set<string>();
+  let descriptorBytes = 0;
+  return async (revision: Revision) => {
+    const commit = revision.commit;
+    let entry = descriptors.get(commit.descriptor.hash);
+    if (!entry) {
+      const bytes = await read(commit.descriptor.hash);
+      entry = { value: parseDescriptor(bytes), size: bytes.length };
+      if (descriptorBytes + bytes.length > 8 * 1024 * 1024) {
+        descriptors.clear();
+        descriptorBytes = 0;
+      }
+      descriptors.set(commit.descriptor.hash, entry);
+      descriptorBytes += bytes.length;
+    }
+    const descriptor = entry.value;
+    if (
+      entry.size !== commit.descriptor.size ||
+      descriptor.libraryId !== libraryId ||
+      descriptor.documentId !== commit.documentId
+    )
+      throw new NotesError(
+        "CORRUPT",
+        "Revision descriptor identity or size mismatch."
+      );
+    const content = async (ref: ContentRef, update = false) => {
+      const key = (update ? "update:" : "asset:") + JSON.stringify(ref);
+      if (contents.has(key)) return;
+      const bytes = await joinContent(ref, read);
+      if (update) validateUpdate(bytes);
+      if (contents.size >= 60000) contents.clear();
+      contents.add(key);
+    };
+    for (const update of commit.updates) {
+      if (
+        !descriptor.streams.some(
+          (s) =>
+            s.streamId === update.streamId &&
+            s.epoch === update.epoch &&
+            s.codec === update.codec
+        )
+      )
+        throw new NotesError("CORRUPT", "Revision stream identity mismatch.");
+      if (
+        update.role === "checkpoint" &&
+        JSON.stringify([...update.covers].sort()) !==
+          JSON.stringify([...commit.parents].sort())
+      )
+        throw new NotesError(
+          "CORRUPT",
+          "Checkpoint coverage frontier mismatch."
+        );
+      await content(update.content, true);
+    }
+    for (const asset of descriptor.assets) await content(asset.content);
+    if (commit.kind === "tombstone" && commit.updates.length)
+      throw new NotesError("CORRUPT", "Deletion contains replacement content.");
+    return descriptor;
+  };
 }
 
 /** IndexedDB implementation of the platform-neutral repository API below. No content is sent to Sylf servers. */
@@ -743,6 +817,29 @@ export class IndexedDbNotesRepository {
       .toArray();
     this.session.assert();
     return rows.map((r) => r.documentId);
+  }
+  /** Presence only; never substitutes for source validation when opening content. */
+  async hasDocument(documentId: string): Promise<boolean> {
+    await this.guard();
+    const row = await this.db.documents.get([this.scope, documentId]);
+    this.session.assert();
+    return !!row;
+  }
+  /** A new alias may hand off only when it holds no local source/recovery bytes. */
+  async hasLocalData(): Promise<boolean> {
+    await this.guard();
+    const counts = await Promise.all(
+      [
+        this.db.documents,
+        this.db.journal,
+        this.db.objects,
+        this.db.stages,
+        this.db.quarantine,
+        this.db.outbox,
+      ].map((table) => table.where("scope").equals(this.scope).limit(1).count())
+    );
+    this.session.assert();
+    return counts.some(Boolean);
   }
   /** Rebuildable, encrypted metadata projection. Journal/immutable source remain authoritative. */
   async catalogPage(
@@ -1340,8 +1437,25 @@ export class IndexedDbNotesRepository {
   }
   /** All raw objects in a revision's history, including assets. Useful for verified upload/export, never per pointer sample. */
   async closure(ids: string[]): Promise<PreparedObject[]> {
+    await this.guard();
     const map = new Map<string, Revision>(),
-      pending = [...ids];
+      objects = new Map<string, PreparedObject>();
+    let total = 0;
+    const read = async (hash: string) => {
+      this.session.assert();
+      const prior = objects.get(hash);
+      if (prior) return prior.bytes;
+      const bytes = await this.readObject(hash);
+      total += bytes.length;
+      if (total > 256 * 1024 * 1024 || objects.size >= 60000)
+        throw new NotesError(
+          "LIMIT",
+          "Revision closure exceeds its bounded memory budget. Originals were retained."
+        );
+      objects.set(hash, { hash, bytes });
+      return bytes;
+    };
+    const pending = [...ids];
     while (pending.length) {
       const id = pending.pop()!;
       if (map.has(id)) continue;
@@ -1350,7 +1464,7 @@ export class IndexedDbNotesRepository {
           "LIMIT",
           "Revision closure exceeds this operation's budget."
         );
-      const commit = parseCommit(await this.readObject(id));
+      const commit = parseCommit(await read(id));
       if (commit.libraryId !== this.libraryId)
         throw new NotesError(
           "OWNERSHIP",
@@ -1359,47 +1473,16 @@ export class IndexedDbNotesRepository {
       map.set(id, { id, commit });
       pending.push(...commit.parents);
     }
-    const all = [...map.values()],
-      wanted = ancestors(ids, map),
-      objects = new Map<string, PreparedObject>(),
-      verifiedContents = new Set<string>();
-    for (const revision of orderedRevisions(
-      all.filter((r) => wanted.has(r.id))
-    )) {
-      const descriptor = await this.descriptor(revision.commit.descriptor);
-      for (const ref of refsOf(descriptor, revision.commit)) {
-        if (!objects.has(ref.hash)) {
-          const bytes = await this.readObject(ref.hash);
-          if (bytes.length !== ref.size)
-            throw new NotesError("CORRUPT", "Dependency size mismatch.");
-          objects.set(ref.hash, { hash: ref.hash, bytes });
-        }
-      }
-      for (const update of revision.commit.updates) {
-        const key = JSON.stringify(update.content);
-        if (verifiedContents.has(key)) continue;
-        const bytes = await joinContent(
-          update.content,
-          async (hash) => objects.get(hash)!.bytes
-        );
-        validateUpdate(bytes);
-        verifiedContents.add(key);
-      }
-      for (const asset of descriptor.assets) {
-        const key = JSON.stringify(asset.content);
-        if (verifiedContents.has(key)) continue;
-        await joinContent(
-          asset.content,
-          async (hash) => objects.get(hash)!.bytes
-        );
-        verifiedContents.add(key);
-      }
-      objects.set(revision.id, {
-        hash: revision.id,
-        bytes: await this.readObject(revision.id),
-      });
+    const verify = revisionVerifier(this.libraryId, read),
+      output = new Map<string, PreparedObject>();
+    for (const revision of orderedRevisions([...map.values()])) {
+      const descriptor = await verify(revision);
+      for (const ref of refsOf(descriptor, revision.commit))
+        output.set(ref.hash, objects.get(ref.hash)!);
+      output.set(revision.id, objects.get(revision.id)!);
     }
-    return [...objects.values()];
+    await this.guard();
+    return [...output.values()];
   }
   /** Atomically adopt a completely verified import/download page and its cursor. No partial page activation. */
   async installBatch(
@@ -1410,6 +1493,7 @@ export class IndexedDbNotesRepository {
   ): Promise<void> {
     await this.guard();
     const incoming = new Map<string, Uint8Array>();
+    const changedDocuments = new Set<string>();
     for (const object of objects) {
       const bytes = object.bytes.slice();
       if (
@@ -1642,13 +1726,16 @@ export class IndexedDbNotesRepository {
                 requestHash,
                 revisionId: revision.id,
               });
-            await this.db.journal.put({
-              scope: this.scope,
-              id: revision.id,
-              documentId: revision.commit.documentId,
-            });
+            if (!(await this.db.journal.get([this.scope, revision.id]))) {
+              changedDocuments.add(revision.commit.documentId);
+              await this.db.journal.put({
+                scope: this.scope,
+                id: revision.id,
+                documentId: revision.commit.documentId,
+              });
+            }
             const job = await this.db.outbox.get([this.scope, revision.id]);
-            if (!job || source === "remote")
+            if (!job || (source === "remote" && job.state !== "verified"))
               await this.db.outbox.put({
                 scope: this.scope,
                 id: revision.id,
@@ -1662,13 +1749,18 @@ export class IndexedDbNotesRepository {
           }
           this.options.fault?.("after-journal");
           this.options.fault?.("after-outbox");
-          for (const [id, state] of states)
+          for (const [id, state] of states) {
+            // The document index is derived. A verified replay must still be
+            // able to reconstruct a missing index row from retained history.
+            if (state.version === 0) changedDocuments.add(id);
+            if (!changedDocuments.has(id)) continue;
             await this.db.documents.put({
               scope: this.scope,
               documentId: id,
               version: state.version + 1,
               heads: frontier(state.revisions),
             });
+          }
           if (cursor)
             await this.db.cursors.put({
               scope: this.scope,
@@ -1679,9 +1771,14 @@ export class IndexedDbNotesRepository {
           this.options.fault?.("before-commit");
         }
       );
-      for (const id of documents) this.cache.delete(id);
+      for (const id of changedDocuments) {
+        this.cache.delete(id);
+        this.catalogCache.delete(id);
+      }
       this.session.assert();
-      this.notify();
+      // Cursor-only scans and duplicate adoption are not edits. Broadcasting
+      // them made idle tabs wake one another and repeatedly dirty the library.
+      if (changedDocuments.size) this.notify();
     } catch (error) {
       throw storageError(error);
     }
@@ -1696,29 +1793,55 @@ export class IndexedDbNotesRepository {
     return jobs;
   }
   async claimJob(now = Date.now(), leaseMs = 60000): Promise<OutboxJob | null> {
+    return (await this.claimJobs(1, now, leaseMs))[0] ?? null;
+  }
+  /** Claim one bounded publication batch atomically; existing state index avoids
+   * scanning every retained verified receipt for every pending revision. */
+  async claimJobs(
+    limit: number,
+    now = Date.now(),
+    leaseMs = 60000,
+    excluded: ReadonlySet<string> = new Set()
+  ): Promise<OutboxJob[]> {
+    if (
+      !Number.isSafeInteger(limit) ||
+      limit < 1 ||
+      limit > 100 ||
+      !Number.isFinite(now) ||
+      !Number.isSafeInteger(leaseMs) ||
+      leaseMs < 1
+    )
+      throw new NotesError("LIMIT", "Invalid outbox lease budget.");
     await this.guard();
     return this.db.transaction(
       "rw",
       [this.db.libraries, this.db.outbox],
       async () => {
         await this.guard();
-        const rows = await this.db.outbox
-          .where("scope")
-          .equals(this.scope)
-          .toArray();
-        const job = rows.find(
-          (j) =>
-            (j.state === "pending" && j.nextAttemptAt <= now) ||
-            (j.state === "uploading" && (j.leaseUntil ?? 0) <= now)
-        );
-        if (!job) return null;
-        const claimed: OutboxJob = {
-          ...job,
-          state: "uploading",
-          leaseId: newId(),
-          leaseUntil: now + leaseMs,
-        };
-        await this.db.outbox.put(claimed);
+        const [pending, expired] = await Promise.all([
+          this.db.outbox
+            .where("[scope+state]")
+            .equals([this.scope, "pending"])
+            .filter((j) => j.nextAttemptAt <= now && !excluded.has(j.id))
+            .limit(limit)
+            .toArray(),
+          this.db.outbox
+            .where("[scope+state]")
+            .equals([this.scope, "uploading"])
+            .filter((j) => (j.leaseUntil ?? 0) <= now && !excluded.has(j.id))
+            .limit(limit)
+            .toArray(),
+        ]);
+        const claimed: OutboxJob[] = [...pending, ...expired]
+          .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+          .slice(0, limit)
+          .map((job) => ({
+            ...job,
+            state: "uploading",
+            leaseId: newId(),
+            leaseUntil: now + leaseMs,
+          }));
+        if (claimed.length) await this.db.outbox.bulkPut(claimed);
         this.session.assert();
         return claimed;
       }
@@ -1761,13 +1884,46 @@ export class IndexedDbNotesRepository {
       }
     );
     this.session.assert();
-    this.notify();
+    // Outbox receipts do not change native document heads. The synchronizer
+    // publishes its status after the pass; do not trigger editor reloads or
+    // cross-tab edit notifications for every acknowledged historical revision.
   }
   async cursor(channel: string): Promise<string | undefined> {
     await this.guard();
     const row = await this.db.cursors.get([this.scope, channel]);
     this.session.assert();
     return row?.value;
+  }
+  /** Derived-copy receipts contain hashes only. They never acknowledge native
+   * outbox work or authorize deleting a document/history object. */
+  async publicationReceipt(documentId: string, format: "archive" | "pdf") {
+    idSchema.parse(documentId);
+    z.enum(["archive", "pdf"]).parse(format);
+    const value = await this.cursor(`publication-v1:${format}:${documentId}`);
+    return value && /^[a-f0-9]{64}$/.test(value) ? value : undefined;
+  }
+  async rememberPublication(
+    documentId: string,
+    format: "archive" | "pdf",
+    fingerprint: string
+  ) {
+    await this.guard();
+    idSchema.parse(documentId);
+    hashSchema.parse(fingerprint);
+    z.enum(["archive", "pdf"]).parse(format);
+    await this.db.transaction(
+      "rw",
+      [this.db.libraries, this.db.cursors],
+      async () => {
+        await this.guard();
+        await this.db.cursors.put({
+          scope: this.scope,
+          channel: `publication-v1:${format}:${documentId}`,
+          value: fingerprint,
+        });
+      }
+    );
+    this.session.assert();
   }
   async resumeBlockedJobs(): Promise<void> {
     await this.guard();
@@ -2053,18 +2209,37 @@ export class IndexedDbNotesRepository {
     this.notify();
     return revisions.length;
   }
-  async inspectIntegrity(): Promise<{
+  async inspectIntegrity(
+    options: {
+      signal?: AbortSignal;
+      onProgress?: (value: {
+        stage: "history" | "dependencies";
+        completed: number;
+        total: number;
+      }) => void;
+    } = {}
+  ): Promise<{
     issues: { id: string; code: string }[];
     recoverableHeads: Record<string, string[]>;
   }> {
     await this.guard();
+    const check = () => {
+      this.session.assert();
+      options.signal?.throwIfAborted();
+    };
+    check();
     const issues: { id: string; code: string }[] = [],
-      valid: Revision[] = [];
+      valid: Revision[] = [],
+      revisions = new Map<string, Revision>(),
+      failures = new Map<string, NotesErrorCode>();
     const journal = await this.db.journal
-      .where("scope")
-      .equals(this.scope)
-      .toArray();
-    const journalIds = new Set(journal.map((row) => row.id));
+        .where("scope")
+        .equals(this.scope)
+        .toArray(),
+      journalIds = new Set(journal.map((row) => row.id)),
+      journalDocuments = new Map(
+        journal.map((row) => [row.id, row.documentId])
+      );
     const sources = await this.db.objects
       .where("[scope+role]")
       .equals([this.scope, "revision"])
@@ -2072,31 +2247,110 @@ export class IndexedDbNotesRepository {
     for (const key of sources)
       if (!journalIds.has(key[1]))
         issues.push({ id: key[1], code: "JOURNAL_MISSING" });
-    for (const row of journal) {
+    // A missing journal row is recoverable if its raw ancestor bytes survive.
+    // Read each reachable commit once, including such unindexed ancestors.
+    const pending = [...journalIds];
+    while (pending.length) {
+      check();
+      const id = pending.pop()!;
+      if (revisions.has(id) || failures.has(id)) continue;
       try {
-        await this.closure([row.id]);
-        valid.push({
-          id: row.id,
-          commit: parseCommit(await this.readObject(row.id)),
-        });
+        const commit = parseCommit(await this.readObject(id));
+        if (
+          commit.libraryId !== this.libraryId ||
+          (journalDocuments.has(id) &&
+            journalDocuments.get(id) !== commit.documentId)
+        )
+          throw new NotesError("CORRUPT", "Journal source identity mismatch.");
+        revisions.set(id, { id, commit });
+        pending.push(...commit.parents);
       } catch (error) {
-        issues.push({
-          id: row.id,
-          code: error instanceof NotesError ? error.code : "CORRUPT",
+        check();
+        failures.set(id, error instanceof NotesError ? error.code : "CORRUPT");
+      }
+      if ((revisions.size + failures.size) % 100 === 0) {
+        options.onProgress?.({
+          stage: "history",
+          completed: revisions.size + failures.size,
+          total: revisions.size + failures.size + pending.length,
         });
+        await new Promise((resolve) => setTimeout(resolve, 0));
       }
     }
+    // Bounded raw-byte cache is disposable; it carries no proof across scans.
+    const cache = new Map<string, Uint8Array>();
+    let cachedBytes = 0;
+    const read = async (hash: string) => {
+      check();
+      const cached = cache.get(hash);
+      if (cached) return cached;
+      const bytes = await this.readObject(hash);
+      while (cachedBytes + bytes.length > 16 * 1024 * 1024 && cache.size) {
+        const first = cache.keys().next().value!;
+        cachedBytes -= cache.get(first)!.length;
+        cache.delete(first);
+      }
+      cache.set(hash, bytes);
+      cachedBytes += bytes.length;
+      return bytes;
+    };
+    const verify = revisionVerifier(this.libraryId, read),
+      ordered = [...revisions.values()].sort(
+        (a, b) =>
+          a.commit.sequence - b.commit.sequence || (a.id < b.id ? -1 : 1)
+      );
+    for (let i = 0; i < ordered.length; i++) {
+      check();
+      const revision = ordered[i];
+      try {
+        for (const id of revision.commit.parents) {
+          const parent = revisions.get(id);
+          if (failures.has(id))
+            throw new NotesError(failures.get(id)!, "Ancestor needs recovery.");
+          if (
+            !parent ||
+            parent.commit.documentId !== revision.commit.documentId ||
+            parent.commit.sequence >= revision.commit.sequence
+          )
+            throw new NotesError(
+              "CORRUPT",
+              "Revision ancestry is incomplete or invalid."
+            );
+        }
+        await verify(revision);
+        // Retained raw ancestors also participate in the frontier. Omitting a
+        // missing index row would incorrectly expose its indexed parent as a tip.
+        valid.push(revision);
+      } catch (error) {
+        check();
+        failures.set(
+          revision.id,
+          error instanceof NotesError ? error.code : "CORRUPT"
+        );
+      }
+      if ((i + 1) % 100 === 0 || i + 1 === ordered.length) {
+        options.onProgress?.({
+          stage: "dependencies",
+          completed: i + 1,
+          total: ordered.length,
+        });
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+    }
+    for (const id of journalIds)
+      if (failures.has(id)) issues.push({ id, code: failures.get(id)! });
     const groups = new Map<string, Revision[]>();
-    for (const revision of valid)
-      groups.set(revision.commit.documentId, [
-        ...(groups.get(revision.commit.documentId) ?? []),
-        revision,
-      ]);
-    this.session.assert();
+    for (const revision of valid) {
+      const group = groups.get(revision.commit.documentId) || [];
+      group.push(revision);
+      groups.set(revision.commit.documentId, group);
+    }
+    check();
+    await this.guard();
     return {
       issues,
       recoverableHeads: Object.fromEntries(
-        [...groups].map(([id, revisions]) => [id, frontier(revisions)])
+        [...groups].map(([id, revs]) => [id, frontier(revs)])
       ),
     };
   }
@@ -2126,9 +2380,12 @@ export type NotesRepository = Pick<
   | "installBatch"
   | "jobs"
   | "claimJob"
+  | "claimJobs"
   | "settleJob"
   | "resumeBlockedJobs"
   | "cursor"
+  | "publicationReceipt"
+  | "rememberPublication"
   | "quarantine"
   | "repairObject"
   | "rebuildCatalog"

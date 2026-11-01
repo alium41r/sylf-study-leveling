@@ -1,4 +1,5 @@
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
+import { NATIVE_ACCESS_SECONDS, NATIVE_AUDIENCE } from "./native-auth-constants";
 
 export const AUTH_COOKIE_NAME = "hunter_token";
 
@@ -16,6 +17,8 @@ export interface AuthTokenPayload extends JWTPayload {
   /** Session-revocation counter: getSession rejects tokens whose version no
    *  longer matches the user's current tokenVersion. */
   tokenVersion?: number;
+  /** AuthSession id, so one device can be ended on its own. Missing on tokens from before Phase 11. */
+  sid?: string;
   timezone?: string;
 }
 
@@ -87,21 +90,70 @@ export async function verifyToken(token: string): Promise<AuthTokenPayload | nul
 }
 
 /**
+ * The native access token (ADR 0009): 15 minutes, its own audience, and only what revocation needs. The audiences do not cross: the cookie
+ * path verifies `sylf-app`, this path verifies `sylf-native`, so neither token works in the other's place.
+ */
+export async function signNativeToken(payload: { userId: number; sid: string; tokenVersion: number }): Promise<string> {
+  return new SignJWT({ ...payload })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuer(getJwtIssuer())
+    .setAudience(NATIVE_AUDIENCE)
+    .setIssuedAt()
+    .setExpirationTime(`${NATIVE_ACCESS_SECONDS}s`)
+    .sign(getAuthSecret());
+}
+
+/** Verifies a native access token. `sid` and `tokenVersion` are required: a token that revocation cannot reach is no token at all. */
+export async function verifyNativeToken(token: string): Promise<AuthTokenPayload | null> {
+  try {
+    const { payload } = await jwtVerify(token, getAuthSecret(), { issuer: getJwtIssuer(), audience: NATIVE_AUDIENCE });
+    if (!payload.userId || typeof payload.sid !== "string" || !payload.sid || typeof payload.tokenVersion !== "number") return null;
+    return { ...payload, userId: Number(payload.userId) } as AuthTokenPayload;
+  } catch {
+    return null;
+  }
+}
+
+/** Whether a verified session came through the bearer path. Only verified payloads reach this, so the audience is trustworthy. */
+export function isNativeSession(payload: Pick<AuthTokenPayload, "aud">): boolean {
+  return payload.aud === NATIVE_AUDIENCE || (Array.isArray(payload.aud) && payload.aud.includes(NATIVE_AUDIENCE));
+}
+
+/** The raw bearer credential, unverified. */
+export function getBearerToken(req: Request): string | null {
+  const header = req.headers.get("authorization");
+  const match = header?.match(/^Bearer ([A-Za-z0-9._~+/-]+=*)$/);
+  return match ? match[1] : null;
+}
+
+/**
+ * A browser, or a page inside one, cannot use the bearer path (ADR 0009 decision 6). Browsers add Sec-Fetch-Site to every request and script
+ * cannot remove it, so a leaked native token cannot be replayed from a web page.
+ */
+export function isBrowserRequest(req: Request): boolean {
+  return req.headers.has("sec-fetch-site");
+}
+
+/**
  * Pure cookie-only session extraction (no database access). Used by the
  * middleware (edge runtime) and by lib/auth-server as the first step.
  * Browser sessions are cookie-only; the Authorization: Bearer path was
- * removed in S3.
+ * removed in S3, and the native path in getSession accepts only native tokens.
  */
 export async function getCookieSession(req: Request): Promise<AuthTokenPayload | null> {
+  const token = getCookieToken(req);
+  return token ? verifyToken(token) : null;
+}
+
+/** The raw session cookie, unverified. Only for identifying a token that has already been verified. */
+export function getCookieToken(req: Request): string | null {
   const cookieHeader = req.headers.get("cookie");
   if (!cookieHeader) return null;
   const match = cookieHeader
     .split(";")
     .map((c) => c.trim())
     .find((c) => c.startsWith(`${AUTH_COOKIE_NAME}=`));
-  if (!match) return null;
-  const token = match.substring(`${AUTH_COOKIE_NAME}=`.length);
-  return verifyToken(token);
+  return match ? match.substring(`${AUTH_COOKIE_NAME}=`.length) : null;
 }
 
 /**

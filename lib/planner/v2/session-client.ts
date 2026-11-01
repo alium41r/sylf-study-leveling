@@ -35,7 +35,8 @@ export class SessionProtocolV2 {
     const raw = this.storage?.getItem(this.key(execution.sessionId));
     if (raw) this.pending = StudySessionTransitionV2Schema.parse(JSON.parse(raw));
   }
-  accepted(): SessionExecutionV2 | null { return this.execution ? structuredClone(this.execution) : null; }
+  // A fresh copy. Parsing makes one on every runtime: Hermes has no structuredClone.
+  accepted(): SessionExecutionV2 | null { return this.execution ? StudySessionExecutionV2Schema.parse(this.execution) : null; }
   private key(sessionId: number) { return this.storageKey ?? `sylf_session_transition_v2_${sessionId}`; }
   private remember(transition: Transition | null, sessionId: number): void {
     try { if (transition) this.storage?.setItem(this.key(sessionId), JSON.stringify(transition)); else this.storage?.removeItem(this.key(sessionId)); } catch { /* Server receipts remain authoritative when storage is unavailable. */ }

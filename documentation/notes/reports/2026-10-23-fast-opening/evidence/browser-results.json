@@ -1,0 +1,23 @@
+{
+  "liveRepeatReloadToCardObservedMs": 4620,
+  "liveRepeatReloadCardVisible": true,
+  "liveCardSelectionObservedMs": 554,
+  "fixtureLocalReloadObservedMs": 254,
+  "measurement": "Browser-control wall-clock observations, include control overhead. One live repeat reload; no percentile or zero-latency claim.",
+  "liveSameSite": true,
+  "liveSecondSyntheticRevisionSurvivesReload": true,
+  "liveNoReconnectionRequired": true,
+  "normalRoutineStatusLabelsAbsent": true,
+  "desktopFixture": {
+    "width": 1440,
+    "height": 900,
+    "appearance": "dark/custom purple"
+  },
+  "phoneFixture": {
+    "width": 390,
+    "height": 844,
+    "appearance": "custom light/green",
+    "horizontalOverflow": false
+  },
+  "physicalDeviceAndIndependentProfileTested": false
+}

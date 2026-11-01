@@ -1,0 +1,92 @@
+[
+  {
+    "model": "PlannerPlan",
+    "field": "PlannerRevision_PlannerPlan_activeRevisionId_idToPlannerRevision",
+    "relation": "PlannerPlan_activeRevisionId_idToPlannerRevision"
+  },
+  {
+    "model": "PlannerPlan",
+    "field": "PlannerRevision_PlannerPlan_latestDraftRevisionId_idToPlannerRevision",
+    "relation": "PlannerPlan_latestDraftRevisionId_idToPlannerRevision"
+  },
+  {
+    "model": "PlannerPlan",
+    "field": "PlannerIntentVersion_PlannerPlan_workingIntentVersionId_idToPlannerIntentVersion",
+    "relation": "PlannerPlan_workingIntentVersionId_idToPlannerIntentVersion"
+  },
+  {
+    "model": "PlannerRevision",
+    "field": "PlannerPlan_PlannerPlan_activeRevisionId_idToPlannerRevision",
+    "relation": "PlannerPlan_activeRevisionId_idToPlannerRevision"
+  },
+  {
+    "model": "PlannerRevision",
+    "field": "PlannerPlan_PlannerPlan_latestDraftRevisionId_idToPlannerRevision",
+    "relation": "PlannerPlan_latestDraftRevisionId_idToPlannerRevision"
+  },
+  {
+    "model": "PlannerRevision",
+    "field": "PlannerQuestLink_PlannerQuestLink_appliedRevisionId_planIdToPlannerRevision",
+    "relation": "PlannerQuestLink_appliedRevisionId_planIdToPlannerRevision"
+  },
+  {
+    "model": "PlannerRevision",
+    "field": "PlannerQuestLink_PlannerQuestLink_createdRevisionId_planIdToPlannerRevision",
+    "relation": "PlannerQuestLink_createdRevisionId_planIdToPlannerRevision"
+  },
+  {
+    "model": "PlannerRevision",
+    "field": "PlannerRevision_PlannerRevision_baseRevisionId_planIdToPlannerRevision",
+    "relation": "PlannerRevision_baseRevisionId_planIdToPlannerRevision"
+  },
+  {
+    "model": "PlannerRevision",
+    "field": "other_PlannerRevision_PlannerRevision_baseRevisionId_planIdToPlannerRevision",
+    "relation": "PlannerRevision_baseRevisionId_planIdToPlannerRevision"
+  },
+  {
+    "model": "PlannerRevision",
+    "field": "PlannerIntentVersion_PlannerRevision_requestedIntentVersionId_planIdToPlannerIntentVersion",
+    "relation": "PlannerRevision_requestedIntentVersionId_planIdToPlannerIntentVersion"
+  },
+  {
+    "model": "PlannerRevision",
+    "field": "PlannerIntentVersion_PlannerRevision_resolvedIntentVersionId_planIdToPlannerIntentVersion",
+    "relation": "PlannerRevision_resolvedIntentVersionId_planIdToPlannerIntentVersion"
+  },
+  {
+    "model": "PlannerQuestLink",
+    "field": "PlannerRevision_PlannerQuestLink_appliedRevisionId_planIdToPlannerRevision",
+    "relation": "PlannerQuestLink_appliedRevisionId_planIdToPlannerRevision"
+  },
+  {
+    "model": "PlannerQuestLink",
+    "field": "PlannerRevision_PlannerQuestLink_createdRevisionId_planIdToPlannerRevision",
+    "relation": "PlannerQuestLink_createdRevisionId_planIdToPlannerRevision"
+  },
+  {
+    "model": "PlannerIntentVersion",
+    "field": "PlannerIntentVersion_PlannerIntentVersion_parentId_planIdToPlannerIntentVersion",
+    "relation": "PlannerIntentVersion_parentId_planIdToPlannerIntentVersion"
+  },
+  {
+    "model": "PlannerIntentVersion",
+    "field": "other_PlannerIntentVersion_PlannerIntentVersion_parentId_planIdToPlannerIntentVersion",
+    "relation": "PlannerIntentVersion_parentId_planIdToPlannerIntentVersion"
+  },
+  {
+    "model": "PlannerIntentVersion",
+    "field": "PlannerPlan_PlannerPlan_workingIntentVersionId_idToPlannerIntentVersion",
+    "relation": "PlannerPlan_workingIntentVersionId_idToPlannerIntentVersion"
+  },
+  {
+    "model": "PlannerIntentVersion",
+    "field": "PlannerRevision_PlannerRevision_requestedIntentVersionId_planIdToPlannerIntentVersion",
+    "relation": "PlannerRevision_requestedIntentVersionId_planIdToPlannerIntentVersion"
+  },
+  {
+    "model": "PlannerIntentVersion",
+    "field": "PlannerRevision_PlannerRevision_resolvedIntentVersionId_planIdToPlannerIntentVersion",
+    "relation": "PlannerRevision_resolvedIntentVersionId_planIdToPlannerIntentVersion"
+  }
+]

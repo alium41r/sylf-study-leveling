@@ -1,0 +1,7 @@
+{
+  "phase": "preservation verification",
+  "committed": false,
+  "commitOutcomeNeedsReadOnlyConfirmation": false,
+  "sqlstate": null,
+  "message": "Foreign-key count changed"
+}

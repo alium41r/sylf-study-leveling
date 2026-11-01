@@ -1,0 +1,24 @@
+{
+  "runId": "ab24df69-8acd-46e1-a5fc-9be0c653b664",
+  "mode": "LIVE",
+  "owner": 1,
+  "rootRequestId": "fc26dac8-e8ed-506e-a2b2-dd72a701c3bb",
+  "activeAttemptId": "28461f85-f0b6-499d-a442-14b36bc68733",
+  "state": "RESPONSE_RECEIVED",
+  "physicalRequests": 2,
+  "stopReason": null,
+  "roles": [
+    {
+      "sequence": 1,
+      "role": "RESEARCH",
+      "finished": true,
+      "stopReason": null
+    },
+    {
+      "sequence": 2,
+      "role": "VERIFICATION",
+      "finished": true,
+      "stopReason": null
+    }
+  ]
+}

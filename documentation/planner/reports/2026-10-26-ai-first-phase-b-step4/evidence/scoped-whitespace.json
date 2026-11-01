@@ -1,0 +1,43 @@
+{
+  "status": "PASSED",
+  "existingFiles": [
+    "__tests__/planner-v2/postgres/understanding.postgres.ts",
+    "documentation/planner/AI_FIRST_FOUNDATION.md",
+    "lib/planner/v2/intelligence/foundation/calendar.ts",
+    "lib/planner/v2/intelligence/foundation/contracts.ts",
+    "lib/planner/v2/intelligence/foundation/validation.ts",
+    "lib/planner/v2/server/foundation.ts",
+    "scripts/test/test-planner-ai-first-foundation.mjs",
+    "documentation/calendar/README.md",
+    "documentation/planner/README.md",
+    "lib/calendar/contracts.ts",
+    "lib/calendar/dates.ts",
+    "lib/calendar/external/providers.ts",
+    "lib/calendar/external/service.ts",
+    "lib/calendar/ink.ts",
+    "lib/calendar/personal-service.ts",
+    "lib/calendar/recurrence.ts",
+    "lib/planner/v2/contracts/intent.ts",
+    "lib/planner/v2/intelligence/allocator.ts",
+    "lib/planner/v2/intelligence/capacity.ts",
+    "lib/planner/v2/intelligence/schemas/planning.ts",
+    "lib/planner/v2/intelligence/schemas/scheduling.ts",
+    "lib/planner/v2/server/attempts.ts",
+    "lib/planner/v2/server/compiler.ts",
+    "lib/planner/v2/server/worker.ts"
+  ],
+  "addedTextFiles": [
+    "__tests__/planner-v2/intelligence/calendar-capacity.test.ts",
+    "__tests__/planner-v2/postgres/calendar-capacity.postgres.ts",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/README.md",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/STEP_5_HANDOFF.md",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/README.md",
+    "documentation/planner/reports/2026-10-26-ai-first-phase-b-step4/evidence/calendar-postgres-runner.mjs",
+    "lib/calendar/planning.ts",
+    "lib/calendar/projection.ts",
+    "lib/planner/v2/server/calendar-capacity.ts",
+    "prisma/migrations/20261026020000_planner_calendar_capacity/migration.sql"
+  ],
+  "trailingWhitespace": [],
+  "trackedDiffOutput": ""
+}

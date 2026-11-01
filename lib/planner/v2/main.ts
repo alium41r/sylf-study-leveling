@@ -6,10 +6,11 @@ import { PlannerWorker } from "./server/worker";
 import { createCompilerHandlers } from "./server/compiler";
 
 async function main() {
-  if (Number(process.versions.node.split(".")[0]) !== 26) throw new Error("WORKER_TOOLCHAIN_MISMATCH");
+  if (Number(process.versions.node.split(".")[0]) !== 24) throw new Error("WORKER_TOOLCHAIN_MISMATCH");
   if (!process.env.DATABASE_WORKER_URL) throw new Error("WORKER_DATABASE_CONFIGURATION_REQUIRED");
   const pool = new Pool({ connectionString: process.env.DATABASE_WORKER_URL, max: 4, idleTimeoutMillis: 30_000,
-    connectionTimeoutMillis: 5000, options: "-c statement_timeout=10000 -c timezone=UTC" });
+    connectionTimeoutMillis: 5000, query_timeout: 12000, keepAlive: true, keepAliveInitialDelayMillis: 10000,
+    options: "-c statement_timeout=10000 -c timezone=UTC" });
   pool.on("error", () => process.stderr.write('{"event":"database_pool_error"}\n'));
   const attempts = new AttemptService(new PlannerDatabase(pool));
   // Reuse the existing deployment admission flag. Step 5 supplies supervised

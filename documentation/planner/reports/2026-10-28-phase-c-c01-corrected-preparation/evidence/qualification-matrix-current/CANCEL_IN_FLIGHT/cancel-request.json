@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "runId": "unpaid-CANCEL_IN_FLIGHT",
+  "rootRequestId": "9f0a2b05-9cac-5a8b-ab51-266381e381e4",
+  "reason": "Unpaid operator cancellation during a dispatched synthesis request",
+  "requestedAt": "2026-10-29T01:25:48.548Z"
+}

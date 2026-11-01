@@ -42,7 +42,7 @@ export function AcousticsTab() {
     pause,
     setMasterVolume,
     setLayerVolume,
-  } = useAcoustics();
+  } = useAcoustics({ subscribeFrequency: true });
 
   const customAudio = useCustomAudio();
 

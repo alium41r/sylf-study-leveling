@@ -275,7 +275,7 @@ function FocusCustomAudioSeeker({
 }
 
 export default function AudioMixerTool() {
-  const acoustics = useAcoustics();
+  const acoustics = useAcoustics({ subscribeFrequency: true });
   const customAudio = useCustomAudio();
   const [viewMode, setViewMode] = useState<"soundscapes" | "custom" | "layers">("soundscapes");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");

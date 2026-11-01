@@ -10,23 +10,31 @@
 // unlock the page while the settings panel is still open.
 
 let lockCount = 0;
+let prevHtmlOverflow = "";
+let prevBodyOverflow = "";
 
 export function lockPageScroll(): () => void {
   if (typeof document === "undefined") return () => {};
 
   if (lockCount === 0) {
+    prevHtmlOverflow = document.documentElement.style.overflow;
+    prevBodyOverflow = document.body.style.overflow;
     document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
   }
   lockCount++;
 
+  let released = false;
   return () => {
-    // Avoid double-release (e.g. React strict-mode effect re-runs).
+    // Per-instance idempotent release so double-calling one unlock cannot
+    // decrement another active overlay's lock count.
+    if (released) return;
+    released = true;
     if (lockCount <= 0) return;
     lockCount = Math.max(0, lockCount - 1);
     if (lockCount === 0) {
-      document.documentElement.style.overflow = "";
-      document.body.style.overflow = "";
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
     }
   };
 }

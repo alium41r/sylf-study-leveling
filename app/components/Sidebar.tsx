@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PanelLeft, Bell, Sparkles, NotebookPen } from "lucide-react";
@@ -9,9 +9,25 @@ import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsContext";
 import { useProfileModal } from "./ProfileModalContext";
 import { motion, AnimatePresence } from "framer-motion";
-import MarkdownRenderer from "./MarkdownRenderer";
 import { MOTION_SPRING } from "@/lib/motion";
 import { useSystemAI } from "./system/SystemAIProvider";
+
+const MarkdownRenderer = lazy(() => import("./MarkdownRenderer"));
+
+let inflightNotificationsFetch: Promise<SystemMessage[] | null> | null = null;
+function fetchNotificationsSingleFlight(): Promise<SystemMessage[] | null> {
+  if (inflightNotificationsFetch) return inflightNotificationsFetch;
+  inflightNotificationsFetch = fetch("/api/notifications", { credentials: "include" })
+    .then(async (res) => (res.ok ? ((await res.json()) as SystemMessage[]) : null))
+    .catch((e) => {
+      console.error("Failed to fetch notifications", e);
+      return null;
+    })
+    .finally(() => {
+      inflightNotificationsFetch = null;
+    });
+  return inflightNotificationsFetch;
+}
 
 interface SystemMessage {
   id: number;
@@ -137,46 +153,60 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false, o
     };
   }, [showNotifications, mobile]);
 
+  const hasLoadedInitialNotificationsRef = useRef(false);
+  const refreshStatsRef = useRef(refreshStats);
+  useEffect(() => {
+    refreshStatsRef.current = refreshStats;
+  }, [refreshStats]);
+  const userId = user?.id;
+
   // Poll for notifications and listen for preference updates
   useEffect(() => {
-    if (!user) return;
-    
+    if (!userId) {
+      hasLoadedInitialNotificationsRef.current = false;
+      return;
+    }
+
+    let cancelled = false;
+
     const fetchNotifications = async () => {
-      try {
-        const res = await fetch("/api/notifications", {
-          credentials: "include",
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setNotifications(prev => {
-            // Check if there are new unread notifications compared to prev state
-            const hasNewUnread = data.some((n: SystemMessage) => 
-              !n.read && !prev.some(p => p.id === n.id)
-            );
-            
-            // If new notifications arrived (like HP penalties, level ups), sync global stats
-            if (hasNewUnread && refreshStats) {
-              refreshStats();
-            }
-            
-            return data;
-          });
+      const data = await fetchNotificationsSingleFlight();
+      if (cancelled || !Array.isArray(data)) return;
+      setNotifications((prev) => {
+        const isSubsequentLoad = hasLoadedInitialNotificationsRef.current;
+        hasLoadedInitialNotificationsRef.current = true;
+        // Check if there are new unread notifications compared to prev state
+        const hasNewUnread =
+          isSubsequentLoad &&
+          data.some((n: SystemMessage) => !n.read && !prev.some((p) => p.id === n.id));
+
+        // If new notifications arrived after initial load (like HP penalties, level ups), sync global stats
+        if (hasNewUnread && refreshStatsRef.current) {
+          void refreshStatsRef.current();
         }
-      } catch (e) {
-        console.error("Failed to fetch notifications", e);
-      }
+
+        if (prev.length === 0 && data.length === 0) return prev;
+        return data;
+      });
     };
 
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000); // Check every 30 seconds
+    void fetchNotifications();
+    // Only the primary rail runs the 30s background timer; mobile drawer shares single-flight & events
+    const interval = mobile
+      ? null
+      : setInterval(() => {
+          if (typeof document === "undefined" || document.visibilityState === "visible") {
+            void fetchNotifications();
+          }
+        }, 30000);
 
     const handleUpdate = () => {
-      fetchNotifications();
+      void fetchNotifications();
     };
 
     const handleVisibility = () => {
       if (document.visibilityState === "visible") {
-        fetchNotifications();
+        void fetchNotifications();
       }
     };
 
@@ -186,13 +216,14 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false, o
     document.addEventListener("visibilitychange", handleVisibility);
 
     return () => {
-      clearInterval(interval);
+      cancelled = true;
+      if (interval) clearInterval(interval);
       window.removeEventListener("notification-preferences-updated", handleUpdate);
       window.removeEventListener("notifications-updated", handleUpdate);
       window.removeEventListener("focus", handleUpdate);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [user]);
+  }, [userId, mobile]);
 
   if (!user) return null;
 
@@ -351,7 +382,9 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false, o
                           <span className="text-[10px] font-mono text-text-muted">{new Date(n.createdAt).toLocaleDateString()}</span>
                         </div>
                         <div className="text-text-primary text-xs leading-relaxed">
-                          <MarkdownRenderer content={cleanContent} compact />
+                          <Suspense fallback={<span>{cleanContent}</span>}>
+                            <MarkdownRenderer content={cleanContent} compact />
+                          </Suspense>
                         </div>
                       </div>
                       {idx < notifications.length - 1 && (
@@ -979,7 +1012,9 @@ export default function Sidebar({ isCollapsed, setIsCollapsed, mobile = false, o
                           </span>
                         </div>
                         <div className="text-text-primary text-xs leading-relaxed">
-                          <MarkdownRenderer content={cleanContent} compact />
+                          <Suspense fallback={<span>{cleanContent}</span>}>
+                            <MarkdownRenderer content={cleanContent} compact />
+                          </Suspense>
                         </div>
                       </div>
                     );

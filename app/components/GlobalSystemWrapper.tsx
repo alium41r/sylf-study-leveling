@@ -1,17 +1,32 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { MotionConfig } from "framer-motion";
 import { useHeartbeat } from "../hooks/useHeartbeat";
-import { SessionInviteToast } from "./SessionInviteToast";
-import SessionEndToast from "./SessionEndToast";
-import SettingsPanel from "./SettingsPanel";
-import { SettingsProvider } from "./SettingsContext";
+import { SettingsProvider, useSettings } from "./SettingsContext";
 import { AcousticsProvider } from "./AcousticsContext";
 import { CustomAudioProvider } from "./CustomAudioContext";
-import { AcousticsDynamicIsland } from "./AcousticsDynamicIsland";
 import TopRightBar from "./TopRightBar";
-import CalendarReminderAgent from "../calendar/components/CalendarReminderAgent";
+
+const SessionInviteToast = dynamic(
+  () => import("./SessionInviteToast").then((m) => m.SessionInviteToast),
+  { ssr: false }
+);
+const SessionEndToast = dynamic(() => import("./SessionEndToast"), { ssr: false });
+const SettingsPanel = dynamic(() => import("./SettingsPanel"), { ssr: false });
+const AcousticsDynamicIsland = dynamic(
+  () => import("./AcousticsDynamicIsland").then((m) => m.AcousticsDynamicIsland),
+  { ssr: false }
+);
+const CalendarReminderAgent = dynamic(
+  () => import("../calendar/components/CalendarReminderAgent"),
+  { ssr: false }
+);
+const PublicProfileModal = dynamic(
+  () => import("./PublicProfileModal").then((m) => m.PublicProfileModal),
+  { ssr: false }
+);
 
 /* ─── Theme & Background Definitions ─────────────────────────── */
 // Kept in sync with the themes/backgrounds pages so GlobalWrapper
@@ -209,8 +224,7 @@ const BG_MAP: Record<string, { value: string; size?: string; repeat?: string; li
   },
 };
 
-import { ProfileModalProvider } from "./ProfileModalContext";
-import { PublicProfileModal } from "./PublicProfileModal";
+import { ProfileModalProvider, useProfileModal } from "./ProfileModalContext";
 import { useAuth } from "./AuthProvider";
 import { SystemAIProvider } from "./system/SystemAIProvider";
 import { LevelUpProvider } from "./LevelUpProvider";
@@ -341,6 +355,23 @@ export function applyAppearance(options: {
   applyGlobalTheme(resolvedAccent);
 }
 
+function DeferredGlobalModals() {
+  const { isOpen: isProfileOpen } = useProfileModal();
+  const { isOpen: isSettingsOpen } = useSettings();
+  const [hasOpenedProfile, setHasOpenedProfile] = useState(false);
+  const [hasOpenedSettings, setHasOpenedSettings] = useState(false);
+
+  if (isProfileOpen && !hasOpenedProfile) setHasOpenedProfile(true);
+  if (isSettingsOpen && !hasOpenedSettings) setHasOpenedSettings(true);
+
+  return (
+    <>
+      {(isProfileOpen || hasOpenedProfile) && <PublicProfileModal />}
+      {(isSettingsOpen || hasOpenedSettings) && <SettingsPanel />}
+    </>
+  );
+}
+
 export function GlobalSystemWrapper({ children }: { children: React.ReactNode }) {
   useHeartbeat();
   const { user } = useAuth();
@@ -456,12 +487,11 @@ export function GlobalSystemWrapper({ children }: { children: React.ReactNode })
                   </div>
                 </LevelUpProvider>
               </SystemAIProvider>
-              <PublicProfileModal />
+              <DeferredGlobalModals />
               <AcousticsDynamicIsland />
               <SessionInviteToast />
               <SessionEndToast />
               <TopRightBar />
-              <SettingsPanel />
             </ProfileModalProvider>
           </SettingsProvider>
           </CustomAudioProvider>

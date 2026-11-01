@@ -75,7 +75,7 @@ function CustomAudioIslandSeeker({
 }
 
 export function AcousticsDynamicIsland() {
-  const acoustics = useAcoustics();
+  const acoustics = useAcoustics({ subscribeFrequency: true });
   const customAudio = useCustomAudio();
 
   const { isOpen: isSettingsOpen } = useSettings();

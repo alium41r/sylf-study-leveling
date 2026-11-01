@@ -11,13 +11,19 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { AnimatePresence } from "framer-motion";
 import { useAuth } from "../AuthProvider";
 import { PagePresence, resolvePresence } from "./page-presence";
-import { QuotaInfo, AiPlannerModal } from "../AiPlannerModal";
+import type { QuotaInfo } from "../AiPlannerModal";
 import SystemFab from "./SystemFab";
 import SystemOverlay from "./SystemOverlay";
-import { fetchCachedJSON, invalidateClientCache } from "@/lib/client-data-cache";
+import { fetchCachedJSON } from "@/lib/client-data-cache";
+
+const LazyAiPlannerModal = dynamic(
+  () => import("../AiPlannerModal").then((m) => m.AiPlannerModal),
+  { ssr: false }
+);
 
 // ============================================================
 // System AI Provider — the client-side intelligence layer.
@@ -110,25 +116,28 @@ export function SystemAIProvider({ children }: { children: ReactNode }) {
 
   const refreshQuotas = useCallback(async () => {
     try {
+      const apply = (data: { chat?: QuotaInfo | null; planner?: QuotaInfo | null } | null) => {
+        if (data) {
+          setChatQuota(data.chat || null);
+          setPlannerQuota(data.planner || null);
+        }
+      };
       // Stale-while-revalidate: quota info mounts on every page; reuse a
       // fresh-enough snapshot instead of re-querying on each full load.
       const data = await fetchCachedJSON<{ chat?: QuotaInfo | null; planner?: QuotaInfo | null }>(
         "/api/ai-usage",
         {},
-        { ttlMs: 30_000, staleMs: 120_000 }
+        { ttlMs: 30_000, staleMs: 120_000, onUpdate: apply }
       );
-      if (data) {
-        setChatQuota(data.chat || null);
-        setPlannerQuota(data.planner || null);
-      }
+      apply(data);
     } catch (e) {
       console.error("Failed to fetch AI usage:", e);
     }
   }, []);
 
   useEffect(() => {
-    if (user) refreshQuotas();
-  }, [user, refreshQuotas]);
+    if (userId !== undefined) void refreshQuotas();
+  }, [userId, refreshQuotas]);
 
   // Close the overlay when it no longer applies (logout, or navigating to
   // a page without a registered presence).
@@ -224,19 +233,21 @@ export function SystemAIProvider({ children }: { children: ReactNode }) {
       />
 
       {/* ── Global Planner (launched from any context's quick actions) ── */}
-      <AiPlannerModal
-        isOpen={plannerOpen}
-        onClose={() => setPlannerOpen(false)}
-        quota={plannerQuota}
-        onQuotaRefresh={refreshQuotas}
-        sessionId={overlaySessionId}
-        onPlanCreated={(plan: any) => {
-          // Keep the overlay's "Open workspace" linked to the thread that
-          // received the generated plan.
-          if (plan?.sessionId) setOverlaySessionId(plan.sessionId);
-          refreshQuotas();
-        }}
-      />
+      {plannerOpen && (
+        <LazyAiPlannerModal
+          isOpen={plannerOpen}
+          onClose={() => setPlannerOpen(false)}
+          quota={plannerQuota}
+          onQuotaRefresh={refreshQuotas}
+          sessionId={overlaySessionId}
+          onPlanCreated={(plan: any) => {
+            // Keep the overlay's "Open workspace" linked to the thread that
+            // received the generated plan.
+            if (plan?.sessionId) setOverlaySessionId(plan.sessionId);
+            refreshQuotas();
+          }}
+        />
+      )}
     </SystemAIContext.Provider>
   );
 }

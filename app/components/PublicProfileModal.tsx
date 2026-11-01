@@ -12,6 +12,7 @@ import { useProfileModal } from "./ProfileModalContext";
 import { getClassInfo, COSMETICS_CATALOG } from "@/lib/cosmetics-catalog";
 import { ConfirmationModal } from "./ConfirmationModal";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
+import { lockPageScroll } from "@/lib/scroll-lock";
 import {
   getStatCap,
   COGNITIVE_STATS,
@@ -315,6 +316,12 @@ export function PublicProfileModal() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // ─── Lock Page Scroll While Modal Is Open ──────────────────
+  useEffect(() => {
+    if (!isOpen) return;
+    return lockPageScroll();
+  }, [isOpen]);
+
   // ─── Fetch Target Profile Data ─────────────────────────────
   useEffect(() => {
     if (!isOpen || !username) {
@@ -323,6 +330,29 @@ export function PublicProfileModal() {
       setActionsMenuOpen(false);
       return;
     }
+
+    let cancelled = false;
+
+    const applyProfileData = (data: {
+      profile: any;
+      isSelf?: boolean;
+      relationship: string;
+      permissions: any;
+      privacySettings?: any;
+    }) => {
+      if (cancelled) return;
+      setDossier(data.profile);
+      const resolvedSelf = Boolean(
+        data.isSelf ||
+        data.relationship === "SELF" ||
+        (currentUser?.username && username && currentUser.username.toLowerCase() === username.toLowerCase()) ||
+        (currentUser?.id && data.profile?.id && currentUser.id === data.profile.id)
+      );
+      setIsSelf(resolvedSelf);
+      setRelationship(data.relationship);
+      setPermissions(data.permissions);
+      setPrivacySettings(data.privacySettings || null);
+    };
 
     const fetchProfile = async () => {
       setIsLoading(true);
@@ -339,33 +369,42 @@ export function PublicProfileModal() {
         }>(
           `/api/profile/${username}`,
           { credentials: "include" },
-          { ttlMs: 15_000, staleMs: 300_000, storageKey: `profile:${username.toLowerCase()}:${currentUser?.id ?? "guest"}` }
+          {
+            ttlMs: 15_000,
+            staleMs: 300_000,
+            storageKey: `profile:${username.toLowerCase()}:${currentUser?.id ?? "guest"}`,
+            onUpdate: (fresh) => {
+              if (!cancelled && fresh?.profile) {
+                applyProfileData(fresh);
+              }
+            },
+          }
         );
+
+        if (cancelled) return;
 
         if (!data || !data.profile) {
           setError("Scholar not found in the system registry.");
           return;
         }
 
-        setDossier(data.profile);
-        const resolvedSelf = Boolean(
-          data.isSelf ||
-          data.relationship === "SELF" ||
-          (currentUser?.username && username && currentUser.username.toLowerCase() === username.toLowerCase()) ||
-          (currentUser?.id && data.profile?.id && currentUser.id === data.profile.id)
-        );
-        setIsSelf(resolvedSelf);
-        setRelationship(data.relationship);
-        setPermissions(data.permissions);
-        setPrivacySettings(data.privacySettings || null);
+        applyProfileData(data);
       } catch (err) {
-        setError("Network error while connecting to system registry.");
+        if (!cancelled) {
+          setError("Network error while connecting to system registry.");
+        }
       } finally {
-        setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
     };
 
-    fetchProfile();
+    void fetchProfile();
+
+    return () => {
+      cancelled = true;
+    };
   }, [isOpen, username, currentUser?.id, currentUser?.username]);
 
   // ─── Keyboard Shortcut to Close (ESC) ──────────────────────

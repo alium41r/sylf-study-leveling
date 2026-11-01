@@ -84,3 +84,8 @@ export default function MarkdownRenderer({
     </div>
   );
 }
+
+if (typeof globalThis !== "undefined") {
+  (globalThis as { __sylfMarkdownRenderer?: typeof MarkdownRenderer }).__sylfMarkdownRenderer =
+    MarkdownRenderer;
+}

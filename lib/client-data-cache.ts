@@ -20,17 +20,37 @@ interface CacheEntry {
 const memoryCache = new Map<string, CacheEntry>();
 const inflight = new Map<string, Promise<unknown>>();
 const generations = new Map<string, number>();
+const subscribers = new Map<string, Set<(data: unknown) => void>>();
+const inflightCallbacks = new Map<string, Set<(data: unknown) => void>>();
 
 const MAX_MEMORY_ENTRIES = 200;
 
 // S3: never persist these endpoints to localStorage — they contain private
-// AI content (daily briefings, insights) that must not outlive the session
-// on a shared device. They still benefit from the in-memory cache.
-const NO_PERSIST_FRAGMENTS = ["briefing", "insights", "ai-memory", "ai-insight", "planner", "pixel-creations"];
+// AI content (daily briefings, insights, system chat transcripts) that must not
+// outlive the session on a shared device. They still benefit from the in-memory cache.
+const NO_PERSIST_FRAGMENTS = [
+  "briefing",
+  "insights",
+  "ai-memory",
+  "ai-insight",
+  "planner",
+  "pixel-creations",
+  "sys-msgs",
+  "system-messages",
+];
 
 function isPersistable(key: string): boolean {
   const k = key.toLowerCase();
   return !NO_PERSIST_FRAGMENTS.some((f) => k.includes(f));
+}
+
+function isSamePayload(a: unknown, b: unknown): boolean {
+  if (Object.is(a, b)) return true;
+  try {
+    return JSON.stringify(a) === JSON.stringify(b);
+  } catch {
+    return false;
+  }
 }
 
 /** Clear every client-side cache key that carries user data (S3 logout hygiene). */
@@ -48,6 +68,7 @@ export function clearClientCache(): void {
       if (
         key &&
         (key.startsWith("sylf_cache:") ||
+          key === "sylf_cached_weekly_quest" ||
           key.startsWith("focus_scratchpad") ||
           key.startsWith("focus_notes") ||
           key.startsWith("pixel_studio:") ||
@@ -63,6 +84,7 @@ export function clearClientCache(): void {
   memoryCache.clear();
   for (const key of inflight.keys()) generations.set(key, (generations.get(key) ?? 0) + 1);
   inflight.clear();
+  inflightCallbacks.clear();
 }
 
 function pruneMemory() {
@@ -99,7 +121,7 @@ function writeStorage(key: string, entry: CacheEntry) {
   }
 }
 
-export interface FetchCachedOptions {
+export interface FetchCachedOptions<T = unknown> {
   /** Responses younger than this are returned without any network request. */
   ttlMs?: number;
   /** Responses older than `ttlMs` but younger than this are replayed instantly and revalidated in the background. */
@@ -108,6 +130,52 @@ export interface FetchCachedOptions {
   storageKey?: string;
   /** Bypass the cache completely and fetch fresh from network. */
   forceFresh?: boolean;
+  /** Optional callback invoked if a background stale-while-revalidate refresh produces updated data. */
+  onUpdate?: (data: T) => void;
+}
+
+/**
+ * Subscribe to cache updates for a given cacheKey (`storageKey || url`).
+ * Returns an unsubscribe function.
+ */
+export function subscribeClientCache<T = unknown>(
+  keyOrUrl: string,
+  listener: (data: T) => void
+): () => void {
+  let set = subscribers.get(keyOrUrl);
+  if (!set) {
+    set = new Set();
+    subscribers.set(keyOrUrl, set);
+  }
+  const wrapped = listener as (data: unknown) => void;
+  set.add(wrapped);
+  return () => {
+    const current = subscribers.get(keyOrUrl);
+    if (!current) return;
+    current.delete(wrapped);
+    if (current.size === 0) subscribers.delete(keyOrUrl);
+  };
+}
+
+/**
+ * Synchronously read a warm cached value (from memory or localStorage) without
+ * starting a network request. Useful for seeding initial component state.
+ */
+export function readCachedJSON<T = unknown>(
+  url: string,
+  opts: Pick<FetchCachedOptions<T>, "staleMs" | "storageKey"> = {}
+): T | null {
+  const { staleMs = 60_000, storageKey } = opts;
+  const cacheKey = storageKey || url;
+  const memoryHit = memoryCache.get(cacheKey);
+  const entry: CacheEntry | null =
+    memoryHit ?? (storageKey && isPersistable(storageKey) && isPersistable(url) ? readStorage(storageKey) : null);
+  if (!entry) return null;
+  if (!memoryHit) memoryCache.set(cacheKey, entry);
+  if (Date.now() - entry.fetchedAt < staleMs) {
+    return entry.data as T;
+  }
+  return null;
 }
 
 /** Share only an outstanding read, retaining neither a stale value nor storage.
@@ -141,6 +209,7 @@ export function invalidateClientCaches(fragments: readonly string[]): void {
         memoryCache.delete(key);
         generations.set(key, (generations.get(key) ?? 0) + 1);
         inflight.delete(key);
+        inflightCallbacks.delete(key);
       }
     }
     const doomed: string[] = [];
@@ -165,9 +234,9 @@ export function invalidateClientCaches(fragments: readonly string[]): void {
 export async function fetchCachedJSON<T = unknown>(
   url: string,
   init?: RequestInit,
-  opts: FetchCachedOptions = {}
+  opts: FetchCachedOptions<T> = {}
 ): Promise<T | null> {
-  const { ttlMs = 10_000, staleMs = 60_000, storageKey, forceFresh = false } = opts;
+  const { ttlMs = 10_000, staleMs = 60_000, storageKey, forceFresh = false, onUpdate } = opts;
   const now = Date.now();
   const cacheKey = storageKey || url;
 
@@ -182,8 +251,8 @@ export async function fetchCachedJSON<T = unknown>(
         return entry.data as T;
       }
       if (age < staleMs) {
-        // Stale but usable: paint now, refresh in the background.
-        void doFetch(url, init, storageKey);
+        // Stale but usable: paint now, refresh in the background and notify if changed.
+        void doFetch(url, init, storageKey, onUpdate as ((data: unknown) => void) | undefined);
         return entry.data as T;
       }
     }
@@ -192,11 +261,29 @@ export async function fetchCachedJSON<T = unknown>(
   return (await doFetch(url, init, storageKey)) as T | null;
 }
 
-function doFetch(url: string, init?: RequestInit, storageKey?: string): Promise<unknown> {
+function registerInflightCallback(cacheKey: string, cb?: (data: unknown) => void) {
+  if (!cb) return;
+  let set = inflightCallbacks.get(cacheKey);
+  if (!set) {
+    set = new Set();
+    inflightCallbacks.set(cacheKey, set);
+  }
+  set.add(cb);
+}
+
+function doFetch(
+  url: string,
+  init?: RequestInit,
+  storageKey?: string,
+  onBackgroundUpdate?: (data: unknown) => void
+): Promise<unknown> {
   const cacheKey = storageKey || url;
+  registerInflightCallback(cacheKey, onBackgroundUpdate);
   const existing = inflight.get(cacheKey);
   if (existing) return existing; // Single-flight: share in-flight requests.
+  const epoch = sessionEpoch;
   const generation = generations.get(cacheKey) ?? 0;
+  const previousEntry = memoryCache.get(cacheKey);
 
   const request = (async () => {
     try {
@@ -207,7 +294,7 @@ function doFetch(url: string, init?: RequestInit, storageKey?: string): Promise<
       }
       const data = await res.json();
       const entry: CacheEntry = { data, fetchedAt: Date.now() };
-      if ((generations.get(cacheKey) ?? 0) !== generation) return null;
+      if (sessionEpoch !== epoch || (generations.get(cacheKey) ?? 0) !== generation) return null;
       memoryCache.set(cacheKey, entry);
       // S3: sensitive endpoints stay memory-only even when a storageKey was
       // requested.
@@ -215,12 +302,38 @@ function doFetch(url: string, init?: RequestInit, storageKey?: string): Promise<
         writeStorage(storageKey, entry);
       }
       pruneMemory();
+
+      const changed = !previousEntry || !isSamePayload(previousEntry.data, data);
+      const callbacks = inflightCallbacks.get(cacheKey);
+      inflightCallbacks.delete(cacheKey);
+      if (changed && callbacks) {
+        for (const cb of callbacks) {
+          try {
+            cb(data);
+          } catch {
+            // ignore listener error
+          }
+        }
+      }
+      const subs = subscribers.get(cacheKey);
+      if (changed && subs) {
+        for (const sub of subs) {
+          try {
+            sub(data);
+          } catch {
+            // ignore listener error
+          }
+        }
+      }
       return data;
     } catch {
       // Errors are never cached. Callers fall back to their previous state.
       return null;
     } finally {
-      if ((generations.get(cacheKey) ?? 0) === generation) inflight.delete(cacheKey);
+      if (sessionEpoch === epoch && (generations.get(cacheKey) ?? 0) === generation) {
+        inflight.delete(cacheKey);
+        inflightCallbacks.delete(cacheKey);
+      }
     }
   })();
 

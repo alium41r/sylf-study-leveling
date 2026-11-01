@@ -6,6 +6,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useMemo,
   useRef,
   type ReactNode,
 } from "react";
@@ -87,9 +88,11 @@ export function AuthProvider({
   const refreshSequence = useRef(0);
   const owner = useRef(initialUser?.id ?? null);
   const needsRetry = useRef(false);
+  const inflightRefresh = useRef<{ epoch: number; sequence: number; promise: Promise<void> } | null>(null);
 
   const mutateUser = useCallback((newUserData: Partial<UserStats> | null) => {
     updateEpoch.current++;
+    inflightRefresh.current = null;
     if (newUserData === null) { clearClientCache(); clearPixelCreations(); owner.current = null; }
     // S3: in-memory only — no user profile is persisted to localStorage.
     setUser(previous => {
@@ -100,39 +103,56 @@ export function AuthProvider({
   }, []);
 
   // Fetch fresh stats from the server (httpOnly cookie authenticates; no JWT
-  // in JS and no Bearer headers anywhere).
+  // in JS and no Bearer headers anywhere). Single-flight per updateEpoch so
+  // concurrent callers share one in-flight request.
   const refreshStats = useCallback(async (overrideEpoch?: number) => {
-    const epoch = overrideEpoch ?? updateEpoch.current, sequence = ++refreshSequence.current;
-    try {
-      const res = await fetchWithTimeout(fetch, resolveApiUrl("/api/user/stats"), { credentials: "include", cache: "no-store" });
-      if (res.ok) {
-        const data: UserStats = await res.json();
-        // An older read must not undo Apply/equip, login or logout.
-        if (epoch !== updateEpoch.current || sequence !== refreshSequence.current) return;
-        needsRetry.current = false;
-        if (owner.current !== null && owner.current !== data.id) { clearClientCache(); clearPixelCreations(); }
-        owner.current = data.id;
-        setUser(data);
-      } else if (res.status === 401) {
-        if (epoch !== updateEpoch.current || sequence !== refreshSequence.current) return;
-        needsRetry.current = false;
-        updateEpoch.current++; owner.current = null;
-        clearClientCache(); clearPixelCreations();
-        setUser(null);
-      } else if (epoch === updateEpoch.current && sequence === refreshSequence.current) {
-        needsRetry.current = true;
-      }
-      // Other errors (500, network issues): don't nuke the session
-    } catch (err) {
-      if (epoch === updateEpoch.current && sequence === refreshSequence.current) needsRetry.current = true;
-      console.error("Failed to refresh stats:", err);
+    const epoch = overrideEpoch ?? updateEpoch.current;
+    if (inflightRefresh.current && inflightRefresh.current.epoch === epoch) {
+      return inflightRefresh.current.promise;
     }
+    const sequence = ++refreshSequence.current;
+    const promise = (async () => {
+      try {
+        const res = await fetchWithTimeout(fetch, resolveApiUrl("/api/user/stats"), { credentials: "include", cache: "no-store" });
+        if (res.ok) {
+          const data: UserStats = await res.json();
+          // An older read must not undo Apply/equip, login or logout.
+          if (epoch !== updateEpoch.current || sequence !== refreshSequence.current) return;
+          needsRetry.current = false;
+          if (owner.current !== null && owner.current !== data.id) { clearClientCache(); clearPixelCreations(); }
+          owner.current = data.id;
+          setUser(previous => {
+            if (previous && JSON.stringify(previous) === JSON.stringify(data)) {
+              return previous;
+            }
+            return data;
+          });
+        } else if (res.status === 401) {
+          if (epoch !== updateEpoch.current || sequence !== refreshSequence.current) return;
+          needsRetry.current = false;
+          updateEpoch.current++; owner.current = null;
+          clearClientCache(); clearPixelCreations();
+          setUser(null);
+        } else if (epoch === updateEpoch.current && sequence === refreshSequence.current) {
+          needsRetry.current = true;
+        }
+        // Other errors (500, network issues): don't nuke the session
+      } catch (err) {
+        if (epoch === updateEpoch.current && sequence === refreshSequence.current) needsRetry.current = true;
+        console.error("Failed to refresh stats:", err);
+      } finally {
+        if (inflightRefresh.current?.sequence === sequence) {
+          inflightRefresh.current = null;
+        }
+      }
+    })();
+    inflightRefresh.current = { epoch, sequence, promise };
+    return promise;
   }, []);
 
   // On mount: validate the cookie session with the server.
   useEffect(() => {
     let cancelled = false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     void refreshStats().finally(() => { if (!cancelled) setIsLoading(false); });
     const retry = () => { if (needsRetry.current) void refreshStats(); };
     const visible = () => { if (document.visibilityState === "visible") retry(); };
@@ -154,6 +174,7 @@ export function AuthProvider({
     invalidateNotesAccess();
     needsRetry.current = false;
     updateEpoch.current++;
+    inflightRefresh.current = null;
     if (owner.current !== null && owner.current !== userData.id) { clearClientCache(); clearPixelCreations(); }
     owner.current = userData.id;
     setUser(userData);
@@ -169,6 +190,7 @@ export function AuthProvider({
     invalidateNotesAccess();
     needsRetry.current = false;
     updateEpoch.current++;
+    inflightRefresh.current = null;
     try {
       const response = await fetch(resolveApiUrl("/api/auth/logout"), { method: "POST", credentials: "include" });
       if (!response.ok) throw new Error("Sign out was not confirmed.");
@@ -184,10 +206,13 @@ export function AuthProvider({
     window.location.href = "/login";
   }, []);
 
+  const contextValue = useMemo(
+    () => ({ user, isLoading, login, logout, refreshStats, mutateUser }),
+    [user, isLoading, login, logout, refreshStats, mutateUser]
+  );
+
   return (
-    <AuthContext.Provider
-      value={{ user, isLoading, login, logout, refreshStats, mutateUser }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
       {(notesLogoutError || logoutError) && user && <div role="alert" style={{ position:"fixed",bottom:"max(16px, env(safe-area-inset-bottom))",left:"50%",transform:"translateX(-50%)",zIndex:150,width:"min(92vw, 520px)",padding:"16px",borderRadius:14,border:"1px solid var(--border-strong)",background:"var(--surface-raised)",color:"var(--text-primary)",fontSize:13,boxShadow:"0 12px 50px #0003" }}>{notesLogoutError ? "Sign out paused because Notes has unsaved changes. Keep this tab open and use Notes recovery to export or retry them." : "Sign out could not be confirmed. Reconnect and try again. Notes is locked in this tab."}<button type="button" onClick={()=>{setNotesLogoutError(false);setLogoutError(false);}} style={{ display:"block",marginTop:10,minHeight:44,color:"var(--accent-text)",background:"transparent",border:0 }}>Keep working</button></div>}
     </AuthContext.Provider>

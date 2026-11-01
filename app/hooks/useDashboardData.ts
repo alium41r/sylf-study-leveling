@@ -97,12 +97,13 @@ export function useDashboardData(): DashboardData {
 
   useEffect(() => {
     if (!user) return;
+    let active = true;
 
     // 1. Fetch weekly focus quest independently
     fetch("/api/quests/weekly", {})
       .then((r) => (r.ok ? r.json().catch(() => null) : null))
       .then((weeklyData) => {
-        if (weeklyData && !weeklyData.error) {
+        if (active && weeklyData && !weeklyData.error) {
           setWeeklyQuest(weeklyData);
           try {
             localStorage.setItem("sylf_cached_weekly_quest", JSON.stringify(weeklyData));
@@ -111,34 +112,42 @@ export function useDashboardData(): DashboardData {
       })
       .catch(console.error);
 
-    // 2-5. Cached stale-while-revalidate data loads
-    fetchCachedJSON<any[]>("/api/quests", {}, { ttlMs: 15_000, staleMs: 120_000 })
-      .then((questsData) => {
-        if (questsData) setQuests(Array.isArray(questsData) ? questsData : []);
-      })
+    // 2-5. Cached stale-while-revalidate data loads with reactive background updates
+    const applyQuests = (questsData: any[] | null) => {
+      if (active && questsData) setQuests(Array.isArray(questsData) ? questsData : []);
+    };
+    fetchCachedJSON<any[]>("/api/quests", {}, { ttlMs: 15_000, staleMs: 120_000, onUpdate: applyQuests })
+      .then(applyQuests)
       .catch(console.error);
 
-    fetchCachedJSON<any[]>("/api/friends", {}, { ttlMs: 15_000, staleMs: 120_000 })
-      .then((friendsData) => {
-        if (friendsData) setFriends(Array.isArray(friendsData) ? friendsData : []);
-      })
+    const applyFriends = (friendsData: any[] | null) => {
+      if (active && friendsData) setFriends(Array.isArray(friendsData) ? friendsData : []);
+    };
+    fetchCachedJSON<any[]>("/api/friends", {}, { ttlMs: 15_000, staleMs: 120_000, onUpdate: applyFriends })
+      .then(applyFriends)
       .catch(console.error);
 
+    const applyBriefings = (briefingsData: any) => {
+      if (active && briefingsData) setBriefings(briefingsData.messages || []);
+    };
     fetchCachedJSON<any>(
       "/api/system-messages?type=DAILY_BRIEFING&global=true&limit=1&unreadOnly=true",
       {},
-      { ttlMs: 20_000, staleMs: 120_000 }
+      { ttlMs: 20_000, staleMs: 120_000, onUpdate: applyBriefings }
     )
-      .then((briefingsData) => {
-        if (briefingsData) setBriefings(briefingsData.messages || []);
-      })
+      .then(applyBriefings)
       .catch(console.error);
 
-    fetchCachedJSON<any[]>("/api/insights", {}, { ttlMs: 30_000, staleMs: 300_000 })
-      .then((insightsData) => {
-        if (insightsData) setInsights(Array.isArray(insightsData) ? insightsData : []);
-      })
+    const applyInsights = (insightsData: any[] | null) => {
+      if (active && insightsData) setInsights(Array.isArray(insightsData) ? insightsData : []);
+    };
+    fetchCachedJSON<any[]>("/api/insights", {}, { ttlMs: 30_000, staleMs: 300_000, onUpdate: applyInsights })
+      .then(applyInsights)
       .catch(console.error);
+
+    return () => {
+      active = false;
+    };
   }, [user?.id]);
 
   useEffect(() => {

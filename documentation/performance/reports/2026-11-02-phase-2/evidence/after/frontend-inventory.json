@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-02T01:48:58.150Z",
+  "at": "2026-11-02T02:19:39.914Z",
   "sourceFiles": [
     {
       "file": "app/admin/background-studio/page.tsx",
@@ -297,10 +297,10 @@
     },
     {
       "file": "app/api/conversations/[id]/route.ts",
-      "bytes": 10791,
-      "lines": 298,
+      "bytes": 11071,
+      "lines": 301,
       "client": false,
-      "sha256": "971416fdfc45c1d61cc5d88895502f4680084a11ff9ebcdd10e4731bc7192351"
+      "sha256": "9b07e135110c1a06a51d803c1dc178088e170f5739785ce1d867e58fef748a5f"
     },
     {
       "file": "app/api/conversations/route.ts",
@@ -451,10 +451,10 @@
     },
     {
       "file": "app/api/friends/route.ts",
-      "bytes": 9147,
+      "bytes": 9239,
       "lines": 205,
       "client": false,
-      "sha256": "1bf87ff37906acafdf1a2923a414b1abdc1f9937a1854822527e4853a41ad816"
+      "sha256": "e8bd1be51423b04f8059aa0f20733034ae6a2b5da21e2bbc07146a6167655118"
     },
     {
       "file": "app/api/friends/unblock/route.ts",
@@ -521,17 +521,17 @@
     },
     {
       "file": "app/api/media/conversation/[id]/avatar/route.ts",
-      "bytes": 2421,
-      "lines": 79,
+      "bytes": 2506,
+      "lines": 80,
       "client": false,
-      "sha256": "d945b223c70a91da1bbe408281ad64b4e5de0d33ad1bf67cdf321acda52bf6af"
+      "sha256": "f9bc84cb7cb18c61f8759ba8c14ca6c2649a9ab568f5b1c9a4712caa21ab1ccf"
     },
     {
       "file": "app/api/media/user/[id]/[kind]/route.ts",
-      "bytes": 2782,
-      "lines": 86,
+      "bytes": 4038,
+      "lines": 117,
       "client": false,
-      "sha256": "6547ff2c19410d6e14bd1582612ae3657d724665d20e2f1061f33140ee14a3a0"
+      "sha256": "d7797edc44f01eafb3d4e0835aaf94334280dabc83ab4da48c618d062cacf797"
     },
     {
       "file": "app/api/notes/callback/route.ts",
@@ -962,10 +962,10 @@
     },
     {
       "file": "app/api/user/account/route.ts",
-      "bytes": 7746,
-      "lines": 198,
+      "bytes": 7876,
+      "lines": 200,
       "client": false,
-      "sha256": "e28c86b4962fb71a737bfbdf208cbfcd785d1475b2950bfef28c189f41a90962"
+      "sha256": "8849e6579b0bcc6fabe1f91ce2483ce87b14aed332931eb61db7ae96af2060b3"
     },
     {
       "file": "app/api/user/connections/[provider]/link/route.ts",
@@ -1025,10 +1025,10 @@
     },
     {
       "file": "app/api/user/onboarding/route.ts",
-      "bytes": 11053,
-      "lines": 310,
+      "bytes": 11183,
+      "lines": 312,
       "client": false,
-      "sha256": "e1f7199f2104ee1db964512339abd79a17852d7c0a85563a1ad77d9f0d121b19"
+      "sha256": "a7a1e8184b3fd0acf8de7ac66cb2ae7135ffa9a61aaefd869fb0d089915c994a"
     },
     {
       "file": "app/api/user/privacy/route.ts",
@@ -4770,10 +4770,10 @@
     },
     {
       "file": "lib/auth-server.ts",
-      "bytes": 3571,
-      "lines": 76,
+      "bytes": 3839,
+      "lines": 81,
       "client": false,
-      "sha256": "0521ce5593a8a15dfcc16763b4d9591c9b75c22a1323bf637bb08fd75fd0658f"
+      "sha256": "dc44cffd214d18bdc3cc4f2c698ecbb2c01e030bb1dd8ee906ffba9918d6583f"
     },
     {
       "file": "lib/auth-service.ts",
@@ -5582,10 +5582,10 @@
     },
     {
       "file": "lib/pixel-companion-service.ts",
-      "bytes": 3570,
-      "lines": 32,
+      "bytes": 3660,
+      "lines": 36,
       "client": false,
-      "sha256": "d22d3fbfb61d8854a42fdd38e76e98a9c9b9e1cf4850ce9d61c5b111608787c2"
+      "sha256": "efe1650f6a91672c297ac847afe33cd16a76003d44890f4222c2ec0d14f08e7e"
     },
     {
       "file": "lib/pixel-creation-service.ts",
@@ -7367,10 +7367,10 @@
     },
     {
       "file": "lib/profile-service.ts",
-      "bytes": 18461,
-      "lines": 487,
+      "bytes": 18601,
+      "lines": 490,
       "client": false,
-      "sha256": "bb6580c5cc2e0eab1d6b8efaa3c67b7b4951d3958b644a6c262b3964a15d787a"
+      "sha256": "d2daa9956061dfc9e18d2e3bcc58c53ee037a43d02ce54d991c0df27190953c3"
     },
     {
       "file": "lib/provider-types.ts",
@@ -7605,10 +7605,10 @@
     },
     {
       "file": "lib/timezone-server.ts",
-      "bytes": 746,
-      "lines": 26,
+      "bytes": 1785,
+      "lines": 56,
       "client": false,
-      "sha256": "2fcfd293cba020dea81d6c5f06369090f45079650f7f756d71c0ec1c9a15ec0d"
+      "sha256": "ea38df3e6cc272151bb147aa06e53a154d04d04ff8792ca884636fedf776bba9"
     },
     {
       "file": "lib/timezone-service.ts",
@@ -13517,6 +13517,16 @@
     {
       "file": "app/api/media/user/[id]/[kind]/route.ts",
       "line": 5,
+      "module": "@/lib/privacy"
+    },
+    {
+      "file": "app/api/media/user/[id]/[kind]/route.ts",
+      "line": 6,
+      "module": "@/lib/privacy-types"
+    },
+    {
+      "file": "app/api/media/user/[id]/[kind]/route.ts",
+      "line": 7,
       "module": "@/lib/user-media"
     },
     {
@@ -15337,21 +15347,26 @@
     {
       "file": "app/api/user/account/route.ts",
       "line": 10,
-      "module": "bcryptjs"
+      "module": "@/lib/timezone-server"
     },
     {
       "file": "app/api/user/account/route.ts",
       "line": 11,
-      "module": "@/lib/email"
+      "module": "bcryptjs"
     },
     {
       "file": "app/api/user/account/route.ts",
       "line": 12,
-      "module": "@/lib/rate-limit"
+      "module": "@/lib/email"
     },
     {
       "file": "app/api/user/account/route.ts",
       "line": 13,
+      "module": "@/lib/rate-limit"
+    },
+    {
+      "file": "app/api/user/account/route.ts",
+      "line": 14,
       "module": "@/lib/security-code"
     },
     {
@@ -15587,21 +15602,26 @@
     {
       "file": "app/api/user/onboarding/route.ts",
       "line": 10,
-      "module": "bcryptjs"
+      "module": "@/lib/timezone-server"
     },
     {
       "file": "app/api/user/onboarding/route.ts",
       "line": 11,
-      "module": "next/cache"
+      "module": "bcryptjs"
     },
     {
       "file": "app/api/user/onboarding/route.ts",
       "line": 12,
-      "module": "@/lib/skill-tree-skeleton"
+      "module": "next/cache"
     },
     {
       "file": "app/api/user/onboarding/route.ts",
       "line": 13,
+      "module": "@/lib/skill-tree-skeleton"
+    },
+    {
+      "file": "app/api/user/onboarding/route.ts",
+      "line": 14,
       "module": "@/lib/cosmetics-catalog"
     },
     {
@@ -27323,6 +27343,11 @@
       "file": "lib/auth-server.ts",
       "line": 23,
       "module": "@/lib/auth-session-service"
+    },
+    {
+      "file": "lib/auth-server.ts",
+      "line": 24,
+      "module": "@/lib/timezone-server"
     },
     {
       "file": "lib/auth-service.ts",

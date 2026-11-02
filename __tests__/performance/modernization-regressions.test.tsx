@@ -12,10 +12,22 @@ import { lockPageScroll } from "@/lib/scroll-lock";
 import { areAnyUsersBlocked } from "@/lib/block-service";
 import { prisma } from "@/lib/prisma";
 import {
+  computeMediaVersionHash,
   parseSafeImageDataUrl,
   toCompactConversationAvatarUrl,
   toCompactUserMediaUrl,
 } from "@/lib/user-media";
+import * as authServer from "@/lib/auth-server";
+import * as blockService from "@/lib/block-service";
+import * as privacyLib from "@/lib/privacy";
+import { Relationship } from "@/lib/privacy-types";
+import { GET as getUserMedia } from "@/app/api/media/user/[id]/[kind]/route";
+import { GET as getConversationAvatar } from "@/app/api/media/conversation/[id]/avatar/route";
+import {
+  getUserTimezone,
+  invalidateUserTimezoneCache,
+  primeUserTimezoneCache,
+} from "@/lib/timezone-server";
 
 const audioMocks = vi.hoisted(() => ({
   freqByteValue: 80,
@@ -310,5 +322,130 @@ describe("Performance Modernization Regressions", () => {
 
     await act(flush);
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("enforces session revocation, block checks, private banner visibility, and no-cache ETag revalidation on user media endpoints", async () => {
+    const validPng = `data:image/png;base64,${Buffer.from("png-binary-payload-for-test").toString("base64")}`;
+    const expectedEtag = `"${computeMediaVersionHash(validPng)}"`;
+
+    // 1. Revoked / missing session must return 401 even when If-None-Match matches ETag
+    vi.spyOn(authServer, "getSession").mockResolvedValueOnce(null);
+    const unauthRes = await getUserMedia(
+      new Request("http://localhost/api/media/user/55/avatar", {
+        headers: { "if-none-match": expectedEtag },
+      }),
+      { params: Promise.resolve({ id: "55", kind: "avatar" }) }
+    );
+    expect(unauthRes.status).toBe(401);
+
+    // 2. Blocked user must receive 404
+    vi.spyOn(authServer, "getSession").mockResolvedValue({
+      userId: 10,
+      email: "viewer@sylf.dev",
+    });
+    vi.spyOn(prisma.user, "findUnique").mockResolvedValue({
+      avatarUrl: validPng,
+      bannerUrl: validPng,
+      privacy: { profileVisibility: "PRIVATE" },
+    } as unknown as never);
+    vi.spyOn(blockService, "areUsersBlocked").mockResolvedValueOnce(true);
+
+    const blockedRes = await getUserMedia(
+      new Request("http://localhost/api/media/user/55/avatar"),
+      { params: Promise.resolve({ id: "55", kind: "avatar" }) }
+    );
+    expect(blockedRes.status).toBe(404);
+
+    // 3. Private profile banner must return 404 to non-friend / non-shared-conversation viewer
+    vi.spyOn(blockService, "areUsersBlocked").mockResolvedValue(false);
+    vi.spyOn(privacyLib, "getRelationship").mockResolvedValueOnce(Relationship.PUBLIC);
+    if (prisma.conversationParticipant) {
+      vi.spyOn(prisma.conversationParticipant, "findFirst").mockResolvedValueOnce(null);
+    }
+
+    const privateBannerRes = await getUserMedia(
+      new Request("http://localhost/api/media/user/55/banner"),
+      { params: Promise.resolve({ id: "55", kind: "banner" }) }
+    );
+    expect(privateBannerRes.status).toBe(404);
+
+    // 4. Authorized viewer receives 200 with private, no-cache, must-revalidate + Vary: Cookie + ETag, and 304 on If-None-Match
+    const avatarRes = await getUserMedia(
+      new Request("http://localhost/api/media/user/55/avatar"),
+      { params: Promise.resolve({ id: "55", kind: "avatar" }) }
+    );
+    expect(avatarRes.status).toBe(200);
+    expect(avatarRes.headers.get("Cache-Control")).toBe("private, no-cache, must-revalidate");
+    expect(avatarRes.headers.get("Vary")).toBe("Cookie");
+    expect(avatarRes.headers.get("ETag")).toBe(expectedEtag);
+
+    const notModifiedRes = await getUserMedia(
+      new Request("http://localhost/api/media/user/55/avatar", {
+        headers: { "if-none-match": expectedEtag },
+      }),
+      { params: Promise.resolve({ id: "55", kind: "avatar" }) }
+    );
+    expect(notModifiedRes.status).toBe(304);
+    expect(notModifiedRes.headers.get("Cache-Control")).toBe("private, no-cache, must-revalidate");
+  });
+
+  it("enforces conversation participant membership before ETag revalidation on group avatar media endpoint", async () => {
+    const validWebp = `data:image/webp;base64,${Buffer.from("webp-group-avatar-bytes").toString("base64")}`;
+    const expectedEtag = `"${computeMediaVersionHash(validWebp)}"`;
+
+    vi.spyOn(authServer, "getSession").mockResolvedValue({
+      userId: 10,
+      email: "viewer@sylf.dev",
+    });
+    vi.spyOn(prisma.conversation, "findUnique").mockResolvedValue({
+      avatarUrl: validWebp,
+    } as unknown as never);
+
+    // Non-participant must get 403 even with matching If-None-Match
+    vi.spyOn(prisma.conversationParticipant, "findFirst").mockResolvedValueOnce(null);
+    const forbiddenRes = await getConversationAvatar(
+      new Request("http://localhost/api/media/conversation/99/avatar", {
+        headers: { "if-none-match": expectedEtag },
+      }),
+      { params: Promise.resolve({ id: "99" }) }
+    );
+    expect(forbiddenRes.status).toBe(403);
+
+    // Participant gets 200 and then 304 on ETag match
+    vi.spyOn(prisma.conversationParticipant, "findFirst").mockResolvedValue({
+      id: 1,
+    } as unknown as never);
+    const okRes = await getConversationAvatar(
+      new Request("http://localhost/api/media/conversation/99/avatar"),
+      { params: Promise.resolve({ id: "99" }) }
+    );
+    expect(okRes.status).toBe(200);
+    expect(okRes.headers.get("Cache-Control")).toBe("private, no-cache, must-revalidate");
+    expect(okRes.headers.get("ETag")).toBe(expectedEtag);
+
+    const cachedRes = await getConversationAvatar(
+      new Request("http://localhost/api/media/conversation/99/avatar", {
+        headers: { "if-none-match": expectedEtag },
+      }),
+      { params: Promise.resolve({ id: "99" }) }
+    );
+    expect(cachedRes.status).toBe(304);
+  });
+
+  it("serves primed user timezone without an extra database query and re-queries after invalidation", async () => {
+    const findUniqueSpy = vi
+      .spyOn(prisma.user, "findUnique")
+      .mockResolvedValue({ timezone: "America/New_York" } as unknown as never);
+
+    primeUserTimezoneCache(777, "Asia/Karachi");
+    const primedTz = await getUserTimezone(777);
+    expect(primedTz).toBe("Asia/Karachi");
+    expect(findUniqueSpy).not.toHaveBeenCalled();
+
+    invalidateUserTimezoneCache(777);
+    const queriedTz = await getUserTimezone(777);
+    expect(queriedTz).toBe("America/New_York");
+    expect(findUniqueSpy).toHaveBeenCalledTimes(1);
+    invalidateUserTimezoneCache(777);
   });
 });

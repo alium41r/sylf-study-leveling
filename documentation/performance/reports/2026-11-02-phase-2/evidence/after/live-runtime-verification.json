@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-11-02T01:57:21.565Z",
+  "measuredAt": "2026-11-02T02:21:04.020Z",
   "environment": {
     "node": "v26.7.0",
     "platform": "darwin",
@@ -16,13 +16,13 @@
       {
         "path": "/api/user/stats",
         "status": 200,
-        "decodedBytes": 1301,
-        "coldMs": 4324.7,
-        "warmMedianMs": 941.41,
+        "decodedBytes": 1322,
+        "coldMs": 3567.02,
+        "warmMedianMs": 683.23,
         "samplesMs": [
-          4324.7,
-          941.41,
-          716.8
+          3567.02,
+          683.06,
+          683.23
         ],
         "avatarUrlSample": "/api/media/user/122/avatar?v=6c1131519324",
         "bannerUrlSample": "/api/media/user/122/banner?v=b2cfcf09f604"
@@ -31,84 +31,84 @@
         "path": "/api/friends",
         "status": 200,
         "decodedBytes": 4097,
-        "coldMs": 2015.27,
-        "warmMedianMs": 2015.27,
+        "coldMs": 2158.49,
+        "warmMedianMs": 1286.16,
         "samplesMs": [
-          2015.27,
-          1598.95,
-          2337.45
+          2158.49,
+          1161.83,
+          1286.16
         ]
       },
       {
         "path": "/api/conversations",
         "status": 200,
         "decodedBytes": 8660,
-        "coldMs": 1235.38,
-        "warmMedianMs": 911.18,
+        "coldMs": 1293.35,
+        "warmMedianMs": 937.79,
         "samplesMs": [
-          1235.38,
-          911.18,
-          824.17
+          1293.35,
+          937.79,
+          915.66
         ]
       },
       {
         "path": "/api/conversations/20",
         "status": 200,
         "decodedBytes": 4002,
-        "coldMs": 1339.71,
-        "warmMedianMs": 1320.85,
+        "coldMs": 1039.26,
+        "warmMedianMs": 1037.57,
         "samplesMs": [
-          1339.71,
-          1194.84,
-          1320.85
+          1039.26,
+          1025.61,
+          1037.57
         ]
       },
       {
         "path": "/api/goals",
         "status": 200,
         "decodedBytes": 2,
-        "coldMs": 525.04,
-        "warmMedianMs": 520.49,
+        "coldMs": 523.44,
+        "warmMedianMs": 510.65,
         "samplesMs": [
-          525.04,
-          520.49,
-          512.7
+          523.44,
+          510.65,
+          500.1
         ]
       },
       {
         "path": "/api/quests",
         "status": 200,
         "decodedBytes": 2,
-        "coldMs": 1198.55,
-        "warmMedianMs": 936.52,
+        "coldMs": 518.93,
+        "warmMedianMs": 514.44,
         "samplesMs": [
-          1198.55,
-          936.52,
-          643.72
+          518.93,
+          514.44,
+          508.21
         ]
       },
       {
         "path": "/api/notifications",
         "status": 200,
         "decodedBytes": 4963,
-        "coldMs": 558.34,
-        "warmMedianMs": 558.34,
+        "coldMs": 648.65,
+        "warmMedianMs": 505.94,
         "samplesMs": [
-          558.34,
-          514.79,
-          677.92
+          648.65,
+          505.94,
+          500.52
         ]
       },
       {
         "path": "/api/acoustics",
         "status": 200,
         "decodedBytes": 4590,
-        "coldMs": 9.13,
-        "warmMedianMs": 2.02,
+        "coldMs": 8.27,
+        "warmMedianMs": 3.53,
         "samplesMs": [
-          9.13,
-          2.02,
-          1.62
+          8.27,
+          3.53,
+          2.42
         ]
       }
     ],
@@ -118,10 +118,10 @@
       "contentType": "image/webp",
       "binaryBytes": 91474,
       "etag": "\"b2cfcf09f604\"",
-      "cacheControl": "private, max-age=31536000, immutable",
-      "coldMs": 771.7,
+      "cacheControl": "private, no-cache, must-revalidate",
+      "coldMs": 767.98,
       "conditional304Status": 304,
-      "warm304Ms": 508.23
+      "warm304Ms": 536.3
     }
   },
   "chromeCdpVerification": {
@@ -131,279 +131,403 @@
       {
         "route": "/",
         "mode": "guest-cold",
-        "wallMs": 2663.72,
+        "wallMs": 2659.61,
         "pathname": "/",
         "title": "Sylf — A little focus. A different you.",
-        "domInteractiveMs": 1250,
-        "domContentLoadedMs": 1250.2,
-        "loadEventEndMs": 2033,
+        "domInteractiveMs": 1025.7,
+        "domContentLoadedMs": 1025.8,
+        "loadEventEndMs": 1431.8,
+        "lcpMs": 1020,
+        "criticalDataReadyMs": 1158.9,
+        "hasInteractiveContent": true,
         "paints": {
-          "first-paint": 1244,
-          "first-contentful-paint": 1244
+          "first-paint": 1020,
+          "first-contentful-paint": 1020
         },
-        "totalResources": 37,
+        "totalResources": 36,
         "videoResourceCount": 0,
         "apiCalls": [
           {
             "path": "/api/acoustics",
-            "durationMs": 4,
+            "durationMs": 6.6,
+            "responseEndMs": 1134.9,
             "transferSize": 4890,
             "decodedBodySize": 4590
           },
           {
             "path": "/api/user/stats",
-            "durationMs": 13.7,
+            "durationMs": 6.7,
+            "responseEndMs": 1158.9,
             "transferSize": 324,
             "decodedBodySize": 24
           }
         ],
+        "steadyLongTasks": 0,
         "frameP50Ms": 16.7,
         "frameP95Ms": 33.4
       },
       {
         "route": "/login",
         "mode": "guest-cold",
-        "wallMs": 719.5,
+        "wallMs": 1314.79,
         "pathname": "/login",
         "title": "Sylf — Study Leveling",
-        "domInteractiveMs": 34.9,
-        "domContentLoadedMs": 34.9,
-        "loadEventEndMs": 78.3,
+        "domInteractiveMs": 31.9,
+        "domContentLoadedMs": 31.9,
+        "loadEventEndMs": 74.4,
+        "lcpMs": 48,
+        "criticalDataReadyMs": 81.1,
+        "hasInteractiveContent": true,
         "paints": {
-          "first-paint": 76,
-          "first-contentful-paint": 76
+          "first-paint": 48,
+          "first-contentful-paint": 48
         },
         "totalResources": 43,
         "videoResourceCount": 0,
         "apiCalls": [
           {
             "path": "/api/acoustics",
-            "durationMs": 4,
+            "durationMs": 3.5,
+            "responseEndMs": 78.5,
             "transferSize": 4890,
             "decodedBodySize": 4590
           },
           {
             "path": "/api/user/stats",
-            "durationMs": 7.7,
+            "durationMs": 4.9,
+            "responseEndMs": 81.1,
             "transferSize": 324,
             "decodedBodySize": 24
           }
         ],
+        "steadyLongTasks": 0,
         "frameP50Ms": 16.7,
         "frameP95Ms": 16.7
       },
       {
         "route": "/dashboard",
         "mode": "authenticated",
-        "wallMs": 723.34,
+        "wallMs": 1267.47,
         "pathname": "/dashboard",
         "title": "Sylf — Study Leveling",
-        "domInteractiveMs": 37.9,
-        "domContentLoadedMs": 38.1,
-        "loadEventEndMs": 75.2,
+        "domInteractiveMs": 25.3,
+        "domContentLoadedMs": 25.4,
+        "loadEventEndMs": 54.7,
+        "lcpMs": 64,
+        "criticalDataReadyMs": 1062.9,
+        "hasInteractiveContent": true,
         "paints": {
-          "first-paint": 80,
-          "first-contentful-paint": 80
-        },
-        "totalResources": 30,
-        "videoResourceCount": 0,
-        "apiCalls": [
-          {
-            "path": "/api/acoustics",
-            "durationMs": 8.6,
-            "transferSize": 4890,
-            "decodedBodySize": 4590
-          }
-        ],
-        "frameP50Ms": 16.7,
-        "frameP95Ms": 16.8
-      },
-      {
-        "route": "/focus",
-        "mode": "authenticated",
-        "wallMs": 722.49,
-        "pathname": "/focus",
-        "title": "Sylf — Study Leveling",
-        "domInteractiveMs": 44.1,
-        "domContentLoadedMs": 44.2,
-        "loadEventEndMs": 75.9,
-        "paints": {
-          "first-paint": 48
-        },
-        "totalResources": 30,
-        "videoResourceCount": 0,
-        "apiCalls": [
-          {
-            "path": "/api/acoustics",
-            "durationMs": 10.2,
-            "transferSize": 4890,
-            "decodedBodySize": 4590
-          }
-        ],
-        "frameP50Ms": 16.7,
-        "frameP95Ms": 33.3
-      },
-      {
-        "route": "/goals",
-        "mode": "authenticated",
-        "wallMs": 876.57,
-        "pathname": "/goals",
-        "title": "Sylf — Study Leveling",
-        "domInteractiveMs": 27.7,
-        "domContentLoadedMs": 27.7,
-        "loadEventEndMs": 220.1,
-        "paints": {
-          "first-paint": 44,
-          "first-contentful-paint": 44
-        },
-        "totalResources": 29,
-        "videoResourceCount": 0,
-        "apiCalls": [
-          {
-            "path": "/api/acoustics",
-            "durationMs": 3.9,
-            "transferSize": 4890,
-            "decodedBodySize": 4590
-          }
-        ],
-        "frameP50Ms": 16.7,
-        "frameP95Ms": 16.7
-      },
-      {
-        "route": "/social",
-        "mode": "authenticated",
-        "wallMs": 726.99,
-        "pathname": "/social",
-        "title": "Sylf — Study Leveling",
-        "domInteractiveMs": 32.5,
-        "domContentLoadedMs": 32.7,
-        "loadEventEndMs": 80.7,
-        "paints": {
-          "first-paint": 60,
-          "first-contentful-paint": 92
+          "first-paint": 64,
+          "first-contentful-paint": 64
         },
         "totalResources": 37,
         "videoResourceCount": 0,
         "apiCalls": [
           {
             "path": "/api/acoustics",
-            "durationMs": 6.3,
+            "durationMs": 4.5,
+            "responseEndMs": 52.3,
             "transferSize": 4890,
             "decodedBodySize": 4590
           },
           {
+            "path": "/api/user/stats",
+            "durationMs": 1013.4,
+            "responseEndMs": 1062.9,
+            "transferSize": 1622,
+            "decodedBodySize": 1322
+          }
+        ],
+        "steadyLongTasks": 0,
+        "frameP50Ms": 16.7,
+        "frameP95Ms": 16.8
+      },
+      {
+        "route": "/focus",
+        "mode": "authenticated",
+        "wallMs": 1272.97,
+        "pathname": "/focus",
+        "title": "Sylf — Study Leveling",
+        "domInteractiveMs": 29.9,
+        "domContentLoadedMs": 30,
+        "loadEventEndMs": 52.7,
+        "lcpMs": 1144,
+        "criticalDataReadyMs": 1099,
+        "hasInteractiveContent": true,
+        "paints": {
+          "first-paint": 48,
+          "first-contentful-paint": 1144
+        },
+        "totalResources": 47,
+        "videoResourceCount": 0,
+        "apiCalls": [
+          {
+            "path": "/api/acoustics",
+            "durationMs": 4.2,
+            "responseEndMs": 57.4,
+            "transferSize": 4890,
+            "decodedBodySize": 4590
+          },
+          {
+            "path": "/api/user/stats",
+            "durationMs": 1044.5,
+            "responseEndMs": 1099,
+            "transferSize": 1622,
+            "decodedBodySize": 1322
+          }
+        ],
+        "steadyLongTasks": 0,
+        "frameP50Ms": 16.7,
+        "frameP95Ms": 16.7
+      },
+      {
+        "route": "/goals",
+        "mode": "authenticated",
+        "wallMs": 1261.46,
+        "pathname": "/goals",
+        "title": "Sylf — Study Leveling",
+        "domInteractiveMs": 19.4,
+        "domContentLoadedMs": 19.5,
+        "loadEventEndMs": 47.9,
+        "lcpMs": 28,
+        "criticalDataReadyMs": 1240.3,
+        "hasInteractiveContent": true,
+        "paints": {
+          "first-paint": 28,
+          "first-contentful-paint": 28
+        },
+        "totalResources": 50,
+        "videoResourceCount": 0,
+        "apiCalls": [
+          {
+            "path": "/api/acoustics",
+            "durationMs": 4.1,
+            "responseEndMs": 44.2,
+            "transferSize": 4890,
+            "decodedBodySize": 4590
+          },
+          {
+            "path": "/api/user/stats",
+            "durationMs": 677.1,
+            "responseEndMs": 718.6,
+            "transferSize": 1622,
+            "decodedBodySize": 1322
+          },
+          {
+            "path": "/api/media/user/122/avatar?v=6c1131519324",
+            "durationMs": 512.3,
+            "responseEndMs": 1233.7,
+            "transferSize": 300,
+            "decodedBodySize": 14862
+          },
+          {
+            "path": "/api/notifications",
+            "durationMs": 514.2,
+            "responseEndMs": 1240.3,
+            "transferSize": 5263,
+            "decodedBodySize": 4963
+          },
+          {
+            "path": "/api/goals",
+            "durationMs": 499.6,
+            "responseEndMs": 1226.4,
+            "transferSize": 302,
+            "decodedBodySize": 2
+          },
+          {
+            "path": "/api/ai-usage",
+            "durationMs": 385.5,
+            "responseEndMs": 1112.7,
+            "transferSize": 1040,
+            "decodedBodySize": 740
+          }
+        ],
+        "steadyLongTasks": 0,
+        "frameP50Ms": 16.7,
+        "frameP95Ms": 16.7
+      },
+      {
+        "route": "/social",
+        "mode": "authenticated",
+        "wallMs": 1313.59,
+        "pathname": "/social",
+        "title": "Sylf — Study Leveling",
+        "domInteractiveMs": 19.6,
+        "domContentLoadedMs": 19.7,
+        "loadEventEndMs": 58.1,
+        "lcpMs": 64,
+        "criticalDataReadyMs": 1080.4,
+        "hasInteractiveContent": true,
+        "paints": {
+          "first-paint": 32,
+          "first-contentful-paint": 64
+        },
+        "totalResources": 45,
+        "videoResourceCount": 0,
+        "apiCalls": [
+          {
+            "path": "/api/acoustics",
+            "durationMs": 4,
+            "responseEndMs": 45,
+            "transferSize": 4890,
+            "decodedBodySize": 4590
+          },
+          {
+            "path": "/api/user/stats",
+            "durationMs": 1038,
+            "responseEndMs": 1080.4,
+            "transferSize": 1622,
+            "decodedBodySize": 1322
+          },
+          {
             "path": "/api/realtime/token",
-            "durationMs": 268.3,
+            "durationMs": 265.8,
+            "responseEndMs": 321.9,
             "transferSize": 612,
             "decodedBodySize": 312
           }
         ],
+        "steadyLongTasks": 0,
         "frameP50Ms": 16.7,
         "frameP95Ms": 16.7
       },
       {
         "route": "/system",
         "mode": "authenticated",
-        "wallMs": 718.5,
+        "wallMs": 1863.02,
         "pathname": "/system",
         "title": "Sylf — Study Leveling",
-        "domInteractiveMs": 24.6,
-        "domContentLoadedMs": 24.8,
-        "loadEventEndMs": 76.2,
+        "domInteractiveMs": 596.1,
+        "domContentLoadedMs": 596.2,
+        "loadEventEndMs": 617.6,
+        "lcpMs": 616,
+        "criticalDataReadyMs": 1833,
+        "hasInteractiveContent": true,
         "paints": {
-          "first-paint": 64,
-          "first-contentful-paint": 64
+          "first-paint": 616,
+          "first-contentful-paint": 616
         },
-        "totalResources": 32,
+        "totalResources": 38,
         "videoResourceCount": 0,
         "apiCalls": [
           {
             "path": "/api/acoustics",
-            "durationMs": 7.9,
+            "durationMs": 3.9,
+            "responseEndMs": 622.3,
             "transferSize": 4890,
             "decodedBodySize": 4590
+          },
+          {
+            "path": "/api/user/stats",
+            "durationMs": 1212,
+            "responseEndMs": 1833,
+            "transferSize": 1622,
+            "decodedBodySize": 1322
           }
         ],
+        "steadyLongTasks": 0,
         "frameP50Ms": 16.7,
         "frameP95Ms": 16.7
       },
       {
         "route": "/locker",
         "mode": "authenticated",
-        "wallMs": 1129.42,
+        "wallMs": 1262.03,
         "pathname": "/locker",
         "title": "Sylf — Study Leveling",
-        "domInteractiveMs": 452.6,
-        "domContentLoadedMs": 452.6,
-        "loadEventEndMs": 480.3,
+        "domInteractiveMs": 19,
+        "domContentLoadedMs": 19.1,
+        "loadEventEndMs": 50.8,
+        "lcpMs": 32,
+        "criticalDataReadyMs": 47,
+        "hasInteractiveContent": true,
         "paints": {
-          "first-paint": 452,
-          "first-contentful-paint": 452
+          "first-paint": 32,
+          "first-contentful-paint": 32
         },
         "totalResources": 33,
         "videoResourceCount": 0,
         "apiCalls": [
           {
             "path": "/api/acoustics",
-            "durationMs": 3.7,
+            "durationMs": 3.9,
+            "responseEndMs": 47,
             "transferSize": 4890,
             "decodedBodySize": 4590
           }
         ],
+        "steadyLongTasks": 0,
         "frameP50Ms": 16.7,
         "frameP95Ms": 16.8
       },
       {
         "route": "/notes",
         "mode": "authenticated",
-        "wallMs": 1647.94,
+        "wallMs": 1314.57,
         "pathname": "/notes",
         "title": "Sylf — Study Leveling",
-        "domInteractiveMs": 293.8,
-        "domContentLoadedMs": 293.8,
-        "loadEventEndMs": 992,
+        "domInteractiveMs": 16.2,
+        "domContentLoadedMs": 16.2,
+        "loadEventEndMs": 69.6,
+        "lcpMs": 32,
+        "criticalDataReadyMs": 46.1,
+        "hasInteractiveContent": true,
         "paints": {
-          "first-paint": 292,
-          "first-contentful-paint": 292
+          "first-paint": 32,
+          "first-contentful-paint": 32
         },
         "totalResources": 35,
         "videoResourceCount": 0,
         "apiCalls": [
           {
             "path": "/api/acoustics",
-            "durationMs": 548.6,
+            "durationMs": 3.3,
+            "responseEndMs": 46.1,
             "transferSize": 4890,
             "decodedBodySize": 4590
           }
         ],
+        "steadyLongTasks": 0,
         "frameP50Ms": 16.7,
         "frameP95Ms": 16.7
       },
       {
         "route": "/dashboard",
         "mode": "authenticated-warm",
-        "wallMs": 724.59,
+        "wallMs": 1316.73,
         "pathname": "/dashboard",
         "title": "Sylf — Study Leveling",
-        "domInteractiveMs": 28.5,
-        "domContentLoadedMs": 28.5,
-        "loadEventEndMs": 64.2,
+        "domInteractiveMs": 24.4,
+        "domContentLoadedMs": 24.5,
+        "loadEventEndMs": 66.2,
+        "lcpMs": 40,
+        "criticalDataReadyMs": 1090.3,
+        "hasInteractiveContent": true,
         "paints": {
-          "first-paint": 76,
-          "first-contentful-paint": 76
+          "first-paint": 40,
+          "first-contentful-paint": 40
         },
-        "totalResources": 33,
+        "totalResources": 40,
         "videoResourceCount": 0,
         "apiCalls": [
           {
             "path": "/api/acoustics",
-            "durationMs": 10.9,
+            "durationMs": 12.3,
+            "responseEndMs": 72.4,
             "transferSize": 4890,
             "decodedBodySize": 4590
+          },
+          {
+            "path": "/api/user/stats",
+            "durationMs": 1028.7,
+            "responseEndMs": 1090.3,
+            "transferSize": 1622,
+            "decodedBodySize": 1322
           }
         ],
+        "steadyLongTasks": 0,
         "frameP50Ms": 16.7,
-        "frameP95Ms": 16.8
+        "frameP95Ms": 16.7
       }
     ]
   }

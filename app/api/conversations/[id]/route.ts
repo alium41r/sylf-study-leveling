@@ -24,24 +24,19 @@ export async function GET(
     const conversationId = parseInt(id);
     const userId = session.userId;
 
-    // Verify user is a participant
-    const participant = await prisma.conversationParticipant.findUnique({
-      where: { userId_conversationId: { userId, conversationId } },
-    });
-    if (!participant) {
-      return NextResponse.json({ error: "Not a participant" }, { status: 403 });
-    }
-
     // Parse pagination
     const beforeParam = req.nextUrl.searchParams.get("before");
     const limit = 50;
 
-    const whereClause: any = { conversationId };
+    const whereClause: { conversationId: number; id?: { lt: number } } = { conversationId };
     if (beforeParam) {
       whereClause.id = { lt: parseInt(beforeParam) };
     }
 
-    const [conversation, messages] = await Promise.all([
+    const [participant, conversation, messages] = await Promise.all([
+      prisma.conversationParticipant.findUnique({
+        where: { userId_conversationId: { userId, conversationId } },
+      }),
       prisma.conversation.findUnique({
         where: { id: conversationId },
         include: {
@@ -90,14 +85,22 @@ export async function GET(
       }),
     ]);
 
+    if (!participant) {
+      return NextResponse.json({ error: "Not a participant" }, { status: 403 });
+    }
+
     if (!conversation) {
       return NextResponse.json({ error: "Conversation not found" }, { status: 404 });
     }
 
-    // Mark as read — only for user-initiated loads. Background refreshes
-    // (the 30s presence poll) pass ?refresh=1 and skip this write entirely,
-    // which removes a pointless DB write per poll per viewer.
-    if (req.nextUrl.searchParams.get("refresh") !== "1") {
+    // Mark as read — only for user-initiated loads when there is an unread
+    // message newer than lastReadAt. Background refreshes (?refresh=1) and
+    // already-caught-up participants skip this write round-trip.
+    const latestMessageAt = messages[0]?.createdAt ? new Date(messages[0].createdAt) : null;
+    const needsReadReceiptUpdate =
+      !participant.lastReadAt ||
+      (latestMessageAt !== null && latestMessageAt > new Date(participant.lastReadAt));
+    if (req.nextUrl.searchParams.get("refresh") !== "1" && needsReadReceiptUpdate) {
       await prisma.conversationParticipant.update({
         where: { userId_conversationId: { userId, conversationId } },
         data: { lastReadAt: new Date() },

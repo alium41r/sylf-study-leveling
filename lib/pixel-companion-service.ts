@@ -7,9 +7,13 @@ import { normalizeDisplayBorder, normalizePixelGap } from './pixel-display-style
 export async function selectedCompanionsForUsers(ids: readonly number[], viewerId: number | null, scope: 'public' | 'friends' | 'party', staticFrame = true): Promise<Map<number, SelectedPixelCompanion>> {
  const unique = [...new Set(ids)].filter(Number.isInteger);
  if (!unique.length) return new Map();
- const users = await prisma.user.findMany({ where: { id: { in: unique } }, select: { id: true, characterConfig: true, activeAura: true, privacy: { select: { profileVisibility: true } } } });
- // Existing party membership is an authorization scope; blocks still win.
- const blocks = viewerId === null ? [] : await prisma.$queryRaw<Array<{ userId: number; blockedId: number }>>`SELECT "userId", "blockedId" FROM "BlockedUser" WHERE "userId"=${viewerId} OR "blockedId"=${viewerId}`;
+ const [users, blocks] = await Promise.all([
+   prisma.user.findMany({ where: { id: { in: unique } }, select: { id: true, characterConfig: true, activeAura: true, privacy: { select: { profileVisibility: true } } } }),
+   // Existing party membership is an authorization scope; blocks still win.
+   viewerId === null
+     ? Promise.resolve([] as Array<{ userId: number; blockedId: number }>)
+     : prisma.$queryRaw<Array<{ userId: number; blockedId: number }>>`SELECT "userId", "blockedId" FROM "BlockedUser" WHERE "userId"=${viewerId} OR "blockedId"=${viewerId}`,
+ ]);
  const blocked = new Set(blocks.map(row => row.userId === viewerId ? row.blockedId : row.userId));
  const permitted = users.filter(user => user.id === viewerId || (!blocked.has(user.id) && (scope === 'party' || user.privacy?.profileVisibility !== 'PRIVATE') && (scope !== 'public' || !user.privacy || user.privacy.profileVisibility === 'PUBLIC')));
  const references = permitted.flatMap(user => { const config = user.characterConfig as Record<string, unknown> | null; return typeof config?.outfit === 'string' && config.outfit.startsWith('user:') ? [{ userId: user.id, slug: config.outfit.slice(5) }] : []; });

@@ -7,6 +7,7 @@ import { attachReissuedSession } from "@/lib/auth-session-service";
 import { formatScholarId } from "@/lib/scholar-id";
 import { xpForNextLevel } from "@/lib/game-engine";
 import { TimezoneService } from "@/lib/timezone-service";
+import { primeUserTimezoneCache } from "@/lib/timezone-server";
 import bcrypt from "bcryptjs";
 import { sendEmailChangedNotice } from "@/lib/email";
 import { rateLimit } from "@/lib/rate-limit";
@@ -133,6 +134,7 @@ export async function PATCH(req: NextRequest) {
       where: { id: userId },
       data: updates,
     }));
+    primeUserTimezoneCache(updatedUser.id, updatedUser.timezone);
 
     if (updates.email) {
       if (usedEmailCode !== null) await prisma.verificationToken.deleteMany({ where: { id: usedEmailCode } });

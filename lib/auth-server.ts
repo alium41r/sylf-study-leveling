@@ -21,6 +21,7 @@
 import { prisma } from "@/lib/prisma";
 import { getBearerToken, getCookieSession, getCookieToken, isBrowserRequest, verifyNativeToken, type AuthTokenPayload } from "@/lib/auth";
 import { authSessionAllows, sessionLookup } from "@/lib/auth-session-service";
+import { primeUserTimezoneCache } from "@/lib/timezone-server";
 
 const inflightSessionByRequest = new WeakMap<Request, Promise<AuthTokenPayload | null>>();
 
@@ -52,12 +53,16 @@ async function resolveSessionInternal(req: Request): Promise<AuthTokenPayload | 
       where: { id: payload.userId },
       select: {
         tokenVersion: true,
+        timezone: true,
         authSessions: { where: sessionLookup(payload, getCookieToken(req) ?? ""), select: { expiresAt: true }, take: 1 },
       },
     });
     if (!user) return null;
     if (user.tokenVersion !== (payload.tokenVersion ?? 1)) return null;
     if (!authSessionAllows(payload, user.authSessions?.[0])) return null;
+    if (typeof (user as { timezone?: string | null }).timezone === "string") {
+      primeUserTimezoneCache(payload.userId, (user as { timezone?: string | null }).timezone);
+    }
   } catch (err) {
     console.error("[auth-server] tokenVersion check failed:", err);
     // Fail closed on infrastructure errors rather than accepting the token.

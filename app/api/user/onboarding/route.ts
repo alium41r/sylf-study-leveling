@@ -7,6 +7,7 @@ import { attachReissuedSession } from "@/lib/auth-session-service";
 import { xpForNextLevel } from "@/lib/game-engine";
 import { formatScholarId } from "@/lib/scholar-id";
 import { TimezoneService } from "@/lib/timezone-service";
+import { primeUserTimezoneCache } from "@/lib/timezone-server";
 import { hash } from "bcryptjs";
 import { revalidateTag } from "next/cache";
 import { SKELETON_NODES } from "@/lib/skill-tree-skeleton";
@@ -254,6 +255,7 @@ export async function POST(req: NextRequest) {
     const updatedScholarId = updatedUser.scholarId || formatScholarId(updatedUser.id);
 
     // 3. Issue fresh signed JWT with hasCompletedOnboarding: true and updated timezone
+    primeUserTimezoneCache(updatedUser.id, updatedUser.timezone);
     const tokenPayload: AuthTokenPayload = {
       userId: updatedUser.id,
       email: updatedUser.email,

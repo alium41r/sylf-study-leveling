@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
-import { parseSafeImageDataUrl } from "@/lib/user-media";
+import { computeMediaVersionHash, parseSafeImageDataUrl } from "@/lib/user-media";
+
+const MEDIA_CACHE_CONTROL = "private, no-cache, must-revalidate";
 
 export async function GET(
   req: Request,
@@ -19,46 +21,44 @@ export async function GET(
       return NextResponse.json({ error: "Invalid conversation ID" }, { status: 400 });
     }
 
-    const participant = await prisma.conversationParticipant.findFirst({
-      where: {
-        conversationId,
-        userId: session.userId,
-      },
-      select: { id: true },
-    });
+    const [participant, conversation] = await Promise.all([
+      prisma.conversationParticipant.findFirst({
+        where: {
+          conversationId,
+          userId: session.userId,
+        },
+        select: { id: true },
+      }),
+      prisma.conversation.findUnique({
+        where: { id: conversationId },
+        select: { avatarUrl: true },
+      }),
+    ]);
 
     if (!participant) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const conversation = await prisma.conversation.findUnique({
-      where: { id: conversationId },
-      select: { avatarUrl: true },
-    });
-
-    if (!conversation?.avatarUrl) {
+    if (!conversation?.avatarUrl || !conversation.avatarUrl.startsWith("data:image/")) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    const etag = `"${computeMediaVersionHash(conversation.avatarUrl)}"`;
+    const ifNoneMatch = req.headers.get("if-none-match");
+    if (ifNoneMatch && ifNoneMatch === etag) {
+      return new NextResponse(null, {
+        status: 304,
+        headers: {
+          ETag: etag,
+          "Cache-Control": MEDIA_CACHE_CONTROL,
+          Vary: "Cookie",
+        },
+      });
     }
 
     const parsed = parseSafeImageDataUrl(conversation.avatarUrl);
     if (!parsed) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
-
-    const ifNoneMatch = req.headers.get("if-none-match");
-    const hasVersionParam = new URL(req.url).searchParams.has("v");
-    const cacheControl = hasVersionParam
-      ? "private, max-age=31536000, immutable"
-      : "private, max-age=300, stale-while-revalidate=86400";
-
-    if (ifNoneMatch && ifNoneMatch === parsed.etag) {
-      return new NextResponse(null, {
-        status: 304,
-        headers: {
-          ETag: parsed.etag,
-          "Cache-Control": cacheControl,
-        },
-      });
     }
 
     return new NextResponse(new Uint8Array(parsed.buffer), {
@@ -67,7 +67,8 @@ export async function GET(
         "Content-Type": parsed.contentType,
         "Content-Length": String(parsed.buffer.byteLength),
         ETag: parsed.etag,
-        "Cache-Control": cacheControl,
+        "Cache-Control": MEDIA_CACHE_CONTROL,
+        Vary: "Cookie",
         "X-Content-Type-Options": "nosniff",
       },
     });

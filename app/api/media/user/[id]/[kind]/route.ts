@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth-server";
 import { areUsersBlocked } from "@/lib/block-service";
 import { prisma } from "@/lib/prisma";
-import { parseSafeImageDataUrl } from "@/lib/user-media";
+import { getRelationship, isVisible } from "@/lib/privacy";
+import { Relationship } from "@/lib/privacy-types";
+import { computeMediaVersionHash, parseSafeImageDataUrl } from "@/lib/user-media";
+
+const MEDIA_CACHE_CONTROL = "private, no-cache, must-revalidate";
 
 export async function GET(
   req: Request,
@@ -23,49 +27,75 @@ export async function GET(
       return NextResponse.json({ error: "Invalid media kind" }, { status: 400 });
     }
 
-    if (session.userId !== targetUserId) {
-      const blocked = await areUsersBlocked(session.userId, targetUserId);
-      if (blocked) {
+    const isSelf = session.userId === targetUserId;
+
+    const [user, blocked, relationship, sharedConversation] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: targetUserId },
+        select: {
+          ...(kind === "avatar"
+            ? { avatarUrl: true, bannerUrl: false }
+            : { avatarUrl: false, bannerUrl: true }),
+          privacy: { select: { profileVisibility: true } },
+        },
+      }),
+      isSelf ? Promise.resolve(false) : areUsersBlocked(session.userId, targetUserId),
+      !isSelf && kind === "banner"
+        ? getRelationship(session.userId, targetUserId)
+        : Promise.resolve(Relationship.SELF),
+      !isSelf && kind === "banner" && prisma.conversationParticipant?.findFirst
+        ? prisma.conversationParticipant
+            .findFirst({
+              where: {
+                userId: session.userId,
+                conversation: {
+                  participants: { some: { userId: targetUserId } },
+                },
+              },
+              select: { id: true },
+            })
+            .catch(() => null)
+        : Promise.resolve(null),
+    ]);
+
+    if (blocked) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    if (!isSelf && kind === "banner") {
+      const visibility =
+        (user as { privacy?: { profileVisibility?: string } | null } | null)?.privacy
+          ?.profileVisibility ?? "PUBLIC";
+      if (!isVisible(visibility, relationship) && !sharedConversation) {
         return NextResponse.json({ error: "Not found" }, { status: 404 });
       }
     }
-
-    const user = await prisma.user.findUnique({
-      where: { id: targetUserId },
-      select:
-        kind === "avatar"
-          ? { avatarUrl: true, bannerUrl: false }
-          : { avatarUrl: false, bannerUrl: true },
-    });
 
     const rawUrl =
       kind === "avatar"
         ? (user as { avatarUrl?: string | null } | null)?.avatarUrl
         : (user as { bannerUrl?: string | null } | null)?.bannerUrl;
 
-    if (!rawUrl) {
+    if (!rawUrl || !rawUrl.startsWith("data:image/")) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    const etag = `"${computeMediaVersionHash(rawUrl)}"`;
+    const ifNoneMatch = req.headers.get("if-none-match");
+    if (ifNoneMatch && ifNoneMatch === etag) {
+      return new NextResponse(null, {
+        status: 304,
+        headers: {
+          ETag: etag,
+          "Cache-Control": MEDIA_CACHE_CONTROL,
+          Vary: "Cookie",
+        },
+      });
     }
 
     const parsed = parseSafeImageDataUrl(rawUrl);
     if (!parsed) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
-
-    const ifNoneMatch = req.headers.get("if-none-match");
-    const hasVersionParam = new URL(req.url).searchParams.has("v");
-    const cacheControl = hasVersionParam
-      ? "private, max-age=31536000, immutable"
-      : "private, max-age=300, stale-while-revalidate=86400";
-
-    if (ifNoneMatch && ifNoneMatch === parsed.etag) {
-      return new NextResponse(null, {
-        status: 304,
-        headers: {
-          ETag: parsed.etag,
-          "Cache-Control": cacheControl,
-        },
-      });
     }
 
     return new NextResponse(new Uint8Array(parsed.buffer), {
@@ -74,7 +104,8 @@ export async function GET(
         "Content-Type": parsed.contentType,
         "Content-Length": String(parsed.buffer.byteLength),
         ETag: parsed.etag,
-        "Cache-Control": cacheControl,
+        "Cache-Control": MEDIA_CACHE_CONTROL,
+        Vary: "Cookie",
         "X-Content-Type-Options": "nosniff",
       },
     });

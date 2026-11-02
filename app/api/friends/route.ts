@@ -87,47 +87,47 @@ export async function GET(req: NextRequest) {
 
     const friendIds = friends.map((f) => (f.userId === userId ? f.friendId : f.userId));
 
-    // ── Aggregate today's study seconds & active sessions for ALL friends in 2 queries ──
+    // ── Aggregate today's study seconds, active sessions & companions for ALL friends in parallel ──
     const completedMap = new Map<number, number>();
     const todayMap = new Map<number, number>();
     const activeSessionMap = new Map<number, Date>();
 
-    if (friendIds.length > 0) {
-      const [completedRows, activeRows] = await Promise.all([
-        prisma.$queryRaw<Array<{ userId: number; seconds: number; todaySeconds: number }>>`
-          SELECT "userId", COALESCE(SUM(CASE WHEN "endedAt" IS NOT NULL THEN "durationSeconds" ELSE 0 END), 0)::int AS seconds,
-            COALESCE(SUM("durationSeconds"), 0)::int AS "todaySeconds"
-          FROM "StudySession" AS s
-          WHERE "userId" = ANY(${friendIds}::int[])
-            AND CASE WHEN to_jsonb(s)->'executionContext'->>'actualCivilDate' IS NOT NULL
-              THEN to_jsonb(s)->'executionContext'->>'actualCivilDate' = ${TimezoneService.getUserLocalDate(timezone)}
-              ELSE "startedAt" >= ${todayStart} END
-          GROUP BY "userId"
-        `.catch(studyAggregateFailed),
-        prisma.$queryRaw<Array<{ userId: number; startedAt: Date }>>`
-          SELECT "userId", MAX("startedAt") AS "startedAt"
-          FROM "StudySession" AS s
-          WHERE "userId" = ANY(${friendIds}::int[])
-            AND "endedAt" IS NULL
-            AND (to_jsonb(s)->>'executionState' = 'RUNNING' OR to_jsonb(s)->>'executionState' IS NULL
-              AND ("startedAt" >= ${new Date(now.getTime() - 180_000)} OR "durationSeconds" > 0 AND "startedAt" >= ${twelveHoursAgo}))
-          GROUP BY "userId"
-        `.catch(studyAggregateFailed),
-      ]);
+    const [completedRows, activeRows, companions] =
+      friendIds.length > 0
+        ? await Promise.all([
+            prisma.$queryRaw<Array<{ userId: number; seconds: number; todaySeconds: number }>>`
+              SELECT "userId", COALESCE(SUM(CASE WHEN "endedAt" IS NOT NULL THEN "durationSeconds" ELSE 0 END), 0)::int AS seconds,
+                COALESCE(SUM("durationSeconds"), 0)::int AS "todaySeconds"
+              FROM "StudySession" AS s
+              WHERE "userId" = ANY(${friendIds}::int[])
+                AND CASE WHEN to_jsonb(s)->'executionContext'->>'actualCivilDate' IS NOT NULL
+                  THEN to_jsonb(s)->'executionContext'->>'actualCivilDate' = ${TimezoneService.getUserLocalDate(timezone)}
+                  ELSE "startedAt" >= ${todayStart} END
+              GROUP BY "userId"
+            `.catch(studyAggregateFailed),
+            prisma.$queryRaw<Array<{ userId: number; startedAt: Date }>>`
+              SELECT "userId", MAX("startedAt") AS "startedAt"
+              FROM "StudySession" AS s
+              WHERE "userId" = ANY(${friendIds}::int[])
+                AND "endedAt" IS NULL
+                AND (to_jsonb(s)->>'executionState' = 'RUNNING' OR to_jsonb(s)->>'executionState' IS NULL
+                  AND ("startedAt" >= ${new Date(now.getTime() - 180_000)} OR "durationSeconds" > 0 AND "startedAt" >= ${twelveHoursAgo}))
+              GROUP BY "userId"
+            `.catch(studyAggregateFailed),
+            selectedCompanionsForUsers(friendIds, userId, "friends"),
+          ])
+        : [[], [], new Map()];
 
-      for (const row of completedRows) {
-        completedMap.set(Number(row.userId), Number(row.seconds) || 0);
-        todayMap.set(Number(row.userId), Number(row.todaySeconds ?? row.seconds) || 0);
-      }
-      for (const row of activeRows) {
-        const started = new Date(row.startedAt);
-        if (!Number.isNaN(started.getTime())) {
-          activeSessionMap.set(Number(row.userId), started);
-        }
+    for (const row of completedRows) {
+      completedMap.set(Number(row.userId), Number(row.seconds) || 0);
+      todayMap.set(Number(row.userId), Number(row.todaySeconds ?? row.seconds) || 0);
+    }
+    for (const row of activeRows) {
+      const started = new Date(row.startedAt);
+      if (!Number.isNaN(started.getTime())) {
+        activeSessionMap.set(Number(row.userId), started);
       }
     }
-
-    const companions = await selectedCompanionsForUsers(friendIds, userId, "friends");
 
     const result = friends.map((f) => {
       const friendData = f.userId === userId ? f.friend : f.user;

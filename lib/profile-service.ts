@@ -415,7 +415,10 @@ export async function getProfileDossier(
         id: targetUser.id,
         username: targetUser.username,
         name: targetUser.name,
-        avatarUrl: targetUser.avatarUrl,
+        avatarUrl:
+          !isRestrictedByBlock && viewerId
+            ? toCompactUserMediaUrl(targetUser.id, "avatar", targetUser.avatarUrl)
+            : targetUser.avatarUrl,
         activeAvatar: targetUser.activeAvatar,
         activeFrame: targetUser.activeFrame,
         activeTitle: targetUser.activeTitle,

@@ -45,7 +45,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json([], { status: 200 });
     }
 
-    let rawNotifications: any[] = [];
+    let rawNotifications: Array<{
+      id: number;
+      content: string;
+      type: string;
+      read: boolean;
+      createdAt: Date;
+    }> = [];
     try {
       rawNotifications = await prisma.systemMessage.findMany({
         where: notificationWhere(userId),
@@ -59,9 +65,10 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: "desc" },
         take: 50,
       });
-    } catch (dbError: any) {
-      console.warn("Transient database connection error in /api/notifications, returning empty list:", dbError?.message || dbError);
-      return NextResponse.json([], { status: 200 });
+    } catch (dbError: unknown) {
+      const msg = dbError instanceof Error ? dbError.message : String(dbError);
+      console.warn("Transient database connection error in /api/notifications:", msg);
+      return NextResponse.json({ error: "Notifications temporarily unavailable" }, { status: 503 });
     }
 
     // Apply granular user preferences filter + chat message hard-block

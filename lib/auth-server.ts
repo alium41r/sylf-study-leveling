@@ -22,12 +22,28 @@ import { prisma } from "@/lib/prisma";
 import { getBearerToken, getCookieSession, getCookieToken, isBrowserRequest, verifyNativeToken, type AuthTokenPayload } from "@/lib/auth";
 import { authSessionAllows, sessionLookup } from "@/lib/auth-session-service";
 
+const inflightSessionByRequest = new WeakMap<Request, Promise<AuthTokenPayload | null>>();
+
 /**
  * Server-side session resolution for API routes.
  * Returns the verified payload only when the token is valid, its tokenVersion
  * matches the user's current value, and its device session has not been ended.
+ * Concurrent calls on the same Request instance share a single in-flight lookup.
  */
 export async function getSession(req: Request): Promise<AuthTokenPayload | null> {
+  if (req && typeof req === "object") {
+    const existing = inflightSessionByRequest.get(req);
+    if (existing) return existing;
+    const promise = resolveSessionInternal(req).finally(() => {
+      inflightSessionByRequest.delete(req);
+    });
+    inflightSessionByRequest.set(req, promise);
+    return promise;
+  }
+  return resolveSessionInternal(req);
+}
+
+async function resolveSessionInternal(req: Request): Promise<AuthTokenPayload | null> {
   const payload = (await getCookieSession(req)) ?? (await getNativeSession(req));
   if (!payload) return null;
 

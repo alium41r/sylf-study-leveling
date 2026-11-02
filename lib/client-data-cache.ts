@@ -15,10 +15,12 @@ import { invalidateNotesAccess } from "./notes/session";
 interface CacheEntry {
   data: unknown;
   fetchedAt: number;
+  url?: string;
 }
 
 const memoryCache = new Map<string, CacheEntry>();
 const inflight = new Map<string, Promise<unknown>>();
+const inflightUrls = new Map<string, string>();
 const generations = new Map<string, number>();
 const subscribers = new Map<string, Set<(data: unknown) => void>>();
 const inflightCallbacks = new Map<string, Set<(data: unknown) => void>>();
@@ -84,6 +86,7 @@ export function clearClientCache(): void {
   memoryCache.clear();
   for (const key of inflight.keys()) generations.set(key, (generations.get(key) ?? 0) + 1);
   inflight.clear();
+  inflightUrls.clear();
   inflightCallbacks.clear();
 }
 
@@ -205,18 +208,33 @@ export function invalidateClientCaches(fragments: readonly string[]): void {
   if (typeof window === "undefined") return;
   try {
     for (const key of new Set([...memoryCache.keys(), ...inflight.keys()])) {
-      if (fragments.some(fragment => key.includes(fragment))) {
+      const associatedUrl = memoryCache.get(key)?.url ?? inflightUrls.get(key) ?? "";
+      if (fragments.some(fragment => key.includes(fragment) || associatedUrl.includes(fragment))) {
         memoryCache.delete(key);
         generations.set(key, (generations.get(key) ?? 0) + 1);
         inflight.delete(key);
+        inflightUrls.delete(key);
         inflightCallbacks.delete(key);
       }
     }
     const doomed: string[] = [];
     for (let i = 0; i < window.localStorage.length; i++) {
       const key = window.localStorage.key(i);
-      if (key && key.startsWith("sylf_cache:") && fragments.some(fragment => key.includes(fragment))) {
+      if (!key || !key.startsWith("sylf_cache:")) continue;
+      if (fragments.some(fragment => key.includes(fragment))) {
         doomed.push(key);
+        continue;
+      }
+      try {
+        const raw = window.localStorage.getItem(key);
+        if (raw) {
+          const parsed = JSON.parse(raw) as CacheEntry;
+          if (parsed?.url && fragments.some(fragment => parsed.url!.includes(fragment))) {
+            doomed.push(key);
+          }
+        }
+      } catch {
+        // ignore
       }
     }
     for (const key of doomed) window.localStorage.removeItem(key);
@@ -245,6 +263,7 @@ export async function fetchCachedJSON<T = unknown>(
     const entry: CacheEntry | null =
       memoryHit ?? (storageKey && isPersistable(storageKey) && isPersistable(url) ? readStorage(storageKey) : null);
     if (entry) {
+      if (!entry.url) entry.url = url;
       if (!memoryHit) memoryCache.set(cacheKey, entry);
       const age = now - entry.fetchedAt;
       if (age < ttlMs) {
@@ -256,6 +275,11 @@ export async function fetchCachedJSON<T = unknown>(
         return entry.data as T;
       }
     }
+  } else if (inflight.has(cacheKey)) {
+    generations.set(cacheKey, (generations.get(cacheKey) ?? 0) + 1);
+    inflight.delete(cacheKey);
+    inflightUrls.delete(cacheKey);
+    inflightCallbacks.delete(cacheKey);
   }
 
   return (await doFetch(url, init, storageKey)) as T | null;
@@ -284,6 +308,7 @@ function doFetch(
   const epoch = sessionEpoch;
   const generation = generations.get(cacheKey) ?? 0;
   const previousEntry = memoryCache.get(cacheKey);
+  inflightUrls.set(cacheKey, url);
 
   const request = (async () => {
     try {
@@ -293,7 +318,7 @@ function doFetch(
         throw new Error(`Request failed with status ${res.status}`);
       }
       const data = await res.json();
-      const entry: CacheEntry = { data, fetchedAt: Date.now() };
+      const entry: CacheEntry = { data, fetchedAt: Date.now(), url };
       if (sessionEpoch !== epoch || (generations.get(cacheKey) ?? 0) !== generation) return null;
       memoryCache.set(cacheKey, entry);
       // S3: sensitive endpoints stay memory-only even when a storageKey was
@@ -315,13 +340,17 @@ function doFetch(
           }
         }
       }
-      const subs = subscribers.get(cacheKey);
-      if (changed && subs) {
-        for (const sub of subs) {
-          try {
-            sub(data);
-          } catch {
-            // ignore listener error
+      if (changed) {
+        const keysToNotify = cacheKey === url ? [cacheKey] : [cacheKey, url];
+        for (const notifyKey of keysToNotify) {
+          const subs = subscribers.get(notifyKey);
+          if (!subs) continue;
+          for (const sub of subs) {
+            try {
+              sub(data);
+            } catch {
+              // ignore listener error
+            }
           }
         }
       }
@@ -332,6 +361,7 @@ function doFetch(
     } finally {
       if (sessionEpoch === epoch && (generations.get(cacheKey) ?? 0) === generation) {
         inflight.delete(cacheKey);
+        inflightUrls.delete(cacheKey);
         inflightCallbacks.delete(cacheKey);
       }
     }

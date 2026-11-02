@@ -4,7 +4,7 @@ import { fetchWithTimeout } from "@/lib/api-transport";
 import { SYLVIE_CLIENT_TIMEOUT_MS } from "@/lib/ai/client-budget";
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import MarkdownRenderer from "@/app/components/MarkdownRenderer";
+import MarkdownRenderer from "@/app/components/LazyMarkdownRenderer";
 import {
   Search,
   Copy,

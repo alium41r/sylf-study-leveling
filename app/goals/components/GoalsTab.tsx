@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../components/AuthProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { backdropVariants, bottomSheetVariants } from "@/lib/motion";
-import MarkdownRenderer from "../../components/MarkdownRenderer";
+import MarkdownRenderer from "../../components/LazyMarkdownRenderer";
 import CustomDatePicker from "../../components/CustomDatePicker";
 import { fetchCachedJSON } from "@/lib/client-data-cache";
 import {

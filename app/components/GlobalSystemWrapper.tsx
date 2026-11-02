@@ -461,7 +461,7 @@ export function GlobalSystemWrapper({ children }: { children: React.ReactNode })
     <MotionConfig reducedMotion="user">
       <ImmersiveModeProvider>
         <TimerSyncWorker />
-        <CalendarReminderAgent />
+        {user ? <CalendarReminderAgent /> : null}
         <AcousticsProvider>
           <CustomAudioProvider>
           <SettingsProvider>
@@ -488,9 +488,9 @@ export function GlobalSystemWrapper({ children }: { children: React.ReactNode })
                 </LevelUpProvider>
               </SystemAIProvider>
               <DeferredGlobalModals />
-              <AcousticsDynamicIsland />
-              <SessionInviteToast />
-              <SessionEndToast />
+              {user ? <AcousticsDynamicIsland /> : null}
+              {user ? <SessionInviteToast /> : null}
+              {user ? <SessionEndToast /> : null}
               <TopRightBar />
             </ProfileModalProvider>
           </SettingsProvider>

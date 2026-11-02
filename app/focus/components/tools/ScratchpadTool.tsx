@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useFocusTools } from "../FocusToolsContext";
-import MarkdownRenderer from "@/app/components/MarkdownRenderer";
+import MarkdownRenderer from "@/app/components/LazyMarkdownRenderer";
 import {
   Plus,
   Trash2,

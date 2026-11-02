@@ -46,6 +46,14 @@ const AcousticsContext = createContext<AcousticsContextType | null>(null);
 const SILENT_AUDIO_URI = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
 
 export function AcousticsProvider({ children }: { children: React.ReactNode }) {
+  const parent = useContext(AcousticsContext);
+  if (parent) {
+    return <>{children}</>;
+  }
+  return <AcousticsRootProvider>{children}</AcousticsRootProvider>;
+}
+
+function AcousticsRootProvider({ children }: { children: React.ReactNode }) {
   const [tracks, setTracks] = useState<AcousticTrack[]>([]);
   const [activeTrack, setActiveTrack] = useState<AcousticTrack | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);

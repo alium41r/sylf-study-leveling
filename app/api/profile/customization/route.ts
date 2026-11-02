@@ -7,6 +7,7 @@ import { z } from "zod";
 import { assertMayWear, CosmeticNotAllowedError, WEARER_SELECT, WORN_FIELDS } from "@/lib/cosmetic-policy";
 import { isClearOrSafeImageAddress } from "@/lib/image-address";
 import { rateLimit } from "@/lib/rate-limit";
+import { toCompactUserMediaUrl } from "@/lib/user-media";
 
 export const dynamic = "force-dynamic";
 
@@ -62,10 +63,16 @@ async function handleCustomizationUpdate(req: NextRequest) {
 
     const updateData: Record<string, any> = {};
     if (data.bannerUrl !== undefined) {
-      updateData.bannerUrl = typeof data.bannerUrl === "string" ? (data.bannerUrl.trim() || null) : data.bannerUrl;
+      const normalizedBanner = typeof data.bannerUrl === "string" ? (data.bannerUrl.trim() || null) : data.bannerUrl;
+      if (!normalizedBanner || !normalizedBanner.startsWith(`/api/media/user/${userId}/banner`)) {
+        updateData.bannerUrl = normalizedBanner;
+      }
     }
     if (data.avatarUrl !== undefined) {
-      updateData.avatarUrl = typeof data.avatarUrl === "string" ? (data.avatarUrl.trim() || null) : data.avatarUrl;
+      const normalizedAvatar = typeof data.avatarUrl === "string" ? (data.avatarUrl.trim() || null) : data.avatarUrl;
+      if (!normalizedAvatar || !normalizedAvatar.startsWith(`/api/media/user/${userId}/avatar`)) {
+        updateData.avatarUrl = normalizedAvatar;
+      }
     }
     if (data.bio !== undefined) updateData.bio = data.bio;
     if (data.activeAura !== undefined) updateData.activeAura = data.activeAura;
@@ -125,7 +132,11 @@ async function handleCustomizationUpdate(req: NextRequest) {
       success: true,
       message: "Profile identity updated successfully.",
       characterConfig: updatedUser.characterConfig,
-      user: updatedUser,
+      user: {
+        ...updatedUser,
+        avatarUrl: toCompactUserMediaUrl(updatedUser.id, "avatar", updatedUser.avatarUrl),
+        bannerUrl: toCompactUserMediaUrl(updatedUser.id, "banner", updatedUser.bannerUrl),
+      },
     });
   } catch (error: any) {
     if (error instanceof CosmeticNotAllowedError) return NextResponse.json({ error: error.message, code: error.code }, { status: 403 });

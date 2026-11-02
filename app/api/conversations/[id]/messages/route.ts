@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth-server";
 import { messageRefusal, MESSAGES_PER_MINUTE } from "@/lib/message-limits";
 import { rateLimit } from "@/lib/rate-limit";
 import { areAnyUsersBlocked } from "@/lib/block-service";
+import { toCompactUserMediaUrl } from "@/lib/user-media";
 
 const SENDER_SELECT = {
   id: true,
@@ -47,13 +48,23 @@ export async function GET(
       return NextResponse.json({ error: "Invalid 'after' parameter" }, { status: 400 });
     }
 
-    const messages = await prisma.message.findMany({
-      where: { conversationId, id: { gt: parseInt(afterParam) } },
-      include: { sender: { select: SENDER_SELECT } },
-      orderBy: { id: "asc" },
-      // Oldest first, so a poller that gets a full page simply asks again from its last id.
-      take: 200,
-    });
+    const messages = (
+      await prisma.message.findMany({
+        where: { conversationId, id: { gt: parseInt(afterParam) } },
+        include: { sender: { select: SENDER_SELECT } },
+        orderBy: { id: "asc" },
+        // Oldest first, so a poller that gets a full page simply asks again from its last id.
+        take: 200,
+      })
+    ).map((m) => ({
+      ...m,
+      sender: m.sender
+        ? {
+            ...m.sender,
+            avatarUrl: toCompactUserMediaUrl(m.sender.id, "avatar", m.sender.avatarUrl),
+          }
+        : m.sender,
+    }));
 
     return NextResponse.json({ messages }, { status: 200 });
   } catch (error) {
@@ -146,7 +157,17 @@ export async function POST(
     // the notifications inbox is reserved for important events only
     // (level-ups, quest completions, friend requests, group adds, ...).
 
-    return NextResponse.json(message, { status: 201 });
+    const compactMessage = {
+      ...message,
+      sender: message.sender
+        ? {
+            ...message.sender,
+            avatarUrl: toCompactUserMediaUrl(message.sender.id, "avatar", message.sender.avatarUrl),
+          }
+        : message.sender,
+    };
+
+    return NextResponse.json(compactMessage, { status: 201 });
   } catch (error) {
     console.error("POST message error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

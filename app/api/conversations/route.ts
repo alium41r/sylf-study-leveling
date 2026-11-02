@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth-server";
 import { isClearOrSafeImageAddress } from "@/lib/image-address";
 import { rateLimit } from "@/lib/rate-limit";
 import { areUsersBlocked, mayAddToConversation } from "@/lib/block-service";
+import { toCompactConversationAvatarUrl, toCompactUserMediaUrl } from "@/lib/user-media";
 
 /**
  * GET /api/conversations
@@ -74,7 +75,7 @@ export async function GET(req: NextRequest) {
       return {
         id: conv.id,
         name: displayName,
-        avatarUrl: conv.avatarUrl,
+        avatarUrl: toCompactConversationAvatarUrl(conv.id, conv.avatarUrl),
         isGroup: conv.isGroup,
         participants: conv.participants.map((p: any) => ({
           id: p.user.id,
@@ -82,7 +83,7 @@ export async function GET(req: NextRequest) {
           username: p.user.username,
           hunterRank: p.user.hunterRank,
           level: p.user.level || 1,
-          avatarUrl: p.user.avatarUrl,
+          avatarUrl: toCompactUserMediaUrl(p.user.id, "avatar", p.user.avatarUrl),
           activeAvatar: p.user.activeAvatar || "class_scholar",
           activeFrame: p.user.activeFrame || "frame_default",
           characterConfig: p.user.characterConfig,

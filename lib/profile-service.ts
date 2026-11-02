@@ -8,6 +8,7 @@ import { TimezoneService } from "@/lib/timezone-service";
 import { unstable_cache } from "next/cache";
 import { getLevelProgress, calculateRequiredXp } from "@/lib/game-engine";
 import { cachedWithRedis } from "@/lib/redis";
+import { toCompactUserMediaUrl } from "@/lib/user-media";
 
 export interface ProfileDossierResult {
   profile: any | null;
@@ -346,8 +347,12 @@ export async function getProfileDossier(
       username: targetUser.username,
       scholarId: (targetUser as any).scholarId,
       verificationStatus: (targetUser as any).verificationStatus,
-      avatarUrl: targetUser.avatarUrl,
-      bannerUrl: targetUser.bannerUrl,
+      avatarUrl: viewerId
+        ? toCompactUserMediaUrl(targetUser.id, "avatar", targetUser.avatarUrl)
+        : targetUser.avatarUrl,
+      bannerUrl: viewerId
+        ? toCompactUserMediaUrl(targetUser.id, "banner", targetUser.bannerUrl)
+        : targetUser.bannerUrl,
       bio: targetUser.bio,
       hunterRank: userStats.rank || targetUser.hunterRank,
       level: statLevel,

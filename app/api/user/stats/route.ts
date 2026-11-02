@@ -8,6 +8,7 @@ import { TimezoneService } from "@/lib/timezone-service";
 import { getCognitiveEffects } from "@/lib/cognitive-stats";
 import { storedStudySeconds, studySessionIsRunning } from "@/lib/session-math";
 import { isEmailInAdminBootstrap } from "@/lib/auth-admin";
+import { toCompactUserMediaUrl } from "@/lib/user-media";
 
 export async function GET(req: NextRequest) {
   try {
@@ -122,6 +123,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         ...userStats,
+        avatarUrl: toCompactUserMediaUrl(user.id, "avatar", userStats.avatarUrl),
+        bannerUrl: toCompactUserMediaUrl(user.id, "banner", userStats.bannerUrl),
         scholarId,
         xpToNextLevel,
         hasPassword,

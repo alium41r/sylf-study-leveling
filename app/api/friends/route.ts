@@ -5,6 +5,7 @@ import { TimezoneService } from "@/lib/timezone-service";
 import { isVisible } from "@/lib/privacy";
 import { Relationship } from "@/lib/privacy-types";
 import { selectedCompanionsForUsers } from "@/lib/pixel-companion-service";
+import { toCompactUserMediaUrl } from "@/lib/user-media";
 
 /** Friends still load if study time cannot, and a failure must reach the log: silently it reads as everyone being idle. */
 function studyAggregateFailed(error: unknown): never[] {
@@ -171,7 +172,7 @@ export async function GET(req: NextRequest) {
         isOnline,
         isStudying,
         activeSessionStartedAt: activeSession ? activeSession.toISOString() : null,
-        avatarUrl: friendData.avatarUrl,
+        avatarUrl: toCompactUserMediaUrl(friendData.id, "avatar", friendData.avatarUrl),
         activeAvatar: friendData.activeAvatar || "class_scholar",
         activeFrame: friendData.activeFrame || "none",
         activeTitle: friendData.activeTitle || "title_novice",

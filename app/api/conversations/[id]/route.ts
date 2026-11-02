@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 import { isClearOrSafeImageAddress } from "@/lib/image-address";
 import { mayAddToConversation } from "@/lib/block-service";
+import { toCompactConversationAvatarUrl, toCompactUserMediaUrl } from "@/lib/user-media";
 
 /**
  * GET /api/conversations/[id]
@@ -107,7 +108,7 @@ export async function GET(
       conversation: {
         id: conversation.id,
         name: conversation.name,
-        avatarUrl: conversation.avatarUrl,
+        avatarUrl: toCompactConversationAvatarUrl(conversation.id, conversation.avatarUrl),
         isGroup: conversation.isGroup,
         createdBy: conversation.createdBy,
         createdAt: conversation.createdAt,
@@ -117,13 +118,13 @@ export async function GET(
           username: p.user.username,
           hunterRank: p.user.hunterRank,
           level: p.user.level || 1,
-          avatarUrl: p.user.avatarUrl,
+          avatarUrl: toCompactUserMediaUrl(p.user.id, "avatar", p.user.avatarUrl),
           activeAvatar: p.user.activeAvatar || "class_scholar",
           activeFrame: p.user.activeFrame || "frame_default",
           activeTitle: p.user.activeTitle,
           characterConfig: p.user.characterConfig,
           bio: p.user.bio,
-          bannerUrl: p.user.bannerUrl,
+          bannerUrl: toCompactUserMediaUrl(p.user.id, "banner", p.user.bannerUrl),
           createdAt: p.user.createdAt,
           isOnline: p.user.lastSeenAt
             ? p.user.lastSeenAt >= new Date(Date.now() - 2 * 60 * 1000)
@@ -131,7 +132,15 @@ export async function GET(
           lastSeenAt: p.user.lastSeenAt,
         })),
       },
-      messages: messages.reverse(), // Return in chronological order
+      messages: messages.reverse().map((m) => ({
+        ...m,
+        sender: m.sender
+          ? {
+              ...m.sender,
+              avatarUrl: toCompactUserMediaUrl(m.sender.id, "avatar", m.sender.avatarUrl),
+            }
+          : m.sender,
+      })), // Return in chronological order
       hasMore: messages.length === limit,
     });
   } catch (error) {
@@ -215,7 +224,10 @@ export async function PATCH(
     }
     if (!isClearOrSafeImageAddress(body.avatarUrl)) return NextResponse.json({ error: "Use an https image address." }, { status: 400 });
     if (body.avatarUrl !== undefined) {
-      updateData.avatarUrl = body.avatarUrl ? (typeof body.avatarUrl === "string" ? body.avatarUrl.trim() : body.avatarUrl) : null;
+      const normalizedAvatar = body.avatarUrl ? (typeof body.avatarUrl === "string" ? body.avatarUrl.trim() : body.avatarUrl) : null;
+      if (!normalizedAvatar || !normalizedAvatar.startsWith(`/api/media/conversation/${conversationId}/avatar`)) {
+        updateData.avatarUrl = normalizedAvatar;
+      }
     }
 
     let updatedConversation = conversation;

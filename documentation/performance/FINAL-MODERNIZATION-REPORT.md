@@ -1,25 +1,32 @@
-# Sylf — Final Performance Optimization & Modernization Report
+# Sylf — Final Performance Optimization & Modernization Report (Phases 1 & 2)
 
-Canonical report: [`documentation/performance/reports/2026-11-01-modernization/report.md`](reports/2026-11-01-modernization/report.md)
-Before/After Evidence: [`documentation/performance/reports/2026-11-01-modernization/evidence/`](reports/2026-11-01-modernization/evidence/)
+- **Phase 2 Report (Real-World Verification & Completion):** [`documentation/performance/reports/2026-11-02-phase-2/report.md`](reports/2026-11-02-phase-2/report.md) ([evidence](reports/2026-11-02-phase-2/evidence/))
+- **Phase 1 Report:** [`documentation/performance/reports/2026-11-01-modernization/report.md`](reports/2026-11-01-modernization/report.md) ([evidence](reports/2026-11-01-modernization/evidence/))
 
 ---
 
 ## 1. Executive Summary
 
-This report documents the comprehensive, autonomous performance optimization and modernization execution across the Sylf web and mobile client codebase, anchored against the historical September 2026 audit ([`documentation/performance/phase-0/MASTER-MODERNIZATION-REPORT.md`](phase-0/MASTER-MODERNIZATION-REPORT.md)) and current codebase baseline.
+This report documents the complete, two-phase performance optimization and real-world verification execution across the Sylf web and mobile client codebase, anchored against the historical September 2026 audit ([`documentation/performance/phase-0/MASTER-MODERNIZATION-REPORT.md`](phase-0/MASTER-MODERNIZATION-REPORT.md)) and current codebase baseline.
 
 ### Key Measured Outcomes
 
-1. **Initial Route JavaScript Reductions (Next.js 16.2.9 Production Build):**
-   - **`/` (Landing / Home):** `2,044,975` B (`588,926` B gzip) → `1,463,665` B (`421,610` B gzip) — **-581.3 KB raw (-28.4%), -167.3 KB gzip (-28.4%)**
-   - **`/dashboard`:** `1,994,640` B (`570,621` B gzip) → `1,456,133` B (`417,490` B gzip) — **-538.5 KB raw (-27.0%), -153.1 KB gzip (-26.8%)**
-   - **`/timer`:** `1,991,653` B (`569,375` B gzip) → `1,410,363` B (`402,084` B gzip) — **-581.3 KB raw (-29.2%), -167.3 KB gzip (-29.4%)**
-   - **`/system`:** `2,280,666` B (`648,459` B gzip) → `1,722,432` B (`487,626` B gzip) — **-558.2 KB raw (-24.5%), -160.8 KB gzip (-24.8%)**
-   - **`/locker`:** `2,139,820` B (`608,918` B gzip) → `1,602,696` B (`456,119` B gzip) — **-537.1 KB raw (-25.1%), -152.8 KB gzip (-25.1%)**
-   - **`/social`:** `2,412,655` B (`673,744` B gzip) → `1,876,001` B (`521,131` B gzip) — **-536.7 KB raw (-22.2%), -152.6 KB gzip (-22.6%)**
-   - **`/focus`:** `2,258,345` B (`638,753` B gzip) → `2,106,107` B (`597,935` B gzip) — **-152.2 KB raw (-6.7%), -40.8 KB gzip (-6.4%)**
-   - **`/goals`:** `2,002,192` B (`571,733` B gzip) → `1,854,666` B (`532,820` B gzip) — **-147.5 KB raw (-7.4%), -38.9 KB gzip (-6.8%)**
+1. **98%–99.1% Reduction in Live Authenticated JSON Payloads (Phase 2):**
+   - Replaced oversized inline `data:image/...;base64,...` strings (`> 1024` chars) in user stats, friends, conversations, conversation detail, and profile dossiers with compact, content-hashed, authenticated binary media references (`/api/media/user/[id]/[kind]?v=<sha1_12>`, `/api/media/conversation/[id]/avatar?v=<sha1_12>`).
+   - Verified live on `next start` against the audit account (`userId: 122 / dark`):
+     - **`GET /api/user/stats`:** `142,780` B → **`1,301` B (-99.09%)**
+     - **`GET /api/friends`:** `199,772` B → **`4,097` B (-97.95%)**
+     - **`GET /api/conversations`:** `492,043` B → **`8,660` B (-98.24%)**
+     - **`GET /api/conversations/20`:** `334,570` B → **`4,002` B (-98.80%)**
+2. **Initial Route JavaScript Reductions Across All Major Routes (Next.js 16.2.9 Production Build):**
+   - **`/` (Landing / Home):** `2,044,975` B (`588,926` B gzip) → `1,464,262` B (`421,806` B gzip) — **-567.1 KB raw (-28.4%), -163.2 KB gzip (-28.4%)**
+   - **`/dashboard`:** `1,994,640` B (`570,621` B gzip) → `1,456,730` B (`417,685` B gzip) — **-525.3 KB raw (-27.0%), -149.4 KB gzip (-26.8%)**
+   - **`/timer`:** `1,991,653` B (`569,375` B gzip) → `1,410,960` B (`402,279` B gzip) — **-567.1 KB raw (-29.2%), -163.2 KB gzip (-29.3%)**
+   - **`/focus`:** `2,258,345` B (`638,753` B gzip) → `1,681,813` B (`472,649` B gzip) — **-563.0 KB raw (-25.5%), -162.2 KB gzip (-26.0%)**
+   - **`/goals`:** `2,002,192` B (`571,733` B gzip) → `1,430,372` B (`407,534` B gzip) — **-558.4 KB raw (-28.6%), -160.4 KB gzip (-28.7%)**
+   - **`/system`:** `2,280,666` B (`648,459` B gzip) → `1,723,029` B (`487,821` B gzip) — **-544.6 KB raw (-24.5%), -156.9 KB gzip (-24.8%)**
+   - **`/locker`:** `2,139,820` B (`608,918` B gzip) → `1,603,293` B (`456,314` B gzip) — **-524.0 KB raw (-25.1%), -149.0 KB gzip (-25.1%)**
+   - **`/social`:** `2,412,655` B (`673,744` B gzip) → `1,876,598` B (`521,326` B gzip) — **-523.5 KB raw (-22.2%), -148.8 KB gzip (-22.6%)**
 2. **React Render & Main-Thread Churn Elimination:**
    - **Acoustics 60fps Analyser Broadcast:** Control-only consumers of `useAcoustics()` dropped from **60 re-renders per 60 animation frames** during audio playback to **0 re-renders** (`100%` elimination). The `requestAnimationFrame` analyser loop now runs on-demand only when at least one visualizer subscriber (`useAcoustics({ subscribeFrequency: true })`) is mounted and the tab is visible.
    - **Social Screen 1Hz Full-Tree Re-render:** Removed the 1-second `tick` state from `SocialContent` (1,639 lines) that forced the entire Friends, Leaderboard, and Messages hub to re-render every second whenever the current user was in an active study session; replaced with the isolated `<FriendStudyTimer />` component.
@@ -104,11 +111,12 @@ Every finding from [`documentation/performance/phase-0/MASTER-MODERNIZATION-REPO
 ### Git Isolation & Integration
 
 - **Worktree Path:** `/Users/aliumair/.gemini/antigravity/worktrees/sylf/sylf_performance_optimization_modernization`
-- **Branch Name:** `sylf_performance_optimization_modernization`
+- **Phase 2 Branch (Recommended Integration Target):** `sylf_performance_phase_2`
+- **Phase 1 Anchor Branch:** `sylf_performance_optimization_modernization` (`3e179f1`)
 
 ```bash
 cd /Users/aliumair/Desktop/sylf
-git log main..sylf_performance_optimization_modernization --oneline
-git diff main...sylf_performance_optimization_modernization --stat
-git merge sylf_performance_optimization_modernization
+git log main..sylf_performance_phase_2 --oneline
+git diff main...sylf_performance_phase_2 --stat
+git merge sylf_performance_phase_2
 ```

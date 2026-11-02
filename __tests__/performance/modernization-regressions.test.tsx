@@ -11,6 +11,11 @@ import {
 import { lockPageScroll } from "@/lib/scroll-lock";
 import { areAnyUsersBlocked } from "@/lib/block-service";
 import { prisma } from "@/lib/prisma";
+import {
+  parseSafeImageDataUrl,
+  toCompactConversationAvatarUrl,
+  toCompactUserMediaUrl,
+} from "@/lib/user-media";
 
 const audioMocks = vi.hoisted(() => ({
   freqByteValue: 80,
@@ -231,5 +236,79 @@ describe("Performance Modernization Regressions", () => {
     const blocked = await areAnyUsersBlocked(10, [20, 30, 40, 20, 10]);
     expect(blocked).toBe(true);
     expect(queryRawSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("invalidates custom storageKey entries when invalidateClientCache is called with the underlying URL fragment", async () => {
+    let calls = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        calls++;
+        return new Response(JSON.stringify({ seq: calls }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+      }),
+    );
+
+    const first = await fetchCachedJSON<{ seq: number }>(
+      "/api/system-messages?sessionId=42",
+      undefined,
+      { storageKey: "sys-msgs:42", ttlMs: 60_000, staleMs: 120_000 },
+    );
+    expect(first).toEqual({ seq: 1 });
+
+    // URL-based invalidation must clear the entry even though its cacheKey is "sys-msgs:42"
+    invalidateClientCache("/api/system-messages");
+
+    const second = await fetchCachedJSON<{ seq: number }>(
+      "/api/system-messages?sessionId=42",
+      undefined,
+      { storageKey: "sys-msgs:42", ttlMs: 60_000, staleMs: 120_000 },
+    );
+    expect(second).toEqual({ seq: 2 });
+    expect(calls).toBe(2);
+  });
+
+  it("replaces oversized base64 data:image URLs with compact versioned media references while preserving small synthetic strings", () => {
+    const smallDataUrl = "data:image/webp;base64,mockAvatarData";
+    expect(toCompactUserMediaUrl(7, "avatar", smallDataUrl)).toBe(smallDataUrl);
+    expect(toCompactUserMediaUrl(7, "banner", "https://cdn.example.com/banner.webp")).toBe(
+      "https://cdn.example.com/banner.webp",
+    );
+
+    const largeBase64 = "A".repeat(24_000);
+    const largeDataUrl = `data:image/png;base64,${largeBase64}`;
+    const compactAvatar = toCompactUserMediaUrl(7, "avatar", largeDataUrl);
+    const compactConv = toCompactConversationAvatarUrl(19, largeDataUrl);
+
+    expect(compactAvatar).toMatch(/^\/api\/media\/user\/7\/avatar\?v=[0-9a-f]{12}$/);
+    expect(compactConv).toMatch(/^\/api\/media\/conversation\/19\/avatar\?v=[0-9a-f]{12}$/);
+    expect(compactAvatar!.length).toBeLessThan(60);
+
+    const parsed = parseSafeImageDataUrl(largeDataUrl);
+    expect(parsed).not.toBeNull();
+    expect(parsed?.contentType).toBe("image/png");
+    expect(parsed?.buffer.byteLength).toBeGreaterThan(10_000);
+    expect(parseSafeImageDataUrl("data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=")).toBeNull();
+  });
+
+  it("deduplicates nested AcousticsProvider mounts so /api/acoustics is fetched only once", async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ tracks: [] }),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <AcousticsProvider>
+        <AcousticsProvider>
+          <div data-testid="nested-child" />
+        </AcousticsProvider>
+      </AcousticsProvider>,
+    );
+
+    await act(flush);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });

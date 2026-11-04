@@ -586,7 +586,7 @@ async function runChecks(window) {
 
   // 11. Opening and closing, on a busy page.
   if (runs("frames")) {
-    await open("space=workspace&wsClear=1&wsOpen=notes,calculator,timer,calendar&session=running&sessionLength=25&theme=signature&mode=dark");
+    await open("space=workspace&wsClear=1&wsOpen=notes,calculator,timer,audio&session=running&sessionLength=25&theme=signature&mode=dark");
     await sleep(800);
     await js(frames(150));
     for (let i = 0; i < 4; i++) { await clickOn(tid("dock")); await sleep(420); await key("Escape"); await sleep(380); }

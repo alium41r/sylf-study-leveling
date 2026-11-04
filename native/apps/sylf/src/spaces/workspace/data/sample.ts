@@ -1,6 +1,6 @@
 // Sample content for reviewing the tools. It is invented, every result is marked "sample", and a window says so. Without
 // development tools the empty adapter is bound, so a store build cannot show any of this.
-import type { CalendarEntry, ResourceEntry, ToolResult, WorkspaceDataAdapter } from "./contracts";
+import type { ResourceEntry, ToolResult, WorkspaceDataAdapter } from "./contracts";
 
 const sample = <T,>(data: T): Promise<ToolResult<T>> => Promise.resolve({ provenance: "sample", data });
 const empty = <T,>(): Promise<ToolResult<T>> => Promise.resolve({ provenance: "live", data: null });
@@ -18,12 +18,6 @@ const PDFS = [
 
 const BOARDS = [{ id: "unit-circle", title: "Unit circle sketch", detail: "Further Mathematics" }, { id: "mechanism", title: "Reaction mechanism", detail: "Chemistry" }];
 
-const dayKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-
-function sampleCalendar(now: Date): CalendarEntry[] {
-  const at = (days: number) => dayKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() + days));
-  return [{ id: "seminar", day: at(0), time: "11:00", title: "History seminar" }, { id: "lab", day: at(1), time: "14:30", title: "Chemistry lab" }, { id: "due", day: at(3), time: "17:00", title: "Essay outline due" }, { id: "mock", day: at(6), time: "09:00", title: "Mock exam, Paper 1" }, { id: "tutor", day: at(-2), time: "16:00", title: "Tutor group" }];
-}
 
 const SHELF: ResourceEntry[] = [
   { id: "r-complex", kind: "note", documentId: "complex", title: "Complex numbers", detail: "Note, Further Mathematics" },
@@ -37,14 +31,11 @@ export const SAMPLE_WORKSPACE_DATA: WorkspaceDataAdapter = {
   notes: () => sample(NOTES),
   pdfs: () => sample(PDFS),
   boards: () => sample(BOARDS),
-  planner: () => sample({ items: [{ id: "a", time: "11:00", title: "History seminar", detail: "Class, 1 hr" }, { id: "b", time: "14:00", title: "Complex numbers", detail: "Session, 45 min" }, { id: "c", time: "16:30", title: "Waves and optics", detail: "Session, 30 min" }], objectives: [{ id: "paper", title: "Finish one past paper", detail: "Further Mathematics" }, { id: "outline", title: "Outline the essay", detail: "Literature" }, { id: "cards", title: "Review 20 chemistry cards", detail: "Chemistry" }] }),
-  calendar: (now) => sample(sampleCalendar(now)),
   sylvie: () => sample([{ id: "thread", title: "Roots of unity", messages: [{ id: "1", from: "person", text: "Why are the cube roots of −8 evenly spaced?" }, { id: "2", from: "sylvie", text: "Each root has the same modulus, 2, so they all sit on one circle. De Moivre's theorem says their arguments differ by 2π/3, a third of a full turn. Three equal turns bring you back to where you began." }, { id: "3", from: "person", text: "So for fourth roots it would be a quarter turn?" }, { id: "4", from: "sylvie", text: "Exactly. n roots, spaced 2π/n apart. Try sketching the fourth roots of 16 and see whether the picture agrees." }] }]),
   sounds: () => sample([{ id: "rain", name: "Rain on a window", detail: "Ambient" }, { id: "library", name: "Quiet library", detail: "Ambient" }, { id: "brown", name: "Brown noise", detail: "Noise" }, { id: "piano", name: "Slow piano", detail: "Music" }]),
   resources: () => sample(SHELF),
 };
 
-export const EMPTY_WORKSPACE_DATA: WorkspaceDataAdapter = { notes: empty, pdfs: empty, boards: empty, planner: empty, calendar: () => empty(), sylvie: empty, sounds: empty, resources: empty };
+export const EMPTY_WORKSPACE_DATA: WorkspaceDataAdapter = { notes: empty, pdfs: empty, boards: empty, sylvie: empty, sounds: empty, resources: empty };
 
 export const workspaceDataFor = (devTools: boolean, scenario: "sample" | "empty" | "slow" | null) => (devTools && scenario !== "empty" ? SAMPLE_WORKSPACE_DATA : EMPTY_WORKSPACE_DATA);
-export { dayKey };

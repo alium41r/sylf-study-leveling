@@ -12,6 +12,7 @@ import { HomeNavigationProvider, SpacesProvider, StudySessionProvider, Workspace
 import { connectBackend, currentBackend, prepareBackend, useBackend, useBackendPhase } from "./shell/backend";
 import { DEV_TOOLS, closeShowcase, openProbe, openShowcase, setHomeDataScenario, setWorldScenarios, useDevSurface, worldHostScenario } from "./shell/dev-surface";
 import { parseAppLink } from "./shell/links";
+import { onForegroundChange } from "./shell/focus/alerts";
 import { SpacesShell } from "./shell/SpacesShell";
 
 const Showcase = lazy(() => import("./showcase/Showcase"));
@@ -44,6 +45,7 @@ const worldController = createWorldController(spacesStore, {
 AppState.addEventListener("change", (state) => {
   worldController.setForeground(state === "active");
   studySession.setForeground(state === "active");
+  void onForegroundChange(state === "active", studySession);
   if (state === "active") currentBackend()?.wake();
   if (state !== "active") { currentBackend()?.sleep(); homeNavigation.flush(); workspaceModel.flush(); spacesStore.flush(); appearanceStore.flush(); }
 });

@@ -19,7 +19,7 @@ export function useWorkspaceData() {
 export function useToolResult<T>(view: LiveToolView, load: (adapter: WorkspaceDataAdapter) => Promise<ToolResult<T>>, param?: string): ToolResult<T> | null {
   const backend = useLiveBackend();
   const limited = backend ? LIMITED_TOOLS[view] : undefined;
-  const resource = useMemo(() => (backend && (view === "planner" || view === "calendar" || view === "sounds") ? (backend.resources.resource(liveToolResource(backend, view, param)) as Resource<T>) : null), [backend, view, param]);
+  const resource = useMemo(() => (backend && view === "sounds" ? (backend.resources.resource(liveToolResource(backend, "sounds")) as Resource<T>) : null), [backend, view, param]);
   const state = useOptionalResource(resource);
   const adapter = useWorkspaceData();
   const [result, setResult] = useState<{ adapter: WorkspaceDataAdapter; value: ToolResult<T> } | null>(null);

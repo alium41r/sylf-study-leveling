@@ -9,7 +9,7 @@ import { app } from "electron";
 import { APP_ORIGIN } from "./security.mjs";
 
 const THEMES = ["signature", "studio", "arcane", "voxel", "cozy", "student"];
-const TOOL_IDS = ["notes", "pdfs", "whiteboard", "planner", "calendar", "sylvie", "timer", "calculator", "audio", "resources"];
+const TOOL_IDS = ["notes", "pdfs", "whiteboard", "sylvie", "timer", "calculator", "audio", "resources"];
 const WINDOWS = [{ name: "wide", width: 1680, height: 1000 }, { name: "expanded", width: 1280, height: 820 }, { name: "medium", width: 820, height: 900 }, { name: "short", width: 900, height: 480 }, { name: "compact", width: 480, height: 800 }];
 const sleep = (/** @type {number} */ ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const GROUPS = (process.env.SYLF_WORKSPACE_CHECK_ONLY ?? "").split(",").filter(Boolean);
@@ -434,7 +434,7 @@ async function toolsGroup(t) {
 /** @param {any} t */
 async function framesGroup(t) {
   const { checks, results, js } = t;
-  await t.fresh("wsOpen=notes,pdfs,calculator,planner");
+  await t.fresh("wsOpen=notes,pdfs,calculator,audio");
   await t.sleep(900);
   const frames = (/** @type {number} */ n) => `window.__frames = new Promise((resolve) => { const stamps = []; let last = performance.now(); const tick = (t) => { stamps.push(t - last); last = t; if (stamps.length < ${n}) requestAnimationFrame(tick); else { const s = stamps.slice(5).sort((a, b) => a - b); resolve({ frames: s.length, p50: +s[s.length >> 1].toFixed(1), p95: +s[Math.floor(s.length * 0.95)].toFixed(1), p99: +s[Math.floor(s.length * 0.99)].toFixed(1), max: +s[s.length - 1].toFixed(1) }); } }; requestAnimationFrame(tick); }); true`;
   const mid = { x: 640, y: 90 };
@@ -469,7 +469,7 @@ async function framesGroup(t) {
   checks.fullWorkspacePanHolds60 = results.fullPanFrames.p95 < 25;
   checks.mountedContentStaysInBudget = results.fullWorkspace.mounted <= 11;
   // Entering a busy Workspace, from a click to the first window on screen.
-  await t.fresh("space=workspace&wsOpen=notes,pdfs,calculator,planner,calendar,timer");
+  await t.fresh("space=workspace&wsOpen=notes,pdfs,calculator,sylvie,audio,timer");
   await t.sleep(900);
   /** @type {number[]} */
   const entry = [];
@@ -537,7 +537,7 @@ async function retentionGroup(t) {
   // Opening and closing windows must give everything back.
   await t.fresh("");
   const windowRound = async () => {
-    for (const tool of ["notes", "pdfs", "calculator", "calendar"]) { await t.js(`document.querySelector('[data-testid=dock-${tool}]').click(); true`); await sleep(220); }
+    for (const tool of ["notes", "pdfs", "calculator", "audio"]) { await t.js(`document.querySelector('[data-testid=dock-${tool}]').click(); true`); await sleep(220); }
     for (let left = await t.count("[data-testid^=window-close-]"); left > 0; left--) { await t.js(`document.querySelector('[data-testid^=window-close-]').click(); true`); await sleep(160); }
     await sleep(200);
     return measure();
@@ -551,7 +551,7 @@ async function retentionGroup(t) {
   checks.windowsRetainNoNodes = peak(windowSamples.slice(-3)) <= peak(windowSamples.slice(1, 4)) + 40;
   checks.windowsRetainNoHeap = windowSamples.at(-1).heapMb <= windowSamples[3].heapMb + 1.2;
   // Leaving Workspace and coming back must not add up, with four tools open.
-  await t.fresh("wsOpen=notes,pdfs,calculator,calendar");
+  await t.fresh("wsOpen=notes,pdfs,calculator,audio");
   await sleep(900);
   const spaceRound = async () => {
     for (const label of ["Home", "Workspace"]) {
@@ -770,7 +770,7 @@ async function restoreGroup(t) {
 async function lifecycleGroup(t) {
   const { checks, results } = t;
   const stateOf = (/** @type {string} */ id) => t.js(`document.querySelector('[data-testid=tool-${id}]')?.getAttribute('data-lifecycle') ?? null`);
-  await t.fresh("wsZoom=0.5&wsOpen=notes,calculator,timer,planner,calendar,audio&session=clear&sessionLength=25");
+  await t.fresh("wsZoom=0.5&wsOpen=notes,calculator,timer,sylvie,audio&session=clear&sessionLength=25");
   await t.sleep(1000);
   const state = await t.workspace();
   const ids = state.windows.map((/** @type {any} */ w) => w.id);
@@ -960,7 +960,7 @@ async function contrastGroup(t) {
   const CUSTOM = { "custom-dark": "theme=signature&mode=dark&accent=e5ff00&day=7f8088&night=101010", "custom-light": "theme=cozy&mode=light&accent=ff2d55&day=7f8088&night=101010" };
   const pairs = [...THEMES.flatMap((theme) => ["light", "dark"].map((mode) => [`${theme}-${mode}`, `theme=${theme}&mode=${mode}`])), ...Object.entries(CUSTOM)];
   for (const [name, query] of pairs) {
-    await t.fresh(`wsOpen=notes,calculator,timer,calendar,planner,sylvie,audio,resources&wsZoom=0.5&${query}`);
+    await t.fresh(`wsOpen=notes,calculator,timer,sylvie,audio,resources&wsZoom=0.5&${query}`);
     await t.sleep(1400);
     lowest[name] = await js(`(${LOWEST_CONTRAST})(${visible})`);
     checks[`contrast_${name}`] = lowest[name].lowest >= 4.5;
@@ -971,7 +971,7 @@ async function contrastGroup(t) {
 /** @param {any} t */
 async function accessibilityGroup(t) {
   const { checks, results, js } = t;
-  await t.fresh("wsOpen=notes,calculator,timer,calendar,planner,sylvie,audio,resources&wsZoom=0.5&theme=signature&mode=dark");
+  await t.fresh("wsOpen=notes,calculator,timer,sylvie,audio,resources&wsZoom=0.5&theme=signature&mode=dark");
   await t.sleep(1400);
   const min = (await t.workspace()).windows[0];
   await t.clickOn(`[data-testid=window-minimize-${min.id}]`);

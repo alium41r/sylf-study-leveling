@@ -6,7 +6,7 @@
 // Time here is tracked on this device, and nothing in this file reaches a server. `createSessionBridge` in @sylf/backend reads this model
 // and writes to the existing timer journal, and the journal delivers through SessionProtocolV2. What the server accepts comes back through
 // `settleAccepted`, which is the only way a record becomes `saved`. Rewards are never computed on the client.
-import { timer } from "@sylf/shared";
+import { modes, timer } from "@sylf/shared";
 
 export type TimerSnapshot = timer.TimerSnapshot;
 export type SessionStatus = "idle" | "running" | "paused" | "finished";
@@ -18,6 +18,12 @@ export const SESSION_LENGTHS: readonly SessionLength[] = [15, 25, 50, 90, null];
 export const DEFAULT_SESSION_LENGTH: SessionLength = 25;
 export const sessionLengthLabel = (length: SessionLength) => (length === null ? "No limit" : `${length} min`);
 export const DEFAULT_SESSION_TITLE = "Study session";
+/** How a session is shaped. "countdown" is one block of the chosen length, as before modes existed. The others are web's seven modes, from lib/timer-modes.ts. */
+export type SessionMode = "countdown" | modes.StudyModeId;
+export const SESSION_MODES: readonly SessionMode[] = ["countdown", ...modes.STUDY_MODES.map((mode) => mode.id)];
+const isMode = (value: unknown): value is SessionMode => value === "countdown" || modes.isStudyModeId(value);
+/** A mode's settings, starting from its definition. A person's changes are kept on this device, as web keeps them. */
+export const sessionModeSettings = (state: Pick<StudySessionState, "modeSettings">, mode: modes.StudyModeId): modes.ModeSettings => ({ ...modes.defaultModeSettings(mode), ...state.modeSettings?.[mode] });
 /** The most one session can credit on the server. Time past this still ends normally, and the screens say that it does not count. */
 export const MAX_CREDITED_FOCUS_SECONDS = timer.MAX_SESSION_FOCUS_SECONDS;
 
@@ -39,7 +45,11 @@ interface SessionDelivery {
   declined: boolean;
 }
 
+/** Where a mode session is. Absent on a countdown. `seconds` is the length of the phase now running, for drawing its progress. */
+export interface ActivePhase { mode: modes.StudyModeId; label: string; round: number; rounds: number; seconds: number | null }
+
 export interface ActiveSession extends SessionDelivery {
+  phase?: ActivePhase;
   /** TimerSessionStart.clientKey: one stable identity, so a replayed start can never make a second StudySession. */
   clientKey: string;
   title: string;
@@ -76,6 +86,9 @@ export interface StudySessionState {
   length: SessionLength;
   /** The subject and task the next session starts with. Personal, so it goes when the account changes. */
   plan: SessionPlan | null;
+  /** How the next session is shaped. Absent in records from before modes, which read as a countdown. */
+  mode?: SessionMode;
+  modeSettings?: Partial<Record<modes.StudyModeId, Record<string, boolean | number | string>>>;
   active: ActiveSession | null;
   ended: EndedSession[];
 }
@@ -86,8 +99,11 @@ export interface SessionReadout {
   clock: number;
   focusSeconds: number;
   breakSeconds: number;
-  /** 0 to 1 through a countdown, or null when there is no limit. */
+  /** 0 to 1 through a countdown, or null when there is no limit. In a mode, through the phase now running. */
   fraction: number | null;
+  /** The phase now running, and the words a timer shows for it. Focus on a countdown. */
+  phase: timer.TimerPhase;
+  label: string | null;
 }
 
 export const INITIAL_SESSION_STATE: StudySessionState = { version: 1, length: DEFAULT_SESSION_LENGTH, plan: null, active: null, ended: [] };
@@ -117,11 +133,22 @@ export function speakSessionClock(seconds: number) {
 
 export function readSession(state: StudySessionState, now: number): SessionReadout {
   const { active } = state;
-  if (!active) return { status: "idle", clock: state.length === null ? 0 : Math.round(state.length * 60), focusSeconds: 0, breakSeconds: 0, fraction: state.length === null ? null : 0 };
+  if (!active) {
+    const mode = state.mode ?? "countdown";
+    const start = mode === "countdown" ? null : modes.modeStart(mode, sessionModeSettings(state, mode));
+    const idle = start ? start.seconds : state.length === null ? null : Math.round(state.length * 60);
+    return { status: "idle", clock: idle ?? 0, focusSeconds: 0, breakSeconds: 0, fraction: idle === null ? null : 0, phase: "focus", label: start?.label ?? null };
+  }
   const derived = timer.deriveTimer(active.snapshot, now);
+  if (active.phase) {
+    const seconds = active.phase.seconds;
+    const remaining = derived.remainingSec;
+    const breaking = timer.isBreakPhase(active.snapshot.phase);
+    return { status: statusOf(active), clock: remaining !== null ? remaining : breaking ? derived.breakSec : derived.focusSec, focusSeconds: derived.focusSec, breakSeconds: derived.breakSec, fraction: seconds && remaining !== null ? Math.min(1, 1 - remaining / seconds) : null, phase: active.snapshot.phase, label: active.phase.label };
+  }
   const total = active.length === null ? null : Math.round(active.length * 60);
   const fraction = total === null ? null : Math.min(1, derived.focusSec / Math.max(1, total));
-  return { status: statusOf(active), clock: total !== null && active.snapshot.remainingMs !== null ? derived.remainingSec ?? 0 : derived.focusSec, focusSeconds: derived.focusSec, breakSeconds: derived.breakSec, fraction };
+  return { status: statusOf(active), clock: total !== null && active.snapshot.remainingMs !== null ? derived.remainingSec ?? 0 : derived.focusSec, focusSeconds: derived.focusSec, breakSeconds: derived.breakSec, fraction, phase: active.snapshot.phase, label: null };
 }
 
 const isSnapshot = (value: unknown): value is TimerSnapshot => {
@@ -134,10 +161,27 @@ const parseId = parseOwner;
 const parseDelivery = (value: Partial<SessionDelivery>): SessionDelivery => ({ ownerId: parseOwner(value.ownerId), subjectId: parseId(value.subjectId), questId: parseId(value.questId), journaled: finite(value.journaled) ? value.journaled : 0, declined: value.declined === true });
 const parseOperations = (raw: unknown): SessionOperation[] => (Array.isArray(raw) ? raw.filter((op): op is SessionOperation => !!op && typeof op.id === "string" && ["PAUSE", "RESUME", "END"].includes(op.action) && finite(op.sequence) && finite(op.focus) && finite(op.breaks) && typeof op.at === "string") : []);
 
+function parsePhase(raw: unknown): ActivePhase | null {
+  const value = raw as Partial<ActivePhase> | null;
+  if (!value || typeof value !== "object" || !modes.isStudyModeId(value.mode) || typeof value.label !== "string" || !finite(value.round) || !finite(value.rounds)) return null;
+  return { mode: value.mode, label: value.label, round: value.round, rounds: value.rounds, seconds: finite(value.seconds) ? value.seconds : null };
+}
+
+function parseModeSettings(raw: unknown): StudySessionState["modeSettings"] {
+  if (!raw || typeof raw !== "object") return undefined;
+  const out: NonNullable<StudySessionState["modeSettings"]> = {};
+  for (const [mode, settings] of Object.entries(raw)) {
+    if (!modes.isStudyModeId(mode) || !settings || typeof settings !== "object") continue;
+    out[mode] = Object.fromEntries(Object.entries(settings).filter(([, item]) => ["boolean", "number", "string"].includes(typeof item) && (typeof item !== "number" || Number.isFinite(item)))) as Record<string, boolean | number | string>;
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
 function parseActive(raw: unknown): ActiveSession | null {
   const value = raw as Partial<ActiveSession> | null;
   if (!value || typeof value !== "object" || typeof value.clientKey !== "string" || typeof value.title !== "string" || !finite(value.startedAt) || !isLength(value.length) || !isSnapshot(value.snapshot)) return null;
-  return { ...parseDelivery(value), clientKey: value.clientKey, title: value.title, subject: typeof value.subject === "string" ? value.subject : null, startedAt: value.startedAt, length: value.length, snapshot: value.snapshot, operations: parseOperations(value.operations) };
+  const phase = parsePhase(value.phase);
+  return { ...parseDelivery(value), clientKey: value.clientKey, title: value.title, subject: typeof value.subject === "string" ? value.subject : null, startedAt: value.startedAt, length: value.length, snapshot: value.snapshot, operations: parseOperations(value.operations), ...(phase ? { phase } : {}) };
 }
 
 function parseEnded(raw: unknown): EndedSession | null {
@@ -158,7 +202,8 @@ export function parseSessionState(raw: unknown): StudySessionState {
   if (!raw || typeof raw !== "object") return INITIAL_SESSION_STATE;
   const value = raw as Partial<StudySessionState>;
   if (value.version !== 1) return INITIAL_SESSION_STATE;
-  return { version: 1, length: value.length === undefined || !isLength(value.length) ? DEFAULT_SESSION_LENGTH : value.length, plan: parsePlan(value.plan), active: parseActive(value.active), ended: Array.isArray(value.ended) ? value.ended.map(parseEnded).filter((item): item is EndedSession => !!item).slice(0, MAX_ENDED) : [] };
+  const modeSettings = parseModeSettings(value.modeSettings);
+  return { version: 1, length: value.length === undefined || !isLength(value.length) ? DEFAULT_SESSION_LENGTH : value.length, plan: parsePlan(value.plan), active: parseActive(value.active), ended: Array.isArray(value.ended) ? value.ended.map(parseEnded).filter((item): item is EndedSession => !!item).slice(0, MAX_ENDED) : [], ...(isMode(value.mode) && value.mode !== "countdown" ? { mode: value.mode } : {}), ...(modeSettings ? { modeSettings } : {}) };
 }
 
 /** A person's view of the ended list: their own, and whatever belongs to nobody. Another account's work is never shown to them. */
@@ -212,6 +257,12 @@ export interface StudySessionModel {
   /** A number that changes with every beat and every change, so a view can tell when to read again. */
   revision(): number;
   setLength(length: SessionLength): boolean;
+  /** How the next session is shaped. Refused while a session exists, because a running session keeps the shape it began with. */
+  setMode(mode: SessionMode): boolean;
+  /** One of a mode's settings, kept on this device. */
+  setModeSetting(mode: modes.StudyModeId, key: string, value: boolean | number | string): boolean;
+  /** A break when the person asks for one, in Free Flow and Flowtime. Its length comes from how long they have focused. */
+  takeBreak(): boolean;
   /** Chooses what the next session is about. */
   setPlan(plan: SessionPlan | null): boolean;
   /** Refuses while a session exists: there is one session, and a second start is a mistake rather than a new one. */
@@ -309,6 +360,29 @@ export function createStudySessionModel(storage: StudySessionStorage | undefined
   };
 
   /**
+   * A mode session moves through its phases at their own deadlines, however long the app was away, so a break that ended an hour ago ended an hour
+   * ago. A phase that waits for the person pauses at its boundary, with a PAUSE in the journal, exactly where web pauses. Breaks add to `breakMs`,
+   * which every later operation carries, so nothing else changes for the server.
+   */
+  const advance = (start: ActiveSession, at: number): ActiveSession => {
+    let active = start;
+    for (let guard = 0; guard < 64 && active.phase && timer.countdownCrossed(active.snapshot, at); guard++) {
+      const { snapshot, phase } = active;
+      const ends = (snapshot.runningSinceMs ?? at) + (snapshot.remainingMs ?? 0);
+      const step = modes.modeNext(phase.mode, sessionModeSettings(state, phase.mode), snapshot.phase, phase.round, phase.rounds);
+      if (!step || step.phase === "done") {
+        active = { ...active, phase: { ...phase, label: step?.label ?? phase.label, seconds: null }, snapshot: timer.transitionSnapshot(snapshot, ends, { phase: "done", remainingSec: 0, paused: true }), operations: withOperation(active, "PAUSE", ends) };
+        break;
+      }
+      const next = timer.transitionSnapshot(snapshot, ends, { phase: step.phase, remainingSec: step.seconds, paused: step.pause });
+      active = { ...active, phase: { ...phase, label: step.label, round: step.round, seconds: step.seconds }, snapshot: next, operations: step.pause ? withOperation(active, "PAUSE", ends) : active.operations };
+      log("phase", { phase: step.phase, label: step.label, chime: step.chime });
+      if (step.pause) break;
+    }
+    return active;
+  };
+
+  /**
    * Catches the record up with the clock. A countdown that ended while nobody was looking ends at its own deadline, not at the moment
    * someone came back, and a wall clock moved backwards cannot leave time stuck: the live stretch restarts from what is banked. Returns
    * whether anything changed.
@@ -318,6 +392,7 @@ export function createStudySessionModel(storage: StudySessionStorage | undefined
     if (!active || !running()) return false;
     const { snapshot } = active;
     if (timer.countdownCrossed(snapshot, at)) {
+      if (active.phase) { change({ ...state, active: advance(active, at) }, "phase"); return true; }
       const ends = (snapshot.runningSinceMs ?? at) + (snapshot.remainingMs ?? 0);
       change({ ...state, active: { ...active, snapshot: timer.transitionSnapshot(snapshot, ends, { phase: "done", remainingSec: 0, paused: true }), operations: withOperation(active, "PAUSE", ends) } }, "finished");
       return true;
@@ -350,6 +425,28 @@ export function createStudySessionModel(storage: StudySessionStorage | undefined
       change({ ...state, length }, "length");
       return true;
     },
+    setMode(mode) {
+      if (state.active || !isMode(mode) || mode === (state.mode ?? "countdown")) return false;
+      const { mode: _previous, ...rest } = state;
+      change(mode === "countdown" ? rest : { ...rest, mode }, "mode");
+      return true;
+    },
+    setModeSetting(mode, key, value) {
+      const definition = modes.studyMode(mode).settings.find((setting) => setting.key === key);
+      if (!definition || typeof value !== typeof definition.value) return false;
+      if (typeof value === "number" && (!Number.isFinite(value) || (definition.min !== undefined && value < definition.min) || (definition.max !== undefined && value > definition.max))) return false;
+      change({ ...state, modeSettings: { ...state.modeSettings, [mode]: { ...state.modeSettings?.[mode], [key]: value } } }, "mode-setting");
+      return true;
+    },
+    takeBreak() {
+      const active = state.active;
+      if (settle(now()) || !active?.phase || !running() || active.snapshot.phase !== "focus" || !modes.takesBreaksOnDemand(active.phase.mode)) return false;
+      const at = now();
+      const { focusSec } = timer.deriveTimer(active.snapshot, at);
+      const rest = modes.onDemandBreak(active.phase.mode, sessionModeSettings(state, active.phase.mode), focusSec);
+      change({ ...state, active: { ...active, phase: { ...active.phase, label: rest.label, seconds: rest.seconds }, snapshot: timer.transitionSnapshot(active.snapshot, at, { phase: "short-break", remainingSec: rest.seconds, paused: false }) } }, "break");
+      return true;
+    },
     setPlan(plan) {
       const next = plan ? parsePlan(plan) : null;
       if (JSON.stringify(next) === JSON.stringify(state.plan)) return false;
@@ -359,13 +456,16 @@ export function createStudySessionModel(storage: StudySessionStorage | undefined
     start(context) {
       if (state.active) return false;
       const at = now();
-      const seconds = state.length === null ? null : Math.round(state.length * 60);
+      const mode = state.mode ?? "countdown";
+      const shape = mode === "countdown" ? null : modes.modeStart(mode, sessionModeSettings(state, mode));
+      const seconds = shape ? shape.seconds : state.length === null ? null : Math.round(state.length * 60);
       const snapshot = timer.setCountdownSnapshot(timer.createInitialSnapshot(at), seconds, at);
+      const phase: ActivePhase | null = shape && mode !== "countdown" ? { mode, label: shape.label, round: shape.round, rounds: shape.rounds, seconds: shape.seconds } : null;
       const { plan } = state;
       const active: ActiveSession = {
         clientKey: createKey(), ownerId: ownerId(), title: context?.title?.trim() || plan?.title || DEFAULT_SESSION_TITLE, subject: context?.subject ?? plan?.subject ?? null,
         subjectId: context?.subjectId ?? plan?.subjectId ?? null, questId: context?.questId ?? plan?.questId ?? null, journaled: 0, declined: false,
-        startedAt: at, length: state.length, snapshot, operations: [],
+        startedAt: at, length: phase ? null : state.length, snapshot, operations: [], ...(phase ? { phase } : {}),
       };
       // A task is finished by working on it, so it does not carry over to the next session. The subject does.
       change({ ...state, plan: plan?.subject ? { ...plan, title: null, questId: null } : null, active }, "start");
@@ -382,14 +482,16 @@ export function createStudySessionModel(storage: StudySessionStorage | undefined
       const active = state.active;
       if (!active || statusOf(active) !== "paused") return false;
       const at = now();
-      change({ ...state, active: { ...active, snapshot: timer.resumeSnapshot(active.snapshot, at), operations: withOperation(active, "RESUME", at) } }, "resume");
+      const phase = active.phase?.label === "BREAK OVER" ? { ...active.phase, label: active.phase.mode === "flowtime" ? "FLOW" : "FREE FLOW" } : active.phase;
+      change({ ...state, active: { ...active, ...(phase ? { phase } : {}), snapshot: timer.resumeSnapshot(active.snapshot, at), operations: withOperation(active, "RESUME", at) } }, "resume");
       return true;
     },
     keepGoing() {
       const active = state.active;
       if (!active || statusOf(active) !== "finished") return false;
       const at = now();
-      change({ ...state, active: { ...active, length: null, snapshot: timer.transitionSnapshot(active.snapshot, at, { phase: "focus", remainingSec: null }), operations: withOperation(active, "RESUME", at) } }, "keep-going");
+      const phase = active.phase ? { ...active.phase, label: "KEEP GOING", seconds: null } : undefined;
+      change({ ...state, active: { ...active, length: null, ...(phase ? { phase } : {}), snapshot: timer.transitionSnapshot(active.snapshot, at, { phase: "focus", remainingSec: null }), operations: withOperation(active, "RESUME", at) } }, "keep-going");
       return true;
     },
     end() {

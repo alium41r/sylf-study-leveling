@@ -9,6 +9,7 @@ import { FocusToolsProvider } from "./FocusToolsContext";
 import FocusToolsDock from "./FocusToolsDock";
 import FocusToolWindow from "./FocusToolWindow";
 import { useFocusEyeComfort } from "../hooks/useFocusEyeComfort";
+import { isStudyModeId, modeNext, modeStart, onDemandBreak, takesBreaksOnDemand, type ModeSettings, type StudyModeId } from "@/lib/timer-modes";
 import { useScreenWakeLock } from "../hooks/useScreenWakeLock";
 import { useTimerLeadership } from "../hooks/useTimerLeadership";
 import { SESSION_ENDED_EVENT, SESSION_SUMMARY_KEY } from "@/app/components/SessionEndToast";
@@ -46,6 +47,8 @@ interface ModeConfig {
 type PauseReason = "manual" | "break-over";
 
 const VALID_PHASES = ["focus", "short-break", "long-break", "rest", "done"];
+
+const modeSettingsOf = (mode: ModeConfig): ModeSettings => Object.fromEntries(mode.settings.map((setting) => [setting.key, setting.value]));
 
 function getSetting(mode: ModeConfig, key: string, fallback: number | boolean | string = 0): number | boolean | string {
   const found = mode.settings.find((s) => s.key === key);
@@ -666,73 +669,13 @@ function FocusContent() {
 
     if (activeMode === null) return;
 
-    const get = (key: string, fallback: number) =>
-      Number(getSetting(activeMode, key, fallback));
-
-    switch (activeMode.id) {
-      case "pomodoro": {
-        const focusMin = get("focusDuration", 25);
-        const sessionsBeforeLong = get("sessionsBeforeLong", 4);
-        setCountdown(focusMin * 60);
-        setTotalSessions(sessionsBeforeLong);
-        setPhase("focus");
-        setPhaseLabel(`FOCUS 1/${sessionsBeforeLong}`);
-        break;
-      }
-      case "5217": {
-        // Data-backed 52/17 rhythm: long work block, real recovery break.
-        const workMin = get("workDuration", 52);
-        const cycles = get("cycles", 3);
-        setCountdown(workMin * 60);
-        setTotalSessions(cycles);
-        setPhase("focus");
-        setPhaseLabel(`52/17 FOCUS 1/${cycles}`);
-        break;
-      }
-      case "animedoro": {
-        // Long focus block rewarded with a guilt-free fun break.
-        const focusMin = get("focusDuration", 45);
-        const cycles = get("cycles", 3);
-        setCountdown(focusMin * 60);
-        setTotalSessions(cycles);
-        setPhase("focus");
-        setPhaseLabel(`ANIMEDORO FOCUS 1/${cycles}`);
-        break;
-      }
-      case "deepwork": {
-        const sessionMin = get("sessionLength", 90);
-        setCountdown(sessionMin * 60);
-        setPhase("focus");
-        setPhaseLabel("DEEP WORK");
-        setTotalSessions(1);
-        break;
-      }
-      case "sprint": {
-        const sprintMin = get("sprintDuration", 10);
-        const sprints = get("totalSprints", 6);
-        setCountdown(sprintMin * 60);
-        setTotalSessions(sprints);
-        setPhase("focus");
-        setPhaseLabel("SPRINT 1/" + sprints);
-        break;
-      }
-      case "flowtime": {
-        // Flexible: open-ended stopwatch; breaks are taken on demand.
-        setCountdown(null);
-        setPhase("focus");
-        setPhaseLabel("FLOW");
-        setTotalSessions(1);
-        break;
-      }
-      case "freeflow":
-      default: {
-        // Stopwatch mode
-        setCountdown(null);
-        setPhase("focus");
-        setPhaseLabel("FREE FLOW");
-        break;
-      }
-    }
+    // The mode's rules live in lib/timer-modes.ts, shared with Sylf Native. An unknown id behaves as Free Flow, as it always did.
+    const modeId: StudyModeId = isStudyModeId(activeMode.id) ? activeMode.id : "freeflow";
+    const start = modeStart(modeId, modeSettingsOf(activeMode));
+    setCountdown(start.seconds);
+    if (modeId !== "freeflow") setTotalSessions(start.rounds);
+    setPhase("focus");
+    setPhaseLabel(start.label);
 
     // Trigger Fullscreen for Deep Work (respects the autoFullscreen setting)
     if (
@@ -818,128 +761,18 @@ function FocusContent() {
     } else {
       if (!activeMode) return;
 
-      const get = (key: string, fallback: number) =>
-        Number(getSetting(activeMode, key, fallback));
-
-      // End-of-session chime is a per-mode setting (silent modes stay silent).
-      const chimeEnabled = getSetting(activeMode, "endChime", true) !== false;
-      if (chimeEnabled) chimeAtBoundary();
-
-      // Auto-start boundaries: when disabled, the timer pauses at the
-      // transition so the next block only begins when the user resumes.
-      const pauseIf = (autoSetting: string) => {
-        if (getSetting(activeMode, autoSetting, true) === false) nextPaused = true;
-      };
-
-      if (activeMode.id === "pomodoro") {
-        const sessionsBeforeLong = get("sessionsBeforeLong", 4);
-        if (phase === "focus") {
-          if (currentSession >= sessionsBeforeLong) {
-            // Long break
-            nextPhase = "long-break";
-            nextRemaining = get("longBreak", 15) * 60;
-            nextLabel = "LONG BREAK";
-          } else {
-            // Short break
-            nextPhase = "short-break";
-            nextRemaining = get("shortBreak", 5) * 60;
-            nextLabel = "SHORT BREAK";
-          }
-          pauseIf("autoStartBreaks");
-        } else {
-          // After a break → next focus session
-          nextSession = phase === "long-break" ? 1 : currentSession + 1;
-          nextPhase = "focus";
-          nextRemaining = get("focusDuration", 25) * 60;
-          nextLabel = `FOCUS ${nextSession}/${totalSessions}`;
-          pauseIf("autoStartFocus");
-        }
-      } else if (activeMode.id === "5217") {
-        // 52/17 rhythm: work block ↔ real recovery break, cycling.
-        if (phase === "focus") {
-          nextPhase = "short-break";
-          nextRemaining = get("breakDuration", 17) * 60;
-          nextLabel = "RECOVERY BREAK";
-          pauseIf("autoStartBreaks");
-        } else {
-          if (currentSession >= totalSessions) {
-            nextPhase = "done";
-            nextRemaining = null;
-            nextLabel = "SESSION COMPLETE";
-          } else {
-            nextSession = currentSession + 1;
-            nextPhase = "focus";
-            nextRemaining = get("workDuration", 52) * 60;
-            nextLabel = `52/17 FOCUS ${nextSession}/${totalSessions}`;
-            pauseIf("autoStartFocus");
-          }
-        }
-      } else if (activeMode.id === "animedoro") {
-        // Animedoro: focus block → guilt-free reward break, cycling.
-        if (phase === "focus") {
-          nextPhase = "long-break";
-          nextRemaining = get("rewardBreak", 20) * 60;
-          nextLabel = "REWARD BREAK";
-          pauseIf("autoStartBreaks");
-        } else {
-          if (currentSession >= totalSessions) {
-            nextPhase = "done";
-            nextRemaining = null;
-            nextLabel = "SESSION COMPLETE";
-          } else {
-            nextSession = currentSession + 1;
-            nextPhase = "focus";
-            nextRemaining = get("focusDuration", 45) * 60;
-            nextLabel = `ANIMEDORO FOCUS ${nextSession}/${totalSessions}`;
-            pauseIf("autoStartFocus");
-          }
-        }
-      } else if (activeMode.id === "sprint") {
-        if (phase === "focus") {
-          if (currentSession >= totalSessions) {
-            // All sprints done
-            nextPhase = "done";
-            nextRemaining = null;
-            nextLabel = "SPRINTS COMPLETE";
-          } else {
-            nextPhase = "rest";
-            nextRemaining = get("restDuration", 2) * 60;
-            nextLabel = "REST";
-            pauseIf("autoStartRests");
-          }
-        } else {
-          // After rest → next sprint
-          nextSession = currentSession + 1;
-          nextPhase = "focus";
-          nextRemaining = get("sprintDuration", 10) * 60;
-          nextLabel = `SPRINT ${nextSession}/${totalSessions}`;
-          pauseIf("autoStartSprints");
-        }
-      } else if (activeMode.id === "deepwork") {
-        // Deep work done → break
-        if (phase === "focus") {
-          nextPhase = "long-break";
-          nextRemaining = get("breakLength", 20) * 60;
-          nextLabel = "BREAK";
-        } else {
-          nextPhase = "done";
-          nextRemaining = null;
-          nextLabel = "SESSION COMPLETE";
-        }
-      } else if (activeMode.id === "flowtime" || activeMode.id === "freeflow") {
-        // Flowtime / Free Flow: the break countdown finished. NEVER silently resume the
-        // open-ended focus stopwatch — the user must consciously resume. This
-        // is what made a break bleed into study time: an auto-resumed stopwatch
-        // kept counting while the user was away from the phone.
-        nextPhase = "focus";
-        nextRemaining = null;
-        nextLabel = "BREAK OVER";
-        nextPaused = true;
-        nextPauseReason = "break-over";
-        setFlowNudge(false);
-      } else {
-        return;
-      }
+      // The next phase comes from lib/timer-modes.ts, shared with Sylf Native. Auto-start, chime and round rules are all there.
+      const modeId: StudyModeId = isStudyModeId(activeMode.id) ? activeMode.id : "freeflow";
+      const step = modeNext(modeId, modeSettingsOf(activeMode), phase, currentSession, totalSessions);
+      if (!step) return;
+      if (step.chime) chimeAtBoundary();
+      nextPhase = step.phase;
+      nextRemaining = step.seconds;
+      nextLabel = step.label;
+      nextSession = step.round;
+      nextPaused = step.pause;
+      nextPauseReason = step.pauseReason;
+      if (takesBreaksOnDemand(modeId)) setFlowNudge(false);
     }
 
     // Epoch transition: bank the current stretch, switch phase, re-anchor
@@ -1303,24 +1136,10 @@ function FocusContent() {
     if (endingRef.current || !await acquireLeadership()) return;
     if (phaseRef.current !== "focus" && phase !== "focus") return;
 
-    const focusMinutes = Math.max(1, Math.round(elapsedSecondsRef.current / 60));
-    let breakMin = 5;
-
-    if (activeMode?.id === "flowtime") {
-      const autoScale = getSetting(activeMode, "autoScaleBreak", true) !== false;
-      const defaultBreak = Number(getSetting(activeMode, "defaultBreak", 10));
-      const maxBreak = Number(getSetting(activeMode, "maxBreak", 20));
-      // Flowtime doctrine: ~10% of the focus block, clamped to 5–max minutes.
-      const scaled = Math.max(5, Math.round(focusMinutes * 0.1));
-      breakMin = Math.max(1, Math.min(maxBreak, autoScale ? scaled : defaultBreak));
-    } else {
-      // Free Flow / Quest Overtime: natural break, 5m default, scaled up to 20m if studying long
-      breakMin = Math.max(5, Math.min(20, Math.round(focusMinutes * 0.1) || 5));
-    }
-
-    const breakSec = breakMin * 60;
+    const flowBreak = onDemandBreak(activeMode?.id === "flowtime" ? "flowtime" : "freeflow", activeMode ? modeSettingsOf(activeMode) : {}, elapsedSecondsRef.current);
+    const breakSec = flowBreak.seconds;
     const breakPhase: TimerPhase = "short-break";
-    const nextLabel = activeMode?.id === "flowtime" ? "FLOW BREAK" : "BREAK";
+    const nextLabel = flowBreak.label;
 
     // Re-anchor epoch snapshot: bank focus time, enter break countdown, unpause
     snapRef.current = transitionSnapshot(snapRef.current, Date.now(), {

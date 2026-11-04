@@ -39,7 +39,7 @@ const LINKS = {
   homeThemeDestinations: THEMES.flatMap((theme) => ["light", "dark"].flatMap((mode) => ["today", "focus", "circle", "progress"].map((home) => `space=home&home=${home}&theme=${theme}&mode=${mode}`))),
   // Workspace: entering with tools open, opening and closing tools, moving the camera through overview, and changing presets.
   workspaceEntry: ["home", "workspace"].map((space) => `space=${space}&theme=signature&mode=dark`),
-  workspaceTools: ["notes,pdfs,calculator,planner", "calendar,sylvie,timer,audio"].flatMap((tools) => [`space=workspace&wsClear=1&wsOpen=${tools}&theme=signature&mode=dark`, "space=workspace&wsClear=1"]),
+  workspaceTools: ["notes,pdfs,calculator,whiteboard", "resources,sylvie,timer,audio"].flatMap((tools) => [`space=workspace&wsClear=1&wsOpen=${tools}&theme=signature&mode=dark`, "space=workspace&wsClear=1"]),
   workspaceCamera: [1, 0.3, 1, 0.6, 1.5, 0.3].map((zoom) => `space=workspace&wsZoom=${zoom}&theme=signature&mode=dark`),
   workspaceZoom: ["space=workspace&wsClear=1&wsOpen=notes,calculator,timer&theme=signature&mode=dark", ...[0.3, 1, 0.6, 1.5, 0.45, 1].map((zoom) => `space=workspace&wsZoom=${zoom}&theme=signature&mode=dark`)],
   workspaceLayouts: ["focus", "split", "assistant", "free"].map((layout) => `space=workspace&wsLayout=${layout}&theme=signature&mode=dark`),

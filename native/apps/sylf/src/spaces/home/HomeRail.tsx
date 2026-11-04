@@ -1,14 +1,15 @@
-// Home's own navigation: four destinations in a column under the Spaces icon, or along the bottom of a compact window. It is
+// Home's own navigation: five destinations in a column under the Spaces icon, or along the bottom of a compact window. It is
 // one element in both shapes, so crossing that width moves it without remounting it. Labels stay visible, because touch has no
 // hover to reveal them, and they go only when the window is too short for them.
 import { useRef, useState } from "react";
 import { AccessibilityInfo, Platform, ScrollView, View, useWindowDimensions, type LayoutChangeEvent } from "react-native";
-import { Avatar, Icon, Press, Text, Tooltip, TravellingMarker, useTheme, type ViewHandle } from "@sylf/design-system";
+import { Avatar, Icon, Press, Text, Tooltip, TravellingMarker, useTheme, type IconName, type ViewHandle } from "@sylf/design-system";
 import { HOME_DESTINATIONS, HOME_LABELS, railTargetForKey, type HomeDestination } from "@sylf/spaces";
 import { useAccountEntry, useHomeNavigation, useShellMetrics } from "../../shell/context";
 import { useStats } from "../../shell/live";
 
 const ICON = 22;
+const RAIL_ICONS: Record<HomeDestination, IconName> = { today: "today", plan: "calendar", focus: "focus", circle: "circle", progress: "progress" };
 
 function RailItem({ id, selected, labelled, width, height, onSelect }: { id: HomeDestination; selected: boolean; labelled: boolean; width: number; height: number; onSelect: () => void }) {
   const { color, shape, space } = useTheme();
@@ -27,7 +28,7 @@ function RailItem({ id, selected, labelled, width, height, onSelect }: { id: Hom
           {...(Platform.OS === "web" ? { tabIndex: selected ? 0 : -1 } : {})}
           bodyStyle={{ width, height, alignItems: "center", justifyContent: "center", gap: space.hair }}
         >
-          <Icon name={id} size={ICON} active={selected} color={selected ? color.ink : color.inkSoft} />
+          <Icon name={RAIL_ICONS[id]} size={ICON} active={selected} color={selected ? color.ink : color.inkSoft} />
           {labelled ? <Text variant="caption" tone={selected ? "ink" : "soft"} numberOfLines={1}>{HOME_LABELS[id]}</Text> : null}
         </Press>
       )}

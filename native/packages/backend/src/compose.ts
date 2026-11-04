@@ -5,6 +5,7 @@ import { createBackendClient, type BackendClient } from "./client";
 import { createConnectivity, type Connectivity } from "./connectivity";
 import type { AuthGateway } from "./gateway";
 import { createJournalStorage, type PreferenceStore } from "./journal-storage";
+import { createPresence } from "./presence";
 import { createResourceStore, type ResourceStore } from "./resources";
 import { createReads, type Reads } from "./reads";
 import { createTimerDelivery, type TimerDelivery } from "./timer-delivery";
@@ -21,6 +22,8 @@ export interface Backend {
   start(): Promise<void>;
   /** The app came back to the front. */
   wake(): void;
+  /** The app went behind something. Nothing runs from here until `wake`. */
+  sleep(): void;
   /** A deep link arrived. True when it belonged to a sign-in. */
   receiveLink(url: string): boolean;
 }
@@ -31,15 +34,19 @@ export function createBackend({ gateway, preferences, assetUrl }: { gateway: Aut
   const auth = createAuthModel(gateway, resources);
   const client = createBackendClient({ transport: gateway?.transport ?? null, connectivity, assetUrl, onSignedOut: () => auth.sessionEnded() });
   const timer = createTimerDelivery({ auth, client, storage: createJournalStorage(preferences), connectivity });
+  const reads = createReads(client);
+  const presence = createPresence(() => reads.heartbeat());
   let owner = auth.getSnapshot().userId;
   auth.subscribe(() => {
-    const next = auth.getSnapshot().userId;
-    if (next !== owner) { client.reset(); owner = next; }
+    const snapshot = auth.getSnapshot();
+    if (snapshot.userId !== owner) { client.reset(); owner = snapshot.userId; }
+    presence.update(snapshot.status === "signed-in");
   });
   return {
-    client, connectivity, resources, auth, timer, reads: createReads(client),
+    client, connectivity, resources, auth, timer, reads,
     start: () => auth.restore(),
-    wake() { resources.wake(); timer.wake(); },
+    wake() { resources.wake(); timer.wake(); presence.setForeground(true); },
+    sleep() { presence.setForeground(false); },
     receiveLink: (url) => gateway?.receiveLink?.(url) ?? false,
   };
 }

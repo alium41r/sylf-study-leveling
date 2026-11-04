@@ -1,9 +1,9 @@
 // What every destination shares: a still strip that lines up with the Spaces icon, and a page that scrolls beneath it and
 // comes back to where it was. The sample notice sits in the strip, so it stays on screen however far a page is scrolled.
-import { useRef, type ComponentRef, type ReactNode } from "react";
+import { useRef, useSyncExternalStore, type ComponentRef, type ReactNode } from "react";
 import { ScrollView, View, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
-import { Badge, Button, EmptyState, Placeholder, Stack, Text, useTheme, useWindowClass, type IconName } from "@sylf/design-system";
-import type { HomeDestination } from "@sylf/spaces";
+import { Badge, Button, EmptyState, IconButton, Placeholder, Segmented, Stack, Text, useDismiss, useTheme, useWindowClass, type IconName } from "@sylf/design-system";
+import { HOME_VIEWS, type HomeDestination, type HomeViewDestination, type HomeViewOf } from "@sylf/spaces";
 import { useDockMetrics, useHomeNavigation, useShellMetrics } from "../../shell/context";
 import type { LiveStatus } from "../../shell/live-result";
 import type { Provenance } from "./data/contracts";
@@ -86,6 +86,35 @@ export function Section({ title, children }: { title: string; children: ReactNod
   return (
     <Stack gap="md">
       <Text variant="subheading" role="heading" aria-level={2}>{title}</Text>
+      {children}
+    </Stack>
+  );
+}
+
+/** The view a destination is on, kept with Home's other state so it survives everything that does. */
+export function useHomeView<D extends HomeViewDestination>(destination: D): HomeViewOf<D> {
+  const navigation = useHomeNavigation();
+  return useSyncExternalStore(navigation.subscribeDetail, () => navigation.viewOf(destination), () => navigation.viewOf(destination));
+}
+
+/** One level of navigation inside a destination. It is `Segmented`, so it scrolls in a narrow window and its Marker travels as everywhere else. */
+export function SubNav<D extends HomeViewDestination>({ destination, label, labels }: { destination: D; label: string; labels: Record<HomeViewOf<D>, string> }) {
+  const navigation = useHomeNavigation();
+  const value = useHomeView(destination);
+  const options = (HOME_VIEWS[destination] as readonly HomeViewOf<D>[]).map((view) => ({ value: view, label: labels[view] }));
+  return <View testID={`home-subnav-${destination}`}><Segmented<HomeViewOf<D>> label={label} value={value} options={options} onChange={(view) => navigation.setView(destination, view)} /></View>;
+}
+
+/** A page pushed inside a destination, for a long flow. Back, Escape and Android Back all leave it, because it joins the one dismiss stack. */
+export function PushedPage({ title, onBack, children, testID }: { title: string; onBack: () => void; children: ReactNode; testID?: string }) {
+  const { space } = useTheme();
+  useDismiss(true, onBack);
+  return (
+    <Stack gap="lg">
+      <View testID={testID} style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
+        <IconButton icon="chevronLeft" label="Back" testID="pushed-back" onPress={onBack} />
+        <Text variant="heading" role="heading" aria-level={1} numberOfLines={1} style={{ flex: 1 }}>{title}</Text>
+      </View>
       {children}
     </Stack>
   );

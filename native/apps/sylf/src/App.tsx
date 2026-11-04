@@ -45,7 +45,7 @@ AppState.addEventListener("change", (state) => {
   worldController.setForeground(state === "active");
   studySession.setForeground(state === "active");
   if (state === "active") currentBackend()?.wake();
-  if (state !== "active") { homeNavigation.flush(); workspaceModel.flush(); spacesStore.flush(); appearanceStore.flush(); }
+  if (state !== "active") { currentBackend()?.sleep(); homeNavigation.flush(); workspaceModel.flush(); spacesStore.flush(); appearanceStore.flush(); }
 });
 spacesStore.subscribe(() => {
   const { state, world } = spacesStore.getSnapshot();

@@ -1,5 +1,5 @@
 // Small words and numbers Home works out itself, from data it already has, kept apart so they can be tested without a renderer.
-import type { DayEntry } from "./data/contracts";
+import type { DayEntry, Objective } from "./data/contracts";
 
 export function greetingFor(hour: number) {
   if (hour < 5) return "Still up.";
@@ -26,6 +26,15 @@ export function summarizeDay(entries: DayEntry[]) {
   const deadlines = ahead.filter((entry) => entry.kind === "deadline").length;
   const parts = [sessions ? `${count(sessions, "session")} left` : null, deadlines ? `${count(deadlines, "deadline").replace(/^One/, sessions ? "one" : "One")} to come` : null].filter(Boolean);
   return parts.length ? `${parts.join(", and ")}.` : "Nothing left to do today.";
+}
+
+/** The one thing to do now. An event starting within the hour comes first, because it will not wait. Then the first open quest, then whatever is next. */
+export function pickNext(entries: DayEntry[], objectives: Objective[], now: number): { kind: "event"; entry: DayEntry } | { kind: "quest"; objective: Objective } | null {
+  const event = entries.find((entry) => entry.state === "next");
+  if (event && event.startsAt - now <= 60 * 60_000) return { kind: "event", entry: event };
+  const quest = objectives.find((objective) => !objective.done);
+  if (quest) return { kind: "quest", objective: quest };
+  return event ? { kind: "event", entry: event } : null;
 }
 
 export const plannedMinutes = (entries: DayEntry[]) => entries.reduce((sum, entry) => sum + (entry.minutes ?? 0), 0);

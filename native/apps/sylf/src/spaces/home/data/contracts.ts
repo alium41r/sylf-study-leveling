@@ -15,7 +15,10 @@ export type DayEntryState = "past" | "next" | "later";
 export interface DayEntry { id: string; startsAt: number; title: string; detail: string; kind: DayEntryKind; state: DayEntryState; minutes?: number }
 
 /** The day's goals and quests: Goal, Quest. */
-export interface Objective { id: string; title: string; detail: string; done: boolean; questId?: number; subject?: string | null; subjectId?: number | null; minutes?: number }
+export interface Objective { id: string; title: string; detail: string; done: boolean; questId?: number; subject?: string | null; subjectId?: number | null; minutes?: number; completion?: { id: number; plannedMinutes?: number | null; executionVersion?: number } }
+
+/** Today's study against the student's own target. On a rest day there is no target to meet. */
+export interface DayTarget { studied: number; goal: number; rest: boolean }
 
 export interface TodayView {
   entries: DayEntry[];
@@ -24,6 +27,7 @@ export interface TodayView {
   allDay?: string[];
   /** The day in one sentence, when the server's data says more than the entries do. */
   summary?: string;
+  target?: DayTarget;
 }
 
 /** A desk is a focus background from the existing catalog (FocusBackground, UserFocusBackground), not a new kind of thing. */

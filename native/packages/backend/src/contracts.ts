@@ -27,6 +27,18 @@ export const userStatsSchema = z.object({
   activeSessionSubjectId: z.number().int().nullable().optional(),
   /** Whether a password can sign in on this account. OAuth accounts have none. */
   hasPassword: z.boolean().optional(),
+  /** False until the first-run questions are answered or skipped, on any client. */
+  hasCompletedOnboarding: z.boolean().optional(),
+  verificationStatus: z.string().optional(),
+  bio: z.string().nullable().optional(),
+  bannerUrl: z.string().nullable().optional(),
+  avatarUrl: z.string().nullable().optional(),
+  activeFrame: z.string().nullable().optional(),
+  activeAura: z.string().nullable().optional(),
+  activeNameColor: z.string().nullable().optional(),
+  activeTheme: z.string().nullable().optional(),
+  activeBackground: z.string().nullable().optional(),
+  socialLinks: z.record(z.string(), z.string().nullable()).nullable().optional(),
 });
 export type UserStats = z.infer<typeof userStatsSchema>;
 
@@ -100,6 +112,10 @@ export const calendarEventSchema = z.object({
 });
 export type CalendarEvent = z.infer<typeof calendarEventSchema>;
 export const calendarRangeSchema = z.object({ events: z.array(calendarEventSchema) });
+
+/** GET /api/user/study-schedule. `enableHpPenalty` stays out of this on purpose: Sylf Native has no HP. */
+export const studyScheduleSchema = z.object({ dailyGoalMinutes: z.number(), restDays: z.array(z.number()) });
+export type StudySchedule = z.infer<typeof studyScheduleSchema>;
 
 /** GET /api/planner/capabilities. The server's own idea of today, and whether AI planning is open to this person. */
 export const plannerCapabilitiesSchema = z.object({ timezone: z.string(), today: z.string(), restDays: z.array(z.number()), studentWorkspace: z.object({ enabled: z.boolean() }).optional() });

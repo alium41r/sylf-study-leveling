@@ -2,16 +2,16 @@
 // here, and the Spaces for someone who is. The Spaces are keyed by account, so a change of person drops every screen's state at once, which is
 // what "no trace of the last person" needs: cached reads go through `resources.clear`, and everything held in a component goes here.
 // This file loads only when a backend exists.
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { View } from "react-native";
 import { useNotice, useTheme } from "@sylf/design-system";
 import type { Backend } from "@sylf/backend";
 import { speakSessionClock, type HomeNavigation, type WorkspaceModel } from "@sylf/spaces";
-import { currentBridge, currentPreferences } from "../backend";
+import { currentBridge, currentPreferences, useResource } from "../backend";
 import { AccountEntryProvider } from "../context";
 import { SpacesShell } from "../SpacesShell";
-import { AccountSheet } from "./AccountSheet";
 import { ClaimSheet } from "./ClaimSheet";
+import { OnboardingSurface } from "./OnboardingSurface";
 import { SignInSurface } from "./SignInSurface";
 
 const LOCAL_ONLY_KEY = "sylf.native.local-only.v1";
@@ -40,12 +40,20 @@ function SavedNotices() {
   return null;
 }
 
+/** A person who has not answered the first-run questions sees them once, on any client. Nothing waits on this read when it fails: they keep studying. */
+function FirstRun({ backend, children, home }: { backend: Backend; children: ReactNode; home: HomeNavigation }) {
+  const resource = useMemo(() => backend.resources.resource({ key: "user-stats", load: (signal) => backend.reads.stats(signal), tags: ["progress", "traveller"], ttlMs: 60_000 }), [backend]);
+  const state = useResource(resource);
+  const [done, setDone] = useState(false);
+  if (done || state.data?.hasCompletedOnboarding !== false) return children;
+  return <OnboardingSurface backend={backend} onDone={(next) => { home.select(next === "plan" ? "plan" : "focus"); setDone(true); }} />;
+}
+
 export default function AccountGate({ backend, workspace, home }: { backend: Backend; workspace: WorkspaceModel; home: HomeNavigation }) {
   const { color } = useTheme();
   const auth = useSyncExternalStore(backend.auth.subscribe, backend.auth.getSnapshot);
   const [localOnly, setLocalOnly] = useLocalOnly();
-  const [sheet, setSheet] = useState(false);
-  const entry = useMemo(() => ({ open: () => setSheet(true) }), []);
+  const entry = useMemo(() => ({ open: () => home.setAccountOpen(true), signIn: () => setLocalOnly(false) }), [home, setLocalOnly]);
 
   // What the last person left in the device's own stores, which `resources.clear` cannot reach. It runs as they go, not when the next one arrives,
   // because the app may be closed in between.
@@ -54,6 +62,7 @@ export default function AccountGate({ backend, workspace, home }: { backend: Bac
     if (lastOwner.current !== null && lastOwner.current !== auth.userId) {
       workspace.state().windows.forEach((window) => workspace.patchTool(window.id, PERSONAL_TOOL_STATE));
       home.select("today");
+      home.setAccountOpen(false);
     }
     lastOwner.current = auth.userId;
     if (auth.status === "signed-in" && localOnly) setLocalOnly(false);
@@ -63,10 +72,9 @@ export default function AccountGate({ backend, workspace, home }: { backend: Bac
   if (auth.status === "signed-out" && !localOnly) return <SignInSurface backend={backend} ended={auth.ended} onLater={() => setLocalOnly(true)} />;
   return (
     <AccountEntryProvider value={entry}>
-      <SpacesShell key={auth.userId ?? "this-device"} />
+      {auth.status === "signed-in" ? <FirstRun key={auth.userId} backend={backend} home={home}><SpacesShell key={auth.userId} /></FirstRun> : <SpacesShell key="this-device" />}
       <SavedNotices />
       <ClaimSheet backend={backend} />
-      <AccountSheet backend={backend} open={sheet} onClose={() => setSheet(false)} onSignIn={() => { setSheet(false); setLocalOnly(false); }} />
     </AccountEntryProvider>
   );
 }

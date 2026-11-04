@@ -1,7 +1,7 @@
 // Home over the real backend. Each destination is one resource, composed here from the reads it needs, so a screen sees one state and one retry.
 // The mappers are pure and hold no rule the server owns: levels, ranks, streaks and rewards are read as they come. What a quest does not have, a time
 // of day, is not invented: timed events go on the line, and quests follow in order.
-import type { Backend, CalendarEvent, Friend, FriendRequest, FocusParty, Quest, RecentSessions, ResourceDefinition, StudySummary, UserStats, AchievementRecord, PlannerCapabilities } from "@sylf/backend";
+import type { Backend, CalendarEvent, Friend, FriendRequest, FocusParty, Quest, RecentSessions, ResourceDefinition, StudySchedule, StudySummary, UserStats, AchievementRecord } from "@sylf/backend";
 import type { Achievement, CircleView, DayEntry, FocusView, Objective, ProgressView, RecentSession, TodayView } from "./contracts";
 import { formatMinutes } from "../format";
 
@@ -14,7 +14,7 @@ const sentence = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
 export function questMinutes(quest: Quest) { return quest.plannedMinutes ?? quest.requiredMinutes ?? quest.targetMinutes ?? null; }
 
-export function mapToday(events: CalendarEvent[], quests: Quest[], capabilities: PlannerCapabilities | null, now: Date): TodayView {
+export function mapToday(events: CalendarEvent[], quests: Quest[], schedule: StudySchedule | null, summary: Pick<StudySummary, "dailyStudy" | "todayDate"> | null, now: Date): TodayView {
   const day = localDay(now);
   const timed = events.filter((event) => !event.allDay && event.startsAt && localDay(new Date(event.startsAt)) === day).sort((a, b) => Date.parse(a.startsAt!) - Date.parse(b.startsAt!));
   const allDay = events.filter((event) => event.allDay).map((event) => event.title);
@@ -31,14 +31,16 @@ export function mapToday(events: CalendarEvent[], quests: Quest[], capabilities:
   // Open work first, in the server's order. A plan's order is the student's own.
   const objectives: Objective[] = [...quests.filter((quest) => quest.status !== "COMPLETED"), ...quests.filter((quest) => quest.status === "COMPLETED")].map((quest) => {
     const minutes = questMinutes(quest);
-    return { id: `quest-${quest.id}`, questId: quest.id, title: quest.title, detail: [quest.subject?.name, minutes ? formatMinutes(minutes) : null].filter(Boolean).join(", ") || "Quest", done: quest.status === "COMPLETED", subject: quest.subject?.name ?? null, subjectId: quest.subjectId, minutes: minutes ?? undefined };
+    return { id: `quest-${quest.id}`, questId: quest.id, title: quest.title, detail: [quest.subject?.name, minutes ? formatMinutes(minutes) : null].filter(Boolean).join(", ") || "Quest", done: quest.status === "COMPLETED", subject: quest.subject?.name ?? null, subjectId: quest.subjectId, minutes: minutes ?? undefined, completion: { id: quest.id, plannedMinutes: quest.plannedMinutes, executionVersion: quest.executionVersion } };
   });
-  const restDay = capabilities ? capabilities.restDays.includes(new Date(`${capabilities.today}T12:00:00Z`).getUTCDay()) : false;
+  const serverDay = summary?.todayDate ?? day;
+  const restDay = schedule ? schedule.restDays.includes(new Date(`${serverDay}T12:00:00Z`).getUTCDay()) : false;
   const open = objectives.filter((objective) => !objective.done).length;
   const ahead = entries.filter((entry) => entry.state !== "past").length;
   const parts = [open ? `${plural(open, "quest")} to finish` : null, ahead ? `${plural(ahead, "event")} ahead` : null].filter(Boolean);
-  const summary = parts.length ? `${sentence(parts.join(", and "))}.` : objectives.length ? "Everything for today is done." : restDay ? "A rest day. Nothing is planned." : "Nothing is planned yet.";
-  return { entries, objectives, allDay, summary };
+  const line = parts.length ? `${sentence(parts.join(", and "))}.` : objectives.length ? "Everything for today is done." : restDay ? "A rest day. Nothing is planned." : "Nothing is planned yet.";
+  const target = schedule ? { studied: Math.round(summary?.dailyStudy.find((entry) => entry.date === serverDay)?.minutes ?? 0), goal: schedule.dailyGoalMinutes, rest: restDay } : undefined;
+  return { entries, objectives, allDay, summary: line, target };
 }
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -117,11 +119,11 @@ export function liveHomeViews(backend: Backend) {
   const { reads } = backend;
   const views: { today: ResourceDefinition<TodayView>; focus: ResourceDefinition<FocusView>; circle: ResourceDefinition<CircleView>; progress: ResourceDefinition<ProgressView> } = {
     today: {
-      key: "home-today", tags: ["today"], ttlMs: 60_000,
+      key: "home-today", tags: ["today", "sessions", "plan"], ttlMs: 60_000,
       async load(signal) {
         const now = new Date();
-        const [quests, capabilities, calendar] = await Promise.all([reads.questsToday(signal), reads.planner(signal), reads.calendar(localDay(now), localDay(addDays(now, 1)), signal)]);
-        return mapToday(calendar.events, quests, capabilities, new Date());
+        const [quests, schedule, calendar, summary] = await Promise.all([reads.questsToday(signal), reads.schedule(signal), reads.calendar(localDay(now), localDay(addDays(now, 1)), signal), reads.studySummary(signal)]);
+        return mapToday(calendar.events, quests, schedule, summary, new Date());
       },
     },
     focus: {

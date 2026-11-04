@@ -17,8 +17,8 @@ export const WorldControllerProvider = WorldContext.Provider;
 const SessionContext = createContext<StudySessionModel | null>(null);
 export const StudySessionProvider = SessionContext.Provider;
 
-/** How to reach the account sheet. Null in a build with no backend, so nothing is drawn for it. */
-const AccountEntryContext = createContext<{ open(): void } | null>(null);
+/** How to reach the account page, and sign in from it. Null in a build with no backend, so nothing is drawn for it. */
+const AccountEntryContext = createContext<{ open(): void; signIn(): void } | null>(null);
 export const AccountEntryProvider = AccountEntryContext.Provider;
 export const useAccountEntry = () => useContext(AccountEntryContext);
 

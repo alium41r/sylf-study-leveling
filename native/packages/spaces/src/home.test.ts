@@ -29,6 +29,35 @@ describe("Home navigation", () => {
   beforeEach(() => { vi.useFakeTimers(); });
   afterEach(() => { vi.useRealTimers(); });
 
+  it("keeps a view through a change of destination, and a saved view through a restart", () => {
+    const { navigation, data } = setup();
+    expect(navigation.viewOf("plan")).toBe("calendar");
+    navigation.setView("plan", "quests");
+    navigation.select("focus");
+    navigation.select("plan");
+    expect(navigation.viewOf("plan")).toBe("quests");
+    const storage = { getItem: (key: string) => data.get(key) ?? null, setItem: () => undefined };
+    expect(createHomeNavigation(createSpacesStore(storage, "tablet")).viewOf("plan")).toBe("quests");
+  });
+  it("drops a view that no longer exists", () => {
+    expect(parseHomeSnapshot({ destination: "plan", scroll: {}, views: { plan: "garden", today: "x" } }).views).toBeUndefined();
+  });
+  it("tells detail listeners about views, and rail listeners only about destinations", () => {
+    const { navigation } = setup();
+    const rail = vi.fn(); const detail = vi.fn();
+    navigation.subscribe(rail); navigation.subscribeDetail(detail);
+    navigation.setView("plan", "plans");
+    expect(detail).toHaveBeenCalledTimes(1);
+    expect(rail).not.toHaveBeenCalled();
+  });
+  it("closes the account page when someone goes anywhere on the rail", () => {
+    const { navigation } = setup();
+    navigation.setAccountOpen(true);
+    expect(navigation.accountOpen()).toBe(true);
+    navigation.select("today");
+    expect(navigation.accountOpen()).toBe(false);
+  });
+
   it("opens on the saved destination", () => {
     expect(setup({ version: 1, activeSpace: "home", snapshots: { home: { destination: "progress", scroll: {} } } }).navigation.destination()).toBe("progress");
   });
@@ -124,6 +153,6 @@ describe("Rail keyboard", () => {
   });
   it("jumps with Home and End", () => {
     expect(railTargetForKey("Home", 2, HOME_DESTINATIONS.length, "vertical")).toBe(0);
-    expect(railTargetForKey("End", 0, HOME_DESTINATIONS.length, "vertical")).toBe(3);
+    expect(railTargetForKey("End", 0, HOME_DESTINATIONS.length, "vertical")).toBe(HOME_DESTINATIONS.length - 1);
   });
 });

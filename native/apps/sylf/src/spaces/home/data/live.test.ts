@@ -7,11 +7,11 @@ import { localDay, mapCircle, mapProgress, mapRecent, mapToday } from "./live";
 const at = (hour: number, minute = 0) => new Date(2026, 10, 2, hour, minute);
 const event = (id: string, start: Date, end: Date, overrides: Partial<CalendarEvent> = {}): CalendarEvent => ({ id, title: id, allDay: false, startDate: localDay(start), endDate: localDay(end), startsAt: start.toISOString(), endsAt: end.toISOString(), ...overrides });
 const quest = (id: number, overrides: Partial<Quest> = {}): Quest => ({ id, title: `Quest ${id}`, status: "PENDING", scheduledFor: "2026-11-02", subjectId: 9, targetMinutes: 30, subject: { id: 9, name: "Physics" }, ...overrides });
-const capabilities = { timezone: "UTC", today: "2026-11-02", restDays: [0] };
+const schedule = { dailyGoalMinutes: 120, restDays: [0] };
 
 describe("Today", () => {
   it("puts timed events on the line, past then next then later, and never gives a quest a time", () => {
-    const view = mapToday([event("later", at(16), at(17)), event("seminar", at(9), at(10)), event("next", at(13), at(14))], [quest(1), quest(2, { status: "COMPLETED" }), quest(3)], capabilities, at(11));
+    const view = mapToday([event("later", at(16), at(17)), event("seminar", at(9), at(10)), event("next", at(13), at(14))], [quest(1), quest(2, { status: "COMPLETED" }), quest(3)], schedule, null, at(11));
     expect(view.entries.map((entry) => [entry.title, entry.state])).toEqual([["seminar", "past"], ["next", "next"], ["later", "later"]]);
     expect(view.objectives.map((objective) => objective.title)).toEqual(["Quest 1", "Quest 3", "Quest 2"]);
     expect(view.objectives[0]).toMatchObject({ questId: 1, subject: "Physics", subjectId: 9, minutes: 30, detail: "Physics, 30 min" });
@@ -20,19 +20,19 @@ describe("Today", () => {
   });
 
   it("keeps an event that started before now and has not ended as the next thing", () => {
-    expect(mapToday([event("now", at(10), at(12))], [], capabilities, at(11)).entries[0].state).toBe("next");
+    expect(mapToday([event("now", at(10), at(12))], [], schedule, null, at(11)).entries[0].state).toBe("next");
   });
 
   it("leaves all-day events off the line, and other days out", () => {
-    const view = mapToday([event("trip", at(0), at(0), { allDay: true, startsAt: null, endsAt: null, title: "Field trip" }), event("tomorrow", new Date(2026, 10, 3, 9), new Date(2026, 10, 3, 10))], [], capabilities, at(11));
+    const view = mapToday([event("trip", at(0), at(0), { allDay: true, startsAt: null, endsAt: null, title: "Field trip" }), event("tomorrow", new Date(2026, 10, 3, 9), new Date(2026, 10, 3, 10))], [], schedule, null, at(11));
     expect(view.entries).toEqual([]);
     expect(view.allDay).toEqual(["Field trip"]);
   });
 
   it("says a rest day is one, and says when everything is done", () => {
-    expect(mapToday([], [], { ...capabilities, today: "2026-11-01" }, at(11)).summary).toBe("A rest day. Nothing is planned.");
-    expect(mapToday([], [], capabilities, at(11)).summary).toBe("Nothing is planned yet.");
-    expect(mapToday([], [quest(1, { status: "COMPLETED" })], capabilities, at(11)).summary).toBe("Everything for today is done.");
+    expect(mapToday([], [], schedule, { dailyStudy: [], todayDate: "2026-11-01" }, at(11)).summary).toBe("A rest day. Nothing is planned.");
+    expect(mapToday([], [], schedule, null, at(11)).summary).toBe("Nothing is planned yet.");
+    expect(mapToday([], [quest(1, { status: "COMPLETED" })], schedule, null, at(11)).summary).toBe("Everything for today is done.");
   });
 });
 

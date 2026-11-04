@@ -23,7 +23,9 @@ export interface BackendClientOptions {
   random?: () => number;
 }
 
-export interface ReadOptions { signal?: AbortSignal; timeoutMs?: number; retries?: number }
+export interface ReadOptions {
+  /** Sent as they are, on routes with a contract header. */
+  headers?: Record<string, string>; signal?: AbortSignal; timeoutMs?: number; retries?: number }
 export interface SendOptions<T> { signal?: AbortSignal; timeoutMs?: number; body?: unknown; schema?: z.ZodType<T>; headers?: Record<string, string> }
 
 export interface BackendClient {
@@ -84,10 +86,10 @@ export function createBackendClient({ transport, connectivity, onSignedOut, asse
     throw new BackendError("contract", `The answer from ${path} did not match its contract.`);
   }
 
-  async function read(path: string, timeoutMs: number, retries: number, signal: AbortSignal): Promise<unknown> {
+  async function read(path: string, timeoutMs: number, retries: number, signal: AbortSignal, headers?: Record<string, string>): Promise<unknown> {
     for (let tried = 0; ; tried++) {
       try {
-        return await attempt(path, { method: "GET" }, timeoutMs, signal);
+        return await attempt(path, { method: "GET", ...(headers ? { headers } : {}) }, timeoutMs, signal);
       } catch (error) {
         const failure = error as BackendError;
         const wait = failure.detail.retryAfterMs ?? RETRY_BASE_MS * 2 ** tried * (0.75 + random() / 2);
@@ -98,12 +100,12 @@ export function createBackendClient({ transport, connectivity, onSignedOut, asse
     }
   }
 
-  function join<T>(path: string, timeoutMs: number, retries: number, signal: AbortSignal | undefined): Promise<unknown> {
+  function join<T>(path: string, timeoutMs: number, retries: number, signal: AbortSignal | undefined, headers?: Record<string, string>): Promise<unknown> {
     if (signal?.aborted) return Promise.reject(new BackendError("cancelled", "Cancelled."));
     let flight = flights.get(path);
     if (!flight) {
       const controller = new AbortController();
-      const created: Flight = { controller, waiters: 0, promise: read(path, timeoutMs, retries, controller.signal).finally(() => { if (flights.get(path) === created) flights.delete(path); }) };
+      const created: Flight = { controller, waiters: 0, promise: read(path, timeoutMs, retries, controller.signal, headers).finally(() => { if (flights.get(path) === created) flights.delete(path); }) };
       flight = created;
       flights.set(path, created);
       created.promise.catch(() => undefined);
@@ -142,7 +144,7 @@ export function createBackendClient({ transport, connectivity, onSignedOut, asse
       );
     }) as typeof fetch,
     async get(path, schema, options = {}) {
-      return parse(schema, await join(path, options.timeoutMs ?? READ_TIMEOUT_MS, options.retries ?? 2, options.signal), path);
+      return parse(schema, await join(path, options.timeoutMs ?? READ_TIMEOUT_MS, options.retries ?? 2, options.signal, options.headers), path);
     },
     async send(method, path, options = {}) {
       const { body, schema, signal, timeoutMs = WRITE_TIMEOUT_MS, headers } = options;

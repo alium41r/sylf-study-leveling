@@ -4,7 +4,8 @@
 import { COSMETICS_CATALOG, getClassInfo } from "@sylf/shared/backend";
 import type { BackendClient } from "./client";
 import { BackendError } from "./errors";
-import { achievementsSchema, calendarRangeSchema, chatMessagesSchema, chatsSchema, cosmeticsSchema, earnedThisWeekSchema, focusPartySchema, friendRequestsSchema, friendsSchema, goalsSchema, plannerCapabilitiesSchema, questDaySchema, recentSessionsSchema, soundsSchema, studySummarySchema, subjectsSchema, userStatsSchema, type Quest } from "./contracts";
+import { createPlanReads } from "./plan";
+import { achievementsSchema, calendarRangeSchema, chatMessagesSchema, chatsSchema, cosmeticsSchema, earnedThisWeekSchema, focusPartySchema, friendRequestsSchema, friendsSchema, goalsSchema, plannerCapabilitiesSchema, questDaySchema, recentSessionsSchema, soundsSchema, studyScheduleSchema, studySummarySchema, subjectsSchema, userStatsSchema, type Quest } from "./contracts";
 
 export interface SylvieTurn {
   /** Text so far, as it arrives. */
@@ -21,6 +22,7 @@ const dayAfter = (day: string) => { const next = new Date(`${day}T00:00:00Z`); n
 
 export function createReads(client: BackendClient) {
   return {
+    plan: createPlanReads(client),
     /** The catalog's name and rarity for something a person owns. Unknown keys read as themselves. */
     cosmetic(category: keyof typeof COSMETICS_CATALOG | string, key: string) {
       const item = (COSMETICS_CATALOG as Record<string, { id: string; name: string; rarity: string }[]>)[category]?.find((entry) => entry.id === key);
@@ -28,6 +30,12 @@ export function createReads(client: BackendClient) {
     },
     className: (key: string | null | undefined) => getClassInfo(key).name,
     stats: (signal: AbortSignal) => client.get("/api/user/stats", userStatsSchema, { signal }),
+    schedule: (signal: AbortSignal) => client.get("/api/user/study-schedule", studyScheduleSchema, { signal }),
+    saveSchedule: (change: { dailyGoalMinutes?: number; restDays?: number[] }) => client.send("PATCH", "/api/user/study-schedule", { body: change }),
+    /** Finishes the first-run questions. The server makes each subject's code, and answers with no change if this already happened. */
+    completeOnboarding: (answers: { subjects: { name: string; examBoard?: string; level?: string }[]; timezone?: string }) => client.send("POST", "/api/user/onboarding", { body: { ...answers, classId: "class_scholar" } }),
+    saveAccount: (change: { name?: string; username?: string; email?: string; timezone?: string; currentPassword?: string; code?: string }) => client.send("PATCH", "/api/user/account", { body: change }),
+    heartbeat: () => client.send("POST", "/api/user/heartbeat"),
     subjects: (signal: AbortSignal) => client.get("/api/subjects", subjectsSchema, { signal }),
     recentSessions: (limit: number, signal: AbortSignal) => client.get(`/api/sessions?limit=${limit}`, recentSessionsSchema, { signal }),
     studySummary: (signal: AbortSignal) => client.get("/api/user/detailed-stats?summary=true", studySummarySchema, { signal }),

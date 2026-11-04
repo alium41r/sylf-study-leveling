@@ -85,7 +85,6 @@ export function usePlannerPlan(planId: string) {
     await load();
     if (alive.current) setBusy(null);
     return ok;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [backend, busy, load, notice]);
 
   return { view, activity, failure, offline, busy, problem, running, reload: load, act, reads: backend?.reads.plan.planner ?? null };

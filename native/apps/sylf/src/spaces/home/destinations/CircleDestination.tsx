@@ -2,14 +2,17 @@
 // server gives. A friend's hidden level or hours say "hidden", never zero, and there is no schedule or activity feed, because no such thing exists.
 // Friend requests can be answered here. Finding people and joining study parties stay on the web for now, and the page says so.
 import { useState } from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Avatar, Button, Stack, Text, useNotice, useTheme, useWindowClass } from "@sylf/design-system";
 import { useLiveBackend } from "../../../shell/backend";
 import { describeFailureText } from "../../../shell/account/failure";
-import { useShellMetrics } from "../../../shell/context";
+import { useHomeNavigation, useShellMetrics } from "../../../shell/context";
 import { useHomeResult } from "../data";
 import type { CirclePerson, HomeDataAdapter } from "../data/contracts";
-import { EmptyPage, FailedPage, HomeColumns, HomePage, LoadingPage, PageTitle, Section } from "../HomePage";
+import { EmptyPage, FailedPage, HomeColumns, HomePage, LoadingPage, PageTitle, Section, SubNav, useHomeView } from "../HomePage";
+import { FindPeopleSheet } from "../circle/FindPeopleSheet";
+import { MessagesView } from "../circle/MessagesView";
+import { PersonSheet } from "../circle/PersonSheet";
 
 const load = (adapter: HomeDataAdapter) => adapter.circle();
 const AVATAR = 48;
@@ -66,9 +69,14 @@ export function CircleDestination() {
   const { width } = useWindowClass();
   const { insets } = useShellMetrics();
   const result = useHomeResult("circle", load);
+  const view = useHomeView("circle");
+  const navigation = useHomeNavigation();
+  const [finding, setFinding] = useState(false);
+  const [managing, setManaging] = useState<CirclePerson | null>(null);
+  const [conversation, setConversation] = useState<number | null>(null);
   const circle = result?.data;
   const live = result?.provenance === "live" && Boolean(result.live);
-  const lonely = live && circle !== undefined && circle !== null && !circle.people.length && !circle.parties.length && !circle.invites?.length && !circle.requests?.length;
+  const lonely = !live && circle !== undefined && circle !== null && !circle.people.length && !circle.parties.length && !circle.invites?.length && !circle.requests?.length;
   const ringSize = Math.min(MAX_RING, width - insets.left - insets.right - space.lg * 2);
 
   return (
@@ -76,11 +84,12 @@ export function CircleDestination() {
       {!result ? <LoadingPage title="Circle" /> : !circle && result.live?.failure ? <FailedPage title="Circle" icon="circle" live={result.live} /> : !circle || lonely ? <EmptyPage title="Circle" icon="circle" heading="Your circle is empty" message={live ? "Friends you add on Sylf for the web appear here, with who is studying right now." : "Friends and study parties will appear here."} /> : (
         <>
           <PageTitle title="Circle" />
-          <HomeColumns
+          {live ? <SubNav destination="circle" label="Circle views" labels={{ people: "People", messages: "Messages", parties: "Parties" }} /> : null}
+          {live && view === "messages" ? <MessagesView openId={conversation} onOpened={() => setConversation(null)} /> : <HomeColumns
             primary={
               <Stack gap="xl">
-                {circle.people.length ? <Ring people={circle.people} size={ringSize} /> : null}
-                {live ? <Text variant="caption" tone="soft" align="center">Adding friends and joining study parties stay on Sylf for the web for now.</Text> : (
+                {circle.people.length && view !== "parties" ? <Ring people={circle.people} size={ringSize} /> : null}
+                {live ? <Button title="Find people" icon="plus" variant="emphasis" testID="circle-find" style={{ alignSelf: "center" }} onPress={() => setFinding(true)} /> : (
                   <Stack gap="sm" align="center">
                     <Button title="Invite a friend" icon="plus" disabled testID="circle-invite" style={{ alignSelf: "center" }} />
                     <Text variant="caption" tone="soft" align="center">Social features arrive in a later phase. Everyone shown here is invented.</Text>
@@ -89,21 +98,21 @@ export function CircleDestination() {
               </Stack>
             }
             secondary={[
-              ...(circle.requests?.length ? [<Section key="requests" title="Friend requests"><Stack gap="md">{circle.requests.map((request) => <FriendRequest key={request.id} request={request} />)}</Stack></Section>] : []),
-              ...(circle.people.length ? [<Section key="people" title="People">
+              ...(view === "people" && circle.requests?.length ? [<Section key="requests" title="Friend requests"><Stack gap="md">{circle.requests.map((request) => <FriendRequest key={request.id} request={request} />)}</Stack></Section>] : []),
+              ...(view === "people" && circle.people.length ? [<Section key="people" title="People">
                 <Stack gap="md">
                   {circle.people.map((person) => (
-                    <View key={person.id} accessible testID="circle-person">
+                    <Pressable key={person.id} accessibilityRole={live ? "button" : undefined} accessibilityLabel={`${person.name}. ${person.status}`} testID="circle-person" disabled={!live} onPress={() => setManaging(person)}>
                       <View style={{ flexDirection: "row", alignItems: "baseline", gap: space.md }}>
                         <Text variant="small" numberOfLines={1} style={{ flex: 1 }}>{person.name}</Text>
                         <Text variant="caption" tone="soft" numberOfLines={1}>{person.status}</Text>
                       </View>
                       {person.detail ? <Text variant="caption" tone="soft" numberOfLines={1}>{person.detail}</Text> : null}
-                    </View>
+                    </Pressable>
                   ))}
                 </Stack>
               </Section>] : []),
-              ...(circle.parties.length || circle.invites?.length ? [<Section key="parties" title="Study parties">
+              ...(view === "parties" && (circle.parties.length || circle.invites?.length) ? [<Section key="parties" title="Study parties">
                 <Stack gap="md">
                   {circle.parties.map((party) => (
                     <View key={party.id} accessible>
@@ -120,7 +129,9 @@ export function CircleDestination() {
                 </Stack>
               </Section>] : []),
             ]}
-          />
+          />}
+          <FindPeopleSheet open={finding} onClose={() => setFinding(false)} />
+          <PersonSheet person={managing} onClose={() => setManaging(null)} onMessage={(id) => { setConversation(id); navigation.setView("circle", "messages"); }} />
         </>
       )}
     </HomePage>

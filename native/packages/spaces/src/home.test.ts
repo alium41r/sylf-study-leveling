@@ -155,4 +155,9 @@ describe("Rail keyboard", () => {
     expect(railTargetForKey("Home", 2, HOME_DESTINATIONS.length, "vertical")).toBe(0);
     expect(railTargetForKey("End", 0, HOME_DESTINATIONS.length, "vertical")).toBe(HOME_DESTINATIONS.length - 1);
   });
+  it("gives Circle its three views and keeps older snapshots readable", () => {
+    expect(parseHomeSnapshot({ destination: "circle", scroll: {}, views: { circle: "messages" } }).views).toEqual({ circle: "messages" });
+    expect(parseHomeSnapshot({ destination: "circle", scroll: {} }).views).toBeUndefined();
+    expect(parseHomeSnapshot({ destination: "circle", scroll: {}, views: { circle: "wall" } }).views).toBeUndefined();
+  });
 });

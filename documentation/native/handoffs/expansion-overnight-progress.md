@@ -24,7 +24,7 @@
 | --- | --- |
 | Part 3 A AI Planner V2 | built (reads, intent builder, hook, NewPlanSheet, PlannerFlow in Plans view); tests written not run; **not yet done:** materials upload (needs a file-picker dependency, owner approval), docs, ADR 0012 d16 update, planner stage-state unit tests for the hook |
 | Part 3 B Sylvie | partly built (Today briefing done, `TodayBriefing.tsx`): status events, safe `RichText` (no maths typesetting yet), proposal preview + Apply/Not now with `confirmSylvieAction`, widened contracts. **Remaining:** KaTeX via Expo DOM (new dependency, needs approval), quick-ask overlay, in-environment entry, images (multipart + bearer `RemoteImage`), daily briefing on Today, planner handoff to Plans, insights/memories, companion. Tests for these written-not-run: `rich-text/parse.test.ts` |
-| Part 3 C Social + Realtime | started: `packages/backend/src/social.ts` (search, requests, remove/block/unblock, conversations, messages, groups; wired as `reads.social`). **Remaining:** Circle views (People, Messages, Parties) + `HOME_VIEWS.circle = [people, messages, parties]` in `packages/spaces/src/home.ts` with test, Realtime client (spike; `@supabase/realtime-js` not installed), bounded polling fallback via `createResourceStore`, presence respecting `showOnlineStatus`, notifications list, backend fixes A-28/S-15/Realtime migration (owner decision), two-account tests |
+| Part 3 C Social + Realtime | started: `packages/backend/src/social.ts` (search, requests, remove/block/unblock, conversations, messages, groups; wired as `reads.social`). Circle now has People/Messages/Parties sub-views (`spaces/home/circle/{MessagesView,FindPeopleSheet,PersonSheet,useSeen}.tsx`, `HOME_VIEWS.circle` + test), message fallback polls 30 s seen-only. **Remaining:** group create/manage UI, blocked-list/unblock UI, notifications list, Parties lifecycle view (currently the old read-only list), Realtime client (spike; `@supabase/realtime-js` not installed), bounded polling fallback via `createResourceStore`, presence respecting `showOnlineStatus`, notifications list, backend fixes A-28/S-15/Realtime migration (owner decision), two-account tests |
 | Part 3 D Parties | not started |
 | Part 3 report + handoff | not started |
 | Part 4 A–F | not started |
@@ -49,3 +49,4 @@ Slice B remainder (planner handoff via `lib/ai/sylvie/planner-bridge.ts`, quick-
 
 - 2026-11-04: Slice B first cut committed (RichText parser/renderer, proposal card, status events). typecheck, ESLint, boundaries clean.
 - 2026-11-04: Today briefing + `reads.social` committed. typecheck/ESLint clean.
+- 2026-11-04: Circle People/Messages UI committed. typecheck/ESLint/boundaries clean.

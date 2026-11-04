@@ -12,6 +12,7 @@ export const HOME_LABELS: Record<HomeDestination, string> = { today: "Today", pl
 export const HOME_VIEWS = {
   plan: ["calendar", "quests", "plans"],
   progress: ["overview", "stats", "standing", "honours", "skills", "codex"],
+  circle: ["people", "messages", "parties"],
 } as const satisfies Partial<Record<HomeDestination, readonly string[]>>;
 export type HomeViewDestination = keyof typeof HOME_VIEWS;
 export type HomeViewOf<D extends HomeViewDestination> = (typeof HOME_VIEWS)[D][number];

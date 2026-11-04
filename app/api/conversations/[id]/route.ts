@@ -282,6 +282,17 @@ export async function PATCH(
           userId: { in: body.removeMemberIds },
         },
       });
+      // A-28: a group always keeps someone who can manage it. When its creator leaves, the member who has been in it longest takes over.
+      if (conversation.createdBy != null && body.removeMemberIds.includes(conversation.createdBy)) {
+        const successor = await prisma.conversationParticipant.findFirst({
+          where: { conversationId },
+          orderBy: [{ joinedAt: "asc" }, { id: "asc" }],
+          select: { userId: true },
+        });
+        if (successor) {
+          updatedConversation = await prisma.conversation.update({ where: { id: conversationId }, data: { createdBy: successor.userId } });
+        }
+      }
     }
 
     return NextResponse.json({

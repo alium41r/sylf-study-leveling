@@ -8,8 +8,8 @@ import { app } from "electron";
 import { APP_ORIGIN } from "./security.mjs";
 
 const THEMES = ["signature", "studio", "arcane", "voxel", "cozy", "student"];
-const DESTINATIONS = ["today", "focus", "circle", "progress"];
-const LABELS = { today: "Today", focus: "Focus", circle: "Circle", progress: "Progress" };
+const DESTINATIONS = ["today", "plan", "focus", "circle", "progress"];
+const LABELS = { today: "Today", plan: "Plan", focus: "Focus", circle: "Circle", progress: "Progress" };
 const WINDOWS = [{ name: "wide", width: 1680, height: 1000 }, { name: "expanded", width: 1280, height: 820 }, { name: "medium", width: 820, height: 900 }, { name: "compact", width: 480, height: 800 }, { name: "narrow", width: 340, height: 640 }, { name: "short", width: 900, height: 420 }];
 const sleep = (/** @type {number} */ ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -224,7 +224,7 @@ async function runChecks(window) {
   checks.focusStaysOnRail = (await focused()) === "Circle";
   await key("Tab");
   results.afterRail = await focused();
-  checks.tabLeavesRailForPage = !["Today", "Focus", "Circle", "Progress"].includes(results.afterRail);
+  checks.tabLeavesRailForPage = !["Today", "Plan", "Focus", "Circle", "Progress"].includes(results.afterRail);
   const hiddenFocus = await js(`(async () => { const hits = []; for (let i = 0; i < 40; i++) { const e = document.activeElement; if (e?.closest?.('[aria-hidden=true]')) hits.push(e.getAttribute('aria-label')); await new Promise((r) => setTimeout(r, 0)); } return hits.length; })()`);
   for (let i = 0; i < 24; i++) await key("Tab");
   checks.tabNeverEntersHiddenDestination = hiddenFocus === 0 && !(await js(`!!document.activeElement?.closest?.('[aria-hidden=true]')`));

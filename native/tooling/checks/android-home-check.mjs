@@ -11,10 +11,10 @@ const PACKAGE = "app.sylf.client";
 const arg = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split("=")[1];
 const out = path.resolve(arg("out") ?? "android-home-check");
 const THEMES = ["signature", "studio", "arcane", "voxel", "cozy", "student"];
-const DESTINATIONS = ["today", "focus", "circle", "progress"];
-const LABELS = { today: "Today", focus: "Focus", circle: "Circle", progress: "Progress" };
+const DESTINATIONS = ["today", "plan", "focus", "circle", "progress"];
+const LABELS = { today: "Today", plan: "Plan", focus: "Focus", circle: "Circle", progress: "Progress" };
 // A heading found on one destination only, so seeing it proves which page is in the accessibility tree.
-const MARKS = { today: "Quests", focus: "Study desks", circle: "People", progress: "Achievements" };
+const MARKS = { today: "Quests", plan: "Quests and goals", focus: "Recent sessions", circle: "People", progress: "Thirty days" };
 const adb = (...args) => execFileSync(ADB, args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const screenshot = (name) => fs.writeFileSync(path.join(out, `${name}.png`), execFileSync(ADB, ["exec-out", "screencap", "-p"], { maxBuffer: 64 * 1024 * 1024 }));
@@ -54,7 +54,7 @@ await launch();
 let nodes = dump();
 const density = Number(/(\d+)\s*$/.exec(adb("shell", "wm", "density").trim())?.[1] ?? 280) / 160;
 check("opensOnToday", selectedItem(nodes) === "Today" && shows(nodes, MARKS.today));
-check("fourNamedDestinations", DESTINATIONS.every((id) => railItem(nodes, id)));
+check("fiveNamedDestinations", DESTINATIONS.every((id) => railItem(nodes, id)));
 check("sampleDataLabelled", shows(nodes, "Sample data"));
 const icon = nodes.find((n) => n.desc.startsWith("Spaces."));
 const today = railItem(nodes, "today");
@@ -113,7 +113,7 @@ check("prepareGoesToFocus", selectedItem(dump()) === "Focus");
 // 6. Restoration: each destination keeps its own scroll position across a Space change and a process kill.
 const mid = Math.round(width / 2);
 // Below the fold in both orientations, so a swipe moves it.
-const mark = { today: "Go to", focus: "Recent sessions", circle: "Study parties", progress: "Achievements" };
+const mark = { today: "Quests", plan: "Quests and goals", focus: "Recent sessions", circle: "Study parties", progress: "Thirty days" };
 const swipeUp = () => adb("shell", "input", "swipe", String(mid), String(Math.round(height * 0.72)), String(mid), String(Math.round(height * 0.6)), "700");
 const positions = async () => { const found = {}; for (const id of DESTINATIONS) { await go(id); found[id] = dump().find((n) => n.text === mark[id])?.y1; } return found; };
 for (const id of DESTINATIONS) { await go(id); swipeUp(); await sleep(900); }

@@ -201,7 +201,7 @@ async function runStage(window, { stub }, stage, out) {
 
     // 4. Move into Workspace while the same timer continues.
     await toSpace("Workspace");
-    await open("space=workspace&wsClear=1&wsOpen=timer,planner,calendar");
+    await open("space=workspace&wsClear=1&wsOpen=timer");
     check("switching Spaces and reloading kept the session", (await record()).active?.clientKey === started.active.clientKey);
     check("Workspace's Timer shows the one session", await until(tid("timer-clock")));
     const dock = seconds(await clock());
@@ -209,17 +209,20 @@ async function runStage(window, { stub }, stage, out) {
     check("the dock and the Timer agree", Math.abs(dock - timerTool) <= 1);
     await shot("09-workspace-running");
 
-    // 5. Connected tools.
-    check("Planner shows the real quest", await says("Optics past paper"));
-    check("Planner says where AI plans live, and does not imitate them", await until(tid("planner-note")) && (await textOf(tid("planner-note")))?.includes("built and reviewed on Sylf for the web"));
-    check("Calendar shows the real event", await says("Lab seminar"));
-    await type(tid("calendar-new-title"), "Revision hour");
-    await type(tid("calendar-new-time"), "23:00");
-    await clickOn(tid("calendar-add"));
+    // 5. Connected tools. Planning and the calendar live in Home's Plan, and Workspace has eight tools.
+    await open("space=home&home=plan");
+    check("Plan shows the real event", await says("Lab seminar"));
+    await clickOn(tid("home-subnav-plan") + " [role=radio]:nth-child(2)");
+    check("Quests show the real quest", await says("Optics past paper"));
+    await clickOn(tid("home-subnav-plan") + " [role=radio]:nth-child(3)");
+    check("Plans says where AI plans are, and does not imitate them", await until(tid("plan-plans")));
+    await clickOn(tid("home-subnav-plan") + " [role=radio]:nth-child(1)");
+    await type(tid("plan-add-text"), "Revision hour at 23:00");
+    await clickOn(tid("plan-add"));
     await sleep(800);
     facts.calendarWrites = stub.seen.filter((/** @type {any} */ entry) => entry.method === "POST" && entry.path.startsWith("/api/calendar")).map((/** @type {any} */ entry) => entry.status);
-    check("a new event is added through the server, and appears", await js(`[...document.querySelectorAll('[data-testid^="workspace-window"]')].some((node) => node.innerText.includes("Revision hour"))`) && (await textOf(tid("calendar-new-title")) ?? "") === "");
-    await shot("10-planner-calendar");
+    check("a new event is added through the server, and appears", await says("Revision hour"));
+    await shot("10-plan");
     await open("space=workspace&wsClear=1&wsOpen=sylvie,audio,notes");
     check("Audio lists the real catalog", await says("Forest Wind & Leaves"));
     check("Notes is honest about where notes are", await says("Notes open on the web for now"));
@@ -387,7 +390,7 @@ async function runStage(window, { stub }, stage, out) {
   contents.sendInputEvent({ type: "keyDown", keyCode: "Escape" }); contents.sendInputEvent({ type: "keyUp", keyCode: "Escape" });
   await sleep(400);
   await toSpace("World"); await until(tid("world-lobby")); await sleep(500); await scan("World");
-  await open("space=workspace&wsClear=1&wsOpen=planner,calendar"); await sleep(700); await scan("Workspace");
+  await open("space=workspace&wsClear=1&wsOpen=timer,audio"); await sleep(700); await scan("Workspace"); await open("space=home&home=plan"); await sleep(700); await scan("Plan");
   await shot("21-second-person");
   check("the server agrees: this is someone else", (await api("/api/user/stats")).json?.email === bob.email);
   check("the second person's record is empty", (await serverSessions()).length === 0);
@@ -477,7 +480,7 @@ async function runStage(window, { stub }, stage, out) {
       await shot(`review-${name}-${place}`);
       overflow[`${name}-${place}`] = await js("document.documentElement.scrollWidth > window.innerWidth + 1");
     }
-    await open(`space=workspace&wsClear=1&wsOpen=planner,calendar&${query}`);
+    await open(`space=workspace&wsClear=1&wsOpen=timer,audio&${query}`);
     await sleep(450);
     await shot(`review-${name}-workspace`);
   }

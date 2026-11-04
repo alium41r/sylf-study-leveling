@@ -10,6 +10,7 @@ import { useEnterFocus } from "../../../shell/focus/enter";
 import { useHomeResult } from "../data";
 import type { DayEntry, DayTarget, HomeDataAdapter, Objective } from "../data/contracts";
 import { formatMinutes, greetingFor, pickNext, plannedMinutes } from "../format";
+import { TodayBriefing } from "./TodayBriefing";
 import { EmptyPage, FailedPage, HomeColumns, HomePage, LoadingPage, PageTitle, Section } from "../HomePage";
 
 const load = (adapter: HomeDataAdapter) => adapter.today(new Date());
@@ -143,6 +144,7 @@ export function TodayDestination() {
       ) : (
         <>
           <PageTitle title={greeting} detail={today!.summary} />
+          <TodayBriefing />
           <HomeColumns
             primary={
               <>

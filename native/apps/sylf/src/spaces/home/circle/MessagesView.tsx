@@ -10,6 +10,7 @@ import { useAuth, useLiveBackend, useOptionalResource } from "../../../shell/bac
 import { toLiveResult } from "../../../shell/live-result";
 import { describeFailureText } from "../../../shell/account/failure";
 import { useDestinationSeen } from "./useSeen";
+import { NewGroupSheet } from "./NewGroupSheet";
 
 const FALLBACK_MS = 30_000;
 const LIMIT = 2000;
@@ -19,6 +20,7 @@ export function MessagesView({ openId, onOpened }: { openId?: number | null; onO
   const backend = useLiveBackend();
   const seen = useDestinationSeen("circle");
   const [open, setOpen] = useState<number | null>(openId ?? null);
+  const [grouping, setGrouping] = useState(false);
   useEffect(() => { if (openId) { setOpen(openId); onOpened?.(); } }, [openId, onOpened]);
   const resource = useMemo(() => (backend ? backend.resources.resource({ key: "circle-conversations", tags: ["circle", "messages"], ttlMs: 30_000, load: (signal) => backend.reads.social.conversations(signal) }) : null), [backend]);
   const list = toLiveResult(useOptionalResource(resource), resource);
@@ -34,9 +36,12 @@ export function MessagesView({ openId, onOpened }: { openId?: number | null; onO
   if (!list) return <Text tone="soft">Loading your conversations.</Text>;
   if (list.live.failure && !list.data) return <Callout tone="caution" title={list.live.offline ? "You're offline" : "Messages didn't load"} message={list.live.failure} />;
   const conversations = list.data ?? [];
-  if (!conversations.length) return <EmptyState icon="circle" title="No conversations yet" message="Open a friend in People and choose Message to start one." />;
+  const sheet = <NewGroupSheet open={grouping} onClose={() => setGrouping(false)} onCreated={(id) => { setGrouping(false); setOpen(id); }} />;
+  if (!conversations.length) return <><EmptyState icon="circle" title="No conversations yet" message="Open a friend in People and choose Message to start one, or make a group." action={<Button title="New group" testID="messages-new-group" onPress={() => setGrouping(true)} />} />{sheet}</>;
   return (
     <Stack gap="xs" testID="circle-messages">
+      <View style={{ flexDirection: "row" }}><Button title="New group" size="small" icon="plus" testID="messages-new-group" onPress={() => setGrouping(true)} /></View>
+      {sheet}
       {list.live.offline ? <Badge label="Offline. Showing what you last saw." /> : null}
       <View style={{ gap: space.hair }}>{conversations.map((conversation) => <ConversationRow key={conversation.id} conversation={conversation} onPress={() => setOpen(conversation.id)} />)}</View>
     </Stack>
@@ -118,6 +123,7 @@ function ConversationView({ id, seen, onBack }: { id: number; seen: boolean; onB
     <Stack gap="md" testID="conversation">
       <Button title="Messages" size="small" icon="chevronLeft" onPress={onBack} testID="conversation-back" />
       <Text variant="subheading" role="heading" aria-level={2}>{conversation.name ?? conversation.participants.map((person) => person.name ?? person.username).join(", ")}</Text>
+      {conversation.isGroup ? <GroupActions id={id} conversation={conversation} me={me} onLeft={onBack} /> : null}
       {hasMore ? <Button title="Earlier messages" size="small" onPress={() => void older()} /> : null}
       <Stack gap="sm">
         {messages.map((message) => (
@@ -140,5 +146,28 @@ function ConversationView({ id, seen, onBack }: { id: number; seen: boolean; onB
       </View>
       <Dialog open={removing !== null} onClose={() => setRemoving(null)} title="Delete this message?" message="It is removed for everyone in the conversation." actions={[{ label: "Keep it", onPress: () => setRemoving(null) }, { label: "Delete", variant: "critical", onPress: () => { const target = removing; setRemoving(null); if (target) void remove(target); } }]} />
     </Stack>
+  );
+}
+
+/** Only a group's creator may rename it. Anyone may leave. The server enforces both and answers in words for people. */
+function GroupActions({ id, conversation, me, onLeft }: { id: number; conversation: Conversation["conversation"]; me: unknown; onLeft: () => void }) {
+  const { space } = useTheme();
+  const backend = useLiveBackend();
+  const notice = useNotice();
+  const [renaming, setRenaming] = useState(false);
+  const [name, setName] = useState(conversation.name ?? "");
+  const [leaving, setLeaving] = useState(false);
+  const creator = conversation.createdBy != null && String(conversation.createdBy) === String(me);
+  const change = async (work: () => Promise<unknown>, done: string, after?: () => void) => {
+    if (!backend) return;
+    try { await work(); backend.resources.invalidate("messages"); notice(done); after?.(); } catch (error) { notice(describeFailureText(error)); }
+  };
+  return (
+    <View style={{ flexDirection: "row", gap: space.sm, flexWrap: "wrap" }}>
+      {creator ? <Button title="Rename" size="small" onPress={() => setRenaming(!renaming)} /> : null}
+      <Button title="Leave group" size="small" variant="critical" onPress={() => setLeaving(true)} />
+      {renaming ? <View style={{ flexBasis: "100%", gap: space.xs }}><TextField label="Group name" value={name} onChangeText={setName} /><Button title="Save name" size="small" disabled={!name.trim()} onPress={() => void change(() => backend!.reads.social.changeGroup(id, { name: name.trim() }), "Renamed.", () => setRenaming(false))} /></View> : null}
+      <Dialog open={leaving} onClose={() => setLeaving(false)} title="Leave this group?" message="You will stop receiving its messages." actions={[{ label: "Stay", onPress: () => setLeaving(false) }, { label: "Leave", variant: "critical", onPress: () => { setLeaving(false); void change(() => backend!.reads.social.changeGroup(id, { removeMemberIds: [Number(me)] }), "You left the group.", onLeft); } }]} />
+    </View>
   );
 }

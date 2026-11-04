@@ -33,6 +33,8 @@
 
 ## Next action
 
+**Window 1 ended** with Part 3 mostly built (see `reports/expansion-part-3/report.md`, the living Part 3 report). Do next, in order: (1) party session through `createStudySessionModel` (read ADR 0015 and `packages/spaces/src/session/model.ts`; party time comes from `parties.timer`; add a session-owner test), (2) Sylvie images/maths/environment entry/insights if dependencies are approved (otherwise log), (3) Realtime spike *design* only if no device/server (else keep fallback), (4) finish Part 3: update report, write `handoffs/expansion-part-3.md`, update feature map, Home guide §4, Sylvie contract native note, Workspace guide §5, ADR 0012 decision 16, then (5) Part 4 slices A–F. Older text below is superseded by this paragraph.
+
 Slice B remainder (planner handoff via `lib/ai/sylvie/planner-bridge.ts`, quick-ask overlay, images, KaTeX), then Slice C UI on top of `reads.social` (Circle People/Messages/Parties), Realtime, then D (parties). Slice A docs (`documentation/native/plan/README.md`, ADR 0012 d16) are batched with the Part 3 report.
 
 ## Owner decisions / blockers (append)

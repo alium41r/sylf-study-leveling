@@ -11,6 +11,7 @@ import { useHomeResult } from "../data";
 import type { DayEntry, DayTarget, HomeDataAdapter, Objective } from "../data/contracts";
 import { formatMinutes, greetingFor, pickNext, plannedMinutes } from "../format";
 import { TodayBriefing } from "./TodayBriefing";
+import { QuickAsk } from "./QuickAsk";
 import { EmptyPage, FailedPage, HomeColumns, HomePage, LoadingPage, PageTitle, Section } from "../HomePage";
 
 const load = (adapter: HomeDataAdapter) => adapter.today(new Date());
@@ -95,6 +96,7 @@ export function TodayDestination() {
   const now = useMemo(() => new Date(), []);
   const { active } = useSessionState();
   const [sending, setSending] = useState<string | null>(null);
+  const [asking, setAsking] = useState(false);
   const today = result?.data;
   const greeting = greetingFor(now.getHours());
   const date = now.toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" });
@@ -145,6 +147,8 @@ export function TodayDestination() {
         <>
           <PageTitle title={greeting} detail={today!.summary} />
           <TodayBriefing />
+          {backend ? <View style={{ flexDirection: "row" }}><Button title="Ask Sylvie" size="small" icon="sylvie" testID="today-ask" onPress={() => setAsking(true)} /></View> : null}
+          <QuickAsk open={asking} onClose={() => setAsking(false)} />
           <HomeColumns
             primary={
               <>

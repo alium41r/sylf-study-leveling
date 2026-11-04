@@ -8,7 +8,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./parity": "./src/parity.ts",
-    "./backend": "./src/backend.ts"
+    "./backend": "./src/backend.ts",
+    "./catalogs": "./src/catalogs.ts"
   },
   "dependencies": {
     "yjs": "13.6.33",

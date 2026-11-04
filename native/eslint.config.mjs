@@ -5,7 +5,7 @@ import tseslint from "typescript-eslint";
 
 const repoEscape = {
   group: ["../../../../*", "../../../../../*", "**/../lib/*"],
-  message: "Only packages/shared/src/index.ts and backend.ts may import the Sylf repository's lib/ (see tooling/checks/check-boundaries.mjs).",
+  message: "Only packages/shared/src/index.ts, backend.ts and catalogs.ts may import the Sylf repository's lib/ (see tooling/checks/check-boundaries.mjs).",
 };
 
 export default tseslint.config(
@@ -18,7 +18,7 @@ export default tseslint.config(
       "no-restricted-imports": ["error", { patterns: [repoEscape, { group: ["@sylf/phone"], message: "The phone companion is selected only by the app entry (master plan §4.5)." }] }],
     },
   },
-  { files: ["packages/shared/src/index.ts", "packages/shared/src/backend.ts"], rules: { "no-restricted-imports": "off" } },
+  { files: ["packages/shared/src/index.ts", "packages/shared/src/backend.ts", "packages/shared/src/catalogs.ts"], rules: { "no-restricted-imports": "off" } },
   { files: ["apps/sylf/index.ts"], rules: { "no-restricted-imports": ["error", { patterns: [repoEscape] }], "@typescript-eslint/no-require-imports": "off" } },
   // Metro resolves font assets through require(); there is no import form for them.
   { files: ["packages/design-system/src/theme/font-loader.web.ts"], rules: { "@typescript-eslint/no-require-imports": "off" } },

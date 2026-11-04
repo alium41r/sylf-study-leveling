@@ -10,6 +10,7 @@ import { SpaceStage } from "./SpaceStage";
 import { SpacesSwitcher } from "./SpacesSwitcher";
 import { TimerDock } from "./TimerDock";
 import { useFocusEnvironmentOpen } from "./focus/environment";
+import { LevelNotice } from "./LevelNotice";
 
 const FocusEnvironment = lazy(() => import("./focus/FocusEnvironment"));
 
@@ -30,6 +31,7 @@ export function SpacesShell() {
       {free ? <SpacesSwitcher onReach={setBarReach} /> : null}
       {free ? <TimerDock barReach={barReach} /> : null}
       <SpaceStage />
+      <LevelNotice />
       {free && DEV_TOOLS ? <DevEntry /> : null}
       {focusing && !worldHoldsNavigation(world) ? <Suspense fallback={null}><FocusEnvironment /></Suspense> : null}
     </View>

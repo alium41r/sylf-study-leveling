@@ -15,6 +15,7 @@ const workspace = path.resolve(import.meta.dirname, "../..");
 const sylf = path.resolve(workspace, "..");
 const sharedIndex = path.join(workspace, "packages/shared/src/index.ts");
 const sharedBackend = path.join(workspace, "packages/shared/src/backend.ts");
+const sharedCatalogs = path.join(workspace, "packages/shared/src/catalogs.ts");
 const sharedDeps = Object.keys(JSON.parse(fs.readFileSync(path.join(workspace, "packages/shared/package.json"), "utf8")).dependencies ?? {});
 // Portable shared code must not depend on UI frameworks or browser-only storage.
 const NON_PORTABLE_PACKAGES = [/^react(-dom)?$/, /^react-native/, /^next/, /^dexie$/, /^@blocknote\//, /^framer-motion$/, /^lucide-react$/, /^pdfjs-dist/];
@@ -33,7 +34,7 @@ function resolveFile(fromFile, spec) {
 }
 
 // 1. Allow-list closure.
-const allowList = [sharedIndex, sharedBackend].flatMap((file) => importsOf(fs.readFileSync(file, "utf8")).filter((s) => s.includes("/lib/")));
+const allowList = [sharedIndex, sharedBackend, sharedCatalogs].flatMap((file) => importsOf(fs.readFileSync(file, "utf8")).filter((s) => s.includes("/lib/")));
 const visited = new Set();
 const queue = allowList.map((s) => resolveFile(sharedIndex, s));
 const bareDependencies = new Set();
@@ -79,12 +80,12 @@ for (const file of sources) {
     if (SERVER_ONLY_SPECIFIERS.some((re) => re.test(spec)) && !rel.startsWith("tooling/")) violations.push(`${rel} imports server-only package ${spec}`);
     if (spec.startsWith(".")) {
       const target = path.resolve(path.dirname(file), spec);
-      if (!target.startsWith(workspace + path.sep) && file !== sharedIndex && file !== sharedBackend) violations.push(`${rel} reaches outside native/ (${spec}); use @sylf/shared`);
+      if (!target.startsWith(workspace + path.sep) && file !== sharedIndex && file !== sharedBackend && file !== sharedCatalogs) violations.push(`${rel} reaches outside native/ (${spec}); use @sylf/shared`);
     }
     if (spec === "@sylf/phone" && !/^apps\/[^/]+\/index\.ts$/.test(rel)) violations.push(`${rel} imports @sylf/phone; only app entries may select the phone frontend`);
   }
   for (const spec of staticImportsOf(fs.readFileSync(file, "utf8").replace(/^\s*(import|export) type\b.*$/gm, ""))) {
-    if ((spec === "@sylf/backend" || spec === "@sylf/shared/backend") && !rel.startsWith("packages/backend/")) violations.push(`${rel} statically imports ${spec}; it must stay behind import()`);
+    if ((spec === "@sylf/backend" || spec === "@sylf/shared/backend" || spec === "@sylf/shared/catalogs") && !rel.startsWith("packages/backend/")) violations.push(`${rel} statically imports ${spec}; it must stay behind import()`);
     if (!spec.startsWith(".")) continue;
     const target = path.relative(workspace, path.resolve(path.dirname(file), spec)).split(path.sep).join("/");
     if (target.startsWith(WORLD) && !rel.startsWith(WORLD)) violations.push(`${rel} statically imports World (${spec}); it must stay behind import()`);

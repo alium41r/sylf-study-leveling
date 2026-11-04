@@ -147,7 +147,7 @@ export const focusPartySchema = z.object({
 export type FocusParty = z.infer<typeof focusPartySchema>;
 
 /** GET /api/achievements. */
-export const achievementsSchema = z.object({ achievements: z.array(z.object({ id: z.string(), title: z.string(), description: z.string(), target: z.number(), currentProgress: z.number(), isClaimed: z.boolean(), reward: z.object({ type: z.string(), amount: z.number() }).optional() })) });
+export const achievementsSchema = z.object({ achievements: z.array(z.object({ id: z.string(), title: z.string(), description: z.string(), target: z.number(), currentProgress: z.number(), isClaimed: z.boolean(), category: z.string().optional(), rarity: z.string().optional(), reward: z.object({ type: z.string(), amount: z.number() }).optional() })) });
 export type AchievementRecord = z.infer<typeof achievementsSchema>["achievements"][number];
 
 /** GET /api/cosmetics. Names and rarity live in lib/cosmetics-catalog. */

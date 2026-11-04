@@ -1,14 +1,28 @@
-// Progress keeps gamification quiet: one line for the level, three numbers, and one small chart. Only today's bar spends the
-// accent. The chart has one series, so its title names it and it needs no legend.
-import { useState } from "react";
+// Progress answers three questions, each in its own view: am I studying enough, how do I compare, and how does this all work. Six views, one level of
+// navigation, and each mounts the first time it is opened and stays, so going back and forth costs nothing (risk R17). With nobody signed in there is no
+// record of anyone's to read, so the page keeps the small sample view it always had, and says nothing about standing or honours.
+// Gamification stays quiet: no HP, no celebration, and every number is the server's.
+import { Suspense, lazy, useState } from "react";
 import { Platform, View } from "react-native";
 import { Button, Icon, Press, Progress, Readout, Stack, Text, Tooltip, useNotice, useTheme } from "@sylf/design-system";
+import type { HomeViewOf } from "@sylf/spaces";
 import { useLiveBackend } from "../../../shell/backend";
 import { describeFailureText } from "../../../shell/account/failure";
 import { useHomeResult } from "../data";
 import type { Achievement, HomeDataAdapter, StudyDay } from "../data/contracts";
 import { formatMinutes } from "../format";
-import { EmptyPage, FailedPage, HomeColumns, HomePage, LoadingPage, PageTitle, Section } from "../HomePage";
+import { EmptyPage, FailedPage, HomeColumns, HomePage, LoadingPage, PageTitle, Section, SubNav, useHomeView } from "../HomePage";
+
+const OverviewView = lazy(() => import("../progress/OverviewView").then((module) => ({ default: module.OverviewView })));
+const StatsView = lazy(() => import("../progress/StatsView").then((module) => ({ default: module.StatsView })));
+const StandingView = lazy(() => import("../progress/StandingView").then((module) => ({ default: module.StandingView })));
+const HonoursView = lazy(() => import("../progress/HonoursView").then((module) => ({ default: module.HonoursView })));
+const SkillsView = lazy(() => import("../progress/SkillsView").then((module) => ({ default: module.SkillsView })));
+const CodexView = lazy(() => import("../progress/CodexView").then((module) => ({ default: module.CodexView })));
+
+type View_ = HomeViewOf<"progress">;
+const LABELS: Record<View_, string> = { overview: "Overview", stats: "Stats", standing: "Standing", honours: "Honours", skills: "Skills", codex: "Codex" };
+const SCREENS = { overview: OverviewView, stats: StatsView, standing: StandingView, honours: HonoursView, skills: SkillsView, codex: CodexView };
 
 const load = (adapter: HomeDataAdapter) => adapter.progress(new Date());
 const CHART_HEIGHT = 120;
@@ -72,7 +86,7 @@ function AchievementRow({ achievement }: { achievement: Achievement }) {
   );
 }
 
-export function ProgressDestination() {
+function SampleProgress() {
   const { space } = useTheme();
   const result = useHomeResult("progress", load);
   const progress = result?.data;
@@ -109,6 +123,27 @@ export function ProgressDestination() {
           />
         </>
       )}
+    </HomePage>
+  );
+}
+
+export function ProgressDestination() {
+  const { space } = useTheme();
+  const backend = useLiveBackend();
+  const view = useHomeView("progress");
+  const [visited, setVisited] = useState<View_[]>([view]);
+  if (!visited.includes(view)) setVisited([...visited, view]);
+  if (!backend) return <SampleProgress />;
+  return (
+    <HomePage destination="progress" eyebrow="Your study record" ready>
+      <PageTitle title="Progress" />
+      <View style={{ gap: space.xl }}>
+        <SubNav destination="progress" label="Progress views" labels={LABELS} />
+        {visited.map((id) => {
+          const Screen = SCREENS[id];
+          return <View key={id} style={id === view ? undefined : { display: "none" }} testID={`progress-view-${id}`}><Suspense fallback={null}><Screen /></Suspense></View>;
+        })}
+      </View>
     </HomePage>
   );
 }

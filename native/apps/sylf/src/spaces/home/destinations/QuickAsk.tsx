@@ -6,11 +6,14 @@ import { Button, Sheet, Stack, Text, TextField, useTheme } from "@sylf/design-sy
 import { RichText } from "../../../shell/rich-text/RichText";
 import { useLiveBackend } from "../../../shell/backend";
 import { useSylvieTurn } from "../../../shell/sylvie/useSylvieTurn";
+import { useHomeNavigation } from "../../../shell/context";
+import { setPlanPrefill } from "../plan/prefill";
 
 export function QuickAsk({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { color, shape, space } = useTheme();
   const backend = useLiveBackend();
   const turn = useSylvieTurn(backend);
+  const navigation = useHomeNavigation();
   const [text, setText] = useState("");
   const submit = async () => { const message = text; setText(""); if (!(await turn.send(message))) setText(message); };
   return (
@@ -30,6 +33,7 @@ export function QuickAsk({ open, onClose }: { open: boolean; onClose: () => void
               </View>
             </View>
           ) : null}
+          {turn.planRequest && !turn.working ? <Button title="Review in Plans" testID="quick-ask-plan" onPress={() => { setPlanPrefill(turn.planRequest!); turn.reset(); onClose(); navigation.setView("plan", "plans"); navigation.select("plan"); }} /> : null}
           {turn.failure ? <Text variant="caption" tone="critical" testID="quick-ask-failure">{turn.failure}</Text> : null}
           <TextField label="Ask Sylvie" hideLabel placeholder="Ask Sylvie" value={text} onChangeText={setText} editable={!turn.working} returnKeyType="send" onSubmitEditing={() => void submit()} testID="quick-ask-input" />
           <Button title={turn.working ? "Sylvie is answering" : "Send"} variant="emphasis" disabled={!text.trim() || turn.working} testID="quick-ask-send" onPress={() => void submit()} />

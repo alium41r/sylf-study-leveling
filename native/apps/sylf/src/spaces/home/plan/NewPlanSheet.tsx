@@ -12,7 +12,7 @@ const WEEK = ["S", "M", "T", "W", "T", "F", "S"];
 const toMinute = (clock: string) => { const [hour, minute] = clock.split(":").map(Number); return (hour ?? 0) * 60 + (minute ?? 0); };
 const validClock = (clock: string) => /^([01]?\d|2[0-3]):[0-5]\d$/.test(clock);
 
-export function NewPlanSheet({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: (planId: string) => void }) {
+export function NewPlanSheet({ open, onClose, onCreated, initialGoal = "" }: { open: boolean; onClose: () => void; onCreated: (planId: string) => void; initialGoal?: string }) {
   const { space } = useTheme();
   const backend = useLiveBackend();
   const notice = useNotice();
@@ -28,7 +28,7 @@ export function NewPlanSheet({ open, onClose, onCreated }: { open: boolean; onCl
   const [busy, setBusy] = useState(false);
   const [key, setKey] = useState<string | null>(null);
 
-  useEffect(() => { if (open) { setTitle(""); setGoal(""); setDeadline(""); setTopics(""); setNotes(""); setKey(null); } }, [open]);
+  useEffect(() => { if (open) { setTitle(""); setGoal(initialGoal); setDeadline(""); setTopics(""); setNotes(""); setKey(null); } }, [open, initialGoal]);
 
   const topicList = topics.split(/[\n,]/).map((item) => item.trim()).filter(Boolean);
   const daily = Number(minutes);

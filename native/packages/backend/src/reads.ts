@@ -86,25 +86,26 @@ export function createReads(client: BackendClient) {
     confirmSylvieAction: (chatId: number, token: string) => client.send("POST", "/api/system-messages/chat", { body: { sessionId: chatId, confirmationToken: token }, timeoutMs: 60_000 }),
 
     /** One turn with Sylvie, read as it arrives. Quotas, tools and every model choice stay on the server. Resolves with the full reply. */
-    async sendToSylvie(message: string, chatId: number | null, turn: SylvieTurn, signal: AbortSignal): Promise<{ reply: string; chatId: number | null; pendingAction: PendingAction | null }> {
+    async sendToSylvie(message: string, chatId: number | null, turn: SylvieTurn, signal: AbortSignal): Promise<{ reply: string; chatId: number | null; pendingAction: PendingAction | null; planRequest: string | null }> {
       let buffer = "";
       let text = "";
       let reply: string | null = null;
       let session = chatId;
       let pendingAction: PendingAction | null = null;
+      let planRequest: string | null = null;
       let failure: BackendError | null = null;
       const frame = (raw: string) => {
         const lines = raw.split("\n");
         const event = lines.find((line) => line.startsWith("event:"))?.slice(6).trim();
         const data = lines.filter((line) => line.startsWith("data:")).map((line) => line.slice(5).trimStart()).join("\n");
         if (!event || !data) return;
-        let value: { text?: unknown; sessionId?: unknown; reply?: unknown; error?: unknown; message?: unknown; status?: unknown; pendingAction?: unknown; phase?: unknown; label?: unknown };
+        let value: { text?: unknown; sessionId?: unknown; reply?: unknown; error?: unknown; message?: unknown; status?: unknown; pendingAction?: unknown; plannerHandoff?: unknown; phase?: unknown; label?: unknown };
         try { value = JSON.parse(data); } catch { return; }
         if (event === "delta" && typeof value.text === "string") { text += value.text; turn.onDelta(text); }
         else if (event === "reset") { text = ""; turn.onReset(); }
         else if (event === "session" && typeof value.sessionId === "number") { session = value.sessionId; turn.onSession(value.sessionId); }
         else if (event === "status" && typeof (value.label ?? value.phase ?? value.message) === "string") turn.onStatus?.(String(value.label ?? value.phase ?? value.message));
-        else if (event === "result") { if (typeof value.sessionId === "number") session = value.sessionId; reply = typeof value.reply === "string" ? value.reply : text; const pending = pendingActionSchema.safeParse(value.pendingAction); pendingAction = pending.success ? pending.data : null; }
+        else if (event === "result") { if (typeof value.sessionId === "number") session = value.sessionId; reply = typeof value.reply === "string" ? value.reply : text; const pending = pendingActionSchema.safeParse(value.pendingAction); pendingAction = pending.success ? pending.data : null; const handoff = value.plannerHandoff as { request?: unknown } | null | undefined; planRequest = typeof handoff?.request === "string" && handoff.request.trim() ? handoff.request.trim().slice(0, 2000) : null; }
         else if (event === "error") failure = new BackendError(value.status === 429 ? "rate-limited" : "server", typeof value.error === "string" && Number(value.status) < 500 ? value.error : "Sylvie could not answer just now. Try again shortly.");
       };
       await client.stream("/api/system-messages/chat", { method: "POST", signal, headers: { "Content-Type": "application/json", Accept: "text/event-stream" }, body: JSON.stringify({ message, ...(chatId ? { sessionId: chatId } : {}) }) }, (chunk) => {
@@ -113,7 +114,7 @@ export function createReads(client: BackendClient) {
       });
       if (failure) throw failure;
       if (reply === null) throw new BackendError("server", "Sylvie's answer stopped before it finished.");
-      return { reply, chatId: session, pendingAction };
+      return { reply, chatId: session, pendingAction, planRequest };
     },
   };
 }

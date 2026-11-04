@@ -14,6 +14,7 @@ export function useSylvieTurn(backend: Backend | null) {
   const [answer, setAnswer] = useState<string | null>(null);
   const [chatId, setChatId] = useState<number | null>(null);
   const [proposal, setProposal] = useState<Proposal | null>(null);
+  const [planRequest, setPlanRequest] = useState<string | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [working, setWorking] = useState(false);
   const flight = useRef<AbortController | null>(null);
@@ -23,12 +24,13 @@ export function useSylvieTurn(backend: Backend | null) {
     if (!backend || working || !message.trim()) return false;
     const controller = new AbortController();
     flight.current = controller;
-    setAsked(message.trim()); setReply(""); setAnswer(null); setStatus(null); setFailure(null); setProposal(null); setWorking(true);
+    setAsked(message.trim()); setReply(""); setAnswer(null); setStatus(null); setFailure(null); setProposal(null); setPlanRequest(null); setWorking(true);
     let ok = false;
     try {
       const done = await backend.reads.sendToSylvie(message.trim(), chatId, { onDelta: setReply, onReset: () => setReply(""), onSession: setChatId, onStatus: setStatus }, controller.signal);
       setChatId(done.chatId); setAnswer(done.reply);
       if (done.pendingAction && done.chatId !== null) setProposal({ chatId: done.chatId, token: done.pendingAction.token, summary: done.pendingAction.summary });
+      setPlanRequest(done.planRequest);
       backend.resources.invalidate("sylvie");
       ok = true;
     } catch (error) {
@@ -49,6 +51,6 @@ export function useSylvieTurn(backend: Backend | null) {
     setProposal(null); setWorking(false);
   }, [backend, proposal, working]);
 
-  const reset = useCallback(() => { flight.current?.abort(); setAsked(null); setReply(""); setAnswer(null); setProposal(null); setFailure(null); setStatus(null); setWorking(false); }, []);
-  return { asked, text: working ? reply : answer ?? reply, status, proposal, failure, working, send, confirm, dismiss: () => setProposal(null), reset };
+  const reset = useCallback(() => { flight.current?.abort(); setAsked(null); setReply(""); setAnswer(null); setProposal(null); setPlanRequest(null); setFailure(null); setStatus(null); setWorking(false); }, []);
+  return { asked, text: working ? reply : answer ?? reply, status, proposal, planRequest, failure, working, send, confirm, dismiss: () => setProposal(null), reset };
 }

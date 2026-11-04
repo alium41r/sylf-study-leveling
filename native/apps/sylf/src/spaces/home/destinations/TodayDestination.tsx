@@ -6,6 +6,7 @@ import { Button, Checkbox, Marker, Meter, Plane, Stack, Text, useNotice, useThem
 import { useLiveBackend } from "../../../shell/backend";
 import { describeFailureText } from "../../../shell/account/failure";
 import { useHomeNavigation, useSessionState, useStudySession } from "../../../shell/context";
+import { useEnterFocus } from "../../../shell/focus/enter";
 import { useHomeResult } from "../data";
 import type { DayEntry, DayTarget, HomeDataAdapter, Objective } from "../data/contracts";
 import { formatMinutes, greetingFor, pickNext, plannedMinutes } from "../format";
@@ -86,6 +87,7 @@ export function TodayDestination() {
   const { color } = useTheme();
   const navigation = useHomeNavigation();
   const session = useStudySession();
+  const enter = useEnterFocus();
   const backend = useLiveBackend();
   const notice = useNotice();
   const result = useHomeResult("today", load);
@@ -96,10 +98,15 @@ export function TodayDestination() {
   const greeting = greetingFor(now.getHours());
   const date = now.toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" });
 
-  // A quest has a subject and a title, so choosing it fills in everything Focus would ask. It starts nothing: the person does that.
+  // A quest has a subject and a title, so beginning it fills in everything Focus would ask, then goes straight into the environment.
+  // "Study this" on a quest only prepares: it shows Focus with that quest chosen, so the rhythm can still be picked.
   const prepare = (objective?: Objective) => {
     if (objective) session.setPlan({ title: objective.title, subject: objective.subject ?? null, subjectId: objective.subjectId ?? null, questId: objective.questId ?? null });
     navigation.select("focus");
+  };
+  const begin = (objective?: Objective) => {
+    if (objective) session.setPlan({ title: objective.title, subject: objective.subject ?? null, subjectId: objective.subjectId ?? null, questId: objective.questId ?? null });
+    enter();
   };
   const tick = async (objective: Objective) => {
     if (!backend || !objective.completion || sending) return;
@@ -120,7 +127,7 @@ export function TodayDestination() {
   const next = pickNext(entries, objectives, now.getTime());
   const nextTitle = active ? active.title : next?.kind === "quest" ? next.objective.title : next?.kind === "event" ? next.entry.title : "";
   const nextDetail = active ? active.subject ?? "" : next?.kind === "quest" ? next.objective.detail : next?.kind === "event" ? `${clock(next.entry.startsAt)}. ${next.entry.detail}` : "";
-  const onBegin = () => prepare(!active && next?.kind === "quest" ? next.objective : undefined);
+  const onBegin = () => begin(!active && next?.kind === "quest" ? next.objective : undefined);
 
   return (
     <HomePage destination="today" eyebrow={date} provenance={result?.provenance} live={result?.live} ready={result !== null}>

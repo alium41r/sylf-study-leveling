@@ -1,49 +1,24 @@
-// Focus is where a session is set up and followed, and it shows the one study session the dock and Workspace's Timer show. It keeps no
-// time of its own. A session runs with or without data, so the instrument is always here. What the server has accepted is listed under
-// Recent sessions, and what it has not yet is listed apart, under On this device, with a badge that stays true until the answer arrives.
-import { useState, useSyncExternalStore } from "react";
-import { Image, View } from "react-native";
-import { Badge, Plane, Press, Stack, Text, useTheme } from "@sylf/design-system";
-import { DEFAULT_SESSION_TITLE, MAX_CREDITED_FOCUS_SECONDS, endedSessionsFor, speakSessionClock, type EndedSession } from "@sylf/spaces";
+// Focus is the threshold: what I am studying, the rhythm, and where, then one way in. The session itself lives in the environment above the
+// Spaces, and in the dock, so the clock is not here until a session is running. It keeps no time of its own. What the server has accepted is
+// listed under Recent sessions, and what it has not yet is listed apart, under On this device, with a badge that stays true until it answers.
+import { useSyncExternalStore } from "react";
+import { ScrollView, View } from "react-native";
+import { Image } from "expo-image";
+import { Badge, Button, Chip, Plane, Press, Stack, Text, useTheme } from "@sylf/design-system";
+import { MAX_CREDITED_FOCUS_SECONDS, endedSessionsFor, speakSessionClock, type EndedSession } from "@sylf/spaces";
 import { useAuth, useSessionSync } from "../../../shell/backend";
 import { useHomeNavigation, useSessionState, useStudySession } from "../../../shell/context";
-import { SESSION_STATUS_LABELS, SessionActions, SessionClock, SessionLengths, SessionNote, SessionProgress, SessionSubject } from "../../../shell/session/SessionParts";
+import { SESSION_STATUS_LABELS, SessionActions, SessionClock, SessionNote, SessionSubject } from "../../../shell/session/SessionParts";
+import { ModeChooser } from "../../../shell/focus/ModeChooser";
+import { useBackgroundCatalog, useFocusBackground } from "../../../shell/focus/useFocusBackground";
+import { useEnterFocus } from "../../../shell/focus/enter";
 import { useStats } from "../../../shell/live";
 import { useHomeResult } from "../data";
-import type { FocusView, HomeDataAdapter, StudyDesk } from "../data/contracts";
+import type { FocusView, HomeDataAdapter, Objective } from "../data/contracts";
 import { formatMinutes } from "../format";
 import { HomeColumns, HomePage, PageTitle, Section } from "../HomePage";
 
 const load = (adapter: HomeDataAdapter) => adapter.focus();
-
-/** A small drawing of the desk, made of the theme's own tones. Real desks show their focus background's image instead. */
-function DeskPreview({ art, selected }: { art: StudyDesk["art"]; selected: boolean }) {
-  const { color, shape } = useTheme();
-  const ink = selected ? color.accent.mote : color.lineStrong;
-  if (art.kind === "image") return <Image source={{ uri: art.url }} style={{ width: 64, height: 44, borderRadius: shape.radius.sm }} />;
-  const { layout } = art;
-  return (
-    <View style={{ width: 64, height: 44, borderRadius: shape.radius.sm, backgroundColor: color.selected, overflow: "hidden" }}>
-      {layout === "window" ? <View style={{ position: "absolute", top: 7, left: 22, width: 20, height: 20, borderWidth: 1, borderColor: ink }} /> : null}
-      {layout === "lamp" ? <View style={{ position: "absolute", top: 13, left: 36, width: 8, height: 8, backgroundColor: ink }} /> : null}
-      {layout === "shelf" ? [10, 18, 26].map((top) => <View key={top} style={{ position: "absolute", top, left: 10, right: 10, height: 1, backgroundColor: ink }} />) : null}
-      <View style={{ position: "absolute", bottom: 7, left: 6, right: 6, height: 2, backgroundColor: color.lineStrong }} />
-    </View>
-  );
-}
-
-function DeskRow({ desk, selected, onPress }: { desk: StudyDesk; selected: boolean; onPress: () => void }) {
-  const { shape, space } = useTheme();
-  return (
-    <Press role="radio" checked={selected} label={`${desk.name}. ${desk.category}`} onPress={onPress} radius={shape.radius.sm} bodyStyle={{ flexDirection: "row", alignItems: "center", gap: space.md, padding: space.xs }}>
-      <DeskPreview art={desk.art} selected={selected} />
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <Text variant="small" tone="ink">{desk.name}</Text>
-        <Text variant="caption" tone="soft">{desk.category}</Text>
-      </View>
-    </Press>
-  );
-}
 
 /** The clock renders only while this page is showing, because a hidden destination stays mounted. */
 function useFocusIsShowing() {
@@ -60,31 +35,84 @@ function ElsewhereNote() {
   return <Text variant="caption" tone="soft" align="center" testID="focus-elsewhere">A session is already running on another device. End it there before starting here.</Text>;
 }
 
-function SessionInstrument({ focus }: { focus: FocusView | null }) {
+const loadToday = (adapter: HomeDataAdapter) => adapter.today(new Date());
+
+/** What the next session is about: a quest from today, which fills in its subject, or just a subject. Fixed once a session exists. */
+function WhatPicker({ quests }: { quests: Objective[] }) {
   const { space } = useTheme();
   const session = useStudySession();
-  const { active, plan } = useSessionState();
-  const showing = useFocusIsShowing();
-  const status = session.status();
-  const subject = active ? active.subject : plan?.subject ?? (focus?.subject || null);
-  const title = active ? active.title : plan?.title ?? (focus?.topic || DEFAULT_SESSION_TITLE);
+  const { plan } = useSessionState();
   return (
-    <Plane level="raised" radius="xl" style={{ paddingVertical: space.air, paddingHorizontal: space.xl, alignItems: "center", gap: space.lg }}>
-      <Stack gap="xs" align="center">
-        {subject ? <Text variant="caption" tone="soft" align="center">{subject}</Text> : null}
-        <Text variant="title" align="center">{title}</Text>
-      </Stack>
-      <Stack gap="xs" align="center" style={{ alignSelf: "stretch" }}>
-        <SessionClock live={showing} testID="focus-clock" />
-        {status === "idle" ? null : <Text variant="caption" tone="soft" align="center">{SESSION_STATUS_LABELS[status]}</Text>}
-      </Stack>
-      {status === "idle" ? <SessionLengths /> : <View style={{ alignSelf: "center", maxWidth: 420, width: "100%" }}><SessionProgress live={showing} /></View>}
-      <Stack gap="sm" align="center" style={{ alignSelf: "stretch" }}>
-        <View style={{ alignSelf: "center", width: "100%", maxWidth: 320, gap: space.sm }}>
-          <ElsewhereNote />
-          <SessionSubject />
-          <SessionActions surface="focus" title={focus?.topic || undefined} subject={focus?.subject || undefined} />
+    <Stack gap="sm">
+      <Text variant="caption" tone="soft">What</Text>
+      <SessionSubject />
+      {quests.length ? (
+        <View role="radiogroup" aria-label="Quest" style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xs }}>
+          {quests.map((quest) => <Chip key={quest.id} radio label={quest.title} selected={plan?.questId === quest.questId} onPress={() => session.setPlan(plan?.questId === quest.questId ? null : { title: quest.title, subject: quest.subject ?? null, subjectId: quest.subjectId ?? null, questId: quest.questId ?? null })} />)}
         </View>
+      ) : null}
+    </Stack>
+  );
+}
+
+/** Where: Sylf's plain ground, then the catalog's backgrounds. Choosing saves the preference on the account, so web shows the same one. */
+function WherePicker() {
+  const { space, shape, color } = useTheme();
+  const catalog = useBackgroundCatalog();
+  const { chosenId, choose } = useFocusBackground();
+  const options = catalog?.categories.flatMap((category) => category.backgrounds).slice(0, 12) ?? [];
+  if (!catalog) return null;
+  const tile = { width: 88, height: 56, borderRadius: shape.radius.sm, overflow: "hidden" as const, backgroundColor: color.selected };
+  return (
+    <Stack gap="sm">
+      <Text variant="caption" tone="soft">Where</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} role="radiogroup" aria-label="Background" contentContainerStyle={{ gap: space.sm }}>
+        <Press role="radio" checked={chosenId === null} label="Classic. Sylf's plain ground" onPress={() => void choose(null)} radius={shape.radius.sm} bodyStyle={{ gap: space.xs }}>
+          <View style={[tile, { borderWidth: 1, borderColor: chosenId === null ? color.accent.mote : color.line }]} />
+          <Text variant="caption" tone={chosenId === null ? "ink" : "soft"} numberOfLines={1} style={{ width: 88 }}>Classic</Text>
+        </Press>
+        {options.map((option) => (
+          <Press key={option.id} role="radio" checked={chosenId === option.id} label={option.name} onPress={() => void choose(option.id)} radius={shape.radius.sm} bodyStyle={{ gap: space.xs }}>
+            <View style={[tile, { borderWidth: 1, borderColor: chosenId === option.id ? color.accent.mote : color.line }]}>
+              <Image source={{ uri: option.publicUrl }} contentFit="cover" recyclingKey={String(option.id)} style={{ width: 88, height: 56 }} accessible={false} />
+            </View>
+            <Text variant="caption" tone={chosenId === option.id ? "ink" : "soft"} numberOfLines={1} style={{ width: 88 }}>{option.name}</Text>
+          </Press>
+        ))}
+      </ScrollView>
+    </Stack>
+  );
+}
+
+function Threshold({ focus }: { focus: FocusView | null }) {
+  const { space } = useTheme();
+  const session = useStudySession();
+  const { active } = useSessionState();
+  const showing = useFocusIsShowing();
+  const today = useHomeResult("today", loadToday);
+  const enter = useEnterFocus();
+  const status = session.status();
+  const quests = (today?.data?.objectives ?? []).filter((objective) => !objective.done && objective.questId !== undefined).slice(0, 6);
+  return (
+    <Plane level="raised" radius="xl" style={{ paddingVertical: space.xl, paddingHorizontal: space.xl, gap: space.xl }}>
+      {active ? (
+        <Stack gap="xs" align="center">
+          {active.subject ? <Text variant="caption" tone="soft" align="center">{active.subject}</Text> : null}
+          <Text variant="title" align="center">{active.title}</Text>
+          <SessionClock live={showing} variant="readout" testID="focus-clock" />
+          <Text variant="caption" tone="soft" align="center">{SESSION_STATUS_LABELS[status]}</Text>
+        </Stack>
+      ) : (
+        <>
+          <WhatPicker quests={quests} />
+          <Stack gap="sm"><Text variant="caption" tone="soft">Rhythm</Text><ModeChooser /></Stack>
+          <WherePicker />
+        </>
+      )}
+      <Stack gap="sm" style={{ alignSelf: "stretch" }}>
+        <ElsewhereNote />
+        <Button title={active ? "Back to your session" : "Enter"} variant="emphasis" icon="focus" fill testID="focus-enter" onPress={() => enter({ title: focus?.topic || undefined, subject: focus?.subject || undefined })} />
+        {active ? <SessionActions surface="focus" /> : null}
         <SessionNote />
       </Stack>
     </Plane>
@@ -121,8 +149,6 @@ export function FocusDestination() {
   // Only this person's, and only what the server has not accepted. Once it has, it belongs to Recent sessions.
   const ended = endedSessionsFor(state, userId).filter((item) => !item.saved && item.focusSeconds > 0);
   const focus = result?.data ?? null;
-  const [deskId, setDeskId] = useState<string | null>(null);
-  const desk = focus?.desks.find((item) => item.id === deskId) ?? focus?.desks[0];
   const local = ended.length ? (
     <Section key="local" title="On this device">
       <View style={{ alignSelf: "flex-start" }}><Badge label="Not saved yet" /></View>
@@ -131,19 +157,15 @@ export function FocusDestination() {
   ) : null;
 
   return (
-    <HomePage destination="focus" eyebrow={!result || result.live ? "Study sessions" : "Study sessions and desks"} provenance={result?.provenance} live={result?.live} ready={result !== null}>
+    <HomePage destination="focus" eyebrow="Study sessions" provenance={result?.provenance} live={result?.live} ready={result !== null}>
       <>
         <PageTitle title="Focus" />
         {/* A running session needs nothing from this read, so its controls never wait for one. Only the history does. */}
         <HomeColumns
-            primary={<SessionInstrument focus={focus} />}
+            primary={<Threshold focus={focus} />}
             secondary={[
               ...(local ? [local] : []),
               ...(focus ? [
-                ...(focus.desks.length ? [<Section key="desks" title="Study desks">
-                  <View role="radiogroup" aria-label="Study desk" style={{ gap: space.xs }}>{focus.desks.map((item) => <DeskRow key={item.id} desk={item} selected={item.id === desk?.id} onPress={() => setDeskId(item.id)} />)}</View>
-                  <Text variant="caption" tone="soft">Preview only. Desks do not change anything yet.</Text>
-                </Section>] : []),
                 <Section key="recent" title="Recent sessions">
                   <CreditNote />
                   {focus.recent.length ? null : <Text variant="small" tone="soft" testID="focus-no-history">Sessions you finish appear here, with their time.</Text>}

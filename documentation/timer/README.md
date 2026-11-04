@@ -7,7 +7,8 @@ Current owners and guarantees for study timers and Focus Party timers. Source, t
 | Responsibility | Owner |
 | --- | --- |
 | Epoch snapshots, separate focus/break accounting | [`lib/timer-engine.ts`](../../lib/timer-engine.ts) |
-| Local lifecycle, modes, recovery, terminal UI | [`FocusScreen`](../../app/focus/components/FocusScreen.tsx) |
+| Mode definitions and phase rules (pure) | [`lib/timer-modes.ts`](../../lib/timer-modes.ts), used by web's `FocusScreen` and Sylf Native's session model. Table-tested in [`timer-modes.test.ts`](../../__tests__/timer/timer-modes.test.ts) |
+| Local lifecycle, recovery, terminal UI | [`FocusScreen`](../../app/focus/components/FocusScreen.tsx) |
 | Tab leadership and lease fallback | [`useTimerLeadership`](../../app/focus/hooks/useTimerLeadership.ts), [`lib/timer-leader.ts`](../../lib/timer-leader.ts) |
 | Durable client intent and background delivery | [`lib/timer-sync.ts`](../../lib/timer-sync.ts), [`TimerSyncWorker`](../../app/components/TimerSyncWorker.tsx) |
 | Cookie authorization and account checks | [`/api/sessions`](../../app/api/sessions/route.ts), [`/api/focus-party/[id]/session/timer`](../../app/api/focus-party/%5Bid%5D/session/timer/route.ts) |

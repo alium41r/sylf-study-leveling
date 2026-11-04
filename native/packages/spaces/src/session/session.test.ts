@@ -497,3 +497,75 @@ describe("on its way to the server", () => {
     expect(kept.some((item) => item.clientKey === "key-1")).toBe(true);
   });
 });
+
+describe("modes and breaks", () => {
+  it("shapes a Pomodoro from its first focus block, and keeps the countdown as the default", () => {
+    const { session } = model();
+    expect(session.state().mode ?? "countdown").toBe("countdown");
+    expect(session.setMode("pomodoro")).toBe(true);
+    session.start({ title: "Waves" });
+    expect(session.readout()).toMatchObject({ status: "running", clock: 25 * 60, phase: "focus" });
+    expect(session.state().active?.phase).toMatchObject({ mode: "pomodoro", round: 1, rounds: 4 });
+  });
+  it("refuses to change the mode once a session exists", () => {
+    const { session } = model();
+    session.setMode("pomodoro");
+    session.start();
+    expect(session.setMode("sprint")).toBe(false);
+  });
+  it("moves into a break at the deadline and counts it apart from focus", () => {
+    const { session } = model();
+    session.setMode("pomodoro");
+    session.start();
+    vi.advanceTimersByTime(25 * MINUTE + 2 * SECOND);
+    expect(session.readout()).toMatchObject({ phase: "short-break", focusSeconds: 25 * 60 });
+    vi.advanceTimersByTime(60 * SECOND);
+    expect(session.readout().breakSeconds).toBeGreaterThanOrEqual(60);
+    expect(session.readout().focusSeconds).toBe(25 * 60);
+  });
+  it("catches up through phases that ended while the app was away", () => {
+    const { session } = model();
+    session.setMode("pomodoro");
+    session.start();
+    session.setForeground(false);
+    vi.setSystemTime(START + 31 * MINUTE);
+    session.setForeground(true);
+    expect(session.readout()).toMatchObject({ phase: "focus", focusSeconds: 25 * 60 });
+    expect(session.state().active?.phase?.round).toBe(2);
+  });
+  it("takes a break in Free Flow only when asked, and pauses at its end", () => {
+    const { session } = model();
+    session.setMode("freeflow");
+    session.start();
+    vi.advanceTimersByTime(30 * MINUTE);
+    expect(session.takeBreak()).toBe(true);
+    expect(session.readout().phase).toBe("short-break");
+    expect(session.takeBreak()).toBe(false);
+    vi.advanceTimersByTime(6 * MINUTE);
+    expect(session.readout()).toMatchObject({ status: "paused", phase: "focus" });
+  });
+  it("refuses a break in a scheduled mode", () => {
+    const { session } = model();
+    session.setMode("pomodoro");
+    session.start();
+    expect(session.takeBreak()).toBe(false);
+  });
+  it("keeps a mode setting only within its bounds and type", () => {
+    const { session } = model();
+    expect(session.setModeSetting("pomodoro", "focusDuration", 50)).toBe(true);
+    expect(session.setModeSetting("pomodoro", "focusDuration", 500)).toBe(false);
+    expect(session.setModeSetting("pomodoro", "focusDuration", "50")).toBe(false);
+    session.setMode("pomodoro");
+    session.start();
+    expect(session.readout().clock).toBe(50 * 60);
+  });
+  it("restores a running mode session from storage exactly", () => {
+    const first = model();
+    first.session.setMode("pomodoro");
+    first.session.start({ title: "Waves" });
+    vi.advanceTimersByTime(10 * MINUTE);
+    const second = model(first.storage);
+    expect(second.session.state().active?.phase).toMatchObject({ mode: "pomodoro", round: 1 });
+    expect(second.session.readout()).toMatchObject({ status: "running", focusSeconds: 10 * 60 });
+  });
+});

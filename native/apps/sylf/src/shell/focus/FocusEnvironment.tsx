@@ -6,7 +6,7 @@ import { Platform, Pressable, StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { Image } from "expo-image";
 import { useKeepAwake } from "expo-keep-awake";
-import { Button, IconButton, Text, fade, useDismiss, useTheme } from "@sylf/design-system";
+import { IconButton, Text, fade, useDismiss, useTheme } from "@sylf/design-system";
 import { modes } from "@sylf/shared";
 import { formatSessionClock, sessionModeSettings } from "@sylf/spaces";
 import { useSessionReadout, useSessionState, useStudySession } from "../context";
@@ -85,7 +85,6 @@ export function FocusEnvironment() {
 
   const active = state.active;
   const breaking = readout.phase !== "focus" && readout.phase !== "done";
-  const canBreak = active?.phase && modes.takesBreaksOnDemand(active.phase.mode) && readout.phase === "focus" && readout.status === "running";
   const ground = breaking ? color.selected : color.ground;
   return (
     <View testID="focus-environment" style={[StyleSheet.absoluteFill, { backgroundColor: ground, zIndex: 50 }]}>
@@ -108,7 +107,6 @@ export function FocusEnvironment() {
         </View>
         <View style={{ position: "absolute", bottom: space.xl, left: space.xl, right: space.xl, alignItems: "center", gap: space.sm }}>
           <View style={{ width: "100%", maxWidth: 420, gap: space.sm }}>
-            {canBreak ? <Button title="Take a break" testID="environment-break" onPress={() => { session.takeBreak(); wake(); }} /> : null}
             <SessionActions surface="environment" onEnded={leave} />
             <SessionNote />
           </View>

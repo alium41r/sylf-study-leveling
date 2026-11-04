@@ -18,7 +18,13 @@ const config: ExpoConfig = {
   orientation: "default",
   userInterfaceStyle: "automatic",
   // The secure store plugin keeps its values out of Android's Auto Backup, and asks for no biometric permission: nothing here uses one.
-  plugins: [["expo-font", { fonts: FONTS }], ["expo-secure-store", { configureAndroidBackup: true, faceIDPermission: false }]],
+  // Audio keeps playing with the screen off, and asks for no microphone: nothing here records. Notifications are local only, for a phase ending.
+  plugins: [
+    ["expo-font", { fonts: FONTS }],
+    ["expo-secure-store", { configureAndroidBackup: true, faceIDPermission: false }],
+    ["expo-audio", { enableBackgroundPlayback: true, microphonePermission: false, recordAudioAndroid: false }],
+    ["expo-notifications", { defaultChannel: "phase" }],
+  ],
   ios: {
     bundleIdentifier: "app.sylf.client",
     supportsTablet: true,

@@ -35,10 +35,11 @@ export async function onForegroundChange(active: boolean, session: StudySessionM
   const notifications = await load().catch(() => null);
   if (!notifications) return;
   await cancel();
+  if (Platform.OS === "android") await notifications.setNotificationChannelAsync("phase", { name: "Study phases", importance: notifications.AndroidImportance.HIGH }).catch(() => undefined);
   const seconds = Math.max(1, Math.round(readout.clock));
   const breaking = readout.phase !== "focus";
   scheduled = await notifications.scheduleNotificationAsync({
     content: { title: breaking ? "Break's over" : "Time for a break", body: current.title, sound: true },
-    trigger: { type: notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds },
+    trigger: { type: notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds, ...(Platform.OS === "android" ? { channelId: "phase" } : {}) },
   }).catch(() => null);
 }

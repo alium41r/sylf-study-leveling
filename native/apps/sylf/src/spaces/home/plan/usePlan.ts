@@ -30,7 +30,7 @@ const questsResource = (backend: Backend): ResourceDefinition<QuestsView> => ({
 const plansResource = (backend: Backend): ResourceDefinition<PlansView> => ({ key: "plan-plans", tags: ["plan"], ttlMs: 60_000, load: (signal) => backend.reads.plan.plans(signal) });
 
 function useLive<T>(backend: Backend | null, definition: (backend: Backend) => ResourceDefinition<T>, key: string) {
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- `key` says when the definition changed.
+  // `key` says when the definition changed.
   const resource = useMemo(() => (backend ? backend.resources.resource(definition(backend)) : null), [backend, key]);
   return toLiveResult(useOptionalResource(resource), resource);
 }

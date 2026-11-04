@@ -10,6 +10,7 @@ import { Button, Corners, Divider, Icon, Marker, Press, Text, Tooltip, fade, mov
 import { formatSessionClock, sessionLengthLabel, type SessionStatus, type ToolId } from "@sylf/spaces";
 import { useDockMetrics, useHomeNavigation, useSessionReadout, useSessionState, useSpacesStore, useStudySession, useWorkspaceModel } from "./context";
 import { SESSION_STATUS_LABELS, SessionActions, SessionClock, SessionLengths, SessionNote, SessionProgress, SessionSubject, speakReadout } from "./session/SessionParts";
+import { EnterFocusButton } from "./focus/enter";
 import { DOCK_SHORTCUT, useDockKeys } from "./shell-keys";
 
 const hiddenOnWeb = Platform.select<ViewStyle>({ web: { visibility: "hidden" } as unknown as ViewStyle, default: {} });
@@ -60,6 +61,7 @@ function DockPanel({ open, onClose, onGo }: { open: boolean; onClose: () => void
       {status === "idle" ? <SessionLengths /> : <SessionProgress live={open} />}
       <SessionSubject />
       <SessionActions surface="dock" onEnded={onClose} />
+      <EnterFocusButton surface="dock" onEnter={onClose} />
       <Divider />
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Button title="Focus" size="small" variant="ghost" icon="focus" testID="dock-go-focus" onPress={focus} />

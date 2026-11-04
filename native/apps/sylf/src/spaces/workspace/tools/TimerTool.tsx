@@ -4,6 +4,7 @@ import { View } from "react-native";
 import { Stack, Text, useTheme } from "@sylf/design-system";
 import { sessionLengthLabel } from "@sylf/spaces";
 import { useSessionState, useStudySession } from "../../../shell/context";
+import { EnterFocusButton } from "../../../shell/focus/enter";
 import { SESSION_STATUS_LABELS, SessionActions, SessionClock, SessionLengths, SessionNote, SessionProgress, SessionSubject } from "../../../shell/session/SessionParts";
 import { isSeen, ToolPage, type ToolProps } from "./shared";
 
@@ -23,6 +24,7 @@ export default function TimerTool({ lifecycle }: ToolProps) {
       <Stack gap="sm">
         <SessionSubject />
         <SessionActions surface="timer" />
+        <EnterFocusButton surface="timer" />
         <SessionNote />
       </Stack>
     </ToolPage>

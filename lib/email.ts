@@ -419,3 +419,8 @@ export async function sendEmailChangedNotice({ to, name, newEmail }: { to: strin
 export async function sendPasswordResetEmail({ to, name, url }: { to: string; name?: string | null; url: string }) {
   return sendSecurityNotice({ to, subject: "Reset your Sylf password", text: `Hello ${name || "Scholar"},\n\nUse this link to choose a new password. It works once, for 30 minutes:\n\n${url}\n\nIf you didn't ask for this, you can ignore this message. Your password has not changed.` });
 }
+
+/** After a reset, so someone who did not ask for it finds out at once. */
+export async function sendPasswordChangedNotice({ to, name }: { to: string; name?: string | null }) {
+  return sendSecurityNotice({ to, subject: "Your Sylf password was changed", text: `Hello ${name || "Scholar"},\n\nThe password on your Sylf account was just changed with a reset link, and every device was signed out.\n\nIf this was you, there is nothing to do. If it wasn't, ask for a new reset link now and contact support.` });
+}

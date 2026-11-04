@@ -29,6 +29,9 @@ export function SignInSurface({ backend, ended, onLater }: { backend: Backend; e
   const [username, setUsername] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
+  // Asking for a reset link. The answer is the same whether or not an account matches, so it says only that a link is on its way, if there is one to send.
+  const [resetting, setResetting] = useState(false);
+  const [asked, setAsked] = useState(false);
   const passwordField = useRef<ComponentRef<typeof TextInput>>(null);
 
   const attempt = async (label: string, work: () => Promise<void>) => {
@@ -45,27 +48,55 @@ export function SignInSurface({ backend, ended, onLater }: { backend: Backend; e
       ? backend.auth.signIn({ identifier: identifier.trim(), password })
       : backend.auth.register({ email: identifier.trim(), password, name: name.trim(), username: username.trim(), timezone: timezone() })));
   };
-  const switchMode = (next: Mode) => { setMode(next); setFailure(null); };
+  const switchMode = (next: Mode) => { setMode(next); setFailure(null); setResetting(false); setAsked(false); };
+  const sendLink = async () => {
+    if (!identifier.includes("@") || busy) return;
+    setBusy("reset");
+    setFailure(null);
+    try { await backend.auth.requestPasswordReset(identifier.trim()); setAsked(true); }
+    catch (error) { setFailure(describeFailureText(error)); }
+    setBusy(null);
+  };
+  const stopResetting = () => { setResetting(false); setAsked(false); setFailure(null); };
 
   const door = (
     <Plane level="raised" radius="xl" testID="signin-plane" style={{ padding: space.xl, gap: space.lg, width: "100%", maxWidth: 420 }}>
       <Segmented<Mode> label="Account" value={mode} options={[{ value: "sign-in", label: "Sign in" }, { value: "create", label: "Create account" }]} onChange={switchMode} />
       {ended ? <View testID="signin-ended"><Callout tone="caution" title="You've been signed out" message="This device's session ended, on another device or because it expired. Sign in to carry on. Anything you studied here stays on this device, and is saved when you're back." /></View> : null}
-      <Stack gap="md">
-        {mode === "create" ? <TextField testID="signin-name" label="Your name" value={name} onChangeText={setName} autoComplete="name" textContentType="name" returnKeyType="next" /> : null}
-        {mode === "create" ? <TextField testID="signin-username" label="Username" helper="Letters, numbers and underscores. Friends find you by this." value={username} onChangeText={setUsername} autoCapitalize="none" autoCorrect={false} autoComplete="username-new" returnKeyType="next" /> : null}
-        <TextField testID="signin-identifier" label={mode === "sign-in" ? "Email or username" : "Email"} value={identifier} onChangeText={setIdentifier} autoCapitalize="none" autoCorrect={false} keyboardType="email-address" autoComplete={mode === "sign-in" ? "username" : "email"} textContentType="username" returnKeyType="next" onSubmitEditing={() => passwordField.current?.focus()} />
-        <TextField ref={passwordField} testID="signin-password" label="Password" helper={mode === "create" ? "At least 6 characters." : undefined} value={password} onChangeText={setPassword} secureTextEntry autoCapitalize="none" autoCorrect={false} autoComplete={mode === "sign-in" ? "current-password" : "new-password"} textContentType={mode === "sign-in" ? "password" : "newPassword"} returnKeyType="go" onSubmitEditing={submit} />
-      </Stack>
-      {failure ? <View testID="signin-error" role="alert"><Text variant="small" tone="critical">{failure}</Text></View> : null}
-      <Button title={busy === "password" ? (mode === "sign-in" ? "Signing in" : "Creating your account") : mode === "sign-in" ? "Sign in" : "Create account"} variant="emphasis" fill disabled={!ready || busy !== null} testID="signin-submit" onPress={submit} />
-      <Stack gap="sm">
-        <Text variant="caption" tone="soft">Or continue with</Text>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xs }}>
-          {PROVIDERS.map((provider) => <Button key={provider.id} title={busy === provider.id ? "Waiting for the browser" : provider.label} size="small" disabled={busy !== null} testID={`signin-${provider.id}`} onPress={() => void attempt(provider.id, () => backend.auth.signInWithProvider(provider.id))} />)}
-        </View>
-      </Stack>
-      {mode === "sign-in" ? <Text variant="caption" tone="soft" testID="signin-no-reset">Forgotten your password? Sylf can't reset passwords yet, so keep it somewhere safe.</Text> : null}
+      {resetting ? (
+        <Stack gap="md" testID="signin-reset">
+          <Text variant="subheading">Choose a new password</Text>
+          {asked ? (
+            <Callout tone="positive" title="Check your email" message="If an account uses that address, a link is on its way. It opens in your browser, works once, and lasts 30 minutes." />
+          ) : (
+            <>
+              <Text variant="small" tone="soft">Enter the email you signed up with. Sylf sends a link to choose a new password.</Text>
+              <TextField testID="signin-reset-email" label="Email" value={identifier} onChangeText={setIdentifier} autoCapitalize="none" autoCorrect={false} keyboardType="email-address" autoComplete="email" textContentType="emailAddress" returnKeyType="go" onSubmitEditing={() => void sendLink()} />
+              {failure ? <View testID="signin-error" role="alert"><Text variant="small" tone="critical">{failure}</Text></View> : null}
+              <Button title={busy === "reset" ? "Sending" : "Send the link"} variant="emphasis" fill disabled={!identifier.includes("@") || busy !== null} testID="signin-reset-send" onPress={() => void sendLink()} />
+            </>
+          )}
+          <Button title="Back to sign in" variant="ghost" size="small" testID="signin-reset-back" style={{ alignSelf: "flex-start" }} onPress={stopResetting} />
+        </Stack>
+      ) : (
+        <>
+          <Stack gap="md">
+            {mode === "create" ? <TextField testID="signin-name" label="Your name" value={name} onChangeText={setName} autoComplete="name" textContentType="name" returnKeyType="next" /> : null}
+            {mode === "create" ? <TextField testID="signin-username" label="Username" helper="Letters, numbers and underscores. Friends find you by this." value={username} onChangeText={setUsername} autoCapitalize="none" autoCorrect={false} autoComplete="username-new" returnKeyType="next" /> : null}
+            <TextField testID="signin-identifier" label={mode === "sign-in" ? "Email or username" : "Email"} value={identifier} onChangeText={setIdentifier} autoCapitalize="none" autoCorrect={false} keyboardType="email-address" autoComplete={mode === "sign-in" ? "username" : "email"} textContentType="username" returnKeyType="next" onSubmitEditing={() => passwordField.current?.focus()} />
+            <TextField ref={passwordField} testID="signin-password" label="Password" helper={mode === "create" ? "At least 6 characters." : undefined} value={password} onChangeText={setPassword} secureTextEntry autoCapitalize="none" autoCorrect={false} autoComplete={mode === "sign-in" ? "current-password" : "new-password"} textContentType={mode === "sign-in" ? "password" : "newPassword"} returnKeyType="go" onSubmitEditing={submit} />
+          </Stack>
+          {failure ? <View testID="signin-error" role="alert"><Text variant="small" tone="critical">{failure}</Text></View> : null}
+          <Button title={busy === "password" ? (mode === "sign-in" ? "Signing in" : "Creating your account") : mode === "sign-in" ? "Sign in" : "Create account"} variant="emphasis" fill disabled={!ready || busy !== null} testID="signin-submit" onPress={submit} />
+          {mode === "sign-in" ? <Button title="Forgot your password?" variant="ghost" size="small" testID="signin-forgot" style={{ alignSelf: "flex-start" }} onPress={() => { setResetting(true); setFailure(null); }} /> : null}
+          <Stack gap="sm">
+            <Text variant="caption" tone="soft">Or continue with</Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xs }}>
+              {PROVIDERS.map((provider) => <Button key={provider.id} title={busy === provider.id ? "Waiting for the browser" : provider.label} size="small" disabled={busy !== null} testID={`signin-${provider.id}`} onPress={() => void attempt(provider.id, () => backend.auth.signInWithProvider(provider.id))} />)}
+            </View>
+          </Stack>
+        </>
+      )}
     </Plane>
   );
 

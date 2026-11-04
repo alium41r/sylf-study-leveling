@@ -6,10 +6,16 @@ import type { AuthGateway } from "./gateway";
 import { createResourceStore } from "./resources";
 
 const user = (id: number): NativeUser => ({ id, email: `${id}@local.test`, username: `u${id}`, name: null, scholarId: null, verificationStatus: "VERIFIED", hunterRank: "E", level: 1, hasCompletedOnboarding: true, avatarUrl: null });
-const gateway = (overrides: Partial<AuthGateway> = {}): AuthGateway => ({ transport: async () => new Response("{}"), restore: async () => null, signIn: async () => user(1), register: async () => user(1), signInWithProvider: async () => user(1), signOut: async () => undefined, ping: async () => true, ...overrides });
+const gateway = (overrides: Partial<AuthGateway> = {}): AuthGateway => ({ transport: async () => new Response("{}"), restore: async () => null, signIn: async () => user(1), register: async () => user(1), signInWithProvider: async () => user(1), requestPasswordReset: async () => undefined, signOut: async () => undefined, ping: async () => true, ...overrides });
 const settled = () => new Promise((done) => setTimeout(done, 0));
 
 describe("the auth model", () => {
+  it("asks the gateway for a reset link, and refuses with no backend", async () => {
+    const asked: string[] = [];
+    await createAuthModel(gateway({ requestPasswordReset: async (email) => { asked.push(email); } }), createResourceStore()).requestPasswordReset("a@local.test");
+    expect(asked).toEqual(["a@local.test"]);
+    await expect(createAuthModel(null, createResourceStore()).requestPasswordReset("a@local.test")).rejects.toMatchObject({ kind: "not-configured" });
+  });
   it("has nothing to do in a build with no backend", async () => {
     const auth = createAuthModel(null, createResourceStore());
     await auth.restore();

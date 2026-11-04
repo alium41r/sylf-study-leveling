@@ -72,6 +72,7 @@ function device(server: Server, shared = new Map<string, string>(), vault: { id:
     signIn: async ({ identifier }) => { vault.id = Number(identifier); return person(vault.id); },
     register: async () => person(0),
     signInWithProvider: async () => person(0),
+    requestPasswordReset: async () => undefined,
     signOut: async () => { vault.id = null; },
     ping: async () => !server.isDown(),
   };

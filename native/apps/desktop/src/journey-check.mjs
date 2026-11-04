@@ -119,8 +119,7 @@ async function runStage(window, { stub }, stage, out) {
     // 1. Authenticate.
     check("the sign-in surface is the first thing shown", await until(tid("signin-surface")));
     await shot("01-sign-in");
-    check("it says plainly that there is no password reset", (await textOf(tid("signin-no-reset")))?.includes("can't reset passwords"));
-    check("nothing implies a reset link", !/reset link|forgot password\?$/i.test(String(await screen())));
+    check("a forgotten password offers an emailed link", Boolean(await textOf(tid("signin-forgot"))));
     const loginsBefore = stub.seen.filter((/** @type {any} */ entry) => entry.path === "/api/auth/native/login").length;
     await signInUi("nobody@local.test", "wrong password");
     check("a wrong password is refused, in the server's words", await until(tid("signin-error")));

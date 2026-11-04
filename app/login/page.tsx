@@ -192,6 +192,9 @@ function LoginForm() {
                 )}
               </button>
             </div>
+            <p className={styles.footerText}>
+              <Link href="/forgot-password" className={styles.footerLink}>Forgot your password?</Link>
+            </p>
           </div>
 
           <button

@@ -24,6 +24,8 @@ export interface Backend {
   wake(): void;
   /** The app went behind something. Nothing runs from here until `wake`. */
   sleep(): void;
+  /** An account was deleted: what this device kept of its unsent timer journal goes with it. */
+  forgetOwner(ownerId: number): void;
   /** A deep link arrived. True when it belonged to a sign-in. */
   receiveLink(url: string): boolean;
 }
@@ -33,7 +35,8 @@ export function createBackend({ gateway, preferences, assetUrl }: { gateway: Aut
   const resources = createResourceStore({ connectivity });
   const auth = createAuthModel(gateway, resources);
   const client = createBackendClient({ transport: gateway?.transport ?? null, connectivity, assetUrl, onSignedOut: () => auth.sessionEnded() });
-  const timer = createTimerDelivery({ auth, client, storage: createJournalStorage(preferences), connectivity });
+  const journal = createJournalStorage(preferences);
+  const timer = createTimerDelivery({ auth, client, storage: journal, connectivity });
   const reads = createReads(client);
   const presence = createPresence(() => reads.heartbeat());
   let owner = auth.getSnapshot().userId;
@@ -47,6 +50,10 @@ export function createBackend({ gateway, preferences, assetUrl }: { gateway: Aut
     start: () => auth.restore(),
     wake() { resources.wake(); timer.wake(); presence.setForeground(true); },
     sleep() { presence.setForeground(false); },
+    forgetOwner(ownerId) {
+      const prefix = `sylf_timer_journal_v1:${ownerId}:`;
+      for (let index = journal.length - 1; index >= 0; index--) { const name = journal.key(index); if (name?.startsWith(prefix)) journal.removeItem(name); }
+    },
     receiveLink: (url) => gateway?.receiveLink?.(url) ?? false,
   };
 }

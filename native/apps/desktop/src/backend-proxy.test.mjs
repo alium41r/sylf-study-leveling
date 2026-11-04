@@ -233,6 +233,14 @@ describe("session lifecycle", () => {
     expect(vault.peek()).toBeNull();
   });
 
+  it("lets a password-reset request through with no credential, and no other cookie route", async () => {
+    const { fetch, calls } = server({ "/api/auth/forgot-password": () => Response.json({ message: "ok" }) });
+    const proxy = createBackendProxy({ origin: ORIGIN, fetch, vault: memoryVault(), clientName: "Mac" });
+    expect((await proxy.handle(post("/api/auth/forgot-password", { email: "a@local.test" }))).status).toBe(200);
+    expect(calls[0].headers.get("authorization")).toBeNull();
+    expect((await proxy.handle(post("/api/auth/reset-password", { token: "x", password: "y" }))).status).toBe(404);
+  });
+
   it("restores from the vault after a restart, with no network", async () => {
     const vault = memoryVault();
     await vault.write(JSON.stringify({ refreshToken: "sid.refresh-1", sessionId: "sid", userId: 7 }));

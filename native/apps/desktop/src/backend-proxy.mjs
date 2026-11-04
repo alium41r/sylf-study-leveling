@@ -15,7 +15,7 @@ const RESPONSE_HEADERS = ["accept-ranges", "content-disposition", "content-range
 /** Outside /api/, and public: `/audio/...` from the catalog and legacy `/uploads/...` (G-8). No credential goes with these. */
 const ASSET_PREFIXES = ["/audio/", "/uploads/", "/images/"];
 /** The web's cookie routes make no sense here. Only these leave the /api/auth/ namespace. */
-const AUTH_PASS_THROUGH = new Set(["/api/auth/check-username", "/api/auth/logout-all", "/api/auth/verify-email/send", "/api/auth/native/ping"]);
+const AUTH_PASS_THROUGH = new Set(["/api/auth/check-username", "/api/auth/logout-all", "/api/auth/verify-email/send", "/api/auth/forgot-password", "/api/auth/native/ping"]);
 const NATIVE_PREFIX = "/api/auth/native/";
 const OAUTH_WINDOW_MS = 5 * 60_000;
 

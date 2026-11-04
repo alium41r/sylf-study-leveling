@@ -282,6 +282,8 @@ export interface StudySessionModel {
   assignOwner(clientKeys: string[], ownerId: number): void;
   /** Leaves ownerless sessions on this device, and stops asking about them. */
   declineOwner(clientKeys: string[]): void;
+  /** The account behind these sessions was deleted, so what the device kept for it goes too: its running session and every ended one. Ownerless ones stay. */
+  forgetOwner(ownerId: number): void;
   /** The app left or returned to the foreground. Nothing beats behind it, and it catches up at once on return. */
   setForeground(active: boolean): void;
 }
@@ -427,7 +429,8 @@ export function createStudySessionModel(storage: StudySessionStorage | undefined
     },
     setMode(mode) {
       if (state.active || !isMode(mode) || mode === (state.mode ?? "countdown")) return false;
-      const { mode: _previous, ...rest } = state;
+      const rest: StudySessionState = { ...state };
+      delete rest.mode;
       change(mode === "countdown" ? rest : { ...rest, mode }, "mode");
       return true;
     },
@@ -541,6 +544,11 @@ export function createStudySessionModel(storage: StudySessionStorage | undefined
       const keys = new Set(clientKeys);
       const leave = <T extends { clientKey: string; ownerId: number | null }>(item: T): T => (keys.has(item.clientKey) && item.ownerId === null ? { ...item, declined: true } : item);
       change({ ...state, active: state.active ? leave(state.active) : null, ended: state.ended.map(leave) }, "declined");
+    },
+    forgetOwner(owner) {
+      const mine = (item: { ownerId: number | null }) => item.ownerId === owner;
+      if (!(state.active && mine(state.active)) && !state.ended.some(mine)) return;
+      change({ ...state, active: state.active && mine(state.active) ? null : state.active, ended: state.ended.filter((item) => !mine(item)) }, "forgotten");
     },
     setForeground(active) {
       if (foreground === active) return;

@@ -20,6 +20,8 @@ export interface AuthGateway {
   register(input: RegisterInput): Promise<NativeUser>;
   /** Sign in through the system browser. Resolves once the app has its session. */
   signInWithProvider(provider: OAuthProvider): Promise<NativeUser>;
+  /** Asks for a password-reset link. The answer is the same whether or not an account matches, and the link opens on the web. */
+  requestPasswordReset(email: string): Promise<void>;
   /** Forgets this device's credentials first, and then tells the server. Never fails: signing out works offline. */
   signOut(): Promise<void>;
   /** Asks whether the server can be reached. */
@@ -133,6 +135,10 @@ export function createBearerGateway({ origin, clientName, vault, crypto, openUrl
       post("/api/auth/native/token", { grant: "oauth_code", code, verifier: flow.verifier, clientName }).then(open).then(flow.resolve, flow.reject);
       return true;
     },
+    async requestPasswordReset(email) {
+      const response = await post("/api/auth/forgot-password", { email });
+      if (!response.ok) throw await refusal(response);
+    },
     async signOut() {
       const refreshToken = await tokens.end();
       if (!refreshToken) return;
@@ -168,6 +174,10 @@ export function createHostGateway(request: typeof fetch = (input, init) => globa
     signIn: async (input) => open(await post("/api/auth/native/login", input)),
     register: async (input) => open(await post("/api/auth/native/register", input)),
     signInWithProvider: async (provider) => open(await post("/api/auth/native/oauth/begin", { provider })),
+    async requestPasswordReset(email) {
+      const response = await post("/api/auth/forgot-password", { email });
+      if (!response.ok) throw await refusal(response);
+    },
     async signOut() { try { await post("/api/auth/native/logout"); } catch { /* The host forgets its copy either way. */ } },
     ping: () => call("/api/auth/native/ping").then((response) => response.ok, () => false),
   };

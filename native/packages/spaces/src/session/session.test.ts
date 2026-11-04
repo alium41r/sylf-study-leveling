@@ -569,3 +569,33 @@ describe("modes and breaks", () => {
     expect(second.session.readout()).toMatchObject({ status: "running", focusSeconds: 10 * 60 });
   });
 });
+
+describe("forgetting a deleted account's sessions", () => {
+  it("removes what belongs to that owner, and keeps ownerless and other people's", () => {
+    let who: number | null = 7;
+    const storage = memoryStorage();
+    const session = createStudySessionModel(storage, { ownerId: () => who });
+    session.start({ title: "Mine" }); vi.advanceTimersByTime(60 * SECOND); session.end();
+    who = null;
+    session.start({ title: "Nobody's" }); vi.advanceTimersByTime(60 * SECOND); session.end();
+    who = 8;
+    session.start({ title: "Theirs" }); vi.advanceTimersByTime(60 * SECOND); session.end();
+    session.forgetOwner(7);
+    expect(session.state().ended.map((item) => item.title).sort()).toEqual(["Nobody's", "Theirs"]);
+    expect(saved(storage).ended).toHaveLength(2);
+  });
+  it("ends a running session of that owner without keeping it", () => {
+    const session = createStudySessionModel(memoryStorage(), { ownerId: () => 7 });
+    session.start({ title: "Running" });
+    session.forgetOwner(7);
+    expect(session.state().active).toBeNull();
+    expect(session.state().ended).toHaveLength(0);
+  });
+  it("does nothing, and writes nothing, when the owner has none", () => {
+    const storage = memoryStorage();
+    const session = createStudySessionModel(storage, { ownerId: () => 7 });
+    const before = storage.writes.count;
+    session.forgetOwner(99);
+    expect(storage.writes.count).toBe(before);
+  });
+});

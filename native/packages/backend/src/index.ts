@@ -12,4 +12,5 @@ export * from "./session-bridge";
 export * from "./reads";
 export * from "./plan";
 export * from "./progress";
+export * from "./account";
 export * from "./focus";

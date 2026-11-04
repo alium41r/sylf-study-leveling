@@ -20,6 +20,24 @@ export async function askOnce() {
   if (current && !current.granted && current.canAskAgain) await notifications.requestPermissionsAsync().catch(() => undefined);
 }
 
+export type AlertPermission = "granted" | "denied" | "undetermined" | "unsupported";
+
+/** What this device allows, for the Account page to say. */
+export async function alertPermission(): Promise<AlertPermission> {
+  const notifications = await load().catch(() => null);
+  if (!notifications) return "unsupported";
+  const current = await notifications.getPermissionsAsync().catch(() => null);
+  return !current ? "unsupported" : current.granted ? "granted" : current.canAskAgain ? "undetermined" : "denied";
+}
+
+/** Asks the system, when it will still ask. A refusal changes nothing else: sessions still end truthfully. */
+export async function requestAlertPermission(): Promise<AlertPermission> {
+  const notifications = await load().catch(() => null);
+  if (!notifications) return "unsupported";
+  await notifications.requestPermissionsAsync().catch(() => undefined);
+  return alertPermission();
+}
+
 async function cancel() {
   if (!scheduled || !module) return;
   const id = scheduled; scheduled = null;

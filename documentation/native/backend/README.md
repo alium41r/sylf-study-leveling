@@ -65,7 +65,7 @@ A key names one object. Put the owner-independent identity of the read in it: th
 - **`userId` is known from the device, with no network,** so a session started offline has its owner.
 - **After a restart `user` is null.** Read identity from `useStats()`.
 - **`ended: true`** means the server ended this session. Say so, rather than quietly showing a sign-in screen.
-- **Password reset does not exist on any client** (G-4), and needs the owner. Registration closes in prelaunch.
+- **Password reset** is an emailed single-use link, requested from the web or from Native's sign-in, and completed on the web ([Account guide](../account/README.md#password-reset)). It needs `APP_PUBLIC_URL`. Registration closes in prelaunch.
 
 | Route | Takes | Gives |
 | --- | --- | --- |

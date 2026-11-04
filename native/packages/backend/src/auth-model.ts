@@ -27,6 +27,7 @@ export interface AuthModel {
   signIn(input: SignInInput): Promise<void>;
   register(input: RegisterInput): Promise<void>;
   signInWithProvider(provider: OAuthProvider): Promise<void>;
+  requestPasswordReset(email: string): Promise<void>;
   signOut(): Promise<void>;
   /** The server refused this session. */
   sessionEnded(): void;
@@ -59,6 +60,7 @@ export function createAuthModel(gateway: AuthGateway | null, resources: Resource
     async signIn(input) { if (!gateway) throw refused(); open(await gateway.signIn(input)); },
     async register(input) { if (!gateway) throw refused(); open(await gateway.register(input)); },
     async signInWithProvider(provider) { if (!gateway) throw refused(); open(await gateway.signInWithProvider(provider)); },
+    async requestPasswordReset(email) { if (!gateway) throw refused(); await gateway.requestPasswordReset(email); },
     async signOut() {
       if (!gateway) return;
       resources.clear();

@@ -7,6 +7,7 @@ import { BackendError } from "./errors";
 import { createPlanReads } from "./plan";
 import { createFocusReads } from "./focus";
 import { createProgressReads } from "./progress";
+import { createAccountReads } from "./account";
 import { achievementsSchema, calendarRangeSchema, chatMessagesSchema, chatsSchema, cosmeticsSchema, earnedThisWeekSchema, focusPartySchema, friendRequestsSchema, friendsSchema, goalsSchema, plannerCapabilitiesSchema, questDaySchema, recentSessionsSchema, soundsSchema, studyScheduleSchema, studySummarySchema, subjectsSchema, userStatsSchema, type Quest } from "./contracts";
 
 export interface SylvieTurn {
@@ -27,6 +28,7 @@ export function createReads(client: BackendClient) {
     plan: createPlanReads(client),
     focus: createFocusReads(client),
     progress: createProgressReads(client),
+    account: createAccountReads(client),
     /** The catalog's name and rarity for something a person owns. Unknown keys read as themselves. */
     cosmetic(category: keyof typeof COSMETICS_CATALOG | string, key: string) {
       const item = (COSMETICS_CATALOG as Record<string, { id: string; name: string; rarity: string }[]>)[category]?.find((entry) => entry.id === key);

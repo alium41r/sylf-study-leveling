@@ -30,7 +30,7 @@ All **Proposed**. Decision 2 settles master plan S2 for now, and it stays the ow
 | 14 | **Real data binds only for someone signed in. Sample binds only in a development build with no backend at all.** Signed out with a backend is the empty adapter. | So invented content can never sit beside a real account. |
 | 15 | **Notes, PDFs, Whiteboard and Resources say what is true,** through `limited` on their result, in place of an empty state that implies something is missing. | Phase 14 owns them, and the server has no list of them by design. |
 | 16 | **AI Planner V2 is not imitated.** The Planner tool lists what was applied, as quests, and says where plans are built. The end-to-end flow was not verified, so this is the honest state the brief asks for. | `ApplyService` and the four-stage lifecycle stay on the web, untouched. |
-| 17 | **The account control lives in Home,** at the foot of the rail, or the end of the bar in a compact window. Workspace and World have none. | There is no settings surface. Home is where someone goes to leave. A control beside the dock would fight it in a compact window. |
+| 17 | **The account control lives in Home** (still true after Part 2, when the sheet became a page), at the foot of the rail, or the end of the bar in a compact window. Workspace and World have none. | There is no settings surface. Home is where someone goes to leave. A control beside the dock would fight it in a compact window. |
 | 18 | **Sylvie's text is drawn plain,** with Markdown marks removed. Her proposals are not confirmed here. | A real renderer is its own piece of work. A change she proposes is confirmed on the web. |
 | 19 | **Desks are gone from a signed-in Focus.** | They changed nothing, and a real person would reasonably expect them to. |
 
@@ -64,3 +64,5 @@ Decision 5 said a session that ended before `createdAt` is not offered. **As bui
 - **A session running on another device** is shown as a note in Focus, and is not adopted into the dock (`SessionProtocolV2.restore` remains deferred). If the subject matches, the server folds this start into that session. If it differs, the server refuses, and the note beside the session says why.
 - **Reconciliation happens on wake and on the journal's 30-second gate,** so a pause on another device does not reach a device that is sitting idle in front of someone. That follows from not polling.
 - **Offline with no prior reads,** a page has nothing to show, because cached reads stay in memory (ADR 0011 decision 9). It says so and offers to try again.
+
+> **Update, Expansion Part 2.** The account is now a page (`shell/account/AccountPage.tsx`) with seven sections ([Account guide](../account/README.md)). Password reset exists: a neutral request, a single-use 30 minute link, completed on the web. The sign-in surface no longer says that Sylf cannot reset passwords.

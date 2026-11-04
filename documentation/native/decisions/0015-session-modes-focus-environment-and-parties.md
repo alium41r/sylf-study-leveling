@@ -1,6 +1,6 @@
 # ADR 0015 — One session across modes, the Focus environment and parties
 
-**Status: Accepted by the owner for decisions 1, 6 and 7, 1 November 2026, which approved the immersive Focus environment. The rest stay Proposed.** It extends [ADR 0008](0008-study-session-and-timer-dock.md) and replaces its decision 20 when built. It builds on [ADR 0012](0012-connected-app.md) and [ADR 0013](0013-expansion-stage.md). Nothing here is built yet. Part 1 may refine it with evidence.
+**Status: Accepted by the owner for decisions 1, 6 and 7, 1 November 2026, which approved the immersive Focus environment. Decisions 2 to 10, 13 and 14 were built in Expansion Part 2 (4 November 2026). Decisions 11, 12 and 15 wait for Part 3 and Part 4.** It extends [ADR 0008](0008-study-session-and-timer-dock.md) and replaces its decision 20 when built. It builds on [ADR 0012](0012-connected-app.md) and [ADR 0013](0013-expansion-stage.md). Part 2 built the session half, noted in [the Focus guide](../focus/README.md). One refinement: **decision 5 changed.** The stored record stays `v1` with optional `mode`, `modeSettings` and `phase` fields, so a session running across the upgrade continues and an older reader still opens it. A `.v2` key would have orphaned running sessions for no gain.
 
 ## The problem
 

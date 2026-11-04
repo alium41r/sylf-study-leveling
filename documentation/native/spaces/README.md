@@ -117,6 +117,8 @@ When on, it adds a palette button at the top right that opens the Showcase, and 
 
 **Confirmed (owner, Phase 10):** one authoritative timer, one dock, in Home, Workspace and the World lobby, and no silent game time.
 
+> **Update, Expansion Part 2.** The session now has a **mode** (the seven study modes from `lib/timer-modes.ts`), phases that advance at their own deadlines, and real breaks counted in `breakMs`. The **Focus environment** is a shell layer above the Spaces, entered by one hook (`useEnterFocus`) from Focus, the dock, Workspace's Timer and Today's Begin. It hides the dock and the Spaces icon, and leaving is not ending. See the [Focus guide](../focus/README.md) and [ADR 0015](../decisions/0015-session-modes-focus-environment-and-parties.md). One clock still holds: no surface counts time of its own.
+
 ### The session
 
 `createStudySessionModel(preferences, options)` is created in `App.tsx`, outside React. It is the only owner of the study session, and it has no copy anywhere. The dock, Home's Focus and Workspace's Timer call its actions and read it.

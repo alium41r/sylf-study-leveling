@@ -6,6 +6,8 @@ Labels follow the master plan: **Confirmed** came from the owner's briefs, **Pro
 
 **Planned change, 1 November 2026.** [ADR 0014](0014-home-hub-and-workspace-scope.md) makes Home the planning hub and proposes a fifth destination, Plan, which will change decision 2 when built. This record still describes what is built.
 
+> **Update, Expansion Part 2 (4 November 2026).** Home now has five destinations: Today, Plan, Focus, Circle and Progress. Plan and Progress carry sub-views (`SubNav`, kept in the Home snapshot), and the account is a page reached from the rail's foot. See the [Home guide](../home/README.md), the [Plan guide](../plan/README.md) and the [Progress guide](../progress/README.md). The template's rules, the five states and the memory budget still apply to every new view.
+
 ## Decisions
 
 | # | Decision | Status | Why |

@@ -1,6 +1,6 @@
 # Expansion Part 2 — resume handoff (paused mid-part)
 
-**Written 4 November 2026. Part 2 is paused, not finished.** The session ran out of context. A fresh session continues Part 2 from §4. Start from this page, then the [Part 2 brief](../expansion/part-2-study-progression-personalization.md), the [blueprint](../expansion/blueprint.md) and the [Part 1 handoff](expansion-part-1.md). Source wins over prose.
+**Superseded the same day: Part 2 was finished, and [the Part 3 handoff](expansion-part-2.md) replaces this page. It is kept for its record of step 0 and the owner's standing instructions.** Written 4 November 2026 while Part 2 was paused, not finished. The session ran out of context. A fresh session continues Part 2 from §4. Start from this page, then the [Part 2 brief](../expansion/part-2-study-progression-personalization.md), the [blueprint](../expansion/blueprint.md) and the [Part 1 handoff](expansion-part-1.md). Source wins over prose.
 
 ## 1. Owner's standing instructions (1–4 November)
 

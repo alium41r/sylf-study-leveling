@@ -6,6 +6,8 @@ The owner's brief asked for reversible decisions to be made and documented overn
 
 **Planned change, 1 November 2026.** [ADR 0014](0014-home-hub-and-workspace-scope.md) moves Planner and Calendar to Home. The two tools leave Workspace once Home has parity, leaving eight. This record still describes what is built.
 
+> **Update, Expansion Part 2 (4 November 2026).** Planner and Calendar left Workspace after Home's Plan passed the parity list ([ADR 0014](0014-home-hub-and-workspace-scope.md)). Workspace has **eight tools**, and Alt+1 to 9 and Alt+0 follow that order. `parseWindow` drops unknown tools, so a saved layout that held them still opens, with its other windows intact. The Timer tool gained **Enter focus**.
+
 ## Decisions
 
 | # | Decision | Status | Why |

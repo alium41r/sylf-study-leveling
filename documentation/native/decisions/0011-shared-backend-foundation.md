@@ -39,6 +39,8 @@ All **Proposed**.
 | Credentials | Refresh token | `SecureSessionAdapter`, or Electron's main process. The access token is in memory only | `token-session.mjs` | Yes |
 | Acknowledged work | The timer journal, the active session, the last 12 ended | Preferences, written at once | `TimerSync`, `createStudySessionModel` | **No.** It waits for its owner |
 | Local preferences | Theme, active Space, Workspace layout, World's sky | Preferences | Their stores | No |
+| Local preferences (Part 2) | Mode settings, the one-time appearance seed marker (per account), the Home snapshot with its sub-views | Preferences | Their stores | No. A deleted account's sessions and unsent journal are removed by `forgetOwner` |
+| Memory only (Part 2) | Account, Progress and Plan reads, the Codex catalog once opened, the alert-permission prompt flag | Memory | `resources`, their modules | Yes |
 | Unsaved drafts | Notes and ink (Phase 14), anything a screen is editing | Their local-first owner | Notes' repository | No |
 
 ## Rejected

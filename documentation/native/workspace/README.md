@@ -4,7 +4,7 @@
 
 Labels: **Confirmed** came from the owner's brief or master plan. **Proposed** is a decision from these phases the owner can still change.
 
-**What is planned (1 November 2026, not built).** **Confirmed, and approved by the owner:** Workspace is a dedicated multitasking study environment. Calendar, AI Planner, quests and objectives belong in Home. Planner and Calendar leave as tools once Home's parity is verified, in one change, and nothing is lost. **Today gains a tick first,** because today only Workspace's Planner has one. The list and the files are in [Part 2 slice C](../expansion/part-2-study-progression-personalization.md#removing-workspaces-planner-and-calendar), and the decisions in [ADR 0014](../decisions/0014-home-hub-and-workspace-scope.md). **Everything below describes what is built today, including ten tools.**
+**Updated 4 November 2026 (Expansion Part 2).** Workspace has **eight tools**: Notes, PDFs, Whiteboard, Sylvie, Calculator, Timer, Audio and Resources. **Planner and Calendar moved to Home's Plan** once its parity list passed ([ADR 0014](../decisions/0014-home-hub-and-workspace-scope.md)), and Alt+1 to 9 and Alt+0 follow the new order. A saved layout that held them still opens, because unknown tools are dropped and the rest survives. The Timer tool offers **Enter focus**, and Audio is the one native engine, shared with the Focus environment. Text below that names Planner or Calendar describes Workspace as it was in Phase 13.
 
 ## 1. What exists
 

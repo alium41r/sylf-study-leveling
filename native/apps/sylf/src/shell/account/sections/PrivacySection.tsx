@@ -2,12 +2,14 @@
 // the page never shows a setting the server did not keep.
 import { View } from "react-native";
 import { Callout, Select, Stack, Text, useNotice } from "@sylf/design-system";
-import { PRIVACY_LEVELS, type PrivacyLevel, type PrivacySetting } from "@sylf/backend";
+import type { PrivacyLevel, PrivacySetting } from "@sylf/backend";
 import { useLiveBackend } from "../../backend";
 import { describeFailureText } from "../failure";
 import { usePrivacy } from "../useAccount";
 import { AccountSection } from "./Section";
 
+// The three levels the database has. `@sylf/backend` stays behind import(), so the list is here and its type is the package's.
+const PRIVACY_LEVELS: readonly PrivacyLevel[] = ["PUBLIC", "FRIENDS", "PRIVATE"];
 const LEVEL_NAMES: Record<PrivacyLevel, string> = { PUBLIC: "Everyone", FRIENDS: "Friends", PRIVATE: "Only me" };
 const SETTINGS: { id: PrivacySetting; label: string; says: (level: string) => string }[] = [
   { id: "profileVisibility", label: "Your profile", says: (l) => `${l} can open your profile.` },

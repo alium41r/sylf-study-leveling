@@ -4,7 +4,7 @@
 
 Labels: **Confirmed** came from the owner's brief or master plan. **Proposed** is a Phase 6 decision the owner can still change.
 
-**What is planned (1 November 2026, not built).** **Confirmed:** calendar, AI Planner, quests and objectives belong in Home, which becomes the hub for planning, daily objectives, schedules and educational progress. **Approved by the owner:** one new destination, Plan, holding Calendar, Quests and goals, and Plans. **Proposed:** Progress gains Stats, Standing, Honours, Skills and Codex as sub-views, Circle gains People, Messages and Parties, and the account control opens a page. See [ADR 0014](../decisions/0014-home-hub-and-workspace-scope.md) and the [blueprint](../expansion/blueprint.md). **Everything below describes what is built today.**
+**Updated 4 November 2026 (Expansion Part 2).** Home now has **five destinations: Today, Plan, Focus, Circle and Progress**, and the account is a page reached from the rail's foot. Plan holds Calendar, Quests and goals, and Plans ([Plan guide](../plan/README.md)). Progress holds Overview, Stats, Standing, Honours, Skills and the Codex ([Progress guide](../progress/README.md)). Focus is the threshold to the Focus environment ([Focus guide](../focus/README.md)). The account has seven sections ([Account guide](../account/README.md)). Circle still has one view: People, Messages and Parties arrive in Part 3. Sections 2 and 3 below were written for four destinations and a template on sample data, and are corrected where this paragraph says so. **Planner and Calendar left Workspace** ([ADR 0014](../decisions/0014-home-hub-and-workspace-scope.md)).
 
 ## 1. What exists
 
@@ -14,15 +14,15 @@ Home is a frontend template. It loads no real person's data and contacts no serv
 | --- | --- | --- |
 | Navigation state | `packages/spaces/src/home.ts` | Destinations, labels, the snapshot and its parsing, `createHomeNavigation`, rail keyboard targets. No React |
 | Space | `spaces/home/HomeSpace.tsx` | The rail and the destination layers |
-| Rail | `spaces/home/HomeRail.tsx` | The four destinations, as a column or a bottom bar |
+| Rail | `spaces/home/HomeRail.tsx` | The five destinations, as a column or a bottom bar, with the account at its foot |
 | Page | `spaces/home/HomePage.tsx` | The still strip, the scrolling page, restoration, columns, `Section`, `PageTitle`, the empty and loading pages |
-| Destinations | `spaces/home/destinations/` | Today, Focus, Circle, Progress |
+| Destinations | `spaces/home/destinations/` | Today, Plan, Focus, Circle, Progress. Plan and Progress mount their views from `spaces/home/plan/` and `spaces/home/progress/`, each on first visit |
 | Data | `spaces/home/data/` | Typed contracts, the sample and empty adapters, the one binding point |
 | Words and numbers | `spaces/home/format.ts` | Greeting, durations, and the day's summary |
 
 ## 2. The rail
 
-**Confirmed:** a compact left rail with Today, Focus, Circle and Progress.
+**Confirmed:** a compact left rail with Today, Plan, Focus, Circle and Progress.
 
 **Proposed details.**
 
@@ -47,9 +47,10 @@ Each page has a still strip at the top, level with the Spaces icon and the timer
 | Destination | Layout | Real actions | Disabled until later |
 | --- | --- | --- | --- |
 | **Today** | A greeting, one sentence about the day, then the day as a single line: what has gone, the one next thing with the Marker on it, and what follows. Objectives and quick actions beside it | Prepare in Focus, Start studying, Open Workspace, Open World. These navigate for real | Nothing |
-| **Focus** | An instrument: subject, length, and Begin, then the running session. What is on this device, study desks and recent sessions beside it | Everything about a session: lengths, Begin, Pause, Resume, End. It is the same session as the dock and Workspace's Timer. A desk is still a preview, and says so | Nothing |
+| **Plan** | Calendar (Month, Week, Agenda beside a day page, with one add field), Quests and goals, Plans | Create, move and complete quests and events, rest days, goals and subjects | Drag to move or resize in Week, AI plan building (Part 3) |
+| **Focus** (replaced in Part 2 by the threshold: what, rhythm, where, **Enter**) | An instrument: subject, length, and Begin, then the running session. What is on this device, study desks and recent sessions beside it | Everything about a session: lengths, Begin, Pause, Resume, End. It is the same session as the dock and Workspace's Timer. A desk is still a preview, and says so | Nothing |
 | **Circle** | The people you study with around one ring, with the number studying in the middle. People and parties beside it | None | Invite a friend |
-| **Progress** | Level on one line, three numbers, one week chart. Subjects and achievements beside it | None | Nothing |
+| **Progress** (six views since Part 2) | Overview, Stats, Standing, Honours, Skills, Codex. Level on one quiet line, no HP | Claim all, raise an attribute | Skill nodes |
 
 Gamification stays quiet by design, as master plan §2.1 asks: one line for the level, no celebration, and no reward styling.
 

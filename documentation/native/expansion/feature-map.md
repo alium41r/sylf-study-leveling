@@ -4,6 +4,24 @@
 
 **How it was verified.** A static inventory of all 155 routes ([`route-inventory.json`](../reports/expansion-part-1/evidence/route-inventory.json)). About 175 requests as a bearer client, against a production build on a disposable local database, including a second and third student ([contract probes](../reports/expansion-part-1/evidence/)). An import walk of 32 shared modules ([`portability.json`](../reports/expansion-part-1/evidence/portability.json)). Reading web workflows and Native's screens. **Nothing ran on a device, on Hermes, against a hosted service or a real AI provider.** Rows marked ✓ were proved by a request.
 
+## Status after Expansion Part 2 (4 November 2026)
+
+**Built, and unverified on screen, Hermes and the tablet** (testing is deferred to the end of Part 4). Status words in the sections below are as of Part 1 unless this table says otherwise.
+
+| Area | Now | Where |
+| --- | --- | --- |
+| Study modes (seven), breaks, phases | Implemented | `lib/timer-modes.ts`, [Focus guide](../focus/README.md) |
+| Focus environment, backgrounds, audio engine, phase alert | Implemented. Foreground chime, upload of backgrounds and adopting another device's session are not | [Focus guide](../focus/README.md) |
+| Calendar, quests, goals, subjects, schedule, rest days | Implemented in Home's Plan. Week drag and reminders are not | [Plan guide](../plan/README.md) |
+| AI plans | Read-only list and readiness. Building, watching and confirming are **Part 3** | Plan, Plans view |
+| Stats, Standing, Honours with Claim all, attributes, Codex | Implemented | [Progress guide](../progress/README.md) |
+| Skill nodes, subject constellations, `compile`, `forge-apex` | **Later**, with the reason in the Progress guide | |
+| Onboarding, presence, timezone offer | Implemented | Home guide, `packages/backend/src/presence.ts` |
+| Identity, security, devices, privacy, notifications, delete and reset, profile | Implemented. Aura choice, banner and avatar upload, provider linking are not | [Account guide](../account/README.md) |
+| Password reset | Implemented (web page, routes, Native link). Needs `APP_PUBLIC_URL` | [Account guide](../account/README.md#password-reset) |
+| HP | **Absent on Native, by decision** | [ADR 0017](../decisions/0017-hp-stays-off-native.md) |
+| People, Messages, Parties, Sylvie, AI Planner, Realtime, streaming | **Part 3** | |
+
 ## Status words
 
 | Word | Meaning |

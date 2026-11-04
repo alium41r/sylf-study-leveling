@@ -1,0 +1,46 @@
+# Expansion Parts 3 and 4 — overnight progress checkpoint
+
+**Started 4 November 2026.** This is the live resume file for the autonomous run the owner requested ("Overnight Expansion Parts 3 & 4"). A fresh session reads this page first, then continues at **Next action**. Update it at every commit.
+
+## Standing rules (from the owner)
+
+- Work only in `/Users/aliumair/Desktop/sylf-expansion-part-3` on branch `expansion-part-3`. Do not touch `~/Desktop/sylf` (it holds another agent's uncommitted Planner files).
+- Order: Part 3 slices A (AI Planner V2) → B (Sylvie) → C (Social + Realtime) → D (Parties), then Part 4 slices A–F. **Stop after Part 4.** No Phase 14.
+- **Testing is deferred until all Expansion features are built.** Write tests as you go but do not run them; keep `npm run typecheck` and `node tooling/checks/check-boundaries.mjs` (in `native/`) clean. After the features are done, comprehensive verification is authorized with a **disposable local backend only** (Docker is not running now; start Docker Desktop or report it as a blocker).
+- Commit and push safe checkpoints to `expansion-part-3` without asking. Never force-push, never deploy, never touch hosted data, never merge branches. Scan for secrets before each push. Stage only your own paths and check `git diff --cached --name-only` before every commit.
+- HP stays off Native. Tablet: do not touch without the owner's authorization (it is authorized only for the final verification if the owner says so; otherwise list as unverified).
+- Make reasonable decisions; record decisions needing owner approval in the "Owner decisions" list below.
+- Reports: `documentation/native/reports/expansion-part-3/report.md`, `.../expansion-part-4/report.md`; handoffs `handoffs/expansion-part-3.md` and `handoffs/expansion.md`.
+
+## Usage / resume protocol
+
+- Check `mcp__ccd_session_mgmt__get_usage` regularly. At **5% remaining in the 5-hour window**: finish the current small unit, typecheck, commit and push, update this file, then create a one-shot scheduled task (`mcp__scheduled-tasks__create_scheduled_task`, `fireAt` shortly after the window's `resetsAt`) whose prompt says "Read documentation/native/handoffs/expansion-overnight-progress.md in /Users/aliumair/Desktop/sylf-expansion-part-3 and continue the run". Then stop.
+- If the weekly limit is near exhaustion, schedule for its reset instead.
+- The scheduled task only fires while the Claude desktop app is open. If it did not fire, the owner continues manually by opening a session in the worktree and pasting the same sentence.
+
+## Status
+
+| Item | State |
+| --- | --- |
+| Part 3 A AI Planner V2 | not started |
+| Part 3 B Sylvie | not started |
+| Part 3 C Social + Realtime | not started |
+| Part 3 D Parties | not started |
+| Part 3 report + handoff | not started |
+| Part 4 A–F | not started |
+| Part 4 report + `handoffs/expansion.md` | not started |
+| Final verification run | not started |
+
+## Next action
+
+Slice A: add `packages/backend/src/planner.ts` (named reads with `x-sylf-planner-contract: 2`), export planner types via `@sylf/shared`, then the planner flow inside `spaces/home/plan/PlansView.tsx`.
+
+## Owner decisions / blockers (append)
+
+- E-6 (hosted Planner flags, real-provider spend): default **off**; Native says so plainly. No real provider calls.
+- E-13 (party time counts as study?): default is the stage plan's "Yes, through `StudySession`"; needs the owner before slice D settles anything. Build the client without computing rewards.
+- Docker is not running on the Mac: Postgres suites cannot run until it is started.
+
+## Log
+
+- 2026-11-04: checkpoint file created.

@@ -51,3 +51,4 @@ Slice B remainder (planner handoff via `lib/ai/sylvie/planner-bridge.ts`, quick-
 - 2026-11-04: Today briefing + `reads.social` committed. typecheck/ESLint clean.
 - 2026-11-04: Circle People/Messages UI committed. typecheck/ESLint/boundaries clean.
 - 2026-11-04: Parties lifecycle UI committed.
+- 2026-11-04: group chats, notifications sheet, docs (`plan/README.md`, new `circle/README.md`) committed. Slice B gaps still open: planner handoff (the web handoff targets the older Copilot, `lib/ai/sylvie/planner-bridge.ts`; Native should open Plans with `request` prefilled in NewPlanSheet and needs cross-space navigation), quick-ask overlay, images, KaTeX, insights/memories, companion. Slice C gaps: Realtime client + presence, blocked list, backend repairs A-28/S-15/publication migration. Slice D gap: party session. Then Part 3 report + `handoffs/expansion-part-3.md`, then Part 4.

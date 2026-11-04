@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
     if (!isGroup && allParticipants.length === 2) {
       const otherId = allParticipants.find((id) => id !== userId)!;
 
-      if (await areUsersBlocked(userId, otherId)) {
+      if (await areUsersBlocked(userId, otherId, { failClosed: true })) {
         return NextResponse.json({ error: "Cannot start conversation with this user" }, { status: 403 });
       }
 

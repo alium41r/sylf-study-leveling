@@ -120,7 +120,8 @@ export async function POST(
       otherParticipants.length > 0 &&
       (await areAnyUsersBlocked(
         userId,
-        otherParticipants.map((p) => p.userId)
+        otherParticipants.map((p) => p.userId),
+        { failClosed: true }
       ))
     ) {
       return NextResponse.json(

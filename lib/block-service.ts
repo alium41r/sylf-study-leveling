@@ -20,7 +20,12 @@ export async function isUserBlocked(userId: number, targetUserId: number): Promi
 /**
  * Checks if a block exists in either direction between two users.
  */
-export async function areUsersBlocked(userA: number, userB: number): Promise<boolean> {
+export interface BlockCheckOptions {
+  /** When the query fails: answer "blocked" instead of "not blocked". Messaging uses it, because a failed check must never let a message through (S-15). */
+  failClosed?: boolean;
+}
+
+export async function areUsersBlocked(userA: number, userB: number, options: BlockCheckOptions = {}): Promise<boolean> {
   try {
     const rows = await prisma.$queryRaw<Array<{ id: number }>>`
       SELECT id FROM "BlockedUser"
@@ -31,7 +36,7 @@ export async function areUsersBlocked(userA: number, userB: number): Promise<boo
     return Boolean(rows && rows.length > 0);
   } catch (err) {
     console.error("areUsersBlocked query error:", err);
-    return false;
+    return options.failClosed === true;
   }
 }
 
@@ -41,10 +46,11 @@ export async function areUsersBlocked(userA: number, userB: number): Promise<boo
  */
 export async function areAnyUsersBlocked(
   userId: number,
-  otherUserIds: number[]
+  otherUserIds: number[],
+  options: BlockCheckOptions = {}
 ): Promise<boolean> {
   if (otherUserIds.length === 0) return false;
-  if (otherUserIds.length === 1) return areUsersBlocked(userId, otherUserIds[0]);
+  if (otherUserIds.length === 1) return areUsersBlocked(userId, otherUserIds[0], options);
   try {
     const rows = await prisma.$queryRaw<Array<{ id: number }>>`
       SELECT id FROM "BlockedUser"
@@ -55,7 +61,7 @@ export async function areAnyUsersBlocked(
     return Boolean(rows && rows.length > 0);
   } catch (err) {
     console.error("areAnyUsersBlocked query error:", err);
-    return false;
+    return options.failClosed === true;
   }
 }
 

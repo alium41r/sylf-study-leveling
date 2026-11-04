@@ -1,5 +1,5 @@
 // A conversation with Sylvie. With an account she answers for real, as she types: `sendToSylvie` reads the same route the web uses, so quotas, tools,
-// confirmations and every model choice stay on the server, and a proposal she makes is confirmed on the web. Without one it is a sample, the field
+// confirmations and every model choice stay on the server, and a proposal she makes is previewed here and applied only when the person confirms it. Without one it is a sample, the field
 // is disabled, and it says why. The Assistant layout puts this window beside the main tool.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { type ComponentRef } from "react";
@@ -11,12 +11,10 @@ import { toLiveResult } from "../../../shell/live-result";
 import type { Backend } from "@sylf/backend";
 import type { WorkspaceDataAdapter } from "../data/contracts";
 import { useToolResult } from "../data";
+import { RichText } from "../../../shell/rich-text/RichText";
 import { ToolEmpty, ToolLoading, ToolPage, type ToolProps } from "./shared";
 
 const load = (adapter: WorkspaceDataAdapter) => adapter.sylvie();
-
-/** Sylvie writes Markdown, and this window draws plain text for now, so the marks go rather than showing as stray asterisks. */
-const plain = (text: string) => text.replace(/\*\*(.+?)\*\*/g, "$1").replace(/^#{1,6}\s+/gm, "").replace(/^\s*[-*]\s+/gm, "• ").replace(/`([^`]+)`/g, "$1");
 
 function PersonBubble({ text }: { text: string }) {
   const { color, shape, space } = useTheme();
@@ -24,7 +22,7 @@ function PersonBubble({ text }: { text: string }) {
 }
 
 function LiveSylvie({ backend, window, patch, onProvenance }: ToolProps & { backend: Backend }) {
-  const { space } = useTheme();
+  const { color, space } = useTheme();
   const threadsResource = useMemo(() => backend.resources.resource({ key: "sylvie-threads", tags: ["sylvie"], ttlMs: 60_000, load: (signal) => backend.reads.chats(signal) }), [backend]);
   const threads = toLiveResult(useOptionalResource(threadsResource), threadsResource);
   const chosen = typeof window.state.thread === "number" ? window.state.thread : null;
@@ -34,6 +32,10 @@ function LiveSylvie({ backend, window, patch, onProvenance }: ToolProps & { back
   const [text, setText] = useState("");
   const [turn, setTurn] = useState<{ asked: string; reply: string } | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
+  const [proposal, setProposal] = useState<{ chatId: number; token: string; summary: string } | null>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [dismissed, setDismissed] = useState<string | null>(null);
   const flight = useRef<AbortController | null>(null);
   const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
   useEffect(() => { onProvenance(false); }, [onProvenance]);
@@ -44,20 +46,35 @@ function LiveSylvie({ backend, window, patch, onProvenance }: ToolProps & { back
     if (!asked || turn) return;
     const controller = new AbortController();
     flight.current = controller;
-    setText(""); setFailure(null); setTurn({ asked, reply: "" });
+    setText(""); setFailure(null); setStatus(null); setProposal(null); setTurn({ asked, reply: "" });
     try {
-      const { chatId } = await backend.reads.sendToSylvie(asked, threadId, {
+      const { chatId, pendingAction } = await backend.reads.sendToSylvie(asked, threadId, {
+        onStatus: setStatus,
         onDelta: (reply) => setTurn({ asked, reply }),
         onReset: () => setTurn({ asked, reply: "" }),
         onSession: (id) => { if (id !== threadId) patch({ thread: id }); },
       }, controller.signal);
       if (chatId !== null) patch({ thread: chatId });
+      if (pendingAction && chatId !== null) setProposal({ chatId, token: pendingAction.token, summary: pendingAction.summary });
       backend.resources.invalidate("sylvie");
     } catch (error) {
       if ((error as { kind?: string }).kind !== "cancelled") { setFailure(describeFailureText(error)); setText(asked); }
     }
-    setTurn(null);
+    setTurn(null); setStatus(null);
     flight.current = null;
+  };
+  // A proposal is only ever what the server signed. It is confirmed once and on purpose, and a newer message makes the server refuse it.
+  const last = messages[messages.length - 1];
+  const found = proposal ?? (last && last.type !== "USER" && last.pendingAction && threadId !== null ? { chatId: threadId, token: last.pendingAction.token, summary: last.pendingAction.summary }  : null);
+  const offered = found && found.token !== dismissed ? found : null;
+  const confirm = async () => {
+    if (!offered || confirming) return;
+    setConfirming(true); setFailure(null);
+    try {
+      await backend.reads.confirmSylvieAction(offered.chatId, offered.token);
+      for (const tag of ["sylvie", "plan", "today", "progress"]) backend.resources.invalidate(tag);
+    } catch (error) { setFailure(describeFailureText(error)); }
+    setProposal(null); setDismissed(offered.token); setConfirming(false);
   };
   const list = threads?.data?.sessions ?? [];
   if (!threads) return <ToolLoading />;
@@ -66,9 +83,10 @@ function LiveSylvie({ backend, window, patch, onProvenance }: ToolProps & { back
       {list.length > 1 ? <View style={{ paddingHorizontal: space.md, paddingTop: space.sm, flexDirection: "row", gap: space.sm, alignItems: "center" }}><View style={{ flex: 1, minWidth: 0 }}><Select label="Conversation" hideLabel value={String(threadId)} options={list.map((item) => ({ value: String(item.id), label: item.title }))} onChange={(value) => patch({ thread: Number(value) })} /></View><Button title="New" size="small" variant="ghost" onPress={() => patch({ thread: null })} /></View> : null}
       <ToolPage ref={scroller} onContentSizeChange={() => scroller.current?.scrollToEnd({ animated: false })}>
         {!messages.length && !turn ? <Text variant="small" tone="soft" testID="sylvie-empty">Ask Sylvie about your plan, your progress or what you're studying.</Text> : null}
-        {messages.map((message) => (message.type === "USER" ? <PersonBubble key={message.id} text={message.content} /> : <Text key={message.id} variant="small" testID="sylvie-reply">{plain(message.content)}</Text>))}
+        {messages.map((message) => (message.type === "USER" ? <PersonBubble key={message.id} text={message.content} /> : <RichText key={message.id} text={message.content} testID="sylvie-reply" />))}
         {turn ? <PersonBubble text={turn.asked} /> : null}
-        {turn ? <Text variant="small" tone={turn.reply ? "ink" : "soft"} testID="sylvie-streaming">{plain(turn.reply) || "Thinking"}</Text> : null}
+        {turn ? (turn.reply ? <RichText text={turn.reply} testID="sylvie-streaming" /> : <Text variant="small" tone="soft" testID="sylvie-streaming">{status ?? "Thinking"}</Text>) : null}
+        {offered && !turn ? <View testID="sylvie-proposal" style={{ gap: space.sm, padding: space.md, borderRadius: 12, borderWidth: 1, borderColor: color.line }}><Text variant="small" tone="soft">Sylvie suggests</Text><Text variant="small">{offered.summary}</Text><View style={{ flexDirection: "row", gap: space.sm }}><Button title={confirming ? "Applying" : "Apply"} size="small" variant="emphasis" disabled={confirming} testID="sylvie-confirm" onPress={() => void confirm()} /><Button title="Not now" size="small" disabled={confirming} testID="sylvie-dismiss" onPress={() => { setProposal(null); setDismissed(offered.token); }} /></View></View> : null}
       </ToolPage>
       <View style={{ paddingHorizontal: space.md, paddingBottom: space.sm, gap: space.xs }}>
         {failure ? <View testID="sylvie-failure"><Text variant="caption" tone="critical">{failure}</Text></View> : null}

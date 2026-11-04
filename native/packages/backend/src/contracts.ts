@@ -164,7 +164,10 @@ export const soundsSchema = z.object({ tracks: z.array(z.object({ id: z.number()
 export const chatsSchema = z.object({ sessions: z.array(z.object({ id: z.number().int(), title: z.string() }).loose()), nextCursor: z.number().int().nullable() });
 export type ChatThread = z.infer<typeof chatsSchema>["sessions"][number];
 /** GET /api/system-messages?sessionId=&limit=. Newest first, from the server. */
-export const chatMessagesSchema = z.object({ messages: z.array(z.object({ id: z.number().int(), content: z.string(), type: z.string() }).loose()) });
+/** A change Sylvie proposed. `token` is signed by the server and opaque here: it comes back unchanged to confirm, and is single use. */
+export const pendingActionSchema = z.object({ token: z.string(), summary: z.string() });
+export type PendingAction = z.infer<typeof pendingActionSchema>;
+export const chatMessagesSchema = z.object({ messages: z.array(z.object({ id: z.number().int(), content: z.string(), type: z.string(), pendingAction: pendingActionSchema.optional().catch(undefined) }).loose()) });
 
 /** GET /api/user/earned-this-week. What the ledgers credited since the student's own Monday. */
 export const earnedThisWeekSchema = z.object({ xp: z.number(), sylph: z.number() });

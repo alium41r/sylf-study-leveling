@@ -8,7 +8,7 @@ import { createPlanReads } from "./plan";
 import { createFocusReads } from "./focus";
 import { createProgressReads } from "./progress";
 import { createAccountReads } from "./account";
-import { achievementsSchema, calendarRangeSchema, chatMessagesSchema, chatsSchema, cosmeticsSchema, earnedThisWeekSchema, focusPartySchema, friendRequestsSchema, friendsSchema, goalsSchema, plannerCapabilitiesSchema, questDaySchema, recentSessionsSchema, soundsSchema, studyScheduleSchema, studySummarySchema, subjectsSchema, userStatsSchema, type Quest } from "./contracts";
+import { pendingActionSchema, type PendingAction, achievementsSchema, calendarRangeSchema, chatMessagesSchema, chatsSchema, cosmeticsSchema, earnedThisWeekSchema, focusPartySchema, friendRequestsSchema, friendsSchema, goalsSchema, plannerCapabilitiesSchema, questDaySchema, recentSessionsSchema, soundsSchema, studyScheduleSchema, studySummarySchema, subjectsSchema, userStatsSchema, type Quest } from "./contracts";
 
 export interface SylvieTurn {
   /** Text so far, as it arrives. */
@@ -16,6 +16,8 @@ export interface SylvieTurn {
   /** A reply can start again when the model changes course. */
   onReset(): void;
   onSession(sessionId: number): void;
+  /** What the server is doing before words arrive, in its own terms ("searching", "checking your calendar"). Shown as status, never as a typing effect. */
+  onStatus?(status: string): void;
 }
 
 /** `day` and `endDay` are local to `timezone`, which the server checks. An all-day event has no instants. */
@@ -71,24 +73,32 @@ export function createReads(client: BackendClient) {
     /** One new event, on one day. Edits, repeats and shared calendars stay on the web for now. */
     createEvent: ({ id, title, day, endDay, startsAt, endsAt, timezone }: NewCalendarEvent) => client.send("POST", "/api/calendar/personal", { body: { kind: "event", id, revision: 1, data: { title, description: "", color: "BLUE", allDay: startsAt === null, startDate: day, endDate: startsAt === null ? dayAfter(day) : endDay, startsAt, endsAt, timezone } } }),
 
+    /**
+     * Confirms a change Sylvie proposed, by sending back the server's own token. The server runs exactly what it signed, once. A later message from
+     * the person, an expired token or a calendar that moved on makes it refuse with its own words, and nothing is changed. Never automatic.
+     */
+    confirmSylvieAction: (chatId: number, token: string) => client.send("POST", "/api/system-messages/chat", { body: { sessionId: chatId, confirmationToken: token }, timeoutMs: 60_000 }),
+
     /** One turn with Sylvie, read as it arrives. Quotas, tools and every model choice stay on the server. Resolves with the full reply. */
-    async sendToSylvie(message: string, chatId: number | null, turn: SylvieTurn, signal: AbortSignal): Promise<{ reply: string; chatId: number | null }> {
+    async sendToSylvie(message: string, chatId: number | null, turn: SylvieTurn, signal: AbortSignal): Promise<{ reply: string; chatId: number | null; pendingAction: PendingAction | null }> {
       let buffer = "";
       let text = "";
       let reply: string | null = null;
       let session = chatId;
+      let pendingAction: PendingAction | null = null;
       let failure: BackendError | null = null;
       const frame = (raw: string) => {
         const lines = raw.split("\n");
         const event = lines.find((line) => line.startsWith("event:"))?.slice(6).trim();
         const data = lines.filter((line) => line.startsWith("data:")).map((line) => line.slice(5).trimStart()).join("\n");
         if (!event || !data) return;
-        let value: { text?: unknown; sessionId?: unknown; reply?: unknown; error?: unknown; message?: unknown; status?: unknown };
+        let value: { text?: unknown; sessionId?: unknown; reply?: unknown; error?: unknown; message?: unknown; status?: unknown; pendingAction?: unknown; phase?: unknown; label?: unknown };
         try { value = JSON.parse(data); } catch { return; }
         if (event === "delta" && typeof value.text === "string") { text += value.text; turn.onDelta(text); }
         else if (event === "reset") { text = ""; turn.onReset(); }
         else if (event === "session" && typeof value.sessionId === "number") { session = value.sessionId; turn.onSession(value.sessionId); }
-        else if (event === "result") { if (typeof value.sessionId === "number") session = value.sessionId; reply = typeof value.reply === "string" ? value.reply : text; }
+        else if (event === "status" && typeof (value.label ?? value.phase ?? value.message) === "string") turn.onStatus?.(String(value.label ?? value.phase ?? value.message));
+        else if (event === "result") { if (typeof value.sessionId === "number") session = value.sessionId; reply = typeof value.reply === "string" ? value.reply : text; const pending = pendingActionSchema.safeParse(value.pendingAction); pendingAction = pending.success ? pending.data : null; }
         else if (event === "error") failure = new BackendError(value.status === 429 ? "rate-limited" : "server", typeof value.error === "string" && Number(value.status) < 500 ? value.error : "Sylvie could not answer just now. Try again shortly.");
       };
       await client.stream("/api/system-messages/chat", { method: "POST", signal, headers: { "Content-Type": "application/json", Accept: "text/event-stream" }, body: JSON.stringify({ message, ...(chatId ? { sessionId: chatId } : {}) }) }, (chunk) => {
@@ -97,7 +107,7 @@ export function createReads(client: BackendClient) {
       });
       if (failure) throw failure;
       if (reply === null) throw new BackendError("server", "Sylvie's answer stopped before it finished.");
-      return { reply, chatId: session };
+      return { reply, chatId: session, pendingAction };
     },
   };
 }

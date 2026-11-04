@@ -141,6 +141,8 @@ export function TodayDestination() {
           <View style={{ flexDirection: "row", gap: 12, flexWrap: "wrap" }}>
             <Button title="Plan something" variant="emphasis" testID="today-plan" onPress={() => navigation.select("plan")} />
             <Button title={active ? "Back to your session" : "Start studying"} testID="today-study" onPress={() => prepare()} />
+            {backend ? <Button title="Ask Sylvie" icon="sylvie" testID="today-ask-clear" onPress={() => setAsking(true)} /> : null}
+            <QuickAsk open={asking} onClose={() => setAsking(false)} />
           </View>
         </>
       ) : (

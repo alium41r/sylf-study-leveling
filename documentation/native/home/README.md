@@ -47,10 +47,12 @@ Each page has a still strip at the top, level with the Spaces icon and the timer
 | Destination | Layout | Real actions | Disabled until later |
 | --- | --- | --- | --- |
 | **Today** | A greeting, one sentence about the day, then the day as a single line: what has gone, the one next thing with the Marker on it, and what follows. Objectives and quick actions beside it | Prepare in Focus, Start studying, Open Workspace, Open World. These navigate for real | Nothing |
-| **Plan** | Calendar (Month, Week, Agenda beside a day page, with one add field), Quests and goals, Plans | Create, move and complete quests and events, rest days, goals and subjects | Drag to move or resize in Week, AI plan building (Part 3) |
+| **Plan** | Calendar (Month, Week, Agenda beside a day page, with one add field), Quests and goals, Plans | Create, move and complete quests and events, rest days, goals and subjects, and build, watch, answer and confirm an AI plan (Plans) | Drag to move or resize in Week; plan materials upload |
 | **Focus** (replaced in Part 2 by the threshold: what, rhythm, where, **Enter**) | An instrument: subject, length, and Begin, then the running session. What is on this device, study desks and recent sessions beside it | Everything about a session: lengths, Begin, Pause, Resume, End. It is the same session as the dock and Workspace's Timer. A desk is still a preview, and says so | Nothing |
-| **Circle** | The people you study with around one ring, with the number studying in the middle. People and parties beside it | None | Invite a friend |
+| **Circle** (three views since Part 3) | People (the ring and list), Messages, Parties, with Notifications and Find people as sheets | Find people, requests, message, remove, block; conversations, groups; party invitations, start, invite, leave | Realtime, party sessions, blocked list |
 | **Progress** (six views since Part 2) | Overview, Stats, Standing, Honours, Skills, Codex. Level on one quiet line, no HP | Claim all, raise an attribute | Skill nodes |
+
+Today also carries Sylvie: a daily briefing line when she wrote one (`TodayBriefing`) and **Ask Sylvie** (`QuickAsk`), a sheet on the same conversation runtime as Workspace. See the [Circle guide](../circle/README.md) and the [Plan guide](../plan/README.md).
 
 Gamification stays quiet by design, as master plan §2.1 asks: one line for the level, no celebration, and no reward styling.
 

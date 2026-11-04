@@ -15,3 +15,4 @@ export * from "./progress";
 export * from "./account";
 export * from "./focus";
 export * from "./planner";
+export * from "./social";

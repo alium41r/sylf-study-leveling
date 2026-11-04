@@ -23,8 +23,8 @@
 | Item | State |
 | --- | --- |
 | Part 3 A AI Planner V2 | built (reads, intent builder, hook, NewPlanSheet, PlannerFlow in Plans view); tests written not run; **not yet done:** materials upload (needs a file-picker dependency, owner approval), docs, ADR 0012 d16 update, planner stage-state unit tests for the hook |
-| Part 3 B Sylvie | partly built: status events, safe `RichText` (no maths typesetting yet), proposal preview + Apply/Not now with `confirmSylvieAction`, widened contracts. **Remaining:** KaTeX via Expo DOM (new dependency, needs approval), quick-ask overlay, in-environment entry, images (multipart + bearer `RemoteImage`), daily briefing on Today, planner handoff to Plans, insights/memories, companion. Tests for these written-not-run: `rich-text/parse.test.ts` |
-| Part 3 C Social + Realtime | not started |
+| Part 3 B Sylvie | partly built (Today briefing done, `TodayBriefing.tsx`): status events, safe `RichText` (no maths typesetting yet), proposal preview + Apply/Not now with `confirmSylvieAction`, widened contracts. **Remaining:** KaTeX via Expo DOM (new dependency, needs approval), quick-ask overlay, in-environment entry, images (multipart + bearer `RemoteImage`), daily briefing on Today, planner handoff to Plans, insights/memories, companion. Tests for these written-not-run: `rich-text/parse.test.ts` |
+| Part 3 C Social + Realtime | started: `packages/backend/src/social.ts` (search, requests, remove/block/unblock, conversations, messages, groups; wired as `reads.social`). **Remaining:** Circle views (People, Messages, Parties) + `HOME_VIEWS.circle = [people, messages, parties]` in `packages/spaces/src/home.ts` with test, Realtime client (spike; `@supabase/realtime-js` not installed), bounded polling fallback via `createResourceStore`, presence respecting `showOnlineStatus`, notifications list, backend fixes A-28/S-15/Realtime migration (owner decision), two-account tests |
 | Part 3 D Parties | not started |
 | Part 3 report + handoff | not started |
 | Part 4 A–F | not started |
@@ -33,7 +33,7 @@
 
 ## Next action
 
-Finish Slice B remainder (briefing on Today, planner handoff, quick-ask, images), then C (Realtime/social), D (parties). Slice A docs (`documentation/native/plan/README.md`, ADR 0012 d16) are batched with the Part 3 report.
+Slice B remainder (planner handoff via `lib/ai/sylvie/planner-bridge.ts`, quick-ask overlay, images, KaTeX), then Slice C UI on top of `reads.social` (Circle People/Messages/Parties), Realtime, then D (parties). Slice A docs (`documentation/native/plan/README.md`, ADR 0012 d16) are batched with the Part 3 report.
 
 ## Owner decisions / blockers (append)
 
@@ -48,3 +48,4 @@ Finish Slice B remainder (briefing on Today, planner handoff, quick-ask, images)
 - 2026-11-04: Slice A code committed: `native/packages/backend/src/planner.ts` (+test), `spaces/home/plan/{usePlanner.ts,NewPlanSheet.tsx,PlannerFlow.tsx,PlansView.tsx}`. typecheck, boundaries and ESLint clean. Decision: planner types are loose zod schemas in `@sylf/backend` (not exported from `@sylf/shared`), because the server enforces the strict contracts and a loose parse tolerates additive fields.
 
 - 2026-11-04: Slice B first cut committed (RichText parser/renderer, proposal card, status events). typecheck, ESLint, boundaries clean.
+- 2026-11-04: Today briefing + `reads.social` committed. typecheck/ESLint clean.

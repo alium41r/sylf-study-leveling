@@ -2,6 +2,7 @@
 // quest may become. `month` is the only place Native reads `calendar/month`, which is 0 to 11 and, for a native session, charges nobody (ADR 0017).
 import { z } from "zod";
 import type { BackendClient } from "./client";
+import { createPlannerReads } from "./planner";
 import { calendarEventSchema, calendarRangeSchema, questPageSchema } from "./contracts";
 
 const dayQuestSchema = z.object({ id: z.number().int(), title: z.string(), status: z.string(), difficulty: z.string().optional(), requiredMinutes: z.number().nullable().optional(), plannedMinutes: z.number().nullable().optional(), plannerOwned: z.boolean().optional(), goal: z.object({ id: z.number().int(), title: z.string() }).nullable().optional() }).loose();
@@ -75,6 +76,8 @@ export function createPlanReads(client: BackendClient) {
 
     /** Saved plans and whether new ones can be built here. Reading never grants anything. */
     plans: (signal: AbortSignal) => client.get("/api/planner/workspace", plansSchema, { signal, headers: PLANNER_CONTRACT }),
+    /** Everything between asking for a plan and confirming it (Part 3 A). */
+    planner: createPlannerReads(client),
   };
 }
 export type PlanReads = ReturnType<typeof createPlanReads>;

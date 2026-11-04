@@ -22,7 +22,7 @@
 
 | Item | State |
 | --- | --- |
-| Part 3 A AI Planner V2 | not started |
+| Part 3 A AI Planner V2 | built (reads, intent builder, hook, NewPlanSheet, PlannerFlow in Plans view); tests written not run; **not yet done:** materials upload (needs a file-picker dependency, owner approval), docs, ADR 0012 d16 update, planner stage-state unit tests for the hook |
 | Part 3 B Sylvie | not started |
 | Part 3 C Social + Realtime | not started |
 | Part 3 D Parties | not started |
@@ -33,7 +33,7 @@
 
 ## Next action
 
-Slice A: add `packages/backend/src/planner.ts` (named reads with `x-sylf-planner-contract: 2`), export planner types via `@sylf/shared`, then the planner flow inside `spaces/home/plan/PlansView.tsx`.
+Slice B (Sylvie): progress events + RichText with maths, proposals/confirmationToken, quick-ask, images, briefing, planner handoff. Then C, D. Slice A docs (`documentation/native/plan/README.md`, ADR 0012 d16) are batched with the Part 3 report.
 
 ## Owner decisions / blockers (append)
 
@@ -44,3 +44,5 @@ Slice A: add `packages/backend/src/planner.ts` (named reads with `x-sylf-planner
 ## Log
 
 - 2026-11-04: checkpoint file created.
+
+- 2026-11-04: Slice A code committed: `native/packages/backend/src/planner.ts` (+test), `spaces/home/plan/{usePlanner.ts,NewPlanSheet.tsx,PlannerFlow.tsx,PlansView.tsx}`. typecheck, boundaries and ESLint clean. Decision: planner types are loose zod schemas in `@sylf/backend` (not exported from `@sylf/shared`), because the server enforces the strict contracts and a loose parse tolerates additive fields.

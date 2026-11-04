@@ -12,6 +12,7 @@ import type { CirclePerson, HomeDataAdapter } from "../data/contracts";
 import { EmptyPage, FailedPage, HomeColumns, HomePage, LoadingPage, PageTitle, Section, SubNav, useHomeView } from "../HomePage";
 import { FindPeopleSheet } from "../circle/FindPeopleSheet";
 import { MessagesView } from "../circle/MessagesView";
+import { PartiesView } from "../circle/PartiesView";
 import { PersonSheet } from "../circle/PersonSheet";
 
 const load = (adapter: HomeDataAdapter) => adapter.circle();
@@ -85,7 +86,7 @@ export function CircleDestination() {
         <>
           <PageTitle title="Circle" />
           {live ? <SubNav destination="circle" label="Circle views" labels={{ people: "People", messages: "Messages", parties: "Parties" }} /> : null}
-          {live && view === "messages" ? <MessagesView openId={conversation} onOpened={() => setConversation(null)} /> : <HomeColumns
+          {live && view === "messages" ? <MessagesView openId={conversation} onOpened={() => setConversation(null)} /> : live && view === "parties" ? <PartiesView /> : <HomeColumns
             primary={
               <Stack gap="xl">
                 {circle.people.length && view !== "parties" ? <Ring people={circle.people} size={ringSize} /> : null}

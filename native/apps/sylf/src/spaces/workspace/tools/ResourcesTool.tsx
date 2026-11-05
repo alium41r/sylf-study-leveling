@@ -12,7 +12,7 @@ import { KIND_ICON, KIND_LABEL, relativeTime } from "../notes/LibraryBrowser";
 import { openDocumentWindow } from "../notes/open-window";
 import { ToolPage, type ToolProps } from "./shared";
 
-const KINDS: { value: NoteKind | "all"; label: string; icon?: IconName }[] = [{ value: "all", label: "All" }, { value: "note", label: "Notes", icon: "notes" }, { value: "handwriting", label: "Handwriting", icon: "pen" }, { value: "pdf", label: "PDFs", icon: "pdf" }, { value: "board", label: "Boards", icon: "whiteboard" }];
+const KINDS: { value: NoteKind | "all"; label: string; icon?: IconName }[] = [{ value: "all", label: "All" }, { value: "note", label: "Notes", icon: "notes" }, { value: "pdf", label: "PDFs", icon: "pdf" }, { value: "board", label: "Boards", icon: "whiteboard" }];
 
 export default function ResourcesTool({ onProvenance }: ToolProps) {
   const { space, color } = useTheme();

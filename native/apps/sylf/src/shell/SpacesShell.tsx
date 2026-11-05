@@ -5,6 +5,7 @@ import { View } from "react-native";
 import { IconButton, useTheme } from "@sylf/design-system";
 import { worldHoldsNavigation } from "@sylf/spaces";
 import { useHomeNavigation, useShellMetrics, useSpaces, useWorkspaceState } from "./context";
+import { useChromeRevealed } from "../spaces/workspace/chrome-reveal";
 import { conversationRequest } from "./profile/store";
 import { ProfileSheet } from "./profile/ProfileSheet";
 import { DEV_TOOLS, openShowcase } from "./dev-surface";
@@ -28,7 +29,8 @@ export function SpacesShell() {
   const workspace = useWorkspaceState();
   const focusing = useFocusEnvironmentOpen();
   // Workspace in full screen keeps the whole screen for its tools: no Spaces icon, no timer, no development entry.
-  const filling = state.activeSpace === "workspace" && workspace.layout === "fill" && workspace.windows.some((w) => !w.minimized);
+  const chrome = useChromeRevealed();
+  const filling = state.activeSpace === "workspace" && workspace.layout === "fill" && workspace.windows.some((w) => !w.minimized) && !chrome;
   const free = !worldHoldsNavigation(world) && !focusing && !filling;
   const [barReach, setBarReach] = useState<number | null>(null);
   const navigation = useHomeNavigation();

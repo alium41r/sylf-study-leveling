@@ -24,6 +24,10 @@ export interface RichTextProps {
   onUpdate(update: string): Promise<void>;
   onText(text: string): Promise<void>;
   onFormat(state: string): Promise<void>;
+  /** A page's text layer rather than a whole note: transparent over the paper, drawn at the page's zoom, lines on the paper's rule. */
+  page?: { zoom: number; lineHeight: number; focus: boolean } | null;
+  /** The text's height in page units, so a page can grow to hold it. */
+  onHeight?(height: number): Promise<void>;
   dom?: DOMProps;
 }
 
@@ -35,7 +39,7 @@ const REMOTE = "host";
 type Editor = ReturnType<typeof BlockNoteEditor.create>;
 interface Slash { query: string; left: number; top: number; items: DefaultSuggestionItem[]; index: number }
 
-export default function RichTextDom({ ref, initial, template, look, editable, onUpdate, onText, onFormat }: RichTextProps) {
+export default function RichTextDom({ ref, initial, template, look, editable, onUpdate, onText, onFormat, page, onHeight }: RichTextProps) {
   const host = useRef<HTMLDivElement>(null);
   const editorRef = useRef<Editor | null>(null);
   const docRef = useRef<Y.Doc | null>(null);
@@ -105,8 +109,14 @@ export default function RichTextDom({ ref, initial, template, look, editable, on
       } else if (event.key === "Escape") { menu?.closeMenu(); }
     };
     host.current!.addEventListener("keydown", keys, true);
+    // A page layer reports its height whenever it changes, and takes the cursor when it opens.
+    let lastHeight = 0;
+    const measure = new ResizeObserver(() => { const height = Math.ceil(host.current?.scrollHeight ?? 0); if (height && Math.abs(height - lastHeight) > 2) { lastHeight = height; void onHeight?.(height); } });
+    measure.observe(host.current!);
+    if (page?.focus) setTimeout(() => { editor.focus(); try { editor.setTextCursorPosition(editor.document[editor.document.length - 1], "end"); } catch { /* An empty page has nowhere to put it yet. */ } }, 30);
     return () => {
       host.current?.removeEventListener("keydown", keys, true);
+      measure.disconnect();
       unsubscribeMenu?.(); offSelection(); offChange();
       if (timer) { clearTimeout(timer); send(); }
       if (textTimer) clearTimeout(textTimer);
@@ -125,10 +135,10 @@ export default function RichTextDom({ ref, initial, template, look, editable, on
   };
 
   return (
-    <div data-editable={String(editable)} style={{ position: "relative", height: "100%", overflow: "auto", background: look.paper, WebkitOverflowScrolling: "touch" }}>
-      <style>{css(look)}</style>
+    <div data-editable={String(editable)} style={page ? { position: "relative", height: "100%", overflow: "visible", background: "transparent" } : { position: "relative", height: "100%", overflow: "auto", background: look.paper, WebkitOverflowScrolling: "touch" }}>
+      <style>{css(look) + (page ? pageCss(page.lineHeight) : "")}</style>
       {/* BlockNote mounts on the inner element and adds its own classes there, so the styles above reach it as a descendant. */}
-      <div className="sylf-note" style={{ minHeight: "100%", paddingBottom: 120 }}><div ref={host} /></div>
+      <div className={page ? "sylf-note sylf-page" : "sylf-note"} style={page ? { zoom: page.zoom, minHeight: "100%" } as object : { minHeight: "100%", paddingBottom: 120 }}><div ref={host} /></div>
       {slash && slash.items.length ? (
         <div role="listbox" aria-label="Blocks" style={{ position: "absolute", left: Math.max(8, slash.left), top: slash.top, width: 236, maxHeight: 320, overflow: "auto", background: look.menu, color: look.menuInk, borderRadius: 12, boxShadow: "0 10px 30px rgba(20,24,40,0.18), 0 0 0 1px rgba(20,24,40,0.08)", padding: 6, zIndex: 10, fontFamily: look.font }}>
           {slash.items.map((item, index) => (
@@ -148,7 +158,8 @@ type Command =
   | { type: "mark"; mark: "bold" | "italic" | "underline" | "strike" | "code" }
   | { type: "highlight"; color: string | null }
   | { type: "block"; block: "paragraph" | "heading" | "bulletListItem" | "numberedListItem" | "checkListItem" | "quote" | "codeBlock"; level?: number }
-  | { type: "undo" } | { type: "redo" } | { type: "indent" } | { type: "outdent" } | { type: "focus" } | { type: "insert"; text: string };
+  | { type: "undo" } | { type: "redo" } | { type: "indent" } | { type: "outdent" } | { type: "focus" } | { type: "insert"; text: string }
+  | { type: "image"; url: string; name: string; width: number };
 
 function run(editor: Editor, command: Command) {
   switch (command.type) {
@@ -171,6 +182,11 @@ function run(editor: Editor, command: Command) {
     case "outdent": if (editor.canUnnestBlock()) editor.unnestBlock(); break;
     case "insert": editor.insertInlineContent(command.text); break;
     case "focus": break;
+    case "image": {
+      const at = editor.getTextCursorPosition().block;
+      editor.insertBlocks([{ type: "image", props: { url: command.url, name: command.name, previewWidth: command.width } } as never], at, "after");
+      break;
+    }
   }
   editor.focus();
 }
@@ -191,4 +207,13 @@ const css = (look: RichTextLook) => `
 .sylf-note ::selection { background: ${look.wash}; }
 .sylf-note .bn-block-outer { margin: 1px 0; }
 .sylf-note [data-content-type="checkListItem"] input { accent-color: ${look.accent}; width: 16px; height: 16px; }
+`;
+
+/** On a page, text sits on the paper's rule: no inner padding, and every line the rule's height. */
+const pageCss = (line: number) => `
+.sylf-page .bn-editor { padding: 0 !important; background: transparent; line-height: ${line}px; }
+.sylf-page .bn-block-content { padding: 0; }
+.sylf-page [data-content-type="heading"] { padding-top: 14px; line-height: 1.3; }
+.sylf-page .bn-block-content:has(.ProseMirror-trailingBreak:only-child)::after { opacity: 0.7; }
+.sylf-page img { border-radius: 4px; }
 `;

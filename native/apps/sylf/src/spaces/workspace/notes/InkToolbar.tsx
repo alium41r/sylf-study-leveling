@@ -20,12 +20,13 @@ interface Props {
   onRedo(): void;
   selection: number;
   onSelectionAction(action: "delete" | "done" | "bigger" | "smaller" | { color: string }): void;
-  /** Extra controls at the end: pages, paper, zoom. */
+  /** Extra controls at the start (a note's Type and Write switch) and at the end (pages, paper, zoom). */
+  leading?: React.ReactNode;
   trailing?: React.ReactNode;
   stylusKnown: boolean;
 }
 
-export default function InkToolbar({ tool, onTool, canUndo, canRedo, onUndo, onRedo, selection, onSelectionAction, trailing, stylusKnown }: Props) {
+export default function InkToolbar({ tool, onTool, canUndo, canRedo, onUndo, onRedo, selection, onSelectionAction, leading, trailing, stylusKnown }: Props) {
   const { space, color } = useTheme();
   const [menu, setMenu] = useState<"shape" | "eraser" | null>(null);
   const shapeAnchor = useRef<ViewHandle>(null), eraserAnchor = useRef<ViewHandle>(null);
@@ -54,6 +55,7 @@ export default function InkToolbar({ tool, onTool, canUndo, canRedo, onUndo, onR
         </>
       ) : (
         <>
+          {leading}
           <IconButton icon="undo" size="small" label="Undo" disabled={!canUndo} onPress={onUndo} />
           <IconButton icon="redo" size="small" label="Redo" disabled={!canRedo} onPress={onRedo} />
           <Divider vertical style={{ height: 18, marginHorizontal: 4 }} />

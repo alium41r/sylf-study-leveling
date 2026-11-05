@@ -151,7 +151,7 @@ export default function WorkspaceSpace() {
             ) : null}
             {fillArea ? <FillSeams area={fillArea} state={state} model={model} /> : null}
             {drop ? <DropPreview rect={drop.preview} /> : null}
-            {fill ? null : <DockShelf state={state} model={model} tuckable={state.layout === "focus" && !compact} bottom={insets.bottom + edge} sides={{ left: insets.left + edge, right: insets.right + edge }}>
+            {<DockShelf state={state} model={model} tuckable={(state.layout === "focus" || fill) && !compact} bottom={insets.bottom + edge} sides={{ left: insets.left + edge, right: insets.right + edge }}>
               <CommandCenter state={state} height={dockHeight} />
             </DockShelf>}
           </>

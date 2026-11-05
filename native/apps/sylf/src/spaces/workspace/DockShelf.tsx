@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { Platform, Pressable, ScrollView, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { Icon, Press, Text, getInputMode, move, useTheme } from "@sylf/design-system";
+import { setChromeRevealed } from "./chrome-reveal";
 import { minimizedWindows, windowTitle, type WorkspaceModel, type WorkspaceState } from "@sylf/spaces";
 import { TOOL_ICONS } from "./icons";
 
@@ -30,7 +31,7 @@ function MinimizedRow({ state, model }: { state: WorkspaceState; model: Workspac
 }
 
 export function DockShelf({ state, model, tuckable, bottom, sides, children }: { state: WorkspaceState; model: WorkspaceModel; tuckable: boolean; bottom: number; sides: { left: number; right: number }; children: ReactNode }) {
-  const { color, motion, shape, space } = useTheme();
+  const { color, motion, space, surface } = useTheme();
   const [revealed, setRevealed] = useState(false);
   const away = useSharedValue(tuckable ? 1 : 0);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -39,6 +40,7 @@ export function DockShelf({ state, model, tuckable, bottom, sides, children }: {
   useEffect(() => { away.value = move(tucked ? 1 : 0, motion, "glide"); }, [tucked, away, motion]);
   useEffect(() => () => clearTimeout(timer.current), []);
   useEffect(() => { setRevealed(false); }, [tuckable]);
+  useEffect(() => { setChromeRevealed(tuckable && revealed); return () => setChromeRevealed(false); }, [tuckable, revealed]);
 
   const reveal = useCallback(() => { clearTimeout(timer.current); setRevealed(true); }, []);
   const linger = useCallback(() => { clearTimeout(timer.current); timer.current = setTimeout(() => setRevealed(false), LINGER_MS); }, []);
@@ -48,10 +50,16 @@ export function DockShelf({ state, model, tuckable, bottom, sides, children }: {
 
   return (
     <>
+      {/* On a touch screen nothing "leaves" the dock, so a tap anywhere else tucks it and the chrome away again. */}
+      {tuckable && revealed && Platform.OS !== "web" ? <Pressable aria-hidden accessible={false} onPress={() => setRevealed(false)} style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }} /> : null}
       {tucked ? (
         <View pointerEvents="box-none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 44, alignItems: "center", justifyContent: "flex-end" }}>
-          <Pressable testID="dock-reveal" role="button" aria-label="Show the Command Center" onPress={reveal} onHoverIn={reveal} style={{ width: 120, height: 44, alignItems: "center", justifyContent: "flex-end", paddingBottom: bottom > 12 ? bottom - 12 : 2 }}>
-            <View style={{ width: 44, height: 5, borderRadius: Math.min(shape.radius.xs, 2.5), backgroundColor: color.lineStrong }} />
+          {/* A labelled pull-up, not a bare line: people looking for their tools could not find the old handle (owner, Phase 14). */}
+          <Pressable testID="dock-reveal" role="button" aria-label="Show the Command Center" onPress={reveal} onHoverIn={reveal} style={{ height: 44, alignItems: "center", justifyContent: "flex-end", paddingBottom: Math.max(4, bottom - 8) }}>
+            <View style={[surface("float", "full"), { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, height: 30, opacity: 0.92 }]}>
+              <Icon name="chevronUp" size={14} color={color.inkSoft} />
+              <Text variant="caption" tone="soft">Tools</Text>
+            </View>
           </Pressable>
         </View>
       ) : null}

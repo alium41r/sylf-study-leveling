@@ -9,6 +9,11 @@ import { isSeen, type ToolProps } from "../tools/shared";
 import BoardCanvas from "./BoardCanvas";
 import LibraryBrowser, { KIND_ICON } from "./LibraryBrowser";
 import PagedInk from "./PagedInk";
+import NoteEditor from "./NoteEditor";
+import { isLayeredNote } from "@sylf/notes";
+import { detectCapabilities } from "@sylf/platform";
+
+const stylusDevice = (() => { try { return detectCapabilities().input.stylus === true; } catch { return false; } })();
 import { openBeside, openDocumentWindow } from "./open-window";
 import { useWorkspaceModel, useWorkspaceState } from "../../../shell/context";
 import { LIVE_EDITORS } from "./editor-budget";
@@ -134,6 +139,10 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
         <View style={{ flex: 1, justifyContent: "center" }}><EmptyState icon="warning" title="This didn't open" message={opened.error} action={<Button title="Back to notes" size="small" onPress={close} />} /></View>
       ) : !document ? (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}><Activity label="Opening" /></View>
+      ) : kind === "note" && isLayeredNote(document.descriptor()) ? (
+        <NoteEditor key={document.id} library={library} document={document} editable={editable} narrow={narrow}
+          mode={window.state.mode === "type" || window.state.mode === "write" ? window.state.mode : stylusDevice ? "write" : "type"} onMode={(mode) => patch({ mode })}
+          initialPage={typeof window.state.page === "number" ? window.state.page : 0} onPage={(page) => { if (page !== window.state.page) patch({ page }); }} />
       ) : kind === "note" && !liveEditor ? (
         <Press label="Edit this note" onPress={() => model.focus(window.id)} feedback="none" style={{ flex: 1 }} bodyStyle={{ flex: 1, backgroundColor: DOCUMENT_DEFAULTS.paper, padding: space.xl }}>
           <Text variant="body" style={{ color: DOCUMENT_DEFAULTS.ink, lineHeight: 24 }} numberOfLines={30}>{entry.text || entry.preview || " "}</Text>

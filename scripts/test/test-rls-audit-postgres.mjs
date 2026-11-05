@@ -134,6 +134,29 @@ try {
     try { const result = await client.query(`UPDATE "FocusParty" SET name='x' WHERE id=7001`); return { rowCount: result.rowCount }; }
     catch (error) { return { denied: error.code }; }
   });
+  // Message Realtime (Expansion Part 3, slice C): a token for someone outside a conversation hears nothing from it, and a participant hears it. The grant is
+  // forced inside a rolled-back transaction, because Realtime reads with the role's own rights and the inner wall (RLS) is what is being tested.
+  await client.query(`INSERT INTO "User" (id, email, username, password, "scholarId") VALUES (9003,'c@local.test','audit_c','x','#9003') ON CONFLICT DO NOTHING`);
+  report.messageRealtime = {};
+  for (const [label, sub] of [["outsider", 9001], ["participant", 9002], ["other participant", 9003]]) {
+    await client.query("BEGIN");
+    try {
+      await client.query(`INSERT INTO "Conversation" (id, "isGroup", "updatedAt") VALUES (8001, false, now())`);
+      await client.query(`INSERT INTO "ConversationParticipant" ("userId","conversationId") VALUES (9002,8001),(9003,8001)`);
+      await client.query(`INSERT INTO "Message" ("conversationId","senderId",content) VALUES (8001,9002,'private')`);
+      // The policy reads ConversationParticipant as the caller, so Realtime needs both grants. Neither is held on a database built from the history (the
+      // defense-in-depth migration removed them), which means Realtime would deliver nothing there and the polling fallback carries on.
+      await client.query(`GRANT SELECT ON "Message", "ConversationParticipant" TO authenticated`);
+      await client.query(`SELECT set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ sub: String(sub), role: "authenticated" })]);
+      await client.query("SET LOCAL ROLE authenticated");
+      report.messageRealtime[label] = { rowsVisible: (await client.query(`SELECT count(*)::int AS n FROM "Message"`)).rows[0].n };
+    } catch (error) { report.messageRealtime[label] = { error: String(error.message).slice(0, 120) }; }
+    finally { await client.query("ROLLBACK").catch(() => {}); }
+  }
+  report.messageRealtime.publishedOnThisDatabase = report.summary.published.includes("Message");
+  report.messageRealtime.grantsHeldByAuthenticated = (await client.query(`SELECT has_table_privilege('authenticated','"Message"','SELECT') AS message, has_table_privilege('authenticated','"ConversationParticipant"','SELECT') AS participant`)).rows[0];
+  const heard = report.messageRealtime;
+  if (heard.outsider?.rowsVisible !== 0 || heard.participant?.rowsVisible !== 1 || heard["other participant"]?.rowsVisible !== 1) throw new Error(`Message RLS is wrong for Realtime: ${JSON.stringify(heard)}`);
   report.status = "PASSED";
 } catch (error) {
   report.status = "FAILED"; report.error = backend.redact(error.stack ?? error.message); exit = 1;

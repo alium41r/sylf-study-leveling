@@ -1,0 +1,2759 @@
+{
+ "schemaVersion": 1,
+ "startedAt": "2026-11-05T01:52:56.719Z",
+ "scope": "The migration history replayed on disposable PostgreSQL 17. Hosted state was not inspected.",
+ "build": {
+  "migrations": 83,
+  "appliedWhole": 72,
+  "recovered": [
+   {
+    "name": "20261002000000_planner_v2_durable_core",
+    "statementsApplied": 67,
+    "alreadyPresent": 24,
+    "remaining": []
+   },
+   {
+    "name": "20261014000000_timer_durable_completion",
+    "statementsApplied": 9,
+    "alreadyPresent": 3,
+    "remaining": []
+   },
+   {
+    "name": "20261015130000_ai_dispatch_telemetry",
+    "statementsApplied": 2,
+    "alreadyPresent": 1,
+    "remaining": []
+   },
+   {
+    "name": "20261025000000_planner_ai_first_foundation",
+    "statementsApplied": 6,
+    "alreadyPresent": 2,
+    "remaining": []
+   },
+   {
+    "name": "20261025010000_planner_compiler_version",
+    "statementsApplied": 7,
+    "alreadyPresent": 1,
+    "remaining": []
+   },
+   {
+    "name": "20261026000000_planner_role_resources",
+    "statementsApplied": 13,
+    "alreadyPresent": 0,
+    "remaining": []
+   },
+   {
+    "name": "20261026010000_planner_understanding",
+    "statementsApplied": 6,
+    "alreadyPresent": 0,
+    "remaining": []
+   },
+   {
+    "name": "20261026020000_planner_calendar_capacity",
+    "statementsApplied": 3,
+    "alreadyPresent": 0,
+    "remaining": []
+   },
+   {
+    "name": "20261026030000_planner_natural_learning",
+    "statementsApplied": 3,
+    "alreadyPresent": 0,
+    "remaining": []
+   },
+   {
+    "name": "20261027000000_planner_reviewed_learning",
+    "statementsApplied": 6,
+    "alreadyPresent": 0,
+    "remaining": []
+   },
+   {
+    "name": "20261028000000_planner_reviewed_publication",
+    "statementsApplied": 13,
+    "alreadyPresent": 0,
+    "remaining": []
+   }
+  ],
+  "historyGaps": {
+   "tables": [
+    "SubjectNode",
+    "BlockedUser",
+    "Item",
+    "UserInventory",
+    "VerificationToken",
+    "AcousticTrack",
+    "AuthSession"
+   ],
+   "types": [
+    "ItemCategory",
+    "ItemSlot",
+    "ItemRarity",
+    "VerificationStatus"
+   ]
+  },
+  "repairedByPrismaDiff": [
+   "ALTER TABLE \"AiUsageLog\" ADD COLUMN     \"accountingState\" TEXT NOT NULL DEFAULT 'SETTLED',",
+   "ALTER TABLE \"ConnectedAccount\" ADD COLUMN     \"providerUsername\" TEXT",
+   "ALTER TABLE \"Conversation\" ADD COLUMN     \"avatarUrl\" TEXT",
+   "ALTER TABLE \"FocusSessionMember\" ADD COLUMN     \"timerTimeline\" JSONB",
+   "ALTER TABLE \"PlannerPlan\" ADD COLUMN     \"contractVersion\" INTEGER NOT NULL DEFAULT 1,",
+   "ALTER TABLE \"PlannerQuestLink\" ADD COLUMN     \"baselineSpecDigest\" TEXT",
+   "ALTER TABLE \"PlannerRevision\" ADD COLUMN     \"attemptId\" UUID,",
+   "ALTER TABLE \"Quest\" ADD COLUMN     \"executionVersion\" INTEGER NOT NULL DEFAULT 0,",
+   "ALTER TABLE \"StudySession\" ADD COLUMN     \"acceptedBreakAtResume\" INTEGER NOT NULL DEFAULT 0,",
+   "ALTER TABLE \"Subject\" ADD COLUMN     \"code\" TEXT NOT NULL DEFAULT 'GENERAL',",
+   "ALTER TABLE \"SylphLedger\" ADD COLUMN     \"balanceAfter\" INTEGER NOT NULL DEFAULT 0,",
+   "ALTER TABLE \"User\" ADD COLUMN     \"activeAura\" TEXT NOT NULL DEFAULT 'none',",
+   "CREATE TABLE \"TimerSessionStart\" (",
+   "CREATE TABLE \"PlannerIntentVersion\" (",
+   "CREATE TABLE \"PlannerAttempt\" (",
+   "CREATE INDEX \"TimerSessionStart_sessionId_idx\" ON \"TimerSessionStart\"(\"sessionId\")",
+   "CREATE UNIQUE INDEX \"PlannerIntentVersion_planId_version_key\" ON \"PlannerIntentVersion\"(\"planId\", \"version\")",
+   "CREATE UNIQUE INDEX \"PlannerIntentVersion_id_planId_key\" ON \"PlannerIntentVersion\"(\"id\", \"planId\")",
+   "CREATE INDEX \"PlannerAttempt_state_createdAt_idx\" ON \"PlannerAttempt\"(\"state\", \"createdAt\")",
+   "CREATE INDEX \"PlannerAttempt_state_leaseExpiresAt_idx\" ON \"PlannerAttempt\"(\"state\", \"leaseExpiresAt\")",
+   "CREATE INDEX \"PlannerAttempt_userId_kind_state_idx\" ON \"PlannerAttempt\"(\"userId\", \"kind\", \"state\")",
+   "CREATE UNIQUE INDEX \"PlannerAttempt_userId_requestKey_key\" ON \"PlannerAttempt\"(\"userId\", \"requestKey\")",
+   "CREATE INDEX \"AcousticTrack_category_orderIndex_idx\" ON \"AcousticTrack\"(\"category\", \"orderIndex\")",
+   "CREATE INDEX \"AiInsight_userId_dismissed_createdAt_idx\" ON \"AiInsight\"(\"userId\", \"dismissed\", \"createdAt\" DESC)",
+   "CREATE INDEX \"AiMemory_userId_confidence_idx\" ON \"AiMemory\"(\"userId\", \"confidence\" DESC)",
+   "CREATE UNIQUE INDEX \"AiUsageLog_requestId_key\" ON \"AiUsageLog\"(\"requestId\")",
+   "CREATE UNIQUE INDEX \"AuthSession_tokenHash_key\" ON \"AuthSession\"(\"tokenHash\")",
+   "CREATE INDEX \"AuthSession_userId_lastActiveAt_idx\" ON \"AuthSession\"(\"userId\", \"lastActiveAt\" DESC)",
+   "CREATE UNIQUE INDEX \"BlockedUser_userId_blockedId_key\" ON \"BlockedUser\"(\"userId\", \"blockedId\")",
+   "CREATE INDEX \"ChatSession_userId_updatedAt_idx\" ON \"ChatSession\"(\"userId\", \"updatedAt\" DESC)",
+   "CREATE INDEX \"ConversationParticipant_conversationId_userId_idx\" ON \"ConversationParticipant\"(\"conversationId\", \"userId\")",
+   "CREATE INDEX \"FriendRequest_receiverId_status_idx\" ON \"FriendRequest\"(\"receiverId\", \"status\")",
+   "CREATE INDEX \"FriendRequest_senderId_status_idx\" ON \"FriendRequest\"(\"senderId\", \"status\")",
+   "CREATE INDEX \"Friendship_friendId_userId_idx\" ON \"Friendship\"(\"friendId\", \"userId\")",
+   "CREATE INDEX \"Goal_userId_status_idx\" ON \"Goal\"(\"userId\", \"status\")",
+   "CREATE INDEX \"Goal_userId_createdAt_idx\" ON \"Goal\"(\"userId\", \"createdAt\" DESC)",
+   "CREATE INDEX \"HpLedger_userId_createdAt_idx\" ON \"HpLedger\"(\"userId\", \"createdAt\" DESC)",
+   "CREATE INDEX \"InventoryItem_userId_itemKey_idx\" ON \"InventoryItem\"(\"userId\", \"itemKey\")",
+   "CREATE UNIQUE INDEX \"Item_sku_key\" ON \"Item\"(\"sku\")",
+   "CREATE INDEX \"Item_category_rankRequirement_idx\" ON \"Item\"(\"category\", \"rankRequirement\")",
+   "CREATE INDEX \"Item_rarity_idx\" ON \"Item\"(\"rarity\")",
+   "CREATE INDEX \"Item_setKey_idx\" ON \"Item\"(\"setKey\")",
+   "CREATE INDEX \"Message_conversationId_createdAt_idx\" ON \"Message\"(\"conversationId\", \"createdAt\" ASC)",
+   "CREATE INDEX \"Message_senderId_idx\" ON \"Message\"(\"senderId\")",
+   "CREATE UNIQUE INDEX \"PlannerPlan_workingIntentVersionId_key\" ON \"PlannerPlan\"(\"workingIntentVersionId\")",
+   "CREATE UNIQUE INDEX \"PlannerPlan_reservedGoalId_key\" ON \"PlannerPlan\"(\"reservedGoalId\")",
+   "CREATE INDEX \"Quest_userId_status_idx\" ON \"Quest\"(\"userId\", \"status\")",
+   "CREATE INDEX \"Quest_subjectNodeId_idx\" ON \"Quest\"(\"subjectNodeId\")",
+   "CREATE INDEX \"SessionInvite_receiverId_status_idx\" ON \"SessionInvite\"(\"receiverId\", \"status\")",
+   "CREATE INDEX \"SessionInvite_senderId_status_idx\" ON \"SessionInvite\"(\"senderId\", \"status\")",
+   "CREATE INDEX \"StudySession_userId_startedAt_idx\" ON \"StudySession\"(\"userId\", \"startedAt\" DESC)",
+   "CREATE INDEX \"StudySession_userId_questId_idx\" ON \"StudySession\"(\"userId\", \"questId\")",
+   "CREATE INDEX \"StudySession_userId_subjectId_idx\" ON \"StudySession\"(\"userId\", \"subjectId\")",
+   "CREATE UNIQUE INDEX \"Subject_userId_code_key\" ON \"Subject\"(\"userId\", \"code\")",
+   "CREATE UNIQUE INDEX \"SubjectNode_subjectId_nodeId_key\" ON \"SubjectNode\"(\"subjectId\", \"nodeId\")",
+   "CREATE INDEX \"SylphLedger_userId_createdAt_idx\" ON \"SylphLedger\"(\"userId\", \"createdAt\" DESC)",
+   "CREATE INDEX \"SystemMessage_userId_read_createdAt_idx\" ON \"SystemMessage\"(\"userId\", \"read\", \"createdAt\" DESC)",
+   "CREATE INDEX \"SystemMessage_userId_sessionId_idx\" ON \"SystemMessage\"(\"userId\", \"sessionId\")",
+   "CREATE UNIQUE INDEX \"User_scholarId_key\" ON \"User\"(\"scholarId\")",
+   "CREATE INDEX \"UserAchievement_userId_claimedAt_idx\" ON \"UserAchievement\"(\"userId\", \"claimedAt\" DESC)",
+   "CREATE INDEX \"UserCosmetic_userId_category_idx\" ON \"UserCosmetic\"(\"userId\", \"category\")",
+   "CREATE INDEX \"UserInventory_userId_isEquipped_idx\" ON \"UserInventory\"(\"userId\", \"isEquipped\")",
+   "CREATE UNIQUE INDEX \"UserInventory_userId_itemId_key\" ON \"UserInventory\"(\"userId\", \"itemId\")",
+   "CREATE UNIQUE INDEX \"VerificationToken_token_key\" ON \"VerificationToken\"(\"token\")",
+   "CREATE INDEX \"VerificationToken_userId_idx\" ON \"VerificationToken\"(\"userId\")",
+   "ALTER TABLE \"SubjectNode\" ADD CONSTRAINT \"SubjectNode_subjectId_fkey\" FOREIGN KEY (\"subjectId\") REFERENCES \"Subject\"(\"id\") ON DELETE CASCADE",
+   "ALTER TABLE \"Quest\" ADD CONSTRAINT \"Quest_subjectId_fkey\" FOREIGN KEY (\"subjectId\") REFERENCES \"Subject\"(\"id\") ON DELETE SET NULL ON UPDATE ",
+   "ALTER TABLE \"Quest\" ADD CONSTRAINT \"Quest_subjectNodeId_fkey\" FOREIGN KEY (\"subjectNodeId\") REFERENCES \"SubjectNode\"(\"id\") ON DELETE SET NUL",
+   "ALTER TABLE \"PlannerPlan\" ADD CONSTRAINT \"PlannerPlan_workingIntentVersionId_fkey\" FOREIGN KEY (\"workingIntentVersionId\") REFERENCES \"Planne",
+   "ALTER TABLE \"PlannerRevision\" ADD CONSTRAINT \"PlannerRevision_attemptId_fkey\" FOREIGN KEY (\"attemptId\") REFERENCES \"PlannerAttempt\"(\"id\") ON",
+   "ALTER TABLE \"TimerSessionStart\" ADD CONSTRAINT \"TimerSessionStart_userId_fkey\" FOREIGN KEY (\"userId\") REFERENCES \"User\"(\"id\") ON DELETE CASC",
+   "ALTER TABLE \"TimerSessionStart\" ADD CONSTRAINT \"TimerSessionStart_sessionId_fkey\" FOREIGN KEY (\"sessionId\") REFERENCES \"StudySession\"(\"id\") ",
+   "ALTER TABLE \"BlockedUser\" ADD CONSTRAINT \"BlockedUser_userId_fkey\" FOREIGN KEY (\"userId\") REFERENCES \"User\"(\"id\") ON DELETE CASCADE ON UPDAT",
+   "ALTER TABLE \"BlockedUser\" ADD CONSTRAINT \"BlockedUser_blockedId_fkey\" FOREIGN KEY (\"blockedId\") REFERENCES \"User\"(\"id\") ON DELETE CASCADE ON",
+   "ALTER TABLE \"UserInventory\" ADD CONSTRAINT \"UserInventory_userId_fkey\" FOREIGN KEY (\"userId\") REFERENCES \"User\"(\"id\") ON DELETE CASCADE ON U",
+   "ALTER TABLE \"UserInventory\" ADD CONSTRAINT \"UserInventory_itemId_fkey\" FOREIGN KEY (\"itemId\") REFERENCES \"Item\"(\"id\") ON DELETE CASCADE ON U",
+   "ALTER TABLE \"VerificationToken\" ADD CONSTRAINT \"VerificationToken_userId_fkey\" FOREIGN KEY (\"userId\") REFERENCES \"User\"(\"id\") ON DELETE CASC",
+   "ALTER TABLE \"AuthSession\" ADD CONSTRAINT \"AuthSession_userId_fkey\" FOREIGN KEY (\"userId\") REFERENCES \"User\"(\"id\") ON DELETE CASCADE ON UPDAT",
+   "ALTER TABLE \"PlannerIntentVersion\" ADD CONSTRAINT \"PlannerIntentVersion_planId_fkey\" FOREIGN KEY (\"planId\") REFERENCES \"PlannerPlan\"(\"id\") O",
+   "ALTER TABLE \"PlannerIntentVersion\" ADD CONSTRAINT \"PlannerIntentVersion_userId_fkey\" FOREIGN KEY (\"userId\") REFERENCES \"User\"(\"id\") ON DELET",
+   "ALTER TABLE \"PlannerIntentVersion\" ADD CONSTRAINT \"PlannerIntentVersion_parentId_fkey\" FOREIGN KEY (\"parentId\") REFERENCES \"PlannerIntentVer",
+   "ALTER TABLE \"PlannerAttempt\" ADD CONSTRAINT \"PlannerAttempt_userId_fkey\" FOREIGN KEY (\"userId\") REFERENCES \"User\"(\"id\") ON DELETE CASCADE ON"
+  ],
+  "declined": [
+   "ALTER TABLE \"PlannerIntentVersion\" DROP CONSTRAINT \"planner_intent_parent_membership\"",
+   "ALTER TABLE \"PlannerPlan\" DROP CONSTRAINT \"planner_active_membership\"",
+   "ALTER TABLE \"PlannerPlan\" DROP CONSTRAINT \"planner_draft_membership\"",
+   "ALTER TABLE \"PlannerPlan\" DROP CONSTRAINT \"planner_working_intent_membership\"",
+   "ALTER TABLE \"PlannerQuestLink\" DROP CONSTRAINT \"planner_applied_membership\"",
+   "ALTER TABLE \"PlannerQuestLink\" DROP CONSTRAINT \"planner_created_membership\"",
+   "ALTER TABLE \"PlannerRevision\" DROP CONSTRAINT \"planner_base_membership\"",
+   "ALTER TABLE \"PlannerRevision\" DROP CONSTRAINT \"planner_requested_intent_membership\"",
+   "ALTER TABLE \"PlannerRevision\" DROP CONSTRAINT \"planner_resolved_intent_membership\"",
+   "ALTER TABLE \"UserStats\" ALTER COLUMN \"updatedAt\" DROP DEFAULT"
+  ]
+ },
+ "inventory": {
+  "tables": [
+   {
+    "name": "AcousticTrack",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "AiInsight",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "AiMemory",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "AiUsageLog",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "AuthSession",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "BlockedUser",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "CalendarConnection",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "CalendarEvent",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "CalendarEventException",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "CalendarNote",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "CalendarNoteRecognition",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "CalendarOAuthState",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "CalendarPreference",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "CalendarReminderReceipt",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "CalendarSyncMember",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "CalendarSyncWindow",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "ChatSession",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "ConnectedAccount",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "ConnectedCalendar",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "Conversation",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 4
+   },
+   {
+    "name": "ConversationParticipant",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 2
+   },
+   {
+    "name": "DailyBriefingLog",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "ExternalCalendarEvent",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "ExternalCalendarMutation",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "FloatingRestDay",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "FocusBackground",
+    "rls": true,
+    "forced": false,
+    "anon_select": true,
+    "anon_write": false,
+    "auth_select": true,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "FocusBackgroundCategory",
+    "rls": true,
+    "forced": false,
+    "anon_select": true,
+    "anon_write": false,
+    "auth_select": true,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "FocusParty",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": true,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "FocusPartyMember",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": true,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "FocusSession",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": true,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "FocusSessionMember",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": true,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "FriendRequest",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 4
+   },
+   {
+    "name": "Friendship",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 2
+   },
+   {
+    "name": "Goal",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "HpLedger",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "InventoryItem",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "Item",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "Message",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 2
+   },
+   {
+    "name": "NotesConnection",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "NotesOAuthState",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "PixelCreation",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "PlannerAttempt",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "PlannerCheckResult",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "PlannerFrictionEvent",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "PlannerIntakeSession",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "PlannerIntentVersion",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "PlannerPlan",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "PlannerPreference",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "PlannerQuestLink",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "PlannerRevision",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "Quest",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "SessionInvite",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": true,
+    "auth_write": false,
+    "policies": 4
+   },
+   {
+    "name": "SharedCalendar",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "SharedCalendarMember",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "StatInvestLedger",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "StudySession",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "Subject",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "SubjectNode",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "SylphLedger",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "SystemMessage",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "TimerSessionStart",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "User",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 3
+   },
+   {
+    "name": "UserAchievement",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "UserCosmetic",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "UserFocusBackground",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": true,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "UserInventory",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "UserPrivacy",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "UserQuota",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "UserSkillNode",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "UserStats",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "VerificationToken",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   },
+   {
+    "name": "WaitlistEntry",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 0
+   },
+   {
+    "name": "XpLedger",
+    "rls": true,
+    "forced": false,
+    "anon_select": false,
+    "anon_write": false,
+    "auth_select": false,
+    "auth_write": false,
+    "policies": 1
+   }
+  ],
+  "policies": [
+   {
+    "table": "AiInsight",
+    "name": "aiinsight_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "AiMemory",
+    "name": "aimemory_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "AiUsageLog",
+    "name": "aiusagelog_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "AuthSession",
+    "name": "authsession_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "BlockedUser",
+    "name": "blockeduser_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "ChatSession",
+    "name": "chatsession_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "ConnectedAccount",
+    "name": "connectedaccount_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "Conversation",
+    "name": "conversation_delete_participant",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "DELETE",
+    "qual": "((\"createdBy\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)) OR (EXISTS ( SELECT 1\n   FROM \"ConversationParticipant\" cp\n  WHERE ((cp.\"conversationId\" = \"Conversation\".id) AND (cp.\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))))))",
+    "with_check": null
+   },
+   {
+    "table": "Conversation",
+    "name": "conversation_insert_creator",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(\"createdBy\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "Conversation",
+    "name": "conversation_update_creator",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "UPDATE",
+    "qual": "((\"createdBy\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)) OR (EXISTS ( SELECT 1\n   FROM \"ConversationParticipant\" cp\n  WHERE ((cp.\"conversationId\" = \"Conversation\".id) AND (cp.\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))))))",
+    "with_check": "(\"createdBy\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "Conversation",
+    "name": "convo_select_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "(EXISTS ( SELECT 1\n   FROM \"ConversationParticipant\" cp\n  WHERE ((cp.\"conversationId\" = \"Conversation\".id) AND (cp.\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)))))",
+    "with_check": null
+   },
+   {
+    "table": "ConversationParticipant",
+    "name": "convo_participant_select_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": null
+   },
+   {
+    "table": "ConversationParticipant",
+    "name": "convo_participant_write_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "DailyBriefingLog",
+    "name": "dailybriefinglog_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "FloatingRestDay",
+    "name": "floatingrestday_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "FocusBackground",
+    "name": "Public Read Active Backgrounds",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "anon",
+     "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "((\"isActive\" = true) AND (EXISTS ( SELECT 1\n   FROM \"FocusBackgroundCategory\" c\n  WHERE ((c.id = \"FocusBackground\".\"categoryId\") AND (c.\"isActive\" = true)))))",
+    "with_check": null
+   },
+   {
+    "table": "FocusBackgroundCategory",
+    "name": "Public Read Active Categories",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "anon",
+     "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(\"isActive\" = true)",
+    "with_check": null
+   },
+   {
+    "table": "FocusParty",
+    "name": "focus_party_select_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "(is_focus_party_member(id, (COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))::integer) OR has_pending_party_invite(id, (COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))::integer))",
+    "with_check": null
+   },
+   {
+    "table": "FocusPartyMember",
+    "name": "focus_party_member_select",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "is_focus_party_member(\"partyId\", (COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))::integer)",
+    "with_check": null
+   },
+   {
+    "table": "FocusSession",
+    "name": "focus_session_select",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "is_focus_party_member(\"partyId\", (COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))::integer)",
+    "with_check": null
+   },
+   {
+    "table": "FocusSessionMember",
+    "name": "focus_session_member_select",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "is_focus_session_participant(\"sessionId\", (COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))::integer)",
+    "with_check": null
+   },
+   {
+    "table": "FriendRequest",
+    "name": "friend_request_delete_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "DELETE",
+    "qual": "((\"senderId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)) OR (\"receiverId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)))",
+    "with_check": null
+   },
+   {
+    "table": "FriendRequest",
+    "name": "friend_request_insert_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(\"senderId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "FriendRequest",
+    "name": "friend_request_select_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "((\"senderId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)) OR (\"receiverId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)))",
+    "with_check": null
+   },
+   {
+    "table": "FriendRequest",
+    "name": "friend_request_update_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "UPDATE",
+    "qual": "((\"senderId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)) OR (\"receiverId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)))",
+    "with_check": "((\"senderId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)) OR (\"receiverId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)))"
+   },
+   {
+    "table": "Friendship",
+    "name": "friendship_select_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "((\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)) OR (\"friendId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)))",
+    "with_check": null
+   },
+   {
+    "table": "Friendship",
+    "name": "friendship_write_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "Goal",
+    "name": "goal_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "HpLedger",
+    "name": "hpledger_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "InventoryItem",
+    "name": "inventoryitem_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "Item",
+    "name": "item_select_public_catalog",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "true",
+    "with_check": null
+   },
+   {
+    "table": "Message",
+    "name": "message_insert_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "INSERT",
+    "qual": null,
+    "with_check": "(\"senderId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "Message",
+    "name": "message_select_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "(\"conversationId\" IN ( SELECT cp.\"conversationId\"\n   FROM \"ConversationParticipant\" cp\n  WHERE (cp.\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))))",
+    "with_check": null
+   },
+   {
+    "table": "PixelCreation",
+    "name": "pixel_creation_owner",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "authenticated"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'userId'::text))::integer, 0))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'userId'::text))::integer, 0))"
+   },
+   {
+    "table": "Quest",
+    "name": "quest_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "SessionInvite",
+    "name": "session_invite_delete_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "DELETE",
+    "qual": "((\"senderId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)) OR (\"receiverId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)))",
+    "with_check": null
+   },
+   {
+    "table": "SessionInvite",
+    "name": "session_invite_select",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "((\"senderId\" = (COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))::integer) OR (\"receiverId\" = (COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))::integer))",
+    "with_check": null
+   },
+   {
+    "table": "SessionInvite",
+    "name": "session_invite_select_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "((\"senderId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)) OR (\"receiverId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)))",
+    "with_check": null
+   },
+   {
+    "table": "SessionInvite",
+    "name": "session_invite_update_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "UPDATE",
+    "qual": "((\"senderId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)) OR (\"receiverId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)))",
+    "with_check": "((\"senderId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)) OR (\"receiverId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint)))"
+   },
+   {
+    "table": "StudySession",
+    "name": "studysession_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "Subject",
+    "name": "subject_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "SubjectNode",
+    "name": "subject_node_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"subjectId\" IN ( SELECT s.id\n   FROM \"Subject\" s\n  WHERE (s.\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))))",
+    "with_check": "(\"subjectId\" IN ( SELECT s.id\n   FROM \"Subject\" s\n  WHERE (s.\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))))"
+   },
+   {
+    "table": "SylphLedger",
+    "name": "sylphledger_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "SystemMessage",
+    "name": "systemmessage_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "User",
+    "name": "users_delete_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "DELETE",
+    "qual": "(id = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": null
+   },
+   {
+    "table": "User",
+    "name": "users_select_own_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "SELECT",
+    "qual": "(id = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": null
+   },
+   {
+    "table": "User",
+    "name": "users_update_own_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "UPDATE",
+    "qual": "(id = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(id = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "UserAchievement",
+    "name": "userachievement_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "UserCosmetic",
+    "name": "usercosmetic_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "UserFocusBackground",
+    "name": "user_focus_background_select_own",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "authenticated"
+    ],
+    "cmd": "SELECT",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": null
+   },
+   {
+    "table": "UserInventory",
+    "name": "userinventory_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "UserPrivacy",
+    "name": "userprivacy_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "UserQuota",
+    "name": "userquota_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "UserSkillNode",
+    "name": "userskillnode_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "UserStats",
+    "name": "userstats_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "VerificationToken",
+    "name": "verificationtoken_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   },
+   {
+    "table": "XpLedger",
+    "name": "xpledger_user_policy",
+    "permissive": "PERMISSIVE",
+    "roles": [
+     "public"
+    ],
+    "cmd": "ALL",
+    "qual": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))",
+    "with_check": "(\"userId\" = COALESCE(((auth.jwt() ->> 'sub'::text))::bigint, ((auth.jwt() ->> 'userId'::text))::bigint, (0)::bigint))"
+   }
+  ],
+  "definers": [
+   {
+    "name": "calendar_note_search_before",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": true
+   },
+   {
+    "name": "calendar_planning_lock",
+    "args": "",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "calendar_planning_owners",
+    "args": "table_name text, row_data jsonb",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "calendar_recognition_search_after",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": true
+   },
+   {
+    "name": "canonical_level_from_xp",
+    "args": "p_total_xp integer",
+    "definer": false,
+    "config": null,
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "canonical_rank_db",
+    "args": "p_level integer",
+    "definer": false,
+    "config": null,
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "canonical_rank_display",
+    "args": "p_level integer",
+    "definer": false,
+    "config": null,
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "canonical_required_xp",
+    "args": "p_level integer",
+    "definer": false,
+    "config": null,
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "canonical_xp_for_next_level",
+    "args": "p_level integer",
+    "definer": false,
+    "config": null,
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "check_focus_party_capacity",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": true
+   },
+   {
+    "name": "check_focus_party_invite_sender",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": true
+   },
+   {
+    "name": "check_focus_session_ended_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": true
+   },
+   {
+    "name": "check_focus_session_member_delete_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": true
+   },
+   {
+    "name": "check_focus_session_member_party",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": true
+   },
+   {
+    "name": "check_user_single_active_party",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": true
+   },
+   {
+    "name": "claim_achievement_reward_atomic",
+    "args": "p_user_id text, p_achievement_id text, p_xp_reward integer, p_sylph_reward integer, p_title text",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "claim_quest_reward",
+    "args": "p_user_id integer, p_quest_id integer, p_user_local_date text",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "complete_study_session",
+    "args": "p_user_id integer, p_session_id integer, p_duration_minutes integer, p_duration_seconds integer, p_quest_id integer, p_subject_id integer, p_break_seconds integer, p_focus_rate integer, p_is_final boolean",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "create_focus_party",
+    "args": "p_user_id integer, p_name text",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "enter_focus_session",
+    "args": "p_party_id integer, p_user_id integer",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "forge_apex_node_atomic",
+    "args": "p_user_id text, p_subject_id text, p_node_key text",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "get_focus_party_state",
+    "args": "p_party_id integer, p_user_id integer",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "handle_focus_background_deletion",
+    "args": "",
+    "definer": false,
+    "config": null,
+    "anon": false,
+    "authenticated": false,
+    "service": true
+   },
+   {
+    "name": "has_pending_party_invite",
+    "args": "p_party_id integer, p_user_id integer",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": true,
+    "service": true
+   },
+   {
+    "name": "is_focus_party_member",
+    "args": "p_party_id integer, p_user_id integer",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": true,
+    "service": true
+   },
+   {
+    "name": "is_focus_session_participant",
+    "args": "p_session_id integer, p_user_id integer",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": true,
+    "service": true
+   },
+   {
+    "name": "join_focus_party",
+    "args": "p_party_id integer, p_user_id integer",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "leave_focus_party",
+    "args": "p_party_id integer, p_user_id integer",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "leave_focus_session",
+    "args": "p_session_id integer, p_user_id integer",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "leave_focus_session",
+    "args": "p_session_id integer, p_user_id integer, p_joined_at timestamp without time zone, p_ended_at timestamp without time zone",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "pause_focus_timer",
+    "args": "p_session_id integer, p_user_id integer",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_calendar_capacity_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_compiler_version_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_goal_delete_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_intelligence_retention_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_natural_learning_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_ownership_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_quest_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_research_tool_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_reviewed_claim_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_reviewed_journey_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_reviewed_publication_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_reviewed_research_handoff_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_revision_compiler_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_revision_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_role_attempt_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_role_receipt_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_understanding_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_v2_artifact_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_v2_assert_coordinated",
+    "args": "owner_id integer",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_v2_conversation_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_v2_core_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_v2_execution_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_v2_goal_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_v2_revision_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "planner_v2_source_guard",
+    "args": "",
+    "definer": false,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "purchase_shop_item",
+    "args": "p_item_id integer",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "remove_focus_party_member",
+    "args": "p_party_id integer, p_leader_id integer, p_target_user_id integer",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "resume_focus_timer",
+    "args": "p_session_id integer, p_user_id integer",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "settle_study_session_atomic",
+    "args": "p_user_id integer, p_session_id integer, p_duration_seconds integer, p_break_seconds integer, p_quest_id integer, p_subject_id integer, p_complete_quest boolean, p_is_final boolean, p_user_local_date text",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "start_focus_timer",
+    "args": "p_session_id integer, p_user_id integer",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "start_study_session",
+    "args": "p_user_id integer, p_quest_id integer, p_subject_id integer, p_initial_seconds integer",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "toggle_equip_item",
+    "args": "p_inventory_id integer",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   },
+   {
+    "name": "unlock_skill_node_atomic",
+    "args": "p_user_id text, p_node_key text, p_sp_cost integer, p_required_prereqs text[]",
+    "definer": true,
+    "config": [
+     "search_path=public"
+    ],
+    "anon": false,
+    "authenticated": false,
+    "service": false
+   }
+  ],
+  "publication": [
+   {
+    "schemaname": "public",
+    "tablename": "FocusParty"
+   },
+   {
+    "schemaname": "public",
+    "tablename": "FocusPartyMember"
+   },
+   {
+    "schemaname": "public",
+    "tablename": "FocusSession"
+   },
+   {
+    "schemaname": "public",
+    "tablename": "FocusSessionMember"
+   },
+   {
+    "schemaname": "public",
+    "tablename": "Message"
+   }
+  ],
+  "triggers": [
+   {
+    "table": "AiUsageLog",
+    "name": "planner_research_tool_guard",
+    "fn": "planner_research_tool_guard"
+   },
+   {
+    "table": "AiUsageLog",
+    "name": "planner_role_receipt_guard",
+    "fn": "planner_role_receipt_guard"
+   },
+   {
+    "table": "CalendarConnection",
+    "name": "calendar_planning_lock",
+    "fn": "calendar_planning_lock"
+   },
+   {
+    "table": "CalendarEvent",
+    "name": "calendar_planning_lock",
+    "fn": "calendar_planning_lock"
+   },
+   {
+    "table": "CalendarEventException",
+    "name": "calendar_planning_lock",
+    "fn": "calendar_planning_lock"
+   },
+   {
+    "table": "CalendarNote",
+    "name": "CalendarNote_search_before",
+    "fn": "calendar_note_search_before"
+   },
+   {
+    "table": "CalendarNoteRecognition",
+    "name": "CalendarNoteRecognition_search_after",
+    "fn": "calendar_recognition_search_after"
+   },
+   {
+    "table": "CalendarSyncMember",
+    "name": "calendar_planning_lock",
+    "fn": "calendar_planning_lock"
+   },
+   {
+    "table": "CalendarSyncWindow",
+    "name": "calendar_planning_lock",
+    "fn": "calendar_planning_lock"
+   },
+   {
+    "table": "ConnectedCalendar",
+    "name": "calendar_planning_lock",
+    "fn": "calendar_planning_lock"
+   },
+   {
+    "table": "ExternalCalendarEvent",
+    "name": "calendar_planning_lock",
+    "fn": "calendar_planning_lock"
+   },
+   {
+    "table": "ExternalCalendarMutation",
+    "name": "calendar_planning_lock",
+    "fn": "calendar_planning_lock"
+   },
+   {
+    "table": "FloatingRestDay",
+    "name": "planner_v2_rest_source",
+    "fn": "planner_v2_source_guard"
+   },
+   {
+    "table": "FocusBackground",
+    "name": "trg_official_background_delete",
+    "fn": "handle_focus_background_deletion"
+   },
+   {
+    "table": "FocusPartyMember",
+    "name": "trg_check_focus_party_capacity",
+    "fn": "check_focus_party_capacity"
+   },
+   {
+    "table": "FocusPartyMember",
+    "name": "trg_check_user_single_active_party",
+    "fn": "check_user_single_active_party"
+   },
+   {
+    "table": "FocusSessionMember",
+    "name": "trg_check_focus_session_ended_guard",
+    "fn": "check_focus_session_ended_guard"
+   },
+   {
+    "table": "FocusSessionMember",
+    "name": "trg_check_focus_session_member_delete_guard",
+    "fn": "check_focus_session_member_delete_guard"
+   },
+   {
+    "table": "FocusSessionMember",
+    "name": "trg_check_focus_session_member_party",
+    "fn": "check_focus_session_member_party"
+   },
+   {
+    "table": "Goal",
+    "name": "planner_goal_delete_guard",
+    "fn": "planner_goal_delete_guard"
+   },
+   {
+    "table": "Goal",
+    "name": "planner_v2_goal_guard",
+    "fn": "planner_v2_goal_guard"
+   },
+   {
+    "table": "InventoryItem",
+    "name": "planner_v2_inventory_source",
+    "fn": "planner_v2_source_guard"
+   },
+   {
+    "table": "PlannerAttempt",
+    "name": "planner_calendar_capacity_guard",
+    "fn": "planner_calendar_capacity_guard"
+   },
+   {
+    "table": "PlannerAttempt",
+    "name": "planner_compiler_version_guard",
+    "fn": "planner_compiler_version_guard"
+   },
+   {
+    "table": "PlannerAttempt",
+    "name": "planner_intelligence_attempt",
+    "fn": "planner_intelligence_retention_guard"
+   },
+   {
+    "table": "PlannerAttempt",
+    "name": "planner_natural_learning_guard",
+    "fn": "planner_natural_learning_guard"
+   },
+   {
+    "table": "PlannerAttempt",
+    "name": "planner_reviewed_claim_guard",
+    "fn": "planner_reviewed_claim_guard"
+   },
+   {
+    "table": "PlannerAttempt",
+    "name": "planner_reviewed_journey_guard",
+    "fn": "planner_reviewed_journey_guard"
+   },
+   {
+    "table": "PlannerAttempt",
+    "name": "planner_reviewed_research_handoff_guard",
+    "fn": "planner_reviewed_research_handoff_guard"
+   },
+   {
+    "table": "PlannerAttempt",
+    "name": "planner_role_attempt_guard",
+    "fn": "planner_role_attempt_guard"
+   },
+   {
+    "table": "PlannerAttempt",
+    "name": "planner_understanding_guard",
+    "fn": "planner_understanding_guard"
+   },
+   {
+    "table": "PlannerAttempt",
+    "name": "planner_v2_attempt_guard",
+    "fn": "planner_v2_artifact_guard"
+   },
+   {
+    "table": "PlannerIntentVersion",
+    "name": "planner_v2_intent_guard",
+    "fn": "planner_v2_artifact_guard"
+   },
+   {
+    "table": "PlannerPlan",
+    "name": "planner_plan_ownership",
+    "fn": "planner_ownership_guard"
+   },
+   {
+    "table": "PlannerPlan",
+    "name": "planner_v2_conversation_guard",
+    "fn": "planner_v2_conversation_guard"
+   },
+   {
+    "table": "PlannerPlan",
+    "name": "planner_v2_core_plan",
+    "fn": "planner_v2_core_guard"
+   },
+   {
+    "table": "PlannerQuestLink",
+    "name": "planner_link_ownership",
+    "fn": "planner_ownership_guard"
+   },
+   {
+    "table": "PlannerQuestLink",
+    "name": "planner_v2_core_link",
+    "fn": "planner_v2_core_guard"
+   },
+   {
+    "table": "PlannerRevision",
+    "name": "planner_intelligence_revision",
+    "fn": "planner_intelligence_retention_guard"
+   },
+   {
+    "table": "PlannerRevision",
+    "name": "planner_reviewed_publication_guard",
+    "fn": "planner_reviewed_publication_guard"
+   },
+   {
+    "table": "PlannerRevision",
+    "name": "planner_revision_compiler_guard",
+    "fn": "planner_revision_compiler_guard"
+   },
+   {
+    "table": "PlannerRevision",
+    "name": "planner_revision_guard",
+    "fn": "planner_revision_guard"
+   },
+   {
+    "table": "PlannerRevision",
+    "name": "planner_v2_core_revision",
+    "fn": "planner_v2_core_guard"
+   },
+   {
+    "table": "PlannerRevision",
+    "name": "planner_v2_revision_guard",
+    "fn": "planner_v2_revision_guard"
+   },
+   {
+    "table": "Quest",
+    "name": "planner_quest_guard",
+    "fn": "planner_quest_guard"
+   },
+   {
+    "table": "Quest",
+    "name": "planner_v2_execution_quest",
+    "fn": "planner_v2_execution_guard"
+   },
+   {
+    "table": "SessionInvite",
+    "name": "trg_check_focus_party_invite_sender",
+    "fn": "check_focus_party_invite_sender"
+   },
+   {
+    "table": "SharedCalendar",
+    "name": "calendar_planning_lock",
+    "fn": "calendar_planning_lock"
+   },
+   {
+    "table": "SharedCalendarMember",
+    "name": "calendar_planning_lock",
+    "fn": "calendar_planning_lock"
+   },
+   {
+    "table": "StudySession",
+    "name": "planner_v2_execution_session",
+    "fn": "planner_v2_execution_guard"
+   },
+   {
+    "table": "Subject",
+    "name": "planner_v2_subject_source",
+    "fn": "planner_v2_source_guard"
+   },
+   {
+    "table": "SubjectNode",
+    "name": "planner_v2_node_source",
+    "fn": "planner_v2_source_guard"
+   },
+   {
+    "table": "User",
+    "name": "calendar_planning_user_lock",
+    "fn": "calendar_planning_lock"
+   },
+   {
+    "table": "User",
+    "name": "planner_v2_user_source",
+    "fn": "planner_v2_source_guard"
+   },
+   {
+    "table": "UserFocusBackground",
+    "name": "trg_custom_background_delete",
+    "fn": "handle_focus_background_deletion"
+   },
+   {
+    "table": "UserInventory",
+    "name": "planner_v2_owned_inventory_source",
+    "fn": "planner_v2_source_guard"
+   },
+   {
+    "table": "UserStats",
+    "name": "planner_v2_stats_source",
+    "fn": "planner_v2_source_guard"
+   }
+  ]
+ },
+ "summary": {
+  "tables": 73,
+  "rlsEnabled": 73,
+  "noRls": [],
+  "noRlsReachableByAnonOrAuthenticated": [],
+  "rlsWithNoPolicy": [
+   "AcousticTrack",
+   "CalendarConnection",
+   "CalendarEvent",
+   "CalendarEventException",
+   "CalendarNote",
+   "CalendarNoteRecognition",
+   "CalendarOAuthState",
+   "CalendarPreference",
+   "CalendarReminderReceipt",
+   "CalendarSyncMember",
+   "CalendarSyncWindow",
+   "ConnectedCalendar",
+   "ExternalCalendarEvent",
+   "ExternalCalendarMutation",
+   "NotesConnection",
+   "NotesOAuthState",
+   "PlannerAttempt",
+   "PlannerCheckResult",
+   "PlannerFrictionEvent",
+   "PlannerIntakeSession",
+   "PlannerIntentVersion",
+   "PlannerPlan",
+   "PlannerPreference",
+   "PlannerQuestLink",
+   "PlannerRevision",
+   "SharedCalendar",
+   "SharedCalendarMember",
+   "StatInvestLedger",
+   "TimerSessionStart",
+   "WaitlistEntry"
+  ],
+  "permissivePoliciesWithTrueQual": [
+   "Item.item_select_public_catalog (SELECT)"
+  ],
+  "policiesForAnonOrPublic": [
+   "AiInsight.aiinsight_user_policy (ALL, public)",
+   "AiMemory.aimemory_user_policy (ALL, public)",
+   "AiUsageLog.aiusagelog_user_policy (ALL, public)",
+   "AuthSession.authsession_user_policy (ALL, public)",
+   "BlockedUser.blockeduser_user_policy (ALL, public)",
+   "ChatSession.chatsession_user_policy (ALL, public)",
+   "ConnectedAccount.connectedaccount_user_policy (ALL, public)",
+   "Conversation.conversation_delete_participant (DELETE, public)",
+   "Conversation.conversation_insert_creator (INSERT, public)",
+   "Conversation.conversation_update_creator (UPDATE, public)",
+   "Conversation.convo_select_policy (SELECT, public)",
+   "ConversationParticipant.convo_participant_select_policy (SELECT, public)",
+   "ConversationParticipant.convo_participant_write_policy (ALL, public)",
+   "DailyBriefingLog.dailybriefinglog_user_policy (ALL, public)",
+   "FloatingRestDay.floatingrestday_user_policy (ALL, public)",
+   "FocusBackground.Public Read Active Backgrounds (SELECT, anon,authenticated)",
+   "FocusBackgroundCategory.Public Read Active Categories (SELECT, anon,authenticated)",
+   "FocusParty.focus_party_select_policy (SELECT, public)",
+   "FocusPartyMember.focus_party_member_select (SELECT, public)",
+   "FocusSession.focus_session_select (SELECT, public)",
+   "FocusSessionMember.focus_session_member_select (SELECT, public)",
+   "FriendRequest.friend_request_delete_policy (DELETE, public)",
+   "FriendRequest.friend_request_insert_policy (INSERT, public)",
+   "FriendRequest.friend_request_select_policy (SELECT, public)",
+   "FriendRequest.friend_request_update_policy (UPDATE, public)",
+   "Friendship.friendship_select_policy (SELECT, public)",
+   "Friendship.friendship_write_policy (ALL, public)",
+   "Goal.goal_user_policy (ALL, public)",
+   "HpLedger.hpledger_user_policy (ALL, public)",
+   "InventoryItem.inventoryitem_user_policy (ALL, public)",
+   "Item.item_select_public_catalog (SELECT, public)",
+   "Message.message_insert_policy (INSERT, public)",
+   "Message.message_select_policy (SELECT, public)",
+   "Quest.quest_user_policy (ALL, public)",
+   "SessionInvite.session_invite_delete_policy (DELETE, public)",
+   "SessionInvite.session_invite_select_policy (SELECT, public)",
+   "SessionInvite.session_invite_update_policy (UPDATE, public)",
+   "StudySession.studysession_user_policy (ALL, public)",
+   "Subject.subject_user_policy (ALL, public)",
+   "SubjectNode.subject_node_user_policy (ALL, public)",
+   "SylphLedger.sylphledger_user_policy (ALL, public)",
+   "SystemMessage.systemmessage_user_policy (ALL, public)",
+   "User.users_delete_policy (DELETE, public)",
+   "User.users_select_own_policy (SELECT, public)",
+   "User.users_update_own_policy (UPDATE, public)",
+   "UserAchievement.userachievement_user_policy (ALL, public)",
+   "UserCosmetic.usercosmetic_user_policy (ALL, public)",
+   "UserInventory.userinventory_user_policy (ALL, public)",
+   "UserPrivacy.userprivacy_user_policy (ALL, public)",
+   "UserQuota.userquota_user_policy (ALL, public)",
+   "UserSkillNode.userskillnode_user_policy (ALL, public)",
+   "UserStats.userstats_user_policy (ALL, public)",
+   "VerificationToken.verificationtoken_user_policy (ALL, public)",
+   "XpLedger.xpledger_user_policy (ALL, public)"
+  ],
+  "definersExecutableByAnon": [],
+  "definersExecutableByAuthenticated": [
+   "has_pending_party_invite(p_party_id integer, p_user_id integer)",
+   "is_focus_party_member(p_party_id integer, p_user_id integer)",
+   "is_focus_session_participant(p_session_id integer, p_user_id integer)"
+  ],
+  "definersWithoutSearchPath": [],
+  "allFunctionsExecutableByAnon": [],
+  "published": [
+   "FocusParty",
+   "FocusPartyMember",
+   "FocusSession",
+   "FocusSessionMember",
+   "Message"
+  ]
+ },
+ "anonymousReads": [
+  "FocusBackground: 0",
+  "FocusBackgroundCategory: 4"
+ ],
+ "authenticatedSeesOtherRows": [
+  "FocusBackgroundCategory: 4"
+ ],
+ "directWrites": {
+  "User: raise own XP": {
+   "denied": "42501",
+   "message": "permission denied for table User"
+  },
+  "User: read another person's password": {
+   "denied": "42501",
+   "message": "permission denied for table User"
+  },
+  "User: bump own tokenVersion": {
+   "denied": "42501",
+   "message": "permission denied for table User"
+  }
+ },
+ "policiesWithGrantForced": {
+  "Goal": {
+   "visible": 1,
+   "others": 0
+  },
+  "StudySession": {
+   "visible": 1,
+   "others": 0
+  },
+  "ChatSession": {
+   "visible": 1,
+   "others": 0
+  },
+  "AuthSession": {
+   "visible": 1,
+   "others": 0
+  },
+  "VerificationToken": {
+   "visible": 1,
+   "others": 0
+  },
+  "SystemMessage": {
+   "visible": 1,
+   "others": 0
+  },
+  "Quest": {
+   "visible": 1,
+   "others": 0
+  }
+ },
+ "realtimeTables": {
+  "FocusParty": {
+   "rowsVisibleToOutsider": 0
+  },
+  "FocusPartyMember": {
+   "rowsVisibleToOutsider": 0
+  },
+  "FocusSession": {
+   "rowsVisibleToOutsider": 0
+  },
+  "FocusSessionMember": {
+   "rowsVisibleToOutsider": 0
+  },
+  "SessionInvite": {
+   "rowsVisibleToOutsider": 0
+  }
+ },
+ "realtimeGrantedRoleWrites": {
+  "denied": "42501"
+ },
+ "messageRealtime": {
+  "outsider": {
+   "rowsVisible": 0
+  },
+  "participant": {
+   "rowsVisible": 1
+  },
+  "other participant": {
+   "rowsVisible": 1
+  },
+  "publishedOnThisDatabase": true,
+  "grantsHeldByAuthenticated": {
+   "message": false,
+   "participant": false
+  }
+ },
+ "status": "PASSED",
+ "finishedAt": "2026-11-05T01:52:59.742Z"
+}

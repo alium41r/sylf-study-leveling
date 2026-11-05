@@ -13,6 +13,7 @@ import { formatMinutes, greetingFor, pickNext, plannedMinutes } from "../format"
 import { TodayBriefing } from "./TodayBriefing";
 import { TodayInvites } from "./TodayInvites";
 import { TodayAhead } from "./TodayAhead";
+import { TodayStatus } from "./TodayStatus";
 import { WeeklyQuestCard } from "../../../shell/charts/WeeklyQuestCard";
 import { useWeeklyQuest } from "../progress/useProgress";
 import { meterUnits } from "../progress/shared";
@@ -154,6 +155,7 @@ export function TodayDestination() {
       ) : (
         <>
           <PageTitle title={greeting} detail={today!.summary} />
+          <TodayStatus />
           <TodayBriefing />
           <TodayInvites />
           {backend ? <View style={{ flexDirection: "row" }}><Button title="Ask Sylvie" size="small" icon="sylvie" testID="today-ask" onPress={() => setAsking(true)} /></View> : null}

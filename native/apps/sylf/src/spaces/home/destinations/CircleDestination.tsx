@@ -2,7 +2,7 @@
 // server gives. A friend's hidden level or hours say "hidden", never zero, and there is no schedule or activity feed, because no such thing exists.
 // People, Messages and Parties are views of this page: friend requests, finding people, groups, and studying together all work here.
 import { useEffect, useState } from "react";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { Avatar, Button, Stack, Text, useNotice, useTheme, useWindowClass } from "@sylf/design-system";
 import { useLiveBackend } from "../../../shell/backend";
 import { describeFailureText } from "../../../shell/account/failure";
@@ -14,8 +14,9 @@ import { BlockedSheet } from "../circle/BlockedSheet";
 import { FindPeopleSheet } from "../circle/FindPeopleSheet";
 import { MessagesView } from "../circle/MessagesView";
 import { PartiesView } from "../circle/PartiesView";
+import { PersonRow } from "../circle/PersonRow";
 import { NotificationsSheet } from "../circle/NotificationsSheet";
-import { openProfile, conversationRequest, useConversationRequest } from "../../../shell/profile/store";
+import { conversationRequest, useConversationRequest } from "../../../shell/profile/store";
 
 const load = (adapter: HomeDataAdapter) => adapter.circle();
 const AVATAR = 48;
@@ -106,16 +107,8 @@ export function CircleDestination() {
             secondary={[
               ...(view === "people" && circle.requests?.length ? [<Section key="requests" title="Friend requests"><Stack gap="md">{circle.requests.map((request) => <FriendRequest key={request.id} request={request} />)}</Stack></Section>] : []),
               ...(view === "people" && circle.people.length ? [<Section key="people" title="People">
-                <Stack gap="md">
-                  {circle.people.map((person) => (
-                    <Pressable key={person.id} accessibilityRole={live ? "button" : undefined} accessibilityLabel={`${person.name}. ${person.status}`} testID="circle-person" disabled={!live} onPress={() => (person.username ? openProfile(person.username) : undefined)}>
-                      <View style={{ flexDirection: "row", alignItems: "baseline", gap: space.md }}>
-                        <Text variant="small" numberOfLines={1} style={{ flex: 1 }}>{person.name}</Text>
-                        <Text variant="caption" tone="soft" numberOfLines={1}>{person.status}</Text>
-                      </View>
-                      {person.detail ? <Text variant="caption" tone="soft" numberOfLines={1}>{person.detail}</Text> : null}
-                    </Pressable>
-                  ))}
+                <Stack gap="xs">
+                  {circle.people.map((person) => <PersonRow key={person.id} person={person} live={live} />)}
                 </Stack>
               </Section>] : []),
               ...(view === "parties" && (circle.parties.length || circle.invites?.length) ? [<Section key="parties" title="Study parties">

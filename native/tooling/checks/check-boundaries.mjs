@@ -19,6 +19,15 @@ const sharedCatalogs = path.join(workspace, "packages/shared/src/catalogs.ts");
 const sharedDeps = Object.keys(JSON.parse(fs.readFileSync(path.join(workspace, "packages/shared/package.json"), "utf8")).dependencies ?? {});
 // Portable shared code must not depend on UI frameworks or browser-only storage.
 const NON_PORTABLE_PACKAGES = [/^react(-dom)?$/, /^react-native/, /^next/, /^dexie$/, /^@blocknote\//, /^framer-motion$/, /^lucide-react$/, /^pdfjs-dist/];
+/**
+ * `document.` is the DOM only when nothing local is called `document`. A note's `document` field and a parameter named `document` (both are in lib/calendar) are
+ * data, not the page, so a property access (`note.document.version`) and a file that declares its own `document` binding do not count. Everything else still does.
+ */
+function usesBrowserGlobals(code) {
+  const declaresDocument = /(?:\b(?:const|let|var)\s+document\b|[(,]\s*document\s*[:,)])/.test(code);
+  const scrubbed = code.replace(/\.document\b/g, ".field").replace(declaresDocument ? /\bdocument\./g : /$^/g, "field.");
+  return BROWSER_GLOBALS.test(scrubbed);
+}
 const BROWSER_GLOBALS = /\b(document\.|window\.|localStorage|sessionStorage|indexedDB|navigator\.locks|BroadcastChannel|requestAnimationFrame)\b/;
 
 const violations = [];
@@ -46,7 +55,7 @@ while (queue.length) {
   if (!rel.startsWith("lib/") || FORBIDDEN_REPO_PATHS.some((re) => re.test(rel))) violations.push(`allow-list reaches forbidden file ${rel}`);
   const source = fs.readFileSync(file, "utf8");
   const code = stripComments(source);
-  if (BROWSER_GLOBALS.test(code) && !/\btypeof (window|document|localStorage|indexedDB)\b/.test(code)) violations.push(`${rel} uses browser-only globals without a guard`);
+  if (usesBrowserGlobals(code) && !/\btypeof (window|document|localStorage|indexedDB)\b/.test(code)) violations.push(`${rel} uses browser-only globals without a guard`);
   for (const spec of importsOf(source)) {
     if (spec.startsWith(".") || spec.startsWith("@/")) {
       const target = resolveFile(file, spec);

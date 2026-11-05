@@ -8,6 +8,7 @@ export * as calculator from "../../../../lib/calculator/math-engine";
 export { TimezoneService } from "../../../../lib/timezone-service";
 export * as timer from "../../../../lib/timer-engine";
 export * as modes from "../../../../lib/timer-modes";
+export * as quickAdd from "../../../../lib/calendar/quick-add";
 export * as ink from "../../../../lib/notes/ink";
 export * as inkGeometry from "../../../../lib/notes/ink-geometry";
 export * as notesGraph from "../../../../lib/notes/graph";

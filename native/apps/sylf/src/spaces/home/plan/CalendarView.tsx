@@ -4,8 +4,10 @@
 import { useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { Button, Checkbox, IconButton, ListRow, Marker, Meter, Plane, Press, Segmented, Stack, Text, TextField, useNotice, useTheme, useWindowClass } from "@sylf/design-system";
+import { quickAdd } from "@sylf/shared";
 import type { DayQuest, MonthDay, PlanEvent } from "@sylf/backend";
 import { useLiveBackend } from "../../../shell/backend";
+import { useSubjectColour } from "../../../shell/live";
 import { describeFailureText } from "../../../shell/account/failure";
 import { useHomeNavigation, useSessionState, useStudySession } from "../../../shell/context";
 import { formatMinutes } from "../format";
@@ -53,13 +55,29 @@ function MonthGrid({ view, year, month, selected, onSelect }: { view: MonthView 
 }
 
 /** A real week. Tapping an empty hour starts an event there. Moving one is done in its sheet, which works from a keyboard and a screen reader alike. */
-function WeekGrid({ events, selected, today, onSelect, onEvent, onNew }: { events: PlanEvent[]; selected: string; today: string; onSelect: (day: string) => void; onEvent: (event: PlanEvent) => void; onNew: (day: string, time: string) => void }) {
+function WeekGrid({ events, quests, colourOf, selected, today, onSelect, onEvent, onNew }: { events: PlanEvent[]; quests: (day: string) => DayQuest[]; colourOf: (id: number | null | undefined) => string | null; selected: string; today: string; onSelect: (day: string) => void; onEvent: (event: PlanEvent) => void; onNew: (day: string, time: string) => void }) {
   const { color, shape, space } = useTheme();
   const days = weekOf(selected);
   return (
     <View testID="plan-week" style={{ gap: space.xs }}>
       <View style={{ flexDirection: "row", paddingLeft: HOUR_LABEL }}>
         {days.map((day) => <Press key={day} label={dayTitle(day)} selected={day === selected} onPress={() => onSelect(day)} height={40} style={{ flex: 1 }} bodyStyle={{ height: 40, alignItems: "center", justifyContent: "center" }}><Text variant="caption" tone={day === today || day === selected ? "ink" : "soft"} numberOfLines={1}>{shortDay(day)}</Text></Press>)}
+      </View>
+      <View testID="plan-week-quests" style={{ flexDirection: "row", paddingLeft: HOUR_LABEL, gap: 2, minHeight: 28 }}>
+        {days.map((day) => {
+          const list = quests(day).filter((quest) => !questFailed(quest));
+          return (
+            <View key={day} style={{ flex: 1, minWidth: 0, gap: 2 }}>
+              {list.slice(0, 3).map((quest) => (
+                <Press key={quest.id} label={`Quest: ${quest.title}`} onPress={() => onSelect(day)} radius={shape.radius.xs} bodyStyle={{ flexDirection: "row", alignItems: "center", gap: 4, paddingVertical: 2, paddingHorizontal: 4, backgroundColor: color.selected, borderRadius: shape.radius.xs, opacity: questDone(quest) ? 0.5 : 1 }}>
+                  <View style={{ width: 3, alignSelf: "stretch", borderRadius: 2, backgroundColor: colourOf((quest as { subjectId?: number | null }).subjectId) ?? color.accent.mote }} />
+                  <Text variant="caption" numberOfLines={1} style={{ flex: 1, textDecorationLine: questDone(quest) ? "line-through" : undefined }}>{quest.title}</Text>
+                </Press>
+              ))}
+              {list.length > 3 ? <Text variant="caption" tone="soft">{`+${list.length - 3} more`}</Text> : null}
+            </View>
+          );
+        })}
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" nestedScrollEnabled style={{ maxHeight: HOUR * 10 }} showsVerticalScrollIndicator={false}>
         <View style={{ flexDirection: "row", height: HOUR * GRID_HOURS.length }}>
@@ -114,15 +132,22 @@ function AddField({ day, rest, onAdded, onDetails }: { day: string; rest: boolea
   const [time, setTime] = useState("");
   const [busy, setBusy] = useState(false);
   const timeError = kind === "event" && time.trim() && !validTime(time) ? "Use 24-hour time, such as 14:30." : undefined;
+  // "Physics mock tomorrow at 10am" and "Study group every Tuesday 4pm": a small, fixed grammar turns words into a draft, and the draft is shown before it is saved.
+  const draft = useMemo(() => {
+    if (kind !== "event" || !text.trim() || time.trim()) return null;
+    try { return quickAdd.parseQuickEvent(text, dateKey(new Date()), day, deviceTimezone()); } catch { return null; }
+  }, [kind, text, time, day]);
+  const preview = draft ? [dayTitle(draft.data.startDate), draft.data.allDay ? "all day" : `${clock(draft.data.startsAt!)} to ${clock(draft.data.endsAt!)}`, draft.data.recurrence ? "repeats" : null].filter(Boolean).join(", ") : null;
   const add = async () => {
     if (!backend || !text.trim() || busy || timeError) return;
     setBusy(true);
     try {
       if (kind === "quest") await backend.reads.plan.createQuest({ title: text.trim(), scheduledFor: day, targetMinutes: 30, difficulty: "NORMAL" });
+      else if (draft) await backend.reads.plan.createEvent(globalThis.crypto.randomUUID(), draft.data);
       else {
         const startsAt = time.trim() ? instantOf(day, time) : null;
         const endsAt = startsAt ? new Date(Date.parse(startsAt) + 3_600_000).toISOString() : null;
-        await backend.reads.plan.createEvent(globalThis.crypto.randomUUID(), { title: text.trim(), description: "", color: "BLUE", allDay: !startsAt, startDate: day, endDate: startsAt ? new Date(endsAt!).toLocaleDateString("en-CA") : addDays(day, 1), startsAt, endsAt, timezone: deviceTimezone() });
+        await backend.reads.plan.createEvent(globalThis.crypto.randomUUID(), { title: text.trim(), description: "", color: "BLUE", allDay: !startsAt, startDate: day, endDate: startsAt ? new Date(endsAt!).toLocaleDateString("en-CA") : day, startsAt, endsAt, timezone: deviceTimezone() });
       }
       setText(""); setTime(""); refreshPlan(backend); onAdded();
     } catch (error) { notice(describeFailureText(error)); }
@@ -130,7 +155,8 @@ function AddField({ day, rest, onAdded, onDetails }: { day: string; rest: boolea
   };
   return (
     <Stack gap="sm">
-      <TextField label="Add to this day" hideLabel placeholder={kind === "quest" ? "Add a quest" : "Add an event"} value={text} onChangeText={setText} testID="plan-add-text" returnKeyType="done" onSubmitEditing={() => void add()} />
+      <TextField label="Add to this day" hideLabel placeholder={kind === "quest" ? "Add a quest" : "Add an event, like Lab tomorrow at 3pm"} value={text} onChangeText={setText} testID="plan-add-text" returnKeyType="done" onSubmitEditing={() => void add()} />
+      {preview ? <Text variant="caption" tone="soft" testID="plan-add-preview">{`${draft!.data.title}: ${preview}`}</Text> : null}
       <View style={{ flexDirection: "row", alignItems: "flex-start", gap: space.sm, flexWrap: "wrap" }}>
         <Segmented<"quest" | "event"> label="Kind of thing to add" value={kind} options={[{ value: "quest", label: "Quest" }, { value: "event", label: "Event" }]} onChange={setKind} />
         {kind === "event" ? <View style={{ width: 120 }}><TextField label="Time" hideLabel placeholder="Time" value={time} onChangeText={setTime} error={timeError} testID="plan-add-time" /></View> : null}
@@ -213,6 +239,7 @@ export function CalendarView() {
   const result = useMonth(shown.year, shown.month);
   const view = result?.data ?? null;
   const change = (delta: number) => {
+    if (span === "week") { select(addDays(selected, 7 * delta)); return; }
     const next = new Date(shown.year, shown.month + delta, 1);
     setShown({ year: next.getFullYear(), month: next.getMonth() });
     setSelected(dateKey(next));
@@ -222,18 +249,23 @@ export function CalendarView() {
     const date = new Date(`${day}T12:00:00`);
     if (date.getMonth() !== shown.month || date.getFullYear() !== shown.year) setShown({ year: date.getFullYear(), month: date.getMonth() });
   };
-  const title = new Date(shown.year, shown.month, 1).toLocaleDateString([], { month: "long", year: "numeric" });
+  const weekDays = weekOf(selected);
+  const title = span === "week"
+    ? `${new Date(`${weekDays[0]}T12:00:00`).toLocaleDateString([], { day: "numeric", month: "short" })} to ${new Date(`${weekDays[6]}T12:00:00`).toLocaleDateString([], { day: "numeric", month: "short", year: "numeric" })}`
+    : new Date(shown.year, shown.month, 1).toLocaleDateString([], { month: "long", year: "numeric" });
+  const colourOf = useSubjectColour();
+  const questsOn = (day: string) => view?.month.days.find((entry) => entry.date === day)?.quests ?? [];
   const main = (
     <Stack gap="md">
       <View style={{ flexDirection: "row", alignItems: "center", gap: space.xs, flexWrap: "wrap" }}>
-        <IconButton icon="chevronLeft" label="Previous month" testID="plan-prev" onPress={() => change(-1)} />
-        <Text variant="subheading" testID="plan-month-title" style={{ minWidth: 150, textAlign: "center" }}>{title}</Text>
-        <IconButton icon="chevronRight" label="Next month" testID="plan-next" onPress={() => change(1)} />
+        <IconButton icon="chevronLeft" label={span === "week" ? "Previous week" : "Previous month"} testID="plan-prev" onPress={() => change(-1)} />
+        <Text variant="subheading" testID="plan-month-title" style={{ minWidth: span === "week" ? 220 : 150, textAlign: "center" }}>{title}</Text>
+        <IconButton icon="chevronRight" label={span === "week" ? "Next week" : "Next month"} testID="plan-next" onPress={() => change(1)} />
         <View style={{ flex: 1 }} />
         <Segmented<Span> label="Calendar span" value={span} options={[{ value: "month", label: "Month" }, { value: "week", label: "Week" }, { value: "agenda", label: "Agenda" }]} onChange={setSpan} />
       </View>
       {result?.live?.failure && !view ? <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}><Text variant="small" tone="soft" style={{ flex: 1 }}>{result.live.failure}</Text><Button title="Try again" size="small" onPress={result.live.retry} /></View> : null}
-      {span === "month" ? <MonthGrid view={view} year={shown.year} month={shown.month} selected={selected} onSelect={select} /> : span === "week" ? <WeekGrid events={view?.events ?? []} selected={selected} today={view?.today ?? dateKey(now)} onSelect={select} onEvent={(event) => setEventTarget({ event, day: selected })} onNew={(day, time) => setEventTarget({ event: null, day, time })} /> : <Agenda view={view} from={selected} onSelect={select} onEvent={(event) => setEventTarget({ event, day: selected })} />}
+      {span === "month" ? <MonthGrid view={view} year={shown.year} month={shown.month} selected={selected} onSelect={select} /> : span === "week" ? <WeekGrid events={view?.events ?? []} quests={questsOn} colourOf={colourOf} selected={selected} today={view?.today ?? dateKey(now)} onSelect={select} onEvent={(event) => setEventTarget({ event, day: selected })} onNew={(day, time) => setEventTarget({ event: null, day, time })} /> : <Agenda view={view} from={selected} onSelect={select} onEvent={(event) => setEventTarget({ event, day: selected })} />}
     </Stack>
   );
   const page = <DayPage view={view} day={selected} onEvent={(event) => setEventTarget({ event, day: selected })} onNewEvent={() => setEventTarget({ event: null, day: selected })} onQuest={setQuestTarget} />;

@@ -1,6 +1,6 @@
 // The people you have blocked, and a way to undo it. Blocking was one tap in a person's sheet, so undoing it has to be just as findable. Unblocking does not
 // bring a friendship back: they are a stranger again, and either of you can send a request.
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 import { Button, EmptyState, ListRow, Sheet, Stack, Text, useNotice, useTheme } from "@sylf/design-system";
 import { useLiveBackend, useOptionalResource } from "../../../shell/backend";
@@ -13,6 +13,8 @@ export function BlockedSheet({ open, onClose }: { open: boolean; onClose: () => 
   const [busy, setBusy] = useState<number | null>(null);
   const resource = useMemo(() => (backend && open ? backend.resources.resource({ key: "circle-blocked", tags: ["circle", "blocked"], ttlMs: 30_000, load: (signal) => backend.reads.social.blocked(signal) }) : null), [backend, open]);
   const state = useOptionalResource(resource);
+  // A block made on another device is not something this one can know about, so opening the list asks again.
+  useEffect(() => { if (open) resource?.refresh(); }, [open, resource]);
   const people = state?.data ?? null;
   const unblock = async (id: number) => {
     if (!backend || busy !== null) return;

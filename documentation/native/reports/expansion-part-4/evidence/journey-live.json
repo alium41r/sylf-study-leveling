@@ -1,0 +1,33 @@
+{
+ "stage": "live",
+ "passed": true,
+ "failed": [],
+ "checks": {
+  "the sign-in surface is first": true,
+  "Home opens after sign-up": true,
+  "a second person exists": true,
+  "a friend request can be answered": true,
+  "the request is there": true,
+  "the friend joins the circle": true,
+  "parties offer to start one": true,
+  "a party exists": true,
+  "the party room lists both people": true,
+  "Study together goes to Focus": true,
+  "the environment opens": true,
+  "the room strip names the party": true,
+  "the server seated Alice in the room, focusing": true,
+  "the session record is a party session": true,
+  "leaving the session leaves the room": true,
+  "exactly one study session was recorded": true,
+  "a blocked person is listed with Unblock": true,
+  "unblocking empties the list": true,
+  "no sample content: the live screens": true
+ },
+ "facts": {
+  "alice": 1,
+  "invite": 201
+ },
+ "consoleErrors": [
+  "Uncaught (in promise) Error: The wake lock with tag sylf-focus has not activated yet"
+ ]
+}

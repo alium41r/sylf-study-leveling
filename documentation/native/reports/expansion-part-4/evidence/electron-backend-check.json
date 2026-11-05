@@ -1,0 +1,84 @@
+{
+ "passed": true,
+ "passedCount": 39,
+ "total": 39,
+ "failed": [],
+ "results": {
+  "starts signed out, and configured": true,
+  "a protected route refuses a renderer with no session": true,
+  "registration works through the host": true,
+  "the sign-in answer carries no token": true,
+  "the host holds a session": true,
+  "a wrong password is refused, with the server's words": true,
+  "a bearer request from this process passes the server's browser check": true,
+  "requests carry the bearer token": true,
+  "no cookie left this process": true,
+  "no Sec-Fetch-Site left this process, which the server would refuse": true,
+  "the server set no cookie on a native request": true,
+  "the host keeps its own install name, not the renderer's": true,
+  "a stream arrives as it is sent, through protocol.handle": true,
+  "a relative audio URL loads through the host, by range": true,
+  "an audio element plays a proxied file under the app's CSP": true,
+  "a keepalive start and end reach the real timer through the host": true,
+  "eight requests at once all succeed": true,
+  "a real refresh rotates the token": true,
+  "the check really captured the tokens it compares against": true,
+  "no token in any window global, the page, or web storage": true,
+  "no token-shaped value in the renderer": true,
+  "the renderer has no cookie": true,
+  "the renderer has no database or cache holding a session": true,
+  "the bridge did not grow": true,
+  "the refresh token is on disk, encrypted": true,
+  "only this user can read it": true,
+  "a restart restores the session, with no network": true,
+  "a restarted client refreshes and reads": true,
+  "the rotation it made is on disk": true,
+  "sign-out through the restarted client ends the session": true,
+  "sign-out removed the file": true,
+  "the first client is out too: the server's row ended": true,
+  "signing in again works": true,
+  "the host forgets on sign-out": true,
+  "a token copied before sign-out is refused by the server": true,
+  "sign out everywhere works through the host": true,
+  "sign out everywhere leaves the host empty": true,
+  "a public route answers with nobody signed in": true,
+  "the web's cookie routes are not reachable": true
+ },
+ "facts": {
+  "statsStatus": 200,
+  "secFetchHeadersSeen": [
+   "sec-fetch-mode"
+  ],
+  "deviceName": "Sylf for Mac",
+  "sessionsStatus": 200,
+  "stream": {
+   "status": 200,
+   "type": "text/event-stream",
+   "events": 5,
+   "reads": 5,
+   "spreadMs": 603
+  },
+  "audioPath": "/audio/ambient/wind.ogg",
+  "audioRange": {
+   "status": 206,
+   "bytes": 100,
+   "type": "audio/ogg",
+   "range": "bytes 0-99/289537"
+  },
+  "audioElement": "metadata",
+  "timerShaped": {
+   "started": 201,
+   "ended": 200,
+   "state": "ENDED"
+  },
+  "rendererStringsScanned": 26,
+  "secretsCompared": 4,
+  "safeStorage": {
+   "available": true,
+   "backend": "os"
+  },
+  "safeStorageProbe": 19,
+  "vaultFile": true
+ },
+ "requests": 33
+}

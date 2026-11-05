@@ -68,6 +68,14 @@ async function nativeChecks() {
 }
 
 /** Two processes and one profile: what crosses between them is what a real restart keeps. The profile is thrown away afterwards. */
+function live() {
+  mkdirSync(out, { recursive: true });
+  const profile = mkdtempSync(join(tmpdir(), "sylf-live-"));
+  report.live = nativeCheck("npm", ["--workspace", "@sylf/desktop", "run", "journey-check"], { SYLF_BACKEND_TARGET: base, SYLF_JOURNEY_OUT: out, SYLF_JOURNEY_PROFILE: profile, SYLF_JOURNEY_STAGE: "live" }, 540_000);
+  rmSync(profile, { recursive: true, force: true });
+  if (!report.live) report.failed = true;
+}
+
 function journey() {
   mkdirSync(out, { recursive: true });
   const profile = mkdtempSync(join(tmpdir(), "sylf-journey-"));
@@ -131,7 +139,7 @@ try {
   server.stdout.on("data", keep); server.stderr.on("data", keep);
   await ready();
   if (has("--serve")) { console.log(`Serving ${base} on a disposable database. Ctrl-C stops both.`); await new Promise(() => {}); }
-  if (has("--journey")) journey(); else if (has("--native-checks")) await nativeChecks(); else await smoke();
+  if (has("--live")) live(); else if (has("--journey")) journey(); else if (has("--native-checks")) await nativeChecks(); else await smoke();
   report.serverErrors = logs.join("").split("\n").filter(line => /error/i.test(line)).map(line => backend.redact(line).slice(0, 200)).slice(0, 30);
   if (report.failed) exit = 1;
 } catch (error) {

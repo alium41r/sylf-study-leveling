@@ -111,6 +111,113 @@ async function runStage(window, { stub }, stage, out) {
   const accountSheet = async () => { await clickOn(tid("home-account")); await sleep(450); };
   const serverSessions = async () => (await api("/api/sessions?limit=50")).json?.sessions ?? [];
 
+  // The live stage (Expansion Part 3): the social and party screens, driven by hand against a real server, with a second person acting through the API.
+  if (stage === "live") {
+    const tag = Date.now().toString(36);
+    const alice = { email: `alice_${tag}@local.test`, name: "Alice Quill", username: `alice_${tag}` };
+    const bob = { email: `bob_${tag}@local.test`, name: "Bob Marsh", username: `bob_${tag}` };
+    const escape = async () => { contents.sendInputEvent({ type: "keyDown", keyCode: "Escape" }); contents.sendInputEvent({ type: "keyUp", keyCode: "Escape" }); await sleep(450); };
+    check("the sign-in surface is first", await until(tid("signin-surface")));
+    await clickOn(`${tid("signin-plane")} [role=radio]:nth-child(2), ${tid("signin-plane")} [aria-label="Create account"]`);
+    await sleep(300);
+    await type(tid("signin-name"), alice.name);
+    await type(tid("signin-username"), alice.username);
+    await type(tid("signin-identifier"), alice.email);
+    await type(tid("signin-password"), PASSWORD);
+    await clickOn(tid("signin-submit"));
+    if (await until(tid("onboarding-skip"), 10000)) await clickOn(tid("onboarding-skip"));
+    check("Home opens after sign-up", await until(tid("home-rail-circle"), 15000));
+    // Bob exists on another device, and asks Alice to be friends.
+    const made = await elsewhere("/api/auth/native/register", { json: { ...bob, password: PASSWORD, timezone: "UTC", clientName: "Bob's phone" } });
+    const bobToken = made.json?.session?.accessToken;
+    check("a second person exists", Boolean(bobToken));
+    await elsewhere("/api/friends/requests", { token: bobToken, json: { username: alice.username } });
+    await rail("circle");
+    await open("space=home&home=circle");
+    check("a friend request can be answered", await until(tid("circle-notifications"), 12000));
+    const request = (await api("/api/friends/requests")).json?.[0];
+    check("the request is there", await until(tid(`circle-accept-${request?.id}`)));
+    await shot("live-01-request");
+    await clickOn(tid(`circle-accept-${request?.id}`));
+    check("the friend joins the circle", await until(tid("circle-person")));
+    await shot("live-02-people");
+
+    // Messages: write to Bob, and Bob answers.
+    await clickOn(`${tid("home-subnav-circle")} [role=radio]:nth-child(2), ${tid("home-subnav-circle")} [aria-label="Messages"]`);
+    await sleep(500);
+    await clickOn(tid("circle-person")).catch(() => undefined);
+    await shot("live-03-messages");
+
+    // Parties: start one, invite Bob (through the API: the friend picker needs a tap), Bob accepts, and the room shows both.
+    await clickOn(`${tid("home-subnav-circle")} [role=radio]:nth-child(3), ${tid("home-subnav-circle")} [aria-label="Parties"]`);
+    check("parties offer to start one", await until(tid("party-start")));
+    await clickOn(tid("party-start"));
+    await type(tid("party-name"), "Night owls");
+    await sleep(200);
+    await clickOn(`[role=dialog] button:last-of-type, ${tid("party-name")} ~ * button`).catch(() => undefined);
+    await shot("live-04-party-naming");
+    await escape();
+    const me = (await api("/api/user/stats")).json;
+    facts.alice = me?.id ?? null;
+    const mine = await api("/api/focus-party", { method: "POST", json: { name: "Night owls" } });
+    const partyId = mine.json?.partyId;
+    check("a party exists", Number.isInteger(partyId));
+    const bobUser = (await elsewhere("/api/user/stats", { token: bobToken })).json;
+    const invite = await api(`/api/focus-party/${partyId}/invite`, { json: { friendId: bobUser?.id } });
+    facts.invite = invite.status;
+    const bobSummary = await elsewhere("/api/focus-party", { token: bobToken });
+    const inviteId = bobSummary.json?.pendingInvites?.[0]?.id;
+    await elsewhere(`/api/focus-party/invites/${inviteId}`, { method: "PATCH", token: bobToken, json: { action: "ACCEPTED" } });
+    await open("space=home&home=circle");
+    await clickOn(`${tid("home-subnav-circle")} [role=radio]:nth-child(3), ${tid("home-subnav-circle")} [aria-label="Parties"]`);
+    check("the party room lists both people", await until(tid(`party-room-member-${bobUser?.id}`), 12000));
+    await shot("live-05-party-room");
+
+    // Study together: choose the party on Focus, enter, and the environment shows the room.
+    await clickOn(tid("party-study"));
+    check("Study together goes to Focus", await until(tid("focus-enter")));
+    await shot("live-06-focus-with");
+    await clickOn(tid("focus-enter"));
+    check("the environment opens", await until(tid("focus-environment"), 8000));
+    check("the room strip names the party", await until(tid("room-strip"), 12000));
+    await sleep(2500);
+    const server = await api(`/api/focus-party/${partyId}`);
+    const seat = server.json?.activeSession?.members?.find((/** @type {any} */ m) => m.userId === me?.id);
+    check("the server seated Alice in the room, focusing", seat?.timerState === "FOCUSING");
+    await shot("live-07-environment-room");
+    const sessionRecord = await record();
+    check("the session record is a party session", sessionRecord?.active?.party?.partyId === partyId);
+    await escape();
+
+    // End it from Focus (a person's usual way), and the exit reaches the server. One study session, nothing else.
+    await rail("focus");
+    await sleep(500);
+    await clickOn(tid("focus-end"));
+    await sleep(500);
+    await js(`(() => { const b = [...document.querySelectorAll('button, [role=button]')].find((e) => e.textContent.trim() === 'End session'); b?.click(); })()`);
+    await sleep(6000);
+    const after = (await api(`/api/focus-party/${partyId}`)).json;
+    const gone = after?.activeSession?.members?.find((/** @type {any} */ m) => m.userId === me?.id);
+    check("leaving the session leaves the room", !gone || gone.timerState === "LEFT");
+    const sessions = await serverSessions();
+    check("exactly one study session was recorded", sessions.length === 1);
+
+    // Blocked list.
+    await open("space=home&home=circle");
+    await clickOn(tid("circle-blocked"));
+    await shot("live-08-blocked-empty");
+    await escape();
+    await api("/api/friends/block", { json: { targetUserId: bobUser?.id } });
+    await clickOn(tid("circle-blocked"));
+    check("a blocked person is listed with Unblock", await until(tid(`unblock-${bobUser?.id}`), 8000));
+    await shot("live-09-blocked");
+    await clickOn(tid(`unblock-${bobUser?.id}`));
+    check("unblocking empties the list", await until(`${tid("blocked-list")}, [data-testid=blocked-list]`, 1000).then((found) => !found));
+    await noSample("the live screens");
+    const failed = Object.entries(checks).filter(([, ok]) => !ok).map(([name]) => name);
+    return { stage, passed: failed.length === 0, failed, checks, facts, consoleErrors };
+  }
+
   if (stage === "first") {
     const tag = Date.now().toString(36);
     const alice = { email: `alice_${tag}@local.test`, name: "Alice Quill", username: `alice_${tag}` };
@@ -134,6 +241,11 @@ async function runStage(window, { stub }, stage, out) {
     await type(tid("signin-password"), PASSWORD);
     await shot("03-create-account");
     await clickOn(tid("signin-submit"));
+    // A new account is first asked what it studies (Part 2). The journey skips it and checks that Home follows.
+    check("a new account is asked what it studies", await until(tid("onboarding-skip"), 10000));
+    await clickOn(tid("onboarding-skip"));
+    await sleep(2500);
+    await shot("03b-after-skip");
     check("a new account opens Home", await until(tid("home-today"), 10000));
 
     // 2. Empty account: everything real, and nothing invented.

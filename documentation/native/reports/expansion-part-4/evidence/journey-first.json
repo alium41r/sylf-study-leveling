@@ -1,0 +1,5 @@
+{
+ "passed": false,
+ "stage": "first",
+ "error": "Error: nothing visible at [data-testid=\"focus-begin\"]\n    at clickOn (file:///Users/aliumair/Desktop/sylf-expansion-part-3/native/apps/desktop/src/journey-check.mjs:67:23)\n    at async runStage (file:///Users/aliumair/Desktop/sylf-expansion-part-3/native/apps/desktop/src/journey-check.mjs:187:5)\n    at async runJourneyCheck (file:///Users/aliumair/Desktop/sylf-expansion-part-3/native/apps/desktop/src/journey-check.mjs:29:24)"
+}

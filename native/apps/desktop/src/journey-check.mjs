@@ -220,7 +220,9 @@ async function runStage(window, { stub }, stage, out) {
     const todayKey = new Date().toLocaleDateString("en-CA");
     const quest = await api("/api/quests", { json: { title: "Waves: past paper", scheduledFor: todayKey, targetMinutes: 45, difficulty: "NORMAL", subjectId: subject.json?.id } });
     await open("space=home&home=today");
-    check("Today says where you stand", await until(tid("today-status"), 10000));
+    check("Today says where you stand", await until(tid("today-momentum"), 10000));
+    check("Today's hero has the ring and the window onto the World", (await until(tid("today-ring"), 10000)) && (await js(`new Promise((done) => { const end = Date.now() + 10000; const look = () => (document.querySelector('[data-testid="today-window"] img') || Date.now() > end ? done(!!document.querySelector('[data-testid="today-window"]')) : setTimeout(look, 100)); look(); })`)));
+    check("Today has its day, world and circle cards", (await until(tid("today-day"))) && (await until(tid("today-world"))) && (await until(tid("today-circle"), 8000)));
     check("Today shows the week's focus quest", await until(tid("weekly-quest"), 10000));
     await shot("live-12-today");
     await open("space=home&home=progress");

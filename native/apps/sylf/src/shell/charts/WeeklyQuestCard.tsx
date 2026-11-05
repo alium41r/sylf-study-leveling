@@ -28,3 +28,19 @@ export function WeeklyQuestCard({ quest }: { quest: WeeklyQuest }) {
     </View>
   );
 }
+
+/** The same quest as one inline block, for places that already sit inside a card (a card inside a card is clutter). */
+export function WeeklyQuestInline({ quest }: { quest: WeeklyQuest }) {
+  const { space } = useTheme();
+  const progress = Math.min(quest.progressMinutes, quest.targetMinutes);
+  return (
+    <View testID="weekly-quest" style={{ gap: space.xs }}>
+      <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", gap: space.md }}>
+        <Text variant="caption" tone="soft">Focus quest this week</Text>
+        <Text variant="caption" tone="soft">{quest.isCompleted ? "Done" : weeklyQuestLine(quest).replace(/\.$/, "")}</Text>
+      </View>
+      <Meter {...meterUnits(progress, quest.targetMinutes)} label={`${formatMinutes(quest.progressMinutes)} of ${formatMinutes(quest.targetMinutes)} this week`} />
+      <Text variant="small">{`${formatMinutes(quest.progressMinutes)} of ${formatMinutes(quest.targetMinutes)}`}</Text>
+    </View>
+  );
+}

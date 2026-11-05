@@ -76,10 +76,10 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, onOpen
   }, [snapshot.entries, kinds, inTrash, folderId, query]);
 
   const run = (task: Promise<unknown>, done?: string) => { void task.then(() => { if (done) notice(done); }, (error: unknown) => notice(error instanceof Error ? error.message : "That didn't work.")); };
-  const create = async (kind: Exclude<NoteKind, "pdf">, template?: string, paper?: string) => {
+  const create = async (kind: Exclude<NoteKind, "pdf">, template?: string, paper?: string, flow?: "endless") => {
     setCreating(false);
     try {
-      const options = kind === "board" ? { kind, paper: (paper ?? template) as never } : { kind: "note" as const, template: template ?? "blank", paper: (paper ?? "ruled") as never, title: template && template !== "blank" ? TYPED_TEMPLATES.find((t) => t.id === template)?.label : undefined };
+      const options = kind === "board" ? { kind, paper: (paper ?? template) as never } : { kind: "note" as const, template: template ?? "blank", paper: (paper ?? "ruled") as never, title: template && template !== "blank" ? TYPED_TEMPLATES.find((t) => t.id === template)?.label : undefined, flow };
       const id = await library.create({ ...options, notebookId: folderId, subjectId: studying });
       const entry = library.getSnapshot().entries.find((e) => e.id === id);
       if (entry) onOpen(entry);
@@ -98,6 +98,7 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, onOpen
   const notes = kinds.includes("note");
   const createItems: MenuItem[] = [
     ...(notes ? PAPER_TEMPLATES.slice(0, 4).map((t) => ({ key: `note-${t.id}`, label: `Note, ${t.label.toLowerCase()}`, detail: "Type and write on the same pages", icon: "notes" as IconName, onSelect: () => void create("note", "blank", t.id) })) : []),
+    ...(notes ? [{ key: "note-endless", label: "Note, endless", detail: "One page that grows as you write", icon: "notes" as IconName, onSelect: () => void create("note", "blank", "ruled", "endless") }] : []),
     ...(notes ? TYPED_TEMPLATES.filter((t) => t.id !== "blank").map((t) => ({ key: `tpl-${t.id}`, label: t.label, detail: t.detail, icon: "bulletList" as IconName, onSelect: () => void create("note", t.id, "ruled") })) : []),
     ...(kinds.includes("board") ? BOARD_TEMPLATES.map((t) => ({ key: `board-${t.id}`, label: `Whiteboard, ${t.label.toLowerCase()}`, icon: "whiteboard" as IconName, onSelect: () => void create("board", t.id) })) : []),
     ...(kinds.includes("pdf") ? [{ key: "pdf", label: "Import a PDF", icon: "fileImport" as IconName, onSelect: () => void importPdf() }] : []),

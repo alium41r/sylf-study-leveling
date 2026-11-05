@@ -2,11 +2,11 @@
 // layer, in the web's page-layers format. A Type and Write switch changes what the pen and fingers do, and the toolbar with it. Only
 // the page being typed on runs an editor; every other page draws its text natively, so a long note costs what one page costs.
 import { useEffect, useMemo, useRef, useState, type ComponentRef, type ReactNode } from "react";
-import { Image, ScrollView, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
+import { Image, Platform, ScrollView, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
 import * as Y from "yjs";
 import { DOCUMENT_DEFAULTS, Divider, Icon, IconButton, Menu, Press, Text, useNotice, useTheme, type MenuItem, type ViewHandle } from "@sylf/design-system";
 import type { DocumentDescriptor, InkPaper } from "@sylf/shared";
-import { InkScene, typedTemplate, templateOf, type NotesLibrary, type OpenDocument } from "@sylf/notes";
+import { InkScene, flowOf, typedTemplate, templateOf, unionOf, type NotesLibrary, type OpenDocument } from "@sylf/notes";
 import FormatBar, { NO_FORMAT, type Format } from "./FormatBar";
 import InkToolbar from "./InkToolbar";
 import InkView from "./InkView";
@@ -25,6 +25,10 @@ import * as DocumentPicker from "expo-document-picker";
 type Page = DocumentDescriptor["pages"][number];
 export type NoteMode = "type" | "write";
 const GAP = 20, SNAP = 96, MARGIN = 160;
+// An endless page keeps this much empty paper below whatever is written on it, in page units: write into it and the page grows.
+const ENDLESS_ROOM = 640;
+// Below the last page of a paged note: pull (or, with a wheel, keep scrolling) through this to add a page.
+const PULL = 120, WHEEL_PULL = 320;
 const RULED = new Set(["ruled", "cornell", "journal"]);
 // The system face on both sides: the WebView on Android has none of the app's fonts, and the native text must match it.
 const FONT = '-apple-system, BlinkMacSystemFont, Roboto, "Segoe UI", system-ui, sans-serif';
@@ -82,7 +86,10 @@ export default function NoteEditor({ library, document, editable, initialPage, o
     let top = GAP;
     return pages.map((page) => { const row = { page, top, width: page.width * scale, height: page.height * scale }; top += row.height + GAP; return row; });
   }, [pages, scale]);
-  const contentHeight = (layout.at(-1)?.top ?? 0) + (layout.at(-1)?.height ?? 0) + GAP;
+  const endless = flowOf(descriptor) === "endless";
+  const pullable = editable && !endless && !!pages.length;
+  const pagesHeight = (layout.at(-1)?.top ?? 0) + (layout.at(-1)?.height ?? 0) + GAP;
+  const contentHeight = pagesHeight + (pullable ? PULL : 0);
   const contentWidth = Math.max(size.width, widest * scale + GAP * 2);
   const current = Math.max(0, layout.findIndex((row) => row.top + row.height > scroll.y + size.height / 3));
   useEffect(() => { onPage(current); }, [current]);
@@ -174,6 +181,51 @@ export default function NoteEditor({ library, document, editable, initialPage, o
     </>
   );
 
+  // An endless note grows its last page to keep room below the lowest ink, as the text does through onHeight.
+  const lastPage = pages.at(-1);
+  const lastScene = endless && lastPage && !lastPage.originalAssetId ? scene(lastPage) : null;
+  const inkBottom = lastScene && lastScene.strokes().length ? (() => { const box = unionOf(lastScene.strokes().map((st) => st.bounds)); return box.y + box.height; })() : 0;
+  useEffect(() => { if (lastPage && inkBottom) document.growPage(lastPage.pageId, inkBottom + ENDLESS_ROOM); }, [lastPage?.pageId, inkBottom]);
+
+  // Pull to add a page: on touch, release with the zone below the last page fully shown; with a wheel, keep scrolling at the end.
+  const [wheelPull, setWheelPull] = useState(0);
+  const adding = useRef(false);
+  // How much of the zone showed when the drag began: a pull starts with the zone in view, so dragging or flinging to the end adds nothing.
+  const pullStart = useRef(0);
+  const addPageAtEnd = () => {
+    if (adding.current || !pullable) return;
+    adding.current = true;
+    document.addPage(pages.length - 1);
+    setWheelPull(0);
+    requestAnimationFrame(() => { vertical.current?.scrollTo({ y: Math.max(0, pagesHeight - GAP), animated: true }); setTimeout(() => { adding.current = false; }, 500); });
+  };
+  const addLatest = useRef(addPageAtEnd);
+  addLatest.current = addPageAtEnd;
+  useEffect(() => {
+    if (Platform.OS !== "web" || !pullable) return;
+    const node = (vertical.current as unknown as { getScrollableNode?(): HTMLElement } | null)?.getScrollableNode?.();
+    if (!node) return;
+    // Momentum that carries a scroll to the end is not a pull: only scrolling that starts after a pause at the end counts.
+    let pulled = 0, armed = false, last = 0, idle: ReturnType<typeof setTimeout> | undefined;
+    const onWheel = (event: WheelEvent) => {
+      if (event.ctrlKey || event.metaKey) return;
+      const now = event.timeStamp, gap = now - last;
+      last = now;
+      const atEnd = node.scrollTop + node.clientHeight >= node.scrollHeight - 2;
+      if (!atEnd || event.deltaY <= 0) { armed = false; if (pulled) { pulled = 0; setWheelPull(0); } return; }
+      if (!armed) { armed = gap > 220; if (!armed) return; }
+      pulled += event.deltaY * (event.deltaMode === 1 ? 16 : 1);
+      setWheelPull(Math.min(1, pulled / WHEEL_PULL));
+      clearTimeout(idle);
+      if (pulled >= WHEEL_PULL) { pulled = 0; addLatest.current(); return; }
+      idle = setTimeout(() => { pulled = 0; armed = false; setWheelPull(0); }, 700);
+    };
+    node.addEventListener("wheel", onWheel, { passive: true });
+    return () => { node.removeEventListener("wheel", onWheel); clearTimeout(idle); };
+  }, [pullable, size.width > 0]);
+  const revealed = Math.max(0, Math.min(1, (scroll.y + size.height - pagesHeight) / PULL));
+  const pullProgress = Platform.OS === "web" ? wheelPull : revealed;
+
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const y = event.nativeEvent.contentOffset.y;
     if (Math.abs(y - scroll.y) >= 8) setScroll((s) => ({ ...s, y }));
@@ -188,7 +240,9 @@ export default function NoteEditor({ library, document, editable, initialPage, o
       <View style={{ flex: 1, backgroundColor: color.sunken }} onLayout={(e: LayoutChangeEvent) => setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}>
         {size.width ? (
           <ScrollView ref={horizontal} horizontal keyboardShouldPersistTaps="handled" scrollEnabled={contentWidth > size.width + 1} showsHorizontalScrollIndicator={contentWidth > size.width + 1} onScroll={(e) => setScroll((s) => ({ ...s, x: e.nativeEvent.contentOffset.x }))} scrollEventThrottle={32} contentContainerStyle={{ width: contentWidth }}>
-            <ScrollView ref={vertical} keyboardShouldPersistTaps="handled" style={{ width: contentWidth, height: size.height }} onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ height: contentHeight }}>
+            <ScrollView ref={vertical} keyboardShouldPersistTaps="handled" style={{ width: contentWidth, height: size.height }} onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ height: contentHeight }}
+              onScrollBeginDrag={(e) => { pullStart.current = (e.nativeEvent.contentOffset.y + size.height - pagesHeight) / PULL; }}
+              onScrollEndDrag={(e) => { if (pullable && pullStart.current > 0.25 && e.nativeEvent.contentOffset.y + size.height >= contentHeight - 12) addPageAtEnd(); }}>
               {layout.map((row) => {
                 const left = (contentWidth - row.width) / 2;
                 const near = row.top + row.height > scroll.y - size.height && row.top < scroll.y + size.height * 2;
@@ -214,7 +268,7 @@ export default function NoteEditor({ library, document, editable, initialPage, o
                       typingHere ? (
                         <View style={{ position: "absolute", left: box.left * scale, top: box.top * scale, width: box.width * scale, height: (row.page.height - box.top - 24) * scale }}>
                           <PageTextEditor key={row.page.pageId} handle={editor} doc={text} document={document} page={row.page} scale={scale} line={box.line} template={row === layout[0] ? JSON.stringify(typedTemplate(templateOf(descriptor)).blocks) : "[]"}
-                            onFormat={setFormat} pendingImage={pendingImage} onImageDone={() => setPendingImage(null)} onHeight={(h) => document.growPage(row.page.pageId, box.top + h + 80)} />
+                            onFormat={setFormat} pendingImage={pendingImage} onImageDone={() => setPendingImage(null)} onHeight={(h) => document.growPage(row.page.pageId, box.top + h + (endless ? ENDLESS_ROOM : 80))} />
                         </View>
                       ) : (
                         <Press label="Type on this page" disabled={mode !== "type" || !editable} feedback="none" onPress={() => setTyping(row.page.pageId)}
@@ -234,6 +288,15 @@ export default function NoteEditor({ library, document, editable, initialPage, o
                   </View>
                 );
               })}
+              {pullable ? (
+                <View pointerEvents="none" style={{ position: "absolute", top: pagesHeight, left: 0, width: contentWidth, height: PULL, alignItems: "center", justifyContent: "center", gap: 8, opacity: 0.35 + pullProgress * 0.65 }} testID="note-pull-zone">
+                  <View style={{ width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center", backgroundColor: pullProgress >= 1 ? color.accent.fill : color.raised, transform: [{ scale: 0.85 + pullProgress * 0.15 }] }}>
+                    <Icon name="pagePlus" size={20} color={pullProgress >= 1 ? color.accent.on : color.inkSoft} />
+                  </View>
+                  <View style={{ width: 96, height: 3, borderRadius: 2, backgroundColor: color.line, overflow: "hidden" }}><View style={{ width: 96 * pullProgress, height: 3, backgroundColor: color.accent.fill }} /></View>
+                  <Text variant="caption" tone="soft">{Platform.OS === "web" ? "Keep scrolling to add a page" : pullProgress >= 1 ? "Release to add a page" : "Pull to add a page"}</Text>
+                </View>
+              ) : null}
             </ScrollView>
           </ScrollView>
         ) : null}

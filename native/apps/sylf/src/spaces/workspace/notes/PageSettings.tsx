@@ -5,7 +5,7 @@ import { useState } from "react";
 import { View } from "react-native";
 import { Button, Icon, Press, Segmented, Sheet, Text, useNotice, useTheme } from "@sylf/design-system";
 import { ink, type DocumentDescriptor, type InkPaper } from "@sylf/shared";
-import { InkScene, PAPER_TEMPLATES, type NotesLibrary, type OpenDocument, type PaperTemplate } from "@sylf/notes";
+import { InkScene, PAPER_TEMPLATES, flowOf, type NotesLibrary, type OpenDocument, type PaperTemplate } from "@sylf/notes";
 import { pickImage } from "./pick-image";
 
 type Page = DocumentDescriptor["pages"][number];
@@ -61,6 +61,7 @@ export default function PageSettings({ open, onClose, library, document, page, s
   return (
     <Sheet open={open} onClose={onClose} title="Page" width={420}>
       <View style={{ gap: space.lg }}>
+        <Segmented label="Pages" value={flowOf(document.descriptor())} onChange={(flow) => document.setFlow(flow)} options={[{ value: "pages", label: "Separate pages" }, { value: "endless", label: "Endless" }]} />
         <Segmented label="Apply to" value={scope} onChange={setScope} options={[{ value: "page", label: "This page" }, { value: "all", label: "Every page" }]} />
         {page?.originalAssetId ? <Text variant="small" tone="soft">This is a PDF page: its look is the PDF's. Choose another page, or Every page, to change the paper.</Text> : null}
         <View style={{ gap: space.sm }}>

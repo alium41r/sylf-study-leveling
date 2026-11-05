@@ -4,7 +4,7 @@
 import * as Y from "yjs";
 import type { DocumentDescriptor, InkPaper, PdfSourcePage } from "@sylf/shared";
 import type { DocumentMeta, LibraryEntry, LibraryRecord, LibrarySnapshot, NoteKind, Notebook, NotesStorage, StoredDocument, StoredUpdate } from "./contracts";
-import { LAYER_FEATURES, board, coverOf, inkPage, isLayeredNote, kindOf, layeredPage, newId, note, pdf, type Created } from "./documents";
+import { LAYER_FEATURES, board, coverOf, inkPage, isLayeredNote, kindOf, layeredPage, newId, note, pdf, type Created, type PageFlow } from "./documents";
 import { boardPaper, paperFor, type PaperTemplate } from "./templates";
 
 export const DEVICE_OWNER = "device";
@@ -12,12 +12,14 @@ export const ownerKey = (userId: number | null) => (userId ? `user:${userId}` : 
 const SAVE_DELAY_MS = 250;
 const COMPACT_AFTER = 48;
 const PDF_BYTES = 50 * 1024 * 1024;
+// An endless page grows to this, about seventy A4 pages; the web's schema allows 100000.
+const MAX_PAGE_HEIGHT = 60000;
 const NOTEBOOK_COLORS = ["#5b7cfa", "#2f9e8f", "#d9822b", "#c2547a", "#7a62d6", "#4f8a3a"];
 const LOADED = Symbol("loaded");
 
 export type SaveState = "saved" | "saving" | "failed";
 /** `linkedTo` ties a note to the document it is about, so each can open the other beside it. */
-export interface CreateOptions { kind: Exclude<NoteKind, "pdf">; title?: string; notebookId?: string | null; template?: string; paper?: PaperTemplate; paperSpec?: InkPaper; linkedTo?: string; subjectId?: string | null }
+export interface CreateOptions { kind: Exclude<NoteKind, "pdf">; title?: string; notebookId?: string | null; template?: string; paper?: PaperTemplate; paperSpec?: InkPaper; linkedTo?: string; subjectId?: string | null; flow?: PageFlow }
 export interface StoredAssetRef { hash: string; size: number; name: string; mediaType: string }
 export interface PdfImport { bytes: Uint8Array; name: string; pages: PdfSourcePage[]; geometry: "pdfjs" | "native"; notebookId?: string | null; subjectId?: string | null }
 
@@ -38,6 +40,8 @@ export interface OpenDocument {
   setDefaultPaper(paper: InkPaper): void;
   /** Grows a paper page so its typed text fits. */
   growPage(pageId: string, height: number): void;
+  /** Pages, or one endless page. Turning a paged note endless keeps its pages; new space then comes by growing the last one. */
+  setFlow(flow: PageFlow): void;
   removePage(pageId: string): void;
   movePage(pageId: string, toIndex: number): void;
   /** The start of a typed note, for the library row and search. */
@@ -299,8 +303,13 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       },
       growPage(pageId, height) {
         const page = stored.descriptor.pages.find((p) => p.pageId === pageId);
-        if (!page || page.originalAssetId || height <= page.height || height > 20000) return;
+        if (!page || page.originalAssetId || height <= page.height) return;
+        height = Math.min(height, MAX_PAGE_HEIGHT);
+        if (height <= page.height) return;
         mutate((d) => { const found = d.pages.find((p) => p.pageId === pageId); if (found) found.height = Math.ceil(height); });
+      },
+      setFlow(flow) {
+        mutate((d) => { const native = { ...(d.extensions.sylfNative as object) } as Record<string, unknown>; if (flow === "endless") native.flow = flow; else delete native.flow; d.extensions.sylfNative = native as never; });
       },
       removePage(pageId) {
         if (stored.descriptor.pages.length <= 1) return;
@@ -364,7 +373,7 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       const folder = input.notebookId ?? null;
       // Typed and handwritten notes are one kind now: pages with a text layer and an ink layer. "handwriting" only picks the paper.
       const created = input.kind === "board" ? board(record.libraryId, input.title ?? "Whiteboard", folder, boardPaper(input.paper ?? "dotted"))
-        : note(record.libraryId, input.title ?? null, folder, input.paperSpec ?? paperFor(input.paper ?? "ruled"), input.template ?? "blank");
+        : note(record.libraryId, input.title ?? null, folder, input.paperSpec ?? paperFor(input.paper ?? "ruled"), input.template ?? "blank", input.flow);
       if (input.subjectId) created.descriptor.subjectId = input.subjectId.slice(0, 128);
       if (input.linkedTo && documents.has(input.linkedTo)) created.descriptor.extensions.sylfNative = { ...(created.descriptor.extensions.sylfNative as object), linkedTo: input.linkedTo };
       return save(created);

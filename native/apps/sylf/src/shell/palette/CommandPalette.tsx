@@ -53,9 +53,9 @@ export default function CommandPalette({ open }: { open: boolean }) {
     const toWorkspace = () => store.select("workspace");
     const studying = sessionState.active?.subjectId ?? sessionState.plan?.subjectId ?? null;
     const openEntry = (entry: Pick<LibraryEntry, "id" | "kind" | "title">) => { toWorkspace(); if (!openDocumentWindow(model, entry, null)) notice("The Workspace is full. Close a window first."); };
-    const create = async (kind: "note" | "board", paper: string) => {
+    const create = async (kind: "note" | "board", paper: string, flow?: "endless") => {
       try {
-        const id = await library.create({ ...(kind === "board" ? { kind, paper } : { kind, template: "blank", paper }), subjectId: studying == null ? null : String(studying) } as never);
+        const id = await library.create({ ...(kind === "board" ? { kind, paper } : { kind, template: "blank", paper, flow }), subjectId: studying == null ? null : String(studying) } as never);
         const entry = library.getSnapshot().entries.find((e) => e.id === id);
         if (entry) openEntry(entry);
       } catch (error) { notice(error instanceof Error ? error.message : "That could not be created."); }
@@ -80,6 +80,7 @@ export default function CommandPalette({ open }: { open: boolean }) {
         { id: "new:note", title: "New note", detail: "Type and write, ruled", icon: "notes", group: "Create", keywords: ["create", "page", "handwriting", "typing"], suggested: true, run: () => void create("note", "ruled") },
         { id: "new:note-grid", title: "New note, grid", icon: "notes", group: "Create", keywords: ["create", "squared", "maths"], run: () => void create("note", "grid") },
         { id: "new:note-dotted", title: "New note, dotted", icon: "notes", group: "Create", keywords: ["create", "dots"], run: () => void create("note", "dotted") },
+        { id: "new:note-endless", title: "New endless note", detail: "One page that grows as you write", icon: "notes", group: "Create", keywords: ["create", "infinite", "scroll", "continuous"], run: () => void create("note", "ruled", "endless") },
         { id: "new:board", title: "New whiteboard", icon: "whiteboard", group: "Create", keywords: ["create", "board", "draw", "sketch"], run: () => void create("board", BOARD_TEMPLATES[0].id) },
         { id: "new:pdf", title: "Import a PDF", icon: "pdf", group: "Create", keywords: ["add", "open", "paper", "file"], run: () => void importPdf() },
       );

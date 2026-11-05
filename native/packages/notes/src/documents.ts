@@ -57,13 +57,17 @@ export function layeredPage(paper: InkPaper, size = { width: noteStyle.DEFAULT_N
 export const LAYER_FEATURES = ["rich-text-v1", "ink-v1", "page-layers-v1", "paged-v1", "creative-tools-v1"];
 
 /** The one note: pages you can type and write on, with PDF pages and pictures among them. */
-export function note(libraryId: string, title: string | null, folderId: string | null, paper: InkPaper, template: string): Created {
+export type PageFlow = "pages" | "endless";
+/** Pages, or one endless page that grows as it is written on. Kept in the Native extension: the web reads an endless note as one tall page. */
+export const flowOf = (descriptor: DocumentDescriptor): PageFlow => ((descriptor.extensions.sylfNative as { flow?: string } | undefined)?.flow === "endless" ? "endless" : "pages");
+
+export function note(libraryId: string, title: string | null, folderId: string | null, paper: InkPaper, template: string, flow: PageFlow = "pages"): Created {
   const d = base(libraryId, title ?? "Untitled note", "notebook", folderId), first = layeredPage(paper);
   d.streams.push(...first.streams);
   d.pages.push(first.page);
   d.requiredFeatures = [...LAYER_FEATURES];
   d.extensions.noteStyle = { ...noteStyle.DEFAULT_NOTE_STYLE, paper };
-  d.extensions.sylfNative = { surface: "note", template, autoTitle: title === null };
+  d.extensions.sylfNative = { surface: "note", template, autoTitle: title === null, ...(flow === "endless" ? { flow } : {}) };
   return { descriptor: d, updates: first.updates };
 }
 

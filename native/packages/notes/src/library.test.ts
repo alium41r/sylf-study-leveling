@@ -1,7 +1,7 @@
 import * as Y from "yjs";
 import { describe, expect, it } from "vitest";
 import { notesContracts } from "@sylf/shared";
-import { createMemoryStorage, createNotesLibrary, InkScene, brushFor, kindOf, DEVICE_OWNER, ownerKey, type NotesStorage } from "./index";
+import { createMemoryStorage, createNotesLibrary, InkScene, brushFor, flowOf, kindOf, DEVICE_OWNER, ownerKey, type NotesStorage } from "./index";
 
 const sha256 = async (bytes: Uint8Array) => {
   const { createHash } = await import("node:crypto");
@@ -107,6 +107,24 @@ describe("Notes library", () => {
     expect(scene.model.strokes()).toHaveLength(0);
     scene.undo();
     expect(scene.strokes()).toHaveLength(3);
+  });
+
+  it("keeps an endless note as one page that grows, and switches between endless and pages", async () => {
+    const library = make();
+    const id = await library.create({ kind: "note", paper: "ruled", flow: "endless" });
+    const handle = await library.open(id);
+    expect(flowOf(handle.descriptor())).toBe("endless");
+    expect(notesContracts.documentSchema.safeParse(handle.descriptor()).success).toBe(true);
+    const page = handle.descriptor().pages[0];
+    handle.growPage(page.pageId, 4000);
+    expect(handle.descriptor().pages[0].height).toBe(4000);
+    handle.growPage(page.pageId, 2000);
+    expect(handle.descriptor().pages[0].height).toBe(4000);
+    handle.growPage(page.pageId, 1e9);
+    expect(handle.descriptor().pages[0].height).toBe(60000);
+    handle.setFlow("pages");
+    expect(flowOf(handle.descriptor())).toBe("pages");
+    expect(handle.descriptor().pages).toHaveLength(1);
   });
 
   it("adds, moves and removes pages", async () => {

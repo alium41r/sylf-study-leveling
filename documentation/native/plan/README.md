@@ -27,7 +27,7 @@ Files: `spaces/home/destinations/PlanDestination.tsx` and `spaces/home/plan/` (`
 
 ## Not built
 
-- Materials: picking a PDF or text file for a plan needs a file-picker dependency the owner has not approved. Research runs on materials added on the web.
+- (Built 5 November 2026) Materials: **Add a PDF or text file** (up to 3 MB) through the system picker, sent to `planner/[id]/documents` with one key per upload. Tested to the unit level only: the live Planner flow needs the flags on (E-6).
 - Full artifact browsing by id and long-document paging. Strategy and review text show; deeper history is read through `history` and `artifact` in `planner.ts` but has no screen yet.
 - Streaming (`?stream=true`) waits for the streaming spike (ADR 0016). The poll is the dependable path.
 - Real-provider runs and educational quality are **unverified**: only fixtures may run until the owner names a spend (E-6).

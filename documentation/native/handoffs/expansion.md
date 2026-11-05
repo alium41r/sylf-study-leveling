@@ -18,7 +18,7 @@ A party session is the one study session with a room attached. Its time and cred
 
 ## Phase 14 requirements (restated)
 
-Unchanged from the [Stage 3 handoff](stage-3.md) and not re-audited this stage: Workspace's tools and `LIMITED_TOOLS`, G-6, G-7 and G-13, and Notes joining Sylvie and Focus when it arrives. Two additions from this stage: Sylvie's chat already carries image attachments and readable maths through `shell/rich-text` and `shell/sylvie/ChatImage`, so Notes should reuse them; and `reads.upload` plus `PickedFile` are the one way to send a chosen file. Do not start Phase 14 without the owner.
+Unchanged from the [Stage 3 handoff](stage-3.md) and not re-audited this stage: Workspace's tools and `LIMITED_TOOLS`, G-6, G-7 and G-13, and Notes joining Sylvie and Focus when it arrives. Two additions from this stage: Sylvie's chat already carries image attachments and readable maths through `shell/rich-text` and `shell/sylvie/ChatImage`, so Notes should reuse them; and `client.upload` plus `PickedFile` are the one way to send a chosen file. Do not start Phase 14 without the owner.
 
 ## Rules that still apply
 

@@ -7,6 +7,7 @@ import { BOARD_TEMPLATES, PAPER_TEMPLATES, TYPED_TEMPLATES, type LibraryEntry, t
 import { useLibrarySnapshot } from "../../../shell/notes/library";
 import { importPdfFile } from "./pdf-import";
 import { useDragSource } from "../drop";
+import { useSessionState } from "../../../shell/context";
 
 export const KIND_ICON: Record<NoteKind, IconName> = { note: "notes", handwriting: "pen", pdf: "pdf", board: "whiteboard" };
 export const KIND_LABEL: Record<NoteKind, string> = { note: "Typed note", handwriting: "Handwriting", pdf: "PDF", board: "Whiteboard" };
@@ -39,6 +40,10 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, onOpen
   const { space } = useTheme();
   const notice = useNotice();
   const snapshot = useLibrarySnapshot(library);
+  // What is made during a study session belongs to its subject, so the Resource Shelf can bring it back next time.
+  const session = useSessionState();
+  const studyingId = session.active?.subjectId ?? session.plan?.subjectId ?? null;
+  const studying = studyingId == null ? null : String(studyingId);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>({ notebook: "all" });
   const [width, setWidth] = useState(480);
@@ -61,7 +66,7 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, onOpen
     setCreating(false);
     try {
       const options = kind === "note" ? { kind, template, title: template && template !== "blank" ? TYPED_TEMPLATES.find((t) => t.id === template)?.label : undefined } : { kind, paper: template as never };
-      const id = await library.create({ ...options, notebookId });
+      const id = await library.create({ ...options, notebookId, subjectId: studying });
       const entry = library.getSnapshot().entries.find((e) => e.id === id);
       if (entry) onOpen(entry);
     } catch (error) { notice(error instanceof Error ? error.message : "The note could not be created."); }
@@ -69,7 +74,7 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, onOpen
   const importPdf = async () => {
     setCreating(false);
     try {
-      const id = await importPdfFile(library, notebookId);
+      const id = await importPdfFile(library, notebookId, studying);
       const entry = id ? library.getSnapshot().entries.find((e) => e.id === id) : null;
       if (entry) onOpen(entry);
     } catch (error) { notice(error instanceof Error ? error.message : "That PDF could not be added."); }

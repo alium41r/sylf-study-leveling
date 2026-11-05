@@ -63,8 +63,9 @@ export function board(libraryId: string, title: string, folderId: string | null,
 export interface PdfAsset { hash: string; size: number; name: string }
 
 /** One sylf-pdf/1 stream per page, with the original kept as an asset whose identity is its SHA-256, as the web imports it. */
-export function pdf(libraryId: string, title: string, folderId: string | null, asset: PdfAsset, pages: PdfSourcePage[], geometry: "pdfjs" | "native"): Created {
+export function pdf(libraryId: string, title: string, folderId: string | null, asset: PdfAsset, pages: PdfSourcePage[], geometry: "pdfjs" | "native", subjectId: string | null = null): Created {
   const d = base(libraryId, title, "pdf", folderId), updates: Created["updates"] = [];
+  d.subjectId = subjectId;
   d.assets.push({ assetId: asset.hash, mediaType: "application/pdf", name: asset.name.slice(0, 500), content: { hash: asset.hash, size: asset.size, parts: [{ hash: asset.hash, size: asset.size }] }, extensions: {} });
   pages.forEach((source, index) => {
     const streamId = newId();

@@ -17,8 +17,8 @@ const LOADED = Symbol("loaded");
 
 export type SaveState = "saved" | "saving" | "failed";
 /** `linkedTo` ties a note to the document it is about, so each can open the other beside it. */
-export interface CreateOptions { kind: Exclude<NoteKind, "pdf">; title?: string; notebookId?: string | null; template?: string; paper?: PaperTemplate; linkedTo?: string }
-export interface PdfImport { bytes: Uint8Array; name: string; pages: PdfSourcePage[]; geometry: "pdfjs" | "native"; notebookId?: string | null }
+export interface CreateOptions { kind: Exclude<NoteKind, "pdf">; title?: string; notebookId?: string | null; template?: string; paper?: PaperTemplate; linkedTo?: string; subjectId?: string | null }
+export interface PdfImport { bytes: Uint8Array; name: string; pages: PdfSourcePage[]; geometry: "pdfjs" | "native"; notebookId?: string | null; subjectId?: string | null }
 
 export interface OpenDocument {
   readonly id: string;
@@ -300,6 +300,7 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       const created = input.kind === "note" ? typedNote(record.libraryId, input.title ?? null, folder, input.template ?? "blank")
         : input.kind === "board" ? board(record.libraryId, input.title ?? "Whiteboard", folder, boardPaper(input.paper ?? "dotted"))
         : handwriting(record.libraryId, input.title ?? "Handwritten note", folder, paperFor(input.paper ?? "ruled"));
+      if (input.subjectId) created.descriptor.subjectId = input.subjectId.slice(0, 128);
       if (input.linkedTo && documents.has(input.linkedTo)) created.descriptor.extensions.sylfNative = { ...(created.descriptor.extensions.sylfNative as object), linkedTo: input.linkedTo };
       return save(created);
     },
@@ -309,7 +310,7 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       await loaded;
       const hash = await options.sha256(input.bytes);
       await write(() => storage.putAsset(owner, { hash, mediaType: "application/pdf", name: input.name, bytes: input.bytes }));
-      return save(pdf(record.libraryId, input.name.replace(/\.pdf$/i, "") || "Imported PDF", input.notebookId ?? null, { hash, size: input.bytes.length, name: input.name }, input.pages, input.geometry));
+      return save(pdf(record.libraryId, input.name.replace(/\.pdf$/i, "") || "Imported PDF", input.notebookId ?? null, { hash, size: input.bytes.length, name: input.name }, input.pages, input.geometry, input.subjectId ?? null));
     },
     open(id) {
       const found = open.get(id);

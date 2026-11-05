@@ -10,18 +10,18 @@ async function readBytes(asset: DocumentPicker.DocumentPickerAsset): Promise<Uin
   return new Uint8Array(await response.arrayBuffer());
 }
 
-export async function importPdfFile(library: NotesLibrary, notebookId: string | null): Promise<string | null> {
+export async function importPdfFile(library: NotesLibrary, notebookId: string | null, subjectId: string | null = null): Promise<string | null> {
   const picked = await DocumentPicker.getDocumentAsync({ type: "application/pdf", copyToCacheDirectory: true, multiple: false });
   if (picked.canceled || !picked.assets[0]) return null;
   const asset = picked.assets[0];
   if ((asset.size ?? 0) > 50 * 1024 * 1024) throw new Error("Choose a PDF up to 50 MB.");
-  return importPdfBytes(library, await readBytes(asset), asset.name || "Imported.pdf", notebookId);
+  return importPdfBytes(library, await readBytes(asset), asset.name || "Imported.pdf", notebookId, subjectId);
 }
 
-export async function importPdfBytes(library: NotesLibrary, bytes: Uint8Array, name: string, notebookId: string | null) {
+export async function importPdfBytes(library: NotesLibrary, bytes: Uint8Array, name: string, notebookId: string | null, subjectId: string | null = null) {
   if (!looksLikePdf(bytes)) throw new Error("That file is not a PDF.");
   const pages = await inspectPdf(bytes);
-  return library.importPdf({ bytes, name, pages, geometry: PDF_GEOMETRY, notebookId });
+  return library.importPdf({ bytes, name, pages, geometry: PDF_GEOMETRY, notebookId, subjectId });
 }
 
 /** "%PDF-" in the first kilobyte, as the web checks it, without a TextDecoder (Hermes has none). */

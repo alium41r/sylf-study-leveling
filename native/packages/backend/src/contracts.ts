@@ -167,7 +167,10 @@ export type ChatThread = z.infer<typeof chatsSchema>["sessions"][number];
 /** A change Sylvie proposed. `token` is signed by the server and opaque here: it comes back unchanged to confirm, and is single use. */
 export const pendingActionSchema = z.object({ token: z.string(), summary: z.string() });
 export type PendingAction = z.infer<typeof pendingActionSchema>;
-export const chatMessagesSchema = z.object({ messages: z.array(z.object({ id: z.number().int(), content: z.string(), type: z.string(), pendingAction: pendingActionSchema.optional().catch(undefined) }).loose()) });
+/** An image kept with a chat message. Its URL needs the signed-in session, so a screen draws it through `ChatImage`, never as a bare link. */
+export const chatImageSchema = z.object({ index: z.number().int(), url: z.string(), name: z.string().optional(), mimeType: z.string().optional() });
+export type ChatImage = z.infer<typeof chatImageSchema>;
+export const chatMessagesSchema = z.object({ messages: z.array(z.object({ id: z.number().int(), content: z.string(), type: z.string(), pendingAction: pendingActionSchema.optional().catch(undefined), attachments: z.array(chatImageSchema).optional().catch(undefined) }).loose()) });
 
 /** GET /api/user/earned-this-week. What the ledgers credited since the student's own Monday. */
 export const earnedThisWeekSchema = z.object({ xp: z.number(), sylph: z.number() });

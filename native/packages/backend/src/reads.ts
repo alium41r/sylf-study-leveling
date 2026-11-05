@@ -10,6 +10,11 @@ import { createProgressReads } from "./progress";
 import { createAccountReads } from "./account";
 import { createSocialReads } from "./social";
 import { createPartyReads } from "./party";
+import { appendFile, type PickedFile } from "./files";
+
+/** The server's limits (lib/ai/sylvie/image-contract.ts). Saying so before the upload saves a slow request that is certain to fail. */
+export const SYLVIE_IMAGE_LIMIT = 4;
+export const SYLVIE_IMAGE_BYTES = 5 * 1024 * 1024;
 import { pendingActionSchema, type PendingAction, achievementsSchema, calendarRangeSchema, chatMessagesSchema, chatsSchema, cosmeticsSchema, earnedThisWeekSchema, focusPartySchema, friendRequestsSchema, friendsSchema, goalsSchema, plannerCapabilitiesSchema, questDaySchema, recentSessionsSchema, soundsSchema, studyScheduleSchema, studySummarySchema, subjectsSchema, userStatsSchema, type Quest } from "./contracts";
 
 export interface SylvieTurn {
@@ -86,7 +91,9 @@ export function createReads(client: BackendClient) {
     confirmSylvieAction: (chatId: number, token: string) => client.send("POST", "/api/system-messages/chat", { body: { sessionId: chatId, confirmationToken: token }, timeoutMs: 60_000 }),
 
     /** One turn with Sylvie, read as it arrives. Quotas, tools and every model choice stay on the server. Resolves with the full reply. */
-    async sendToSylvie(message: string, chatId: number | null, turn: SylvieTurn, signal: AbortSignal): Promise<{ reply: string; chatId: number | null; pendingAction: PendingAction | null; planRequest: string | null }> {
+    /** What the server accepts with a message, so a screen can say so before anyone picks a file. */
+    sylvieImages: { limit: SYLVIE_IMAGE_LIMIT, bytes: SYLVIE_IMAGE_BYTES },
+    async sendToSylvie(message: string, chatId: number | null, turn: SylvieTurn, signal: AbortSignal, images: PickedFile[] = []): Promise<{ reply: string; chatId: number | null; pendingAction: PendingAction | null; planRequest: string | null }> {
       let buffer = "";
       let text = "";
       let reply: string | null = null;
@@ -108,7 +115,18 @@ export function createReads(client: BackendClient) {
         else if (event === "result") { if (typeof value.sessionId === "number") session = value.sessionId; reply = typeof value.reply === "string" ? value.reply : text; const pending = pendingActionSchema.safeParse(value.pendingAction); pendingAction = pending.success ? pending.data : null; const handoff = value.plannerHandoff as { request?: unknown } | null | undefined; planRequest = typeof handoff?.request === "string" && handoff.request.trim() ? handoff.request.trim().slice(0, 2000) : null; }
         else if (event === "error") failure = new BackendError(value.status === 429 ? "rate-limited" : "server", typeof value.error === "string" && Number(value.status) < 500 ? value.error : "Sylvie could not answer just now. Try again shortly.");
       };
-      await client.stream("/api/system-messages/chat", { method: "POST", signal, headers: { "Content-Type": "application/json", Accept: "text/event-stream" }, body: JSON.stringify({ message, ...(chatId ? { sessionId: chatId } : {}) }) }, (chunk) => {
+      if (images.length > SYLVIE_IMAGE_LIMIT) throw new BackendError("invalid", `Attach up to ${SYLVIE_IMAGE_LIMIT} images at a time.`);
+      if (images.some((image) => image.size !== undefined && image.size > SYLVIE_IMAGE_BYTES)) throw new BackendError("invalid", "Each image must be 5 MB or less.");
+      // Images go as multipart, with the field names the web uses. Without them the request is the same JSON as ever, so a text turn never changes.
+      let body: string | FormData;
+      if (images.length) {
+        const form = new FormData();
+        form.set("message", message);
+        if (chatId) form.set("sessionId", String(chatId));
+        images.forEach((image) => appendFile(form, "images", image));
+        body = form;
+      } else body = JSON.stringify({ message, ...(chatId ? { sessionId: chatId } : {}) });
+      await client.stream("/api/system-messages/chat", { method: "POST", signal, headers: { ...(images.length ? {} : { "Content-Type": "application/json" }), Accept: "text/event-stream" }, body }, (chunk) => {
         buffer += chunk.replace(/\r\n/g, "\n");
         for (let end = buffer.indexOf("\n\n"); end !== -1; end = buffer.indexOf("\n\n")) { frame(buffer.slice(0, end)); buffer = buffer.slice(end + 2); }
       });

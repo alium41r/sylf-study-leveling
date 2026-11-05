@@ -34,6 +34,8 @@ export interface BackendClient {
   fetch: typeof fetch;
   get<T>(path: string, schema: z.ZodType<T>, options?: ReadOptions): Promise<T>;
   send<T = unknown>(method: "POST" | "PUT" | "PATCH" | "DELETE", path: string, options?: SendOptions<T>): Promise<T>;
+  /** A multipart upload (a file the person chose). Never retried and never shared: the body is consumed by the first try, and the caller decides about a second. */
+  upload<T = unknown>(path: string, form: FormData, options?: { signal?: AbortSignal; timeoutMs?: number; schema?: z.ZodType<T> }): Promise<T>;
   /** Reads a streaming response chunk by chunk, for Sylvie. The deadline covers the whole stream. */
   stream(path: string, init: RequestInit & { timeoutMs?: number }, onChunk: (text: string) => void): Promise<void>;
   /** A relative `/audio/...` or `/uploads/...` URL, made loadable. Absolute URLs pass through. */
@@ -45,6 +47,7 @@ export interface BackendClient {
 const READ_TIMEOUT_MS = 15_000;
 const WRITE_TIMEOUT_MS = 30_000;
 const STREAM_TIMEOUT_MS = 120_000;
+const UPLOAD_TIMEOUT_MS = 90_000;
 const RETRY_BASE_MS = 300;
 const RETRY_AFTER_LIMIT_MS = 5_000;
 
@@ -149,6 +152,12 @@ export function createBackendClient({ transport, connectivity, onSignedOut, asse
     async send(method, path, options = {}) {
       const { body, schema, signal, timeoutMs = WRITE_TIMEOUT_MS, headers } = options;
       const value = await attempt(path, { method, headers: { ...(body === undefined ? {} : { "Content-Type": "application/json" }), ...headers }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) }, timeoutMs, signal);
+      return (schema ? parse(schema, value, path) : value) as never;
+    },
+    async upload(path, form, options = {}) {
+      const { signal, timeoutMs = UPLOAD_TIMEOUT_MS, schema } = options;
+      // No Content-Type: the transport sets it with the boundary the body needs.
+      const value = await attempt(path, { method: "POST", body: form }, timeoutMs, signal);
       return (schema ? parse(schema, value, path) : value) as never;
     },
     async stream(path, { timeoutMs = STREAM_TIMEOUT_MS, ...init }, onChunk) {

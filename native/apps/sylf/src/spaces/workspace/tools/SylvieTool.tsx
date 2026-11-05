@@ -4,21 +4,28 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { type ComponentRef } from "react";
 import { ScrollView, View } from "react-native";
-import { Button, Select, Text, TextField, useTheme } from "@sylf/design-system";
+import { Button, IconButton, Select, Text, TextField, useTheme } from "@sylf/design-system";
 import { useLiveBackend, useOptionalResource } from "../../../shell/backend";
 import { describeFailureText } from "../../../shell/account/failure";
 import { toLiveResult } from "../../../shell/live-result";
-import type { Backend } from "@sylf/backend";
+import type { Backend, ChatImage as ChatImageRecord, PickedFile } from "@sylf/backend";
 import type { WorkspaceDataAdapter } from "../data/contracts";
 import { useToolResult } from "../data";
 import { RichText } from "../../../shell/rich-text/RichText";
+import { ChatImage } from "../../../shell/sylvie/ChatImage";
+import { pickImages } from "../../../shell/files/pick";
 import { ToolEmpty, ToolLoading, ToolPage, type ToolProps } from "./shared";
 
 const load = (adapter: WorkspaceDataAdapter) => adapter.sylvie();
 
-function PersonBubble({ text }: { text: string }) {
+function PersonBubble({ text, images }: { text: string; images?: ChatImageRecord[] }) {
   const { color, shape, space } = useTheme();
-  return <View style={{ alignSelf: "flex-end", maxWidth: "86%", paddingHorizontal: space.md, paddingVertical: space.sm, borderRadius: shape.radius.md, backgroundColor: color.selected }}><Text variant="small">{text}</Text></View>;
+  return (
+    <View style={{ alignSelf: "flex-end", maxWidth: "86%", gap: space.xs, paddingHorizontal: space.md, paddingVertical: space.sm, borderRadius: shape.radius.md, backgroundColor: color.selected }}>
+      {images?.length ? <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xs }}>{images.map((image) => <ChatImage key={image.index} path={image.url} name={image.name} size={96} />)}</View> : null}
+      {text ? <Text variant="small">{text}</Text> : null}
+    </View>
+  );
 }
 
 function LiveSylvie({ backend, window, patch, onProvenance }: ToolProps & { backend: Backend }) {
@@ -30,6 +37,7 @@ function LiveSylvie({ backend, window, patch, onProvenance }: ToolProps & { back
   const messagesResource = useMemo(() => (threadId === null ? null : backend.resources.resource({ key: `sylvie-thread-${threadId}`, tags: ["sylvie"], ttlMs: 60_000, load: async (signal) => (await backend.reads.chatMessages(threadId, signal)).messages.filter((message) => message.type === "USER" || message.type === "INFO").reverse() })), [backend, threadId]);
   const messages = useOptionalResource(messagesResource)?.data ?? [];
   const [text, setText] = useState("");
+  const [attached, setAttached] = useState<PickedFile[]>([]);
   const [turn, setTurn] = useState<{ asked: string; reply: string } | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
@@ -43,22 +51,23 @@ function LiveSylvie({ backend, window, patch, onProvenance }: ToolProps & { back
 
   const send = async () => {
     const asked = text.trim();
-    if (!asked || turn) return;
+    const sending = attached;
+    if ((!asked && !sending.length) || turn) return;
     const controller = new AbortController();
     flight.current = controller;
-    setText(""); setFailure(null); setStatus(null); setProposal(null); setTurn({ asked, reply: "" });
+    setText(""); setAttached([]); setFailure(null); setStatus(null); setProposal(null); setTurn({ asked, reply: "" });
     try {
       const { chatId, pendingAction } = await backend.reads.sendToSylvie(asked, threadId, {
         onStatus: setStatus,
         onDelta: (reply) => setTurn({ asked, reply }),
         onReset: () => setTurn({ asked, reply: "" }),
         onSession: (id) => { if (id !== threadId) patch({ thread: id }); },
-      }, controller.signal);
+      }, controller.signal, sending);
       if (chatId !== null) patch({ thread: chatId });
       if (pendingAction && chatId !== null) setProposal({ chatId, token: pendingAction.token, summary: pendingAction.summary });
       backend.resources.invalidate("sylvie");
     } catch (error) {
-      if ((error as { kind?: string }).kind !== "cancelled") { setFailure(describeFailureText(error)); setText(asked); }
+      if ((error as { kind?: string }).kind !== "cancelled") { setFailure(describeFailureText(error)); setText(asked); setAttached(sending); }
     }
     setTurn(null); setStatus(null);
     flight.current = null;
@@ -76,6 +85,15 @@ function LiveSylvie({ backend, window, patch, onProvenance }: ToolProps & { back
     } catch (error) { setFailure(describeFailureText(error)); }
     setProposal(null); setDismissed(offered.token); setConfirming(false);
   };
+  const limits = backend.reads.sylvieImages;
+  const attach = async () => {
+    const room = limits.limit - attached.length;
+    if (room <= 0 || turn) return;
+    const picked = await pickImages(room).catch(() => []);
+    const tooBig = picked.filter((file) => file.size !== undefined && file.size > limits.bytes);
+    if (tooBig.length) setFailure(`Each image must be ${Math.round(limits.bytes / 1024 / 1024)} MB or less.`);
+    setAttached((old) => [...old, ...picked.filter((file) => !tooBig.includes(file))].slice(0, limits.limit));
+  };
   const list = threads?.data?.sessions ?? [];
   if (!threads) return <ToolLoading />;
   return (
@@ -83,14 +101,22 @@ function LiveSylvie({ backend, window, patch, onProvenance }: ToolProps & { back
       {list.length > 1 ? <View style={{ paddingHorizontal: space.md, paddingTop: space.sm, flexDirection: "row", gap: space.sm, alignItems: "center" }}><View style={{ flex: 1, minWidth: 0 }}><Select label="Conversation" hideLabel value={String(threadId)} options={list.map((item) => ({ value: String(item.id), label: item.title }))} onChange={(value) => patch({ thread: Number(value) })} /></View><Button title="New" size="small" variant="ghost" onPress={() => patch({ thread: null })} /></View> : null}
       <ToolPage ref={scroller} onContentSizeChange={() => scroller.current?.scrollToEnd({ animated: false })}>
         {!messages.length && !turn ? <Text variant="small" tone="soft" testID="sylvie-empty">Ask Sylvie about your plan, your progress or what you're studying.</Text> : null}
-        {messages.map((message) => (message.type === "USER" ? <PersonBubble key={message.id} text={message.content} /> : <RichText key={message.id} text={message.content} testID="sylvie-reply" />))}
+        {messages.map((message) => (message.type === "USER" ? <PersonBubble key={message.id} text={message.content} images={message.attachments} /> : <RichText key={message.id} text={message.content} testID="sylvie-reply" />))}
         {turn ? <PersonBubble text={turn.asked} /> : null}
         {turn ? (turn.reply ? <RichText text={turn.reply} testID="sylvie-streaming" /> : <Text variant="small" tone="soft" testID="sylvie-streaming">{status ?? "Thinking"}</Text>) : null}
         {offered && !turn ? <View testID="sylvie-proposal" style={{ gap: space.sm, padding: space.md, borderRadius: 12, borderWidth: 1, borderColor: color.line }}><Text variant="small" tone="soft">Sylvie suggests</Text><Text variant="small">{offered.summary}</Text><View style={{ flexDirection: "row", gap: space.sm }}><Button title={confirming ? "Applying" : "Apply"} size="small" variant="emphasis" disabled={confirming} testID="sylvie-confirm" onPress={() => void confirm()} /><Button title="Not now" size="small" disabled={confirming} testID="sylvie-dismiss" onPress={() => { setProposal(null); setDismissed(offered.token); }} /></View></View> : null}
       </ToolPage>
       <View style={{ paddingHorizontal: space.md, paddingBottom: space.sm, gap: space.xs }}>
         {failure ? <View testID="sylvie-failure"><Text variant="caption" tone="critical">{failure}</Text></View> : null}
-        <TextField label="Ask Sylvie" hideLabel placeholder="Ask Sylvie" value={text} onChangeText={setText} testID="sylvie-input" returnKeyType="send" editable={!turn} onSubmitEditing={() => void send()} trailing={<Button title="Send" size="small" variant="ghost" disabled={!text.trim() || turn !== null} testID="sylvie-send" onPress={() => void send()} />} />
+        {attached.length ? (
+          <View testID="sylvie-attachments" style={{ gap: space.xs }}>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xs }}>
+              {attached.map((file, index) => <Button key={`${file.uri}-${index}`} title={file.name.length > 18 ? `${file.name.slice(0, 15)}...` : file.name} size="small" variant="ghost" icon="close" accessibilityLabel={`Remove ${file.name}`} onPress={() => setAttached((old) => old.filter((_, at) => at !== index))} />)}
+            </View>
+            <Text variant="caption" tone="soft">Sylvie sends attached images to an AI model to read them. Up to {limits.limit}, {Math.round(limits.bytes / 1024 / 1024)} MB each.</Text>
+          </View>
+        ) : null}
+        <TextField label="Ask Sylvie" hideLabel placeholder="Ask Sylvie" value={text} onChangeText={setText} testID="sylvie-input" returnKeyType="send" editable={!turn} onSubmitEditing={() => void send()} trailing={<View style={{ flexDirection: "row", alignItems: "center", gap: space.xs }}><IconButton icon="plus" label="Attach an image" bare disabled={turn !== null || attached.length >= limits.limit} testID="sylvie-attach" onPress={() => void attach()} /><Button title="Send" size="small" variant="ghost" disabled={(!text.trim() && !attached.length) || turn !== null} testID="sylvie-send" onPress={() => void send()} /></View>} />
       </View>
     </View>
   );

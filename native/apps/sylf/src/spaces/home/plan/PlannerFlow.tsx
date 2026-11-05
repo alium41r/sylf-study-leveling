@@ -4,6 +4,7 @@ import { useState } from "react";
 import { View } from "react-native";
 import { Badge, Button, Callout, Checkbox, Dialog, Disclosure, EmptyState, Segmented, Stack, Text, TextField, Toggle, useTheme } from "@sylf/design-system";
 import type { PlannerView } from "@sylf/backend";
+import { pickDocument } from "../../../shell/files/pick";
 import { usePlannerPlan, type Problem } from "./usePlanner";
 
 const LIMITS = [{ value: "0.5", label: "$0.50" }, { value: "1", label: "$1.00" }, { value: "1.75", label: "$1.75" }] as const;
@@ -58,7 +59,16 @@ export function PlannerFlow({ planId, onBack }: { planId: string; onBack: () => 
           <Text variant="subheading" role="heading" aria-level={3}>{flow.phase === "RECOVERY" ? "Try again" : "Build this plan"}</Text>
           <Text variant="small" tone="soft">Building a plan uses AI and costs real money. You choose the most it may spend, and the server enforces it. Your details are already saved, and that was free.</Text>
           <TextField label="Anything else the planner should know" value={notes} onChangeText={setNotes} multiline testID="planner-notes" />
-          {view.documents.length ? <Toggle label={`Let it read my ${view.documents.length} material${view.documents.length === 1 ? "" : "s"}`} hint="Research needs your permission each time." value={research} onChange={setResearch} /> : null}
+          <Toggle label="Let it research with my materials" hint="Research needs your permission each time. Add a PDF or text file (up to 3 MB) for it to read." value={research} onChange={setResearch} />
+          {research || view.documents.length ? (
+            <Stack gap="xs" testID="planner-materials">
+              {view.documents.map((document) => <Text key={document.documentId} variant="small" tone="soft" numberOfLines={1}>{document.title}</Text>)}
+              <Button title={busy === "upload" ? "Adding" : "Add a PDF or text file"} size="small" icon="plus" disabled={busy !== null} testID="planner-add-material" onPress={() => void (async () => {
+                const file = await pickDocument().catch(() => null);
+                if (file) await act("upload", (key) => reads!.uploadDocument(planId, key, file), "Added to your materials.");
+              })()} />
+            </Stack>
+          ) : null}
           <Segmented<Limit> label="Most it may spend" value={limit} options={[...LIMITS]} onChange={setLimit} />
           <Checkbox label={`I allow Sylf to use AI to build this plan, for up to $${limit === "0.5" ? "0.50" : limit === "1" ? "1.00" : "1.75"}.`} value={consent} onChange={setConsent} />
           <Button title={busy === "generate" ? "Starting" : problem?.action === "generate" && problem.retryable ? "Try this same request again" : "Build plan"} variant="emphasis" disabled={!consent || busy !== null} testID="planner-generate" onPress={() => void act("generate", (key) => reads!.generate(view, key, { notes, research, spendingLimitUsd: Number(limit) }), "Planning started. You can leave: it keeps going.", false).then((ok) => { if (ok) { setConsent(false); setNotes(""); } })} />

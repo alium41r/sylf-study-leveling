@@ -7,6 +7,8 @@
 // reuses it when it retries the same action after a lost acknowledgement. Nothing here retries a write.
 import { z } from "zod";
 import type { BackendClient } from "./client";
+import { BackendError } from "./errors";
+import { appendFile, type PickedFile } from "./files";
 
 const CONTRACT = { "x-sylf-planner-contract": "2" };
 /** Retained-artifact verification can outlast an ordinary read, as it does on the web. */
@@ -15,6 +17,9 @@ const WRITE_MS = 20_000;
 /** The web's student ceiling. The server enforces its own, and refuses anything above it. */
 export const STUDENT_SPENDING_LIMIT_USD = 1.75;
 export const STUDENT_RESOURCE_PROFILE = "student-preview-v2";
+/** The server refuses more than 3 MB. Saying so before the upload saves a slow, doomed request. */
+export const MAX_DOCUMENT_BYTES = 3 * 1024 * 1024;
+const documentSchema = z.object({ documentId: z.string(), title: z.string() }).loose();
 
 const text = z.string();
 const attemptStateSchema = z.enum(["QUEUED", "RUNNING", "NEEDS_DECISION", "SUCCEEDED", "FAILED", "CANCELLED", "SUPERSEDED"]);
@@ -180,6 +185,16 @@ export function createPlannerReads(client: BackendClient) {
         documentIds: options.research ? view.documents.map((document) => document.documentId) : [],
       },
     }),
+    /** Adds a PDF or text document to this plan's materials. The server checks ownership and the type again, and the planner reads it only when research is allowed. */
+    uploadDocument: (planId: string, key: string, file: PickedFile) => {
+      if (file.size !== undefined && file.size > MAX_DOCUMENT_BYTES) throw new BackendError("invalid", "Choose a document smaller than 3 MB.");
+      if (!["application/pdf", "text/plain"].includes(file.mimeType)) throw new BackendError("invalid", "Choose a PDF or a plain text file.");
+      const form = new FormData();
+      form.set("key", key);
+      form.set("title", file.name.slice(0, 200));
+      appendFile(form, "file", file);
+      return client.upload(`/api/planner/${encodeURIComponent(planId)}/documents`, form, { schema: documentSchema });
+    },
     /** Answers to the exact questions the server retained. */
     answer: (view: PlannerView, key: string, answers: Record<string, string>) => {
       const attempt = view.attempt;

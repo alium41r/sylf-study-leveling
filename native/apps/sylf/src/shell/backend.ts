@@ -3,15 +3,17 @@
 // A build with no backend makes no request and does not load that package, so Sample data, "Not saved" and start-up are exactly what they
 // were. Electron's host says whether it has one. On a device it is `EXPO_PUBLIC_SYLF_API_ORIGIN`. Screens read `useLiveBackend()`, and
 // `useResource` gives them loading, empty, offline and failed through the same pattern as every other long-lived object here.
-import { useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { Linking } from "react-native";
 import type { PlatformAdapters, PlatformCapabilities } from "@sylf/platform";
 import type { StudySessionModel } from "@sylf/spaces";
-import type { AuthSnapshot, Backend, PartyPresence, PartyPresenceState, Resource, ResourceState, SessionBridge, SessionSyncState } from "@sylf/backend";
+import type { AuthSnapshot, Backend, PartyPresence, PartyPresenceState, Realtime, RealtimeLink, Resource, ResourceState, SessionBridge, SessionSyncState } from "@sylf/backend";
 
 let backend: Backend | null = null;
 let bridge: SessionBridge | null = null;
 let presence: PartyPresence | null = null;
+let realtime: Realtime | null = null;
+let foreground = true;
 /** "pending" exists only while Electron's host is being asked. It lasts one local request, and nothing is drawn that could be wrong. */
 let phase: "pending" | "none" | "ready" = "none";
 let preferences: PlatformAdapters["preferences"] | null = null;
@@ -48,6 +50,29 @@ export function useSessionSync(): SessionSyncState {
   useBackend();
   return useSyncExternalStore(bridge?.subscribe ?? noSubscribe, bridge?.state ?? (() => NO_SYNC));
 }
+
+const noLink = (): RealtimeLink => "off";
+
+/** Whether pushed changes are arriving. A screen with its own fallback poll slows it while this is "live", and runs it at full pace otherwise. */
+export function useRealtimeLink(): RealtimeLink {
+  useBackend();
+  return useSyncExternalStore(realtime?.subscribe ?? noSubscribe, realtime?.state ?? noLink);
+}
+
+/** Runs `onNudge` when the server says these tags moved. It is a hint to read again, never content. */
+export function useRealtimeNudge(tag: string, onNudge: () => void) {
+  const joined = useBackend();
+  const latest = useRef(onNudge);
+  latest.current = onNudge;
+  useEffect(() => realtime?.onNudge((tags) => { if (tags.has(tag)) latest.current(); }), [joined, tag]);
+}
+
+/** The app moved to or from the front. Realtime runs only in front, and only while someone is signed in. */
+export function noteForeground(active: boolean) {
+  foreground = active;
+  syncRealtime();
+}
+function syncRealtime() { realtime?.setActive(foreground && backend?.auth.getSnapshot().status === "signed-in"); }
 
 const NO_ROOM: PartyPresenceState = { clientKey: null, link: "idle", message: null };
 
@@ -87,7 +112,7 @@ export async function connectBackend(adapters: PlatformAdapters, capabilities: P
   // A chunk that will not load must not leave the app on a blank page: it opens as a build with no backend, and studying still works.
   const loaded = await import("@sylf/backend").catch(() => null);
   if (!loaded) { console.warn("SYLF_BACKEND could not load its code."); settle("none"); return; }
-  const { createBackend, createBearerGateway, createHostGateway, createPartyPresence, createSessionBridge, parseBackendOrigin } = loaded;
+  const { createBackend, createBearerGateway, createHostGateway, createPartyPresence, createRealtime, createSessionBridge, createSupabaseSocket, parseBackendOrigin } = loaded;
   const origin = desktop ? null : parseBackendOrigin(configuredOrigin);
   if (!desktop && !origin) { console.warn("SYLF_BACKEND refused an origin that is neither https nor this machine."); settle("none"); return; }
   let joined: Backend | null = null;
@@ -104,6 +129,12 @@ export async function connectBackend(adapters: PlatformAdapters, capabilities: P
   preferences = adapters.preferences;
   bridge = createSessionBridge({ session, delivery: joined.timer, auth: joined.auth, resources: joined.resources, connectivity: joined.connectivity });
   presence = createPartyPresence({ session, parties: joined.reads.parties, auth: joined.auth, connectivity: joined.connectivity });
+  // Realtime is optional: with no address in this build it stays off, and the bounded fallbacks carry on exactly as they did.
+  const realtimeUrl = process.env.EXPO_PUBLIC_SYLF_REALTIME_URL;
+  const realtimeKey = process.env.EXPO_PUBLIC_SYLF_REALTIME_KEY;
+  realtime = createRealtime({ client: joined.client, resources: joined.resources, config: realtimeUrl && realtimeKey ? { url: realtimeUrl, key: realtimeKey } : null, socket: createSupabaseSocket });
+  joined.auth.subscribe(syncRealtime);
   settle("ready");
   await joined.start();
+  syncRealtime();
 }

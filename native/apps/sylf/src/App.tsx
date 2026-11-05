@@ -9,7 +9,7 @@ import { createAdapters, detectCapabilities, windowSizeClass } from "@sylf/platf
 import { runParitySuite } from "@sylf/shared/parity";
 import { availableSpaces, createHomeNavigation, createSpacesStore, createStudySessionModel, createWorkspaceModel, createWorldController } from "@sylf/spaces";
 import { HomeNavigationProvider, SpacesProvider, StudySessionProvider, WorkspaceModelProvider, WorldControllerProvider } from "./shell/context";
-import { connectBackend, currentBackend, prepareBackend, useBackend, useBackendPhase } from "./shell/backend";
+import { connectBackend, currentBackend, noteForeground, prepareBackend, useBackend, useBackendPhase } from "./shell/backend";
 import { DEV_TOOLS, closeShowcase, openProbe, openShowcase, setHomeDataScenario, setWorldScenarios, useDevSurface, worldHostScenario } from "./shell/dev-surface";
 import { parseAppLink } from "./shell/links";
 import { onForegroundChange } from "./shell/focus/alerts";
@@ -46,6 +46,7 @@ AppState.addEventListener("change", (state) => {
   worldController.setForeground(state === "active");
   studySession.setForeground(state === "active");
   void onForegroundChange(state === "active", studySession);
+  noteForeground(state === "active");
   if (state === "active") currentBackend()?.wake();
   if (state !== "active") { currentBackend()?.sleep(); homeNavigation.flush(); workspaceModel.flush(); spacesStore.flush(); appearanceStore.flush(); }
 });

@@ -10,6 +10,7 @@
     "./token-session": "./src/token-session.mjs"
   },
   "dependencies": {
+    "@supabase/realtime-js": "2.112.4",
     "@sylf/shared": "*",
     "zod": "4.4.3"
   }

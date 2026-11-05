@@ -6,19 +6,22 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View } from "react-native";
 import { Badge, Button, Callout, Dialog, EmptyState, ListRow, Stack, Text, TextField, useNotice, useTheme } from "@sylf/design-system";
 import type { BackendError, ChatMessage, Conversation, ConversationSummary } from "@sylf/backend";
-import { useAuth, useLiveBackend, useOptionalResource } from "../../../shell/backend";
+import { useAuth, useLiveBackend, useOptionalResource, useRealtimeLink, useRealtimeNudge } from "../../../shell/backend";
 import { toLiveResult } from "../../../shell/live-result";
 import { describeFailureText } from "../../../shell/account/failure";
 import { useDestinationSeen } from "./useSeen";
 import { NewGroupSheet } from "./NewGroupSheet";
 
 const FALLBACK_MS = 30_000;
+/** With Realtime live the poll is only a safety net, so it slows right down. */
+const LIVE_FALLBACK_MS = 180_000;
 const LIMIT = 2000;
 
 export function MessagesView({ openId, onOpened }: { openId?: number | null; onOpened?: () => void }) {
   const { space } = useTheme();
   const backend = useLiveBackend();
   const seen = useDestinationSeen("circle");
+  const link = useRealtimeLink();
   const [open, setOpen] = useState<number | null>(openId ?? null);
   const [grouping, setGrouping] = useState(false);
   useEffect(() => { if (openId) { setOpen(openId); onOpened?.(); } }, [openId, onOpened]);
@@ -27,9 +30,9 @@ export function MessagesView({ openId, onOpened }: { openId?: number | null; onO
   // The list refreshes at the same bounded pace, seen only.
   useEffect(() => {
     if (!seen || open !== null || !resource) return undefined;
-    const timer = setInterval(() => resource.refresh(), FALLBACK_MS);
+    const timer = setInterval(() => resource.refresh(), link === "live" ? LIVE_FALLBACK_MS : FALLBACK_MS);
     return () => clearInterval(timer);
-  }, [seen, open, resource]);
+  }, [seen, open, resource, link]);
 
   if (!backend) return <EmptyState icon="circle" title="Messages live in your account" message="Sign in to talk with your friends." />;
   if (open !== null) return <ConversationView id={open} seen={seen} onBack={() => { setOpen(null); backend.resources.invalidate("messages"); }} />;
@@ -54,6 +57,7 @@ function ConversationRow({ conversation, onPress }: { conversation: Conversation
 }
 
 function ConversationView({ id, seen, onBack }: { id: number; seen: boolean; onBack: () => void }) {
+  const link = useRealtimeLink();
   const { color, shape, space } = useTheme();
   const backend = useLiveBackend();
   const notice = useNotice();
@@ -88,13 +92,17 @@ function ConversationView({ id, seen, onBack }: { id: number; seen: boolean; onB
   }, [backend, id, merge]);
 
   // The fallback: newer messages only, seen only. An edit or a delete by someone else shows on the next full open.
+  const catchUp = useCallback(() => {
+    if (!backend) return;
+    backend.reads.social.newerThan(id, newest.current, new AbortController().signal).then((value) => { if (alive.current && value.messages.length) merge(value.messages); }, () => undefined);
+  }, [backend, id, merge]);
   useEffect(() => {
     if (!backend || !seen || !conversation) return undefined;
-    const timer = setInterval(() => {
-      backend.reads.social.newerThan(id, newest.current, new AbortController().signal).then((value) => { if (alive.current && value.messages.length) merge(value.messages); }, () => undefined);
-    }, FALLBACK_MS);
+    const timer = setInterval(catchUp, link === "live" ? LIVE_FALLBACK_MS : FALLBACK_MS);
     return () => clearInterval(timer);
-  }, [backend, seen, conversation, id, merge]);
+  }, [backend, seen, conversation, catchUp, link]);
+  // A push only says something moved. The read below is the same one the fallback makes, with the server's own checks.
+  useRealtimeNudge("messages", () => { if (seen && conversation) catchUp(); });
 
   const older = async () => {
     if (!backend || !messages.length) return;

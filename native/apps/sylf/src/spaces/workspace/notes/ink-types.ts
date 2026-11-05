@@ -17,6 +17,8 @@ export interface InkViewProps {
   tool: InkToolState;
   /** False over a PDF page, whose image is the paper. */
   drawPaper: boolean;
+  /** Only the paper, under a page's text and pictures; the strokes are drawn by another view above them. */
+  paperOnly?: boolean;
   editable: boolean;
   selection: string[];
   onSelection(ids: string[]): void;

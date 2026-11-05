@@ -2,7 +2,7 @@
 // puts the subject being studied right now first, and opens each document in the tool that owns it, in a window of its own.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
-import { Chip, ContextArea, EmptyState, Icon, Press, Text, TextField, useNotice, useTheme, type IconName, type MenuItem, type ViewHandle } from "@sylf/design-system";
+import { Chip, ContextArea, EmptyState, Icon, Press, Text, TextField, useNotice, useTheme, type IconName, type MenuItem, type PressProps, type ViewHandle } from "@sylf/design-system";
 import type { LibraryEntry, NoteKind } from "@sylf/notes";
 import { useSessionState, useWorkspaceModel } from "../../../shell/context";
 import { useSubjects } from "../../../shell/live";
@@ -63,7 +63,7 @@ export default function ResourcesTool({ onProvenance }: ToolProps) {
         <View style={{ padding: space.sm }}>
           {shown.length ? shown.map((entry) => (
             <ContextArea key={entry.id} label={entry.title} items={menu(entry)}>
-              <ShelfRow entry={entry} subject={subjectName(entry.subjectId)} notebook={snapshot.notebooks.find((n) => n.id === entry.notebookId)?.title ?? null} studying={!!studying && entry.subjectId === String(studying)} onOpen={open} />
+              {(onLongPress) => <ShelfRow onLongPress={onLongPress} entry={entry} subject={subjectName(entry.subjectId)} notebook={snapshot.notebooks.find((n) => n.id === entry.notebookId)?.title ?? null} studying={!!studying && entry.subjectId === String(studying)} onOpen={open} />}
             </ContextArea>
           )) : <EmptyState icon="search" title="Nothing matches" message="Try another filter." />}
         </View>
@@ -73,14 +73,14 @@ export default function ResourcesTool({ onProvenance }: ToolProps) {
   );
 }
 
-function ShelfRow({ entry, subject, notebook, studying, onOpen }: { entry: LibraryEntry; subject: string | null; notebook: string | null; studying: boolean; onOpen(entry: LibraryEntry): void }) {
+function ShelfRow({ entry, subject, notebook, studying, onOpen, onLongPress }: { entry: LibraryEntry; subject: string | null; notebook: string | null; studying: boolean; onOpen(entry: LibraryEntry): void; onLongPress: PressProps["onLongPress"] }) {
   const { space, color } = useTheme();
   const ref = useRef<ViewHandle>(null);
   useDragSource(ref, entry.id);
   const detail = [KIND_LABEL[entry.kind], subject, notebook, relativeTime(entry.updated)].filter(Boolean).join(" · ");
   return (
     <View ref={ref} collapsable={false}>
-      <Press label={`${entry.title}, ${detail}`} onPress={() => onOpen(entry)} testID={`shelf-${entry.kind}`} bodyStyle={{ flexDirection: "row", alignItems: "center", gap: space.md, paddingHorizontal: space.sm, paddingVertical: space.sm }}>
+      <Press label={`${entry.title}, ${detail}`} onPress={() => onOpen(entry)} onLongPress={onLongPress} delayLongPress={380} testID={`shelf-${entry.kind}`} bodyStyle={{ flexDirection: "row", alignItems: "center", gap: space.md, paddingHorizontal: space.sm, paddingVertical: space.sm }}>
         <View style={{ width: 34, height: 34, borderRadius: 9, alignItems: "center", justifyContent: "center", backgroundColor: studying ? color.accent.wash : color.sunken }}><Icon name={KIND_ICON[entry.kind]} size={18} color={studying ? color.accent.ink : color.inkSoft} /></View>
         <View style={{ flex: 1, minWidth: 0, gap: 1 }}>
           <Text variant="label" numberOfLines={1}>{entry.title}</Text>

@@ -2,7 +2,7 @@
 // notes take a colour and an emoji. Everything acts on the one Notes library, so a change here appears in Resources and every window.
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import { ScrollView, View, type LayoutChangeEvent } from "react-native";
-import { Button, Chip, ContextArea, Dialog, EmptyState, Icon, Menu, Press, Text, TextField, useNotice, useTheme, type IconName, type MenuItem, type ViewHandle } from "@sylf/design-system";
+import { Button, Chip, ContextArea, Dialog, EmptyState, Icon, Menu, Press, Text, TextField, useNotice, useTheme, type IconName, type MenuItem, type PressProps, type ViewHandle } from "@sylf/design-system";
 import { BOARD_TEMPLATES, PAPER_TEMPLATES, TYPED_TEMPLATES, type LibraryEntry, type NoteKind, type Notebook, type NotesLibrary } from "@sylf/notes";
 import { useLibrarySnapshot } from "../../../shell/notes/library";
 import { importPdfFile } from "./pdf-import";
@@ -161,12 +161,12 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, onOpen
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: space.md, paddingTop: space.xs, gap: space.sm, flexDirection: "row", flexWrap: "wrap" }} keyboardShouldPersistTaps="handled">
         {childFolders.map((f) => (
           <ContextArea key={f.id} label={f.title} items={folderMenu(f)}>
-            <FolderTile folder={f} width={cardWidth} items={count(f.id)} onOpen={() => setPlace({ folder: f.id })} onDropDocument={(id) => run(library.move(id, f.id), `Moved to ${f.title}`)} />
+            {(onLongPress) => <FolderTile folder={f} width={cardWidth} items={count(f.id)} onOpen={() => setPlace({ folder: f.id })} onLongPress={onLongPress} onDropDocument={(id) => run(library.move(id, f.id), `Moved to ${f.title}`)} />}
           </ContextArea>
         ))}
         {!snapshot.ready ? null : entries.length ? entries.map((entry) => (
           <ContextArea key={entry.id} label={entry.title} items={entryMenu(entry)}>
-            <Card entry={entry} width={cardWidth} onOpen={onOpen} />
+            {(onLongPress) => <Card entry={entry} width={cardWidth} onOpen={onOpen} onLongPress={onLongPress} />}
           </ContextArea>
         )) : childFolders.length ? null : (
           <View style={{ width: "100%", paddingTop: space.xl }}>
@@ -210,14 +210,14 @@ function FolderRow({ title, icon, tint, depth, onPress }: { title: string; icon:
   );
 }
 
-function FolderTile({ folder, width, items, onOpen, onDropDocument }: { folder: Notebook; width: number; items: number; onOpen(): void; onDropDocument(id: string): void }) {
+function FolderTile({ folder, width, items, onOpen, onLongPress, onDropDocument }: { folder: Notebook; width: number; items: number; onOpen(): void; onLongPress: PressProps["onLongPress"]; onDropDocument(id: string): void }) {
   const { space } = useTheme();
   const ref = useRef<ViewHandle>(null);
   // On desktop, a note dragged onto a folder goes into it.
   useDropTarget(ref, { onDocument: (id) => onDropDocument(id) });
   return (
     <View ref={ref} collapsable={false} style={{ width }}>
-      <Press label={`${folder.title} folder, ${items} ${items === 1 ? "item" : "items"}`} onPress={onOpen} testID="library-folder" bodyStyle={{ padding: space.sm, gap: space.sm }}>
+      <Press label={`${folder.title} folder, ${items} ${items === 1 ? "item" : "items"}`} onPress={onOpen} onLongPress={onLongPress} delayLongPress={380} hint="Long press for options" testID="library-folder" bodyStyle={{ padding: space.sm, gap: space.sm }}>
         <View style={{ height: 112, borderRadius: 12, backgroundColor: `${folder.color}22`, borderWidth: 1, borderColor: `${folder.color}55`, alignItems: "center", justifyContent: "center" }}>
           <View style={{ position: "absolute", left: 12, top: 10, width: 44, height: 10, borderTopLeftRadius: 6, borderTopRightRadius: 6, backgroundColor: `${folder.color}55` }} />
           {folder.icon ? <Text style={{ fontSize: 40 }}>{folder.icon}</Text> : <Icon name="folder" size={40} color={folder.color} />}
@@ -247,14 +247,14 @@ function Customizer({ value, onChange }: { value: Customizing; onChange(next: Cu
   );
 }
 
-function Card({ entry, width, onOpen }: { entry: LibraryEntry; width: number; onOpen(entry: LibraryEntry): void }) {
+function Card({ entry, width, onOpen, onLongPress }: { entry: LibraryEntry; width: number; onOpen(entry: LibraryEntry): void; onLongPress: PressProps["onLongPress"] }) {
   const { space, color } = useTheme();
   const ref = useRef<ViewHandle>(null);
   // On desktop a card can be dragged onto the canvas, where it opens in a window of its own.
   useDragSource(ref, entry.trashed ? null : entry.id);
   return (
     <View ref={ref} collapsable={false} style={{ width }}>
-      <Press label={`${entry.title}, ${KIND_LABEL[entry.kind]}`} hint={entry.trashed ? "In the trash" : undefined} onPress={() => (entry.trashed ? undefined : onOpen(entry))} testID={`library-entry-${entry.kind}`}
+      <Press label={`${entry.title}, ${KIND_LABEL[entry.kind]}`} hint={entry.trashed ? "In the trash" : undefined} onPress={() => (entry.trashed ? undefined : onOpen(entry))} onLongPress={onLongPress} delayLongPress={380} testID={`library-entry-${entry.kind}`}
         style={{ opacity: entry.trashed ? 0.6 : 1 }} bodyStyle={{ padding: space.sm, gap: space.sm }}>
         <Cover entry={entry} />
         <View style={{ gap: 2, paddingHorizontal: 2 }}>

@@ -26,7 +26,8 @@ type Page = DocumentDescriptor["pages"][number];
 export type NoteMode = "type" | "write";
 const GAP = 20, SNAP = 96, MARGIN = 160;
 const RULED = new Set(["ruled", "cornell", "journal"]);
-const FONT = '"Instrument Sans", -apple-system, "Segoe UI", Roboto, system-ui, sans-serif';
+// The system face on both sides: the WebView on Android has none of the app's fonts, and the native text must match it.
+const FONT = '-apple-system, BlinkMacSystemFont, Roboto, "Segoe UI", system-ui, sans-serif';
 
 /** Where typed text sits on a page, in page units: on the paper's rule when it is lined. */
 export function textBox(page: Page, paper: InkPaper | null) {
@@ -203,11 +204,10 @@ export default function NoteEditor({ library, document, editable, initialPage, o
                   <View key={row.page.pageId} style={{ position: "absolute", top: row.top, left, width: row.width, height: row.height, backgroundColor: paper?.color ?? "#ffffff", overflow: "hidden", boxShadow: "0 1px 3px rgba(20,24,40,0.12), 0 6px 18px rgba(20,24,40,0.08)" }} testID="ink-page">
                     {row.page.originalAssetId ? <PdfPageImage library={library} hash={row.page.originalAssetId} index={row.page.sourcePage ?? 0} width={row.width} height={row.height} /> : null}
                     {background ? <PictureBackground library={library} hash={background} width={row.width} height={row.height} /> : null}
-                    {x1 > x0 && y1 > y0 ? (
-                      <View style={{ position: "absolute", left: x0, top: y0 }} pointerEvents={mode === "write" ? "auto" : "none"}>
+                    {x1 > x0 && y1 > y0 && !row.page.originalAssetId && !background ? (
+                      <View style={{ position: "absolute", left: x0, top: y0 }} pointerEvents="none">
                         <InkView scene={s} pageWidth={row.page.width} pageHeight={row.page.height} camera={{ x: x0 / scale, y: y0 / scale, zoom: scale }} width={x1 - x0} height={y1 - y0}
-                          tool={tool} drawPaper={!row.page.originalAssetId && !background} editable={editable && mode === "write"} selection={selection?.page === row.page.pageId ? selection.ids : []}
-                          onSelection={(ids) => setSelection(ids.length ? { page: row.page.pageId, ids } : null)} onPan={pan} onPinch={(factor) => pinch(factor)} onPenSeen={penSeen} wheel="zoom" />
+                          tool={tool} drawPaper paperOnly editable={false} selection={[]} onSelection={() => undefined} />
                       </View>
                     ) : null}
                     {text ? (
@@ -222,6 +222,14 @@ export default function NoteEditor({ library, document, editable, initialPage, o
                           <View style={{ width: box.width, transform: [{ scale }], transformOrigin: "0 0" } as object} pointerEvents="none"><StaticText doc={text} look={look} width={box.width} /></View>
                         </Press>
                       )
+                    ) : null}
+                    {/* Handwriting lies over the typed text and pictures, as ink on a printed page does. */}
+                    {x1 > x0 && y1 > y0 ? (
+                      <View style={{ position: "absolute", left: x0, top: y0 }} pointerEvents={mode === "write" ? "auto" : "none"}>
+                        <InkView scene={s} pageWidth={row.page.width} pageHeight={row.page.height} camera={{ x: x0 / scale, y: y0 / scale, zoom: scale }} width={x1 - x0} height={y1 - y0}
+                          tool={tool} drawPaper={false} editable={editable && mode === "write"} selection={selection?.page === row.page.pageId ? selection.ids : []}
+                          onSelection={(ids) => setSelection(ids.length ? { page: row.page.pageId, ids } : null)} onPan={pan} onPinch={(factor) => pinch(factor)} onPenSeen={penSeen} wheel="zoom" />
+                      </View>
                     ) : null}
                   </View>
                 );

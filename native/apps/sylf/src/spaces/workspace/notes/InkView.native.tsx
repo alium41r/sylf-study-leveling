@@ -51,10 +51,11 @@ function NativeInkSurface(props: InkViewProps) {
   };
   useEffect(() => () => scene.endSweep(), [scene]);
   useEffect(() => {
+    if (props.paperOnly) return;
     sent.current.clear();
     void ref.current?.clearStrokes().then(() => sync.current());
     return scene.subscribe(() => void sync.current());
-  }, [scene]);
+  }, [scene, props.paperOnly]);
 
   const paper = useMemo(() => {
     if (!props.drawPaper) return null;
@@ -70,7 +71,7 @@ function NativeInkSurface(props: InkViewProps) {
 
   return (
     <Native ref={ref} style={{ width: props.width, height: props.height }}
-      tool={tool.tool} penOnly={tool.penOnly} fingerGestures={!!props.fingersMove} editable={props.editable}
+      tool={tool.tool} penOnly={tool.penOnly} fingerGestures={!!props.fingersMove} editable={props.editable && !props.paperOnly}
       inkColor={tool.color} inkWidth={highlighter ? Math.max(8, tool.width * 4) : tool.width} inkOpacity={highlighter ? 0.28 : 1} eraserRadius={eraserRadius(tool)}
       camera={[props.camera.x, props.camera.y, props.camera.zoom]} selectionBox={box ? [box.x, box.y, box.width, box.height] : null} paper={paper}
       onPenSeen={() => latest.current.onPenSeen?.()}
@@ -108,7 +109,7 @@ function ReadOnlyInk(props: InkViewProps) {
     <View style={{ width, height, overflow: "hidden" }} aria-label="Ink, read only on this device">
       <Svg width={width} height={height} viewBox={`${camera.x} ${camera.y} ${width / camera.zoom} ${height / camera.zoom}`}>
         {drawPaper ? <Rect x={0} y={0} width={pageWidth} height={pageHeight} fill={paper.color} /> : null}
-        {scene.strokes().map((s) => <Path key={`${s.id}:${s.version}`} d={s.d} fill={s.color} fillOpacity={s.opacity} />)}
+        {props.paperOnly ? null : scene.strokes().map((s) => <Path key={`${s.id}:${s.version}`} d={s.d} fill={s.color} fillOpacity={s.opacity} />)}
       </Svg>
     </View>
   );

@@ -62,6 +62,7 @@ export default function InkView(props: InkViewProps) {
       }
     }
     const drag = gesture.current?.kind === "move" && gesture.current.origin && gesture.current.last ? { dx: gesture.current.last.x - gesture.current.origin.x, dy: gesture.current.last.y - gesture.current.origin.y } : null;
+    if (latest.current.paperOnly) return;
     for (const stroke of scene.strokes()) {
       const b = stroke.bounds;
       const moving = drag && selection.includes(stroke.id);
@@ -239,7 +240,7 @@ export default function InkView(props: InkViewProps) {
   return (
     <View style={{ width: props.width, height: props.height }} testID="ink-view">
       <canvas ref={base} style={style} aria-hidden />
-      <canvas ref={live} data-owns-wheel={props.wheel} style={{ ...style, cursor }} aria-label="Writing surface" role="img" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} onContextMenu={(e) => e.preventDefault()} />
+      {props.paperOnly ? null : <canvas ref={live} data-owns-wheel={props.wheel} style={{ ...style, cursor }} aria-label="Writing surface" role="img" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} onContextMenu={(e) => e.preventDefault()} />}
     </View>
   );
 }

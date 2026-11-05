@@ -152,13 +152,17 @@ export function Menu({ open, anchor, onClose, items, label, side, matchWidth, po
 }
 
 /** Long press on touch and right-click on desktop open the same menu at the same point. */
-export function ContextArea({ items, label, children }: { items: MenuItem[]; label: string; children: ReactNode }) {
+/** Pass a function when the content is already a button: it receives the long-press handler to put on that button, so there is
+ *  no second button around it (a nested button is invalid on the web, and on touch the inner one takes the press). */
+export function ContextArea({ items, label, children }: { items: MenuItem[]; label: string; children: ReactNode | ((onLongPress: (event: { nativeEvent: { pageX: number; pageY: number } }) => void) => ReactNode) }) {
   const [point, setPoint] = useState<{ x: number; y: number } | null>(null);
   const anchor = useRef<ViewHandle>(null);
   const web = Platform.OS === "web" ? { onContextMenu: (event: { preventDefault(): void; clientX: number; clientY: number }) => { event.preventDefault(); setPoint({ x: event.clientX, y: event.clientY }); } } : {};
   return (
     <View ref={anchor} collapsable={false} {...web as object}>
-      <Press label={label} feedback="none" hint="Long press for options" delayLongPress={380} onLongPress={(event) => setPoint({ x: event.nativeEvent.pageX, y: event.nativeEvent.pageY })}>{children}</Press>
+      {typeof children === "function"
+        ? children((event) => setPoint({ x: event.nativeEvent.pageX, y: event.nativeEvent.pageY }))
+        : <Press label={label} feedback="none" hint="Long press for options" delayLongPress={380} onLongPress={(event) => setPoint({ x: event.nativeEvent.pageX, y: event.nativeEvent.pageY })}>{children}</Press>}
       <Menu open={point !== null} anchor={anchor} onClose={() => setPoint(null)} items={items} label={label} point={point ?? undefined} />
     </View>
   );

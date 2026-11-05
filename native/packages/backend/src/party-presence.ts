@@ -72,7 +72,11 @@ export function createPartyPresence({ session, parties, auth, connectivity, retr
     try {
       const entry = await parties.timer(party.partyId, action, party.roomSessionId ? { sessionId: party.roomSessionId } : {});
       mirrored = { clientKey, state: action === "pause" ? "paused" : "focusing" };
-      if (party.roomSessionId === null && !(await seat(clientKey, party.partyId, entry.sessionId, me))) throw new BackendError("server", "Not seated yet.");
+      if (party.roomSessionId === null) {
+        // A repeated action answers without the room's session, so ask the room itself. Entering is idempotent: it seats a person once.
+        const roomId = entry.sessionId ?? (await parties.enter(party.partyId)).sessionId;
+        if (!(await seat(clientKey, party.partyId, roomId, me))) throw new BackendError("server", "Not seated yet.");
+      }
       // The first "start" starts the room's timer. A session that began on a break wants the room paused as well, and the loop below does it.
       publish({ clientKey, link: "in-room", message: null });
     } catch (error) {

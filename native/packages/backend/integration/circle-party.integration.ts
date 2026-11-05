@@ -14,7 +14,7 @@ const crypto_ = { getRandomValues: (array: Uint8Array<ArrayBuffer>) => { array.s
 const memoryVault = () => { let value: string | null = null; return { read: async () => value, write: async (next: string) => { value = next; }, clear: async () => { value = null; }, peek: () => value }; };
 const memoryPreferences = () => { const map = new Map<string, string>(); return { getItem: (key: string) => map.get(key) ?? null, setItem: (key: string, value: string) => { map.set(key, value); } }; };
 const settle = (ms = 20) => new Promise((done) => setTimeout(done, ms));
-const until = async (done: () => boolean) => { for (let wait = 0; wait < 300 && !done(); wait++) await settle(10); };
+const until = async (done: () => boolean) => { for (let wait = 0; wait < 600 && !done(); wait++) await settle(10); expect(done()).toBe(true); };
 const PASSWORD = "a-long-enough-password";
 // The server limits sign-in by address. Each device here claims its own, which only a local test can do.
 let devices = 0;
@@ -158,11 +158,13 @@ describe("a study party between two real accounts (owner decision E-13)", () => 
   it("seats a person in the room once, mirrors pause and resume, and the exit is replayable at its original instants", async () => {
     const { a, partyId } = await party();
     const entry = await a.student.backend.reads.parties.timer(partyId, "start");
-    expect(entry.sessionId).toBeGreaterThan(0);
-    const again = await a.student.backend.reads.parties.timer(partyId, "start");
-    expect(again.sessionId).toBe(entry.sessionId);
-    await a.student.backend.reads.parties.timer(partyId, "pause", { sessionId: entry.sessionId });
-    await a.student.backend.reads.parties.timer(partyId, "resume", { sessionId: entry.sessionId });
+    const room = entry.sessionId!;
+    expect(room).toBeGreaterThan(0);
+    // A repeated start changes nothing, and entering again names the same room.
+    await a.student.backend.reads.parties.timer(partyId, "start");
+    expect((await a.student.backend.reads.parties.enter(partyId)).sessionId).toBe(room);
+    await a.student.backend.reads.parties.timer(partyId, "pause", { sessionId: room });
+    await a.student.backend.reads.parties.timer(partyId, "resume", { sessionId: room });
     const state = await a.student.backend.reads.parties.state(partyId, signal());
     const mine = state.activeSession?.members.find((member) => member.userId === id(a.student));
     expect(mine?.timerState).toBe("FOCUSING");
@@ -172,7 +174,7 @@ describe("a study party between two real accounts (owner decision E-13)", () => 
   it("studies together through the one study session: one StudySession, the room only mirrors it, and leaving seats nobody", async () => {
     const { a, b, partyId } = await party();
     const preferences = memoryPreferences();
-    const model = createStudySessionModel({ getItem: (key) => preferences.getItem(key), setItem: (key, value) => preferences.setItem(key, value) }, { ownerId: () => id(a.student) });
+    const model = createStudySessionModel({ getItem: (key) => preferences.getItem(key), setItem: (key, value) => preferences.setItem(key, value) }, { createKey: () => randomUUID(), ownerId: () => id(a.student) });
     const bridge = createSessionBridge({ session: model, delivery: a.student.backend.timer, auth: a.student.backend.auth, resources: a.student.backend.resources, connectivity: a.student.backend.connectivity });
     const presence = createPartyPresence({ session: model, parties: a.student.backend.reads.parties, auth: a.student.backend.auth, connectivity: a.student.backend.connectivity, retryMs: 50 });
     expect(model.start({ title: "Together", party: { partyId, name: "Night owls" } })).toBe(true);

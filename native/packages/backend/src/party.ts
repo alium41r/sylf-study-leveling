@@ -3,6 +3,7 @@
 // say where the person is studying. The server banks room seconds on the room member for the others to see, and nothing here computes a reward.
 import { z } from "zod";
 import type { BackendClient } from "./client";
+import { BackendError } from "./errors";
 
 const timerStateSchema = z.string();
 const roomMemberSchema = z.object({
@@ -24,8 +25,8 @@ export const partyStateSchema = z.object({
 }).loose();
 export type PartyState = z.infer<typeof partyStateSchema>;
 
-/** What an entry or a timer action answers (lib/focus-party-service.ts): the room's session, and this person's state in it. */
-export const roomEntrySchema = z.object({ sessionId: z.number().int(), timerState: timerStateSchema.optional(), accumulatedSeconds: z.number().optional() }).loose();
+/** What an entry or a timer action answers. The server names the room's session when it seats a person, but an action that finds nothing to change (a repeated pause) answers without it, so it is optional here and `enter` is the way to learn it. */
+export const roomEntrySchema = z.object({ sessionId: z.number().int().optional(), timerState: timerStateSchema.optional(), accumulatedSeconds: z.number().optional() }).loose();
 export type RoomEntry = z.infer<typeof roomEntrySchema>;
 
 export type RoomAction = "start" | "pause" | "resume" | "leave";
@@ -47,7 +48,11 @@ export function createPartyReads(client: BackendClient) {
     /** The leader removes someone, by that person's user id. */
     remove: (partyId: number, userId: number) => client.send("DELETE", `/api/focus-party/${partyId}/members/${userId}`),
     /** Enters the room. Idempotent: the server seats a person once and answers the same session again. */
-    enter: async (partyId: number): Promise<RoomEntry> => roomEntrySchema.parse(await client.send<unknown>("POST", `/api/focus-party/${partyId}/session`, { body: {} })),
+    enter: async (partyId: number): Promise<RoomEntry & { sessionId: number }> => {
+      const entry = roomEntrySchema.parse(await client.send<unknown>("POST", `/api/focus-party/${partyId}/session`, { body: {} }));
+      if (entry.sessionId === undefined) throw new BackendError("contract", "The room did not say which session it is.");
+      return { ...entry, sessionId: entry.sessionId };
+    },
     /**
      * An acknowledged room action for the caller. Each is idempotent on the server, so a replay after a lost answer is safe. `leave` carries the original
      * seating and exit instants, and `expectedOwnerId` makes the server refuse if the account changed since the action was saved.

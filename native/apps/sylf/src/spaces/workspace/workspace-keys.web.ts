@@ -21,7 +21,6 @@ export function useWorkspaceKeys(actions: WorkspaceKeyActions) {
     const act = (event: KeyboardEvent, run: () => void) => { event.preventDefault(); run(); };
     const onKeyDown = (event: KeyboardEvent) => {
       const a = latest.current;
-      if ((event.metaKey || event.ctrlKey) && event.code === "KeyK") return act(event, a.quickSwitch);
       if (event.metaKey || event.ctrlKey || typing()) return;
       if (event.altKey) {
         const digit = /^Digit(\d)$/.exec(event.code)?.[1];

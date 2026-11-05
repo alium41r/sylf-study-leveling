@@ -318,6 +318,38 @@ function DialogBody({ open, onClose, title, message, actions, children }: { open
   );
 }
 
+/** The command palette's frame: a panel near the top of the screen, over everything, the way a launcher drops in. The caller
+ *  supplies the search field and the results; the frame brings the scrim, the motion, Escape and the focus trap. */
+export function Spotlight({ open, onClose, label, width = 640, children }: { open: boolean; onClose: () => void; label: string; width?: number; children: ReactNode }) {
+  const present = usePresence(open, 180);
+  return present ? <Portal><SpotlightBody open={open} onClose={onClose} label={label} width={width}>{children}</SpotlightBody></Portal> : null;
+}
+
+function SpotlightBody({ open, onClose, label, width, children }: { open: boolean; onClose: () => void; label: string; width: number; children: ReactNode }) {
+  const theme = useTheme();
+  const { motion, space, surface } = theme;
+  const insets = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
+  const body = useRef<ViewHandle>(null);
+  const progress = useSharedValue(0);
+  useDismiss(open, onClose);
+  useFocusTrap(body, open);
+  useEffect(() => { progress.value = move(open ? 1 : 0, motion, "lift"); }, [open, motion, progress]);
+  const travel = motion.enterTravel * motion.amount;
+  const enterScale = 1 - (1 - motion.enterScale) * motion.amount;
+  const animated = useAnimatedStyle(() => ({ opacity: Math.min(1, progress.value * 1.5), transform: [{ translateY: (progress.value - 1) * travel }, { scale: enterScale + (1 - enterScale) * progress.value }] }));
+  const top = insets.top + Math.min(110, Math.max(space.lg, height * 0.12));
+  return (
+    <View pointerEvents="box-none" style={[StyleSheet.absoluteFill, { alignItems: "center", paddingTop: top, paddingHorizontal: space.md }]}>
+      <Scrim open={open} onPress={onClose} label={`Close ${label}`} />
+      <Animated.View ref={body as never} role="dialog" aria-modal aria-label={label} accessibilityViewIsModal style={[surface("float", "xl"), { width: "100%", maxWidth: width, maxHeight: Math.max(240, height - top - insets.bottom - space.lg), overflow: "hidden" }, animated]}>
+        {children}
+        <Corners behind={theme.color.scrim} />
+      </Animated.View>
+    </View>
+  );
+}
+
 type NoticeTone = "neutral" | "positive" | "caution" | "critical";
 interface NoticeRecord { id: number; message: string; tone: NoticeTone; action?: { label: string; onPress: () => void } }
 const NoticeContext = createContext<(message: string, options?: { tone?: NoticeTone; action?: NoticeRecord["action"]; duration?: number }) => void>(() => undefined);

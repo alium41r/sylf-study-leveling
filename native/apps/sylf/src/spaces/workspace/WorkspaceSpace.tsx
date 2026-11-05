@@ -11,7 +11,6 @@ import { useShellMetrics, useWorkspaceModel, useWorkspaceState } from "../../she
 import { useKeyboardLift } from "../../shell/useKeyboardLift";
 import { CommandCenter } from "./CommandCenter";
 import { DockShelf } from "./DockShelf";
-import { QuickSwitcher } from "./QuickSwitcher";
 import { useCamera } from "./useCamera";
 import { useWorkspaceKeys } from "./workspace-keys";
 import { WindowView } from "./WorkspaceWindow";
@@ -38,7 +37,6 @@ export default function WorkspaceSpace() {
   const [seen, setSeen] = useState<string[]>([]);
   const [overview, setOverview] = useState(state.camera.zoom < OVERVIEW_ZOOM);
   const [samples, setSamples] = useState<Record<string, boolean>>({});
-  const [switching, setSwitching] = useState(false);
   const [hand, setHand] = useState(false);
   const mountedIds = useRef(new Set(state.windows.map((window) => window.id)));
   const compact = size === "compact";
@@ -102,7 +100,6 @@ export default function WorkspaceSpace() {
     zoomIn() { model.zoomBy(ZOOM.step); },
     zoomOut() { model.zoomBy(1 / ZOOM.step); },
     pan(dx, dy) { const resting = model.state().camera; model.commitCamera({ ...resting, x: resting.x + dx / resting.zoom, y: resting.y + dy / resting.zoom }); },
-    quickSwitch() { setSwitching(true); },
     leaveFocus() { if (state.layout !== "focus" && state.layout !== "fill") return false; model.setLayout("free"); return true; },
     hand: setHand,
   });
@@ -175,7 +172,6 @@ export default function WorkspaceSpace() {
           />
         ))}
       </WorkspaceCanvas>
-      <QuickSwitcher open={switching} onClose={() => setSwitching(false)} state={state} model={model} />
     </Animated.View>
     </FillArrangeContext.Provider>
   );

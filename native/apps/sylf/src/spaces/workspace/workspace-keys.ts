@@ -12,7 +12,6 @@ export interface WorkspaceKeyActions {
   zoomIn(): void;
   zoomOut(): void;
   pan(dx: number, dy: number): void;
-  quickSwitch(): void;
   leaveFocus(): boolean;
   hand(held: boolean): void;
 }

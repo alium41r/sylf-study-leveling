@@ -10,6 +10,7 @@ import type { DockKeyActions } from "./shell-keys";
 const mac = detectCapabilities().os === "macos";
 export const SPACES_SHORTCUT = mac ? "⌘1 2 3" : "Ctrl 1 2 3";
 export const DOCK_SHORTCUT = mac ? "⌥T" : "Alt T";
+export const PALETTE_SHORTCUT = mac ? "⌘K" : "Ctrl K";
 const behindModal = () => document.querySelector('[aria-modal="true"]') !== null;
 const typing = () => {
   const element = document.activeElement as HTMLElement | null;
@@ -26,6 +27,24 @@ export function useSpaceKeys(onDigit: (digit: string) => void) {
       if (!primary || !digit || event.altKey || event.shiftKey || event.repeat || behindModal()) return;
       event.preventDefault();
       latest.current(digit);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+}
+
+/** Command or Control + K opens the command palette from anywhere, typing included, and closes it again. Another modal comes first. */
+export function usePaletteKeys(toggle: () => void) {
+  const latest = useRef(toggle);
+  latest.current = toggle;
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const primary = mac ? event.metaKey && !event.ctrlKey : event.ctrlKey && !event.metaKey;
+      if (!primary || event.code !== "KeyK" || event.altKey || event.shiftKey || event.repeat) return;
+      const palette = document.querySelector('[data-testid="command-palette"]');
+      if (behindModal() && !palette) return;
+      event.preventDefault();
+      latest.current();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);

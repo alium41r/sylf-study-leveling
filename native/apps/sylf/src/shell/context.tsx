@@ -110,5 +110,5 @@ export function useDockMetrics() {
   const { control, edge, insets, top } = useShellMetrics();
   const { width, height, fontScale } = useWindowDimensions();
   const restWidth = Math.ceil(type.value.fontSize! * Math.min(fontScale, type.value.maxScale) * 5.2) + 16 + space.sm + space.md * 2;
-  return { restWidth, height: control, top, ...placeDock({ window: { width, height }, insets, top, edge, control, gap: space.sm, restWidth, reservedRight: DEV_TOOLS ? control : 0 }) };
+  return { restWidth, height: control, top, ...placeDock({ window: { width, height }, insets, top, edge, control, gap: space.sm, restWidth, reservedRight: control + space.sm + (DEV_TOOLS ? control + space.sm : 0) }) };
 }

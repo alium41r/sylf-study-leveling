@@ -2,7 +2,7 @@
 // Spaces, so neither moves when a Space changes. Both step aside for the game, whose own flow holds the screen.
 import { Suspense, lazy, useState } from "react";
 import { View } from "react-native";
-import { IconButton, useTheme } from "@sylf/design-system";
+import { IconButton, Tooltip, useTheme } from "@sylf/design-system";
 import { worldHoldsNavigation } from "@sylf/spaces";
 import { useHomeNavigation, useShellMetrics, useSpaces, useWorkspaceState } from "./context";
 import { useChromeRevealed } from "../spaces/workspace/chrome-reveal";
@@ -15,8 +15,24 @@ import { TimerDock } from "./TimerDock";
 import { useFocusEnvironmentOpen } from "./focus/environment";
 import { LevelNotice } from "./LevelNotice";
 import { AppearanceSeed } from "./AppearanceSeed";
+import { commandPalette, useCommandPaletteOpen } from "./palette/palette";
+import { PALETTE_SHORTCUT, usePaletteKeys } from "./shell-keys";
 
 const FocusEnvironment = lazy(() => import("./focus/FocusEnvironment"));
+const CommandPalette = lazy(() => import("./palette/CommandPalette"));
+
+/** The way into the command palette, in the top-right corner of every Space, beside the development entry when there is one. */
+function PaletteEntry() {
+  const { space } = useTheme();
+  const { control, edge, insets, top } = useShellMetrics();
+  return (
+    <View style={{ position: "absolute", top, right: insets.right + edge + (DEV_TOOLS ? control + space.sm : 0), zIndex: 10 }}>
+      <Tooltip text="Search Sylf" shortcut={PALETTE_SHORTCUT}>
+        {(tip) => <IconButton icon="search" label="Search Sylf" testID="palette-open" onPress={() => commandPalette.open()} onHover={tip.onHover} onFocusChange={tip.onFocusChange} onLongPress={tip.onLongPress} />}
+      </Tooltip>
+    </View>
+  );
+}
 
 function DevEntry() {
   const { edge, insets, top } = useShellMetrics();
@@ -35,6 +51,12 @@ export function SpacesShell() {
   const [barReach, setBarReach] = useState<number | null>(null);
   const navigation = useHomeNavigation();
   const openMessages = (id: number) => { conversationRequest.ask(id); navigation.setView("circle", "messages"); navigation.select("circle"); };
+  // The palette mounts the first time it is asked for and stays, so its next opening is instant.
+  const paletteOpen = useCommandPaletteOpen();
+  const [paletteUsed, setPaletteUsed] = useState(false);
+  if (paletteOpen && !paletteUsed) setPaletteUsed(true);
+  const reachable = !worldHoldsNavigation(world) && !focusing;
+  usePaletteKeys(() => { if (reachable) commandPalette.toggle(); });
   return (
     <View style={{ flex: 1, backgroundColor: color.ground }}>
       {/* Reading order is tab order: the Spaces icon, then the timer, then the Space. */}
@@ -45,6 +67,8 @@ export function SpacesShell() {
       <LevelNotice />
       <AppearanceSeed />
       {free && DEV_TOOLS ? <DevEntry /> : null}
+      {free ? <PaletteEntry /> : null}
+      {paletteUsed && reachable ? <Suspense fallback={null}><CommandPalette open={paletteOpen} /></Suspense> : null}
       {focusing && !worldHoldsNavigation(world) ? <Suspense fallback={null}><FocusEnvironment /></Suspense> : null}
     </View>
   );

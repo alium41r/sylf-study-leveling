@@ -6,3 +6,5 @@ export const SPACES_SHORTCUT: string | undefined = undefined;
 export const DOCK_SHORTCUT: string | undefined = undefined;
 export const useSpaceKeys: (onDigit: (digit: string) => void) => void = () => undefined;
 export const useDockKeys: (actions: DockKeyActions) => void = () => undefined;
+export const PALETTE_SHORTCUT: string | undefined = undefined;
+export const usePaletteKeys: (toggle: () => void) => void = () => undefined;

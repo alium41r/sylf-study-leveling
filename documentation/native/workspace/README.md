@@ -195,7 +195,7 @@ Interactions:
 | Import a PDF | PDFs, Import | Same, or drop a file anywhere on Workspace |
 | Notes beside a PDF | The document menu, "Take notes beside this" | Same |
 | Keep a layout | Layout menu, "Save this layout" | Same |
-| Add a page at the end | Pull up through the zone below the last page, starting with it in view | Pause at the end, then keep scrolling |
+| Add a page at the end | At the end of the last page, pull up until the zone below is fully shown, and let go without flicking. A fling or a short pull adds nothing, and the zone springs back | Pause at the end, then keep scrolling |
 | Endless note | New, "Note, endless", or Page settings, Endless: writing near the end extends the page | Same |
 | Only the page and toolbar | **Full screen** at the toolbar's right end; Exit full screen brings the bars back and leaves full screen | Same |
 | Find or do anything | The search button at the top right of every Space | Command or Control + K |

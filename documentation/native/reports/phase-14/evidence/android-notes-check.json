@@ -1,21 +1,35 @@
 {
   "library opens": true,
-  "pen case is shown for a handwritten page": true,
+  "pen case is shown when the note is in Write": true,
   "writingFrames": {
-    "total": 393,
-    "janky": 7,
-    "percent": 1.78,
+    "total": 396,
+    "janky": 6,
+    "percent": 1.52,
     "p50": 14,
     "p90": 17,
     "p99": 18
   },
-  "memoryHandwriting": {
-    "pssMb": 175
+  "inkBeforeErase": 3919,
+  "inkAfterErase": 0,
+  "eraser removes every stroke, the last one too": {
+    "ok": true,
+    "detail": {
+      "before": 3919,
+      "after": 0
+    }
   },
+  "memoryHandwriting": {
+    "pssMb": 186
+  },
+  "full screen leaves only the toolbar and page": true,
+  "exit full screen brings the bars back": true,
   "whiteboard opens with its pen case": true,
   "typed note runs in a WebView": true,
   "memoryTypedNote": {
-    "pssMb": 217
+    "pssMb": 260
   },
+  "search opens the command palette": true,
+  "back closes the palette": true,
+  "the timer dock has Sound": true,
   "no crash in logcat": true
 }

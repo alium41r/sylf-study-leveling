@@ -277,9 +277,13 @@ async function dotsGroup(t) {
   const all = Object.values(sizes);
   const light = all.map((item) => item.light);
   checks.dotsAtEveryZoom = all.every((item) => item.count >= 4);
-  checks.dotsKeepOneSize = Math.max(...light) / Math.min(...light) <= 1.05;
-  // Dots stay between one and two cells apart at every zoom, so the grid neither fills in nor empties out.
-  checks.dotSpacingStaysReadable = all.every((item) => item.spacing >= 27 && item.spacing < 57);
+  // One size at every zoom. Spacing that is not a whole number of pixels shifts the anti-aliasing a little, hence the tolerance.
+  checks.dotsKeepOneSize = Math.max(...light) / Math.min(...light) <= 1.12;
+  // Spacing follows the zoom (owner, Phase 14): a 28 pt cell times the zoom, doubled only when dots would be closer than 8 pt.
+  const expected = (/** @type {number} */ zoom) => { let spacing = 28 * zoom; while (spacing < 8) spacing *= 2; return spacing; };
+  results.dotSpacingExpected = Object.fromEntries(Object.keys(sizes).map((zoom) => [zoom, Math.round(expected(Number(zoom)) * 10) / 10]));
+  checks.dotSpacingFollowsZoom = Object.entries(sizes).every(([zoom, item]) => Math.abs(item.spacing - expected(Number(zoom))) <= expected(Number(zoom)) * 0.05);
+  checks.dotsSpreadWhenZoomingIn = sizes[0.5].spacing < sizes[0.71].spacing && sizes[0.71].spacing < sizes[1].spacing && sizes[1].spacing < sizes[1.4].spacing && sizes[1.4].spacing < sizes[2].spacing;
 }
 
 /** @param {any} t */

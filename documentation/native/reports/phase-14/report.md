@@ -27,11 +27,11 @@ All on 5 November 2026, on the final code unless a row says otherwise.
 
 | Check | Where | Result |
 | --- | --- | --- |
-| Native unit tests (`npm test`) | Mac | **594 passed**, 1 skipped (46 files). New: 11 Notes library tests (every kind parses with the web's `documentSchema`, ink survives a restart in `sylf-ink/1`, shared replicas, erase and lasso and undo, pages, trash, adoption, failure stops writes, notebooks, linking, auto-titles) and 2 saved-layout tests |
+| Native unit tests (`npm test`) | Mac | **609 passed**, 1 skipped (47 files). New: 17 Notes library tests (every kind parses with the web's `documentSchema`, ink survives a restart in `sylf-ink/1`, shared replicas, erase and lasso and undo, erasing every stroke and across gaps with one undo per sweep, the page-layered note, PDF pages after the writing, picture backgrounds, folders, endless notes, pages, trash, adoption, failure stops writes, linking, auto-titles), saved-layout and full-screen arrangement tests, and command palette ranking |
 | Native typecheck, ESLint, boundary audit, single-copy | Mac | Clean. Boundary audit: 0 violations over 392 files |
-| Web Notes tests on the shared extraction (`ink`, `ink-smoothness`, `creative-tools`, `fluid-editing`, `pdf`) | Mac, root Vitest | **64 passed**. Root `tsc --noEmit` and ESLint on the changed `lib/notes` files: clean |
+| Web Notes tests (`__tests__/notes`) | Mac, root Vitest | **269 passed**, 1 skipped, including a new regression test for erasing the last stroke. ESLint on the changed `lib/notes` files: clean |
 | Electron Workspace check, all groups | Mac, production export | **204 of 204 passed** ([evidence](evidence/electron-workspace-check.json)), including the new `notes` group (26): real typing with markdown shortcuts and the "/" menu, autosave and reload, mouse and pen strokes, eraser and undo, PDF drop and pdf.js render, notes beside, saved layout round trip, whiteboard zoom kept in the window, the shelf. Six themes, light and dark, and custom colours still pass |
-| Live Electron journey on a disposable backend | Mac, Docker PostgreSQL | LIVE_RESULT |
+| Live Electron journey on a disposable backend | Mac, Docker PostgreSQL | **34 of 35** (run before the later additions). The one miss is Circle's "unblocking empties the list" timing, which Phase 14 did not touch |
 | Android release build | Mac, Gradle | Builds (44.7 MB APK). Two device-found fixes, §6 |
 | Tablet, Galaxy Tab S9 FE, Android 16 | **Real device** | Library, handwriting with `input stylus` (stylus tool type), eraser, finger scrolls a pen page, persistence across a force-stop, whiteboard draw and finger pan, typed note in the WebView with the Lecture template and typing, PDF import through the system picker and PdfRenderer, highlighter and pen on the page, split layout. Automated: `npm run android:notes-check` passes ([evidence](evidence/android-notes-check.json)) |
 

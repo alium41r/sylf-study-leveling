@@ -31,8 +31,10 @@ export function OverlayHost({ children }: { children: ReactNode }) {
   }), []);
   return (
     <HostContext.Provider value={value}>
-      <View style={{ flex: 1 }}>{children}</View>
-      {[...nodes.entries()].map(([id, node]) => <View key={id} pointerEvents="box-none" style={StyleSheet.absoluteFill}>{node}</View>)}
+      {/* Kept as a real view, and overlays layered above it: on Android a view that draws nothing is flattened into its parent, which
+          would let a raised piece of the app (the timer dock, zIndex 15 to 30) compete with overlays and win. */}
+      <View collapsable={false} style={{ flex: 1, zIndex: 0 }}>{children}</View>
+      {[...nodes.entries()].map(([id, node], index) => <View key={id} collapsable={false} pointerEvents="box-none" style={[StyleSheet.absoluteFill, { zIndex: 1000 + index }]}>{node}</View>)}
     </HostContext.Provider>
   );
 }

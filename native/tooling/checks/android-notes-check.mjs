@@ -31,7 +31,8 @@ function dump() {
     return { desc: attr("content-desc"), text: attr("text"), cls: attr("class"), x1, y1, x2, y2, cx: Math.round((x1 + x2) / 2), cy: Math.round((y1 + y2) / 2) };
   });
 }
-const find = (nodes, label) => nodes.find((n) => n.desc === label || n.text === label || n.desc.startsWith(`${label},`));
+// Themes may show labels in capitals, so labels match regardless of case.
+const find = (nodes, label) => { const want = label.toLowerCase(); return nodes.find((n) => n.desc.toLowerCase() === want || n.text.toLowerCase() === want || n.desc.toLowerCase().startsWith(`${want},`)); };
 const tapLabel = async (label, wait = 900) => { const node = find(dump(), label); if (!node) throw new Error(`nothing labelled ${label}`); tap(node.cx, node.cy); await sleep(wait); return node; };
 /** Dark pixels in a region of the screen, read from a screenshot (8-bit RGBA or RGB PNG, as screencap writes). Ink is dark; paper and rules are not. */
 function darkPixels(rect) {
@@ -111,13 +112,8 @@ if (page) {
   await sleep(800);
   results.writingFrames = frames(false);
   shot("02-handwriting-stylus");
-  // A finger on a pen-only page scrolls instead of writing.
-  finger({ x: x + 300, y: page.y2 - 200 }, { x: x + 300, y: page.y1 + 200 }, 500);
-  await sleep(700);
-  shot("03-finger-scrolls");
-  results.memoryHandwriting = memory();
   // One eraser sweep over everything leaves nothing, the last stroke included; one Undo brings it back.
-  const region = { x1: page.x1, x2: page.x2, y1: page.y1, y2: Math.min(page.y2, page.y1 + 800) };
+  const region = { x1: x - 20, x2: x + 720, y1: y - 40, y2: y + 6 * 70 + 50 };
   results.inkBeforeErase = darkPixels(region);
   await tapLabel("Eraser", 600);
   for (let dx = 0; dx <= 760; dx += 40) stylus({ x: x + dx, y: y - 60 }, { x: x + dx, y: y + 6 * 70 + 60 }, 250);
@@ -127,6 +123,12 @@ if (page) {
   check("eraser removes every stroke, the last one too", results.inkBeforeErase > 200 && results.inkAfterErase < results.inkBeforeErase * 0.05, { before: results.inkBeforeErase, after: results.inkAfterErase });
   await tapLabel("Undo", 1200);
   await tapLabel("Pen", 400);
+  // A finger on a pen-only page scrolls instead of writing.
+  // Well inside the page: a finger on the window's edge would resize it.
+  finger({ x: x + 300, y: page.cy + 150 }, { x: x + 300, y: page.cy - 150 }, 500);
+  await sleep(700);
+  shot("03-finger-scrolls");
+  results.memoryHandwriting = memory();
   // Full screen: only the toolbar and the page, then back.
   await tapLabel("Full screen", 1800);
   let nodes = dump();
@@ -164,8 +166,11 @@ await link("space=home", 3500);
 await tapLabel("Search Sylf", 2500);
 check("search opens the command palette", !!find(dump(), "New note"));
 shot("06-command-palette");
+// The first Back closes the keyboard, the second the palette.
 adb("shell", "input", "keyevent", "KEYCODE_BACK");
-await sleep(900);
+await sleep(700);
+if (find(dump(), "Search notes, tools, places and actions") || dump().some((n) => n.desc === "Close Search Sylf")) { adb("shell", "input", "keyevent", "KEYCODE_BACK"); await sleep(900); }
+check("back closes the palette", !dump().some((n) => n.desc === "Close Search Sylf"));
 const timer = dump().find((n) => n.desc.startsWith("Timer."));
 if (timer) { tap(timer.cx, timer.cy); await sleep(1500); }
 check("the timer dock has Sound", !!find(dump(), "Sound"));

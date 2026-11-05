@@ -1,6 +1,6 @@
 // What Notes, PDFs and Whiteboard windows share: a library until a document is chosen, then that document, with a slim header to go
 // back, rename and see that it saved. A window keeps only a pointer to its document; the document itself lives in the Notes library.
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { View, type LayoutChangeEvent } from "react-native";
 import { Activity, Button, DOCUMENT_DEFAULTS, Dialog, EmptyState, Icon, IconButton, Menu, Press, Text, TextField, useNotice, useTheme, type MenuItem , type ViewHandle } from "@sylf/design-system";
 import type { LibraryEntry, NoteKind, NotesLibrary, OpenDocument, SaveState } from "@sylf/notes";
@@ -9,10 +9,12 @@ import { isSeen, type ToolProps } from "../tools/shared";
 import BoardCanvas from "./BoardCanvas";
 import LibraryBrowser, { KIND_ICON } from "./LibraryBrowser";
 import PagedInk from "./PagedInk";
-import RichTextEditor from "./RichTextEditor";
 import { openBeside, openDocumentWindow } from "./open-window";
 import { useWorkspaceModel, useWorkspaceState } from "../../../shell/context";
 import { LIVE_EDITORS } from "./editor-budget";
+
+// BlockNote and ProseMirror are large: they load with the first typed note, never with the app.
+const RichTextEditor = lazy(() => import("./RichTextEditor"));
 
 /** Opens a document for as long as the window shows it, sharing the replica with any other window on it. */
 export function useOpenDocument(library: NotesLibrary, id: string | null) {
@@ -136,7 +138,9 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
           <Text variant="body" style={{ color: DOCUMENT_DEFAULTS.ink, lineHeight: 24 }} numberOfLines={30}>{entry.text || entry.preview || " "}</Text>
         </Press>
       ) : kind === "note" ? (
-        <RichTextEditor key={document.id} document={document} editable={editable} narrow={narrow} />
+        <Suspense fallback={<View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: DOCUMENT_DEFAULTS.paper }}><Activity label="Opening the editor" /></View>}>
+          <RichTextEditor key={document.id} document={document} editable={editable} narrow={narrow} />
+        </Suspense>
       ) : kind === "board" ? (
         <BoardCanvas key={document.id} document={document} editable={editable}
           camera={typeof window.state.bz === "number" ? { x: Number(window.state.bx), y: Number(window.state.by), zoom: window.state.bz } : null}

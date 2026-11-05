@@ -25,6 +25,8 @@ export interface InkViewProps {
   onPinch?(factor: number, x: number, y: number): void;
   /** On desktop: "all" when the wheel pans this surface (a whiteboard), "zoom" when only Control and the wheel zoom it. */
   wheel?: "all" | "zoom";
+  /** A whiteboard: fingers move and zoom the view rather than scroll a page around it. */
+  fingersMove?: boolean;
   /** A pen was seen: the owner may switch to pen-only, as tablets expect. */
   onPenSeen?(): void;
 }

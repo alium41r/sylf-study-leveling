@@ -151,6 +151,7 @@ async function runChecks(window) {
   if (runs("retention")) await retentionGroup(env);
   if (runs("probe")) await probeGroup(env);
   if (runs("homescroll")) await homeScrollGroup(env);
+  if (runs("notes")) await notesGroup(env);
 
   checks.noConsoleErrors = consoleErrors.length === 0;
   results.consoleErrors = consoleErrors.slice(0, 10);
@@ -421,14 +422,7 @@ async function toolsGroup(t) {
   await t.clickOn(`[aria-label="Equals"]`);
   await t.sleep(120);
   checks.calculatorKeepsState = (await t.js(`document.querySelector('[data-testid=calculator-expression-${id}]').textContent`)) === "8";
-  // The shelf links one window to another.
-  await t.fresh("wsOpen=resources");
-  await t.sleep(500);
-  await t.clickOn(`[aria-label="Past paper, June 2023"]`);
-  await t.sleep(700);
-  const state = await t.workspace();
-  checks.shelfOpensDocument = state.windows.some((/** @type {any} */ w) => w.tool === "pdfs" && w.state.document === "paper-2023");
-  await t.shot("tool-shelf-opens-pdf");
+  // The shelf (Phase 14: over the Notes library) is checked in the notes group, with documents it made itself.
 }
 
 /** @param {any} t */
@@ -1065,4 +1059,166 @@ async function homeScrollGroup(t) {
   await contents.debugger.sendCommand("Emulation.setCPUThrottlingRate", { rate: 1 });
   contents.debugger.detach();
   await t.resize(1280, 820);
+}
+
+// Phase 14: Notes, PDFs, Whiteboard, Resources and saved layouts, driven with real keys and pointers in the export build.
+/** @param {any} t */
+async function notesGroup(t) {
+  const { checks, results, js } = t;
+  const says = (/** @type {string} */ text) => js(`document.body.innerText.includes(${JSON.stringify(text)})`);
+  const label = (/** @type {string} */ text) => `[aria-label=${JSON.stringify(text)}]`;
+  const typeText = async (/** @type {string} */ text) => { for (const ch of text) await t.key(ch === " " ? "Space" : ch); };
+  const menuItem = async (/** @type {string} */ text) => {
+    const point = await js(`(() => { const e = [...document.querySelectorAll('[role=menuitem]')].find((n) => (n.getAttribute('aria-label') || n.textContent || '').trim().startsWith(${JSON.stringify(text)})); if (!e) return null; const r = e.getBoundingClientRect(); return { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) }; })()`);
+    if (!point) throw new Error(`no menu item ${text}`);
+    await t.click(point);
+  };
+  // Ink pixels on a page's finished-stroke canvas: anything darker than the paper.
+  const inked = (/** @type {number} */ index = 0) => js(`(() => { const c = document.querySelectorAll('[data-testid=ink-view] canvas')[${index} * 2]; if (!c) return -1; const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 16) if (d[i + 3] > 0 && d[i] + d[i + 1] + d[i + 2] < 420) n++; return n; })()`);
+  const pen = (/** @type {string} */ selector, /** @type {[number, number][]} */ points, type = "pen") => js(`(async () => {
+    const c = document.querySelector(${JSON.stringify(selector)}); const r = c.getBoundingClientRect(); const pts = ${JSON.stringify(points)};
+    const fire = (kind, [x, y], p) => c.dispatchEvent(new PointerEvent(kind, { pointerId: 1, pointerType: ${JSON.stringify(type)}, clientX: r.left + x, clientY: r.top + y, pressure: p, bubbles: true, cancelable: true, isPrimary: true, button: 0, buttons: kind === 'pointerup' ? 0 : 1 }));
+    const frames = []; let last = performance.now(); let running = true; const tick = (now) => { frames.push(now - last); last = now; if (running) requestAnimationFrame(tick); }; requestAnimationFrame(tick);
+    const handler = []; fire('pointerdown', pts[0], 0.3);
+    for (let i = 1; i < pts.length; i++) { const t0 = performance.now(); fire('pointermove', pts[i], 0.3 + 0.5 * Math.sin(i / pts.length * Math.PI)); handler.push(performance.now() - t0); await new Promise((res) => setTimeout(res, 8)); }
+    fire('pointerup', pts.at(-1), 0); running = false;
+    handler.sort((a, b) => a - b); frames.sort((a, b) => a - b);
+    return { handlerP50: handler[handler.length >> 1], handlerP95: handler[Math.floor(handler.length * 0.95)], frameP50: frames[frames.length >> 1], frameP95: frames[Math.floor(frames.length * 0.95)], frames: frames.length };
+  })()`);
+  const wave = (/** @type {number} */ ox, /** @type {number} */ oy, n = 120) => Array.from({ length: n }, (_, i) => /** @type {[number, number]} */ ([ox + i * 2.5, oy + 18 * Math.sin(i / 7)]));
+
+  // A clean library: notes live in IndexedDB, which the spaces reset does not touch.
+  await t.plant(null);
+  await js(`new Promise((resolve) => { const r = indexedDB.deleteDatabase('sylf-native-notes'); r.onsuccess = r.onerror = r.onblocked = () => resolve(true); })`);
+  await t.open("space=workspace&wsOpen=notes&wsLayout=focus");
+  await t.sleep(900);
+  checks.notesStartsWithTemplates = (await says("Typed note")) && (await says("Handwriting"));
+  await t.shot("notes-01-empty-library");
+
+  // Typed note: real keys, markdown shortcuts, autosave, an automatic title, and it survives a reload.
+  await t.clickOn(label("Typed note"));
+  for (let wait = 0; wait < 40 && !(await t.has(".sylf-note .bn-editor")); wait++) await t.sleep(250);
+  await t.clickOn(".sylf-note .bn-editor");
+  await typeText("# Complex numbers");
+  await t.key("Return");
+  await typeText("The modulus of z is its distance from the origin.");
+  await t.key("Return");
+  await typeText("- Argand diagram");
+  await t.sleep(900);
+  checks.typedHeadingFromMarkdown = await js(`!!document.querySelector('.sylf-note [data-content-type=heading]')`);
+  checks.typedListFromMarkdown = await js(`!!document.querySelector('.sylf-note [data-content-type=bulletListItem]')`);
+  await t.key("Return"); await t.key("Return");
+  await t.key("/");
+  await t.sleep(400);
+  checks.slashMenuOpens = await t.has('[role=listbox][aria-label=Blocks]');
+  await t.key("Escape");
+  await t.sleep(700);
+  checks.typedNoteSaves = await says("Saved");
+  checks.typedNoteTitledFromFirstLine = (await t.workspace())?.windows?.some((/** @type {any} */ w) => w.state.title === "Complex numbers");
+  await t.shot("notes-02-typed-note");
+  await t.open("space=workspace");
+  await t.sleep(1500);
+  checks.typedNoteSurvivesReload = await js(`[...document.querySelectorAll('.sylf-note .bn-inline-content')].some((n) => n.textContent.includes('distance from the origin'))`);
+
+  // Handwriting: a mouse stroke through the real input path, then pen strokes with pressure; erase, undo.
+  await t.clickOn(label("Back to Notes"));
+  await t.sleep(500);
+  await t.clickOn(label("New"));
+  await t.sleep(300);
+  await menuItem("Handwriting, ruled");
+  await t.sleep(1000);
+  const page = await t.rect('[data-testid=ink-view]');
+  await t.drag({ x: page.x + 80, y: page.y + 120 }, { x: page.x + 320, y: page.y + 150 }, 20, 12);
+  checks.mouseStrokeInks = (await inked()) > 30;
+  results.penStroke = await pen('[data-testid=ink-view] canvas[aria-label="Writing surface"]', wave(80, 240));
+  results.penStroke2 = await pen('[data-testid=ink-view] canvas[aria-label="Writing surface"]', wave(80, 330, 200));
+  await t.sleep(300);
+  results.inkPixels = await inked();
+  checks.penStrokesInk = results.inkPixels > 200;
+  checks.penHandlerFast = results.penStroke2.handlerP95 < 4;
+  checks.penFramesSmooth = results.penStroke2.frameP95 < 25;
+  checks.penTurnsFingersToScrolling = await t.has(label("Fingers scroll; the pen writes"));
+  await t.shot("notes-03-handwriting");
+  await t.clickOn(label("Eraser"));
+  await t.drag({ x: page.x + 150, y: page.y + 100 }, { x: page.x + 160, y: page.y + 170 }, 10, 12);
+  const afterErase = await inked();
+  checks.eraserRemovesStroke = afterErase < results.inkPixels;
+  await t.clickOn(label("Undo"));
+  await t.sleep(200);
+  checks.undoRestoresStroke = (await inked()) > afterErase;
+
+  // PDFs: a file dropped on Workspace is imported, rendered by pdf.js, and annotated.
+  await t.open("space=workspace&wsClear=1");
+  await t.sleep(600);
+  await js(`(() => {
+    const page = (lines) => { const body = 'BT /F1 22 Tf 60 770 Td (' + lines[0] + ') Tj ET ' + lines.slice(1).map((l, i) => 'BT /F1 13 Tf 60 ' + (720 - i * 26) + ' Td (' + l + ') Tj ET').join(' '); return body; };
+    const objs = []; const add = (o) => (objs.push(o), objs.length); const font = add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'); const kids = [];
+    const pages = [['Past paper - Question 1', 'The complex number z satisfies |z - 2i| = |z + 4|.', '(a) Sketch the locus of z.'], ['Question 2', 'Prove by induction that 2^n > n^2 for n >= 5.']];
+    const pagesId = objs.length + 1 + pages.length * 2;
+    for (const p of pages) { const c = page(p); const ci = add('<< /Length ' + c.length + ' >>\\nstream\\n' + c + '\\nendstream'); kids.push(add('<< /Type /Page /Parent ' + pagesId + ' 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 ' + font + ' 0 R >> >> /Contents ' + ci + ' 0 R >>')); }
+    add('<< /Type /Pages /Kids [' + kids.map((k) => k + ' 0 R').join(' ') + '] /Count ' + kids.length + ' >>'); const cat = add('<< /Type /Catalog /Pages ' + pagesId + ' 0 R >>');
+    let out = '%PDF-1.4\\n'; const offs = []; objs.forEach((o, i) => { offs.push(out.length); out += (i + 1) + ' 0 obj\\n' + o + '\\nendobj\\n'; });
+    const xref = out.length; out += 'xref\\n0 ' + (objs.length + 1) + '\\n0000000000 65535 f \\n' + offs.map((o) => String(o).padStart(10, '0') + ' 00000 n \\n').join('') + 'trailer\\n<< /Size ' + (objs.length + 1) + ' /Root ' + cat + ' 0 R >>\\nstartxref\\n' + xref + '\\n%%EOF';
+    const dt = new DataTransfer(); dt.items.add(new File([new TextEncoder().encode(out)], 'Past paper.pdf', { type: 'application/pdf' }));
+    const root = document.querySelector('[data-testid=workspace-root]'); const r = root.getBoundingClientRect(); const o = { bubbles: true, cancelable: true, dataTransfer: dt, clientX: r.left + 300, clientY: r.top + 200 };
+    root.dispatchEvent(new DragEvent('dragover', o)); root.dispatchEvent(new DragEvent('drop', o)); return true; })()`);
+  await t.sleep(2500);
+  let state = await t.workspace();
+  checks.pdfDropOpensWindow = state?.windows?.some((/** @type {any} */ w) => w.tool === "pdfs" && typeof w.state.document === "string");
+  results.pdfPagePixels = await js(`(() => { const c = [...document.querySelectorAll('[data-testid=ink-page] canvas')].find((x) => !x.getAttribute('aria-label') && !x.closest('[data-testid=ink-view]')); if (!c || !c.width) return -1; const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 16) if (d[i] < 128) n++; return n; })()`);
+  checks.pdfPageRenders = results.pdfPagePixels > 50;
+  checks.pdfShowsPageCount = await says("1 / 2");
+  results.pdfHighlight = await pen('[data-testid=ink-view] canvas[aria-label="Writing surface"]', Array.from({ length: 40 }, (_, i) => [60 + i * 6, 120]), "mouse");
+  await t.sleep(300);
+  await t.shot("notes-04-pdf-annotated");
+  // Notes beside the paper, linked both ways.
+  await t.clickOn(label("Document options"));
+  await menuItem("Take notes beside this");
+  await t.sleep(1500);
+  state = await t.workspace();
+  checks.notesBesideOpensSecondWindow = state.windows.filter((/** @type {any} */ w) => w.tool === "notes" || w.tool === "pdfs").length === 2;
+  checks.notesBesideUsesTemplate = await js(`[...document.querySelectorAll('.sylf-note [data-content-type=heading]')].some((n) => n.textContent.includes('Key ideas'))`);
+  checks.linkedChipShown = await t.has('[aria-label^="Open Past paper"]');
+  await t.shot("notes-05-notes-beside-pdf");
+
+  // Saved layout: keep this pair, clear the canvas, bring it back on the same documents.
+  await t.clickOn(t.dock("layout"));
+  await menuItem("Save this layout");
+  await t.sleep(300);
+  await typeText("Paper and notes");
+  await t.key("Return");
+  await t.sleep(400);
+  const kept = (await t.workspace()).windows.map((/** @type {any} */ w) => w.state.document).sort();
+  await js(`(() => { const raw = JSON.parse(localStorage.getItem('sylf.native.spaces.v1')); raw.snapshots.workspace.windows = []; raw.snapshots.workspace.recent = []; raw.snapshots.workspace.focused = null; localStorage.setItem('sylf.native.spaces.v1', JSON.stringify(raw)); return true; })()`);
+  await t.open("space=workspace");
+  await t.clickOn(t.dock("layout"));
+  await menuItem("Paper and notes");
+  await t.sleep(1200);
+  state = await t.workspace();
+  checks.savedLayoutReopensSameDocuments = JSON.stringify(state.windows.map((/** @type {any} */ w) => w.state.document).sort()) === JSON.stringify(kept);
+
+  // Whiteboard: draw, zoom with Control and the wheel, and the camera is kept in the window.
+  await t.open("space=workspace&wsClear=1&wsOpen=whiteboard&wsLayout=focus");
+  await t.sleep(800);
+  await t.clickOn(label("New"));
+  for (let wait = 0; wait < 30 && !(await t.has('[data-testid=board-canvas] canvas')); wait++) await t.sleep(200);
+  const board = await t.rect('[data-testid=board-canvas]');
+  results.boardStroke = await pen('[data-testid=board-canvas] canvas[aria-label="Writing surface"]', wave(board.width / 2 - 150, board.height / 2, 120));
+  const mid = { x: Math.round(board.x + board.width / 2), y: Math.round(board.y + board.height / 2) };
+  for (let i = 0; i < 6; i++) await t.wheel(mid, 0, 8, ["control"]);
+  await t.sleep(700);
+  state = await t.workspace();
+  checks.boardZoomKeptInWindow = typeof state.windows[0]?.state?.bz === "number" && state.windows[0].state.bz !== 1;
+  checks.boardInks = (await inked()) > 30;
+  await t.shot("notes-06-whiteboard");
+
+  // The Resource Shelf lists everything made above and opens each in its own tool.
+  await t.open("space=workspace&wsClear=1&wsOpen=resources");
+  await t.sleep(900);
+  results.shelfRows = await t.count("[data-testid^=shelf-]");
+  checks.shelfListsLibrary = results.shelfRows >= 4;
+  await t.clickOn("[data-testid=shelf-pdf]");
+  await t.sleep(900);
+  checks.shelfOpensDocument = (await t.workspace()).windows.some((/** @type {any} */ w) => w.tool === "pdfs" && typeof w.state.document === "string");
+  await t.shot("notes-07-shelf");
 }

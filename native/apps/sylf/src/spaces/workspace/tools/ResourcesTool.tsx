@@ -51,11 +51,11 @@ export default function ResourcesTool({ onProvenance }: ToolProps) {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ paddingHorizontal: space.md, paddingTop: space.md }}><TextField label="Search" hideLabel icon="search" placeholder="Search everything" value={query} onChangeText={setQuery} /></View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: space.xs, paddingHorizontal: space.md, paddingTop: space.sm }}>
+      <ScrollView keyboardShouldPersistTaps="handled" horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: space.xs, paddingHorizontal: space.md, paddingTop: space.sm }}>
         {KINDS.map((k) => <Chip key={k.value} label={k.label} icon={k.icon} selected={kind === k.value} onPress={() => setKind(k.value)} />)}
       </ScrollView>
       {used.length ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: space.xs, paddingHorizontal: space.md, paddingTop: space.xs }}>
+        <ScrollView keyboardShouldPersistTaps="handled" horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: space.xs, paddingHorizontal: space.md, paddingTop: space.xs }}>
           {used.map((id) => <Chip key={id} label={subjectName(id) ?? "Subject"} icon={id === String(studying) ? "focus" : undefined} selected={subject === id} onPress={() => setSubject(subject === id ? null : id)} />)}
         </ScrollView>
       ) : null}

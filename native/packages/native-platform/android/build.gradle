@@ -13,3 +13,8 @@ android {
     versionName '0.0.0'
   }
 }
+
+dependencies {
+  // PathParser draws the web's SVG stroke outlines (Phase 14 ink view).
+  implementation "androidx.core:core-ktx:1.13.1"
+}

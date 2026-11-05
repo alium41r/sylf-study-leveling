@@ -9,7 +9,7 @@ const repoEscape = {
 };
 
 export default tseslint.config(
-  { ignores: ["**/node_modules/**", "**/dist/**", "**/.expo/**", "apps/sylf/android/**", "apps/sylf/ios/**", "packages/*/android/build/**"] },
+  { ignores: ["**/node_modules/**", "**/dist/**", "**/.expo/**", "apps/sylf/android/**", "apps/sylf/ios/**", "packages/*/android/build/**", "apps/sylf/public/notes-pdf/**"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

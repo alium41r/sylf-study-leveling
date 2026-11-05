@@ -119,7 +119,7 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, onOpen
         {primary === "pdf" || primary === "board" ? <IconMore anchor={newButton} items={createItems} /> : null}
       </View>
       <Menu open={creating} anchor={newButton} onClose={() => setCreating(false)} items={createItems} label="Create" side="bottom" />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: space.xs, paddingHorizontal: space.md, paddingVertical: space.sm }}>
+      <ScrollView keyboardShouldPersistTaps="handled" horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: space.xs, paddingHorizontal: space.md, paddingVertical: space.sm }}>
         <Chip label="All" selected={filter.notebook === "all"} onPress={() => setFilter({ notebook: "all" })} />
         {snapshot.notebooks.map((n) => (
           <ContextArea key={n.id} label={n.title} items={[{ key: "rename", label: "Rename", icon: "type", onSelect: () => setNaming({ title: "Rename notebook", value: n.title, apply: (v) => library.renameNotebook(n.id, v) }) }, { key: "delete", label: "Delete notebook", detail: "Its notes stay", icon: "trash", destructive: true, onSelect: () => { setFilter({ notebook: "all" }); run(library.deleteNotebook(n.id)); } }]}>

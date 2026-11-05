@@ -77,7 +77,7 @@ export default function BoardCanvas({ document, editable, camera: saved, onCamer
       <View style={{ flex: 1, backgroundColor: color.sunken, overflow: "hidden" }} onLayout={(e: LayoutChangeEvent) => setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })} testID="board-canvas">
         {size.width && camera ? (
           <InkView scene={scene} pageWidth={page.width} pageHeight={page.height} camera={camera} width={size.width} height={size.height} tool={tool} drawPaper editable={editable}
-            selection={selection} onSelection={setSelection} onPan={pan} onPinch={zoomAt} onPenSeen={penSeen} wheel="all" />
+            selection={selection} onSelection={setSelection} onPan={pan} onPinch={zoomAt} onPenSeen={penSeen} wheel="all" fingersMove />
         ) : null}
         {!scene.strokes().length && editable ? (
           <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: space.lg, alignItems: "center" }}>

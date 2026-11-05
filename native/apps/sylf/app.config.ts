@@ -1,7 +1,7 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { ExpoConfig } from "expo/config";
-import { withAndroidStyles } from "expo/config-plugins";
+import { withAndroidStyles, withGradleProperties } from "expo/config-plugins";
 
 // Identifiers are provisional: the existing Capacitor client owns app.sylf.study, and whether Sylf Native
 // replaces it (master plan open question C1) must be decided before the first store build.
@@ -40,8 +40,16 @@ const config: ExpoConfig = {
   },
 };
 
+// expo-sqlite 58.0.15's prebuilt Android library calls a SharedObjectRegistry.register signature this expo-modules-core lacks
+// (NoSuchMethodError, then "Cannot find native module 'ExpoSQLite'"). Any SQLite build property makes it compile from source
+// against the installed core instead (android/shouldUsePublication.groovy). Full-text search is harmless to include (Phase 14).
+const withSqliteFromSource = (next: ExpoConfig) => withGradleProperties(next, (mod) => {
+  if (!mod.modResults.some((item) => item.type === "property" && item.key === "expo.sqlite.enableFTS")) mod.modResults.push({ type: "property", key: "expo.sqlite.enableFTS", value: "true" });
+  return mod;
+});
+
 // Android otherwise paints a band behind the gesture bar, which cuts the bottom edge off every Space.
-export default withAndroidStyles(config, (next) => {
+export default withAndroidStyles(withSqliteFromSource(config), (next) => {
   const theme = next.modResults.resources.style?.find((style) => style.$.name === "AppTheme");
   theme?.item.push({ $: { name: "android:enforceNavigationBarContrast" }, _: "false" });
   return next;

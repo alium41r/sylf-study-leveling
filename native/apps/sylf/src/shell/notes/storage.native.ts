@@ -1,6 +1,6 @@
 // Android and iOS: SQLite in WAL mode (ADR 0001, qualified in Phase 2 §5.6). One transaction writes a document and its updates,
 // and "saved" is shown only after it commits.
-import * as SQLite from "expo-sqlite";
+import type * as SQLite from "expo-sqlite";
 import type { LibraryRecord, NotesStorage, StoredDocument } from "@sylf/notes";
 
 const SCHEMA = `
@@ -19,7 +19,8 @@ type Row = { id: string; owner: string; descriptor: string; meta: string };
 export const durableNotesStorage = true;
 export function createPlatformNotesStorage(): NotesStorage {
   let database: Promise<SQLite.SQLiteDatabase> | undefined;
-  const db = () => (database ??= SQLite.openDatabaseAsync("sylf-notes.db").then(async (d) => { await d.execAsync(SCHEMA); return d; }));
+  // Loaded on first use, so a storage problem can only stop Notes, never the app's start.
+  const db = () => (database ??= import("expo-sqlite").then((sqlite) => sqlite.openDatabaseAsync("sylf-notes.db")).then(async (d) => { await d.execAsync(SCHEMA); return d; }));
   const put = (d: SQLite.SQLiteDatabase, document: StoredDocument) => d.runAsync("INSERT OR REPLACE INTO documents (id, owner, descriptor, meta) VALUES (?, ?, ?, ?)", document.id, document.owner, JSON.stringify(document.descriptor), JSON.stringify(document.meta));
   return {
     async load(owner) {

@@ -1,0 +1,21 @@
+{
+  "library opens": true,
+  "pen case is shown for a handwritten page": true,
+  "writingFrames": {
+    "total": 393,
+    "janky": 7,
+    "percent": 1.78,
+    "p50": 14,
+    "p90": 17,
+    "p99": 18
+  },
+  "memoryHandwriting": {
+    "pssMb": 175
+  },
+  "whiteboard opens with its pen case": true,
+  "typed note runs in a WebView": true,
+  "memoryTypedNote": {
+    "pssMb": 217
+  },
+  "no crash in logcat": true
+}

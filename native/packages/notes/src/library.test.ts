@@ -140,4 +140,28 @@ describe("Notes library", () => {
     expect(library.getSnapshot().notebooks).toHaveLength(0);
     expect(library.getSnapshot().entries.every((e) => e.notebookId === null)).toBe(true);
   });
+
+  it("links notes to the document they are about, and tags the studied subject", async () => {
+    const library = make();
+    const paper = await library.importPdf({ bytes: PDF, name: "Paper.pdf", pages: [{ width: 595, height: 842, transform: [1, 0, 0, -1, 0, 842], rotation: 0 }], geometry: "pdfjs", subjectId: "12" });
+    const note = await library.create({ kind: "note", title: "Paper notes", linkedTo: paper, subjectId: "12" });
+    const ghost = await library.create({ kind: "note", linkedTo: "not-a-document" });
+    const entries = library.getSnapshot().entries;
+    expect(entries.find((e) => e.id === note)).toMatchObject({ linkedTo: paper, subjectId: "12" });
+    expect(entries.find((e) => e.id === paper)?.subjectId).toBe("12");
+    expect(entries.find((e) => e.id === ghost)?.linkedTo).toBeNull();
+  });
+
+  it("names a typed note from its first line until it is renamed", async () => {
+    const library = make();
+    const handle = await library.open(await library.create({ kind: "note" }));
+    handle.setText("\nComplex numbers\nThe modulus is |z|.");
+    expect(handle.descriptor().title).toBe("Complex numbers");
+    handle.rename("Paper 1 revision");
+    handle.setText("Something else");
+    expect(handle.descriptor().title).toBe("Paper 1 revision");
+    await handle.flush();
+    expect(library.getSnapshot().entries[0].text).toContain("Something else");
+  });
 });
+

@@ -6,6 +6,8 @@ Labels: **Confirmed** came from the owner's brief or master plan. **Proposed** i
 
 **Updated 4 November 2026 (Expansion Part 2).** Workspace has **eight tools**: Notes, PDFs, Whiteboard, Sylvie, Calculator, Timer, Audio and Resources. **Planner and Calendar moved to Home's Plan** once its parity list passed ([ADR 0014](../decisions/0014-home-hub-and-workspace-scope.md)), and Alt+1 to 9 and Alt+0 follow the new order. A saved layout that held them still opens, because unknown tools are dropped and the rest survives. The Timer tool offers **Enter focus**, and Audio is the one native engine, shared with the Focus environment. Text below that names Planner or Calendar describes Workspace as it was in Phase 13.
 
+**Updated 5 November 2026 (Phase 14).** Notes, PDFs, Whiteboard and Resources are real, over one local-first Notes library in the web's own formats ([ADR 0018](../decisions/0018-local-first-notes-on-native.md), [§11](#11-notes-pdfs-whiteboard-and-resources-phase-14)). Workspace adds named saved layouts, drag and drop on desktop, "open beside", and a running-editor budget. Rows below that say Phase 14 owns these tools describe Workspace before Phase 14.
+
 ## 1. What exists
 
 Workspace is a real window manager. **With an account, Planner, Calendar, Sylvie and Audio's catalog are real, and Calculator and Timer always were. Notes, PDFs, Whiteboard and Resources say honestly that Phase 14 owns them.** The canvas, windows, presets, persistence and suspension all work. Without an account the tools are templates on sample data, except the Calculator, which is real.
@@ -84,16 +86,16 @@ Alt+F, Alt+S and Alt+A choose a preset, and Alt+D returns to Free.
 
 | Tool | Existing owner | What works today | What waits |
 | --- | --- | --- | --- |
-| Notes | `lib/notes`, envelope v1, `/api/notes` | Choosing a sample note, per window | The editor (Phase 14, R3) |
-| PDFs | `lib/notes/pdf`, PDF sources in Notes | Choosing a document, paging, per window | A real renderer (R4) |
-| Whiteboard | A Notes drawing document, `sylf-ink/1` | Choosing a drawing | Native ink (R2). Pen and eraser are disabled and say so |
+| Notes | `lib/notes` formats, local library (`@sylf/notes`) | **Phase 14:** typed notes (BlockNote) and handwriting, templates, notebooks, search | Sync with web Notes (ADR 0018) |
+| PDFs | `lib/notes/pdf` (`sylf-pdf/1`), local library | **Phase 14:** import, pages, pen and highlighter, notes beside | Text search, PDF export, sync |
+| Whiteboard | A Notes drawing document, `sylf-ink/1` | **Phase 14:** a 3200 × 2200 board, pan and zoom, full ink tools | Text boxes and images |
 | Planner | `Quest`, `Goal`, `/api/calendar/personal` | Today's events, quests and goals. A tick completes a quest through the server, and Study this fills in the Timer | AI Planner V2's lifecycle and `ApplyService` stay on the web, unimitated, and the tool says so |
 | Calendar | `CalendarEvent`, `/api/calendar` | A real month, month changes, day selection | Real events |
 | Sylvie | `lib/ai`, `ChatSession`, `/api/system-messages/chat` | Real threads, and a real turn read as it arrives, on the route the web uses | Rich text, images, and confirming a proposal, which stays on the web |
 | Timer | `lib/timer-engine`, `StudySession`, `/api/sessions` | A window on the one study session: the same session as the dock and Focus, with nothing of its own. Tracked on this device, and it says so | Delivery to the server (Phase 13) |
 | Calculator | `lib/calculator/math-engine`, through `@sylf/shared` | **Everything. This tool is real** | Nothing |
 | Audio | `AcousticTrack`, `/api/acoustics`, `lib/acoustics` | Choosing a sound, volume | Playback. Play is disabled and says why |
-| Resources | The Resource Shelf: a catalogue over Notes | Filtering, and opening an entry in the right tool | Real entries |
+| Resources | The Resource Shelf: a catalogue over the Notes library | **Phase 14:** every document, by kind, subject and notebook, the studied subject first, opens in its own window | Shared shelves (needs a backend) |
 
 **Deferred future possibilities, needing backend work.** Saved Study Workspaces and named layouts that sync across devices. Contextual AI that reads a tool's selection. Neither is built or implied.
 
@@ -157,3 +159,33 @@ Android uses the same parameters on `sylf-native://spaces?...`.
 4. Put documents on `DocumentSurface`, and keep text at `soft` or stronger.
 5. Do not add a second store, a second toolbar, or per-theme layout.
 6. Run `npm run desktop:workspace-check`. The tablet checks in the [Phase 8 handoff](../handoffs/phase-8.md) wait until after Phase 10.
+
+## 11. Notes, PDFs, Whiteboard and Resources (Phase 14)
+
+Source: [`native/packages/notes`](../../../native/packages/notes/src/) (the library, storage, templates, `InkScene`) and [`apps/sylf/src/spaces/workspace/notes`](../../../native/apps/sylf/src/spaces/workspace/notes/) (the surfaces). Decision: [ADR 0018](../decisions/0018-local-first-notes-on-native.md).
+
+| Piece | Where | Notes |
+| --- | --- | --- |
+| Library | `packages/notes/src/library.ts`, `shell/notes/library.ts` | One per owner (`user:<id>` or `device`). Ordered writes, shared replicas between windows, a failure stops writing and says why |
+| Storage | `idb-storage.ts` (web, desktop), `shell/notes/storage.native.ts` (SQLite, WAL) | Descriptor, Yjs updates per stream (merged after 48), assets by SHA-256 per owner |
+| Typed notes | `RichTextDom.tsx` (Expo DOM component), `RichTextEditor.tsx` | BlockNote 0.56; format bar in Sylf's own controls; "/" menu; templates inserted by BlockNote |
+| Ink | `InkView.web.tsx` (Pointer Events), `InkView.native.tsx` + `SylfInkView.kt` (Android) | Pen, highlighter, eraser (whole or precise), lasso move, scale, recolour, shapes, undo |
+| Pages | `PagedInk.tsx` | Only pages near the view get a surface, and each covers only its visible part |
+| PDFs | `pdf-engine.web.ts` (pdf.js), `pdf-engine.native.ts` + `SylfPdf.kt` (PdfRenderer) | Originals kept byte for byte; rendered pages cached |
+| Boards | `BoardCanvas.tsx` | Camera in the window's state (`bx`, `by`, `bz`) |
+| Resources | `tools/ResourcesTool.tsx` | Kind, subject and notebook filters; new documents take the session's subject |
+
+Interactions:
+
+| Action | Touch and pen | Desktop |
+| --- | --- | --- |
+| Write | The pen; a finger too until the first pen stroke ("Fingers write too" turns it back) | Mouse or pen |
+| Scroll a page, move a board | One finger once the pen has been seen; two fingers always | Wheel; Control or Command and the wheel zoom |
+| Select | Lasso, then drag inside the box | Same |
+| Erase | Eraser tool, or the S Pen's side button or eraser tip | Eraser tool |
+| Open in another window | Long press, "Open in a new window" | Drag a card onto the canvas |
+| Import a PDF | PDFs, Import | Same, or drop a file anywhere on Workspace |
+| Notes beside a PDF | The document menu, "Take notes beside this" | Same |
+| Keep a layout | Layout menu, "Save this layout" | Same |
+
+Budgets: typed-note editors run for the most recently used two windows on Android and six on desktop. The rest show their text, and a touch brings the editor back.

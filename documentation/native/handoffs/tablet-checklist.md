@@ -269,3 +269,17 @@ Run in portrait and landscape, on a build made after `npx expo prebuild` (three 
 - [ ] **Plan.** With Planner V2 on: details saved free, spending ceiling and consent, **add a PDF or text file** through the system picker (a 4 MB file is refused in words), watch, stop, answer, confirm. With it off: the plain "not switched on" note.
 - [ ] **Realtime** (only if the build has an address and the grants exist): a message from a second device appears without waiting 30 s, nothing arrives for a conversation you are not in, and with the app backgrounded nothing is read.
 - [ ] **Battery and heat** over a 30 minute party session with the screen on, and memory after opening the environment, Plan, and a long chat ten times.
+
+## Phase 14 additions (5 November 2026)
+
+Run on the tablet by the agent with `adb input stylus` and `npm run android:notes-check` ([report](../reports/phase-14/report.md#3-verification)): library, writing, eraser, finger scrolling, persistence, whiteboard, typed note, PDF import and annotation, split layout. **Still by hand, with the S Pen:**
+
+1. Write a paragraph quickly: does ink keep up, with no gap at the start of a stroke and no change in shape at pen-up?
+2. Pressure and tilt: press harder and lighter; tilt the pencil nib. Lines should thicken and thin.
+3. Rest a palm on the page while writing: no marks from the palm.
+4. Hold the S Pen's side button while drawing: it erases. Hover above the page: nothing is drawn.
+5. Two fingers on a whiteboard: it pans and zooms smoothly; on a handwritten page, one finger scrolls once the pen has been used.
+6. Lasso a word, drag it, recolour it, delete it, undo.
+7. A real past paper PDF from Downloads: pages render sharp at 100% and 200%; highlight a line.
+8. Two typed notes open side by side: both editable; a third shows its text until touched.
+

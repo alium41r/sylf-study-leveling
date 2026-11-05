@@ -56,6 +56,7 @@ Sylf Native is a planned, new tablet-first native application for iPad and Andro
 | [Stage 3 handoff](handoffs/stage-3.md) | Phases 11 to 13, the connected architecture, what is verified and partial, the owner's operations in order, and the Phase 14 requirements |
 | [ADR 0012: the connected app](decisions/0012-connected-app.md) | Proposed decisions behind the account gate, the session bridge, and what shows when |
 | [Phase 13 report](reports/phase-13/report.md) | Integration, the student journey, test results by category, and unresolved issues |
+| [Phase 14 report](reports/phase-14/report.md) and [handoff](handoffs/phase-14.md) | Notes, PDFs, Whiteboard, Resources and saved layouts; verified in Electron and on the tablet. Read before Phase 15. |
 | [Tablet checklist](handoffs/tablet-checklist.md) | Everything waiting for a device, Phases 7 to 13, most important first |
 | [Phase 12 handoff](handoffs/phase-12.md) | What is ready, what to connect, what remains unverified, the harness. |
 | [Phase 10 report](reports/phase-10/report.md) | Dock and session build, cross-Space review, responsive and performance measurements, unresolved issues. |
@@ -76,7 +77,7 @@ Phase reports belong in `reports/phase-<n>/`, with evidence beside them. Execute
 | 2 — Frontend Templates and Navigation | Phase 10 | Phases 4–10 and the Phase 11 requirements | [Written](handoffs/stage-2.md), 31 October 2026 |
 | 3 — Backend Integration | Phase 13 | Phases 11–13 and the Phase 14 requirements | [Written](handoffs/stage-3.md), 1 November 2026 |
 | Expansion — Feature Expansion and Experience Redesign | Part 4 | Parts 1–4 and the restated Phase 14 requirements. Each part has its own handoff first | [Part 1's written](handoffs/expansion-part-1.md), 1 November 2026. See the [stage plan](expansion/README.md#13-handoffs-and-documents) |
-| 4 — Advanced Feature Development | Phase 15 | Phases 14–15 and the Phase 16 requirements | Not started |
+| 4 — Advanced Feature Development | Phase 15 | Phases 14–15 and the Phase 16 requirements | Phase 14's [handoff to Phase 15](handoffs/phase-14.md) written 5 November 2026 ([report](reports/phase-14/report.md), [ADR 0018](decisions/0018-local-first-notes-on-native.md)) |
 | 5 — Verification and Release | Phase 17 | Release state | Not started |
 
 The master plan, decision records and phase reports are kept current as development progresses; a handoff summarizes and links them rather than replacing them.

@@ -43,7 +43,8 @@
     "test:integration": "vitest run --config vitest.integration.config.mts",
     "check:boundaries": "node tooling/checks/check-boundaries.mjs",
     "check:single-copy": "node tooling/checks/check-single-copy.mjs",
-    "verify": "npm run typecheck && npm run lint && npm run test && npm run check:boundaries && npm run check:single-copy && npm run build:web"
+    "verify": "npm run typecheck && npm run lint && npm run test && npm run check:boundaries && npm run check:single-copy && npm run build:web",
+    "android:notes-check": "node tooling/checks/android-notes-check.mjs"
   },
   "allowScripts": {
     "electron": true,

@@ -127,7 +127,8 @@ export default function RichTextDom({ ref, initial, template, look, editable, on
   return (
     <div data-editable={String(editable)} style={{ position: "relative", height: "100%", overflow: "auto", background: look.paper, WebkitOverflowScrolling: "touch" }}>
       <style>{css(look)}</style>
-      <div ref={host} className="sylf-note" style={{ minHeight: "100%", paddingBottom: 120 }} />
+      {/* BlockNote mounts on the inner element and adds its own classes there, so the styles above reach it as a descendant. */}
+      <div className="sylf-note" style={{ minHeight: "100%", paddingBottom: 120 }}><div ref={host} /></div>
       {slash && slash.items.length ? (
         <div role="listbox" aria-label="Blocks" style={{ position: "absolute", left: Math.max(8, slash.left), top: slash.top, width: 236, maxHeight: 320, overflow: "auto", background: look.menu, color: look.menuInk, borderRadius: 12, boxShadow: "0 10px 30px rgba(20,24,40,0.18), 0 0 0 1px rgba(20,24,40,0.08)", padding: 6, zIndex: 10, fontFamily: look.font }}>
           {slash.items.map((item, index) => (
@@ -183,7 +184,7 @@ const css = (look: RichTextLook) => `
 .sylf-note [data-content-type="heading"][data-level="3"] { --level: 1.12em; }
 .sylf-note [data-content-type="heading"] { padding-top: 14px; }
 .sylf-note .bn-inline-content { color: ${look.ink}; }
-.sylf-note [data-placeholder]::before, .sylf-note .bn-inline-content:has(> .ProseMirror-trailingBreak:only-child)::before { color: ${look.faint} !important; font-style: normal !important; }
+.sylf-note .bn-block-content:has(.ProseMirror-trailingBreak:only-child)::after { color: ${look.faint}; font-style: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sylf-note [data-content-type="quote"] blockquote { border-left: 3px solid ${look.line}; color: ${look.soft}; }
 .sylf-note code, .sylf-note pre { background: ${look.wash}; border-radius: 6px; }
 .sylf-note a { color: ${look.accent}; }

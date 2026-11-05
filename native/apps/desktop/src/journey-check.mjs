@@ -419,7 +419,7 @@ async function runStage(window, { stub }, stage, out) {
     await shot("10-plan");
     await open("space=workspace&wsClear=1&wsOpen=sylvie,audio,notes");
     check("Audio lists the real catalog", await says("Forest Wind & Leaves"));
-    check("Notes is honest about where notes are", await says("Notes open on the web for now"));
+    check("Notes opens the local library", await says("Typed note"));
     check("no tool shows a sample badge", !(await screen()).includes("Sample"));
     await until(tid("sylvie-input"));
     await type(tid("sylvie-input"), "What is my level?");

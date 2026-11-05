@@ -16,6 +16,7 @@ import { PrivacySection } from "./sections/PrivacySection";
 import { SecuritySection } from "./sections/SecuritySection";
 import { StudySection } from "./sections/StudySection";
 import { YouSection } from "./sections/YouSection";
+import { flushNotes } from "../notes/library";
 
 /** How long a finished session gets to reach the server before signing out carries on without it. It stays safe in the journal either way. */
 const FLUSH_MS = 3_000;
@@ -61,6 +62,8 @@ export default function AccountPage() {
     setLeaving(true);
     if (session.state().active) session.end();
     await currentBridge()?.flush(FLUSH_MS);
+    // Open notes are written before the library they belong to closes over; they stay on this device, under this account.
+    await flushNotes();
     close();
     await backend!.auth.signOut();
     setLeaving(false);

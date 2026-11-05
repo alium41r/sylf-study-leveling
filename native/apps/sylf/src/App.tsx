@@ -14,6 +14,7 @@ import { DEV_TOOLS, closeShowcase, openProbe, openShowcase, setHomeDataScenario,
 import { parseAppLink } from "./shell/links";
 import { onForegroundChange } from "./shell/focus/alerts";
 import { SpacesShell } from "./shell/SpacesShell";
+import { flushNotes } from "./shell/notes/library";
 
 const Showcase = lazy(() => import("./showcase/Showcase"));
 const AccountGate = lazy(() => import("./shell/account/AccountGate"));
@@ -48,7 +49,7 @@ AppState.addEventListener("change", (state) => {
   void onForegroundChange(state === "active", studySession);
   noteForeground(state === "active");
   if (state === "active") currentBackend()?.wake();
-  if (state !== "active") { currentBackend()?.sleep(); homeNavigation.flush(); workspaceModel.flush(); spacesStore.flush(); appearanceStore.flush(); }
+  if (state !== "active") { currentBackend()?.sleep(); homeNavigation.flush(); workspaceModel.flush(); spacesStore.flush(); appearanceStore.flush(); void flushNotes(); }
 });
 spacesStore.subscribe(() => {
   const { state, world } = spacesStore.getSnapshot();

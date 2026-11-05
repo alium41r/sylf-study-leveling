@@ -22,7 +22,13 @@ import {
   type PdfMark,
 } from "./pdf";
 import { inkStrokeSegments, inkOpacity } from "./ink-geometry";
-import { inkOutline, paperGeometry, paperLabelColor } from "./ink-renderer";
+import {
+  inkOutline,
+  outlineSvg,
+  paperGeometry,
+  paperLabelColor,
+} from "./ink-outline";
+export { outlineSvg };
 import type { InkStroke, InkPaper } from "./ink";
 import { PdfSearchText, type SearchTextRun } from "./pdf-search-text";
 export interface PdfExportPage {
@@ -43,16 +49,6 @@ const color = (hex: string) =>
     parseInt(hex.slice(3, 5), 16) / 255,
     parseInt(hex.slice(5, 7), 16) / 255
   );
-export function outlineSvg(points: number[][]) {
-  if (!points.length) return "";
-  let path = `M ${points[0][0]} ${points[0][1]}`;
-  for (let i = 1; i < points.length; i++) {
-    const p = points[i],
-      n = points[(i + 1) % points.length];
-    path += ` Q ${p[0]} ${p[1]} ${(p[0] + n[0]) / 2} ${(p[1] + n[1]) / 2}`;
-  }
-  return path + " Z";
-}
 /** New study copy only. Input assets are immutable; no encryption bypass or source overwrite. */
 export async function buildAnnotatedPdf(
   job: PdfExportJob,

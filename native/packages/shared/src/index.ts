@@ -12,5 +12,12 @@ export * as quickAdd from "../../../../lib/calendar/quick-add";
 export * as ink from "../../../../lib/notes/ink";
 export * as inkGeometry from "../../../../lib/notes/ink-geometry";
 export * as notesGraph from "../../../../lib/notes/graph";
+export * as notesContracts from "../../../../lib/notes/contracts";
+export * as notesPdf from "../../../../lib/notes/pdf";
+export * as noteStyle from "../../../../lib/notes/note-style";
+export * as inkOutline from "../../../../lib/notes/ink-outline";
 
-export type { InkSample, InkBrush, InkPaper } from "../../../../lib/notes/ink";
+export type { InkSample, InkBrush, InkPaper, InkStroke } from "../../../../lib/notes/ink";
+export type { DocumentDescriptor, AssetDescriptor } from "../../../../lib/notes/contracts";
+export type { PdfMark, PdfSourcePage } from "../../../../lib/notes/pdf";
+export type { PenPreset } from "../../../../lib/notes/note-style";

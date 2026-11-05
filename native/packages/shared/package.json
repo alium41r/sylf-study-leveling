@@ -12,6 +12,7 @@
     "./catalogs": "./src/catalogs.ts"
   },
   "dependencies": {
+    "perfect-freehand": "1.2.3",
     "yjs": "13.6.33",
     "zod": "4.4.3"
   }

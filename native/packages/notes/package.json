@@ -1,0 +1,12 @@
+{
+  "name": "@sylf/notes",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Sylf Native's local-first Notes library: typed notes, handwriting, PDFs and whiteboards in the Sylf Notes formats (envelope v1, yjs13 streams, blocknote/0.56.0, sylf-ink/1, sylf-pdf/1). No UI.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@sylf/shared": "*",
+    "yjs": "13.6.33"
+  }
+}

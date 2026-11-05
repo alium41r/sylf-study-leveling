@@ -110,15 +110,14 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
               <Text variant="micro" tone="soft" style={{ minWidth: 36, textAlign: "center" }}>{Math.round(zoom * 100)}%</Text>
               <IconButton icon="plus" size="small" label="Zoom in" onPress={() => pinch(1.25)} />
               {pdf ? null : <View ref={pageMenuAnchor} collapsable={false}><IconButton icon="pagePlus" size="small" label="Pages and paper" onPress={() => setPageMenu(true)} /></View>}
-              {corner}
             </>
-          } />
+          } end={corner} />
       ) : null}
       {header}
       <View style={{ flex: 1, backgroundColor: color.sunken }} onLayout={(e: LayoutChangeEvent) => setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}>
         {size.width ? (
           <ScrollView keyboardShouldPersistTaps="handled" ref={horizontal} horizontal scrollEnabled={contentWidth > size.width + 1} showsHorizontalScrollIndicator={contentWidth > size.width + 1} onScroll={(e) => setScroll((s) => ({ ...s, x: e.nativeEvent.contentOffset.x }))} scrollEventThrottle={32} contentContainerStyle={{ width: contentWidth }}>
-            <ScrollView keyboardShouldPersistTaps="handled" ref={vertical} style={{ width: contentWidth, height: size.height }} onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator contentContainerStyle={{ height: contentHeight }}>
+            <ScrollView keyboardShouldPersistTaps="handled" ref={vertical} {...({ dataSet: { ownsWheel: "scroll" } } as object)} style={{ width: contentWidth, height: size.height }} onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator contentContainerStyle={{ height: contentHeight }}>
               {layout.map((row) => {
                 const left = (contentWidth - row.width) / 2;
                 const near = row.top + row.height > scroll.y - size.height && row.top < scroll.y + size.height * 2;

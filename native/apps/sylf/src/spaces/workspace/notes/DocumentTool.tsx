@@ -117,12 +117,16 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
   // Page only: full screen with no window bar and no header, just the toolbar and the page. The toolbar's own button brings them back.
   const pageOnly = window.state.bare === true && workspace.layout === "fill";
   const togglePageOnly = () => {
-    if (pageOnly) { patch({ bare: false }); return; }
+    if (pageOnly) { patch({ bare: false }); model.setLayout("free"); return; }
     patch({ bare: true });
     model.focus(window.id);
     if (workspace.layout !== "fill") model.setLayout("fill");
   };
-  const pageOnlyButton = <IconButton icon={pageOnly ? "collapse" : "expand"} size="small" label={pageOnly ? "Show the title and header" : "Page only"} testID="document-page-only" onPress={togglePageOnly} />;
+  // Set apart at the toolbar's right end, with its name on it, so it reads as the way into and out of full screen.
+  const pageOnlyButton = narrow
+    ? <IconButton icon={pageOnly ? "collapse" : "expand"} size="small" active={pageOnly} label={pageOnly ? "Exit full screen" : "Full screen"} testID="document-page-only" onPress={togglePageOnly} />
+    : <Button title={pageOnly ? "Exit full screen" : "Full screen"} icon={pageOnly ? "collapse" : "expand"} size="small" variant={pageOnly ? "emphasis" : "solid"} testID="document-page-only" onPress={togglePageOnly} />;
+  const toolbarHoldsFullScreen = editable && !!document && (kind !== "note" || isLayeredNote(document.descriptor()));
   const home = snapshot.notebooks.find((n) => n.id === entry.notebookId)?.title ?? (primary === "pdf" ? "PDFs" : primary === "board" ? "Boards" : "Notes");
 
   return (
@@ -141,7 +145,7 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
           ) : null}
         </View>
         <Text variant="micro" tone={saving === "failed" ? "critical" : "faint"} aria-live="polite">{saving === "saving" ? "Saving" : saving === "failed" ? "Not saved" : "Saved"}</Text>
-        {workspace.layout === "fill" ? null : <IconButton icon="fit" size="small" label="Full screen" onPress={() => { model.focus(window.id); model.setLayout("fill"); }} />}
+        {workspace.layout === "fill" || toolbarHoldsFullScreen ? null : <IconButton icon="fit" size="small" label="Full screen" onPress={() => { model.focus(window.id); model.setLayout("fill"); }} />}
         <View ref={menuAnchor} collapsable={false}><IconButton icon="more" size="small" label="Document options" onPress={() => setMenu(true)} /></View>
       </View>}
       {opened?.error ? (

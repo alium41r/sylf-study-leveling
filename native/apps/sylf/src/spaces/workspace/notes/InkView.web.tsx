@@ -238,7 +238,7 @@ export default function InkView(props: InkViewProps) {
   const style = { position: "absolute", left: 0, top: 0, width: props.width, height: props.height, touchAction: "none" } as const;
   const cursor = props.tool.tool === "eraser" ? "cell" : props.tool.tool === "lasso" ? "crosshair" : props.editable ? "crosshair" : "default";
   return (
-    <View style={{ width: props.width, height: props.height }} testID="ink-view">
+    <View style={{ width: props.width, height: props.height }} testID={props.paperOnly ? "ink-paper" : "ink-view"}>
       <canvas ref={base} style={style} aria-hidden />
       {props.paperOnly ? null : <canvas ref={live} data-owns-wheel={props.wheel} style={{ ...style, cursor }} aria-label="Writing surface" role="img" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} onContextMenu={(e) => e.preventDefault()} />}
     </View>

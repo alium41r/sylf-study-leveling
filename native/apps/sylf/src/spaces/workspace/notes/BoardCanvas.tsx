@@ -71,9 +71,8 @@ export default function BoardCanvas({ document, editable, camera: saved, onCamer
               <Text variant="micro" tone="soft" style={{ minWidth: 36, textAlign: "center" }}>{Math.round((camera?.zoom ?? 1) * 100)}%</Text>
               <IconButton icon="plus" size="small" label="Zoom in" onPress={() => zoomAt(1.25)} />
               <IconButton icon="fit" size="small" label="Show everything" onPress={() => move(fit())} />
-              {corner}
             </>
-          } />
+          } end={corner} />
       ) : null}
       <View style={{ flex: 1, backgroundColor: color.sunken, overflow: "hidden" }} onLayout={(e: LayoutChangeEvent) => setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })} testID="board-canvas">
         {size.width && camera ? (

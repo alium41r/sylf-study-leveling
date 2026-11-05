@@ -5,6 +5,7 @@ import { ScrollView, View } from "react-native";
 import { Divider, IconButton, Menu, Press, Text, useTheme, type IconName, type MenuItem , type ViewHandle } from "@sylf/design-system";
 import type { ShapeKind } from "@sylf/notes";
 import type { InkToolState } from "./ink-types";
+import { ToolbarRow } from "./FormatBar";
 
 export const INKS = ["#1f2a44", "#345bc6", "#c8423b", "#2f8f5b", "#7a4fd0", "#555b63"];
 export const HIGHLIGHTS = ["#e4b930", "#7ed3a3", "#f29bc1", "#8ec5ff"];
@@ -23,10 +24,12 @@ interface Props {
   /** Extra controls at the start (a note's Type and Write switch) and at the end (pages, paper, zoom). */
   leading?: React.ReactNode;
   trailing?: React.ReactNode;
+  /** Pinned at the right end, outside the scrolling tools. */
+  end?: React.ReactNode;
   stylusKnown: boolean;
 }
 
-export default function InkToolbar({ tool, onTool, canUndo, canRedo, onUndo, onRedo, selection, onSelectionAction, leading, trailing, stylusKnown }: Props) {
+export default function InkToolbar({ tool, onTool, canUndo, canRedo, onUndo, onRedo, selection, onSelectionAction, leading, trailing, end, stylusKnown }: Props) {
   const { space, color } = useTheme();
   const [menu, setMenu] = useState<"shape" | "eraser" | null>(null);
   const shapeAnchor = useRef<ViewHandle>(null), eraserAnchor = useRef<ViewHandle>(null);
@@ -43,7 +46,8 @@ export default function InkToolbar({ tool, onTool, canUndo, canRedo, onUndo, onR
   const eraserItems: MenuItem[] = [{ key: "stroke", label: "Whole strokes", selected: tool.eraser === "stroke", onSelect: () => set({ tool: "eraser", eraser: "stroke" }) }, { key: "precise", label: "Just what it touches", selected: tool.eraser === "precise", onSelect: () => set({ tool: "eraser", eraser: "precise" }) }];
 
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="always" style={{ flexGrow: 0, borderBottomWidth: 1, borderBottomColor: color.line }} contentContainerStyle={{ alignItems: "center", gap: 2, paddingHorizontal: space.sm, paddingVertical: space.xs }}>
+    <ToolbarRow end={end}>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="always" style={{ flexGrow: 1, flexShrink: 1 }} contentContainerStyle={{ alignItems: "center", gap: 2, paddingHorizontal: space.sm, paddingVertical: space.xs }}>
       {selection ? (
         <>
           <Text variant="label" tone="soft" style={{ paddingHorizontal: space.xs }}>{selection} selected</Text>
@@ -88,5 +92,6 @@ export default function InkToolbar({ tool, onTool, canUndo, canRedo, onUndo, onR
       <Menu open={menu === "shape"} anchor={shapeAnchor } onClose={() => setMenu(null)} items={shapeItems} label="Shapes" side="bottom" />
       <Menu open={menu === "eraser"} anchor={eraserAnchor } onClose={() => setMenu(null)} items={eraserItems} label="Eraser" side="bottom" />
     </ScrollView>
+    </ToolbarRow>
   );
 }

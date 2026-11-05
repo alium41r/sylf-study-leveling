@@ -10,6 +10,8 @@ import { APP_ORIGIN } from "./security.mjs";
 
 const THEMES = ["signature", "studio", "arcane", "voxel", "cozy", "student"];
 const TOOL_IDS = ["notes", "pdfs", "whiteboard", "sylvie", "timer", "calculator", "audio", "resources"];
+// Audio plays from the timer dock, so Workspace's shelf no longer offers it; a saved Audio window still opens.
+const SHELF_TOOLS = TOOL_IDS.filter((tool) => tool !== "audio");
 const WINDOWS = [{ name: "wide", width: 1680, height: 1000 }, { name: "expanded", width: 1280, height: 820 }, { name: "medium", width: 820, height: 900 }, { name: "short", width: 900, height: 480 }, { name: "compact", width: 480, height: 800 }];
 const sleep = (/** @type {number} */ ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const GROUPS = (process.env.SYLF_WORKSPACE_CHECK_ONLY ?? "").split(",").filter(Boolean);
@@ -356,7 +358,8 @@ async function pinchGroup(t) {
 async function dockGroup(t) {
   const { checks, results } = t;
   await t.fresh("");
-  for (const tool of TOOL_IDS) checks[`dockHas_${tool}`] = await t.has(t.dock(tool));
+  for (const tool of SHELF_TOOLS) checks[`dockHas_${tool}`] = await t.has(t.dock(tool));
+  checks.dockLeavesAudioToTimer = !(await t.has(t.dock("audio")));
   const box = await t.rect("[data-testid=workspace-dock]");
   results.dock = box;
   checks.dockCentered = Math.abs(box.x + box.width / 2 - (await t.js("innerWidth")) / 2) <= 1;
@@ -531,7 +534,7 @@ async function retentionGroup(t) {
   // Opening and closing windows must give everything back.
   await t.fresh("");
   const windowRound = async () => {
-    for (const tool of ["notes", "pdfs", "calculator", "audio"]) { await t.js(`document.querySelector('[data-testid=dock-${tool}]').click(); true`); await sleep(220); }
+    for (const tool of ["notes", "pdfs", "calculator", "resources"]) { await t.js(`document.querySelector('[data-testid=dock-${tool}]').click(); true`); await sleep(220); }
     for (let left = await t.count("[data-testid^=window-close-]"); left > 0; left--) { await t.js(`document.querySelector('[data-testid^=window-close-]').click(); true`); await sleep(160); }
     await sleep(200);
     return measure();
@@ -843,8 +846,8 @@ async function keysGroup(t) {
   checks.escapeLeavesFocus = state.layout === "free";
   await t.key("k", ["cmd"]);
   await t.sleep(420);
-  checks.commandKOpensSwitcher = await t.has("[data-testid=quick-switcher]");
-  await t.shot("keys-quick-switcher");
+  checks.commandKOpensPalette = await t.has("[data-testid=command-palette]");
+  await t.shot("keys-command-palette");
   for (const letter of ["t", "i", "m"]) await t.key(letter);
   await t.sleep(160);
   await t.key("Return");
@@ -1092,11 +1095,11 @@ async function notesGroup(t) {
   await js(`new Promise((resolve) => { const r = indexedDB.deleteDatabase('sylf-native-notes'); r.onsuccess = r.onerror = r.onblocked = () => resolve(true); })`);
   await t.open("space=workspace&wsOpen=notes&wsLayout=focus");
   await t.sleep(900);
-  checks.notesStartsWithTemplates = (await says("Typed note")) && (await says("Handwriting"));
+  checks.notesStartsWithTemplates = (await says("New note")) && (await says("Lecture notes"));
   await t.shot("notes-01-empty-library");
 
-  // Typed note: real keys, markdown shortcuts, autosave, an automatic title, and it survives a reload.
-  await t.clickOn(label("Typed note"));
+  // One note kind: typing on the page with real keys, markdown shortcuts, autosave, an automatic title, and it survives a reload.
+  await t.clickOn(label("New note"));
   for (let wait = 0; wait < 40 && !(await t.has(".sylf-note .bn-editor")); wait++) await t.sleep(250);
   await t.clickOn(".sylf-note .bn-editor");
   await typeText("# Complex numbers");
@@ -1125,8 +1128,11 @@ async function notesGroup(t) {
   await t.sleep(500);
   await t.clickOn(label("New"));
   await t.sleep(300);
-  await menuItem("Handwriting, ruled");
+  await menuItem("Note, ruled");
   await t.sleep(1000);
+  await t.clickOn("[data-testid=note-mode-write]");
+  await t.sleep(400);
+  checks.noteSwitchesToWriting = await t.has(label("Eraser"));
   const page = await t.rect('[data-testid=ink-view]');
   await t.drag({ x: page.x + 80, y: page.y + 120 }, { x: page.x + 320, y: page.y + 150 }, 20, 12);
   checks.mouseStrokeInks = (await inked()) > 30;
@@ -1146,6 +1152,62 @@ async function notesGroup(t) {
   await t.clickOn(label("Undo"));
   await t.sleep(200);
   checks.undoRestoresStroke = (await inked()) > afterErase;
+  // One sweep over everything leaves nothing, the last stroke included, and one undo brings it all back.
+  await t.clickOn(label("Eraser"));
+  await t.drag({ x: page.x + 60, y: page.y + 90 }, { x: page.x + 60, y: page.y + 380 }, 6, 16);
+  await t.drag({ x: page.x + 60, y: page.y + 380 }, { x: page.x + 560, y: page.y + 90 }, 6, 16);
+  await t.drag({ x: page.x + 560, y: page.y + 90 }, { x: page.x + 560, y: page.y + 380 }, 6, 16);
+  for (let x = 90; x <= 560; x += 40) await t.drag({ x: page.x + x, y: page.y + 90 }, { x: page.x + x, y: page.y + 380 }, 4, 12);
+  results.inkAfterSweep = await inked();
+  checks.eraserRemovesEveryStroke = results.inkAfterSweep < 20;
+  await t.clickOn(label("Undo"));
+  await t.sleep(200);
+  checks.oneUndoPerSweep = (await inked()) > 0;
+  await t.shot("notes-03b-erased-and-undone");
+
+  // Pull to add a page: at the end of a paged note, a pause and more scrolling adds one.
+  const pagesNow = async () => js(`(() => { const t = [...document.querySelectorAll('div')].map((d) => d.textContent).find((x) => /^\\d+ \\/ \\d+$/.test(x || '')); return t ? Number(t.split('/')[1]) : 1; })()`);
+  const before = await pagesNow();
+  checks.pullZoneShown = await t.has("[data-testid=note-pull-zone]");
+  const centre = { x: page.x + 200, y: page.y + 200 };
+  for (let i = 0; i < 40; i++) await t.wheel(centre, 0, 120);
+  await t.sleep(600);
+  for (let i = 0; i < 8; i++) await t.wheel(centre, 0, 120);
+  await t.sleep(900);
+  results.pagesAfterPull = { before, after: await pagesNow() };
+  checks.pullAddsPage = results.pagesAfterPull.after === before + 1;
+  await t.shot("notes-03c-pull-added-page");
+
+  // Page only: the window bar and the header go, the toolbar and page stay, and the same button brings them back.
+  await t.clickOn("[data-testid=document-page-only]");
+  await t.sleep(600);
+  const state0 = await t.workspace();
+  checks.pageOnlyFillsAndHidesBars = state0.layout === "fill" && !(await t.has("[data-testid^=window-bar-]")) && !(await t.has(label("Back to Notes"))) && (await t.has(label("Eraser")));
+  await t.shot("notes-03d-page-only");
+  await t.clickOn("[data-testid=document-page-only]");
+  await t.sleep(500);
+  checks.pageOnlyComesBack = (await t.has("[data-testid^=window-bar-]")) && (await t.has(label("Back to Notes"))) && (await t.workspace()).layout !== "fill";
+
+  // An endless note grows as it is written near its end.
+  await t.clickOn(label("Back to Notes"));
+  await t.sleep(400);
+  await t.clickOn(label("New"));
+  await t.sleep(300);
+  await menuItem("Note, endless");
+  await t.sleep(1000);
+  await t.clickOn("[data-testid=note-mode-write]");
+  await t.sleep(300);
+  const endlessBefore = (await t.rect('[data-testid=ink-page]')).height;
+  // Scroll to the end of the page and write just above it.
+  await js(`(() => { let el = document.querySelector('[data-testid=ink-page]').parentElement; while (el && !(el.scrollHeight > el.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(el).overflowY))) el = el.parentElement; if (el) el.scrollTop = el.scrollHeight; return !!el; })()`);
+  await t.sleep(600);
+  const nearEnd = await js(`(() => { const c = document.querySelector('[data-testid=ink-view] canvas[aria-label="Writing surface"]').getBoundingClientRect(); const p = document.querySelector('[data-testid=ink-page]').getBoundingClientRect(); return Math.min(p.bottom, c.bottom) - c.top - 70; })()`);
+  await t.clickOn(label("Pen"));
+  await pen('[data-testid=ink-view] canvas[aria-label="Writing surface"]', wave(60, nearEnd, 80));
+  await t.shot("notes-03e-endless");
+  await t.sleep(600);
+  results.endlessPage = { before: endlessBefore, after: (await t.rect('[data-testid=ink-page]')).height };
+  checks.endlessNoteGrows = results.endlessPage.after > results.endlessPage.before;
 
   // PDFs: a file dropped on Workspace is imported, rendered by pdf.js, and annotated.
   await t.open("space=workspace&wsClear=1");
@@ -1221,4 +1283,22 @@ async function notesGroup(t) {
   await t.sleep(900);
   checks.shelfOpensDocument = (await t.workspace()).windows.some((/** @type {any} */ w) => w.tool === "pdfs" && typeof w.state.document === "string");
   await t.shot("notes-07-shelf");
+
+  // The command palette finds a note by its text and opens it; sound is in the timer dock.
+  await t.open("space=home");
+  await t.sleep(900);
+  await t.clickOn("[data-testid=palette-open]");
+  for (let wait = 0; wait < 30 && !(await t.has("[data-testid=command-palette]")); wait++) await t.sleep(200);
+  await typeText("origin");
+  await t.sleep(300);
+  await t.shot("notes-08-command-palette");
+  await t.key("Return");
+  await t.sleep(1500);
+  state = await t.workspace();
+  checks.paletteOpensNoteByText = state.windows.some((/** @type {any} */ w) => w.state.title === "Complex numbers");
+  await t.clickOn("[data-testid=dock]");
+  await t.sleep(700);
+  checks.dockHasSound = await t.has("[data-testid=dock-sound]");
+  await t.shot("notes-09-dock-sound");
+  await t.key("Escape");
 }

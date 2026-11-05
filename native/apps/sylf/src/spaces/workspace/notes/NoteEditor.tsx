@@ -178,7 +178,6 @@ export default function NoteEditor({ library, document, editable, initialPage, o
       <IconButton icon="minus" size="small" label="Zoom out" onPress={() => pinch(1 / 1.25)} />
       <Text variant="micro" tone="soft" style={{ minWidth: 36, textAlign: "center" }}>{Math.round(zoom * 100)}%</Text>
       <IconButton icon="plus" size="small" label="Zoom in" onPress={() => pinch(1.25)} />
-      {corner}
     </>
   );
 
@@ -235,13 +234,13 @@ export default function NoteEditor({ library, document, editable, initialPage, o
   return (
     <View style={{ flex: 1 }}>
       {editable ? (mode === "type"
-        ? <FormatBar format={format} send={send} narrow={narrow} leading={switcher} trailing={trailing} onImage={() => void insertImage()} />
+        ? <FormatBar format={format} send={send} narrow={narrow} leading={switcher} trailing={trailing} end={corner} onImage={() => void insertImage()} />
         : <InkToolbar tool={tool} onTool={setTool} stylusKnown={stylusKnown} canUndo={!!activeScene?.canUndo()} canRedo={!!activeScene?.canRedo()} onUndo={() => activeScene?.undo()} onRedo={() => activeScene?.redo()}
-            selection={selection?.ids.length ?? 0} onSelectionAction={onSelectionAction} leading={switcher} trailing={trailing} />) : null}
+            selection={selection?.ids.length ?? 0} onSelectionAction={onSelectionAction} leading={switcher} trailing={trailing} end={corner} />) : null}
       <View style={{ flex: 1, backgroundColor: color.sunken }} onLayout={(e: LayoutChangeEvent) => setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}>
         {size.width ? (
           <ScrollView ref={horizontal} horizontal keyboardShouldPersistTaps="handled" scrollEnabled={contentWidth > size.width + 1} showsHorizontalScrollIndicator={contentWidth > size.width + 1} onScroll={(e) => setScroll((s) => ({ ...s, x: e.nativeEvent.contentOffset.x }))} scrollEventThrottle={32} contentContainerStyle={{ width: contentWidth }}>
-            <ScrollView ref={vertical} keyboardShouldPersistTaps="handled" style={{ width: contentWidth, height: size.height }} onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ height: contentHeight }}
+            <ScrollView ref={vertical} keyboardShouldPersistTaps="handled" {...({ dataSet: { ownsWheel: "scroll" } } as object)} style={{ width: contentWidth, height: size.height }} onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ height: contentHeight }}
               onScrollBeginDrag={(e) => { pullStart.current = (e.nativeEvent.contentOffset.y + size.height - pagesHeight) / PULL; }}
               onScrollEndDrag={(e) => { if (pullable && pullStart.current > 0.25 && e.nativeEvent.contentOffset.y + size.height >= contentHeight - 12) addPageAtEnd(); }}>
               {layout.map((row) => {

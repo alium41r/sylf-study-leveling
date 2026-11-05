@@ -11,9 +11,10 @@ const REST_MS = 160;
 
 function toolTakes(event: WheelEvent, root: HTMLElement, zooming: boolean) {
   for (let node = event.target as HTMLElement | null; node && node !== root; node = node.parentElement) {
-    // A surface that pans or zooms itself (a whiteboard, a page being zoomed) claims the wheel outright.
+    // A surface that pans or zooms itself (a whiteboard, a page being zoomed) claims the wheel outright. A document's pages claim
+    // scrolling even at their end ("scroll"), so scrolling past the last page never carries the canvas away.
     const owns = node.dataset?.ownsWheel;
-    if (owns === "all" || (owns === "zoom" && zooming)) return true;
+    if (owns === "all" || (owns === "zoom" && zooming) || (owns === "scroll" && !zooming)) return true;
     if (zooming) continue;
     const style = getComputedStyle(node);
     const canY = /(auto|scroll)/.test(style.overflowY) && node.scrollHeight > node.clientHeight + 1;

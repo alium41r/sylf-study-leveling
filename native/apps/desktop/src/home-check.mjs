@@ -194,7 +194,7 @@ async function runChecks(window) {
   // actions must be disabled and must say why.
   await clickOn(rail("focus"));
   await sleep(500);
-  checks.beginIsReal = await js(`document.querySelector('[data-testid=focus-begin]').getAttribute('aria-disabled') !== 'true'`);
+  checks.beginIsReal = await js(`document.querySelector('[data-testid=focus-enter]').getAttribute('aria-disabled') !== 'true'`);
   checks.localTimeIsLabelled = await js(`document.querySelector('[data-testid=home-focus]').innerText.includes('Not saved to your study record yet')`);
   await clickOn(rail("circle"));
   await sleep(500);
@@ -291,14 +291,14 @@ async function runChecks(window) {
   window.setContentSize(1280, 820);
   await sleep(400);
   await open("space=home&home=today");
-  await clickOn("[data-testid=today-prepare]");
+  await clickOn("[data-testid=today-begin]");
   await sleep(500);
   checks.prepareGoesToFocus = (await selected()) === "Focus";
   await clickOn(rail("today"));
   await sleep(500);
-  await clickOn("[aria-label='Open Workspace']");
-  await sleep(700);
-  checks.quickActionOpensWorkspace = await has("[data-testid=space-workspace]");
+  await clickOn("[data-testid=today-plan]");
+  await sleep(500);
+  checks.quickActionOpensPlan = (await selected()) === "Plan";
   await open("space=home&home=today");
 
   // 8. Every window size, with the rail or the bottom bar inside the window and no page wider than it.

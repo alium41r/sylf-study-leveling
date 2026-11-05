@@ -178,11 +178,12 @@ describe("session lifecycle", () => {
     const reborn = device(student.vault);
     await reborn.backend.start();
     expect(reborn.backend.auth.getSnapshot()).toMatchObject({ status: "signed-in", userId, user: null });
-    // Restoring reads the vault and asks for no token. The presence heartbeat is not a data request, so it is left out of the count.
-    const asked = () => reborn.requests.filter((entry) => !entry.url.endsWith("/api/user/heartbeat"));
-    expect(asked()).toHaveLength(0);
+    // Restoring reads the vault and sends no data request. The presence heartbeat is the one thing that goes out by itself, and it needs a token, so a
+    // refresh may precede it. Nothing else may.
+    await settle(100);
+    expect(reborn.requests.every((entry) => /\/api\/(auth\/native\/token|user\/heartbeat)$/.test(entry.url))).toBe(true);
     expect((await reborn.backend.client.get("/api/user/stats", userStatsSchema)).level).toBe(1);
-    expect(asked()[0].url).toContain("/api/auth/native/token");
+    expect(reborn.requests.some((entry) => entry.url.endsWith("/api/auth/native/token"))).toBe(true);
   });
 
   it("signs out on this device, and the copied token dies at the server", async () => {

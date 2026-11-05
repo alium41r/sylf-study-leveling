@@ -4,7 +4,7 @@
 import * as Y from "yjs";
 import type { DocumentDescriptor, InkPaper, PdfSourcePage } from "@sylf/shared";
 import type { DocumentMeta, LibraryEntry, LibraryRecord, LibrarySnapshot, NoteKind, Notebook, NotesStorage, StoredDocument, StoredUpdate } from "./contracts";
-import { board, handwriting, inkPage, kindOf, newId, pdf, typedNote, type Created } from "./documents";
+import { LAYER_FEATURES, board, coverOf, inkPage, isLayeredNote, kindOf, layeredPage, newId, note, pdf, type Created } from "./documents";
 import { boardPaper, paperFor, type PaperTemplate } from "./templates";
 
 export const DEVICE_OWNER = "device";
@@ -17,7 +17,8 @@ const LOADED = Symbol("loaded");
 
 export type SaveState = "saved" | "saving" | "failed";
 /** `linkedTo` ties a note to the document it is about, so each can open the other beside it. */
-export interface CreateOptions { kind: Exclude<NoteKind, "pdf">; title?: string; notebookId?: string | null; template?: string; paper?: PaperTemplate; linkedTo?: string; subjectId?: string | null }
+export interface CreateOptions { kind: Exclude<NoteKind, "pdf">; title?: string; notebookId?: string | null; template?: string; paper?: PaperTemplate; paperSpec?: InkPaper; linkedTo?: string; subjectId?: string | null }
+export interface StoredAssetRef { hash: string; size: number; name: string; mediaType: string }
 export interface PdfImport { bytes: Uint8Array; name: string; pages: PdfSourcePage[]; geometry: "pdfjs" | "native"; notebookId?: string | null; subjectId?: string | null }
 
 export interface OpenDocument {
@@ -28,7 +29,15 @@ export interface OpenDocument {
   stream(streamId: string): Y.Doc;
   saveState(): SaveState;
   subscribe(listener: () => void): () => void;
-  addPage(afterIndex?: number, paper?: PaperTemplate): string;
+  addPage(afterIndex?: number, paper?: PaperTemplate | InkPaper): string;
+  /** PDF pages into a note at `at`, dropping `replace` (empty pages after the content). The original must be stored first (storeAsset). */
+  insertPdfPages(asset: StoredAssetRef, pages: PdfSourcePage[], at: number, replace: string[]): void;
+  /** A picture under a page's ink and text, or none. */
+  setBackground(pageId: string, asset: StoredAssetRef | null): void;
+  /** The paper new pages start on. */
+  setDefaultPaper(paper: InkPaper): void;
+  /** Grows a paper page so its typed text fits. */
+  growPage(pageId: string, height: number): void;
   removePage(pageId: string): void;
   movePage(pageId: string, toIndex: number): void;
   /** The start of a typed note, for the library row and search. */
@@ -56,9 +65,13 @@ export interface NotesLibrary {
   remove(id: string): Promise<void>;
   duplicate(id: string): Promise<string>;
   asset(hash: string): Promise<Uint8Array | null>;
-  createNotebook(title: string): Promise<string>;
+  /** Keeps a file's bytes under their SHA-256 for this owner, for a document to point at. */
+  storeAsset(bytes: Uint8Array, mediaType: string, name: string): Promise<StoredAssetRef>;
+  setCover(id: string, cover: { color?: string | null; icon?: string | null }): Promise<void>;
+  createNotebook(title: string, parentId?: string | null): Promise<string>;
   renameNotebook(id: string, title: string): Promise<void>;
-  /** Its documents stay, outside any notebook. */
+  updateNotebook(id: string, patch: Partial<Pick<Notebook, "title" | "color" | "icon" | "parentId">>): Promise<void>;
+  /** Its documents and folders move up to its parent. */
   deleteNotebook(id: string): Promise<void>;
   /** Moves every document of another owner on this device into this library. Close `from` afterwards: its snapshot is stale. */
   adopt(from: NotesLibrary): Promise<number>;
@@ -85,6 +98,7 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
     id: d.id, kind: kindOf(d.descriptor), title: d.descriptor.title, notebookId: d.descriptor.folderId, subjectId: d.descriptor.subjectId,
     created: d.meta.created, updated: d.meta.updated, opened: d.meta.opened, pages: d.descriptor.pages.length, pinned: d.meta.pinned, trashed: d.meta.trashed, preview: d.meta.preview, text: d.meta.text ?? "",
     linkedTo: (d.descriptor.extensions.sylfNative as { linkedTo?: string } | undefined)?.linkedTo ?? null,
+    cover: coverOf(d.descriptor),
   });
   const emit = () => {
     snapshot = { ...snapshot, entries: [...documents.values()].map(entry).sort((a, b) => b.updated - a.updated), notebooks: [...record.notebooks] };
@@ -217,6 +231,16 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       schedule();
       emitDescriptor();
     };
+    const mutateMany = (edit: (d: DocumentDescriptor) => void, updates: StoredUpdate[]) => {
+      const descriptor = structuredCloneDocument(stored).descriptor;
+      edit(descriptor);
+      stored = { ...stored, descriptor };
+      pending.push(...updates);
+      descriptorDirty = true;
+      touched = true;
+      schedule();
+      emitDescriptor();
+    };
     const emitDescriptor = () => { documents.set(id, stored); emit(); tell(); };
 
     const handle: Handle = {
@@ -227,15 +251,56 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       saveState: () => state,
       subscribe(listener) { handleListeners.add(listener); return () => { handleListeners.delete(listener); }; },
       addPage(afterIndex, template) {
-        const current = stored.descriptor.pages[Math.max(0, Math.min(afterIndex ?? stored.descriptor.pages.length - 1, stored.descriptor.pages.length - 1))];
-        const paper = template ? paperFor(template) : ((current?.extensions.noteStyle as { paper?: InkPaper } | undefined)?.paper ?? paperFor("ruled"));
-        const page = inkPage(paper, current ? { width: current.width, height: current.height } : undefined);
+        const pages = stored.descriptor.pages;
+        const current = pages[Math.max(0, Math.min(afterIndex ?? pages.length - 1, pages.length - 1))];
+        const defaultPaper = (stored.descriptor.extensions.noteStyle as { paper?: InkPaper } | undefined)?.paper;
+        const paper = typeof template === "object" ? template : template ? paperFor(template) : (defaultPaper ?? (current?.extensions.noteStyle as { paper?: InkPaper } | undefined)?.paper ?? paperFor("ruled"));
+        // A page after a PDF page takes the note's paper size, not the PDF's.
+        const size = current && !current.originalAssetId ? { width: current.width, height: Math.min(current.height, 4000) } : undefined;
+        const index = afterIndex === undefined ? pages.length : afterIndex + 1;
+        if (isLayeredNote(stored.descriptor) && pages.some((p) => p.extensions.textStreamId)) {
+          const page = layeredPage(paper, size ?? { width: (stored.descriptor.extensions.noteStyle as { width?: number } | undefined)?.width ?? 800, height: (stored.descriptor.extensions.noteStyle as { height?: number } | undefined)?.height ?? 1100 });
+          mutateMany((d) => { d.streams.push(...page.streams); d.pages.splice(index, 0, page.page); }, page.updates);
+          return page.page.pageId;
+        }
+        const page = inkPage(paper, size);
         mutate((d) => {
           d.streams.push(page.stream);
-          d.pages.splice(afterIndex === undefined ? d.pages.length : afterIndex + 1, 0, page.page);
+          d.pages.splice(index, 0, page.page);
           return page.bytes;
         }, page.stream.streamId);
         return page.page.pageId;
+      },
+      insertPdfPages(asset, sources, at, replace) {
+        const paper = paperFor("blank");
+        const made = sources.map((source, index) => layeredPage(paper, { width: source.width, height: source.height }, { asset: asset.hash, index, transform: source.transform, rotation: source.rotation }));
+        mutateMany((d) => {
+          if (!d.assets.some((a) => a.assetId === asset.hash)) d.assets.push({ assetId: asset.hash, mediaType: asset.mediaType, name: asset.name.slice(0, 500), content: { hash: asset.hash, size: asset.size, parts: [{ hash: asset.hash, size: asset.size }] }, extensions: {} });
+          for (const m of made) d.streams.push(...m.streams);
+          const kept = d.pages.filter((p) => !replace.includes(p.pageId));
+          const position = Math.max(0, Math.min(at, kept.length));
+          kept.splice(position, 0, ...made.map((m) => m.page));
+          d.pages = kept;
+          d.requiredFeatures = [...new Set([...d.requiredFeatures, ...LAYER_FEATURES, "pdf-v1", "attachments-v1"])];
+        }, made.flatMap((m) => m.updates));
+      },
+      setBackground(pageId, asset) {
+        mutate((d) => {
+          const page = d.pages.find((p) => p.pageId === pageId);
+          if (!page) return;
+          if (!asset) { delete page.extensions.backgroundAssetId; return; }
+          if (!d.assets.some((a) => a.assetId === asset.hash)) d.assets.push({ assetId: asset.hash, mediaType: asset.mediaType, name: asset.name.slice(0, 500), content: { hash: asset.hash, size: asset.size, parts: [{ hash: asset.hash, size: asset.size }] }, extensions: {} });
+          page.extensions.backgroundAssetId = asset.hash;
+          d.requiredFeatures = [...new Set([...d.requiredFeatures, "creative-tools-v1"])];
+        });
+      },
+      setDefaultPaper(paper) {
+        mutate((d) => { d.extensions.noteStyle = { ...(d.extensions.noteStyle as object), paper }; });
+      },
+      growPage(pageId, height) {
+        const page = stored.descriptor.pages.find((p) => p.pageId === pageId);
+        if (!page || page.originalAssetId || height <= page.height || height > 20000) return;
+        mutate((d) => { const found = d.pages.find((p) => p.pageId === pageId); if (found) found.height = Math.ceil(height); });
       },
       removePage(pageId) {
         if (stored.descriptor.pages.length <= 1) return;
@@ -297,9 +362,9 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
     ready: () => loaded,
     create(input) {
       const folder = input.notebookId ?? null;
-      const created = input.kind === "note" ? typedNote(record.libraryId, input.title ?? null, folder, input.template ?? "blank")
-        : input.kind === "board" ? board(record.libraryId, input.title ?? "Whiteboard", folder, boardPaper(input.paper ?? "dotted"))
-        : handwriting(record.libraryId, input.title ?? "Handwritten note", folder, paperFor(input.paper ?? "ruled"));
+      // Typed and handwritten notes are one kind now: pages with a text layer and an ink layer. "handwriting" only picks the paper.
+      const created = input.kind === "board" ? board(record.libraryId, input.title ?? "Whiteboard", folder, boardPaper(input.paper ?? "dotted"))
+        : note(record.libraryId, input.title ?? null, folder, input.paperSpec ?? paperFor(input.paper ?? "ruled"), input.template ?? "blank");
       if (input.subjectId) created.descriptor.subjectId = input.subjectId.slice(0, 128);
       if (input.linkedTo && documents.has(input.linkedTo)) created.descriptor.extensions.sylfNative = { ...(created.descriptor.extensions.sylfNative as object), linkedTo: input.linkedTo };
       return save(created);
@@ -357,9 +422,20 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       return id2;
     },
     async asset(hash) { await loaded; return (await storage.readAsset(owner, hash))?.bytes ?? null; },
-    async createNotebook(title) {
+    async storeAsset(bytes, mediaType, name) {
       await loaded;
-      const notebook: Notebook = { id: newId(), title: title.trim().slice(0, 80) || "Notebook", color: NOTEBOOK_COLORS[record.notebooks.length % NOTEBOOK_COLORS.length], created: now() };
+      const hash = await options.sha256(bytes);
+      await write(() => storage.putAsset(owner, { hash, mediaType, name, bytes }));
+      return { hash, size: bytes.length, name, mediaType };
+    },
+    setCover: (id, cover) => change(id, (d) => {
+      const native = (d.descriptor.extensions.sylfNative as Record<string, unknown> | undefined) ?? {};
+      const current = (native.cover as { color?: string | null; icon?: string | null } | undefined) ?? {};
+      d.descriptor.extensions.sylfNative = { ...native, cover: { color: cover.color === undefined ? current.color ?? null : cover.color, icon: cover.icon === undefined ? current.icon ?? null : cover.icon } };
+    }, false),
+    async createNotebook(title, parentId = null) {
+      await loaded;
+      const notebook: Notebook = { id: newId(), title: title.trim().slice(0, 80) || "Folder", color: NOTEBOOK_COLORS[record.notebooks.length % NOTEBOOK_COLORS.length], created: now(), parentId: parentId && record.notebooks.some((n) => n.id === parentId) ? parentId : null, icon: null };
       await putLibrary({ ...record, notebooks: [...record.notebooks, notebook] });
       return notebook.id;
     },
@@ -368,10 +444,19 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       const next = title.trim().slice(0, 80);
       if (next) await putLibrary({ ...record, notebooks: record.notebooks.map((n) => (n.id === id ? { ...n, title: next } : n)) });
     },
+    async updateNotebook(id, patch) {
+      await loaded;
+      // A folder can never be moved inside itself or one of its own subfolders.
+      const inside = (candidate: string | null | undefined): boolean => !!candidate && (candidate === id || inside(record.notebooks.find((n) => n.id === candidate)?.parentId));
+      if (patch.parentId !== undefined && inside(patch.parentId)) throw new Error("A folder cannot go inside itself.");
+      const title = patch.title?.trim().slice(0, 80);
+      await putLibrary({ ...record, notebooks: record.notebooks.map((n) => (n.id === id ? { ...n, ...patch, ...(title ? { title } : { title: n.title }) } : n)) });
+    },
     async deleteNotebook(id) {
       await loaded;
-      for (const d of [...documents.values()]) if (d.descriptor.folderId === id) await change(d.id, (next) => { next.descriptor.folderId = null; }, false);
-      await putLibrary({ ...record, notebooks: record.notebooks.filter((n) => n.id !== id) });
+      const parent = record.notebooks.find((n) => n.id === id)?.parentId ?? null;
+      for (const d of [...documents.values()]) if (d.descriptor.folderId === id) await change(d.id, (next) => { next.descriptor.folderId = parent; }, false);
+      await putLibrary({ ...record, notebooks: record.notebooks.filter((n) => n.id !== id).map((n) => (n.parentId === id ? { ...n, parentId: parent } : n)) });
     },
     async adopt(from) {
       await loaded;

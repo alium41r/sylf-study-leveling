@@ -4,7 +4,7 @@ import { Suspense, lazy, useState } from "react";
 import { View } from "react-native";
 import { IconButton, useTheme } from "@sylf/design-system";
 import { worldHoldsNavigation } from "@sylf/spaces";
-import { useHomeNavigation, useShellMetrics, useSpaces } from "./context";
+import { useHomeNavigation, useShellMetrics, useSpaces, useWorkspaceState } from "./context";
 import { conversationRequest } from "./profile/store";
 import { ProfileSheet } from "./profile/ProfileSheet";
 import { DEV_TOOLS, openShowcase } from "./dev-surface";
@@ -24,9 +24,12 @@ function DevEntry() {
 
 export function SpacesShell() {
   const { color } = useTheme();
-  const { world } = useSpaces();
+  const { world, state } = useSpaces();
+  const workspace = useWorkspaceState();
   const focusing = useFocusEnvironmentOpen();
-  const free = !worldHoldsNavigation(world) && !focusing;
+  // Workspace in full screen keeps the whole screen for its tools: no Spaces icon, no timer, no development entry.
+  const filling = state.activeSpace === "workspace" && workspace.layout === "fill" && workspace.windows.some((w) => !w.minimized);
+  const free = !worldHoldsNavigation(world) && !focusing && !filling;
   const [barReach, setBarReach] = useState<number | null>(null);
   const navigation = useHomeNavigation();
   const openMessages = (id: number) => { conversationRequest.ask(id); navigation.setView("circle", "messages"); navigation.select("circle"); };

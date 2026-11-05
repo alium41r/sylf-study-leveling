@@ -40,6 +40,33 @@ export function inkPage(paper: InkPaper, size = { width: noteStyle.DEFAULT_NOTE_
   return { page, stream: stream(streamId, ink.INK_ADAPTER, "ink", "map"), bytes: ink.initialInkUpdate(paper) };
 }
 
+/** One page of a note: a sylf-ink/1 layer and a blocknote/0.56.0 text layer, as the web's page-layers-v1 builds them. */
+export function layeredPage(paper: InkPaper, size = { width: noteStyle.DEFAULT_NOTE_STYLE.width, height: noteStyle.DEFAULT_NOTE_STYLE.height }, source?: { asset: string; index: number; transform: number[]; rotation: number }) {
+  const ink = inkPage(paper, size), textId = newId();
+  ink.page.extensions.inkStreamId = ink.stream.streamId;
+  ink.page.extensions.textStreamId = textId;
+  if (source) {
+    ink.page.originalAssetId = source.asset;
+    ink.page.sourcePage = source.index;
+    ink.page.extensions.pdfTransform = source.transform;
+    ink.page.extensions.pdfSourceRotation = source.rotation;
+    ink.page.extensions.pdfRotation = 0;
+  }
+  return { page: ink.page, streams: [ink.stream, stream(textId, RICH_TEXT_ADAPTER, "body", "xml")], updates: [{ streamId: ink.stream.streamId, bytes: ink.bytes }, { streamId: textId, bytes: emptyRichTextUpdate() }] };
+}
+export const LAYER_FEATURES = ["rich-text-v1", "ink-v1", "page-layers-v1", "paged-v1", "creative-tools-v1"];
+
+/** The one note: pages you can type and write on, with PDF pages and pictures among them. */
+export function note(libraryId: string, title: string | null, folderId: string | null, paper: InkPaper, template: string): Created {
+  const d = base(libraryId, title ?? "Untitled note", "notebook", folderId), first = layeredPage(paper);
+  d.streams.push(...first.streams);
+  d.pages.push(first.page);
+  d.requiredFeatures = [...LAYER_FEATURES];
+  d.extensions.noteStyle = { ...noteStyle.DEFAULT_NOTE_STYLE, paper };
+  d.extensions.sylfNative = { surface: "note", template, autoTitle: title === null };
+  return { descriptor: d, updates: first.updates };
+}
+
 export function handwriting(libraryId: string, title: string, folderId: string | null, paper: InkPaper): Created {
   const d = base(libraryId, title, "notebook", folderId), first = inkPage(paper);
   d.streams.push(first.stream);
@@ -84,8 +111,15 @@ export function kindOf(descriptor: DocumentDescriptor): NoteKind {
   if (descriptor.kind === "pdf") return "pdf";
   if (descriptor.kind === "flow") return "note";
   if (surface === "board") return "board";
-  // A web notebook whose first page is typed text still opens as a note.
-  return descriptor.streams.find((s) => s.streamId === descriptor.pages[0]?.streamId)?.adapter === RICH_TEXT_ADAPTER ? "note" : "handwriting";
+  // Every other notebook is a note: typed, handwritten or both, page by page.
+  return "note";
 }
 
 export const templateOf = (descriptor: DocumentDescriptor) => (descriptor.extensions.sylfNative as { template?: string } | undefined)?.template ?? null;
+
+/** Whether this document uses per-page text and ink layers (the one note), rather than a single typed flow. */
+export const isLayeredNote = (descriptor: DocumentDescriptor) => descriptor.kind === "notebook" && (descriptor.extensions.sylfNative as { surface?: string } | undefined)?.surface !== "board";
+export const coverOf = (descriptor: DocumentDescriptor) => {
+  const cover = (descriptor.extensions.sylfNative as { cover?: { color?: string | null; icon?: string | null } } | undefined)?.cover;
+  return { color: cover?.color ?? null, icon: cover?.icon ?? null };
+};

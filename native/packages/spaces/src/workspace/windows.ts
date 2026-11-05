@@ -4,9 +4,9 @@
 import { GRID, HOME_CAMERA, WORLD, boundsOf, clamp, clampCamera, clampZoom, clearWorld, contains, frameRect, intersects, revealRect, snapToGrid, type Camera, type Frame, type Point, type Rect, type Size } from "./canvas";
 import { TOOLS, isToolId, type ToolId } from "./tools";
 
-export const WORKSPACE_LAYOUTS = ["free", "focus", "split", "assistant"] as const;
+export const WORKSPACE_LAYOUTS = ["free", "focus", "split", "assistant", "fill"] as const;
 export type WorkspaceLayout = (typeof WORKSPACE_LAYOUTS)[number];
-export const LAYOUT_LABELS: Record<WorkspaceLayout, string> = { free: "Free", focus: "Focus", split: "Split", assistant: "Assistant" };
+export const LAYOUT_LABELS: Record<WorkspaceLayout, string> = { free: "Free", focus: "Focus", split: "Split", assistant: "Assistant", fill: "Full screen" };
 
 /** A tool's own restorable state: small, serializable, and never a document. Documents stay with their owners. */
 export type ToolState = Record<string, string | number | boolean | null | (string | number)[]>;
@@ -40,9 +40,15 @@ export interface WorkspaceState {
   sequence: number;
   /** Arrangements kept by name, on this device. */
   layouts: NamedLayout[];
+  /** How full screen divides the screen, once someone has arranged it: rows and columns of windows, with their shares. */
+  fill: FillNode | null;
 }
 
-export const INITIAL_WORKSPACE: WorkspaceState = { version: 1, camera: HOME_CAMERA, windows: [], focused: null, layout: "free", saved: null, recent: [], sequence: 0, layouts: [] };
+/** A full-screen arrangement: a window, or a row or column of arrangements with relative weights. */
+export type FillNode = { id: string } | { dir: "row" | "col"; children: FillNode[]; weights: number[] };
+export type DockZone = "left" | "right" | "top" | "bottom" | "center";
+
+export const INITIAL_WORKSPACE: WorkspaceState = { version: 1, camera: HOME_CAMERA, windows: [], focused: null, layout: "free", saved: null, recent: [], sequence: 0, layouts: [], fill: null };
 
 const finite = (value: unknown): value is number => typeof value === "number" && Number.isFinite(value);
 
@@ -104,7 +110,7 @@ export function parseWorkspaceState(raw: unknown): WorkspaceState {
   for (const window of windows) if (!recent.includes(window.id)) recent.push(window.id);
   const focused = windows.some((window) => window.id === value.focused && !window.minimized) ? (value.focused as string) : null;
   const layout = WORKSPACE_LAYOUTS.includes(value.layout as WorkspaceLayout) ? (value.layout as WorkspaceLayout) : "free";
-  return { version: 1, camera: parseCamera(value.camera), windows, focused, layout, saved: parseSaved(value.saved, seen), recent, sequence: finite(value.sequence) ? Math.max(0, Math.floor(value.sequence)) : windows.length, layouts: parseNamedLayouts(value.layouts) };
+  return { version: 1, camera: parseCamera(value.camera), windows, focused, layout, saved: parseSaved(value.saved, seen), recent, sequence: finite(value.sequence) ? Math.max(0, Math.floor(value.sequence)) : windows.length, layouts: parseNamedLayouts(value.layouts), fill: parseFill(value.fill, seen, 0) };
 }
 
 /** A layout that cannot be read is dropped, and so is a window in it whose tool no longer exists; the rest survive. */
@@ -150,6 +156,8 @@ const topZ = (state: WorkspaceState) => state.windows.reduce((top, window) => Ma
 const touched = (state: WorkspaceState, id: string) => [id, ...state.recent.filter((other) => other !== id)];
 /** Arranging anything by hand makes the arrangement the person's own. The preset itself is never changed. */
 const freed = { layout: "free", saved: null } as const;
+/** Full screen tiles whatever is open, so opening, closing, minimizing or restoring a window re-tiles instead of leaving it. */
+const keep = (state: WorkspaceState) => (state.layout === "fill" ? {} : freed);
 
 export const openWindows = (state: WorkspaceState) => state.windows.filter((window) => !window.minimized);
 export interface PinchRegion extends Rect { id: string; owned: boolean }
@@ -244,7 +252,7 @@ export function openWindow(state: WorkspaceState, tool: ToolId, frame: Frame, in
   const sequence = state.sequence + 1;
   const id = `w${sequence}`;
   const window: WorkspaceWindow = { id, tool, ...placeWindow(state, size, frame), ...size, z: topZ(state) + 1, minimized: false, state: parseToolState(initial) };
-  const next = { ...state, ...freed, sequence, focused: id, recent: [id, ...state.recent], windows: [...state.windows, window] };
+  const next = { ...state, ...keep(state), sequence, focused: id, recent: [id, ...state.recent], windows: [...state.windows, window] };
   return { state: { ...next, camera: revealRect(next.camera, window, frame) }, id };
 }
 
@@ -253,21 +261,21 @@ export function closeWindow(state: WorkspaceState, id: string): WorkspaceState {
   const windows = state.windows.filter((window) => window.id !== id);
   const recent = state.recent.filter((other) => other !== id);
   const rest = { ...state, windows, recent };
-  return { ...rest, ...freed, focused: state.focused === id ? frontmost(rest)?.id ?? null : state.focused };
+  return { ...rest, ...keep(state), focused: state.focused === id ? frontmost(rest)?.id ?? null : state.focused };
 }
 
 export function minimizeWindow(state: WorkspaceState, id: string): WorkspaceState {
   const window = find(state, id);
   if (!window || window.minimized) return state;
   const windows = replace(state, id, { minimized: true });
-  return { ...state, ...freed, windows, focused: state.focused === id ? frontmost({ ...state, windows }, id)?.id ?? null : state.focused };
+  return { ...state, ...keep(state), windows, focused: state.focused === id ? frontmost({ ...state, windows }, id)?.id ?? null : state.focused };
 }
 
 export function restoreWindow(state: WorkspaceState, id: string): WorkspaceState {
   const window = find(state, id);
   if (!window) return state;
   if (!window.minimized) return focusWindow(state, id);
-  return focusWindow({ ...state, ...freed, windows: replace(state, id, { minimized: false }) }, id);
+  return focusWindow({ ...state, ...keep(state), windows: replace(state, id, { minimized: false }) }, id);
 }
 
 /** A drop: the window settles on the grid and stays in the world. */
@@ -338,6 +346,8 @@ function primaryOf(state: WorkspaceState) {
  */
 export function applyLayout(state: WorkspaceState, layout: WorkspaceLayout, frame: Frame): WorkspaceState {
   if (layout === "free") return restoreArrangement(state);
+  // Full screen keeps every window where it is on the canvas; the tiles are computed for the screen (fillTiles).
+  if (layout === "fill") return openWindows(state).length ? { ...state, layout: "fill", saved: saveArrangement(state) } : state;
   // Focus hides the Command Center, so the tool can have the room it would have covered.
   const room: Frame = layout === "focus" ? { ...frame, insets: { ...frame.insets, bottom: Math.min(frame.insets.bottom, GRID * 2) } } : frame;
   const saved = saveArrangement(state);
@@ -396,4 +406,137 @@ export function fitWorkspace(state: WorkspaceState, frame: Frame): Camera {
 export function setCamera(state: WorkspaceState, camera: Camera, viewport: Size): WorkspaceState {
   const next = clampCamera(camera, viewport);
   return next.x === state.camera.x && next.y === state.camera.y && next.zoom === state.camera.zoom ? state : { ...state, camera: next };
+}
+
+function parseFill(raw: unknown, ids: Set<string>, depth: number): FillNode | null {
+  if (!raw || typeof raw !== "object" || depth > 6) return null;
+  const value = raw as Partial<{ id: string; dir: string; children: unknown[]; weights: unknown[] }>;
+  if (typeof value.id === "string") return ids.has(value.id) ? { id: value.id } : null;
+  if ((value.dir !== "row" && value.dir !== "col") || !Array.isArray(value.children)) return null;
+  const children: FillNode[] = [], weights: number[] = [];
+  value.children.forEach((child, index) => {
+    const parsed = parseFill(child, ids, depth + 1);
+    if (!parsed) return;
+    children.push(parsed);
+    const weight = Array.isArray(value.weights) ? value.weights[index] : 1;
+    weights.push(finite(weight) && weight > 0 ? weight : 1);
+  });
+  if (!children.length) return null;
+  return children.length === 1 ? children[0] : { dir: value.dir, children, weights };
+}
+
+const leaves = (node: FillNode | null): string[] => (!node ? [] : "id" in node ? [node.id] : node.children.flatMap(leaves));
+function prune(node: FillNode | null, keep: Set<string>): FillNode | null {
+  if (!node) return null;
+  if ("id" in node) return keep.has(node.id) ? node : null;
+  const children: FillNode[] = [], weights: number[] = [];
+  node.children.forEach((child, index) => { const next = prune(child, keep); if (next) { children.push(next); weights.push(node.weights[index] ?? 1); } });
+  if (!children.length) return null;
+  return children.length === 1 ? children[0] : { ...node, children, weights };
+}
+
+/** The first arrangement: left to right as the windows stand on the canvas, in one row (or column, on a tall screen), two rows from four. */
+function defaultFill(windows: WorkspaceWindow[], landscape: boolean): FillNode | null {
+  const open = windows.slice().sort((a, b) => a.x - b.x || a.y - b.y);
+  if (!open.length) return null;
+  const line = (list: WorkspaceWindow[], dir: "row" | "col"): FillNode => (list.length === 1 ? { id: list[0].id } : { dir, children: list.map((w) => ({ id: w.id })), weights: list.map((w) => (dir === "row" ? w.width : w.height)) });
+  if (landscape) return open.length <= 3 ? line(open, "row") : { dir: "col", children: [line(open.slice(0, Math.ceil(open.length / 2)), "row"), line(open.slice(Math.ceil(open.length / 2)), "row")], weights: [1, 1] };
+  if (open.length <= 3) return line(open, "col");
+  const rows: FillNode[] = [];
+  for (let i = 0; i < open.length; i += 2) rows.push(line(open.slice(i, i + 2), "row"));
+  return { dir: "col", children: rows, weights: rows.map(() => 1) };
+}
+
+/** The arrangement in force: the person's own, with closed windows taken out and new ones added beside the rest, or the default. */
+export function effectiveFill(state: WorkspaceState, area: Size): FillNode | null {
+  const open = openWindows(state), ids = new Set(open.map((w) => w.id));
+  let tree = prune(state.fill, ids);
+  if (!tree) return defaultFill(open, area.width >= area.height * 0.9);
+  const missing = open.filter((w) => !leaves(tree).includes(w.id));
+  for (const window of missing) {
+    const dir = area.width >= area.height * 0.9 ? "row" : "col";
+    tree = "id" in tree || tree.dir !== dir ? { dir, children: [tree, { id: window.id }], weights: [2, 1] } : { ...tree, children: [...tree.children, { id: window.id }], weights: [...tree.weights, Math.max(...tree.weights) / 2] };
+  }
+  return tree;
+}
+
+/** Rectangles for an arrangement, edge to edge in whole points. */
+export function fillRects(node: FillNode | null, area: Rect, out: Record<string, Rect> = {}): Record<string, Rect> {
+  if (!node) return out;
+  if ("id" in node) { out[node.id] = { x: Math.round(area.x), y: Math.round(area.y), width: Math.round(area.x + area.width) - Math.round(area.x), height: Math.round(area.y + area.height) - Math.round(area.y) }; return out; }
+  const total = node.weights.reduce((sum, w) => sum + w, 0);
+  let offset = 0;
+  node.children.forEach((child, index) => {
+    const share = node.weights[index] / total;
+    const part = node.dir === "row" ? { x: area.x + area.width * offset, y: area.y, width: area.width * share, height: area.height } : { x: area.x, y: area.y + area.height * offset, width: area.width, height: area.height * share };
+    offset += share;
+    fillRects(child, part, out);
+  });
+  return out;
+}
+
+/** Full screen: the open windows cover the area edge to edge, as arranged (effectiveFill). */
+export function fillTiles(state: WorkspaceState, area: Rect): Record<string, Rect> {
+  return fillRects(effectiveFill(state, area), area);
+}
+
+/** Every seam: the split it belongs to (a path of child indexes from the top), the child before it, and where it is. */
+export interface FillSeam { path: number[]; index: number; dir: "row" | "col"; at: Rect; units: number }
+export function fillSeams(node: FillNode | null, area: Rect, path: number[] = [], out: FillSeam[] = []): FillSeam[] {
+  if (!node || "id" in node) return out;
+  const total = node.weights.reduce((sum, w) => sum + w, 0);
+  let offset = 0;
+  node.children.forEach((child, index) => {
+    const share = node.weights[index] / total;
+    const part = node.dir === "row" ? { x: area.x + area.width * offset, y: area.y, width: area.width * share, height: area.height } : { x: area.x, y: area.y + area.height * offset, width: area.width, height: area.height * share };
+    offset += share;
+    if (index < node.children.length - 1) out.push({ path, index, dir: node.dir, units: total / (node.dir === "row" ? area.width : area.height), at: node.dir === "row" ? { x: part.x + part.width, y: part.y, width: 0, height: part.height } : { x: part.x, y: part.y + part.height, width: part.width, height: 0 } });
+    fillSeams(child, part, [...path, index], out);
+  });
+  return out;
+}
+
+const at = (node: FillNode, path: number[]): FillNode => path.reduce((current, index) => ("id" in current ? current : current.children[index]), node);
+const clone = (node: FillNode): FillNode => JSON.parse(JSON.stringify(node)) as FillNode;
+
+/** Moves one seam by `delta` weight units, keeping the two sides' total and a fair minimum for each. */
+export function resizeFillSeam(state: WorkspaceState, area: Size, path: number[], index: number, delta: number): WorkspaceState {
+  const base = effectiveFill(state, area);
+  if (!base || state.layout !== "fill") return state;
+  const tree = clone(base), split = at(tree, path);
+  if ("id" in split) return state;
+  const a = split.weights[index], b = split.weights[index + 1], total = a + b, floor = total * 0.12;
+  const nextA = Math.max(floor, Math.min(total - floor, a + delta));
+  split.weights[index] = nextA;
+  split.weights[index + 1] = total - nextA;
+  return { ...state, fill: tree };
+}
+
+/** Docks a window against another's edge (or swaps them, at the centre), so any arrangement of rows and columns can be built. */
+export function dockInFill(state: WorkspaceState, area: Size, moving: string, target: string, zone: DockZone): WorkspaceState {
+  const base = effectiveFill(state, area);
+  if (!base || moving === target || state.layout !== "fill") return state;
+  if (zone === "center") {
+    const swap = (node: FillNode): FillNode => ("id" in node ? { id: node.id === moving ? target : node.id === target ? moving : node.id } : { ...node, children: node.children.map(swap) });
+    return { ...state, fill: swap(base) };
+  }
+  const without = prune(base, new Set(leaves(base).filter((id) => id !== moving)));
+  if (!without) return state;
+  const dir = zone === "left" || zone === "right" ? "row" : "col";
+  const pair = (zone === "left" || zone === "top" ? [{ id: moving }, { id: target }] : [{ id: target }, { id: moving }]) as FillNode[];
+  const place = (node: FillNode): FillNode => {
+    if ("id" in node) return node.id === target ? { dir, children: pair, weights: [1, 1] } : node;
+    // Docking beside a sibling in a split of the same direction joins that split rather than nesting another.
+    const hit = node.children.findIndex((child) => "id" in child && child.id === target);
+    if (hit >= 0 && node.dir === dir) {
+      const children = [...node.children], weights = [...node.weights], share = weights[hit] / 2;
+      weights[hit] = share;
+      const insert = zone === "left" || zone === "top" ? hit : hit + 1;
+      children.splice(insert, 0, { id: moving });
+      weights.splice(insert, 0, share);
+      return { ...node, children, weights };
+    }
+    return { ...node, children: node.children.map(place) };
+  };
+  return { ...state, fill: place(without) };
 }

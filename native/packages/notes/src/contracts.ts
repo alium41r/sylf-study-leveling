@@ -24,10 +24,13 @@ export interface LibraryEntry {
   text: string;
   /** The document this one is about: notes taken beside a PDF point at it. */
   linkedTo: string | null;
+  cover: Cover;
 }
 
-/** A folder of documents. The web library calls these folders. */
-export interface Notebook { id: string; title: string; color: string; created: number }
+/** A folder of documents, inside another folder or at the top. The web library calls these folders. */
+export interface Notebook { id: string; title: string; color: string; created: number; parentId?: string | null; icon?: string | null }
+/** How a document looks in the library: a colour and an emoji the person chose. */
+export interface Cover { color: string | null; icon: string | null }
 
 export interface LibrarySnapshot {
   ready: boolean;

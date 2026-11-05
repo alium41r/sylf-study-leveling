@@ -127,6 +127,7 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
           ) : null}
         </View>
         <Text variant="micro" tone={saving === "failed" ? "critical" : "faint"} aria-live="polite">{saving === "saving" ? "Saving" : saving === "failed" ? "Not saved" : "Saved"}</Text>
+        {workspace.layout === "fill" ? null : <IconButton icon="fit" size="small" label="Full screen" onPress={() => { model.focus(window.id); model.setLayout("fill"); }} />}
         <View ref={menuAnchor} collapsable={false}><IconButton icon="more" size="small" label="Document options" onPress={() => setMenu(true)} /></View>
       </View>
       {opened?.error ? (

@@ -1,8 +1,8 @@
 // The Workspace's owner, kept outside React like the Spaces store it writes through, so a layout survives a Space change, a
 // recreated root and a process kill. There is no second copy and no second persistence path: the state is the `workspace`
 // snapshot. Screens call these actions and read `state()`. The camera commits here only when it comes to rest.
-import { HOME_CAMERA, NO_INSETS, clampCamera, frameRect, revealRect, zoomAt, type Camera, type Frame, type Rect } from "./canvas";
-import { INITIAL_WORKSPACE, applyLayout, applyNamedLayout, closeWindow, cycleFocus, deleteNamedLayout, fitWorkspace, focusWindow, minimizeWindow, moveWindow, openWindow, parseWorkspaceState, resizeWindow, restoreWindow, saveNamedLayout, setCamera, setToolState, type ToolState, type WorkspaceLayout, type WorkspaceState } from "./windows";
+import { HOME_CAMERA, NO_INSETS, clampCamera, frameRect, revealRect, zoomAt, type Camera, type Frame, type Rect, type Size } from "./canvas";
+import { INITIAL_WORKSPACE, applyLayout, applyNamedLayout, closeWindow, cycleFocus, deleteNamedLayout, fitWorkspace, focusWindow, minimizeWindow, moveWindow, openWindow, parseWorkspaceState, resizeWindow, restoreWindow, dockInFill, resizeFillSeam, saveNamedLayout, setCamera, setToolState, type DockZone, type ToolState, type WorkspaceLayout, type WorkspaceState } from "./windows";
 import type { ToolId } from "./tools";
 import type { SpacesStore } from "../store";
 
@@ -42,6 +42,10 @@ export interface WorkspaceModel {
   saveLayout(name: string): void;
   applySavedLayout(id: string): void;
   deleteSavedLayout(id: string): void;
+  /** Full screen: moves a seam of the arrangement (see fillSeams). */
+  resizeFill(area: Size, path: number[], index: number, delta: number): void;
+  /** Full screen: docks a window against another's edge, or swaps them. */
+  dockFill(area: Size, moving: string, target: string, zone: DockZone): void;
 }
 
 const CLOSED_FRAME: Frame = { viewport: { width: 1280, height: 820 }, insets: NO_INSETS };
@@ -110,6 +114,8 @@ export function createWorkspaceModel(store: Pick<SpacesStore, "getSnapshot" | "s
     saveLayout: (name) => write(saveNamedLayout(current, name, `n${Date.now().toString(36)}`)),
     applySavedLayout: (id) => write(applyNamedLayout(current, id)),
     deleteSavedLayout: (id) => write(deleteNamedLayout(current, id)),
+    resizeFill: (area, path, index, delta) => write(resizeFillSeam(current, area, path, index, delta)),
+    dockFill: (area, moving, target, zone) => write(dockInFill(current, area, moving, target, zone)),
     resize: (id, rect) => write(resizeWindow(current, id, rect)),
     patchTool: (id, patch) => write(setToolState(current, id, patch)),
     cycle(direction) {

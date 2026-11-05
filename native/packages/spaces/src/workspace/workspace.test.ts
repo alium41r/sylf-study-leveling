@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import { createSpacesStore } from "../store";
-import { EDGE_GUTTER, GRID, HOME_CAMERA, OVERVIEW_ZOOM, WORLD, ZOOM, clampCamera, clearWorld, contains, frameRect, gridDots, gridSpacing, intersects, revealRect, screenToWorld, visibleWorld, worldToScreen, zoomAt, type Frame } from "./canvas";
+import { EDGE_GUTTER, GRID, HOME_CAMERA, MIN_DOT_SPACING, OVERVIEW_ZOOM, WORLD, ZOOM, clampCamera, clearWorld, contains, frameRect, gridDots, gridSpacing, intersects, revealRect, screenToWorld, visibleWorld, worldToScreen, zoomAt, type Frame } from "./canvas";
 import { DEFAULT_BUDGET, planLifecycles, seenWindowIds } from "./lifecycle";
 import { createWorkspaceModel } from "./model";
 import { TOOLS, TOOL_IDS } from "./tools";
-import { INITIAL_WORKSPACE, MAX_TOOL_STATE, MAX_WINDOWS, applyLayout, applyNamedLayout, closeWindow, deleteNamedLayout, saveNamedLayout, cycleFocus, fitWorkspace, focusWindow, minimizeWindow, minimizedWindows, moveWindow, openWindow, openWindows, parseWorkspaceState, pinchOwner, pinchRegions, resizeWindow, restoreArrangement, restoreWindow, setToolState, windowTitle, type WorkspaceState } from "./windows";
+import { INITIAL_WORKSPACE, MAX_TOOL_STATE, MAX_WINDOWS, applyLayout, applyNamedLayout, closeWindow, deleteNamedLayout, saveNamedLayout, cycleFocus, fitWorkspace, focusWindow, minimizeWindow, minimizedWindows, moveWindow, openWindow, openWindows, parseWorkspaceState, pinchOwner, pinchRegions, resizeWindow, restoreArrangement, restoreWindow, setToolState, windowTitle, fillTiles, fillSeams, effectiveFill, dockInFill, resizeFillSeam, parseWorkspaceState as parse2, type WorkspaceState } from "./windows";
 
 const viewport = { width: 1280, height: 820 };
 const frame: Frame = { viewport, insets: { top: 72, right: 16, bottom: 96, left: 16 } };
@@ -65,12 +65,12 @@ describe("camera", () => {
 });
 
 describe("dot grid", () => {
-  it("stays within one octave at every zoom, and its first tile starts off the top left", () => {
+  it("never packs dots closer than the minimum, and its first tile starts off the top left", () => {
     for (let zoom = ZOOM.min; zoom <= ZOOM.max; zoom += 0.013) {
       for (const camera of [{ x: 0, y: 0, zoom }, { x: 3333, y: 1711, zoom }, { x: WORLD.width, y: WORLD.height, zoom }]) {
         const dots = gridDots(camera, viewport);
-        expect(dots.spacing).toBeGreaterThanOrEqual(GRID);
-        expect(dots.spacing).toBeLessThan(GRID * 2);
+        expect(dots.spacing).toBeGreaterThanOrEqual(MIN_DOT_SPACING);
+        expect(dots.spacing).toBeLessThanOrEqual(GRID * ZOOM.max);
         expect(dots.x).toBeLessThanOrEqual(0);
         expect(dots.x).toBeGreaterThan(-dots.spacing);
         expect(dots.y).toBeLessThanOrEqual(0);
@@ -96,11 +96,13 @@ describe("dot grid", () => {
     }
   });
 
-  it("changes spacing with the zoom and nothing else moves it", () => {
+  it("spreads the dots as the view zooms in and draws them together as it zooms out", () => {
     expect(gridSpacing(1).spacing).toBe(GRID);
     expect(gridSpacing(1.5).spacing).toBe(GRID * 1.5);
-    expect(gridSpacing(0.5).level).toBe(1);
-    expect(gridSpacing(2).level).toBe(-1);
+    expect(gridSpacing(2).spacing).toBe(GRID * 2);
+    expect(gridSpacing(0.5).spacing).toBe(GRID * 0.5);
+    for (let zoom = 0.3; zoom < 2; zoom += 0.05) expect(gridSpacing(zoom + 0.05).spacing).toBeGreaterThan(gridSpacing(zoom).spacing);
+    expect(gridSpacing(ZOOM.min).level).toBe(1);
   });
 });
 
@@ -600,5 +602,66 @@ describe("named layouts", () => {
     const parsed = parseWorkspaceState({ ...state, layouts: [...state.layouts, { id: 5 }, { id: "x", name: "Bad", windows: [{ tool: "planner" }] }] });
     expect(parsed.layouts).toHaveLength(8);
     expect(deleteNamedLayout(state, "again").layouts).toHaveLength(7);
+  });
+});
+
+describe("full screen", () => {
+  const frame = { viewport: { width: 1280, height: 820 }, insets: { top: 0, right: 0, bottom: 0, left: 0 } };
+  const three = () => {
+    let state = openWindow(INITIAL_WORKSPACE, "notes", frame).state;
+    state = openWindow(state, "notes", frame).state;
+    return openWindow(state, "calculator", frame).state;
+  };
+  it("covers the whole area with no gaps, wider tools getting more of it", () => {
+    const state = applyLayout(three(), "fill", frame);
+    expect(state.layout).toBe("fill");
+    const tiles = Object.values(fillTiles(state, { x: 0, y: 0, width: 1280, height: 800 }));
+    expect(tiles).toHaveLength(3);
+    expect(tiles.reduce((sum, t) => sum + t.width * t.height, 0)).toBe(1280 * 800);
+    const calculator = fillTiles(state, { x: 0, y: 0, width: 1280, height: 800 })[state.windows.find((w) => w.tool === "calculator")!.id];
+    expect(calculator.width).toBeLessThan(1280 / 3);
+  });
+  it("stacks in portrait, and pairs up four or more", () => {
+    const state = applyLayout(three(), "fill", frame);
+    const portrait = Object.values(fillTiles(state, { x: 0, y: 0, width: 800, height: 1280 }));
+    expect(portrait.every((t) => t.width === 800)).toBe(true);
+    const four = applyLayout(openWindow(three(), "pdfs", frame).state, "fill", frame);
+    expect(new Set(Object.values(fillTiles(four, { x: 0, y: 0, width: 1600, height: 900 })).map((t) => t.y)).size).toBe(2);
+  });
+  it("re-tiles when a window opens or closes, keeps seam moves, and leaves back to the arrangement before", () => {
+    const area = { width: 1280, height: 800 };
+    const before = three();
+    let state = applyLayout(before, "fill", frame);
+    state = openWindow(state, "timer", frame).state;
+    expect(state.layout).toBe("fill");
+    state = closeWindow(state, state.windows.at(-1)!.id);
+    expect(state.layout).toBe("fill");
+    const [seam] = fillSeams(effectiveFill(state, area), { x: 0, y: 0, ...area });
+    const moved = resizeFillSeam(state, area, seam.path, seam.index, 200);
+    const [a, b] = state.windows;
+    expect(fillTiles(moved, { x: 0, y: 0, ...area })[a.id].width).toBeGreaterThan(fillTiles(state, { x: 0, y: 0, ...area })[a.id].width);
+    expect(fillTiles(moved, { x: 0, y: 0, ...area })[b.id]).toBeDefined();
+    const left = applyLayout(moved, "free", frame);
+    expect(left.layout).toBe("free");
+    expect(left.windows.map((w) => w.width)).toEqual(before.windows.map((w) => w.width));
+  });
+  it("builds any arrangement by docking: two notes side by side, the calculator top right", () => {
+    const area = { width: 1600, height: 1000 }, rect = { x: 0, y: 0, ...area };
+    let state = applyLayout(three(), "fill", frame);
+    const [noteA, noteB, calc] = state.windows.map((w) => w.id);
+    // Calculator above the second note: that column splits top and bottom.
+    state = dockInFill(state, area, calc, noteB, "top");
+    let tiles = fillTiles(state, rect);
+    expect(tiles[calc].y).toBe(0);
+    expect(tiles[noteB].y).toBe(tiles[calc].height);
+    expect(tiles[calc].x).toBe(tiles[noteB].x);
+    expect(tiles[noteA].height).toBe(1000);
+    expect(Object.values(tiles).reduce((sum, t) => sum + t.width * t.height, 0)).toBe(1600 * 1000);
+    // Swapping puts each where the other was, and the arrangement survives a restart.
+    state = dockInFill(state, area, noteA, calc, "center");
+    tiles = fillTiles(parse2(JSON.parse(JSON.stringify(state))), rect);
+    expect(tiles[noteA].y).toBe(0);
+    expect(tiles[calc].height).toBe(1000);
+
   });
 });

@@ -8,12 +8,13 @@ import { Dialog, Divider, Icon, IconButton, Menu, Press, Text, TextField, Toolti
 import { LAYOUT_LABELS, TOOLS, TOOL_IDS, WORKSPACE_LAYOUTS, ZOOM, windowTitle, windowsOf, type ToolId, type WorkspaceLayout, type WorkspaceState } from "@sylf/spaces";
 import { useWorkspaceModel } from "../../shell/context";
 import { TOOL_ICONS } from "./icons";
+import { WindowsSheet } from "./WindowsSheet";
 
 const PIPS = 3;
 /** Long enough for a Space's entrance to end. */
 const SHADOW_AFTER_MS = 520;
-const LAYOUT_ICONS: Record<WorkspaceLayout, IconName> = { free: "float", focus: "expand", split: "split", assistant: "sylvie" };
-const LAYOUT_DETAILS: Record<WorkspaceLayout, string> = { free: "Your own arrangement", focus: "One tool fills the view", split: "Two tools side by side", assistant: "A main tool with Sylvie beside it" };
+const LAYOUT_ICONS: Record<WorkspaceLayout, IconName> = { free: "float", focus: "expand", split: "split", assistant: "sylvie", fill: "fit" };
+const LAYOUT_DETAILS: Record<WorkspaceLayout, string> = { free: "Your own arrangement", focus: "One tool fills the view", split: "Two tools side by side", assistant: "A main tool with Sylvie beside it", fill: "Open tools cover the whole screen" };
 
 function ToolSlot({ tool, width, height, count, active, focused, onPress, onMenu, slotRef }: { tool: ToolId; width: number; height: number; count: number; active: number; focused: boolean; onPress: () => void; onMenu: (point?: { x: number; y: number }) => void; slotRef: (node: ViewHandle | null) => void }) {
   const { color, shape } = useTheme();
@@ -79,6 +80,7 @@ export const CommandCenter = memo(function CommandCenter({ state, height }: { st
   ];
 
   const [naming, setNaming] = useState<string | null>(null);
+  const [managing, setManaging] = useState(false);
   const [forgetting, setForgetting] = useState(false);
   const layoutItems: MenuItem[] = [
     ...WORKSPACE_LAYOUTS.map((layout) => ({
@@ -125,6 +127,9 @@ export const CommandCenter = memo(function CommandCenter({ state, height }: { st
           {(tooltip) => <IconButton {...tooltip} icon={LAYOUT_ICONS[state.layout]} size="small" bare label={`Layout: ${LAYOUT_LABELS[state.layout]}`} testID="dock-layout" expanded={layoutOpen} active={state.layout !== "free"} onPress={() => setLayoutOpen(true)} />}
         </Tooltip>
       </View>
+      <Tooltip text="Windows: open several, close or clear">
+        {(tooltip) => <IconButton {...tooltip} icon="layers" size="small" bare label="Windows" testID="dock-windows" style={{ alignSelf: "center" }} onPress={() => setManaging(true)} />}
+      </Tooltip>
       {roomy ? <IconButton icon="expand" size="small" bare label="Fit Workspace" testID="canvas-fit" style={{ alignSelf: "center" }} onPress={() => model.fit()} /> : null}
       {roomy ? <IconButton icon="reset" size="small" bare label="Reset View" testID="canvas-reset" style={{ alignSelf: "center" }} onPress={() => model.resetView()} /> : null}
       <View ref={zoomAnchor} collapsable={false}>
@@ -133,6 +138,7 @@ export const CommandCenter = memo(function CommandCenter({ state, height }: { st
         </Press>
       </View>
       <Menu open={layoutOpen} anchor={layoutAnchor as RefObject<ViewHandle | null>} onClose={() => setLayoutOpen(false)} items={layoutItems} label="Layout" side="top" />
+      <WindowsSheet open={managing} onClose={() => setManaging(false)} state={state} model={model} />
       <Dialog open={naming !== null} onClose={() => setNaming(null)} title="Save this layout" message="Its windows reopen on the same notes, PDFs and boards." actions={[{ label: "Cancel", onPress: () => setNaming(null) }, { label: "Save", variant: "emphasis", onPress: saveNamed }]}>
         <TextField label="Name" hideLabel autoFocus placeholder="Revision desk" value={naming ?? ""} onChangeText={setNaming} onSubmitEditing={saveNamed} maxLength={40} />
       </Dialog>

@@ -6,7 +6,7 @@ import { View } from "react-native";
 import Animated, { useAnimatedReaction } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { Stack, Text, useNotice, useNoticeClearance, useTheme, useWindowClass, type ViewHandle } from "@sylf/design-system";
-import { OVERVIEW_ZOOM, TOOL_IDS, ZOOM, pinchRegions, planLifecycles, seenWindowIds, windowTitle, type Rect, type Size } from "@sylf/spaces";
+import { OVERVIEW_ZOOM, TOOL_IDS, ZOOM, fillTiles, pinchRegions, planLifecycles, seenWindowIds, windowTitle, type Rect, type Size } from "@sylf/spaces";
 import { useShellMetrics, useWorkspaceModel, useWorkspaceState } from "../../shell/context";
 import { useKeyboardLift } from "../../shell/useKeyboardLift";
 import { CommandCenter } from "./CommandCenter";
@@ -16,6 +16,7 @@ import { useCamera } from "./useCamera";
 import { useWorkspaceKeys } from "./workspace-keys";
 import { WindowView } from "./WorkspaceWindow";
 import { WorkspaceCanvas } from "./WorkspaceCanvas";
+import { DropPreview, FillArrangeContext, FillSeams, dropZone } from "./FillDividers";
 import { useDropTarget } from "./drop";
 import { openDocumentWindow } from "./notes/open-window";
 import { importPdfBytes } from "./notes/pdf-import";
@@ -102,7 +103,7 @@ export default function WorkspaceSpace() {
     zoomOut() { model.zoomBy(1 / ZOOM.step); },
     pan(dx, dy) { const resting = model.state().camera; model.commitCamera({ ...resting, x: resting.x + dx / resting.zoom, y: resting.y + dy / resting.zoom }); },
     quickSwitch() { setSwitching(true); },
-    leaveFocus() { if (state.layout !== "focus") return false; model.setLayout("free"); return true; },
+    leaveFocus() { if (state.layout !== "focus" && state.layout !== "fill") return false; model.setLayout("free"); return true; },
     hand: setHand,
   });
 
@@ -111,14 +112,29 @@ export default function WorkspaceSpace() {
   const fillOrder = useMemo(() => new Map(state.recent.map((id, index) => [id, index])), [state.recent]);
   const stackedRect = useMemo<Rect | null>(() => (compact && viewport ? { x: insets.left, y: clearTop, width: viewport.width - insets.left - insets.right, height: viewport.height - clearTop - clearBottom } : null), [compact, viewport, insets.left, insets.right, clearTop, clearBottom]);
   const empty = !state.windows.some((window) => !window.minimized);
+  // Full screen: the open tools tile the screen inside the safe area, and nothing else is drawn.
+  const fill = state.layout === "fill" && !compact && !empty;
+  const fillArea = useMemo(() => (fill && viewport ? { x: insets.left, y: insets.top, width: viewport.width - insets.left - insets.right, height: viewport.height - insets.top - insets.bottom } : null), [fill, viewport, insets.left, insets.right, insets.top, insets.bottom]);
+  const tiles = useMemo(() => (fillArea ? fillTiles(state, fillArea) : null), [fillArea, state]);
+  // Moving a tool by its title bar in full screen: where it would land, shown while dragging, applied on release.
+  const [arranging, setArranging] = useState<{ id: string; x: number; y: number } | null>(null);
+  const drop = arranging && tiles ? dropZone(tiles, arranging.id, arranging.x, arranging.y) : null;
+  const arrange = useMemo(() => ({
+    move: (id: string, x: number, y: number) => setArranging({ id, x, y }),
+    end: (id: string) => setArranging((current) => {
+      if (current && current.id === id && tiles && fillArea) { const target = dropZone(tiles, id, current.x, current.y); if (target) model.dockFill(fillArea, id, target.target, target.zone); }
+      return null;
+    }),
+  }), [tiles, fillArea, model]);
 
   return (
+    <FillArrangeContext.Provider value={arrange}>
     <Animated.View ref={root} testID="workspace-root" aria-label="Workspace" style={[{ flex: 1 }, lifted]}>
       <WorkspaceCanvas
         camera={camera}
         viewport={viewport}
         regions={regions}
-        stacked={compact}
+        stacked={compact || fill}
         hand={hand}
         commit={commit}
         stop={stop}
@@ -133,9 +149,11 @@ export default function WorkspaceSpace() {
                 </Stack>
               </View>
             ) : null}
-            <DockShelf state={state} model={model} tuckable={state.layout === "focus" && !compact} bottom={insets.bottom + edge} sides={{ left: insets.left + edge, right: insets.right + edge }}>
+            {fillArea ? <FillSeams area={fillArea} state={state} model={model} /> : null}
+            {drop ? <DropPreview rect={drop.preview} /> : null}
+            {fill ? null : <DockShelf state={state} model={model} tuckable={state.layout === "focus" && !compact} bottom={insets.bottom + edge} sides={{ left: insets.left + edge, right: insets.right + edge }}>
               <CommandCenter state={state} height={dockHeight} />
-            </DockShelf>
+            </DockShelf>}
           </>
         }
       >
@@ -150,7 +168,8 @@ export default function WorkspaceSpace() {
             fresh={!mountedIds.current.has(window.id)}
             fillOrder={mountedIds.current.has(window.id) ? fillOrder.get(window.id) ?? 0 : 0}
             overview={overview && !compact}
-            stacked={stackedRect}
+            stacked={tiles ? tiles[window.id] ?? null : stackedRect}
+            tiled={!!tiles}
             zoom={zoom}
             onProvenance={onProvenance}
           />
@@ -158,5 +177,6 @@ export default function WorkspaceSpace() {
       </WorkspaceCanvas>
       <QuickSwitcher open={switching} onClose={() => setSwitching(false)} state={state} model={model} />
     </Animated.View>
+    </FillArrangeContext.Provider>
   );
 }

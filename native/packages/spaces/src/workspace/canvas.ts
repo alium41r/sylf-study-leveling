@@ -108,19 +108,22 @@ export function revealRect(camera: Camera, rect: Rect, frame: Frame): Camera {
 }
 
 // Above `gridDots`: a worklet captures what it calls when it is defined, so nothing here is hoisted.
+/** Below this many points apart, dots would blur into a texture, so a far view shows every other one. */
+export const MIN_DOT_SPACING = 8;
+
 export function gridSpacing(zoom: number): { spacing: number; level: number } {
   "worklet";
+  // Spacing follows the zoom exactly, so zooming in visibly spreads the dots and zooming out draws them together (owner, Phase 14).
   let spacing = GRID * zoom;
   let level = 0;
-  while (spacing < GRID) { spacing *= 2; level++; }
-  while (spacing >= GRID * 2) { spacing /= 2; level--; }
+  while (spacing < MIN_DOT_SPACING) { spacing *= 2; level++; }
   return { spacing, level };
 }
 
 /**
- * Where the dots go. They are drawn at one size whatever the zoom, so only their spacing follows the camera. Spacing stays within
- * one octave on screen: as the view pulls back, a dot stands for twice as much of the world, which keeps a far view from filling
- * with dots. `x` and `y` place the first tile, whose dot is at its center, and `level` says which octave.
+ * Where the dots go. They are drawn at one size whatever the zoom, and their spacing is the grid's at that zoom, so the dots show
+ * how far in or out the view is. Only past MIN_DOT_SPACING does a dot stand for twice as much of the world, which keeps the widest
+ * views from filling with dots. `x` and `y` place the first tile, whose dot is at its center, and `level` says which octave.
  */
 export function gridDots(camera: Camera, viewport: Size): { spacing: number; x: number; y: number; level: number } {
   "worklet";

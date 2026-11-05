@@ -18,7 +18,7 @@ describe("Notes library", () => {
     await library.ready();
     const ids = [await library.create({ kind: "note", template: "lecture" }), await library.create({ kind: "handwriting", paper: "grid" }), await library.create({ kind: "board" }), await library.importPdf({ bytes: PDF, name: "Paper 1.pdf", pages: [{ width: 595, height: 842, transform: [1, 0, 0, -1, 0, 842], rotation: 0 }], geometry: "pdfjs" })];
     const entries = library.getSnapshot().entries;
-    expect(entries.map((e) => e.kind).sort()).toEqual(["board", "handwriting", "note", "pdf"]);
+    expect(entries.map((e) => e.kind).sort()).toEqual(["board", "note", "note", "pdf"]);
     for (const id of ids) {
       const handle = await library.open(id);
       expect(() => notesContracts.documentSchema.parse(handle.descriptor())).not.toThrow();
@@ -162,6 +162,60 @@ describe("Notes library", () => {
     expect(handle.descriptor().title).toBe("Paper 1 revision");
     await handle.flush();
     expect(library.getSnapshot().entries[0].text).toContain("Something else");
+  });
+
+  it("makes one note kind: pages with a text layer and an ink layer, valid for the web reader", async () => {
+    const library = make();
+    const handle = await library.open(await library.create({ kind: "note", template: "lecture" }));
+    const [page] = handle.descriptor().pages;
+    const streams = handle.descriptor().streams;
+    expect(streams.find((s) => s.streamId === page.extensions.textStreamId)?.adapter).toBe("blocknote/0.56.0");
+    expect(streams.find((s) => s.streamId === page.extensions.inkStreamId)?.adapter).toBe("sylf-ink/1");
+    handle.addPage(0, "grid");
+    expect(handle.descriptor().pages[1].extensions.textStreamId).toBeTruthy();
+    expect(() => notesContracts.documentSchema.parse(handle.descriptor())).not.toThrow();
+  });
+
+  it("puts PDF pages where the writing ends, replacing the empty pages after it", async () => {
+    const library = make();
+    const handle = await library.open(await library.create({ kind: "note" }));
+    const [first] = handle.descriptor().pages;
+    const spare = handle.addPage();
+    const asset = await library.storeAsset(PDF, "application/pdf", "Paper.pdf");
+    const page = { width: 595, height: 842, transform: [1, 0, 0, -1, 0, 842] as [number, number, number, number, number, number], rotation: 0 as const };
+    handle.insertPdfPages(asset, [page, page], 1, [spare]);
+    const pages = handle.descriptor().pages;
+    expect(pages.map((p) => p.pageId)[0]).toBe(first.pageId);
+    expect(pages.slice(1).map((p) => [p.originalAssetId, p.sourcePage, p.width])).toEqual([[asset.hash, 0, 595], [asset.hash, 1, 595]]);
+    expect(pages.some((p) => p.pageId === spare)).toBe(false);
+    expect(() => notesContracts.documentSchema.parse(handle.descriptor())).not.toThrow();
+    // A fresh note takes the PDF's shape: its blank first page is replaced.
+    const fresh = await library.open(await library.create({ kind: "note" }));
+    fresh.insertPdfPages(asset, [page], 0, [fresh.descriptor().pages[0].pageId]);
+    expect(fresh.descriptor().pages.map((p) => p.width)).toEqual([595]);
+  });
+
+  it("keeps a picture as a page background, as an asset the web schema accepts", async () => {
+    const library = make();
+    const handle = await library.open(await library.create({ kind: "note" }));
+    const picture = await library.storeAsset(new Uint8Array([137, 80, 78, 71]), "image/png", "photo.png");
+    handle.setBackground(handle.descriptor().pages[0].pageId, picture);
+    expect(handle.descriptor().pages[0].extensions.backgroundAssetId).toBe(picture.hash);
+    expect(() => notesContracts.documentSchema.parse(handle.descriptor())).not.toThrow();
+  });
+
+  it("nests folders, refuses a loop, and moves contents up when a folder goes", async () => {
+    const library = make();
+    const top = await library.createNotebook("Maths");
+    const sub = await library.createNotebook("Complex numbers", top);
+    const id = await library.create({ kind: "note", notebookId: sub });
+    await expect(library.updateNotebook(top, { parentId: sub })).rejects.toThrow();
+    await library.updateNotebook(sub, { color: "#c2547a", icon: "🧮" });
+    expect(library.getSnapshot().notebooks.find((n) => n.id === sub)).toMatchObject({ parentId: top, icon: "🧮", color: "#c2547a" });
+    await library.deleteNotebook(sub);
+    expect(library.getSnapshot().entries.find((e) => e.id === id)?.notebookId).toBe(top);
+    await library.setCover(id, { color: "#2f9e8f", icon: "📘" });
+    expect(library.getSnapshot().entries.find((e) => e.id === id)?.cover).toEqual({ color: "#2f9e8f", icon: "📘" });
   });
 });
 

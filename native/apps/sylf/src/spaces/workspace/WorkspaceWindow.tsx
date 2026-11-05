@@ -2,7 +2,7 @@
 // in React until the drop. Position and size live in shared values that follow the model. The shadow is a still layer of its
 // own at the size the model last agreed: a blurred shadow on anything that changes size is redrawn at every size and the GPU keeps
 // each one (Phase 5), so it steps aside while the window resizes and comes back at the end.
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, View, type ViewStyle } from "react-native";
 import { GestureDetector, MouseButton, usePanGesture, useSimultaneousGestures, useTapGesture } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, type SharedValue } from "react-native-reanimated";
@@ -12,6 +12,7 @@ import { GRID, TOOLS, WORLD, clamp, type Rect, type ToolLifecycle, type Workspac
 import { useWorkspaceModel } from "../../shell/context";
 import { TOOL_ICONS } from "./icons";
 import { ToolHost } from "./ToolHost";
+import { FillArrangeContext } from "./FillDividers";
 import { useCanvasPinch } from "./WorkspaceCanvas";
 
 export interface WindowViewProps {
@@ -25,6 +26,8 @@ export interface WindowViewProps {
   overview: boolean;
   /** One tool at a time in a compact window: the rectangle it fills, or null on the canvas. */
   stacked: Rect | null;
+  /** Full screen: placed in a tile of the screen, always shown, with square edges and no shadow. */
+  tiled?: boolean;
   zoom: SharedValue<number>;
   onProvenance: (id: string, sample: boolean) => void;
 }
@@ -91,14 +94,14 @@ function ResizeHandle({ handle, rect, zoom, size, limits, onStart, onEnd }: { ha
   );
 }
 
-export const WindowView = memo(function WindowView({ window, title, focused, lifecycle, sample, fresh, fillOrder, overview, stacked, zoom, onProvenance }: WindowViewProps) {
+export const WindowView = memo(function WindowView({ window, title, focused, lifecycle, sample, fresh, fillOrder, overview, stacked, tiled, zoom, onProvenance }: WindowViewProps) {
   const { color, motion, shape, space, surface } = useTheme();
   const format = useInputFormat();
   const inputMode = useInputMode();
   const model = useWorkspaceModel();
   const [barFocused, setBarFocused] = useState(false);
   const { id, tool, z, minimized } = window;
-  const hidden = minimized || (!!stacked && !focused);
+  const hidden = minimized || (!!stacked && !focused && !tiled);
   const placed = stacked ?? window;
   const spec = TOOLS[tool];
 
@@ -198,7 +201,20 @@ export const WindowView = memo(function WindowView({ window, title, focused, lif
     onDeactivate: () => { "worklet"; lifted.value = move(0, motion); scheduleOnRN(drop, x.value, y.value); },
   });
   const doubleTap = useTapGesture({ enabled: movable, numberOfTaps: 2, onDeactivate: (event) => { "worklet"; if (!event.canceled) scheduleOnRN(frame); } });
-  const bar = useSimultaneousGestures(drag, doubleTap);
+  // In full screen the title bar does not move the window: it carries it to another tile, to dock beside it or swap.
+  const arrange = useContext(FillArrangeContext);
+  const arrangeMove = useCallback((nx: number, ny: number) => arrange?.move(id, nx, ny), [arrange, id]);
+  const arrangeEnd = useCallback(() => arrange?.end(id), [arrange, id]);
+  const carry = usePanGesture({
+    enabled: !!tiled,
+    maxPointers: 1,
+    minDistance: 8,
+    mouseButton: MouseButton.LEFT,
+    onBegin: () => { "worklet"; scheduleOnRN(focus); },
+    onUpdate: (event) => { "worklet"; scheduleOnRN(arrangeMove, event.absoluteX, event.absoluteY); },
+    onDeactivate: () => { "worklet"; scheduleOnRN(arrangeEnd); },
+  });
+  const bar = useSimultaneousGestures(drag, doubleTap, carry);
 
   const lift = 0.012 * motion.amount;
   const enter = 1 - (1 - motion.enterScale) * motion.amount;
@@ -241,8 +257,8 @@ export const WindowView = memo(function WindowView({ window, title, focused, lif
       {...(Platform.OS === "web" ? { onFocus: () => { if (getInputMode() === "keyboard") { focus(); model.reveal(id); } } } as object : {})}
       style={[{ position: "absolute", left: 0, top: 0, zIndex: stacked ? 1 : z }, gone ? hiddenOnWeb : null, frameStyle]}
     >
-      {boxShadow ? <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: window.width, height: window.height, borderRadius: shape.radius.lg, boxShadow }, still]} /> : null}
-      <View style={[StyleSheet.absoluteFill, flat, { overflow: "hidden" }, webOnly({ cursor: "default" })]}>
+      {boxShadow && !tiled ? <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: window.width, height: window.height, borderRadius: shape.radius.lg, boxShadow }, still]} /> : null}
+      <View style={[StyleSheet.absoluteFill, flat, { overflow: "hidden" }, tiled ? { borderRadius: 0, borderWidth: 0, borderRightWidth: StyleSheet.hairlineWidth, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: color.line } : null, webOnly({ cursor: "default" })]}>
         <View style={{ height: BAR, flexDirection: "row", alignItems: "center", paddingRight: space.xs, borderBottomWidth: 1, borderBottomColor: color.line }}>
           <GestureDetector gesture={bar} userSelect="none">
             <View
@@ -253,7 +269,7 @@ export const WindowView = memo(function WindowView({ window, title, focused, lif
               accessibilityActions={[{ name: "moveLeft", label: "Move left" }, { name: "moveRight", label: "Move right" }, { name: "moveUp", label: "Move up" }, { name: "moveDown", label: "Move down" }, { name: "frame", label: "Fill the view" }, { name: "minimize", label: "Minimize" }]}
               onAccessibilityAction={(event) => onAction(event.nativeEvent.actionName)}
               {...(Platform.OS === "web" ? { tabIndex: 0, onKeyDown, onFocus: () => setBarFocused(true), onBlur: () => setBarFocused(false) } as object : {})}
-              style={[{ flex: 1, minWidth: 0, height: BAR, flexDirection: "row", alignItems: "center", gap: space.sm, paddingLeft: space.md }, webOnly({ cursor: movable ? "grab" : "default", outlineStyle: "none", touchAction: "none" })]}
+              style={[{ flex: 1, minWidth: 0, height: BAR, flexDirection: "row", alignItems: "center", gap: space.sm, paddingLeft: space.md }, webOnly({ cursor: movable || tiled ? "grab" : "default", outlineStyle: "none", touchAction: "none" })]}
             >
               {focused ? <Marker /> : null}
               <Icon name={TOOL_ICONS[tool]} size={16} color={focused ? color.ink : color.inkSoft} />
@@ -262,12 +278,13 @@ export const WindowView = memo(function WindowView({ window, title, focused, lif
               {barFocused && inputMode === "keyboard" ? <FocusRing radius={shape.radius.sm} inset={2} /> : null}
             </View>
           </GestureDetector>
+          {tiled ? <IconButton icon="collapse" size="small" bare label="Leave full screen" testID={`window-unfill-${id}`} style={{ alignSelf: "center" }} onPress={() => model.setLayout("free")} /> : null}
           <IconButton icon="minus" size="small" bare label={`Minimize ${title}`} testID={`window-minimize-${id}`} style={{ alignSelf: "center" }} onPress={() => model.minimize(id)} />
           <IconButton icon="close" size="small" bare label={`Close ${title}`} testID={`window-close-${id}`} style={{ alignSelf: "center" }} onPress={() => model.close(id)} />
         </View>
         <ToolHost window={window} lifecycle={lifecycle} title={title} fillOrder={fillOrder} overview={overview} onProvenance={onProvenance} />
       </View>
-      <Corners behind={color.ground} />
+      {tiled ? null : <Corners behind={color.ground} />}
       {focused && movable && !overview && format === "touch" ? <View pointerEvents="none" aria-hidden style={{ position: "absolute", right: 3, bottom: 3 }}><Icon name="grip" size={12} color={color.inkFaint} /></View> : null}
       {focused && movable && !overview ? HANDLES.map((handle) => <ResizeHandle key={handle.id} handle={handle} rect={live} zoom={zoom} size={handleSize} limits={spec} onStart={hideShadow} onEnd={resized} />) : null}
     </Animated.View>

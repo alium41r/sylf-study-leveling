@@ -1,7 +1,7 @@
 // Progress's reads. One resource each, so every view says loading, offline and failed once, and a finished session or a claim reads again through the
 // "progress" tag. Nothing here computes a reward or a rank: every number is the server's.
 import { useMemo } from "react";
-import type { AchievementRecord, Attributes, Backend, RankingSort, Rankings, RecentSessions, ResourceDefinition, StudySchedule, StudySummary } from "@sylf/backend";
+import type { AchievementRecord, Attributes, Backend, RankingSort, Rankings, RecentSessions, ResourceDefinition, StudySchedule, StudySummary, WeeklyQuest } from "@sylf/backend";
 import { useLiveBackend, useOptionalResource } from "../../../shell/backend";
 import { toLiveResult } from "../../../shell/live-result";
 
@@ -17,6 +17,7 @@ const recordResource = (backend: Backend): ResourceDefinition<RecordView> => ({
 const sessionsResource = (backend: Backend): ResourceDefinition<RecentSessions> => ({ key: "progress-sessions", tags: ["progress"], ttlMs: 60_000, load: (signal) => backend.reads.recentSessions(50, signal) });
 const achievementsResource = (backend: Backend): ResourceDefinition<AchievementRecord[]> => ({ key: "progress-honours", tags: ["progress"], ttlMs: 60_000, load: async (signal) => (await backend.reads.achievements(signal)).achievements });
 const attributesResource = (backend: Backend): ResourceDefinition<Attributes> => ({ key: "progress-attributes", tags: ["progress"], ttlMs: 60_000, load: (signal) => backend.reads.progress.attributes(signal) });
+const weeklyResource = (backend: Backend): ResourceDefinition<WeeklyQuest> => ({ key: "progress-weekly-quest", tags: ["progress", "today"], ttlMs: 60_000, load: (signal) => backend.reads.progress.weeklyQuest(signal) });
 const rankingsResource = (backend: Backend, sort: RankingSort): ResourceDefinition<Rankings> => ({ key: `progress-rankings-${sort}`, tags: ["progress"], ttlMs: 2 * 60_000, load: (signal) => backend.reads.progress.rankings(sort, signal) });
 
 function useLive<T>(backend: Backend | null, definition: (backend: Backend) => ResourceDefinition<T>, key: string) {
@@ -28,6 +29,7 @@ function useLive<T>(backend: Backend | null, definition: (backend: Backend) => R
 export const useRecord = () => useLive(useLiveBackend(), recordResource, "record");
 export const useSessionList = () => useLive(useLiveBackend(), sessionsResource, "sessions");
 export const useHonours = () => useLive(useLiveBackend(), achievementsResource, "honours");
+export const useWeeklyQuest = () => useLive(useLiveBackend(), weeklyResource, "weekly");
 export const useAttributes = () => useLive(useLiveBackend(), attributesResource, "attributes");
 export const useRankings = (sort: RankingSort) => useLive(useLiveBackend(), (backend) => rankingsResource(backend, sort), sort);
 

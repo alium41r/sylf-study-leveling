@@ -10,6 +10,7 @@ import { createProgressReads } from "./progress";
 import { createAccountReads } from "./account";
 import { createSocialReads } from "./social";
 import { createPartyReads } from "./party";
+import { createProfileReads } from "./profile";
 import { appendFile, type PickedFile } from "./files";
 
 /** The server's limits (lib/ai/sylvie/image-contract.ts). Saying so before the upload saves a slow request that is certain to fail. */
@@ -37,6 +38,7 @@ export function createReads(client: BackendClient) {
     plan: createPlanReads(client),
     focus: createFocusReads(client),
     progress: createProgressReads(client),
+    profiles: createProfileReads(client),
     account: createAccountReads(client),
     social: createSocialReads(client),
     parties: createPartyReads(client),

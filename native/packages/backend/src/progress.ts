@@ -19,8 +19,17 @@ export type Attributes = z.infer<typeof attributesSchema>;
 export type Ability = z.infer<typeof abilitySchema>;
 export type InvestCurrency = "sp" | "sylph";
 
+/** GET /api/quests/weekly: the week's focus quest. Sunday resets it, and the reward scales with level on the server. */
+export const weeklyQuestSchema = z.object({
+  targetMinutes: z.number(), progressMinutes: z.number(), percentComplete: z.number(), isCompleted: z.boolean(), weekKey: z.string().optional(),
+  daysRemaining: z.number().optional(), timeRemainingMs: z.number().optional(), xpReward: z.number().optional(), sylphReward: z.number().optional(),
+  streakWeeks: z.number().optional(), hasStreakFreeze: z.boolean().optional(), freezeCount: z.number().optional(),
+}).loose();
+export type WeeklyQuest = z.infer<typeof weeklyQuestSchema>;
+
 export function createProgressReads(client: BackendClient) {
   return {
+    weeklyQuest: (signal: AbortSignal) => client.get("/api/quests/weekly", weeklyQuestSchema, { signal }),
     rankings: (sortBy: RankingSort, signal: AbortSignal) => client.get(`/api/user/rankings?sortBy=${sortBy}`, rankingsSchema, { signal }),
     attributes: (signal: AbortSignal) => client.get("/api/cognitive-stats/invest", attributesSchema, { signal }),
     /** One step of five points in one attribute, paid in skill points or Sylph. The server prices it and refuses what cannot be afforded. */

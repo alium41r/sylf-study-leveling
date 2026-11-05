@@ -5,6 +5,7 @@ import { View } from "react-native";
 import { Badge, Button, ListRow, Sheet, Stack, Text, TextField, useNotice, useTheme } from "@sylf/design-system";
 import type { UserSearchResult } from "@sylf/backend";
 import { useLiveBackend } from "../../../shell/backend";
+import { openProfile } from "../../../shell/profile/store";
 import { describeFailureText } from "../../../shell/account/failure";
 
 export function FindPeopleSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -41,7 +42,7 @@ export function FindPeopleSheet({ open, onClose }: { open: boolean; onClose: () 
           {results && !results.length ? <Text variant="small" tone="soft">Nobody matched.</Text> : null}
           {results?.map((person) => (
             <View key={person.id} testID={`find-${person.id}`}>
-              <ListRow title={person.name ?? person.username} detail={`@${person.username}`} trailing={person.isFriend ? <Badge label="Friend" /> : sent.includes(person.id) ? <Badge label="Requested" /> : <Button title="Add" size="small" disabled={busy !== null} onPress={() => void request(person)} />} />
+              <ListRow title={person.name ?? person.username} detail={`@${person.username}`} onPress={() => { onClose(); openProfile(person.username); }} trailing={person.isFriend ? <Badge label="Friend" /> : sent.includes(person.id) ? <Badge label="Requested" /> : <Button title="Add" size="small" disabled={busy !== null} onPress={() => void request(person)} />} />
             </View>
           ))}
         </Stack>

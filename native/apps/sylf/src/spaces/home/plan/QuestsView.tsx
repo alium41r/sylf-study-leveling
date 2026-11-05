@@ -2,28 +2,38 @@
 // here too, because they are what a plan is made of. A goal with a plan behind it says so: the server guards those, and its refusal is shown as given.
 import { useMemo, useState } from "react";
 import { View } from "react-native";
-import { Button, Callout, Checkbox, Chip, ListRow, Progress, Sheet, Stack, Text, TextField, useNotice, useTheme, useWindowClass } from "@sylf/design-system";
+import { Badge, Button, Callout, Chip, ListRow, Plane, Press, Progress, Sheet, Stack, Text, TextField, useNotice, useTheme, useWindowClass } from "@sylf/design-system";
 import type { GoalDetail, Quest, StudySchedule, Subject } from "@sylf/backend";
 import { useLiveBackend, useOptionalResource } from "../../../shell/backend";
 import { describeFailureText } from "../../../shell/account/failure";
-import { useSubjects } from "../../../shell/live";
+import { useSubjects, useSubjectColour } from "../../../shell/live";
+import { useHomeNavigation, useSessionState, useStudySession } from "../../../shell/context";
 import { formatMinutes } from "../format";
 import { QuestSheet, type QuestTarget } from "./QuestSheet";
-import { dateKey, dayTitle, questDone, questFailed, questMinutes, subjectCode, validDay } from "./shared";
+import { dateKey, dayTitle, questDone, questFailed, questMinutes, shortDay, subjectCode, validDay } from "./shared";
 import { refreshPlan, useQuestsAndGoals } from "./usePlan";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const PALETTE = ["#8B5CF6", "#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#EC4899"];
 
-function QuestLine({ quest, today, onTick, onOpen, sending }: { quest: Quest; today: string; onTick: () => void; onOpen: () => void; sending: boolean }) {
+function QuestLine({ quest, today, colour, onTick, onOpen, onStudy, sending }: { quest: Quest; today: string; colour: string | null; onTick: () => void; onOpen: () => void; onStudy: (() => void) | null; sending: boolean }) {
+  const { color, shape, space } = useTheme();
   const minutes = questMinutes(quest);
   const day = quest.scheduledFor;
-  const when = !day ? null : day === today ? "Today" : dayTitle(day);
   const open = !questDone(quest) && !questFailed(quest);
+  const late = open && Boolean(day) && day! < today;
+  const when = !day ? null : day === today ? "Today" : late ? `Was ${shortDay(day)}` : shortDay(day);
+  const detail = [when, quest.subject?.name, minutes ? formatMinutes(minutes) : null, quest.xpReward ? `+${quest.xpReward} XP` : null, questFailed(quest) ? "Not finished" : null].filter(Boolean).join("  ·  ");
+  const tickable = open && Boolean(day) && day! <= today;
   return (
-    <View testID={`plan-list-quest-${quest.id}`}>
-      {open && day === today ? <Checkbox label={quest.title} value={false} disabled={sending} onChange={onTick} /> : null}
-      <ListRow title={open && day === today ? "Details" : quest.title} detail={[when, quest.subject?.name, minutes ? formatMinutes(minutes) : null, questFailed(quest) ? "Not finished" : null].filter(Boolean).join(", ")} onPress={onOpen} />
+    <View testID={`plan-list-quest-${quest.id}`} style={{ flexDirection: "row", alignItems: "center", gap: space.md, paddingVertical: space.sm, paddingRight: space.xs, borderRadius: shape.radius.md }}>
+      <View aria-hidden style={{ width: 3, alignSelf: "stretch", minHeight: 32, borderRadius: 2, backgroundColor: colour ?? color.line, opacity: open ? 1 : 0.4 }} />
+      {tickable ? <Press role="checkbox" checked={false} label={`Finish ${quest.title}`} disabled={sending} onPress={onTick} radius={11}><View style={{ width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: color.ink, opacity: 0.55 }} /></Press> : null}
+      <Press role="button" label={`${quest.title}. ${detail}`} onPress={onOpen} style={{ flex: 1, minWidth: 0 }} bodyStyle={{ gap: 2 }}>
+        <Text variant="small" numberOfLines={1} tone={open ? "ink" : "soft"} style={questDone(quest) ? { textDecorationLine: "line-through" } : undefined}>{quest.title}</Text>
+        <Text variant="caption" tone={late ? "caution" : "soft"} numberOfLines={1}>{detail}</Text>
+      </Press>
+      {onStudy && open ? <Button title="Study" size="small" variant="ghost" icon="play" testID={`plan-study-${quest.id}`} onPress={onStudy} /> : null}
     </View>
   );
 }
@@ -136,6 +146,10 @@ export function QuestsView() {
   const { size } = useWindowClass();
   const backend = useLiveBackend();
   const notice = useNotice();
+  const colourOf = useSubjectColour();
+  const session = useStudySession();
+  const navigation = useHomeNavigation();
+  const { active: running } = useSessionState();
   const result = useQuestsAndGoals();
   const [questTarget, setQuestTarget] = useState<QuestTarget | null>(null);
   const [goalSheet, setGoalSheet] = useState<{ goal: GoalDetail | null } | null>(null);
@@ -154,7 +168,11 @@ export function QuestsView() {
     setSending(false);
     refreshPlan(backend);
   };
-  const line = (quest: Quest) => <QuestLine key={quest.id} quest={quest} today={today} sending={sending} onTick={() => void tick(quest)} onOpen={() => open(quest)} />;
+  const study = (quest: Quest) => {
+    session.setPlan({ title: quest.title, subject: quest.subject?.name ?? null, subjectId: quest.subject?.id ?? null, questId: quest.id });
+    navigation.select("focus");
+  };
+  const line = (quest: Quest) => <QuestLine key={quest.id} quest={quest} today={today} colour={colourOf(quest.subject?.id)} sending={sending} onTick={() => void tick(quest)} onOpen={() => open(quest)} onStudy={running ? null : () => study(quest)} />;
   const active = quests.filter((quest) => !questDone(quest) && !questFailed(quest));
   const loose = active.filter((quest) => !quest.goal);
   const actions = (
@@ -176,12 +194,14 @@ export function QuestsView() {
             const owned = active.filter((quest) => quest.goal?.id === goal.id);
             const total = goal.quests?.length ?? 0;
             const finished = goal.quests?.filter((quest) => quest.status === "COMPLETED").length ?? 0;
+            const left = goal.targetDate ? Math.ceil((Date.parse(`${goal.targetDate.slice(0, 10)}T12:00:00`) - Date.now()) / 86_400_000) : null;
             return (
-              <Stack key={goal.id} gap="sm" testID={`plan-goal-${goal.id}`}>
+              <Plane key={goal.id} level="raised" radius="lg" testID={`plan-goal-${goal.id}`} style={{ padding: space.lg, gap: space.sm }}>
                 <ListRow title={goal.title} detail={[goal.targetDate ? `By ${dayTitle(goal.targetDate.slice(0, 10))}` : null, total ? `${finished} of ${total} quests done` : "No quests yet"].filter(Boolean).join(". ")} onPress={() => setGoalSheet({ goal })} />
+                {left !== null && left >= 0 ? <Badge label={left === 0 ? "Due today" : left === 1 ? "1 day left" : `${left} days left`} tone={left <= 7 ? "caution" : "neutral"} /> : null}
                 {total ? <Progress value={finished / total} label={`${goal.title} progress`} /> : null}
                 {owned.map(line)}
-              </Stack>
+              </Plane>
             );
           }) : <Text tone="soft">A goal is something bigger than one sitting, like an exam or a project.</Text>}
         </Stack>

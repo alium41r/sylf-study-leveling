@@ -38,7 +38,7 @@ export interface RecentSession { id: string; title: string; detail: string; minu
 export interface FocusView { subject: string; topic: string; desks: StudyDesk[]; recent: RecentSession[] }
 
 /** /api/friends: online, studying, and when the session began. It does not say what a friend is studying, so neither does Home. */
-export interface CirclePerson { id: string; name: string; status: string; detail?: string; presence?: "online" | "focusing" }
+export interface CirclePerson { id: string; /** Needed to open their profile. Absent in the sample. */ username?: string; name: string; status: string; detail?: string; presence?: "online" | "focusing" }
 /** /api/focus-party: parties exist now and have members. There is no schedule and no seat limit to show. */
 export interface StudyParty { id: string; name: string; members: number; inSession: boolean }
 export interface CircleView {

@@ -105,7 +105,7 @@ export function mapCircle(friends: Friend[], party: FocusParty, requests: Friend
       const status = studying ? (started ? `Studying, ${formatMinutes(started)}` : "Studying") : friend.isOnline ? "Online" : visible.online ? "Offline" : "Status hidden";
       const rank = visible.rank && friend.level !== null ? `Level ${friend.level}${friend.hunterRank ? `, Rank ${friend.hunterRank}` : ""}` : "Level hidden";
       const hours = visible.hours ? (friend.todaySeconds ? `${formatMinutes(Math.max(1, Math.round(friend.todaySeconds / 60)))} today` : "Nothing today") : "Hours hidden";
-      return { id: String(friend.id), name: friendName(friend), status, detail: `${rank}. ${hours}`, ...(studying ? { presence: "focusing" as const } : friend.isOnline ? { presence: "online" as const } : {}) };
+      return { id: String(friend.id), username: friend.username, name: friendName(friend), status, detail: `${rank}. ${hours}`, ...(studying ? { presence: "focusing" as const } : friend.isOnline ? { presence: "online" as const } : {}) };
     }),
     parties: party.activeParty ? [{ id: String(party.activeParty.id), name: party.activeParty.name, members: party.activeParty.memberCount, inSession: false }] : [],
     invites: party.pendingInvites.map((invite) => ({ id: String(invite.id), name: invite.partyName, from: invite.senderName || invite.senderUsername })),

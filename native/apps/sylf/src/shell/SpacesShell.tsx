@@ -4,7 +4,9 @@ import { Suspense, lazy, useState } from "react";
 import { View } from "react-native";
 import { IconButton, useTheme } from "@sylf/design-system";
 import { worldHoldsNavigation } from "@sylf/spaces";
-import { useShellMetrics, useSpaces } from "./context";
+import { useHomeNavigation, useShellMetrics, useSpaces } from "./context";
+import { conversationRequest } from "./profile/store";
+import { ProfileSheet } from "./profile/ProfileSheet";
 import { DEV_TOOLS, openShowcase } from "./dev-surface";
 import { SpaceStage } from "./SpaceStage";
 import { SpacesSwitcher } from "./SpacesSwitcher";
@@ -26,12 +28,15 @@ export function SpacesShell() {
   const focusing = useFocusEnvironmentOpen();
   const free = !worldHoldsNavigation(world) && !focusing;
   const [barReach, setBarReach] = useState<number | null>(null);
+  const navigation = useHomeNavigation();
+  const openMessages = (id: number) => { conversationRequest.ask(id); navigation.setView("circle", "messages"); navigation.select("circle"); };
   return (
     <View style={{ flex: 1, backgroundColor: color.ground }}>
       {/* Reading order is tab order: the Spaces icon, then the timer, then the Space. */}
       {free ? <SpacesSwitcher onReach={setBarReach} /> : null}
       {free ? <TimerDock barReach={barReach} /> : null}
       <SpaceStage />
+      <ProfileSheet onMessage={openMessages} />
       <LevelNotice />
       <AppearanceSeed />
       {free && DEV_TOOLS ? <DevEntry /> : null}

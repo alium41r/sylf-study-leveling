@@ -61,3 +61,9 @@ export function contextWindow<T extends { isCurrentUser: boolean }>(entries: T[]
 
 /** A line of attribute copy that speaks of HP is left out. Native shows none (ADR 0017). */
 export const mentionsHp = (text: string | undefined) => /\bHP\b|hit points?/i.test(text ?? "");
+
+/** The Meter draws one segment per unit, so a target in minutes needs a unit that keeps it to a dozen or so segments. */
+export function meterUnits(minutes: number, target: number): { value: number; max: number } {
+  const unit = [5, 10, 15, 30, 60].find((candidate) => Math.ceil(target / candidate) <= 16) ?? 60;
+  return { value: Math.min(Math.floor(minutes / unit), Math.ceil(target / unit)), max: Math.max(1, Math.ceil(target / unit)) };
+}

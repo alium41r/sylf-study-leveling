@@ -21,3 +21,4 @@ export * from "./party-presence";
 export * from "./realtime";
 export * from "./realtime-socket";
 export * from "./files";
+export * from "./profile";

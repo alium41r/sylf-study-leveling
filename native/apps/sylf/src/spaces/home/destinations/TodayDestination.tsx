@@ -12,6 +12,10 @@ import type { DayEntry, DayTarget, HomeDataAdapter, Objective } from "../data/co
 import { formatMinutes, greetingFor, pickNext, plannedMinutes } from "../format";
 import { TodayBriefing } from "./TodayBriefing";
 import { TodayInvites } from "./TodayInvites";
+import { TodayAhead } from "./TodayAhead";
+import { WeeklyQuestCard } from "../../../shell/charts/WeeklyQuestCard";
+import { useWeeklyQuest } from "../progress/useProgress";
+import { meterUnits } from "../progress/shared";
 import { QuickAsk } from "./QuickAsk";
 import { EmptyPage, FailedPage, HomeColumns, HomePage, LoadingPage, PageTitle, Section } from "../HomePage";
 
@@ -79,7 +83,7 @@ function TargetLine({ target }: { target: DayTarget }) {
   return (
     <View testID="today-target">
       <Stack gap="sm">
-        <Meter value={Math.min(target.studied, target.goal)} max={target.goal} label={`${formatMinutes(target.studied)} of ${formatMinutes(target.goal)} studied today`} />
+        <Meter {...meterUnits(target.studied, target.goal)} label={`${formatMinutes(target.studied)} of ${formatMinutes(target.goal)} studied today`} />
         <Text variant="caption" tone="soft">{left > 0 ? `${formatMinutes(left)} to your target` : "Target reached."}</Text>
       </Stack>
     </View>
@@ -99,6 +103,7 @@ export function TodayDestination() {
   const [sending, setSending] = useState<string | null>(null);
   const [asking, setAsking] = useState(false);
   const today = result?.data;
+  const weekly = useWeeklyQuest()?.data;
   const greeting = greetingFor(now.getHours());
   const date = now.toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" });
 
@@ -176,9 +181,8 @@ export function TodayDestination() {
             }
             secondary={[
               ...(today!.target ? [<Section key="target" title="Today's target"><TargetLine target={today!.target} /></Section>] : []),
-              <Section key="ahead" title="What's ahead">
-                <View style={{ flexDirection: "row" }}><Button title="Open your plan" size="small" trailingIcon="arrowRight" testID="today-plan" onPress={() => navigation.select("plan")} /></View>
-              </Section>,
+              ...(weekly ? [<Section key="weekly" title="This week"><WeeklyQuestCard quest={weekly} /></Section>] : []),
+              <Section key="ahead" title="What's ahead"><TodayAhead /></Section>,
             ]}
           />
         </>

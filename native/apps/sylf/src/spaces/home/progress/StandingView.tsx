@@ -4,6 +4,7 @@ import { useState } from "react";
 import { View } from "react-native";
 import { Callout, Chip, ListRow, Segmented, Stack, Text, useTheme } from "@sylf/design-system";
 import type { RankingEntry, RankingSort } from "@sylf/backend";
+import { openProfile } from "../../../shell/profile/store";
 import { formatMinutes } from "../format";
 import { Section } from "../HomePage";
 import { contextWindow, ordinal } from "./shared";
@@ -13,7 +14,7 @@ const SORTS: { id: RankingSort; label: string }[] = [{ id: "level", label: "Leve
 const value = (sort: RankingSort, entry: RankingEntry) => (sort === "level" ? `Level ${entry.level}` : sort === "studyHours" ? formatMinutes(Math.round(entry.totalStudyMinutes)) : sort === "streak" ? `${entry.streakDays} ${entry.streakDays === 1 ? "day" : "days"}` : `${entry.questsCompleted}`);
 
 function Row({ entry, place, sort }: { entry: RankingEntry; place: number; sort: RankingSort }) {
-  return <View testID={entry.isCurrentUser ? "progress-standing-you" : `progress-standing-${entry.id}`}><ListRow title={entry.isCurrentUser ? "You" : entry.name || entry.username} detail={ordinal(place)} value={value(sort, entry)} selected={entry.isCurrentUser} /></View>;
+  return <View testID={entry.isCurrentUser ? "progress-standing-you" : `progress-standing-${entry.id}`}><ListRow title={entry.isCurrentUser ? "You" : entry.name || entry.username} detail={ordinal(place)} value={value(sort, entry)} onPress={() => openProfile(entry.username)} selected={entry.isCurrentUser} /></View>;
 }
 
 export function StandingView() {

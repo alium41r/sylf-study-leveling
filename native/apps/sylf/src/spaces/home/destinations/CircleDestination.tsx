@@ -1,12 +1,12 @@
 // Circle draws its name: the people you study with sit around one quiet ring, and the middle says how many are studying now. It shows only what the
 // server gives. A friend's hidden level or hours say "hidden", never zero, and there is no schedule or activity feed, because no such thing exists.
 // People, Messages and Parties are views of this page: friend requests, finding people, groups, and studying together all work here.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import { Avatar, Button, Stack, Text, useNotice, useTheme, useWindowClass } from "@sylf/design-system";
 import { useLiveBackend } from "../../../shell/backend";
 import { describeFailureText } from "../../../shell/account/failure";
-import { useHomeNavigation, useShellMetrics } from "../../../shell/context";
+import { useShellMetrics } from "../../../shell/context";
 import { useHomeResult } from "../data";
 import type { CirclePerson, HomeDataAdapter } from "../data/contracts";
 import { EmptyPage, FailedPage, HomeColumns, HomePage, LoadingPage, PageTitle, Section, SubNav, useHomeView } from "../HomePage";
@@ -15,7 +15,7 @@ import { FindPeopleSheet } from "../circle/FindPeopleSheet";
 import { MessagesView } from "../circle/MessagesView";
 import { PartiesView } from "../circle/PartiesView";
 import { NotificationsSheet } from "../circle/NotificationsSheet";
-import { PersonSheet } from "../circle/PersonSheet";
+import { openProfile, conversationRequest, useConversationRequest } from "../../../shell/profile/store";
 
 const load = (adapter: HomeDataAdapter) => adapter.circle();
 const AVATAR = 48;
@@ -73,12 +73,12 @@ export function CircleDestination() {
   const { insets } = useShellMetrics();
   const result = useHomeResult("circle", load);
   const view = useHomeView("circle");
-  const navigation = useHomeNavigation();
   const [finding, setFinding] = useState(false);
   const [notifying, setNotifying] = useState(false);
   const [blocked, setBlocked] = useState(false);
-  const [managing, setManaging] = useState<CirclePerson | null>(null);
   const [conversation, setConversation] = useState<number | null>(null);
+  const requested = useConversationRequest();
+  useEffect(() => { if (requested !== null) { setConversation(requested); conversationRequest.ask(null); } }, [requested]);
   const circle = result?.data;
   const live = result?.provenance === "live" && Boolean(result.live);
   const lonely = !live && circle !== undefined && circle !== null && !circle.people.length && !circle.parties.length && !circle.invites?.length && !circle.requests?.length;
@@ -108,7 +108,7 @@ export function CircleDestination() {
               ...(view === "people" && circle.people.length ? [<Section key="people" title="People">
                 <Stack gap="md">
                   {circle.people.map((person) => (
-                    <Pressable key={person.id} accessibilityRole={live ? "button" : undefined} accessibilityLabel={`${person.name}. ${person.status}`} testID="circle-person" disabled={!live} onPress={() => setManaging(person)}>
+                    <Pressable key={person.id} accessibilityRole={live ? "button" : undefined} accessibilityLabel={`${person.name}. ${person.status}`} testID="circle-person" disabled={!live} onPress={() => (person.username ? openProfile(person.username) : undefined)}>
                       <View style={{ flexDirection: "row", alignItems: "baseline", gap: space.md }}>
                         <Text variant="small" numberOfLines={1} style={{ flex: 1 }}>{person.name}</Text>
                         <Text variant="caption" tone="soft" numberOfLines={1}>{person.status}</Text>
@@ -139,7 +139,6 @@ export function CircleDestination() {
           <FindPeopleSheet open={finding} onClose={() => setFinding(false)} />
           <NotificationsSheet open={notifying} onClose={() => setNotifying(false)} />
           <BlockedSheet open={blocked} onClose={() => setBlocked(false)} />
-          <PersonSheet person={managing} onClose={() => setManaging(null)} onMessage={(id) => { setConversation(id); navigation.setView("circle", "messages"); }} />
         </>
       )}
     </HomePage>

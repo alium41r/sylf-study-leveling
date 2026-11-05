@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { View } from "react-native";
 import { Button, Callout, Chip, ListRow, Progress, Readout, Stack, Text, useTheme } from "@sylf/design-system";
+import { Bars } from "../../../shell/charts/Bars";
 import { formatMinutes } from "../format";
 import { HomeColumns, Section } from "../HomePage";
 import { BANDS, lastDays, rhythmByBand } from "./shared";
@@ -42,7 +43,8 @@ export function StatsView() {
               <Readout {...amount(active ? total / active : 0)} label="Average a study day" />
               <Readout {...amount(summary.summary.avgSessionSeconds / 60)} label="Average session" />
             </View>
-            <Text variant="caption" tone="soft">{`Your target is ${formatMinutes(schedule.dailyGoalMinutes)} a day.`}</Text>
+            <Bars bars={days.map((day) => ({ key: day.date, value: day.minutes, today: day.today, ...(period === 7 ? { label: ["S", "M", "T", "W", "T", "F", "S"][day.weekday] } : {}) }))} target={Math.max(1, schedule.dailyGoalMinutes)} height={96} gap={period === 7 ? 8 : 2} testID="progress-stats-bars" summary={`Study time over the last ${period} days: ${formatMinutes(total)} on ${active} days.`} />
+            <Text variant="caption" tone="soft">{`Your target is ${formatMinutes(schedule.dailyGoalMinutes)} a day, drawn as the line.`}</Text>
             <Section title="Time of day">
               {bandTotal > 0 ? (
                 <Stack gap="md" testID="progress-rhythm">{BANDS.map((band) => <Progress key={band} value={bands[band] / bandTotal} label={band} showValue />)}</Stack>

@@ -2,9 +2,10 @@
 // who is blocked, and says so in words written for people. With Realtime off, which is a normal answer, a conversation that is on screen asks for
 // newer messages every 30 seconds, only while it is seen, and stops the moment it is not. Nothing is sent optimistically that cannot be undone: a
 // message appears once the server has it.
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { View } from "react-native";
-import { Badge, Button, Callout, Dialog, EmptyState, ListRow, Stack, Text, TextField, useNotice, useTheme } from "@sylf/design-system";
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
+import { ScrollView, View } from "react-native";
+import { Avatar, Badge, Button, Callout, Dialog, EmptyState, IconButton, Press, Stack, Text, TextField, useNotice, useTheme } from "@sylf/design-system";
+import { openProfile } from "../../../shell/profile/store";
 import type { BackendError, ChatMessage, Conversation, ConversationSummary } from "@sylf/backend";
 import { useAuth, useLiveBackend, useOptionalResource, useRealtimeLink, useRealtimeNudge } from "../../../shell/backend";
 import { toLiveResult } from "../../../shell/live-result";
@@ -52,8 +53,24 @@ export function MessagesView({ openId, onOpened }: { openId?: number | null; onO
 }
 
 function ConversationRow({ conversation, onPress }: { conversation: ConversationSummary; onPress: () => void }) {
+  const { space } = useTheme();
   const last = conversation.lastMessage;
-  return <View testID={`conversation-${conversation.id}`}><ListRow title={conversation.name ?? "Conversation"} detail={last ? `${last.senderName ? `${last.senderName}: ` : ""}${last.content}` : "No messages yet"} trailing={conversation.hasUnread ? <Badge label="New" /> : undefined} onPress={onPress} /></View>;
+  const name = conversation.name ?? "Conversation";
+  const when = last?.createdAt ? new Date(last.createdAt) : null;
+  const clock = when ? (new Date().toDateString() === when.toDateString() ? when.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : when.toLocaleDateString([], { day: "numeric", month: "short" })) : "";
+  return (
+    <Press role="button" label={`${name}. ${last ? `${last.senderName ? `${last.senderName}: ` : ""}${last.content}` : "No messages yet"}${conversation.hasUnread ? ". Unread" : ""}`} onPress={onPress} testID={`conversation-${conversation.id}`} bodyStyle={{ flexDirection: "row", alignItems: "center", gap: space.md, paddingVertical: space.sm }}>
+      <Avatar name={name} size={40} />
+      <View style={{ flex: 1, minWidth: 0, gap: 1 }}>
+        <Text variant="small" numberOfLines={1} style={conversation.hasUnread ? { fontWeight: "700" } : undefined}>{name}</Text>
+        <Text variant="caption" tone="soft" numberOfLines={1}>{last ? `${last.senderName ? `${last.senderName}: ` : ""}${last.content}` : "No messages yet"}</Text>
+      </View>
+      <View style={{ alignItems: "flex-end", gap: 4 }}>
+        {clock ? <Text variant="caption" tone="soft">{clock}</Text> : null}
+        {conversation.hasUnread ? <Badge label="New" tone="accent" /> : null}
+      </View>
+    </Press>
+  );
 }
 
 function ConversationView({ id, seen, onBack }: { id: number; seen: boolean; onBack: () => void }) {
@@ -70,6 +87,8 @@ function ConversationView({ id, seen, onBack }: { id: number; seen: boolean; onB
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState<ChatMessage | null>(null);
   const [removing, setRemoving] = useState<ChatMessage | null>(null);
+  const [selected, setSelected] = useState<number | null>(null);
+  const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
   const alive = useRef(true);
   const newest = useRef(0);
   useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
@@ -127,30 +146,52 @@ function ConversationView({ id, seen, onBack }: { id: number; seen: boolean; onB
   };
 
   if (!conversation) return <Stack gap="md"><Button title="Messages" size="small" icon="chevronLeft" onPress={onBack} testID="conversation-back" />{failure ? <Callout tone="caution" title="This conversation didn't load" message={failure} /> : <Text tone="soft">Opening.</Text>}</Stack>;
+  const others = conversation.participants.filter((person) => String(person.id) !== String(me));
+  const title = conversation.name ?? (others.length ? others.map((person) => person.name ?? person.username).join(", ") : "Just you");
+  const direct = !conversation.isGroup && others.length === 1 ? others[0]! : null;
+  const dayOf = (iso: string) => new Date(iso).toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" });
   return (
     <Stack gap="md" testID="conversation">
-      <Button title="Messages" size="small" icon="chevronLeft" onPress={onBack} testID="conversation-back" />
-      <Text variant="subheading" role="heading" aria-level={2}>{conversation.name ?? conversation.participants.map((person) => person.name ?? person.username).join(", ")}</Text>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
+        <IconButton icon="chevronLeft" label="Back to messages" onPress={onBack} testID="conversation-back" />
+        <Press role={direct ? "button" : undefined} label={direct ? `${title}. Open profile` : title} onPress={direct ? () => openProfile(direct.username) : undefined} disabled={!direct} style={{ flex: 1, minWidth: 0 }} bodyStyle={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
+          <Avatar name={title} size={36} />
+          <Text variant="subheading" numberOfLines={1} role="heading" aria-level={2} style={{ flex: 1 }}>{title}</Text>
+        </Press>
+      </View>
       {conversation.isGroup ? <GroupActions id={id} conversation={conversation} me={me} onLeft={onBack} /> : null}
-      {hasMore ? <Button title="Earlier messages" size="small" onPress={() => void older()} /> : null}
-      <Stack gap="sm">
-        {messages.map((message) => (
-          <View key={message.id} testID={`message-${message.id}`} style={{ padding: space.sm, borderRadius: shape.radius.sm, backgroundColor: color.sunken, gap: space.hair }}>
-            <Text variant="caption" tone="soft">{message.sender?.name ?? message.sender?.username ?? "Someone"} · {new Date(message.createdAt).toLocaleString()}{message.editedAt ? " · edited" : ""}</Text>
-            <Text variant="small">{message.content}</Text>
-            {String(message.senderId ?? message.sender?.id) === String(me) ? <View style={{ flexDirection: "row", gap: space.xs }}>
-              <Button title="Edit" size="small" variant="quiet" onPress={() => { setEditing(message); setText(message.content); }} />
-              <Button title="Delete" size="small" variant="quiet" onPress={() => setRemoving(message)} />
-            </View> : null}
-          </View>
-        ))}
-        {!messages.length ? <Text variant="small" tone="soft">No messages yet. Say hello.</Text> : null}
-      </Stack>
+      <ScrollView ref={scroller} keyboardShouldPersistTaps="handled" onContentSizeChange={() => scroller.current?.scrollToEnd({ animated: false })} style={{ maxHeight: 420 }} contentContainerStyle={{ gap: space.xs, paddingVertical: space.xs }} testID="conversation-messages">
+        {hasMore ? <View style={{ alignSelf: "center" }}><Button title="Earlier messages" size="small" variant="ghost" onPress={() => void older()} /></View> : null}
+        {messages.map((message, index) => {
+          const mine = String(message.senderId ?? message.sender?.id) === String(me);
+          const newDay = index === 0 || dayOf(messages[index - 1]!.createdAt) !== dayOf(message.createdAt);
+          const sender = message.sender?.name ?? message.sender?.username ?? "Someone";
+          return (
+            <View key={message.id} style={{ gap: space.xs }}>
+              {newDay ? <Text variant="caption" tone="soft" align="center" style={{ paddingVertical: space.xs }}>{dayOf(message.createdAt)}</Text> : null}
+              <View testID={`message-${message.id}`} style={{ alignSelf: mine ? "flex-end" : "flex-start", maxWidth: "80%", gap: 2 }}>
+                {!mine && conversation.isGroup ? <Text variant="caption" tone="soft">{sender}</Text> : null}
+                <Press role={mine ? "button" : undefined} label={`${mine ? "You" : sender}: ${message.content}. ${new Date(message.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`} onPress={mine ? () => setSelected(selected === message.id ? null : message.id) : undefined} disabled={!mine} radius={shape.radius.md} bodyStyle={{ paddingHorizontal: space.md, paddingVertical: space.sm, borderRadius: shape.radius.md, backgroundColor: mine ? color.accent.wash : color.selected }}>
+                  <Text variant="small">{message.content}</Text>
+                </Press>
+                <Text variant="caption" tone="soft" style={{ alignSelf: mine ? "flex-end" : "flex-start" }}>{new Date(message.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}{message.editedAt ? ", edited" : ""}</Text>
+                {mine && selected === message.id ? (
+                  <View style={{ flexDirection: "row", gap: space.xs, alignSelf: "flex-end" }}>
+                    <Button title="Edit" size="small" variant="ghost" onPress={() => { setEditing(message); setText(message.content); setSelected(null); }} />
+                    <Button title="Delete" size="small" variant="ghost" onPress={() => { setRemoving(message); setSelected(null); }} />
+                  </View>
+                ) : null}
+              </View>
+            </View>
+          );
+        })}
+        {!messages.length ? <Text variant="small" tone="soft" align="center">No messages yet. Say hello.</Text> : null}
+      </ScrollView>
       {failure ? <Callout tone="caution" title="Couldn't refresh" message={failure} /> : null}
-      <TextField label={editing ? "Edit message" : "Message"} value={text} onChangeText={(next) => setText(next.slice(0, LIMIT))} multiline testID="message-input" />
-      <View style={{ flexDirection: "row", gap: space.sm }}>
+      {editing ? <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}><Text variant="caption" tone="soft" style={{ flex: 1 }} numberOfLines={1}>{`Editing: ${editing.content}`}</Text><Button title="Cancel" size="small" variant="ghost" onPress={() => { setEditing(null); setText(""); }} /></View> : null}
+      <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
+        <View style={{ flex: 1 }}><TextField label={editing ? "Edit message" : "Message"} hideLabel placeholder={editing ? "Edit message" : "Write a message"} value={text} onChangeText={(next) => setText(next.slice(0, LIMIT))} returnKeyType="send" onSubmitEditing={() => void submit()} testID="message-input" /></View>
         <Button title={busy ? "Sending" : editing ? "Save" : "Send"} variant="emphasis" disabled={!text.trim() || busy} testID="message-send" onPress={() => void submit()} />
-        {editing ? <Button title="Cancel" onPress={() => { setEditing(null); setText(""); }} /> : null}
       </View>
       <Dialog open={removing !== null} onClose={() => setRemoving(null)} title="Delete this message?" message="It is removed for everyone in the conversation." actions={[{ label: "Keep it", onPress: () => setRemoving(null) }, { label: "Delete", variant: "critical", onPress: () => { const target = removing; setRemoving(null); if (target) void remove(target); } }]} />
     </Stack>

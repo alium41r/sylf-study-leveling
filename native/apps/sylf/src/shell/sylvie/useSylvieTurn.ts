@@ -51,6 +51,9 @@ export function useSylvieTurn(backend: Backend | null) {
     setProposal(null); setWorking(false);
   }, [backend, proposal, working]);
 
+  /** Continue an earlier conversation (or start a fresh one with null). The words of the last turn are cleared, and the thread's own history is read by the caller. */
+  const adopt = useCallback((id: number | null) => { flight.current?.abort(); setChatId(id); setAsked(null); setReply(""); setAnswer(null); setProposal(null); setPlanRequest(null); setFailure(null); setStatus(null); setWorking(false); }, []);
+
   const reset = useCallback(() => { flight.current?.abort(); setAsked(null); setReply(""); setAnswer(null); setProposal(null); setPlanRequest(null); setFailure(null); setStatus(null); setWorking(false); }, []);
-  return { asked, text: working ? reply : answer ?? reply, status, proposal, planRequest, failure, working, send, confirm, dismiss: () => setProposal(null), reset };
+  return { asked, text: working ? reply : answer ?? reply, status, proposal, planRequest, failure, working, chatId, send, confirm, adopt, dismiss: () => setProposal(null), reset };
 }

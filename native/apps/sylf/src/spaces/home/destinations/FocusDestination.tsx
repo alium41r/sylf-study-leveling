@@ -12,7 +12,7 @@ import { SESSION_STATUS_LABELS, SessionActions, SessionClock, SessionNote, Sessi
 import { ModeChooser } from "../../../shell/focus/ModeChooser";
 import { useBackgroundCatalog, useFocusBackground } from "../../../shell/focus/useFocusBackground";
 import { useEnterFocus } from "../../../shell/focus/enter";
-import { useStats } from "../../../shell/live";
+import { useStats, useSubjects } from "../../../shell/live";
 import { studyWith, useStudyWith } from "../../../shell/party/studyWith";
 import { RoomStrip } from "../../../shell/party/RoomStrip";
 import { usePartySummary } from "../../../shell/party/useParty";
@@ -45,6 +45,9 @@ function WhatPicker({ quests }: { quests: Objective[] }) {
   const { space } = useTheme();
   const session = useStudySession();
   const { plan } = useSessionState();
+  const subjects = useSubjects();
+  // With nothing to choose from, a heading over nothing is just noise.
+  if (!subjects.length && !quests.length) return null;
   return (
     <Stack gap="sm">
       <Text variant="caption" tone="soft">What</Text>

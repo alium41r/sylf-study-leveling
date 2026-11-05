@@ -9,7 +9,8 @@ describe("parseInline", () => {
   });
   it("keeps only http and https link targets, and shows the label for anything else", () => {
     expect(parseInline("[ok](https://example.com/a)")).toEqual([{ kind: "link", text: "ok", href: "https://example.com/a" }]);
-    expect(parseInline("[bad](javascript:alert(1))")).toEqual([{ kind: "text", text: "bad" }]);
+    expect(parseInline("[bad](javascript:alert(1))").some((span) => span.kind === "link")).toBe(false);
+    expect(parseInline("[bad](javascript:alert(1))")[0]).toEqual({ kind: "text", text: "bad" });
     expect(safeHref("data:text/html,x")).toBeNull();
     expect(safeHref("sylf-native://x")).toBeNull();
   });

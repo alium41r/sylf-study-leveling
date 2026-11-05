@@ -1,7 +1,9 @@
 // Draws Sylvie's replies. Everything is drawn as Text: nothing the model wrote is run, and a link opens only when it is http(s) and the person taps it.
-// Maths shows as its source in a code face until a typesetter is wired in (Expo DOM, loaded only when `hasMath`), which is the one planned upgrade.
+// Maths is read into plain Unicode by `readMath` (fractions, roots, powers, Greek, operators), so a formula is legible on every platform with no web view. A real
+// typesetter (KaTeX in an Expo DOM component, loaded only when `hasMath`) is the planned upgrade for the tablet. Unknown LaTeX shows as written.
 import { Linking, ScrollView, View } from "react-native";
 import { Text, useTheme } from "@sylf/design-system";
+import { readMath } from "./math";
 import { parseRichText, type Block, type Span } from "./parse";
 
 function Spans({ spans, variant = "small" }: { spans: Span[]; variant?: "small" | "body" }) {
@@ -12,7 +14,8 @@ function Spans({ spans, variant = "small" }: { spans: Span[]; variant?: "small" 
         switch (span.kind) {
           case "bold": return <Text key={index} variant={variant} style={{ fontWeight: "700" }}>{span.text}</Text>;
           case "italic": return <Text key={index} variant={variant} style={{ fontStyle: "italic" }}>{span.text}</Text>;
-          case "code": case "math": return <Text key={index} variant={variant} style={{ fontFamily: "monospace", backgroundColor: color.sunken }}>{span.text}</Text>;
+          case "code": return <Text key={index} variant={variant} style={{ fontFamily: "monospace", backgroundColor: color.sunken }}>{span.text}</Text>;
+          case "math": return <Text key={index} variant={variant} accessibilityLabel={readMath(span.text)} style={{ backgroundColor: color.sunken }}>{readMath(span.text)}</Text>;
           case "link": return <Text key={index} variant={variant} accessibilityRole="link" style={{ textDecorationLine: "underline", color: color.accent.ink }} onPress={() => void Linking.openURL(span.href)}>{span.text}</Text>;
           default: return span.text;
         }
@@ -26,7 +29,8 @@ function BlockView({ block }: { block: Block }) {
   switch (block.kind) {
     case "heading": return <Text variant={block.level === 1 ? "heading" : "subheading"} role="heading" aria-level={block.level + 1}>{block.spans.map((span) => span.text).join("")}</Text>;
     case "list": return <View style={{ gap: space.xs }}>{block.items.map((item, index) => <View key={index} style={{ flexDirection: "row", gap: space.sm }}><Text variant="small" tone="soft">{block.ordered ? `${index + 1}.` : "•"}</Text><View style={{ flex: 1 }}><Spans spans={item} /></View></View>)}</View>;
-    case "code": case "math": return <ScrollView horizontal style={{ backgroundColor: color.sunken, borderRadius: shape.radius.sm }} contentContainerStyle={{ padding: space.sm }}><Text variant="small" style={{ fontFamily: "monospace" }}>{block.text}</Text></ScrollView>;
+    case "code": return <ScrollView horizontal style={{ backgroundColor: color.sunken, borderRadius: shape.radius.sm }} contentContainerStyle={{ padding: space.sm }}><Text variant="small" style={{ fontFamily: "monospace" }}>{block.text}</Text></ScrollView>;
+    case "math": return <ScrollView horizontal style={{ backgroundColor: color.sunken, borderRadius: shape.radius.sm }} contentContainerStyle={{ padding: space.sm }}><Text variant="body" accessibilityLabel={readMath(block.text)}>{readMath(block.text)}</Text></ScrollView>;
     case "quote": return <View style={{ borderLeftWidth: 2, borderLeftColor: color.line, paddingLeft: space.sm }}><Spans spans={block.spans} /></View>;
     case "table": return (
       <ScrollView horizontal><View style={{ borderWidth: 1, borderColor: color.line, borderRadius: shape.radius.sm }}>

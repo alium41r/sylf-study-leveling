@@ -55,7 +55,7 @@ function fakeServer({ cap = Number.MAX_SAFE_INTEGER } = {}) {
     }
     return json({ error: "Not found" }, 404);
   };
-  return { rows, seen, transport, setDown(value: boolean) { down = value; }, isDown: () => down, posts: () => seen.filter((entry) => entry.method === "POST").length };
+  return { rows, seen, transport, setDown(value: boolean) { down = value; }, isDown: () => down, posts: () => seen.filter((entry) => entry.method === "POST" && entry.path.startsWith("/api/sessions")).length };
 }
 
 type Server = ReturnType<typeof fakeServer>;

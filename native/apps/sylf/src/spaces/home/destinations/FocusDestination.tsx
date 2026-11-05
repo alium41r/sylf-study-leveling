@@ -87,7 +87,7 @@ function WherePicker() {
   return (
     <Stack gap="sm">
       <Text variant="caption" tone="soft">Where</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} role="radiogroup" aria-label="Background" contentContainerStyle={{ gap: space.sm }}>
+      <ScrollView horizontal keyboardShouldPersistTaps="handled" showsHorizontalScrollIndicator={false} role="radiogroup" aria-label="Background" contentContainerStyle={{ gap: space.sm }}>
         <Press role="radio" checked={chosenId === null} label="Classic. Sylf's plain ground" onPress={() => void choose(null)} radius={shape.radius.sm} bodyStyle={{ gap: space.xs }}>
           <View style={[tile, { borderWidth: 1, borderColor: chosenId === null ? color.accent.mote : color.line }]} />
           <Text variant="caption" tone={chosenId === null ? "ink" : "soft"} numberOfLines={1} style={{ width: 88 }}>Classic</Text>

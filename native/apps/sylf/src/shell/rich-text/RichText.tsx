@@ -29,11 +29,11 @@ function BlockView({ block }: { block: Block }) {
   switch (block.kind) {
     case "heading": return <Text variant={block.level === 1 ? "heading" : "subheading"} role="heading" aria-level={block.level + 1}>{block.spans.map((span) => span.text).join("")}</Text>;
     case "list": return <View style={{ gap: space.xs }}>{block.items.map((item, index) => <View key={index} style={{ flexDirection: "row", gap: space.sm }}><Text variant="small" tone="soft">{block.ordered ? `${index + 1}.` : "•"}</Text><View style={{ flex: 1 }}><Spans spans={item} /></View></View>)}</View>;
-    case "code": return <ScrollView horizontal style={{ backgroundColor: color.sunken, borderRadius: shape.radius.sm }} contentContainerStyle={{ padding: space.sm }}><Text variant="small" style={{ fontFamily: "monospace" }}>{block.text}</Text></ScrollView>;
-    case "math": return <ScrollView horizontal style={{ backgroundColor: color.sunken, borderRadius: shape.radius.sm }} contentContainerStyle={{ padding: space.sm }}><Text variant="body" accessibilityLabel={readMath(block.text)}>{readMath(block.text)}</Text></ScrollView>;
+    case "code": return <ScrollView horizontal keyboardShouldPersistTaps="handled" style={{ backgroundColor: color.sunken, borderRadius: shape.radius.sm }} contentContainerStyle={{ padding: space.sm }}><Text variant="small" style={{ fontFamily: "monospace" }}>{block.text}</Text></ScrollView>;
+    case "math": return <ScrollView horizontal keyboardShouldPersistTaps="handled" style={{ backgroundColor: color.sunken, borderRadius: shape.radius.sm }} contentContainerStyle={{ padding: space.sm }}><Text variant="body" accessibilityLabel={readMath(block.text)}>{readMath(block.text)}</Text></ScrollView>;
     case "quote": return <View style={{ borderLeftWidth: 2, borderLeftColor: color.line, paddingLeft: space.sm }}><Spans spans={block.spans} /></View>;
     case "table": return (
-      <ScrollView horizontal><View style={{ borderWidth: 1, borderColor: color.line, borderRadius: shape.radius.sm }}>
+      <ScrollView horizontal keyboardShouldPersistTaps="handled"><View style={{ borderWidth: 1, borderColor: color.line, borderRadius: shape.radius.sm }}>
         {[block.header, ...block.rows].map((row, rowIndex) => <View key={rowIndex} style={{ flexDirection: "row", borderTopWidth: rowIndex ? 1 : 0, borderTopColor: color.line }}>{row.map((cell, cellIndex) => <View key={cellIndex} style={{ minWidth: 88, padding: space.sm }}>{rowIndex === 0 ? <Text variant="small" style={{ fontWeight: "700" }}>{cell.map((span) => span.text).join("")}</Text> : <Spans spans={cell} />}</View>)}</View>)}
       </View></ScrollView>
     );

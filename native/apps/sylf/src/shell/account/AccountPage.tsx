@@ -81,7 +81,7 @@ export default function AccountPage() {
   const index = (
     wide
       ? <Stack gap="xs" style={{ width: 168 }} testID="account-index">{INDEX.map(([id, label]) => <Press key={id} role="button" label={label} testID={`account-index-${id}`} onPress={() => jump(id)} bodyStyle={{ paddingVertical: space.sm, paddingHorizontal: space.sm }}><Text variant="small" tone="soft">{label}</Text></Press>)}</Stack>
-      : <ScrollView horizontal showsHorizontalScrollIndicator={false} testID="account-index" contentContainerStyle={{ gap: space.xs }}>{INDEX.map(([id, label]) => <Chip key={id} label={label} onPress={() => jump(id)} />)}</ScrollView>
+      : <ScrollView horizontal keyboardShouldPersistTaps="handled" showsHorizontalScrollIndicator={false} testID="account-index" contentContainerStyle={{ gap: space.xs }}>{INDEX.map(([id, label]) => <Chip key={id} label={label} onPress={() => jump(id)} />)}</ScrollView>
   );
   return (
     <View testID="account-page" style={{ flex: 1, paddingTop: top + control + space.sm }}>

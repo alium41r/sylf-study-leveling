@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View } from "react-native";
 import Animated, { useAnimatedReaction } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
-import { Stack, Text, useNotice, useNoticeClearance, useTheme, useWindowClass } from "@sylf/design-system";
+import { Stack, Text, useNotice, useNoticeClearance, useTheme, useWindowClass, type ViewHandle } from "@sylf/design-system";
 import { OVERVIEW_ZOOM, TOOL_IDS, ZOOM, pinchRegions, planLifecycles, seenWindowIds, windowTitle, type Rect, type Size } from "@sylf/spaces";
 import { useShellMetrics, useWorkspaceModel, useWorkspaceState } from "../../shell/context";
 import { useKeyboardLift } from "../../shell/useKeyboardLift";
@@ -16,6 +16,10 @@ import { useCamera } from "./useCamera";
 import { useWorkspaceKeys } from "./workspace-keys";
 import { WindowView } from "./WorkspaceWindow";
 import { WorkspaceCanvas } from "./WorkspaceCanvas";
+import { useDropTarget } from "./drop";
+import { openDocumentWindow } from "./notes/open-window";
+import { importPdfBytes } from "./notes/pdf-import";
+import { useNotesLibrary } from "../../shell/notes/library";
 
 const same = (a: readonly string[], b: readonly string[]) => a.length === b.length && a.every((id, index) => id === b[index]);
 
@@ -41,6 +45,22 @@ export default function WorkspaceSpace() {
   const clearTop = top + control + space.xs;
   const clearBottom = dockHeight + edge * 2 + insets.bottom;
   useNoticeClearance(clearBottom);
+  const library = useNotesLibrary();
+  const root = useRef<ViewHandle>(null);
+  // A drop lands where it was let go: the window's title bar sits under the pointer.
+  const worldAt = (at: { x: number; y: number }) => viewport ? { x: state.camera.x + (at.x - viewport.width / 2) / state.camera.zoom - 48, y: state.camera.y + (at.y - viewport.height / 2) / state.camera.zoom - 16 } : null;
+  useDropTarget(root, {
+    onDocument: (id, at) => {
+      const entry = library.getSnapshot().entries.find((e) => e.id === id);
+      if (entry && !openDocumentWindow(model, entry, compact ? null : worldAt(at))) notice("The Workspace is full. Close a window first.");
+    },
+    onPdf: (file, at) => {
+      void importPdfBytes(library, file.bytes, file.name, null).then((id) => {
+        const entry = library.getSnapshot().entries.find((e) => e.id === id);
+        if (entry && !openDocumentWindow(model, entry, compact ? null : worldAt(at))) notice("Added to PDFs. Close a window to open it.");
+      }, (error: unknown) => notice(error instanceof Error ? error.message : "That PDF could not be added."));
+    },
+  });
 
   useEffect(() => {
     if (viewport) model.setFrame({ viewport, insets: { top: clearTop, right: insets.right + edge, bottom: clearBottom, left: insets.left + edge } });
@@ -93,7 +113,7 @@ export default function WorkspaceSpace() {
   const empty = !state.windows.some((window) => !window.minimized);
 
   return (
-    <Animated.View testID="workspace-root" aria-label="Workspace" style={[{ flex: 1 }, lifted]}>
+    <Animated.View ref={root} testID="workspace-root" aria-label="Workspace" style={[{ flex: 1 }, lifted]}>
       <WorkspaceCanvas
         camera={camera}
         viewport={viewport}

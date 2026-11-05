@@ -16,7 +16,8 @@ const NOTEBOOK_COLORS = ["#5b7cfa", "#2f9e8f", "#d9822b", "#c2547a", "#7a62d6", 
 const LOADED = Symbol("loaded");
 
 export type SaveState = "saved" | "saving" | "failed";
-export interface CreateOptions { kind: Exclude<NoteKind, "pdf">; title?: string; notebookId?: string | null; template?: string; paper?: PaperTemplate }
+/** `linkedTo` ties a note to the document it is about, so each can open the other beside it. */
+export interface CreateOptions { kind: Exclude<NoteKind, "pdf">; title?: string; notebookId?: string | null; template?: string; paper?: PaperTemplate; linkedTo?: string }
 export interface PdfImport { bytes: Uint8Array; name: string; pages: PdfSourcePage[]; geometry: "pdfjs" | "native"; notebookId?: string | null }
 
 export interface OpenDocument {
@@ -82,7 +83,8 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
 
   const entry = (d: StoredDocument): LibraryEntry => ({
     id: d.id, kind: kindOf(d.descriptor), title: d.descriptor.title, notebookId: d.descriptor.folderId, subjectId: d.descriptor.subjectId,
-    created: d.meta.created, updated: d.meta.updated, opened: d.meta.opened, pages: d.descriptor.pages.length, pinned: d.meta.pinned, trashed: d.meta.trashed, preview: d.meta.preview,
+    created: d.meta.created, updated: d.meta.updated, opened: d.meta.opened, pages: d.descriptor.pages.length, pinned: d.meta.pinned, trashed: d.meta.trashed, preview: d.meta.preview, text: d.meta.text ?? "",
+    linkedTo: (d.descriptor.extensions.sylfNative as { linkedTo?: string } | undefined)?.linkedTo ?? null,
   });
   const emit = () => {
     snapshot = { ...snapshot, entries: [...documents.values()].map(entry).sort((a, b) => b.updated - a.updated), notebooks: [...record.notebooks] };
@@ -295,9 +297,11 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
     ready: () => loaded,
     create(input) {
       const folder = input.notebookId ?? null;
-      if (input.kind === "note") return save(typedNote(record.libraryId, input.title ?? null, folder, input.template ?? "blank"));
-      if (input.kind === "board") return save(board(record.libraryId, input.title ?? "Whiteboard", folder, boardPaper(input.paper ?? "dotted")));
-      return save(handwriting(record.libraryId, input.title ?? "Handwritten note", folder, paperFor(input.paper ?? "ruled")));
+      const created = input.kind === "note" ? typedNote(record.libraryId, input.title ?? null, folder, input.template ?? "blank")
+        : input.kind === "board" ? board(record.libraryId, input.title ?? "Whiteboard", folder, boardPaper(input.paper ?? "dotted"))
+        : handwriting(record.libraryId, input.title ?? "Handwritten note", folder, paperFor(input.paper ?? "ruled"));
+      if (input.linkedTo && documents.has(input.linkedTo)) created.descriptor.extensions.sylfNative = { ...(created.descriptor.extensions.sylfNative as object), linkedTo: input.linkedTo };
+      return save(created);
     },
     async importPdf(input) {
       if (input.bytes.length > PDF_BYTES) throw new Error("Choose a PDF up to 50 MB.");

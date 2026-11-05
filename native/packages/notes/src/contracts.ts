@@ -20,6 +20,10 @@ export interface LibraryEntry {
   trashed: boolean;
   /** The first line of a typed note, kept small for the library. */
   preview: string;
+  /** A typed note's text, up to 4,000 characters, for search and for a preview when its editor is not running. */
+  text: string;
+  /** The document this one is about: notes taken beside a PDF point at it. */
+  linkedTo: string | null;
 }
 
 /** A folder of documents. The web library calls these folders. */

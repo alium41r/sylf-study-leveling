@@ -24,6 +24,10 @@ export interface WorkspaceWindow extends Rect {
 /** How things stood before a preset, so a preset never costs anyone their arrangement. */
 export interface SavedArrangement { camera: Camera; windows: (Rect & { id: string; minimized: boolean })[] }
 
+/** An arrangement someone named and kept: windows, what each was showing, and the camera. Applying it opens fresh windows. */
+export interface NamedLayout { id: string; name: string; camera: Camera; windows: (Rect & { tool: ToolId; minimized: boolean; state: ToolState })[] }
+export const MAX_NAMED_LAYOUTS = 8;
+
 export interface WorkspaceState {
   version: 1;
   camera: Camera;
@@ -34,9 +38,11 @@ export interface WorkspaceState {
   /** Window ids, most recently used first. */
   recent: string[];
   sequence: number;
+  /** Arrangements kept by name, on this device. */
+  layouts: NamedLayout[];
 }
 
-export const INITIAL_WORKSPACE: WorkspaceState = { version: 1, camera: HOME_CAMERA, windows: [], focused: null, layout: "free", saved: null, recent: [], sequence: 0 };
+export const INITIAL_WORKSPACE: WorkspaceState = { version: 1, camera: HOME_CAMERA, windows: [], focused: null, layout: "free", saved: null, recent: [], sequence: 0, layouts: [] };
 
 const finite = (value: unknown): value is number => typeof value === "number" && Number.isFinite(value);
 
@@ -98,7 +104,44 @@ export function parseWorkspaceState(raw: unknown): WorkspaceState {
   for (const window of windows) if (!recent.includes(window.id)) recent.push(window.id);
   const focused = windows.some((window) => window.id === value.focused && !window.minimized) ? (value.focused as string) : null;
   const layout = WORKSPACE_LAYOUTS.includes(value.layout as WorkspaceLayout) ? (value.layout as WorkspaceLayout) : "free";
-  return { version: 1, camera: parseCamera(value.camera), windows, focused, layout, saved: parseSaved(value.saved, seen), recent, sequence: finite(value.sequence) ? Math.max(0, Math.floor(value.sequence)) : windows.length };
+  return { version: 1, camera: parseCamera(value.camera), windows, focused, layout, saved: parseSaved(value.saved, seen), recent, sequence: finite(value.sequence) ? Math.max(0, Math.floor(value.sequence)) : windows.length, layouts: parseNamedLayouts(value.layouts) };
+}
+
+/** A layout that cannot be read is dropped, and so is a window in it whose tool no longer exists; the rest survive. */
+function parseNamedLayouts(raw: unknown): NamedLayout[] {
+  const layouts: NamedLayout[] = [];
+  for (const item of Array.isArray(raw) ? raw : []) {
+    const value = item as Partial<NamedLayout> | null;
+    if (!value || typeof value.id !== "string" || typeof value.name !== "string" || !Array.isArray(value.windows) || layouts.length >= MAX_NAMED_LAYOUTS) continue;
+    const windows = value.windows.map((w, index) => parseWindow({ ...(w as object), id: `l${index}`, z: index })).filter((w): w is WorkspaceWindow => !!w).slice(0, MAX_WINDOWS)
+      .map(({ tool, x, y, width, height, minimized, state }) => ({ tool, x, y, width, height, minimized, state }));
+    if (windows.length) layouts.push({ id: value.id.slice(0, 64), name: value.name.slice(0, 40), camera: parseCamera(value.camera), windows });
+  }
+  return layouts;
+}
+
+/** Keeps the current arrangement under a name. A name already in use is replaced, so saving again updates it. */
+export function saveNamedLayout(state: WorkspaceState, name: string, id: string): WorkspaceState {
+  const clean = name.trim().slice(0, 40);
+  const open = state.windows.slice().sort((a, b) => a.z - b.z);
+  if (!clean || !open.length) return state;
+  const layout: NamedLayout = { id, name: clean, camera: state.camera, windows: open.map(({ tool, x, y, width, height, minimized, state: tool_state }) => ({ tool, x, y, width, height, minimized, state: tool_state })) };
+  const others = state.layouts.filter((item) => item.name.toLowerCase() !== clean.toLowerCase());
+  return { ...state, layouts: [layout, ...others].slice(0, MAX_NAMED_LAYOUTS) };
+}
+
+export function deleteNamedLayout(state: WorkspaceState, id: string): WorkspaceState {
+  return state.layouts.some((item) => item.id === id) ? { ...state, layouts: state.layouts.filter((item) => item.id !== id) } : state;
+}
+
+/** Replaces the open windows with the layout's. Documents live in their own stores, so closing a window loses nothing. */
+export function applyNamedLayout(state: WorkspaceState, id: string): WorkspaceState {
+  const layout = state.layouts.find((item) => item.id === id);
+  if (!layout) return state;
+  let sequence = state.sequence;
+  const windows: WorkspaceWindow[] = layout.windows.map((window, index) => ({ ...window, id: `w${++sequence}`, z: index + 1, state: { ...window.state } }));
+  const top = [...windows].reverse().find((window) => !window.minimized);
+  return { ...state, windows, camera: layout.camera, focused: top?.id ?? null, layout: "free", saved: null, recent: [...windows].reverse().map((window) => window.id), sequence };
 }
 
 const replace = (state: WorkspaceState, id: string, patch: Partial<WorkspaceWindow>) => state.windows.map((window) => (window.id === id ? { ...window, ...patch } : window));

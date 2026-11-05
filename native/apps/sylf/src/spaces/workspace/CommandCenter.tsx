@@ -4,7 +4,7 @@
 import { memo, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Platform, ScrollView, StyleSheet, View, useWindowDimensions } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
-import { Divider, Icon, IconButton, Menu, Press, Text, Tooltip, TravellingMarker, fade, useInputFormat, useNotice, useTheme, type IconName, type MenuItem, type ViewHandle } from "@sylf/design-system";
+import { Dialog, Divider, Icon, IconButton, Menu, Press, Text, TextField, Tooltip, TravellingMarker, fade, useInputFormat, useNotice, useTheme, type IconName, type MenuItem, type ViewHandle } from "@sylf/design-system";
 import { LAYOUT_LABELS, TOOLS, TOOL_IDS, WORKSPACE_LAYOUTS, ZOOM, windowTitle, windowsOf, type ToolId, type WorkspaceLayout, type WorkspaceState } from "@sylf/spaces";
 import { useWorkspaceModel } from "../../shell/context";
 import { TOOL_ICONS } from "./icons";
@@ -78,14 +78,23 @@ export const CommandCenter = memo(function CommandCenter({ state, height }: { st
     { key: "reset", label: "Reset View", icon: "reset", onSelect: () => model.resetView() },
   ];
 
-  const layoutItems: MenuItem[] = WORKSPACE_LAYOUTS.map((layout) => ({
-    key: layout,
-    label: layout === "free" && state.saved ? "Back to my layout" : LAYOUT_LABELS[layout],
-    detail: layout === "free" && state.saved ? "As it was before the preset" : LAYOUT_DETAILS[layout],
-    icon: LAYOUT_ICONS[layout],
-    selected: state.layout === layout,
-    onSelect: () => model.setLayout(layout),
-  }));
+  const [naming, setNaming] = useState<string | null>(null);
+  const [forgetting, setForgetting] = useState(false);
+  const layoutItems: MenuItem[] = [
+    ...WORKSPACE_LAYOUTS.map((layout) => ({
+      key: layout,
+      label: layout === "free" && state.saved ? "Back to my layout" : LAYOUT_LABELS[layout],
+      detail: layout === "free" && state.saved ? "As it was before the preset" : LAYOUT_DETAILS[layout],
+      icon: LAYOUT_ICONS[layout],
+      selected: state.layout === layout,
+      onSelect: () => model.setLayout(layout),
+    })),
+    // Arrangements kept by name: each reopens its windows on the same documents.
+    ...state.layouts.map((layout) => ({ key: `saved-${layout.id}`, label: layout.name, detail: `${layout.windows.length} ${layout.windows.length === 1 ? "window" : "windows"}`, icon: "layers" as IconName, onSelect: () => model.applySavedLayout(layout.id) })),
+    ...(state.windows.length ? [{ key: "save", label: "Save this layout", icon: "bookmark" as IconName, onSelect: () => setNaming("") }] : []),
+    ...(state.layouts.length ? [{ key: "forget", label: "Remove a saved layout", icon: "trash" as IconName, onSelect: () => setForgetting(true) }] : []),
+  ];
+  const saveNamed = () => { const name = naming?.trim(); setNaming(null); if (name) { model.saveLayout(name); notice(`Saved as ${name}`); } };
 
   const focusIndex = focusedTool ? TOOL_IDS.indexOf(focusedTool) : 0;
   const { boxShadow, ...plate } = surface("float", "lg");
@@ -124,6 +133,11 @@ export const CommandCenter = memo(function CommandCenter({ state, height }: { st
         </Press>
       </View>
       <Menu open={layoutOpen} anchor={layoutAnchor as RefObject<ViewHandle | null>} onClose={() => setLayoutOpen(false)} items={layoutItems} label="Layout" side="top" />
+      <Dialog open={naming !== null} onClose={() => setNaming(null)} title="Save this layout" message="Its windows reopen on the same notes, PDFs and boards." actions={[{ label: "Cancel", onPress: () => setNaming(null) }, { label: "Save", variant: "emphasis", onPress: saveNamed }]}>
+        <TextField label="Name" hideLabel autoFocus placeholder="Revision desk" value={naming ?? ""} onChangeText={setNaming} onSubmitEditing={saveNamed} maxLength={40} />
+      </Dialog>
+      <Menu open={forgetting} anchor={layoutAnchor as RefObject<ViewHandle | null>} onClose={() => setForgetting(false)} label="Remove a saved layout" side="top"
+        items={state.layouts.map((layout) => ({ key: layout.id, label: layout.name, icon: "trash" as IconName, destructive: true, onSelect: () => { model.deleteSavedLayout(layout.id); notice(`Removed ${layout.name}`); } }))} />
       <Menu open={zoomOpen} anchor={zoomAnchor as RefObject<ViewHandle | null>} onClose={() => setZoomOpen(false)} items={zoomItems} label="Canvas view" side="top" />
       <Menu open={!!menu} anchor={{ current: menu ? anchors.current.get(menu.tool) ?? null : null }} onClose={() => setMenu(null)} items={items} label={menu ? TOOLS[menu.tool].label : "Tool"} side="top" point={menu?.point} />
       </View>

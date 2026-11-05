@@ -6,6 +6,7 @@ import { Button, Chip, ContextArea, Dialog, EmptyState, Icon, Menu, Press, Text,
 import { BOARD_TEMPLATES, PAPER_TEMPLATES, TYPED_TEMPLATES, type LibraryEntry, type NoteKind, type NotesLibrary } from "@sylf/notes";
 import { useLibrarySnapshot } from "../../../shell/notes/library";
 import { importPdfFile } from "./pdf-import";
+import { useDragSource } from "../drop";
 
 export const KIND_ICON: Record<NoteKind, IconName> = { note: "notes", handwriting: "pen", pdf: "pdf", board: "whiteboard" };
 export const KIND_LABEL: Record<NoteKind, string> = { note: "Typed note", handwriting: "Handwriting", pdf: "PDF", board: "Whiteboard" };
@@ -27,14 +28,15 @@ interface Props {
   /** Which kinds this window creates first. */
   primary: NoteKind;
   onOpen(entry: LibraryEntry): void;
+  /** Opens it in a window of its own, beside this one. */
+  onOpenNew?(entry: LibraryEntry): void;
   footer?: ReactNode;
 }
 
 type Filter = { notebook: string | "all" | "trash" };
 
-export default function LibraryBrowser({ library, kinds, primary, onOpen, footer }: Props) {
-  const theme = useTheme();
-  const { space, color } = theme;
+export default function LibraryBrowser({ library, kinds, primary, onOpen, onOpenNew, footer }: Props) {
+  const { space } = useTheme();
   const notice = useNotice();
   const snapshot = useLibrarySnapshot(library);
   const [query, setQuery] = useState("");
@@ -49,7 +51,7 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, footer
     return snapshot.entries
       .filter((e) => kinds.includes(e.kind))
       .filter((e) => (filter.notebook === "trash" ? e.trashed : !e.trashed && (filter.notebook === "all" || e.notebookId === filter.notebook)))
-      .filter((e) => words.every((w) => `${e.title} ${e.preview}`.toLowerCase().includes(w)))
+      .filter((e) => words.every((w) => `${e.title} ${e.text || e.preview}`.toLowerCase().includes(w)))
       .sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.updated - a.updated);
   }, [snapshot.entries, kinds, filter, query]);
 
@@ -90,6 +92,7 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, footer
     { key: "delete", label: "Delete forever", icon: "trash", destructive: true, onSelect: () => run(library.remove(entry.id), "Deleted") },
   ] : [
     { key: "open", label: "Open", icon: KIND_ICON[entry.kind], onSelect: () => onOpen(entry) },
+    ...(onOpenNew ? [{ key: "window", label: "Open in a new window", icon: "split" as IconName, onSelect: () => onOpenNew(entry) }] : []),
     { key: "rename", label: "Rename", icon: "type", onSelect: () => setNaming({ title: "Rename", value: entry.title, apply: (v) => library.rename(entry.id, v) }) },
     { key: "pin", label: entry.pinned ? "Unpin" : "Pin to top", icon: "pin", onSelect: () => run(library.pin(entry.id, !entry.pinned)) },
     ...snapshot.notebooks.filter((n) => n.id !== entry.notebookId).map((n) => ({ key: `move-${n.id}`, label: `Move to ${n.title}`, icon: "folder" as IconName, onSelect: () => run(library.move(entry.id, n.id), `Moved to ${n.title}`) })),
@@ -125,17 +128,7 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, footer
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: space.md, paddingTop: space.xs, gap: space.sm, flexDirection: "row", flexWrap: "wrap" }} keyboardShouldPersistTaps="handled">
         {!snapshot.ready ? null : entries.length ? entries.map((entry) => (
           <ContextArea key={entry.id} label={entry.title} items={entryMenu(entry)}>
-            <Press label={`${entry.title}, ${KIND_LABEL[entry.kind]}`} hint={entry.trashed ? "In the trash" : undefined} onPress={() => (entry.trashed ? undefined : onOpen(entry))} testID={`library-entry-${entry.kind}`}
-              style={{ width: cardWidth, opacity: entry.trashed ? 0.6 : 1 }} bodyStyle={{ padding: space.sm, gap: space.sm }}>
-              <Cover entry={entry} tint={notebookColor(entry.notebookId)} />
-              <View style={{ gap: 2, paddingHorizontal: 2 }}>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                  {entry.pinned ? <Icon name="pin" size={13} color={color.inkSoft} /> : null}
-                  <Text variant="label" numberOfLines={1} style={{ flex: 1 }}>{entry.title}</Text>
-                </View>
-                <Text variant="caption" tone="soft" numberOfLines={1}>{entry.kind === "pdf" || entry.kind === "handwriting" ? `${entry.pages} ${entry.pages === 1 ? "page" : "pages"} · ` : ""}{relativeTime(entry.updated)}</Text>
-              </View>
-            </Press>
+            <Card entry={entry} width={cardWidth} tint={notebookColor(entry.notebookId)} onOpen={onOpen} />
           </ContextArea>
         )) : (
           <View style={{ width: "100%", paddingTop: space.xl }}>
@@ -147,6 +140,28 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, footer
       <Dialog open={!!naming} onClose={() => setNaming(null)} title={naming?.title ?? ""} actions={[{ label: "Cancel", onPress: () => setNaming(null) }, { label: "Save", variant: "emphasis", onPress: () => { const n = naming; setNaming(null); if (n?.value.trim()) run(n.apply(n.value)); } }]}>
         <TextField label="Name" hideLabel autoFocus value={naming?.value ?? ""} onChangeText={(value) => setNaming((n) => (n ? { ...n, value } : n))} onSubmitEditing={() => { const n = naming; setNaming(null); if (n?.value.trim()) run(n.apply(n.value)); }} />
       </Dialog>
+    </View>
+  );
+}
+
+function Card({ entry, width, tint, onOpen }: { entry: LibraryEntry; width: number; tint?: string; onOpen(entry: LibraryEntry): void }) {
+  const { space, color } = useTheme();
+  const ref = useRef<ViewHandle>(null);
+  // On desktop a card can be dragged onto the canvas, where it opens in a window of its own.
+  useDragSource(ref, entry.trashed ? null : entry.id);
+  return (
+    <View ref={ref} collapsable={false} style={{ width }}>
+      <Press label={`${entry.title}, ${KIND_LABEL[entry.kind]}`} hint={entry.trashed ? "In the trash" : undefined} onPress={() => (entry.trashed ? undefined : onOpen(entry))} testID={`library-entry-${entry.kind}`}
+        style={{ opacity: entry.trashed ? 0.6 : 1 }} bodyStyle={{ padding: space.sm, gap: space.sm }}>
+        <Cover entry={entry} tint={tint} />
+        <View style={{ gap: 2, paddingHorizontal: 2 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            {entry.pinned ? <Icon name="pin" size={13} color={color.inkSoft} /> : null}
+            <Text variant="label" numberOfLines={1} style={{ flex: 1 }}>{entry.title}</Text>
+          </View>
+          <Text variant="caption" tone="soft" numberOfLines={1}>{entry.kind === "pdf" || entry.kind === "handwriting" ? `${entry.pages} ${entry.pages === 1 ? "page" : "pages"} · ` : ""}{relativeTime(entry.updated)}</Text>
+        </View>
+      </Press>
     </View>
   );
 }

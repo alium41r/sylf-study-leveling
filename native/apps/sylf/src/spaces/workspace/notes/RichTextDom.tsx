@@ -177,8 +177,11 @@ function run(editor: Editor, command: Command) {
 const css = (look: RichTextLook) => `
 .sylf-note .bn-editor { background: transparent; color: ${look.ink}; font-family: ${look.font}; font-size: 16px; line-height: 1.6; padding: 28px 40px 0 40px; outline: none; }
 @media (max-width: 520px) { .sylf-note .bn-editor { padding: 20px 18px 0 18px; } }
-.sylf-note .bn-editor h1, .sylf-note [data-content-type="heading"][data-level="1"] h1 { font-size: 1.75em; font-weight: 650; letter-spacing: -0.01em; }
-.sylf-note [data-content-type="heading"] { font-weight: 620; }
+.sylf-note [data-content-type="heading"] { font-weight: 640; letter-spacing: -0.01em; }
+.sylf-note [data-content-type="heading"][data-level="1"] { --level: 1.7em; }
+.sylf-note [data-content-type="heading"][data-level="2"] { --level: 1.32em; }
+.sylf-note [data-content-type="heading"][data-level="3"] { --level: 1.12em; }
+.sylf-note [data-content-type="heading"] { padding-top: 14px; }
 .sylf-note .bn-inline-content { color: ${look.ink}; }
 .sylf-note [data-placeholder]::before, .sylf-note .bn-inline-content:has(> .ProseMirror-trailingBreak:only-child)::before { color: ${look.faint} !important; font-style: normal !important; }
 .sylf-note [data-content-type="quote"] blockquote { border-left: 3px solid ${look.line}; color: ${look.soft}; }

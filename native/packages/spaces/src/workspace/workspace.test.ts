@@ -4,7 +4,7 @@ import { EDGE_GUTTER, GRID, HOME_CAMERA, OVERVIEW_ZOOM, WORLD, ZOOM, clampCamera
 import { DEFAULT_BUDGET, planLifecycles, seenWindowIds } from "./lifecycle";
 import { createWorkspaceModel } from "./model";
 import { TOOLS, TOOL_IDS } from "./tools";
-import { INITIAL_WORKSPACE, MAX_TOOL_STATE, MAX_WINDOWS, applyLayout, closeWindow, cycleFocus, fitWorkspace, focusWindow, minimizeWindow, minimizedWindows, moveWindow, openWindow, openWindows, parseWorkspaceState, pinchOwner, pinchRegions, resizeWindow, restoreArrangement, restoreWindow, setToolState, windowTitle, type WorkspaceState } from "./windows";
+import { INITIAL_WORKSPACE, MAX_TOOL_STATE, MAX_WINDOWS, applyLayout, applyNamedLayout, closeWindow, deleteNamedLayout, saveNamedLayout, cycleFocus, fitWorkspace, focusWindow, minimizeWindow, minimizedWindows, moveWindow, openWindow, openWindows, parseWorkspaceState, pinchOwner, pinchRegions, resizeWindow, restoreArrangement, restoreWindow, setToolState, windowTitle, type WorkspaceState } from "./windows";
 
 const viewport = { width: 1280, height: 820 };
 const frame: Frame = { viewport, insets: { top: 72, right: 16, bottom: 96, left: 16 } };
@@ -572,5 +572,33 @@ describe("summoning a tool from outside Workspace", () => {
     model.setFrame(framed);
     expect(model.state().windows).toHaveLength(1);
     expect(model.state().windows[0].minimized).toBe(false);
+  });
+});
+
+describe("named layouts", () => {
+  const frame = { viewport: { width: 1280, height: 820 }, insets: { top: 0, right: 0, bottom: 0, left: 0 } };
+  it("saves windows with what they show, and reopens them after a restart", () => {
+    let state = openWindow(INITIAL_WORKSPACE, "notes", frame, { document: "a" }).state;
+    state = openWindow(state, "pdfs", frame, { document: "b", page: 3 }).state;
+    state = saveNamedLayout(state, "Revision", "n1");
+    expect(state.layouts).toHaveLength(1);
+    const restarted = parseWorkspaceState(JSON.parse(JSON.stringify(state)));
+    expect(restarted.layouts[0].windows.map((w) => w.state.document)).toEqual(["a", "b"]);
+    const cleared = parseWorkspaceState({ ...restarted, windows: [], recent: [], focused: null });
+    const applied = applyNamedLayout(cleared, "n1");
+    expect(applied.windows.map((w) => [w.tool, w.state.document, w.state.page])).toEqual([["notes", "a", undefined], ["pdfs", "b", 3]]);
+    expect(new Set(applied.windows.map((w) => w.id)).size).toBe(2);
+    expect(applied.focused).toBe(applied.windows[1].id);
+  });
+  it("replaces a layout saved under the same name, keeps at most eight, and drops unreadable ones", () => {
+    let state = openWindow(INITIAL_WORKSPACE, "notes", frame).state;
+    for (let i = 0; i < 10; i++) state = saveNamedLayout(state, `L${i}`, `n${i}`);
+    state = saveNamedLayout(state, "l9", "again");
+    expect(state.layouts).toHaveLength(8);
+    expect(state.layouts[0].id).toBe("again");
+    expect(state.layouts.filter((l) => l.name.toLowerCase() === "l9")).toHaveLength(1);
+    const parsed = parseWorkspaceState({ ...state, layouts: [...state.layouts, { id: 5 }, { id: "x", name: "Bad", windows: [{ tool: "planner" }] }] });
+    expect(parsed.layouts).toHaveLength(8);
+    expect(deleteNamedLayout(state, "again").layouts).toHaveLength(7);
   });
 });

@@ -1,8 +1,8 @@
 // What Notes, PDFs and Whiteboard windows share: a library until a document is chosen, then that document, with a slim header to go
 // back, rename and see that it saved. A window keeps only a pointer to its document; the document itself lives in the Notes library.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { View, type LayoutChangeEvent } from "react-native";
-import { Activity, Button, Dialog, EmptyState, Icon, IconButton, Menu, Press, Text, TextField, useNotice, useTheme, type MenuItem , type ViewHandle } from "@sylf/design-system";
+import { Activity, Button, DOCUMENT_DEFAULTS, Dialog, EmptyState, Icon, IconButton, Menu, Press, Text, TextField, useNotice, useTheme, type MenuItem , type ViewHandle } from "@sylf/design-system";
 import type { LibraryEntry, NoteKind, NotesLibrary, OpenDocument, SaveState } from "@sylf/notes";
 import { adoptDeviceNotes, notesAreDurable, useDeviceNotesWaiting, useLibrarySnapshot, useNotesLibrary } from "../../../shell/notes/library";
 import { isSeen, type ToolProps } from "../tools/shared";
@@ -10,6 +10,9 @@ import BoardCanvas from "./BoardCanvas";
 import LibraryBrowser, { KIND_ICON } from "./LibraryBrowser";
 import PagedInk from "./PagedInk";
 import RichTextEditor from "./RichTextEditor";
+import { openBeside, openDocumentWindow } from "./open-window";
+import { useWorkspaceModel, useWorkspaceState } from "../../../shell/context";
+import { LIVE_EDITORS } from "./editor-budget";
 
 /** Opens a document for as long as the window shows it, sharing the replica with any other window on it. */
 export function useOpenDocument(library: NotesLibrary, id: string | null) {
@@ -36,6 +39,7 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
   const { space, color } = useTheme();
   const notice = useNotice();
   const library = useNotesLibrary();
+  const model = useWorkspaceModel();
   const snapshot = useLibrarySnapshot(library);
   const id = typeof window.state.document === "string" ? window.state.document : null;
   const entry = id ? snapshot.entries.find((e) => e.id === id) : undefined;
@@ -57,12 +61,18 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
   const open = (next: LibraryEntry) => patch({ document: next.id, title: next.title, page: 0, bx: null, by: null, bz: null });
   const close = () => patch({ document: null, title: null });
   const editable = isSeen(lifecycle);
+  const workspace = useWorkspaceState();
+  // The most recently used typed notes keep a running editor; the others show their text, and a touch brings one back.
+  const liveEditor = useMemo(() => workspace.recent.filter((wid) => {
+    const w = workspace.windows.find((item) => item.id === wid);
+    return w && !w.minimized && typeof w.state.document === "string" && snapshot.entries.find((e) => e.id === w.state.document)?.kind === "note";
+  }).slice(0, LIVE_EDITORS).includes(window.id), [workspace.recent, workspace.windows, snapshot.entries, window.id]);
 
   if (!snapshot.ready && !snapshot.failure) return <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}><Activity label="Opening your notes" /></View>;
 
   if (!id || !entry) {
     return (
-      <LibraryBrowser library={library} kinds={kinds} primary={primary} onOpen={open}
+      <LibraryBrowser library={library} kinds={kinds} primary={primary} onOpen={open} onOpenNew={(next) => { if (!openDocumentWindow(model, next, null, false)) notice("The Workspace is full. Close a window first."); }}
         footer={
           <>
             {waiting > 0 ? (
@@ -80,7 +90,17 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
 
   const document = opened?.document;
   const kind = entry.kind;
+  const companion = snapshot.entries.find((e) => !e.trashed && (e.id === entry.linkedTo || e.linkedTo === entry.id));
+  const notesBeside = async () => {
+    try {
+      const existing = snapshot.entries.find((e) => e.linkedTo === entry.id && !e.trashed);
+      const id = existing?.id ?? (await library.create({ kind: "note", title: `${entry.title} notes`, notebookId: entry.notebookId, template: "lecture", linkedTo: entry.id }));
+      const next = library.getSnapshot().entries.find((e) => e.id === id);
+      if (next && !openBeside(model, window.id, next)) notice("The Workspace is full. Close a window first.");
+    } catch (error) { notice(error instanceof Error ? error.message : "The note could not be made."); }
+  };
   const items: MenuItem[] = [
+    ...(kind !== "note" ? [{ key: "beside", label: companion ? "Open its notes beside" : "Take notes beside this", icon: "split" as const, onSelect: () => void notesBeside() }] : []),
     { key: "rename", label: "Rename", icon: "type", onSelect: () => setRenaming(entry.title) },
     { key: "pin", label: entry.pinned ? "Unpin" : "Pin to top", icon: "pin", onSelect: () => void library.pin(entry.id, !entry.pinned) },
     { key: "copy", label: "Duplicate", icon: "copy", onSelect: () => void library.duplicate(entry.id).then(() => notice("Duplicated")) },
@@ -96,7 +116,14 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
           <Icon name="chevronLeft" size={16} color={color.inkSoft} />
           <Text variant="label" tone="soft" numberOfLines={1}>{home}</Text>
         </Press>
-        <View style={{ flex: 1 }} />
+        <View style={{ flex: 1, minWidth: 0, alignItems: "flex-start" }}>
+          {companion ? (
+            <Press label={`Open ${companion.title} beside`} onPress={() => { if (!openBeside(model, window.id, companion)) notice("The Workspace is full. Close a window first."); }} bodyStyle={{ flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: space.sm, paddingVertical: 3, borderRadius: 10, backgroundColor: color.accent.wash, maxWidth: 220 }}>
+              <Icon name={KIND_ICON[companion.kind]} size={14} color={color.accent.ink} />
+              <Text variant="caption" style={{ color: color.accent.ink }} numberOfLines={1}>{companion.title}</Text>
+            </Press>
+          ) : null}
+        </View>
         <Text variant="micro" tone={saving === "failed" ? "critical" : "faint"} aria-live="polite">{saving === "saving" ? "Saving" : saving === "failed" ? "Not saved" : "Saved"}</Text>
         <View ref={menuAnchor} collapsable={false}><IconButton icon="more" size="small" label="Document options" onPress={() => setMenu(true)} /></View>
       </View>
@@ -104,6 +131,10 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
         <View style={{ flex: 1, justifyContent: "center" }}><EmptyState icon="warning" title="This didn't open" message={opened.error} action={<Button title="Back to notes" size="small" onPress={close} />} /></View>
       ) : !document ? (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}><Activity label="Opening" /></View>
+      ) : kind === "note" && !liveEditor ? (
+        <Press label="Edit this note" onPress={() => model.focus(window.id)} feedback="none" style={{ flex: 1 }} bodyStyle={{ flex: 1, backgroundColor: DOCUMENT_DEFAULTS.paper, padding: space.xl }}>
+          <Text variant="body" style={{ color: DOCUMENT_DEFAULTS.ink, lineHeight: 24 }} numberOfLines={30}>{entry.text || entry.preview || " "}</Text>
+        </Press>
       ) : kind === "note" ? (
         <RichTextEditor key={document.id} document={document} editable={editable} narrow={narrow} />
       ) : kind === "board" ? (

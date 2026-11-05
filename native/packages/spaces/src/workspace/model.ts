@@ -2,7 +2,7 @@
 // recreated root and a process kill. There is no second copy and no second persistence path: the state is the `workspace`
 // snapshot. Screens call these actions and read `state()`. The camera commits here only when it comes to rest.
 import { HOME_CAMERA, NO_INSETS, clampCamera, frameRect, revealRect, zoomAt, type Camera, type Frame, type Rect } from "./canvas";
-import { INITIAL_WORKSPACE, applyLayout, closeWindow, cycleFocus, fitWorkspace, focusWindow, minimizeWindow, moveWindow, openWindow, parseWorkspaceState, resizeWindow, restoreWindow, setCamera, setToolState, type ToolState, type WorkspaceLayout, type WorkspaceState } from "./windows";
+import { INITIAL_WORKSPACE, applyLayout, applyNamedLayout, closeWindow, cycleFocus, deleteNamedLayout, fitWorkspace, focusWindow, minimizeWindow, moveWindow, openWindow, parseWorkspaceState, resizeWindow, restoreWindow, saveNamedLayout, setCamera, setToolState, type ToolState, type WorkspaceLayout, type WorkspaceState } from "./windows";
 import type { ToolId } from "./tools";
 import type { SpacesStore } from "../store";
 
@@ -38,6 +38,10 @@ export interface WorkspaceModel {
   frameWindow(id: string): void;
   clear(): void;
   flush(): void;
+  /** Keeps the arrangement under a name; the same name replaces it. */
+  saveLayout(name: string): void;
+  applySavedLayout(id: string): void;
+  deleteSavedLayout(id: string): void;
 }
 
 const CLOSED_FRAME: Frame = { viewport: { width: 1280, height: 820 }, insets: NO_INSETS };
@@ -103,6 +107,9 @@ export function createWorkspaceModel(store: Pick<SpacesStore, "getSnapshot" | "s
       write(window ? setCamera(next, revealRect(next.camera, window, frame), frame.viewport) : next);
     },
     move: (id, x, y) => write(moveWindow(current, id, x, y)),
+    saveLayout: (name) => write(saveNamedLayout(current, name, `n${Date.now().toString(36)}`)),
+    applySavedLayout: (id) => write(applyNamedLayout(current, id)),
+    deleteSavedLayout: (id) => write(deleteNamedLayout(current, id)),
     resize: (id, rect) => write(resizeWindow(current, id, rect)),
     patchTool: (id, patch) => write(setToolState(current, id, patch)),
     cycle(direction) {
@@ -124,7 +131,7 @@ export function createWorkspaceModel(store: Pick<SpacesStore, "getSnapshot" | "s
       const window = windowOf(id);
       if (window) pointCamera(frameRect(window, frame, 28, 1));
     },
-    clear: () => write({ ...INITIAL_WORKSPACE, camera: clampCamera(HOME_CAMERA, frame.viewport), sequence: current.sequence }),
+    clear: () => write({ ...INITIAL_WORKSPACE, camera: clampCamera(HOME_CAMERA, frame.viewport), sequence: current.sequence, layouts: current.layouts }),
     flush: () => store.flush(),
   };
 }

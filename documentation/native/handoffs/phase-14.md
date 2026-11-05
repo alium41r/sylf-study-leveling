@@ -9,7 +9,7 @@
 | Branch | `phase-14`, pushed to `origin`, based on `expansion-part-3` (07f9ec2). Not merged, not deployed |
 | Worktree | `~/Desktop/sylf-phase-14` (the main checkout belongs to another agent's Planner work: never `git add` a directory there) |
 | Hosted services | None touched. No hosted database, Supabase, Redis, Vercel or AI provider was used |
-| Web app | One shared-code change: `lib/notes/ink-outline.ts`, extracted from `ink-renderer.ts` and `pdf-export-core.ts`, which re-export it. Web behaviour is unchanged |
+| Web app | Two shared-code changes: `lib/notes/ink-outline.ts`, extracted from `ink-renderer.ts` and `pdf-export-core.ts`, which re-export it; and a fix in `lib/notes/ink.ts`, where erasing the last stroke did not advance the scene version (web regression test added). Nothing else on the web changed |
 
 ## 2. What Phase 14 added (where to look)
 
@@ -19,6 +19,12 @@
 | Notes, PDFs, Whiteboard tools | `apps/sylf/src/spaces/workspace/notes/` (`DocumentTool`, `LibraryBrowser`, `RichTextDom` + `RichTextEditor`, `InkView.{web,native}`, `PagedInk`, `BoardCanvas`, `pdf-engine.{web,native}`, `PdfPageImage.{web,native}`) |
 | Android pen surface and PDF renderer | `packages/native-platform/android/.../SylfInkView.kt`, `SylfPdf.kt`, registered in `SylfNativePlatformModule.kt`; JS in `packages/native-platform/src/ink-view.ts` |
 | Resource Shelf | `spaces/workspace/tools/ResourcesTool.tsx` |
+| The one note (pages with paper, text and ink; insert; page settings; endless; pull to add; Full screen) | `notes/NoteEditor.tsx`, `StaticText.tsx`, `PageSettings.tsx`, `FormatBar.tsx` (`ToolbarRow` end slot), `InkToolbar.tsx`; library `insertPdfPages`, `setBackground`, `setDefaultPaper`, `growPage`, `setFlow` |
+| Folders | `notes/LibraryBrowser.tsx`; library `createNotebook(title, parentId)`, `updateNotebook`, `deleteNotebook` |
+| Full screen arranging | `packages/spaces/src/workspace/windows.ts` (`FillNode`, `fillTiles`, `fillSeams`, `resizeFillSeam`, `dockInFill`), `spaces/workspace/FillDividers.tsx`, `DockShelf.tsx` ("Tools" handle), `chrome-reveal.ts` |
+| Windows sheet | `spaces/workspace/WindowsSheet.tsx` |
+| Command palette | `apps/sylf/src/shell/palette/` (`palette.ts` store and ranking, `CommandPalette.tsx`), design system `Spotlight`, `usePaletteKeys` in `shell-keys.web.ts` |
+| Sound in the timer dock | `shell/audio/DockSound.tsx`, `SoundBars.tsx`, `TimerDock.tsx`; `LAUNCHER_TOOLS` in `packages/spaces/src/workspace/tools.ts` |
 | Saved layouts | `packages/spaces/src/workspace/windows.ts` (`NamedLayout`, `saveNamedLayout`, `applyNamedLayout`), the Command Center layout menu |
 | Drag and drop (desktop) | `spaces/workspace/drop.{ts,web.ts}`, `notes/open-window.ts` |
 | Decisions | [ADR 0018](../decisions/0018-local-first-notes-on-native.md) |

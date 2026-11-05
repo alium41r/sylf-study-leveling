@@ -6,6 +6,7 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import zlib from "node:zlib";
 
 const ADB = process.env.ADB ?? path.join(process.env.ANDROID_HOME ?? `${process.env.HOME}/Library/Android/sdk`, "platform-tools/adb");
 const PACKAGE = "app.sylf.client";
@@ -32,6 +33,36 @@ function dump() {
 }
 const find = (nodes, label) => nodes.find((n) => n.desc === label || n.text === label || n.desc.startsWith(`${label},`));
 const tapLabel = async (label, wait = 900) => { const node = find(dump(), label); if (!node) throw new Error(`nothing labelled ${label}`); tap(node.cx, node.cy); await sleep(wait); return node; };
+/** Dark pixels in a region of the screen, read from a screenshot (8-bit RGBA or RGB PNG, as screencap writes). Ink is dark; paper and rules are not. */
+function darkPixels(rect) {
+  const png = execFileSync(ADB, ["exec-out", "screencap", "-p"], { maxBuffer: 64 * 1024 * 1024 });
+  let at = 8, width = 0, height = 0, channels = 4;
+  const parts = [];
+  while (at < png.length) {
+    const length = png.readUInt32BE(at), type = png.toString("ascii", at + 4, at + 8), data = png.subarray(at + 8, at + 8 + length);
+    if (type === "IHDR") { width = data.readUInt32BE(0); height = data.readUInt32BE(4); channels = data[9] === 2 ? 3 : 4; }
+    if (type === "IDAT") parts.push(data);
+    at += 12 + length;
+  }
+  const raw = zlib.inflateSync(Buffer.concat(parts)), stride = width * channels, rows = [];
+  let previous = Buffer.alloc(stride);
+  for (let y = 0; y < height; y++) {
+    const filter = raw[y * (stride + 1)], line = Buffer.from(raw.subarray(y * (stride + 1) + 1, (y + 1) * (stride + 1)));
+    for (let i = 0; i < stride; i++) {
+      const a = i >= channels ? line[i - channels] : 0, b = previous[i], c = i >= channels ? previous[i - channels] : 0;
+      const p = a + b - c, pa = Math.abs(p - a), pb = Math.abs(p - b), pc = Math.abs(p - c);
+      line[i] = (line[i] + [0, a, b, (a + b) >> 1, pa <= pb && pa <= pc ? a : pb <= pc ? b : c][filter]) & 255;
+    }
+    rows.push(line);
+    previous = line;
+  }
+  let n = 0;
+  for (let y = Math.max(0, rect.y1); y < Math.min(height, rect.y2); y += 2) for (let x = Math.max(0, rect.x1); x < Math.min(width, rect.x2); x += 2) {
+    const i = x * channels, row = rows[y];
+    if (row[i] + row[i + 1] + row[i + 2] < 240) n++;
+  }
+  return n;
+}
 const frames = (reset) => {
   if (reset) return adb("shell", "dumpsys", "gfxinfo", PACKAGE, "reset");
   const text = adb("shell", "dumpsys", "gfxinfo", PACKAGE);
@@ -68,10 +99,11 @@ await link("space=workspace&wsClear=1&wsOpen=notes", 6000);
 shot("01-library");
 check("library opens", !!find(dump(), "New"));
 
-// Handwriting with the stylus tool type.
-await create("Handwriting, ruled");
+// The one note kind: switch to Write, then handwriting with the stylus tool type.
+await create("Note, ruled");
+if (find(dump(), "Write")) await tapLabel("Write", 900);
 const page = writingArea();
-check("pen case is shown for a handwritten page", !!page);
+check("pen case is shown when the note is in Write", !!page);
 if (page) {
   frames(true);
   const x = page.x1 + 120, y = page.y1 + 200;
@@ -84,6 +116,25 @@ if (page) {
   await sleep(700);
   shot("03-finger-scrolls");
   results.memoryHandwriting = memory();
+  // One eraser sweep over everything leaves nothing, the last stroke included; one Undo brings it back.
+  const region = { x1: page.x1, x2: page.x2, y1: page.y1, y2: Math.min(page.y2, page.y1 + 800) };
+  results.inkBeforeErase = darkPixels(region);
+  await tapLabel("Eraser", 600);
+  for (let dx = 0; dx <= 760; dx += 40) stylus({ x: x + dx, y: y - 60 }, { x: x + dx, y: y + 6 * 70 + 60 }, 250);
+  await sleep(900);
+  results.inkAfterErase = darkPixels(region);
+  shot("03b-erased");
+  check("eraser removes every stroke, the last one too", results.inkBeforeErase > 200 && results.inkAfterErase < results.inkBeforeErase * 0.05, { before: results.inkBeforeErase, after: results.inkAfterErase });
+  await tapLabel("Undo", 1200);
+  await tapLabel("Pen", 400);
+  // Full screen: only the toolbar and the page, then back.
+  await tapLabel("Full screen", 1800);
+  let nodes = dump();
+  check("full screen leaves only the toolbar and page", !nodes.some((n) => n.desc.includes("Move with the arrow keys")) && !!find(nodes, "Exit full screen") && !!find(nodes, "Pen"));
+  shot("03c-full-screen");
+  await tapLabel("Exit full screen", 1500);
+  nodes = dump();
+  check("exit full screen brings the bars back", nodes.some((n) => n.desc.includes("Move with the arrow keys")));
 }
 
 // A whiteboard: pen draws, two-finger moves are on the by-hand list.
@@ -97,14 +148,29 @@ if (board) {
 check("whiteboard opens with its pen case", !!board);
 shot("04-whiteboard");
 
-// Typed notes: BlockNote in a WebView.
+// Typing on the same kind of note: BlockNote in a WebView on the page being typed on.
 await link("space=workspace&wsClear=1&wsOpen=notes", 4000);
-await create("Typed note");
-const web = dump().find((n) => n.cls.includes("WebView"));
+await create("Note, ruled");
+if (find(dump(), "Type")) await tapLabel("Type", 1200);
+let web = dump().find((n) => n.cls.includes("WebView"));
+if (!web) { const area = find(dump(), "Type on this page"); if (area) { tap(area.cx, area.y1 + 60); await sleep(2500); web = dump().find((n) => n.cls.includes("WebView")); } }
 check("typed note runs in a WebView", !!web);
 if (web) { tap(web.cx, web.y1 + 120); await sleep(600); adb("shell", "input", "text", "Complex%snumbers"); await sleep(1200); }
 shot("05-typed-note");
 results.memoryTypedNote = memory();
+
+// The command palette from the corner, and sound in the timer dock.
+await link("space=home", 3500);
+await tapLabel("Search Sylf", 2500);
+check("search opens the command palette", !!find(dump(), "New note"));
+shot("06-command-palette");
+adb("shell", "input", "keyevent", "KEYCODE_BACK");
+await sleep(900);
+const timer = dump().find((n) => n.desc.startsWith("Timer."));
+if (timer) { tap(timer.cx, timer.cy); await sleep(1500); }
+check("the timer dock has Sound", !!find(dump(), "Sound"));
+shot("07-dock-sound");
+adb("shell", "input", "keyevent", "KEYCODE_BACK");
 
 const crashes = adb("logcat", "-d", "-b", "crash");
 check("no crash in logcat", !crashes.includes(PACKAGE), crashes.slice(0, 400) || undefined);

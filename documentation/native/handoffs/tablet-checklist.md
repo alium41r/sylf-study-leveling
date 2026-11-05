@@ -283,3 +283,10 @@ Run on the tablet by the agent with `adb input stylus` and `npm run android:note
 7. A real past paper PDF from Downloads: pages render sharp at 100% and 200%; highlight a line.
 8. Two typed notes open side by side: both editable; a third shows its text until touched.
 
+9. **One note, typing and writing.** New note: type a few lines in Type, switch to Write, write over and between the lines. The text should not move when the editor closes, and ink should sit over the text and any picture.
+10. **Erasing.** Write five lines, then sweep the eraser over all of them, the last one included: nothing should be left. One Undo brings all five back.
+11. **Insert.** Insert a PDF into a note with writing on its first page: the PDF's pages follow that page. Insert a picture while typing. Change a page to grid, wide spacing, Mint paper, then every page.
+12. **Endless and pull to add.** Make a "Note, endless" and write near the bottom: the page should extend as you go. In a normal note, scroll to the last page, then pull up through the zone below it: one page is added; a fling to the bottom adds nothing.
+13. **Full screen.** In a note, press Full screen at the toolbar's right end: only the toolbar and page remain. Exit full screen restores everything. Full-screen two notes and the Calculator, drag a seam, and dock a tile against another's edge.
+14. **Folders.** Make a folder and a subfolder, colour and icon them, move a note in, search for it from the top level.
+15. **Search and sound.** The search button at the top right opens the palette; type part of a note's text and open it. Open the timer, choose a sound in Sound, play it: the bars beside the timer move, and they rest when paused.

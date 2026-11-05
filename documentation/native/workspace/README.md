@@ -40,7 +40,9 @@ Workspace is a real window manager. **With an account, Planner, Calendar, Sylvie
 | Trackpad | Two fingers | Pinch |
 | Keyboard (desktop) | Arrow keys, when nothing is focused | `+`, `-` |
 
-A wheel over a tool that can still scroll belongs to the tool. Reduced motion turns coasting off, and every animated move through `move()`.
+A wheel over a tool that can still scroll belongs to the tool. A document's pages keep the wheel even at their end, so scrolling past the last page never carries the canvas away. Reduced motion turns coasting off, and every animated move through `move()`.
+
+**The dot grid shows the zoom.** Dots are one size at every zoom and their spacing is the grid's at that zoom, so zooming in spreads them and zooming out draws them together. Only when they would be closer than 8 pt does each dot stand for twice the distance (`gridSpacing` in `canvas.ts`).
 
 Canvas controls are at the far end of the Command Center: **Fit Workspace** frames every open window, or the whole world if there are none. **Reset View** returns to the middle at 100%. The zoom button also offers Zoom in, Zoom out and Actual size.
 
@@ -48,8 +50,9 @@ Canvas controls are at the far end of the Command Center: **Fit Workspace** fram
 
 | Action | Touch or stylus | Mouse | Keyboard (desktop) |
 | --- | --- | --- | --- |
-| Open | Tap a tool. Long press for a menu | Click. Right-click for a menu | Alt+1 to 9, Alt+0, or Command or Control + K |
-| Second instance | Long press, New window | Right-click, New window | Command or Control + K |
+| Open | Tap a tool. Long press for a menu | Click. Right-click for a menu | Alt+1 to 9, or the command palette (Command or Control + K) |
+| Second instance | Long press, New window | Right-click, New window | The command palette |
+| Open several, close several, clear | The Windows button in the Command Center | Same | |
 | Move | Drag the title bar | Same | Focus the title bar, arrow keys |
 | Resize | Drag an edge or corner of the focused window (a grip marks it) | Same, with resize cursors | Shift and arrow keys on the title bar |
 | Focus | Press anywhere in it | Same | Alt+] and Alt+[ |
@@ -59,7 +62,7 @@ Canvas controls are at the far end of the Command Center: **Fit Workspace** fram
 
 A window lands on the grid when dropped or resized. It stays in the world, and within its tool's size limits. Only the focused window has resize handles, because eight gesture views on every window would cost more than they give. A press focuses, and the next drag resizes.
 
-**Instances.** Notes, PDFs, Whiteboard, Sylvie, Calculator and Resources can open several windows, each with its own state. Planner, Calendar, Timer and Audio open once, and pressing them again brings the window forward. With several open, pressing a tool asks which one. At most 16 windows can be open.
+**Instances.** Notes, PDFs, Whiteboard, Sylvie, Calculator and Resources can open several windows, each with its own state. Timer opens once, and pressing it again brings the window forward. **Audio is not on the shelf** (`LAUNCHER_TOOLS`): sound plays from the timer dock, anywhere in the app. A saved Audio window from before still opens. With several open, pressing a tool asks which one. At most 16 windows can be open.
 
 **From outside Workspace.** `model.summon(tool)` brings a tool forward and waits for the canvas, so it lands in the real view. The timer dock uses it.
 
@@ -75,10 +78,13 @@ A window lands on the grid when dropped or resized. It stays in the world, and w
 | **Focus** | One tool fills the view at 100%. The rest are minimized. The Command Center slides away and leaves a handle. Escape goes back |
 | **Split** | Two tools side by side. With only one open, it brings a sensible companion: Notes and PDFs pair up |
 | **Assistant** | A main tool at two thirds, and Sylvie at one third |
+| **Full screen** | The open tools tile the whole screen with no canvas, gaps or chrome. The Spaces icon, timer and Command Center hide; a "Tools" handle at the bottom brings them back for a moment. Drag a seam between tiles to resize, or drag a tile's title bar onto another tile's edge to dock it there (left, right, above or below), so any arrangement can be made, such as two notes side by side with the Calculator across the top right. The arrangement is a split tree (`FillNode` in `windows.ts`) kept in `state.fill` |
 
 Presets are computed fresh around the view each time. They minimize what they do not use and close nothing. The arrangement they replaced is kept, and the Free entry reads **Back to my layout** while it is. Moving or resizing by hand makes the arrangement the person's own. A tool with a size limit leaves no hole: the group stays together and centered.
 
-Alt+F, Alt+S and Alt+A choose a preset, and Alt+D returns to Free.
+Alt+F, Alt+S and Alt+A choose a preset, and Alt+D returns to Free. Escape leaves Focus and Full screen.
+
+**Saved layouts.** The Layout menu's "Save this layout" keeps the arrangement and the documents in its windows; choosing it later reopens the same documents. **The Windows sheet** opens several tools at once, and closes, minimizes or puts in full screen the windows chosen; "Close all and clear the canvas" asks first and keeps every document and saved layout.
 
 ## 5. Backend compatibility
 
@@ -168,11 +174,13 @@ Source: [`native/packages/notes`](../../../native/packages/notes/src/) (the libr
 | --- | --- | --- |
 | Library | `packages/notes/src/library.ts`, `shell/notes/library.ts` | One per owner (`user:<id>` or `device`). Ordered writes, shared replicas between windows, a failure stops writing and says why |
 | Storage | `idb-storage.ts` (web, desktop), `shell/notes/storage.native.ts` (SQLite, WAL) | Descriptor, Yjs updates per stream (merged after 48), assets by SHA-256 per owner |
-| Typed notes | `RichTextDom.tsx` (Expo DOM component), `RichTextEditor.tsx` | BlockNote 0.56; format bar in Sylf's own controls; "/" menu; templates inserted by BlockNote |
-| Ink | `InkView.web.tsx` (Pointer Events), `InkView.native.tsx` + `SylfInkView.kt` (Android) | Pen, highlighter, eraser (whole or precise), lasso move, scale, recolour, shapes, undo |
-| Pages | `PagedInk.tsx` | Only pages near the view get a surface, and each covers only its visible part |
+| Notes | `NoteEditor.tsx`, `StaticText.tsx`, `PageSettings.tsx` | One kind: pages with a background, a text layer and an ink layer (ADR 0018 §8). A Type and Write switch changes the toolbar. Insert adds a picture, a PDF (after the last written page) or a blank page. Page settings change the layout (ruled, grid, dotted, Cornell, music and planners), spacing (narrow, medium, wide), paper colour or a picture, for this page or every page, and switch between separate pages and an **endless** page |
+| Typed text | `RichTextDom.tsx` (Expo DOM component), `FormatBar.tsx` | BlockNote 0.56 on the page being typed on; every other page draws its text natively. "/" menu; templates inserted by BlockNote |
+| Ink | `InkView.web.tsx` (Pointer Events), `InkView.native.tsx` + `SylfInkView.kt` (Android) | Pen, highlighter, eraser (whole strokes or precise), lasso move, scale, recolour, shapes, undo. One eraser sweep is one undo step, and gaps between fast eraser samples are filled |
+| Pages | `NoteEditor.tsx`, `PagedInk.tsx` | Only pages near the view get surfaces, and each covers only its visible part. Paper is drawn under the text and pictures, ink over them |
 | PDFs | `pdf-engine.web.ts` (pdf.js), `pdf-engine.native.ts` + `SylfPdf.kt` (PdfRenderer) | Originals kept byte for byte; rendered pages cached |
 | Boards | `BoardCanvas.tsx` | Camera in the window's state (`bx`, `by`, `bz`) |
+| Folders | `LibraryBrowser.tsx` | Folders and subfolders with a colour and icon, a breadcrumb, move, rename, and search across every folder |
 | Resources | `tools/ResourcesTool.tsx` | Kind, subject and notebook filters; new documents take the session's subject |
 
 Interactions:
@@ -187,5 +195,13 @@ Interactions:
 | Import a PDF | PDFs, Import | Same, or drop a file anywhere on Workspace |
 | Notes beside a PDF | The document menu, "Take notes beside this" | Same |
 | Keep a layout | Layout menu, "Save this layout" | Same |
+| Add a page at the end | Pull up through the zone below the last page, starting with it in view | Pause at the end, then keep scrolling |
+| Endless note | New, "Note, endless", or Page settings, Endless: writing near the end extends the page | Same |
+| Only the page and toolbar | **Full screen** at the toolbar's right end; Exit full screen brings the bars back and leaves full screen | Same |
+| Find or do anything | The search button at the top right of every Space | Command or Control + K |
 
 Budgets: typed-note editors run for the most recently used two windows on Android and six on desktop. The rest show their text, and a touch brings the editor back.
+
+**The command palette** (`shell/palette/`) searches every note, PDF and board by title and text, the tools, open windows, Spaces and Home pages, the study session, layouts and saved layouts, and offers New note, New endless note, New whiteboard, Import a PDF and Close all windows. It reads each owner's own state and keeps no index. It replaced Workspace's quick switcher.
+
+**Sound in the timer dock** (`shell/audio/DockSound.tsx`). The dock's panel chooses, plays, pauses and sets the volume of a sound through the one audio engine, anywhere in the app. While a sound is chosen, a small plate beside the resting timer shows bars that move as it plays.

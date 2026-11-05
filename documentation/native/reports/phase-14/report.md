@@ -6,12 +6,13 @@
 
 | Area | Before Phase 14 | Now |
 | --- | --- | --- |
-| **Notes** | A read-only sample note; "Notes open on the web for now" when signed in | A real local library per owner: **typed notes** (BlockNote 0.56, the web's editor) with a Sylf format bar, a "/" block menu, markdown shortcuts and **six templates** (Blank, Lecture, Cornell, Revision, Problem set, Study plan); **handwriting** on nine paper templates with pages; **notebooks**, search over titles and text, pin, duplicate, trash and restore, automatic titles from a note's first line |
+| **Notes** | A read-only sample note; "Notes open on the web for now" when signed in | A real local library per owner with **one note kind**: pages you type and write on, each with paper, a text layer (BlockNote 0.56, the web's editor) and an ink layer, and a **Type / Write** switch that changes the toolbar. **Insert** a picture into the text, a PDF after the last written page (a fresh note takes the PDF's pages), or a page. **Page settings** change layout (ruled, grid, dotted, Cornell, music, planners), spacing (narrow, medium, wide), paper colour or a picture, for one page or all, at any time. **Endless notes** grow as you write; paged notes add a page when you pull past the end. **Folders and subfolders** with colours and icons, search over titles and text, pin, duplicate, trash and restore, automatic titles, six typed templates |
 | **Handwriting and S Pen** | Disabled pen and eraser buttons | Pen with pressure and tilt, highlighter, eraser (whole strokes or precise), lasso select, move, scale and recolour, line, rectangle and ellipse, undo and redo. **Android:** a native surface (`SylfInkView`) reads every digitizer sample with its history and draws the live stroke itself; the S Pen's button or eraser tip erases. **Desktop:** Pointer Events with coalesced samples. The first pen stroke turns fingers into scrolling |
 | **PDFs** | A stand-in page of text | Import from the file picker or by **dropping a file on Workspace**; pages rendered by pdf.js 6.4.299 (desktop) or Android's PdfRenderer, cached; pen and highlighter on every page; zoom; page count; **"Take notes beside this"** opens a linked Lecture note next to the paper, with chips that jump between them |
 | **Whiteboard** | A static circle | A 3200 × 2200 board on dotted, grid or blank paper, with the full pen case, pan, zoom (fingers, wheel, Control and the wheel), "show everything", and its camera kept in the window |
 | **Resources** | Sample shelf entries | A shelf over the whole library: kinds, **subjects** and notebooks; the subject being studied first; new documents take the study session's subject |
-| **Workspace** | Presets and one arrangement | **Named saved layouts** that reopen their windows on the same documents; desktop drag and drop (PDF files, library cards onto the canvas); "Open in a new window"; two windows on one note stay in step; a **running-editor budget** (two on Android, six on desktop) |
+| **Workspace** | Presets and one arrangement | **Full screen**: tools tile the whole screen with no chrome, any arrangement by dragging seams and docking tiles against each other's edges; a document's **Full screen** button (at the toolbar's right end) leaves only the toolbar and the page. **Named saved layouts**; a **Windows sheet** to open several tools, close or minimize chosen windows, or clear the canvas; a dot grid whose spacing shows the zoom; desktop drag and drop; a **running-editor budget** (two on Android, six on desktop). Audio left the shelf for the timer dock |
+| **Everywhere** | Workspace's own quick switcher | A **command palette** from the search button in every Space or Command/Control + K: notes by title or text, tools, windows, places, the session, layouts and actions. **Sound in the timer dock**: choose, play and set the volume of a sound from anywhere, with moving bars beside the timer while it plays |
 | **Lifecycle** | | Notes are written when the app is backgrounded and before sign-out (ADR 0011) |
 
 The formats are the web's own: `sylf-notes` envelope v1, `blocknote/0.56.0`, `sylf-ink/1`, `sylf-pdf/1`. The web's `InkModel`, `PdfMarkup` page maps, note styles and paper templates are used in place through `@sylf/shared`. One shared module was added: `lib/notes/ink-outline.ts`, extracted from the web renderer so web and Native draw identical stroke outlines and paper.
@@ -67,6 +68,11 @@ Desktop (Electron, production export): [empty library](evidence/desktop-notes-01
 - BlockNote mounts on its host element, so the editor's own styles (descendant selectors) never applied; it now mounts inside a styled wrapper, and the placeholder style targets BlockNote's `::after`.
 - The start-up bundle carried BlockNote (above, §4).
 - Four new scroll views lacked `keyboardShouldPersistTaps`, which the keyboard-taps test caught.
+- **Reported by the owner: erasing left the last stroke.** The web's `InkModel` advanced its scene version only when a stroke was drawn or redrawn, so removing the final remaining stroke left every cached view (Native's and the web's) showing it. Fixed in `lib/notes/ink.ts` with regression tests on both sides. The eraser also tested only its sample points, so a fast sweep skipped strokes between them; gaps are now filled, and one sweep is one undo step.
+- A picture in a note hid the handwriting under it: paper, text and ink were one layer order. Paper now sits under the text and pictures and ink over them.
+- Library cards nested a button inside a button (invalid on the web, and on touch the inner one took the long press, so card menus never opened on the tablet). `ContextArea` now hands its long press to the card.
+- Scrolling past a note's last page with a wheel carried on into the canvas and panned the window off screen. A document's pages now keep the wheel at their end.
+- **Reported by the owner:** the Command Center's Windows button sat above the row; its tooltip anchor aligned to the start. The Electron check now measures every button's centre.
 
 ## 7. Limits and open items
 
@@ -77,7 +83,7 @@ Desktop (Electron, production export): [empty library](evidence/desktop-notes-01
 | iOS | No native ink or PDF renderer; ink shows read-only, PDFs say a newer build is needed. Not built or run (no Xcode) | Later |
 | By-hand S Pen checks | Pressure, tilt, palm rejection, the side button and eraser tip, hover, perceived latency, two-finger pinch on a board | Owner, [tablet checklist](../../handoffs/tablet-checklist.md) |
 | PDF geometry from Android | Page units match pdf.js except UserUnit and the crop offset (`geometry: "native"`) | A future PDF export corrects it |
-| PDF text search and export, images in notes, text boxes on boards | Not built | Later |
+| PDF text search and export, text boxes on boards | Not built | Later |
 | Hardware keyboard hook on tablets (ADR 0008 decision 27) | Not built | Later |
 | Typed-note toolbar on phones | Scrolls sideways; works, not tuned | Later |
 

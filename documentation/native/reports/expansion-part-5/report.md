@@ -52,7 +52,7 @@
 | Native unit tests | **578 passed**, 1 skipped (43 files), including new tests for the meter units, day wording and cosmetics mapping |
 | Real-server integration | **37 of 37**: the Part 3 and 4 suite plus four new tests for profiles (a friend's profile with server permissions and no HP, a stranger's, a blocked pair's restricted view) and the weekly focus quest |
 | Electron backend check | 39 of 39 |
-| **Live Electron stage** (real window, real server, second person through the API) | **All checks pass** (31 of 31), no console errors. New in this part: Today status and weekly quest, **real bars with width**, the week drawn Monday to Sunday, a quest with its Study action that lands on Focus with the quest chosen, an event typed in words that is previewed and saved, a friend's profile, a conversation read as a chat, Sylvie offering an earlier conversation |
+| **Live Electron stage** (real window, real server, second person through the API) | **All checks pass** (33 of 33), no console errors. New in this part: Today status and weekly quest, **real bars with width**, the week drawn Monday to Sunday, a quest with its Study action that lands on Focus with the quest chosen, an event typed in words that is previewed and saved, a friend's profile, a conversation read as a chat, Sylvie offering an earlier conversation |
 | Phone (390), tablet (820) and light-mode captures of Today, Plan, Progress and Circle | Taken and read; no overflow or clipped text found |
 
 Screenshots are in [`evidence/`](evidence/): `live-*.png` (the journey, including 12 to 18 for this part) and `part5-phone-*`, `part5-tablet-*`, `part5-light-*`.

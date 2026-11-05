@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { Image } from "expo-image";
-import { useKeepAwake } from "expo-keep-awake";
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import { IconButton, Text, fade, useDismiss, useTheme } from "@sylf/design-system";
 import { modes } from "@sylf/shared";
 import { formatSessionClock, sessionModeSettings } from "@sylf/spaces";
@@ -58,7 +58,12 @@ function Rhythm() {
 }
 
 export function FocusEnvironment() {
-  useKeepAwake("sylf-focus");
+  // Awake only while this is open. Leaving before the lock was granted is normal (a quick Escape), and the library rejects that on the web, so both ends are
+  // caught: the screen simply was not kept awake for that moment.
+  useEffect(() => {
+    void activateKeepAwakeAsync("sylf-focus").catch(() => undefined);
+    return () => { void Promise.resolve().then(() => deactivateKeepAwake("sylf-focus")).catch(() => undefined); };
+  }, []);
   const { color, space, motion } = useTheme();
   const session = useStudySession();
   const state = useSessionState();

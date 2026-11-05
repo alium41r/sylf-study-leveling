@@ -19,6 +19,8 @@
   "the session record is a party session": true,
   "leaving the session leaves the room": true,
   "exactly one study session was recorded": true,
+  "Quick ask is answered by the real route": true,
+  "Plans says AI plans are not on, in words": true,
   "a blocked person is listed with Unblock": true,
   "unblocking empties the list": true,
   "no sample content: the live screens": true
@@ -27,7 +29,5 @@
   "alice": 1,
   "invite": 201
  },
- "consoleErrors": [
-  "Uncaught (in promise) Error: The wake lock with tag sylf-focus has not activated yet"
- ]
+ "consoleErrors": []
 }

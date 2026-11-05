@@ -79,3 +79,16 @@ Additive and scanned: none drops or rewrites data. The two matches for destructi
 ## Open decisions
 
 Password reset (G-4), whether an email change needs a password (S-12), a daily ceiling on credited study (I-2), and Electron's lack of a system proxy. Details are in [Stage 3 handoff §5](../handoffs/stage-3.md#5-for-the-owner-in-order).
+
+
+## Expansion Part 3 and 4 additions (5 November 2026, nothing here has been run on a hosted service)
+
+Everything below was exercised on disposable local databases only. The owner decides each item.
+
+- [ ] **Migrations in order, additive:** `20261105000000_native_message_realtime_publication` (adds `Message` to `supabase_realtime` if that publication exists; no RLS change). Its only effect on a hosted project is that Realtime may deliver message events to a client holding a minted token.
+- [ ] **Grants for message Realtime (owner decision, not in the history):** `GRANT SELECT ON "Message", "ConversationParticipant" TO authenticated;` The existing `message_select_policy` then limits each subscriber to conversations they take part in (probed on a disposable database: an outsider sees 0 rows, a participant sees 1). Without these grants nothing breaks: Realtime delivers nothing and Native polls.
+- [ ] **New route** `GET /api/friends/blocked` (own blocks only; tested). **Changed routes:** `POST /api/conversations`, `POST /api/conversations/[id]/messages` now fail closed on a block-check error (S-15); `PATCH /api/conversations/[id]` hands a group to its longest-standing member when the creator leaves (A-28).
+- [ ] **Env for Planner V2 (E-6):** `PLANNER_V2_DURABLE_CORE_ENABLED`, `PLANNER_V2_STUDENT_WORKSPACE_ENABLED`, a worker, and a provider key. Native states plainly when they are off. Do not enable until the spend ceiling ($1.75 per student) is accepted.
+- [ ] **Env for a Native build with Realtime:** `EXPO_PUBLIC_SYLF_REALTIME_URL`, `EXPO_PUBLIC_SYLF_REALTIME_KEY` (the project address and anon key, both public values). Leave unset to stay on polling.
+- [ ] **New Native dependencies** (all in `native/`, with its lockfile): `@supabase/realtime-js` 2.112.4, `expo-document-picker`, `expo-image-picker`. The Android build needs a prebuild and the tablet run before release.
+- [ ] Rerun the whole local set on the exact commit being deployed.

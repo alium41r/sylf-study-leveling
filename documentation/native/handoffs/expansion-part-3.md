@@ -1,24 +1,25 @@
 # Expansion Part 3 → Part 4 handoff
 
-**Written 5 November 2026**, from the unattended overnight run on `expansion-part-3`. Read the [living Part 3 report](../reports/expansion-part-3/report.md) first (§1 lists what was not run), then the [Part 4 brief](../expansion/part-4-integration-polish.md). Source wins over prose.
+**Rewritten 5 November 2026** after the owner's second brief. Read the [Part 3 report](../reports/expansion-part-3/report.md), then the [Part 4 report](../reports/expansion-part-4/report.md). Source wins over prose.
 
 ## State
 
-- Part 3 is **built in part and entirely unverified**: no test suite, no build, no device and no server was run. Only `tsc` (native), ESLint on touched files and the boundary audit ran, and they are clean at HEAD.
-- Branch `expansion-part-3` is pushed to its own remote branch. Nothing is merged, deployed or touched on hosted services. The tablet was not used.
+Part 3 is **built and verified locally**: Native unit tests, real-server integration (33), the Electron backend check (39), a live Electron check of Circle and parties (19), root security tests, and an RLS audit with a Message Realtime probe. Not run: the tablet, any hosted service, any real AI provider. Branch `expansion-part-3` is pushed. Nothing is merged or deployed.
 
 ## Built
 
-AI Planner V2 journey in Plans; Sylvie rich text, status events, proposals with confirmation, Today briefing, quick-ask, "Review in Plans" handoff; Circle People, Messages, groups, notifications; Parties lifecycle; backend repairs S-15 and A-28. Details and paths are in the report §2.
+Everything in report §1: Planner V2 with materials upload, Sylvie (rich text, readable maths, images, proposals, insights, quick-ask on Today and in the environment), Circle (people, messages, groups, blocked list, notifications), Realtime as a nudge, parties and **study together through the one study session** (E-13), plus S-15, A-28 and `GET /api/friends/blocked`.
 
-## Not built (carry into the final verification or the next owner decision)
+## Not built
 
-Plan materials upload, maths typesetting, Sylvie images, insights/memories, companion, Sylvie inside the Focus environment, Realtime client and presence, blocked list screen, **party session through the one session owner** (needs E-13), party room, World guard for party sessions. Reasons are in the report §3.
+Companion drawing, AI memories and insight dismissal (no server API), KaTeX typesetting, a presence channel, Planner `?stream=true`, `SylvieTool` on `useSylvieTurn`. Reasons and effort in report §4.
 
-## Owner decisions open
+## Owner decisions still open
 
-E-13 (party time counts as study?), E-6 (hosted Planner flags and real provider spend), dependency approvals (file picker, KaTeX/Expo DOM, `@supabase/realtime-js`), the `Message` Realtime publication migration.
+- **E-6**: whether Planner V2 runs on the hosted server. From code it needs `PLANNER_V2_DURABLE_CORE_ENABLED` and `PLANNER_V2_STUDENT_WORKSPACE_ENABLED` both `"true"`, plus a worker and a provider key. The Vercel connector needs you to approve team access before environment variable *names* can be read. No paid provider was called.
+- **Realtime for messages** needs `SELECT` grants for `authenticated` on `Message` and `ConversationParticipant` (not in the history), the project address and key in the build, and the migration `20261105000000_native_message_realtime_publication` applied. All local-only today.
+- **Electron checks** `home-check.mjs` and the whole-student `journey-check.mjs` stages `first` and `second` are stale against Part 2's onboarding and Focus redesign (a few selectors were updated; the rest need a rewrite). The `live` stage replaces them for Part 3's screens.
 
 ## Rules that still apply
 
-Testing runs only after Part 4's features, on a disposable local backend (Docker Desktop is not running on the Mac). Stage only your own paths. HP stays off Native. No tablet without authorization.
+Disposable local backends only. Stage only your own paths. HP stays off Native. No tablet without authorization.

@@ -3,7 +3,7 @@
 // starts Next.js and passes SYLF_BACKEND_TEST_ORIGIN. Real HTTP, real getSession, real SQL, real settlement. This runs on Node, so it proves the
 // client's logic and contracts, and not Hermes or a device's network stack.
 import { createHash, randomBytes, randomUUID } from "node:crypto";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { createStudySessionModel } from "@sylf/spaces";
 import { BackendError, createBackend, createBearerGateway, createPartyPresence, createSessionBridge, recentSessionsSchema, type Backend } from "../src/index";
 

@@ -210,7 +210,7 @@ These were not in an earlier report, except where noted.
 | Realtime and presence | `realtime/token`, `usePostgresChanges`, `useRealtimePresence` | None | **Missing** | Must, Part 3 C, with a bounded fallback |
 | Focus Party: list | `focus-party` | Circle | **Partial** | Extends |
 | Create, join, leave, invite, members ✓ | `focus-party/*`. Invites answer `ACCEPTED` or `DECLINED`. Non-members refused, joining needs an invite | None | **Missing** | Must, Part 3 D |
-| Party session and room ✓ | `focus-party/[id]/session`, `session/timer` with `start`, `pause`, `resume`, `leave` | None | **Missing** | Must, Part 3 D, after decision E-13 |
+| Party session and room ✓ | `focus-party/[id]/session`, `session/timer` with `start`, `pause`, `resume`, `leave` | None | **Built (Part 3, E-13 yes)**: one study session with a room, `party-presence.ts`, `shell/party/` | Verified on a real server and in Electron (Part 4) |
 | Session invites | `invites`, `SessionInvite`, `SessionInviteToast` | None | **Missing** | Should, Part 3 D |
 
 ## 8. Sylvie
@@ -242,7 +242,7 @@ These were not in an earlier report, except where noted.
 | S-12 | **High, raised by Part 1** | Email change needs no password (U-4) | Part 2 step 0, decision E-5 |
 | A-20 | Medium | Stored image addresses (U-6) | Part 2 step 0 on approval |
 | A-21 | High if unscheduled | Server jobs (U-5) | Owner |
-| A-22 | Medium | Solo beside party, party credit (U-7) | Decision E-13, Part 3 D |
+| A-22 | Medium | Solo beside party, party credit (U-7) | **Settled**: E-13 yes, credit through the study session; Native refuses a second session (the server still allows one) |
 | A-28 | Low | A group with no creator | Part 3 C |
 | A-24 | Low | Quest edit narrower than creation | Part 2 C |
 | S-15 | Low | `areUsersBlocked` fails open on a query error. Confirmed still so | Part 3 C |

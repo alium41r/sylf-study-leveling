@@ -256,3 +256,16 @@ npm run android:r15-check -- --scenario=views --minutes=6 --in-app --out=<file>
 ## Part 8. Report
 
 Add an Android section to the [Phase 13 report](../reports/phase-13/report.md), update R1, R12 and R15 in the [master plan](../master-plan.md#81-major-technical-risks), and list anything that failed before fixing it. If the owner authorized only part of this, say which part ran.
+
+---
+
+## Expansion Part 3 additions (5 November 2026, none of this has been run on the tablet)
+
+Run in portrait and landscape, on a build made after `npx expo prebuild` (three new native modules), against a **disposable** or owner-approved backend, with the owner's authorization. Everything below ran only in Electron against a local server, so Hermes, touch and the system pickers are unverified.
+
+- [ ] **Circle.** Find a person, send and answer a request, message, edit and delete, a group (create, rename, leave), Notifications, **Blocked** and Unblock. Each tap lands on the first press (the keyboard rule).
+- [ ] **Parties.** Start one, invite a friend, accept on a second device, the room panel lists both. **With** on Focus, **Study together** from Parties, the dialog when a solo session is running, the room strip in the environment, ending leaves the room, **exactly one study session** in Recent sessions. Airplane mode mid-session: the time still counts, the strip says the room will catch up, and the exit reaches the server on return. Kill and reopen mid-session: the party mark survives.
+- [ ] **Sylvie.** Streamed answer, a proposal with Apply and Not now, a stale proposal refused, **attach an image** (system picker, up to 4, 5 MB), the image shown back in the chat, readable maths in a reply, the daily note and insights on Today, Ask Sylvie inside the environment (and "Review in Plans" steps out of it without ending the session).
+- [ ] **Plan.** With Planner V2 on: details saved free, spending ceiling and consent, **add a PDF or text file** through the system picker (a 4 MB file is refused in words), watch, stop, answer, confirm. With it off: the plain "not switched on" note.
+- [ ] **Realtime** (only if the build has an address and the grants exist): a message from a second device appears without waiting 30 s, nothing arrives for a conversation you are not in, and with the app backgrounded nothing is read.
+- [ ] **Battery and heat** over a 30 minute party session with the screen on, and memory after opening the environment, Plan, and a long chat ten times.

@@ -202,6 +202,19 @@ async function runStage(window, { stub }, stage, out) {
     const sessions = await serverSessions();
     check("exactly one study session was recorded", sessions.length === 1);
 
+    // Sylvie from Today, answered by the server itself (no provider), and Plans saying plainly that AI plans are off on this server.
+    await open("space=home&home=today");
+    await clickOn(`${tid("today-ask-clear")}, ${tid("today-ask")}`);
+    await type(tid("quick-ask-input"), "What is my level?");
+    await clickOn(tid("quick-ask-send"));
+    check("Quick ask is answered by the real route", await until(tid("quick-ask-reply"), 20000));
+    await shot("live-10-quick-ask");
+    await escape();
+    await open("space=home&home=plan");
+    await clickOn(`${tid("home-subnav-plan")} [role=radio]:nth-child(3), ${tid("home-subnav-plan")} [aria-label="Plans"]`);
+    check("Plans says AI plans are not on, in words", await until(tid("plan-plans-unavailable"), 10000));
+    await shot("live-11-plans-off");
+
     // Blocked list.
     await open("space=home&home=circle");
     await clickOn(tid("circle-blocked"));

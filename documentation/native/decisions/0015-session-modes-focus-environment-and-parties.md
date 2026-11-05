@@ -1,6 +1,6 @@
 # ADR 0015 — One session across modes, the Focus environment and parties
 
-**Status: Accepted by the owner for decisions 1, 6 and 7, 1 November 2026, which approved the immersive Focus environment. Decisions 2 to 10, 13 and 14 were built in Expansion Part 2 (4 November 2026). Decisions 11, 12 and 15 wait for Part 3 and Part 4.** It extends [ADR 0008](0008-study-session-and-timer-dock.md) and replaces its decision 20 when built. It builds on [ADR 0012](0012-connected-app.md) and [ADR 0013](0013-expansion-stage.md). Part 2 built the session half, noted in [the Focus guide](../focus/README.md). One refinement: **decision 5 changed.** The stored record stays `v1` with optional `mode`, `modeSettings` and `phase` fields, so a session running across the upgrade continues and an older reader still opens it. A `.v2` key would have orphaned running sessions for no gain.
+**Status: Accepted by the owner for decisions 1, 6 and 7, 1 November 2026, which approved the immersive Focus environment. Decisions 2 to 10, 13 and 14 were built in Expansion Part 2 (4 November 2026). Decisions 11 and 12 were built in Expansion Part 3 (5 November 2026) under the owner's answer to E-13: party time counts through the one `StudySession`, with no second session and no second reward. Decision 15 waits for Part 4's final run.** It extends [ADR 0008](0008-study-session-and-timer-dock.md) and replaces its decision 20 when built. It builds on [ADR 0012](0012-connected-app.md) and [ADR 0013](0013-expansion-stage.md). Part 2 built the session half, noted in [the Focus guide](../focus/README.md). One refinement: **decision 5 changed.** The stored record stays `v1` with optional `mode`, `modeSettings` and `phase` fields, so a session running across the upgrade continues and an older reader still opens it. A `.v2` key would have orphaned running sessions for no gain.
 
 ## The problem
 
@@ -20,7 +20,7 @@ Native has one study session with a length. The stage adds seven timer modes wit
 | 8 | **The environment is a view of the model.** It holds no time, passes `live` correctly, and reads the same controls from `SessionParts.tsx`. | Proposed | ADR 0008 decisions 10 and 15 |
 | 9 | **Heavy resources belong to the environment's lifetime.** Its background, wake lock and any large layout are taken on entry and released on every exit path. Audio lives in one shell-level engine. | Proposed | R15, and a wake lock left on is a battery defect |
 | 10 | **Web's four layouts are not ported.** Part 1 designs Native's own. | Confirmed by the owner's brief for "do not copy" | Web is a reference for behavior only |
-| 11 | **A party session is a kind of the one active session,** marked solo or party on the record. Its time comes from the server's party state, reconciled into the same snapshot shape. Controls call acknowledged server actions. | Proposed | The server already owns party time. `TimerSync` already has the `party` branch. A second model would be a second clock with extra steps |
+| 11 | **A party session is a kind of the one active session (built, Part 3, E-13 answered yes),** marked solo or party on the record. Its time comes from the server's party state, reconciled into the same snapshot shape. Controls call acknowledged server actions. | Proposed | The server already owns party time. `TimerSync` already has the `party` branch. A second model would be a second clock with extra steps |
 | 12 | **A solo session and a party session never run together.** Joining asks first. | Proposed | One active session has always been the rule (ADR 0008 decision 4). **Part 1 proved the server doesn't enforce this,** so only Native's own behavior holds it until E-13 is settled |
 | 13 | **World's guard and the 12-hour cap apply to every kind and mode.** | Confirmed by ADR 0008 and Phase 11 | Game time is never study time, and a server clamp never bends for a client |
 | 14 | **`saved` still flips only in `settleAccepted`.** Breaks are reported, and rewards are the server's. | Confirmed by ADR 0012 | Unchanged |
@@ -38,7 +38,7 @@ Native has one study session with a length. The stage adds seven timer modes wit
 
 ## Consequences
 
-- **Party credit is open.** Part 1 read that party time banks only on `FocusSessionMember`. Decision 14 assumes nothing about it, and decision E-13 settles it before Part 3 slice D.
+- **Party credit is settled (E-13, 5 November 2026):** the study session carries the time and the credit, the room only mirrors it, and the exit is journaled through TimerSync's party branch. Originally open:  Part 1 read that party time banks only on `FocusSessionMember`. Decision 14 assumes nothing about it, and decision E-13 settles it before Part 3 slice D.
 - `lib/timer-modes.ts` touches a sensitive web file. Web's timer suites run before and after, and any change in a test's meaning stops the work (R20).
 - `SessionLength` stays for Free Flow and plain countdowns.
 - `session.test.ts`, the Session check and the journey grow.

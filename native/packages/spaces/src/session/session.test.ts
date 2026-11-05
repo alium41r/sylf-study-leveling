@@ -599,3 +599,50 @@ describe("forgetting a deleted account's sessions", () => {
     expect(storage.writes.count).toBe(before);
   });
 });
+
+describe("a session studied with a party (ADR 0015 decision 11, owner decision E-13)", () => {
+  it("is the one session: same clock, same operations, one record, with a party mark that survives a restart", () => {
+    const { session, storage } = model();
+    expect(session.start({ title: "Together", party: { partyId: 5, name: "Night owls" } })).toBe(true);
+    expect(session.state().active?.party).toEqual({ partyId: 5, name: "Night owls", roomSessionId: null, joinedAt: null });
+    vi.advanceTimersByTime(10 * MINUTE);
+    session.pause();
+    expect(session.state().active?.operations.map((op) => op.action)).toEqual(["PAUSE"]);
+    expect(session.start({ title: "Another" })).toBe(false);
+    expect(createStudySessionModel(storage).state().active?.party?.partyId).toBe(5);
+  });
+  it("is seated once the server answers, and the seat goes with the session when it ends", () => {
+    const { session } = model();
+    session.start({ party: { partyId: 5, name: "Night owls" } });
+    const key = session.state().active!.clientKey;
+    expect(session.setPartyRoom(key, { roomSessionId: 31, joinedAt: "2026-11-05T01:00:00.000Z" })).toBe(true);
+    expect(session.setPartyRoom(key, { roomSessionId: 31, joinedAt: "2026-11-05T01:00:00.000Z" })).toBe(false);
+    vi.advanceTimersByTime(5 * MINUTE);
+    const ended = session.end()!;
+    expect(ended.party).toEqual({ partyId: 5, name: "Night owls", roomSessionId: 31, joinedAt: "2026-11-05T01:00:00.000Z" });
+    expect(ended.focusSeconds).toBe(5 * 60);
+  });
+  it("can be seated after it has ended, so a lost answer still gets its exit", () => {
+    const { session } = model();
+    session.start({ party: { partyId: 5, name: null } });
+    const key = session.state().active!.clientKey;
+    vi.advanceTimersByTime(MINUTE);
+    session.end();
+    expect(session.setPartyRoom(key, { roomSessionId: 9, joinedAt: "2026-11-05T01:00:00.000Z" })).toBe(true);
+    expect(session.state().ended[0].party?.roomSessionId).toBe(9);
+  });
+  it("a solo session has no party, and setting a seat on it does nothing", () => {
+    const { session } = model();
+    session.start();
+    expect(session.state().active?.party).toBeUndefined();
+    expect(session.setPartyRoom(session.state().active!.clientKey, { roomSessionId: 1, joinedAt: "2026-11-05T01:00:00.000Z" })).toBe(false);
+  });
+  it("drops a party mark that cannot be read, without costing the session", () => {
+    const { session } = model();
+    session.start({ party: { partyId: 5, name: "x" } });
+    const raw = JSON.parse(JSON.stringify(session.state()));
+    raw.active.party = { partyId: "nope" };
+    expect(parseSessionState(raw).active?.party).toBeUndefined();
+    expect(parseSessionState(raw).active?.clientKey).toBe(session.state().active!.clientKey);
+  });
+});

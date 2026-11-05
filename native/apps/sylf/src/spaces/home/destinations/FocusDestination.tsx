@@ -13,6 +13,9 @@ import { ModeChooser } from "../../../shell/focus/ModeChooser";
 import { useBackgroundCatalog, useFocusBackground } from "../../../shell/focus/useFocusBackground";
 import { useEnterFocus } from "../../../shell/focus/enter";
 import { useStats } from "../../../shell/live";
+import { studyWith, useStudyWith } from "../../../shell/party/studyWith";
+import { RoomStrip } from "../../../shell/party/RoomStrip";
+import { usePartySummary } from "../../../shell/party/useParty";
 import { useHomeResult } from "../data";
 import type { FocusView, HomeDataAdapter, Objective } from "../data/contracts";
 import { formatMinutes } from "../format";
@@ -51,6 +54,24 @@ function WhatPicker({ quests }: { quests: Objective[] }) {
           {quests.map((quest) => <Chip key={quest.id} radio label={quest.title} selected={plan?.questId === quest.questId} onPress={() => session.setPlan(plan?.questId === quest.questId ? null : { title: quest.title, subject: quest.subject ?? null, subjectId: quest.subjectId ?? null, questId: quest.questId ?? null })} />)}
         </View>
       ) : null}
+    </Stack>
+  );
+}
+
+/** With whom: on one's own, or in a party's room. It exists only for someone in a party, and fixed once a session exists, like the rest. */
+function WithPicker() {
+  const { space } = useTheme();
+  const { summary } = usePartySummary();
+  const chosen = useStudyWith();
+  const party = summary?.activeParty;
+  if (!party) return null;
+  return (
+    <Stack gap="sm">
+      <Text variant="caption" tone="soft">With</Text>
+      <View role="radiogroup" aria-label="Who you study with" style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xs }}>
+        <Chip radio label="On my own" selected={!chosen} onPress={() => studyWith.set(null)} />
+        <Chip radio label={party.name} selected={chosen?.partyId === party.id} onPress={() => studyWith.set({ partyId: party.id, name: party.name })} />
+      </View>
     </Stack>
   );
 }
@@ -101,10 +122,12 @@ function Threshold({ focus }: { focus: FocusView | null }) {
           <Text variant="title" align="center">{active.title}</Text>
           <SessionClock live={showing} variant="readout" testID="focus-clock" />
           <Text variant="caption" tone="soft" align="center">{SESSION_STATUS_LABELS[status]}</Text>
+          <RoomStrip watching={showing} />
         </Stack>
       ) : (
         <>
           <WhatPicker quests={quests} />
+          <WithPicker />
           <Stack gap="sm"><Text variant="caption" tone="soft">Rhythm</Text><ModeChooser /></Stack>
           <WherePicker />
         </>

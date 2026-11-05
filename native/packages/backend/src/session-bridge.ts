@@ -62,6 +62,7 @@ export function createSessionBridge({ session, delivery, auth, resources, connec
     const owned = [...(active ? [active] : []), ...ended].filter((item: ActiveSession | EndedSession) => item.ownerId === sync.ownerId && !("saved" in item && item.saved));
     let wrote = false;
     for (const record of owned) {
+      if ("endedAt" in record && leaveRoom(sync, record)) wrote = true;
       const meta = sync.journal(record.clientKey);
       if (meta?.settled && meta.sessionId) { session.settleAccepted(record.clientKey, { serverId: meta.sessionId, focusSeconds: meta.endedFocusSeconds ?? ("focusSeconds" in record ? record.focusSeconds : 0), breakSeconds: "breakSeconds" in record ? record.breakSeconds : 0, endedAt: meta.endedAt }); continue; }
       if (!meta) {
@@ -77,6 +78,20 @@ export function createSessionBridge({ session, delivery, auth, resources, connec
       if (waiting.length) session.noteJournaled(record.clientKey, waiting[waiting.length - 1].sequence);
     }
     return wrote;
+  }
+
+  /**
+   * A finished party session leaves its room through the journal's party branch, so the exit survives a crash and days offline and is replayed at the
+   * original instants. It carries no credit: the study session above is the only record of the time (owner decision E-13).
+   */
+  function leaveRoom(sync: TimerSync, record: EndedSession) {
+    const { party } = record;
+    if (!party?.roomSessionId || !party.joinedAt) return false;
+    const key = `${record.clientKey}:room`;
+    if (sync.journal(key)) return false;
+    sync.create({ ownerId: sync.ownerId, clientKey: key, startedAt: new Date(record.startedAt).toISOString(), kind: "party", partyId: party.partyId, sessionId: party.roomSessionId, participationJoinedAt: party.joinedAt });
+    sync.finish(key, record.focusSeconds, 0, false, new Date(record.endedAt).toISOString());
+    return true;
   }
 
   /** `drain` joins a run already going, which may have read the journal before this write. The second call picks up anything it missed, and costs nothing otherwise. */

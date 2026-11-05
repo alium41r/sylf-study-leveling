@@ -33,8 +33,17 @@ export interface SessionOperation { id: string; action: "PAUSE" | "RESUME" | "EN
 /** What the next session is about. One choice, seen from all three surfaces, like the length. Ids exist only for a signed-in person's data. */
 export interface SessionPlan { title: string | null; subject: string | null; subjectId: number | null; questId: number | null }
 
+/**
+ * A session studied inside a party's room (ADR 0015 decision 11). It is the same session: its time, its record and its credit are the study
+ * session's alone, so the party adds no second clock and no second reward. The room is only where the others see you. `roomSessionId` and
+ * `joinedAt` arrive once the server has seated this person, and they let a lost exit be replayed exactly (TimerSync's party branch).
+ */
+export interface SessionParty { partyId: number; name: string | null; roomSessionId: number | null; joinedAt: string | null }
+
 /** What both kinds of record carry about their way to the server. */
 interface SessionDelivery {
+  /** Present when this session is studied with a party. */
+  party?: SessionParty;
   /** The account signed in when it started, for good. Null is a session that belongs to nobody, and it is never delivered (ADR 0010). */
   ownerId: number | null;
   subjectId: number | null;
@@ -158,7 +167,12 @@ const isSnapshot = (value: unknown): value is TimerSnapshot => {
 /** Anything but a real account id reads as nobody's, which is what Phase 10's stored sessions are. */
 const parseOwner = (raw: unknown) => (Number.isSafeInteger(raw) && (raw as number) > 0 ? (raw as number) : null);
 const parseId = parseOwner;
-const parseDelivery = (value: Partial<SessionDelivery>): SessionDelivery => ({ ownerId: parseOwner(value.ownerId), subjectId: parseId(value.subjectId), questId: parseId(value.questId), journaled: finite(value.journaled) ? value.journaled : 0, declined: value.declined === true });
+function parseParty(raw: unknown): SessionParty | null {
+  const value = raw as Partial<SessionParty> | null;
+  if (!value || typeof value !== "object" || !finite(value.partyId) || value.partyId <= 0) return null;
+  return { partyId: value.partyId, name: typeof value.name === "string" ? value.name : null, roomSessionId: finite(value.roomSessionId) && value.roomSessionId > 0 ? value.roomSessionId : null, joinedAt: typeof value.joinedAt === "string" ? value.joinedAt : null };
+}
+const parseDelivery = (value: Partial<SessionDelivery>): SessionDelivery => ({ ...(parseParty(value.party) ? { party: parseParty(value.party)! } : {}), ownerId: parseOwner(value.ownerId), subjectId: parseId(value.subjectId), questId: parseId(value.questId), journaled: finite(value.journaled) ? value.journaled : 0, declined: value.declined === true });
 const parseOperations = (raw: unknown): SessionOperation[] => (Array.isArray(raw) ? raw.filter((op): op is SessionOperation => !!op && typeof op.id === "string" && ["PAUSE", "RESUME", "END"].includes(op.action) && finite(op.sequence) && finite(op.focus) && finite(op.breaks) && typeof op.at === "string") : []);
 
 function parsePhase(raw: unknown): ActivePhase | null {
@@ -226,7 +240,7 @@ export function ownerlessOffer(state: StudySessionState, accountCreatedAt: numbe
 }
 
 /** What a session keeps when it ends. */
-const carried = ({ clientKey, ownerId, subjectId, questId, journaled, declined, title, subject, startedAt }: ActiveSession) => ({ clientKey, ownerId, subjectId, questId, journaled, declined, title, subject, startedAt });
+const carried = ({ clientKey, ownerId, subjectId, questId, journaled, declined, title, subject, startedAt, party }: ActiveSession) => ({ clientKey, ownerId, subjectId, questId, journaled, declined, title, subject, startedAt, ...(party ? { party } : {}) });
 
 /** Newest first, and what has already reached the server goes before anything still waiting. */
 function keepEnded(ended: EndedSession[]) {
@@ -266,7 +280,9 @@ export interface StudySessionModel {
   /** Chooses what the next session is about. */
   setPlan(plan: SessionPlan | null): boolean;
   /** Refuses while a session exists: there is one session, and a second start is a mistake rather than a new one. */
-  start(context?: { title?: string; subject?: string | null; subjectId?: number | null; questId?: number | null }): boolean;
+  start(context?: { title?: string; subject?: string | null; subjectId?: number | null; questId?: number | null; party?: { partyId: number; name?: string | null } }): boolean;
+  /** The server has seated this person in the party's room. Kept on the record, so a lost exit can be replayed exactly. Returns false if nothing matched. */
+  setPartyRoom(clientKey: string, room: { roomSessionId: number; joinedAt: string }): boolean;
   pause(): boolean;
   resume(): boolean;
   /** After a countdown ends: the same session carries on with no limit. */
@@ -469,9 +485,17 @@ export function createStudySessionModel(storage: StudySessionStorage | undefined
         clientKey: createKey(), ownerId: ownerId(), title: context?.title?.trim() || plan?.title || DEFAULT_SESSION_TITLE, subject: context?.subject ?? plan?.subject ?? null,
         subjectId: context?.subjectId ?? plan?.subjectId ?? null, questId: context?.questId ?? plan?.questId ?? null, journaled: 0, declined: false,
         startedAt: at, length: phase ? null : state.length, snapshot, operations: [], ...(phase ? { phase } : {}),
+        ...(context?.party ? { party: { partyId: context.party.partyId, name: context.party.name ?? null, roomSessionId: null, joinedAt: null } } : {}),
       };
       // A task is finished by working on it, so it does not carry over to the next session. The subject does.
       change({ ...state, plan: plan?.subject ? { ...plan, title: null, questId: null } : null, active }, "start");
+      return true;
+    },
+    setPartyRoom(clientKey, room) {
+      const seat = <T extends { clientKey: string; party?: SessionParty }>(item: T): T => (item.clientKey === clientKey && item.party && (item.party.roomSessionId !== room.roomSessionId || item.party.joinedAt !== room.joinedAt) ? { ...item, party: { ...item.party, ...room } } : item);
+      const next = { ...state, active: state.active ? seat(state.active) : null, ended: state.ended.map(seat) };
+      if (JSON.stringify(next) === JSON.stringify(state)) return false;
+      change(next, "party-room");
       return true;
     },
     pause() {

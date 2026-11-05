@@ -10,6 +10,7 @@ import { IconButton, Text, fade, useDismiss, useTheme } from "@sylf/design-syste
 import { modes } from "@sylf/shared";
 import { formatSessionClock, sessionModeSettings } from "@sylf/spaces";
 import { useSessionReadout, useSessionState, useStudySession } from "../context";
+import { RoomStrip } from "../party/RoomStrip";
 import { SessionActions, SessionNote } from "../session/SessionParts";
 import { audioEngine, useAudio } from "../audio/engine";
 import { focusEnvironment } from "./environment";
@@ -97,6 +98,7 @@ export function FocusEnvironment() {
         <Text variant="title" align="center" numberOfLines={2}>{active?.title ?? "Nothing running"}</Text>
         <Clock />
         <Rhythm />
+        <RoomStrip watching />
       </Pressable>
       <Animated.View pointerEvents={shown ? "box-none" : "none"} style={[StyleSheet.absoluteFill, controls]}>
         <View style={{ position: "absolute", top: space.xl, left: space.xl, right: space.xl, flexDirection: "row", alignItems: "center", gap: space.sm }}>

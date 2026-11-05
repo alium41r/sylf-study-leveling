@@ -8,6 +8,7 @@ import { Button, Chip, Dialog, Progress, Select, Text, useNotice, useTheme, type
 import { MAX_CREDITED_FOCUS_SECONDS, SESSION_LENGTHS, formatSessionClock, sessionLengthLabel, speakSessionClock, type SessionLength, type SessionReadout, type SessionStatus } from "@sylf/spaces";
 import { useAuth, useSessionSync } from "../backend";
 import { useSessionReadout, useSessionState, useStudySession } from "../context";
+import { takeParty } from "../party/studyWith";
 import { useSubjects } from "../live";
 import { LOCAL_SESSION_NOTE, sessionNote } from "./note";
 
@@ -114,7 +115,7 @@ export function SessionActions({ surface, title, subject, onEnded }: { surface: 
   const wide = { flex: 1 } as const;
   return (
     <>
-      {status === "idle" ? <Button title="Begin session" variant="emphasis" icon="play" fill testID={`${surface}-begin`} onPress={() => session.start({ title, subject })} /> : null}
+      {status === "idle" ? <Button title="Begin session" variant="emphasis" icon="play" fill testID={`${surface}-begin`} onPress={() => session.start({ title, subject, ...takeParty() })} /> : null}
       {canBreak ? <Button title="Take a break" variant="ghost" icon="pause" fill testID={`${surface}-break`} onPress={() => session.takeBreak()} /> : null}
       {status === "running" ? <View style={row}><Button title="Pause" icon="pause" testID={`${surface}-pause`} style={wide} onPress={() => session.pause()} /><Button title="End" variant="ghost" icon="stop" testID={`${surface}-end`} style={wide} onPress={askToEnd} /></View> : null}
       {status === "paused" ? <View style={row}><Button title="Resume" variant="emphasis" icon="play" testID={`${surface}-resume`} style={wide} onPress={() => session.resume()} /><Button title="End" variant="ghost" icon="stop" testID={`${surface}-end`} style={wide} onPress={askToEnd} /></View> : null}

@@ -7,10 +7,11 @@ import { useSyncExternalStore } from "react";
 import { Linking } from "react-native";
 import type { PlatformAdapters, PlatformCapabilities } from "@sylf/platform";
 import type { StudySessionModel } from "@sylf/spaces";
-import type { AuthSnapshot, Backend, Resource, ResourceState, SessionBridge, SessionSyncState } from "@sylf/backend";
+import type { AuthSnapshot, Backend, PartyPresence, PartyPresenceState, Resource, ResourceState, SessionBridge, SessionSyncState } from "@sylf/backend";
 
 let backend: Backend | null = null;
 let bridge: SessionBridge | null = null;
+let presence: PartyPresence | null = null;
 /** "pending" exists only while Electron's host is being asked. It lasts one local request, and nothing is drawn that could be wrong. */
 let phase: "pending" | "none" | "ready" = "none";
 let preferences: PlatformAdapters["preferences"] | null = null;
@@ -20,6 +21,7 @@ const subscribe = (listener: () => void) => { listeners.add(listener); return ()
 
 export const currentBackend = () => backend;
 export const currentBridge = () => bridge;
+export const currentPresence = () => presence;
 export const currentPreferences = () => preferences;
 export const useBackend = () => useSyncExternalStore(subscribe, currentBackend);
 export const useBackendPhase = () => useSyncExternalStore(subscribe, () => phase);
@@ -45,6 +47,14 @@ const NO_SYNC: SessionSyncState = { ownerId: null, pending: 0, offline: false, e
 export function useSessionSync(): SessionSyncState {
   useBackend();
   return useSyncExternalStore(bridge?.subscribe ?? noSubscribe, bridge?.state ?? (() => NO_SYNC));
+}
+
+const NO_ROOM: PartyPresenceState = { clientKey: null, link: "idle", message: null };
+
+/** How the party's room is reached for the session now running, for the words beside it. The session keeps counting whatever this says. */
+export function usePartyPresence(): PartyPresenceState {
+  useBackend();
+  return useSyncExternalStore(presence?.subscribe ?? noSubscribe, presence?.state ?? (() => NO_ROOM));
 }
 
 /** Watching is what makes it load, and leaving is what cancels it. */
@@ -77,7 +87,7 @@ export async function connectBackend(adapters: PlatformAdapters, capabilities: P
   // A chunk that will not load must not leave the app on a blank page: it opens as a build with no backend, and studying still works.
   const loaded = await import("@sylf/backend").catch(() => null);
   if (!loaded) { console.warn("SYLF_BACKEND could not load its code."); settle("none"); return; }
-  const { createBackend, createBearerGateway, createHostGateway, createSessionBridge, parseBackendOrigin } = loaded;
+  const { createBackend, createBearerGateway, createHostGateway, createPartyPresence, createSessionBridge, parseBackendOrigin } = loaded;
   const origin = desktop ? null : parseBackendOrigin(configuredOrigin);
   if (!desktop && !origin) { console.warn("SYLF_BACKEND refused an origin that is neither https nor this machine."); settle("none"); return; }
   let joined: Backend | null = null;
@@ -93,6 +103,7 @@ export async function connectBackend(adapters: PlatformAdapters, capabilities: P
   backend = joined;
   preferences = adapters.preferences;
   bridge = createSessionBridge({ session, delivery: joined.timer, auth: joined.auth, resources: joined.resources, connectivity: joined.connectivity });
+  presence = createPartyPresence({ session, parties: joined.reads.parties, auth: joined.auth, connectivity: joined.connectivity });
   settle("ready");
   await joined.start();
 }

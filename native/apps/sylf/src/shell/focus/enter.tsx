@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { Button } from "@sylf/design-system";
 import { useSessionState, useStudySession } from "../context";
+import { takeParty } from "../party/studyWith";
 import { askOnce } from "./alerts";
 import { focusEnvironment } from "./environment";
 
@@ -11,7 +12,7 @@ type Context = { title?: string; subject?: string | null; subjectId?: number | n
 export function useEnterFocus() {
   const session = useStudySession();
   return useCallback((context?: Context) => {
-    if (session.status() === "idle" && session.start(context) && session.readout().fraction !== null) void askOnce();
+    if (session.status() === "idle" && session.start({ ...context, ...takeParty() }) && session.readout().fraction !== null) void askOnce();
     focusEnvironment.open();
   }, [session]);
 }

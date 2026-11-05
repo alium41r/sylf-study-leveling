@@ -1,6 +1,6 @@
 // Circle draws its name: the people you study with sit around one quiet ring, and the middle says how many are studying now. It shows only what the
 // server gives. A friend's hidden level or hours say "hidden", never zero, and there is no schedule or activity feed, because no such thing exists.
-// Friend requests can be answered here. Finding people and joining study parties stay on the web for now, and the page says so.
+// People, Messages and Parties are views of this page: friend requests, finding people, groups, and studying together all work here.
 import { useState } from "react";
 import { Pressable, View } from "react-native";
 import { Avatar, Button, Stack, Text, useNotice, useTheme, useWindowClass } from "@sylf/design-system";

@@ -1,6 +1,6 @@
 // A whiteboard: one large Notes drawing page seen through a camera. Fingers, the wheel and a trackpad move and zoom it, the pen draws.
 // The camera is the window's small state, so a board reopens where it was left.
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { View, type LayoutChangeEvent } from "react-native";
 import { IconButton, Text, useTheme } from "@sylf/design-system";
 import { InkScene, type OpenDocument } from "@sylf/notes";
@@ -11,7 +11,7 @@ import { useInkTool } from "./ink-tool";
 
 const MIN = 0.15, MAX = 4;
 
-export default function BoardCanvas({ document, editable, camera: saved, onCamera }: { document: OpenDocument; editable: boolean; camera: InkCamera | null; onCamera(camera: InkCamera): void }) {
+export default function BoardCanvas({ document, editable, camera: saved, onCamera, corner }: { document: OpenDocument; editable: boolean; camera: InkCamera | null; onCamera(camera: InkCamera): void; corner?: ReactNode }) {
   const { space, color } = useTheme();
   const page = document.descriptor().pages[0];
   const scene = useMemo(() => new InkScene(document.stream(page.streamId)), [document, page.streamId]);
@@ -71,6 +71,7 @@ export default function BoardCanvas({ document, editable, camera: saved, onCamer
               <Text variant="micro" tone="soft" style={{ minWidth: 36, textAlign: "center" }}>{Math.round((camera?.zoom ?? 1) * 100)}%</Text>
               <IconButton icon="plus" size="small" label="Zoom in" onPress={() => zoomAt(1.25)} />
               <IconButton icon="fit" size="small" label="Show everything" onPress={() => move(fit())} />
+              {corner}
             </>
           } />
       ) : null}

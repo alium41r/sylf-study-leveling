@@ -46,7 +46,7 @@ function hasInk(doc: Y.Doc) {
   return false;
 }
 
-export default function NoteEditor({ library, document, editable, initialPage, onPage, mode, onMode, narrow }: { library: NotesLibrary; document: OpenDocument; editable: boolean; initialPage: number; onPage(page: number): void; mode: NoteMode; onMode(mode: NoteMode): void; narrow: boolean }) {
+export default function NoteEditor({ library, document, editable, initialPage, onPage, mode, onMode, narrow, corner }: { library: NotesLibrary; document: OpenDocument; editable: boolean; initialPage: number; onPage(page: number): void; mode: NoteMode; onMode(mode: NoteMode): void; narrow: boolean; corner?: ReactNode }) {
   const theme = useTheme();
   const { space, color } = theme;
   const notice = useNotice();
@@ -178,6 +178,7 @@ export default function NoteEditor({ library, document, editable, initialPage, o
       <IconButton icon="minus" size="small" label="Zoom out" onPress={() => pinch(1 / 1.25)} />
       <Text variant="micro" tone="soft" style={{ minWidth: 36, textAlign: "center" }}>{Math.round(zoom * 100)}%</Text>
       <IconButton icon="plus" size="small" label="Zoom in" onPress={() => pinch(1.25)} />
+      {corner}
     </>
   );
 

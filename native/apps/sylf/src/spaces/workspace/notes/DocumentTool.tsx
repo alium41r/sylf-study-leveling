@@ -114,11 +114,20 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
     { key: "trash", label: "Move to trash", icon: "trash", destructive: true, onSelect: () => { void library.trash(entry.id).then(() => notice("Moved to trash")); close(); } },
   ];
   const narrow = width < 460;
+  // Page only: full screen with no window bar and no header, just the toolbar and the page. The toolbar's own button brings them back.
+  const pageOnly = window.state.bare === true && workspace.layout === "fill";
+  const togglePageOnly = () => {
+    if (pageOnly) { patch({ bare: false }); return; }
+    patch({ bare: true });
+    model.focus(window.id);
+    if (workspace.layout !== "fill") model.setLayout("fill");
+  };
+  const pageOnlyButton = <IconButton icon={pageOnly ? "collapse" : "expand"} size="small" label={pageOnly ? "Show the title and header" : "Page only"} testID="document-page-only" onPress={togglePageOnly} />;
   const home = snapshot.notebooks.find((n) => n.id === entry.notebookId)?.title ?? (primary === "pdf" ? "PDFs" : primary === "board" ? "Boards" : "Notes");
 
   return (
     <View style={{ flex: 1 }} onLayout={(e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width)}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: space.xs, paddingHorizontal: space.xs, paddingVertical: 2, borderBottomWidth: 1, borderBottomColor: color.line }}>
+      {pageOnly ? null : <View style={{ flexDirection: "row", alignItems: "center", gap: space.xs, paddingHorizontal: space.xs, paddingVertical: 2, borderBottomWidth: 1, borderBottomColor: color.line }}>
         <Press label={`Back to ${home}`} onPress={close} feedback="surface" bodyStyle={{ flexDirection: "row", alignItems: "center", gap: 2, paddingRight: space.sm, paddingVertical: 4 }}>
           <Icon name="chevronLeft" size={16} color={color.inkSoft} />
           <Text variant="label" tone="soft" numberOfLines={1}>{home}</Text>
@@ -134,13 +143,13 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
         <Text variant="micro" tone={saving === "failed" ? "critical" : "faint"} aria-live="polite">{saving === "saving" ? "Saving" : saving === "failed" ? "Not saved" : "Saved"}</Text>
         {workspace.layout === "fill" ? null : <IconButton icon="fit" size="small" label="Full screen" onPress={() => { model.focus(window.id); model.setLayout("fill"); }} />}
         <View ref={menuAnchor} collapsable={false}><IconButton icon="more" size="small" label="Document options" onPress={() => setMenu(true)} /></View>
-      </View>
+      </View>}
       {opened?.error ? (
         <View style={{ flex: 1, justifyContent: "center" }}><EmptyState icon="warning" title="This didn't open" message={opened.error} action={<Button title="Back to notes" size="small" onPress={close} />} /></View>
       ) : !document ? (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}><Activity label="Opening" /></View>
       ) : kind === "note" && isLayeredNote(document.descriptor()) ? (
-        <NoteEditor key={document.id} library={library} document={document} editable={editable} narrow={narrow}
+        <NoteEditor key={document.id} library={library} document={document} editable={editable} narrow={narrow} corner={pageOnlyButton}
           mode={window.state.mode === "type" || window.state.mode === "write" ? window.state.mode : stylusDevice ? "write" : "type"} onMode={(mode) => patch({ mode })}
           initialPage={typeof window.state.page === "number" ? window.state.page : 0} onPage={(page) => { if (page !== window.state.page) patch({ page }); }} />
       ) : kind === "note" && !liveEditor ? (
@@ -152,11 +161,11 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
           <RichTextEditor key={document.id} document={document} editable={editable} narrow={narrow} />
         </Suspense>
       ) : kind === "board" ? (
-        <BoardCanvas key={document.id} document={document} editable={editable}
+        <BoardCanvas key={document.id} document={document} editable={editable} corner={pageOnlyButton}
           camera={typeof window.state.bz === "number" ? { x: Number(window.state.bx), y: Number(window.state.by), zoom: window.state.bz } : null}
           onCamera={(c) => patch({ bx: Math.round(c.x), by: Math.round(c.y), bz: Math.round(c.zoom * 1000) / 1000 })} />
       ) : (
-        <PagedInk key={document.id} library={library} document={document} pdf={kind === "pdf"} editable={editable}
+        <PagedInk key={document.id} library={library} document={document} pdf={kind === "pdf"} editable={editable} corner={pageOnlyButton}
           initialPage={typeof window.state.page === "number" ? window.state.page : 0} onPage={(page) => { if (page !== window.state.page) patch({ page }); }} />
       )}
       <Menu open={menu} anchor={menuAnchor } onClose={() => setMenu(false)} items={items} label="Document" side="bottom" />

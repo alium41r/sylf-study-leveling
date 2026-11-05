@@ -19,7 +19,7 @@ function sceneFor(document: OpenDocument, page: Page, pdf: boolean) {
   return new InkScene(doc, pdf ? { records: notesPdf.pdfPageMaps(doc).ink } : {});
 }
 
-export default function PagedInk({ library, document, pdf, editable, initialPage, onPage, header }: { library: NotesLibrary; document: OpenDocument; pdf: boolean; editable: boolean; initialPage: number; onPage(page: number): void; header?: ReactNode }) {
+export default function PagedInk({ library, document, pdf, editable, initialPage, onPage, header, corner }: { library: NotesLibrary; document: OpenDocument; pdf: boolean; editable: boolean; initialPage: number; onPage(page: number): void; header?: ReactNode; corner?: ReactNode }) {
   const { space, color } = useTheme();
   const [descriptor, setDescriptor] = useState(document.descriptor());
   useEffect(() => document.subscribe(() => setDescriptor(document.descriptor())), [document]);
@@ -110,6 +110,7 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
               <Text variant="micro" tone="soft" style={{ minWidth: 36, textAlign: "center" }}>{Math.round(zoom * 100)}%</Text>
               <IconButton icon="plus" size="small" label="Zoom in" onPress={() => pinch(1.25)} />
               {pdf ? null : <View ref={pageMenuAnchor} collapsable={false}><IconButton icon="pagePlus" size="small" label="Pages and paper" onPress={() => setPageMenu(true)} /></View>}
+              {corner}
             </>
           } />
       ) : null}

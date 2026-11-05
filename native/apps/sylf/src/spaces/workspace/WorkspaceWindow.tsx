@@ -259,7 +259,8 @@ export const WindowView = memo(function WindowView({ window, title, focused, lif
     >
       {boxShadow && !tiled ? <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: window.width, height: window.height, borderRadius: shape.radius.lg, boxShadow }, still]} /> : null}
       <View style={[StyleSheet.absoluteFill, flat, { overflow: "hidden" }, tiled ? { borderRadius: 0, borderWidth: 0, borderRightWidth: StyleSheet.hairlineWidth, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: color.line } : null, webOnly({ cursor: "default" })]}>
-        <View style={{ height: BAR, flexDirection: "row", alignItems: "center", paddingRight: space.xs, borderBottomWidth: 1, borderBottomColor: color.line }}>
+        {/* Page only (a document's toolbar button) hides the bar of a full-screen tile; leaving full screen brings it back. */}
+        {tiled && window.state.bare === true ? null : <View style={{ height: BAR, flexDirection: "row", alignItems: "center", paddingRight: space.xs, borderBottomWidth: 1, borderBottomColor: color.line }}>
           <GestureDetector gesture={bar} userSelect="none">
             <View
               testID={`window-bar-${id}`}
@@ -281,7 +282,7 @@ export const WindowView = memo(function WindowView({ window, title, focused, lif
           {tiled ? <IconButton icon="collapse" size="small" bare label="Leave full screen" testID={`window-unfill-${id}`} style={{ alignSelf: "center" }} onPress={() => model.setLayout("free")} /> : null}
           <IconButton icon="minus" size="small" bare label={`Minimize ${title}`} testID={`window-minimize-${id}`} style={{ alignSelf: "center" }} onPress={() => model.minimize(id)} />
           <IconButton icon="close" size="small" bare label={`Close ${title}`} testID={`window-close-${id}`} style={{ alignSelf: "center" }} onPress={() => model.close(id)} />
-        </View>
+        </View>}
         <ToolHost window={window} lifecycle={lifecycle} title={title} fillOrder={fillOrder} overview={overview} onProvenance={onProvenance} />
       </View>
       {tiled ? null : <Corners behind={color.ground} />}

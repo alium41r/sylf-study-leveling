@@ -5,7 +5,7 @@ import { memo, useEffect, useMemo, useRef, useState, type RefObject } from "reac
 import { Platform, ScrollView, StyleSheet, View, useWindowDimensions } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { Dialog, Divider, Icon, IconButton, Menu, Press, Text, TextField, Tooltip, TravellingMarker, fade, useInputFormat, useNotice, useTheme, type IconName, type MenuItem, type ViewHandle } from "@sylf/design-system";
-import { LAYOUT_LABELS, TOOLS, TOOL_IDS, WORKSPACE_LAYOUTS, ZOOM, windowTitle, windowsOf, type ToolId, type WorkspaceLayout, type WorkspaceState } from "@sylf/spaces";
+import { LAYOUT_LABELS, TOOLS, LAUNCHER_TOOLS, WORKSPACE_LAYOUTS, ZOOM, windowTitle, windowsOf, type ToolId, type WorkspaceLayout, type WorkspaceState } from "@sylf/spaces";
 import { useWorkspaceModel } from "../../shell/context";
 import { TOOL_ICONS } from "./icons";
 import { WindowsSheet } from "./WindowsSheet";
@@ -98,7 +98,7 @@ export const CommandCenter = memo(function CommandCenter({ state, height }: { st
   ];
   const saveNamed = () => { const name = naming?.trim(); setNaming(null); if (name) { model.saveLayout(name); notice(`Saved as ${name}`); } };
 
-  const focusIndex = focusedTool ? TOOL_IDS.indexOf(focusedTool) : 0;
+  const focusIndex = focusedTool ? LAUNCHER_TOOLS.indexOf(focusedTool) : 0;
   const { boxShadow, ...plate } = surface("float", "lg");
   // The shadow is a still layer that arrives once the Space has stopped moving. Drawn during the entrance, the GPU keeps a copy of
   // it for each frame: about 40 MB an entrance on the tablet, up to its 135 MB cap, and it never gives them back.
@@ -115,7 +115,7 @@ export const CommandCenter = memo(function CommandCenter({ state, height }: { st
       {shadowed && boxShadow ? <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: plate.borderRadius, boxShadow }, still]} /> : null}
       <View role="toolbar" aria-label="Command Center" testID="workspace-dock" style={[plate, { flexDirection: "row", alignItems: "center", height, paddingHorizontal: space.xs, gap: space.xs }]}>
       <ScrollView keyboardShouldPersistTaps="handled" horizontal showsHorizontalScrollIndicator={false} overScrollMode="never" style={{ flexShrink: 1 }} contentContainerStyle={{ flexDirection: "row" }}>
-        {TOOL_IDS.map((tool) => {
+        {LAUNCHER_TOOLS.map((tool) => {
           const instances = windowsOf(state, tool);
           return <ToolSlot key={tool} tool={tool} width={slotWidth} height={height - space.xs * 2} count={instances.length} active={instances.filter((item) => !item.minimized).length} focused={focusedTool === tool} onPress={() => press(tool)} onMenu={(point) => setMenu({ tool, point })} slotRef={(node) => { if (node) anchors.current.set(tool, node); }} />;
         })}

@@ -12,6 +12,7 @@ import { useDockMetrics, useHomeNavigation, useSessionReadout, useSessionState, 
 import { SESSION_STATUS_LABELS, SessionActions, SessionClock, SessionLengths, SessionNote, SessionProgress, SessionSubject, speakReadout } from "./session/SessionParts";
 import { EnterFocusButton } from "./focus/enter";
 import { DOCK_SHORTCUT, useDockKeys } from "./shell-keys";
+import { DockSound, DockSoundGlance } from "./audio/DockSound";
 
 const hiddenOnWeb = Platform.select<ViewStyle>({ web: { visibility: "hidden" } as unknown as ViewStyle, default: {} });
 const ANNOUNCED: Partial<Record<SessionStatus, string>> = { running: "Session in progress", paused: "Session paused", finished: "Session finished" };
@@ -63,10 +64,11 @@ function DockPanel({ open, onClose, onGo }: { open: boolean; onClose: () => void
       <SessionActions surface="dock" onEnded={onClose} />
       <EnterFocusButton surface="dock" onEnter={onClose} />
       <Divider />
+      <DockSound />
+      <Divider />
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Button title="Focus" size="small" variant="ghost" icon="focus" testID="dock-go-focus" onPress={focus} />
         <Button title="Timer" size="small" variant="ghost" icon="timer" testID="dock-go-timer" onPress={tool("timer")} />
-        <Button title="Audio" size="small" variant="ghost" icon="audio" testID="dock-go-audio" onPress={tool("audio")} />
       </View>
       <SessionNote />
     </View>
@@ -134,6 +136,9 @@ export function TimerDock({ barReach }: { barReach: number | null }) {
       <Animated.View pointerEvents={open || covered ? "none" : "box-none"} aria-hidden={open || covered || undefined} importantForAccessibility={open || covered ? "no-hide-descendants" : "auto"} style={[surface("raised", "md"), { position: "absolute", top, left: restLeft, width: restWidth, height }, resting]}>
         <DockGlance open={open} onPress={show} pressRef={glance} />
         <Corners behind={color.ground} />
+      </Animated.View>
+      <Animated.View pointerEvents={open || covered ? "none" : "box-none"} aria-hidden={open || covered || undefined} style={[{ position: "absolute", top, left: restLeft + restWidth + space.sm }, resting]}>
+        <DockSoundGlance size={height} />
       </Animated.View>
       {visited ? (
         <>

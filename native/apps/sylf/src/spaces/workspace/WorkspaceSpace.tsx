@@ -6,7 +6,7 @@ import { View } from "react-native";
 import Animated, { useAnimatedReaction } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import { Stack, Text, useNotice, useNoticeClearance, useTheme, useWindowClass, type ViewHandle } from "@sylf/design-system";
-import { OVERVIEW_ZOOM, TOOL_IDS, ZOOM, fillTiles, pinchRegions, planLifecycles, seenWindowIds, windowTitle, type Rect, type Size } from "@sylf/spaces";
+import { OVERVIEW_ZOOM, LAUNCHER_TOOLS, ZOOM, fillTiles, pinchRegions, planLifecycles, seenWindowIds, windowTitle, type Rect, type Size } from "@sylf/spaces";
 import { useShellMetrics, useWorkspaceModel, useWorkspaceState } from "../../shell/context";
 import { useKeyboardLift } from "../../shell/useKeyboardLift";
 import { CommandCenter } from "./CommandCenter";
@@ -89,7 +89,7 @@ export default function WorkspaceSpace() {
   );
 
   useWorkspaceKeys({
-    openTool(index) { if (!model.open(TOOL_IDS[index])) notice("The Workspace is full. Close a window first."); },
+    openTool(index) { const tool = LAUNCHER_TOOLS[index]; if (tool && !model.open(tool)) notice("The Workspace is full. Close a window first."); },
     closeFocused() { if (state.focused) model.close(state.focused); },
     minimizeFocused() { if (state.focused) model.minimize(state.focused); },
     cycle: model.cycle,

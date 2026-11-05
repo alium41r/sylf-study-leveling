@@ -31,4 +31,7 @@ export const TOOLS: Record<ToolId, ToolSpec> = {
   resources: { label: "Resources", multiple: true, min: { width: 308, height: 308 }, preferred: { width: 420, height: 560 }, max: { width: 840, height: 1204 }, capabilities: ["file"], owner: "The Resource Shelf: a catalogue over Notes, not a new store" },
 };
 
+/** The tools Workspace offers to open. Audio plays from the timer dock, anywhere in the app, so it has no place here; a saved Audio
+ *  window from before still opens. */
+export const LAUNCHER_TOOLS: readonly ToolId[] = TOOL_IDS.filter((tool) => tool !== "audio");
 export const isToolId = (value: unknown): value is ToolId => TOOL_IDS.includes(value as ToolId);

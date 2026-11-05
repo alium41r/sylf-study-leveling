@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { Platform, ScrollView, TextInput, View } from "react-native";
 import { Dialog, Icon, Press, Spotlight, Text, useNotice, useTheme, type IconName } from "@sylf/design-system";
 import { BOARD_TEMPLATES, type LibraryEntry, type NoteKind } from "@sylf/notes";
-import { HOME_DESTINATIONS, HOME_LABELS, LAYOUT_LABELS, SPACE_LABELS, TOOLS, TOOL_IDS, windowTitle, type HomeDestination, type ToolId, type WorkspaceLayout } from "@sylf/spaces";
+import { HOME_DESTINATIONS, HOME_LABELS, LAYOUT_LABELS, SPACE_LABELS, TOOLS, LAUNCHER_TOOLS, windowTitle, type HomeDestination, type ToolId, type WorkspaceLayout } from "@sylf/spaces";
 import { useAccountEntry, useHomeNavigation, useSessionState, useSpacesStore, useStudySession, useWorkspaceModel, useWorkspaceState } from "../context";
 import { focusEnvironment } from "../focus/environment";
 import { useLibrarySnapshot, useNotesLibrary } from "../notes/library";
@@ -100,7 +100,7 @@ export default function CommandPalette({ open }: { open: boolean }) {
 
     if (hasWorkspace) {
       // Tools, then the windows already open.
-      for (const tool of TOOL_IDS) out.push({ id: `tool:${tool}`, title: TOOLS[tool].label, detail: "Tool", icon: TOOL_ICONS[tool], group: "Tools", keywords: ["open", "tool", ...(TOOL_WORDS[tool] ?? [])], run: () => { toWorkspace(); model.summon(tool); } });
+      for (const tool of LAUNCHER_TOOLS) out.push({ id: `tool:${tool}`, title: TOOLS[tool].label, detail: "Tool", icon: TOOL_ICONS[tool], group: "Tools", keywords: ["open", "tool", ...(TOOL_WORDS[tool] ?? [])], run: () => { toWorkspace(); model.summon(tool); } });
       for (const window of workspace.windows) out.push({ id: `window:${window.id}`, title: windowTitle(workspace, window), detail: window.minimized ? "Minimized window" : "Open window", icon: TOOL_ICONS[window.tool], group: "Windows", keywords: ["window", "switch", TOOLS[window.tool].label], run: () => { toWorkspace(); if (window.minimized) model.restore(window.id); model.focus(window.id); model.reveal(window.id); } });
       // Arrangements.
       const visible = workspace.windows.some((w) => !w.minimized);

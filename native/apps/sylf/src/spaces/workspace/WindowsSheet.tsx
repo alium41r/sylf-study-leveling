@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { Button, Checkbox, Dialog, Icon, Press, Sheet, Text, useNotice, useTheme } from "@sylf/design-system";
-import { MAX_WINDOWS, TOOLS, TOOL_IDS, windowTitle, type ToolId, type WorkspaceModel, type WorkspaceState } from "@sylf/spaces";
+import { MAX_WINDOWS, TOOLS, LAUNCHER_TOOLS, windowTitle, type ToolId, type WorkspaceModel, type WorkspaceState } from "@sylf/spaces";
 import { TOOL_ICONS } from "./icons";
 
 export function WindowsSheet({ open, onClose, state, model }: { open: boolean; onClose(): void; state: WorkspaceState; model: WorkspaceModel }) {
@@ -51,7 +51,7 @@ export function WindowsSheet({ open, onClose, state, model }: { open: boolean; o
           <View style={{ gap: space.xs }}>
             <Text variant="label" tone="soft">Open together</Text>
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xs }}>
-              {TOOL_IDS.map((tool) => {
+              {LAUNCHER_TOOLS.map((tool) => {
                 const selected = tools.includes(tool);
                 return (
                   <Press key={tool} label={`${TOOLS[tool].label}${selected ? ", chosen" : ""}`} selected={selected} onPress={() => setTools(toggle(tools, tool))}

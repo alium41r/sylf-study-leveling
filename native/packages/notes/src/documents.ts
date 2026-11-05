@@ -24,12 +24,13 @@ export function emptyRichTextUpdate() {
 
 export interface Created { descriptor: DocumentDescriptor; updates: { streamId: string; bytes: Uint8Array }[] }
 
-export function typedNote(libraryId: string, title: string, folderId: string | null, template: string): Created {
-  const d = base(libraryId, title, "flow", folderId), id = newId();
+/** Without a title of its own, a typed note is named by its first line until someone renames it. */
+export function typedNote(libraryId: string, title: string | null, folderId: string | null, template: string): Created {
+  const d = base(libraryId, title ?? "Untitled note", "flow", folderId), id = newId();
   d.streams.push(stream(id, RICH_TEXT_ADAPTER, "body", "xml"));
   d.requiredFeatures = ["rich-text-v1", "creative-tools-v1"];
   d.extensions.noteStyle = noteStyle.DEFAULT_NOTE_STYLE;
-  d.extensions.sylfNative = { surface: "note", template };
+  d.extensions.sylfNative = { surface: "note", template, autoTitle: title === null };
   return { descriptor: d, updates: [{ streamId: id, bytes: emptyRichTextUpdate() }] };
 }
 

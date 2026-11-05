@@ -22,3 +22,6 @@ apps/sylf/ios/
 # Native module build output.
 packages/*/android/build/
 packages/*/android/.gradle/
+
+# PDF.js assets copied by tooling/build/pdf-assets.mjs
+/apps/sylf/public/notes-pdf/

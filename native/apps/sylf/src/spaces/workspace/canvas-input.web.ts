@@ -1,6 +1,7 @@
 // A trackpad's two fingers pan, and its pinch arrives as a wheel event with the control key set, which is also how a mouse user
 // zooms. React's wheel handlers are passive, so this listens directly. A wheel over a tool that can still scroll belongs to the
-// tool. Anything else belongs to the canvas, so the page itself can never scroll or zoom.
+// tool, and so does one that marks itself with data-owns-wheel. Anything else belongs to the canvas, so the page itself can never
+// scroll or zoom.
 import { useEffect, useRef, type RefObject } from "react";
 import type { ViewHandle } from "@sylf/design-system";
 import type { WheelHandlers } from "./canvas-input";
@@ -8,8 +9,12 @@ import type { WheelHandlers } from "./canvas-input";
 const LINE = 16;
 const REST_MS = 160;
 
-function toolTakes(event: WheelEvent, root: HTMLElement) {
+function toolTakes(event: WheelEvent, root: HTMLElement, zooming: boolean) {
   for (let node = event.target as HTMLElement | null; node && node !== root; node = node.parentElement) {
+    // A surface that pans or zooms itself (a whiteboard, a page being zoomed) claims the wheel outright.
+    const owns = node.dataset?.ownsWheel;
+    if (owns === "all" || (owns === "zoom" && zooming)) return true;
+    if (zooming) continue;
     const style = getComputedStyle(node);
     const canY = /(auto|scroll)/.test(style.overflowY) && node.scrollHeight > node.clientHeight + 1;
     const canX = /(auto|scroll)/.test(style.overflowX) && node.scrollWidth > node.clientWidth + 1;
@@ -29,7 +34,7 @@ export function useCanvasWheel(target: RefObject<ViewHandle | null>, handlers: W
     const onWheel = (event: WheelEvent) => {
       const scale = event.deltaMode === 1 ? LINE : 1;
       const zooming = event.ctrlKey || event.metaKey;
-      if (!zooming && toolTakes(event, root)) return;
+      if (toolTakes(event, root, zooming)) return;
       event.preventDefault();
       if (zooming) {
         const box = root.getBoundingClientRect();

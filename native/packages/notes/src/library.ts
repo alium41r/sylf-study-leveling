@@ -250,6 +250,9 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       },
       setText(text) {
         const preview = plain(text, 140), body = plain(text, 4000);
+        const native = stored.descriptor.extensions.sylfNative as { autoTitle?: boolean } | undefined;
+        const first = plain(text.split("\n").find((line) => line.trim()) ?? "", 80);
+        if (native?.autoTitle && first && first !== stored.descriptor.title) mutate((d) => { d.title = first; });
         if (preview === stored.meta.preview && body === stored.meta.text) return;
         stored = { ...stored, meta: { ...stored.meta, preview, text: body } };
         descriptorDirty = true;
@@ -258,8 +261,8 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       },
       rename(title) {
         const next = title.trim().slice(0, 500);
-        if (!next || next === stored.descriptor.title) return;
-        mutate((d) => { d.title = next; });
+        if (!next) return;
+        mutate((d) => { d.title = next; if (d.extensions.sylfNative) d.extensions.sylfNative = { ...(d.extensions.sylfNative as object), autoTitle: false }; });
       },
       flush: () => persist(),
       release() {
@@ -292,7 +295,7 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
     ready: () => loaded,
     create(input) {
       const folder = input.notebookId ?? null;
-      if (input.kind === "note") return save(typedNote(record.libraryId, input.title ?? "Untitled note", folder, input.template ?? "blank"));
+      if (input.kind === "note") return save(typedNote(record.libraryId, input.title ?? null, folder, input.template ?? "blank"));
       if (input.kind === "board") return save(board(record.libraryId, input.title ?? "Whiteboard", folder, boardPaper(input.paper ?? "dotted")));
       return save(handwriting(record.libraryId, input.title ?? "Handwritten note", folder, paperFor(input.paper ?? "ruled")));
     },
@@ -313,7 +316,12 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       opening.set(id, task);
       return task;
     },
-    rename: (id, title) => change(id, (d) => { const next = title.trim().slice(0, 500); if (next) d.descriptor.title = next; }),
+    rename: (id, title) => change(id, (d) => {
+      const next = title.trim().slice(0, 500);
+      if (!next) return;
+      d.descriptor.title = next;
+      if (d.descriptor.extensions.sylfNative) d.descriptor.extensions.sylfNative = { ...(d.descriptor.extensions.sylfNative as object), autoTitle: false };
+    }),
     move: (id, notebookId) => change(id, (d) => { d.descriptor.folderId = notebookId; }),
     setSubject: (id, subjectId) => change(id, (d) => { d.descriptor.subjectId = subjectId; }),
     pin: (id, pinned) => change(id, (d) => { d.meta.pinned = pinned; }, false),

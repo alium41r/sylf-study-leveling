@@ -5,8 +5,8 @@
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
-    "web": "expo start --web",
-    "build:web": "EXPO_PUBLIC_SYLF_DEV_TOOLS=1 expo export --platform web --output-dir dist --clear",
+    "web": "node ../../tooling/build/pdf-assets.mjs && expo start --web",
+    "build:web": "node ../../tooling/build/pdf-assets.mjs && EXPO_PUBLIC_SYLF_DEV_TOOLS=1 expo export --platform web --output-dir dist --clear",
     "prebuild:android": "expo prebuild --platform android --no-install",
     "prebuild:ios": "expo prebuild --platform ios --no-install",
     "build:android": "npm run prebuild:android && cd android && EXPO_PUBLIC_SYLF_DEV_TOOLS=1 ./gradlew assembleRelease -PreactNativeArchitectures=${SYLF_ANDROID_ABIS:-arm64-v8a}",
@@ -17,6 +17,7 @@
     "@expo/metro-runtime": "~58.0.15",
     "@sylf/backend": "*",
     "@sylf/design-system": "*",
+    "@sylf/notes": "*",
     "@sylf/platform": "*",
     "@sylf/shared": "*",
     "@sylf/spaces": "*",

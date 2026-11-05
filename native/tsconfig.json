@@ -6,7 +6,8 @@
     "types": ["node"],
     "paths": {
       "yjs": ["./node_modules/yjs"],
-      "zod": ["./node_modules/zod"]
+      "zod": ["./node_modules/zod"],
+      "perfect-freehand": ["./node_modules/perfect-freehand"]
     }
   },
   "include": [

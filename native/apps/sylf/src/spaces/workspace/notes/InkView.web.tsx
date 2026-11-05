@@ -115,6 +115,7 @@ export default function InkView(props: InkViewProps) {
     drawBase();
     requestLive();
   }, [props.width, props.height, props.camera.x, props.camera.y, props.camera.zoom, props.selection, props.drawPaper, dpr]);
+  useEffect(() => () => props.scene.endSweep(), [props.scene]);
   useEffect(() => props.scene.subscribe(() => {
     const ids = new Set(props.scene.strokes().map((s) => s.id));
     for (const id of [...paths.current.keys()]) if (!ids.has(id)) paths.current.delete(id);
@@ -176,7 +177,7 @@ export default function InkView(props: InkViewProps) {
     }
     if (p.selection.length) p.onSelection([]);
     const tool = native.pointerType === "pen" && native.button === 5 ? "eraser" : p.tool.tool;
-    if (tool === "eraser") { gesture.current = { kind: "erase", pointer: native.pointerId, started: native.timeStamp, points: [], path: [point], last: point }; eraseAlong([point]); requestLive(); return; }
+    if (tool === "eraser") { gesture.current = { kind: "erase", pointer: native.pointerId, started: native.timeStamp, points: [], path: [point], last: point }; p.scene.beginSweep(); eraseAlong([point]); requestLive(); return; }
     if (tool === "lasso") { gesture.current = { kind: "lasso", pointer: native.pointerId, started: native.timeStamp, points: [], path: [point] }; return; }
     const style = brushFor(tool === "highlighter" ? "highlighter" : tool === "shape" ? "shape" : "pen", { color: p.tool.color, width: tool === "highlighter" ? Math.max(8, p.tool.width * 4) : p.tool.width, input: native.pointerType === "pen" ? "pen" : native.pointerType === "touch" ? "touch" : "mouse", shape: p.tool.shape });
     try { p.scene.begin(style); } catch { return; }
@@ -212,9 +213,9 @@ export default function InkView(props: InkViewProps) {
       g.points.push(...samples);
       try { p.scene.append(samples); } catch { gesture.current = null; }
     } else {
-      const points = (events.length ? events : [native]).map((e) => pagePoint(e));
+      const points = (events.length ? events : [native]).map((e) => pagePoint(e)), previous = g.last;
       g.last = points.at(-1);
-      if (g.kind === "erase") { g.path.push(...points); eraseAlong(points); }
+      if (g.kind === "erase") { g.path.push(...points); eraseAlong(previous ? [previous, ...points] : points); }
       else if (g.kind === "lasso") g.path.push(...points);
       else if (g.kind === "move") { drawBase(); return; }
     }
@@ -226,6 +227,7 @@ export default function InkView(props: InkViewProps) {
     if (!g || g.pointer !== native.pointerId) { if (g?.kind === "pan" && !touches.current.size) gesture.current = null; return; }
     gesture.current = null;
     if (g.kind === "draw") { if (native.type === "pointercancel") p.scene.cancel(); else p.scene.end(); }
+    else if (g.kind === "erase") p.scene.endSweep();
     else if (g.kind === "lasso") p.onSelection(p.scene.select(g.path));
     else if (g.kind === "move" && g.origin && g.last) { p.scene.move(p.selection, g.last.x - g.origin.x, g.last.y - g.origin.y); }
     drawBase();

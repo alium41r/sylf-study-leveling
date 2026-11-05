@@ -206,7 +206,7 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
           else -> Kind.DRAW
         }
         if (kind == Kind.MOVE) { moveFrom = floatArrayOf(x, y); moveTo = moveFrom }
-        else if (kind == Kind.ERASE) { erasePoints.add(x); erasePoints.add(y); emitErase(type) }
+        else if (kind == Kind.ERASE) { erasePoints.add(x); erasePoints.add(y); emitErase(type, "start") }
         else sample(event, index, -1)
         invalidate()
         return true
@@ -219,7 +219,7 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
           Kind.ERASE -> {
             for (h in 0 until event.historySize) { erasePoints.add(pageX(event.getHistoricalX(i, h))); erasePoints.add(pageY(event.getHistoricalY(i, h))) }
             erasePoints.add(pageX(event.getX(i))); erasePoints.add(pageY(event.getY(i)))
-            if (erasePoints.size >= 12) emitErase(type)
+            if (erasePoints.size >= 12) emitErase(type, "move")
           }
           Kind.MOVE -> moveTo = floatArrayOf(pageX(event.getX(i)), pageY(event.getY(i)))
           else -> {}
@@ -236,9 +236,11 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
     return true
   }
 
-  private fun emitErase(type: Int) {
-    if (erasePoints.isEmpty()) return
-    onErase(mapOf("points" to erasePoints.map { it.toDouble() }, "pointer" to pointerName(type)))
+  /** One sweep is "start", any "move"s, then "end", so JavaScript can make the whole sweep one undo step. */
+  private fun emitErase(type: Int, phase: String) {
+    if (erasePoints.isEmpty() && phase != "end") return
+    onErase(mapOf("points" to erasePoints.map { it.toDouble() }, "pointer" to pointerName(type), "phase" to phase))
+    if (erasePoints.size < 2) return
     // Keep the last point, so the eraser's ring stays under the pen.
     val x = erasePoints[erasePoints.size - 2]; val y = erasePoints[erasePoints.size - 1]
     erasePoints.clear(); erasePoints.add(x); erasePoints.add(y)
@@ -258,7 +260,7 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
         }
       }
       Kind.LASSO -> if (!cancelled) onStroke(mapOf("kind" to "lasso", "samples" to samples.map { it.toDouble() }, "pointer" to pointerName(type), "live" to 0))
-      Kind.ERASE -> emitErase(type)
+      Kind.ERASE -> emitErase(type, "end")
       Kind.MOVE -> { val from = moveFrom; val to = moveTo; if (!cancelled && from != null && to != null) onStroke(mapOf("kind" to "move", "samples" to listOf(from[0], from[1], to[0], to[1]).map { it.toDouble() }, "pointer" to pointerName(type), "live" to 0)) }
       else -> {}
     }

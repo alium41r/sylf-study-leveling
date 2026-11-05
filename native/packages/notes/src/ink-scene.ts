@@ -25,25 +25,43 @@ const distanceToSegment = (p: Point, a: InkSample, b: InkSample) => {
   return Math.hypot(p.x - (a[0] + t * dx), p.y - (a[1] + t * dy));
 };
 
+/** Samples arrive far apart when the eraser moves fast; fill the gaps so it never skips a stroke lying between two of them. */
+function densify(sampled: readonly Point[], radius: number) {
+  if (sampled.length < 2) return sampled;
+  const step = Math.max(1, radius / 2), path: Point[] = [sampled[0]];
+  for (let i = 1; i < sampled.length && path.length < 1024; i++) {
+    const a = sampled[i - 1], b = sampled[i], n = Math.min(256, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / step));
+    for (let k = 1; k <= n; k++) path.push({ x: a.x + ((b.x - a.x) * k) / n, y: a.y + ((b.y - a.y) * k) / n });
+  }
+  return path;
+}
+
 export interface InkSceneOptions { records?: Y.Map<unknown>; writable?: () => boolean }
 
 export class InkScene {
   readonly model: InkModelType;
   private readonly cache = new Map<string, RenderStroke>();
   private list: RenderStroke[] = [];
-  private seen = -1;
+  private seen = "";
+  // Strokes the eraser has passed over in the sweep under way: hidden now, removed in one edit when it lifts, so one sweep is one undo.
+  private sweep: Set<string> | null = null;
+  private readonly listeners = new Set<() => void>();
   constructor(doc: Y.Doc, options: InkSceneOptions = {}) {
     this.model = new ink.InkModel(doc, options.writable, options.records);
   }
-  subscribe(listener: () => void) { return this.model.subscribe(listener); }
+  subscribe(listener: () => void) {
+    this.listeners.add(listener);
+    const off = this.model.subscribe(listener);
+    return () => { this.listeners.delete(listener); off(); };
+  }
   paper(): InkPaper { return this.model.paper(); }
   /** Finished strokes in drawing order. Each keeps its object while its version holds, so a renderer can diff by identity. */
   strokes(): RenderStroke[] {
-    const version = this.model.sceneVersion();
+    const version = `${this.model.sceneVersion()}:${this.sweep?.size ?? -1}`;
     if (version === this.seen) return this.list;
     this.seen = version;
     const live = new Set<string>();
-    this.list = this.model.strokes().map((stroke) => {
+    this.list = this.model.strokes().filter((stroke) => !this.sweep?.has(stroke.id)).map((stroke) => {
       live.add(stroke.id);
       const cached = this.cache.get(stroke.id);
       if (cached && cached.version === stroke.version) return cached;
@@ -54,19 +72,28 @@ export class InkScene {
     for (const id of [...this.cache.keys()]) if (!live.has(id)) this.cache.delete(id);
     return this.list;
   }
-  begin(style: InkBrush) { return this.model.begin(style); }
+  begin(style: InkBrush) { this.endSweep(); return this.model.begin(style); }
   append(points: InkSample[]) { this.model.append(points); }
   end() { this.model.finish("complete"); }
   cancel() { if (!this.model.cancelUnflushed()) this.model.finish("interrupted"); }
-  /** Whole strokes under the eraser path. */
-  eraseStrokes(path: readonly Point[], radius: number) {
-    const targets = this.hits(path, radius);
-    if (targets.length) this.model.edit({ targets, erase: true });
+  /** Whole strokes under the eraser path. Inside a sweep they are hidden until `endSweep`; otherwise removed at once. */
+  eraseStrokes(sampled: readonly Point[], radius: number) {
+    const path = densify(sampled, radius), targets = this.hits(path, radius).filter((id) => !this.sweep?.has(id));
+    if (!targets.length) return 0;
+    if (this.sweep) { targets.forEach((id) => this.sweep!.add(id)); this.listeners.forEach((listener) => listener()); }
+    else this.model.edit({ targets, erase: true });
     return targets.length;
   }
+  beginSweep() { this.endSweep(); this.sweep = new Set(); }
+  endSweep() {
+    const swept = this.sweep;
+    this.sweep = null;
+    if (!swept?.size) return;
+    try { this.model.edit({ targets: [...swept], erase: true }); } finally { this.listeners.forEach((listener) => listener()); }
+  }
   /** Only the part of each stroke the eraser touched, cut by the web's own geometry. */
-  erasePrecisely(path: readonly Point[], radius: number) {
-    const targets = this.hits(path, radius);
+  erasePrecisely(sampled: readonly Point[], radius: number) {
+    const path = densify(sampled, radius), targets = this.hits(path, radius);
     if (targets.length) this.model.eraseSegments(targets, path.slice(0, 1024).map((p) => ({ x: p.x, y: p.y, radius: Math.max(1, Math.min(100, radius)) })));
     return targets.length;
   }
@@ -99,7 +126,7 @@ export class InkScene {
   redo() { this.model.redoEdit(); }
   canUndo() { return this.model.undo.canUndo(); }
   canRedo() { return this.model.undo.canRedo(); }
-  close() { this.model.close(); }
+  close() { this.endSweep(); this.model.close(); }
   private hits(path: readonly Point[], radius: number) {
     if (!path.length) return [];
     const box = boundsOf(path), reach = { x: box.x - radius, y: box.y - radius, width: box.width + radius * 2, height: box.height + radius * 2 };

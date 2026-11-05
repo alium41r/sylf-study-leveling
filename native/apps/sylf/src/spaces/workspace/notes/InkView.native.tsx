@@ -49,6 +49,7 @@ function NativeInkSurface(props: InkViewProps) {
       await handle.upsertStrokes(JSON.stringify(part.map((s) => ({ id: s.id, d: s.d, color: s.color, opacity: s.opacity }))));
     }
   };
+  useEffect(() => () => scene.endSweep(), [scene]);
   useEffect(() => {
     sent.current.clear();
     void ref.current?.clearStrokes().then(() => sync.current());
@@ -76,8 +77,11 @@ function NativeInkSurface(props: InkViewProps) {
       onPan={(e) => latest.current.onPan?.(e.nativeEvent.dx, e.nativeEvent.dy)}
       onPinch={(e) => latest.current.onPinch?.(e.nativeEvent.factor, e.nativeEvent.x, e.nativeEvent.y)}
       onErase={(e) => {
-        const p = latest.current, path = pointsOf(e.nativeEvent.points, 2);
+        const p = latest.current, { points, phase } = e.nativeEvent, path = pointsOf(points, 2);
+        // A sweep is one undo step. Builds before the phase was sent erase batch by batch.
+        if (phase === "start") p.scene.beginSweep();
         try { if (p.tool.eraser === "precise") p.scene.erasePrecisely(path, eraserRadius(p.tool)); else p.scene.eraseStrokes(path, eraserRadius(p.tool)); } catch { /* A full page refuses precise erasing; the stroke eraser still works. */ }
+        if (phase === "end") p.scene.endSweep();
       }}
       onStroke={(e) => {
         const p = latest.current, { kind, samples, pointer, live } = e.nativeEvent;

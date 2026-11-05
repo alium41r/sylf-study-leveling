@@ -4,7 +4,7 @@ import { requireNativeView, requireOptionalNativeModule } from "expo";
 
 export interface NativeInkEvents {
   onStroke(event: { nativeEvent: { kind: "draw" | "lasso" | "move"; samples: number[]; pointer: "pen" | "touch" | "mouse"; live: number } }): void;
-  onErase(event: { nativeEvent: { points: number[]; pointer: string } }): void;
+  onErase(event: { nativeEvent: { points: number[]; pointer: string; phase?: "start" | "move" | "end" } }): void;
   onPan(event: { nativeEvent: { dx: number; dy: number } }): void;
   onPinch(event: { nativeEvent: { factor: number; x: number; y: number } }): void;
   onPenSeen(event: { nativeEvent: object }): void;

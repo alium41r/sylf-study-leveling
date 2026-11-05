@@ -233,6 +233,15 @@ describe("Sylf vector ink operations", () => {
     ink.redoEdit();
     expect(ink.strokes()[0].points[0][0]).toBe(50);
   });
+
+  it("changes the scene version when the last stroke is erased, so cached views drop it", () => {
+    const ink = model(),
+      id = draw(ink, points(8));
+    const before = ink.sceneVersion();
+    ink.edit({ targets: [id], erase: true });
+    expect(ink.strokes()).toHaveLength(0);
+    expect(ink.sceneVersion()).not.toBe(before);
+  });
   it("merges concurrent strokes/transforms and keeps a peer's work when undoing locally", () => {
     const a = model(),
       b = model();

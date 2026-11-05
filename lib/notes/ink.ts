@@ -376,7 +376,8 @@ export class InkModel {
       const chunks = [...(this.parts.get(id)?.values() || [])].sort(
         (a, b) => a.part - b.part
       );
-      this.projected.delete(id);
+      // A stroke leaving the scene changes it too: without this, erasing the last stroke left the version, and every cached view, as they were.
+      if (this.projected.delete(id)) ++this.version;
       if (!chunks.length) {
         this.parts.delete(id);
         continue;

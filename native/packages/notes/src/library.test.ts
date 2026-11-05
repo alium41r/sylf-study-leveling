@@ -83,6 +83,32 @@ describe("Notes library", () => {
     expect(scene.strokes()).toHaveLength(2);
   });
 
+  it("erases every stroke, the last one too, and across gaps between eraser samples", async () => {
+    const library = make();
+    const handle = await library.open(await library.create({ kind: "board" }));
+    const scene = new InkScene(handle.stream(handle.descriptor().pages[0].streamId));
+    const pen = brushFor("pen", { color: "#2244aa", width: 3, input: "pen" });
+    for (const y of [100, 200, 300]) { scene.begin(pen); scene.append([sample(100, y, 0), sample(200, y, 10)]); scene.end(); }
+    const counts: number[] = [];
+    for (const y of [100, 200, 300]) { scene.eraseStrokes([{ x: 150, y }], 6); counts.push(scene.strokes().length); }
+    expect(counts).toEqual([2, 1, 0]);
+    // A fast sweep: two eraser samples far apart, with three strokes between them.
+    for (const y of [100, 140, 180]) { scene.begin(pen); scene.append([sample(100, y, 0), sample(200, y, 10)]); scene.end(); }
+    expect(scene.eraseStrokes([{ x: 150, y: 60 }, { x: 150, y: 220 }], 6)).toBe(3);
+    expect(scene.strokes()).toHaveLength(0);
+    // One sweep, several batches of samples: hidden as it goes, one undo step brings it all back.
+    scene.undo();
+    expect(scene.strokes()).toHaveLength(3);
+    scene.beginSweep();
+    for (const y of [100, 140, 180]) scene.eraseStrokes([{ x: 150, y }], 6);
+    expect(scene.strokes()).toHaveLength(0);
+    expect(scene.model.strokes()).toHaveLength(3);
+    scene.endSweep();
+    expect(scene.model.strokes()).toHaveLength(0);
+    scene.undo();
+    expect(scene.strokes()).toHaveLength(3);
+  });
+
   it("adds, moves and removes pages", async () => {
     const library = make();
     const handle = await library.open(await library.create({ kind: "handwriting" }));

@@ -85,7 +85,7 @@ export function OverviewView() {
           <Section key="run" title="Run">
             <Stack gap="xs">
               <Text variant="small">{stats ? `${stats.streakDays} ${stats.streakDays === 1 ? "day" : "days"} in a row` : "A streak starts with a session."}</Text>
-              <Text variant="caption" tone="soft">{`${summary.summary.activeDaysLast30} study days in the last 30.`}</Text>
+              <Text variant="caption" tone="soft">{`${summary.summary.activeDaysLast30} study ${summary.summary.activeDaysLast30 === 1 ? "day" : "days"} in the last 30.`}</Text>
               {stats?.sylph !== undefined ? <Text variant="caption" tone="soft" testID="progress-sylph">{`${stats.sylph.toLocaleString()} Sylph`}</Text> : null}
             </Stack>
           </Section>,

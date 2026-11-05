@@ -215,6 +215,73 @@ async function runStage(window, { stub }, stage, out) {
     check("Plans says AI plans are not on, in words", await until(tid("plan-plans-unavailable"), 10000));
     await shot("live-11-plans-off");
 
+    // Part 5: the rebuilt pages, with real data behind them.
+    const subject = await api("/api/subjects", { json: { name: "Physics", code: "PHY", color: "blue" } });
+    const todayKey = new Date().toLocaleDateString("en-CA");
+    const quest = await api("/api/quests", { json: { title: "Waves: past paper", scheduledFor: todayKey, targetMinutes: 45, difficulty: "NORMAL", subjectId: subject.json?.id } });
+    await open("space=home&home=today");
+    check("Today says where you stand", await until(tid("today-status"), 10000));
+    check("Today shows the week's focus quest", await until(tid("weekly-quest"), 10000));
+    await shot("live-12-today");
+    await open("space=home&home=progress");
+    check("Progress draws real bars, not zero-width ones", await until(tid("progress-month-bars"), 10000) && (await js(`[...document.querySelectorAll('[data-testid=progress-month-bars] [aria-hidden=true]')].filter((e) => e.getBoundingClientRect().width > 1).length`)) >= 30);
+    check("the week is drawn Monday to Sunday", (await js(`document.querySelectorAll('[data-testid=progress-week-bars] [aria-hidden=true]').length`)) >= 7);
+    await shot("live-13-progress");
+    await open("space=home&home=plan");
+    await clickOn(`${tid("home-subnav-plan")} [aria-label="Quests and goals"]`);
+    check("a quest shows with its Study action", await until(tid(`plan-study-${quest.json?.id}`), 10000));
+    await shot("live-14-quests");
+    await clickOn(tid(`plan-study-${quest.json?.id}`));
+    check("Study goes to Focus with the quest chosen", await until(tid("focus-enter"), 8000) && (await record())?.plan?.questId === quest.json?.id);
+    await open("space=home&home=plan");
+    await clickOn(`${tid("home-subnav-plan")} [aria-label="Calendar"]`);
+    await clickOn(`[aria-label="Kind of thing to add"] [aria-label="Event"]`);
+    await type(tid("plan-add-text"), "Lab tomorrow at 3pm");
+    check("an event typed in words shows its parsed time first", await until(tid("plan-add-preview"), 6000));
+    await shot("live-15-natural-event");
+    await clickOn(tid("plan-add"));
+    await sleep(1500);
+    const from = todayKey; const to = new Date(Date.now() + 3 * 86_400_000).toLocaleDateString("en-CA");
+    const listed = await api(`/api/calendar/personal?start=${from}&end=${to}`);
+    check("the event was saved on the server", JSON.stringify(listed.json).includes("Lab"));
+    await open("space=home&home=circle");
+    await clickOn(`${tid("home-subnav-circle")} [aria-label="People"]`);
+    await clickOn(tid("circle-person"));
+    check("a friend opens a full profile", (await until(tid("profile-name"), 10000)) && String(await textOf(tid("profile-name"))).includes("Bob"));
+    await shot("live-16-profile");
+    await escape();
+    const talk = await api("/api/conversations", { json: { participantIds: [bobUser?.id], isGroup: false } });
+    await elsewhere(`/api/conversations/${talk.json?.id}/messages`, { token: bobToken, json: { content: "Study session at 8?" } });
+    await open("space=home&home=circle");
+    await clickOn(`${tid("home-subnav-circle")} [aria-label="Messages"]`);
+    check("conversations list with the last message", await until(`[data-testid^="conversation-"]`, 8000));
+    await clickOn(`[data-testid^="conversation-"]`);
+    check("a conversation reads as a chat", await until(tid("conversation-messages"), 8000));
+    await shot("live-17-chat");
+    await open("space=home&home=today");
+    await clickOn(`${tid("today-ask-clear")}, ${tid("today-ask")}`);
+    check("Sylvie offers to pick up an earlier conversation", await until(tid("quick-ask-threads"), 10000));
+    await shot("live-18-sylvie");
+    await escape();
+
+    // The same pages at a phone and a tablet width, and one in light mode, kept as evidence for the review (nothing asserted: it is for reading by eye).
+    for (const [name, width, height] of /** @type {[string, number, number][]} */ ([["phone", 390, 844], ["tablet", 820, 1180]])) {
+      window.setContentSize(width, height);
+      await sleep(600);
+      for (const destination of ["today", "plan", "progress", "circle"]) {
+        await open(`space=home&home=${destination}&theme=signature&mode=dark`);
+        await sleep(1200);
+        await shot(`part5-${name}-${destination}`);
+      }
+    }
+    window.setContentSize(1280, 740);
+    await sleep(600);
+    for (const destination of ["today", "progress"]) {
+      await open(`space=home&home=${destination}&theme=signature&mode=light`);
+      await sleep(1200);
+      await shot(`part5-light-${destination}`);
+    }
+
     // Blocked list.
     await open("space=home&home=circle");
     await clickOn(tid("circle-blocked"));

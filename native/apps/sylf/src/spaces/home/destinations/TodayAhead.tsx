@@ -6,17 +6,10 @@ import { Button, Stack, Text, useTheme } from "@sylf/design-system";
 import { useHomeNavigation } from "../../../shell/context";
 import { useLiveBackend, useOptionalResource } from "../../../shell/backend";
 import { useSubjects } from "../../../shell/live";
+import { dayWords } from "./ahead";
 
 const DAY = 86_400_000;
 const keyOf = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-
-export function dayWords(scheduled: string, now: Date): string {
-  const [year, month, day] = scheduled.slice(0, 10).split("-").map(Number);
-  const then = new Date(year!, (month ?? 1) - 1, day);
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const gap = Math.round((then.getTime() - today.getTime()) / DAY);
-  return gap <= 0 ? "Today" : gap === 1 ? "Tomorrow" : gap < 7 ? then.toLocaleDateString([], { weekday: "long" }) : then.toLocaleDateString([], { day: "numeric", month: "short" });
-}
 
 export function TodayAhead() {
   const { space } = useTheme();

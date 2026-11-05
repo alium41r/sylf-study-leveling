@@ -20,7 +20,7 @@ const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const GRID_HOURS = Array.from({ length: 18 }, (_, index) => index + 6);
 const HOUR = 44;
 const HOUR_LABEL = 40;
-type Span = "month" | "week" | "agenda";
+type Span = "month" | "week" | "day" | "agenda";
 
 function MonthCell({ date, data, selected, today, rest, density, onPress }: { date: string; data: MonthDay | undefined; selected: boolean; today: boolean; rest: boolean; density: number; onPress: () => void }) {
   const { color, shape, space } = useTheme();
@@ -55,11 +55,11 @@ function MonthGrid({ view, year, month, selected, onSelect }: { view: MonthView 
 }
 
 /** A real week. Tapping an empty hour starts an event there. Moving one is done in its sheet, which works from a keyboard and a screen reader alike. */
-function WeekGrid({ events, quests, colourOf, selected, today, onSelect, onEvent, onNew }: { events: PlanEvent[]; quests: (day: string) => DayQuest[]; colourOf: (id: number | null | undefined) => string | null; selected: string; today: string; onSelect: (day: string) => void; onEvent: (event: PlanEvent) => void; onNew: (day: string, time: string) => void }) {
+function WeekGrid({ events, quests, colourOf, selected, today, days: only, onSelect, onEvent, onNew }: { days?: string[]; events: PlanEvent[]; quests: (day: string) => DayQuest[]; colourOf: (id: number | null | undefined) => string | null; selected: string; today: string; onSelect: (day: string) => void; onEvent: (event: PlanEvent) => void; onNew: (day: string, time: string) => void }) {
   const { color, shape, space } = useTheme();
-  const days = weekOf(selected);
+  const days = only ?? weekOf(selected);
   return (
-    <View testID="plan-week" style={{ gap: space.xs }}>
+    <View testID={only ? "plan-day-grid" : "plan-week"} style={{ gap: space.xs }}>
       <View style={{ flexDirection: "row", paddingLeft: HOUR_LABEL }}>
         {days.map((day) => <Press key={day} label={dayTitle(day)} selected={day === selected} onPress={() => onSelect(day)} height={40} style={{ flex: 1 }} bodyStyle={{ height: 40, alignItems: "center", justifyContent: "center" }}><Text variant="caption" tone={day === today || day === selected ? "ink" : "soft"} numberOfLines={1}>{shortDay(day)}</Text></Press>)}
       </View>
@@ -84,7 +84,7 @@ function WeekGrid({ events, quests, colourOf, selected, today, onSelect, onEvent
           <View style={{ width: HOUR_LABEL }}>{GRID_HOURS.map((hour) => <View key={hour} style={{ height: HOUR }}><Text variant="caption" tone="soft">{`${String(hour).padStart(2, "0")}`}</Text></View>)}</View>
           {days.map((day) => (
             <View key={day} style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: color.line }}>
-              {GRID_HOURS.map((hour) => <Press key={hour} label={`New event, ${dayTitle(day)} at ${hour}:00`} feedback="none" onPress={() => onNew(day, `${String(hour).padStart(2, "0")}:00`)} height={HOUR} bodyStyle={{ height: HOUR, borderTopWidth: 1, borderTopColor: color.line }}><View /></Press>)}
+              {GRID_HOURS.map((hour) => <Press key={hour} label={`New event, ${dayTitle(day)} at ${hour}:00`} feedback="none" radius={0} onPress={() => onNew(day, `${String(hour).padStart(2, "0")}:00`)} height={HOUR} bodyStyle={{ height: HOUR, borderTopWidth: 1, borderTopColor: color.line }}><View /></Press>)}
               {eventsOn(events, day).filter((event) => !event.allDay && event.startsAt).map((event) => {
                 const begins = new Date(event.startsAt!); const ends = event.endsAt ? new Date(event.endsAt) : new Date(begins.getTime() + 3_600_000);
                 const top = (begins.getHours() + begins.getMinutes() / 60 - GRID_HOURS[0]) * HOUR;
@@ -240,6 +240,7 @@ export function CalendarView() {
   const view = result?.data ?? null;
   const change = (delta: number) => {
     if (span === "week") { select(addDays(selected, 7 * delta)); return; }
+    if (span === "day") { select(addDays(selected, delta)); return; }
     const next = new Date(shown.year, shown.month + delta, 1);
     setShown({ year: next.getFullYear(), month: next.getMonth() });
     setSelected(dateKey(next));
@@ -250,7 +251,7 @@ export function CalendarView() {
     if (date.getMonth() !== shown.month || date.getFullYear() !== shown.year) setShown({ year: date.getFullYear(), month: date.getMonth() });
   };
   const weekDays = weekOf(selected);
-  const title = span === "week"
+  const title = span === "day" ? dayTitle(selected) : span === "week"
     ? `${new Date(`${weekDays[0]}T12:00:00`).toLocaleDateString([], { day: "numeric", month: "short" })} to ${new Date(`${weekDays[6]}T12:00:00`).toLocaleDateString([], { day: "numeric", month: "short", year: "numeric" })}`
     : new Date(shown.year, shown.month, 1).toLocaleDateString([], { month: "long", year: "numeric" });
   const colourOf = useSubjectColour();
@@ -258,14 +259,14 @@ export function CalendarView() {
   const main = (
     <Stack gap="md">
       <View style={{ flexDirection: "row", alignItems: "center", gap: space.xs, flexWrap: "wrap" }}>
-        <IconButton icon="chevronLeft" label={span === "week" ? "Previous week" : "Previous month"} testID="plan-prev" onPress={() => change(-1)} />
-        <Text variant="subheading" testID="plan-month-title" style={{ minWidth: span === "week" ? 220 : 150, textAlign: "center" }}>{title}</Text>
-        <IconButton icon="chevronRight" label={span === "week" ? "Next week" : "Next month"} testID="plan-next" onPress={() => change(1)} />
+        <IconButton icon="chevronLeft" label={span === "week" ? "Previous week" : span === "day" ? "Previous day" : "Previous month"} testID="plan-prev" onPress={() => change(-1)} />
+        <Text variant="subheading" testID="plan-month-title" style={{ minWidth: span === "month" ? 150 : 220, textAlign: "center" }}>{title}</Text>
+        <IconButton icon="chevronRight" label={span === "week" ? "Next week" : span === "day" ? "Next day" : "Next month"} testID="plan-next" onPress={() => change(1)} />
         <View style={{ flex: 1 }} />
-        <Segmented<Span> label="Calendar span" value={span} options={[{ value: "month", label: "Month" }, { value: "week", label: "Week" }, { value: "agenda", label: "Agenda" }]} onChange={setSpan} />
+        <Segmented<Span> label="Calendar span" value={span} options={[{ value: "month", label: "Month" }, { value: "week", label: "Week" }, { value: "day", label: "Day" }, { value: "agenda", label: "Agenda" }]} onChange={setSpan} />
       </View>
       {result?.live?.failure && !view ? <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}><Text variant="small" tone="soft" style={{ flex: 1 }}>{result.live.failure}</Text><Button title="Try again" size="small" onPress={result.live.retry} /></View> : null}
-      {span === "month" ? <MonthGrid view={view} year={shown.year} month={shown.month} selected={selected} onSelect={select} /> : span === "week" ? <WeekGrid events={view?.events ?? []} quests={questsOn} colourOf={colourOf} selected={selected} today={view?.today ?? dateKey(now)} onSelect={select} onEvent={(event) => setEventTarget({ event, day: selected })} onNew={(day, time) => setEventTarget({ event: null, day, time })} /> : <Agenda view={view} from={selected} onSelect={select} onEvent={(event) => setEventTarget({ event, day: selected })} />}
+      {span === "month" ? <MonthGrid view={view} year={shown.year} month={shown.month} selected={selected} onSelect={select} /> : span === "week" ? <WeekGrid events={view?.events ?? []} quests={questsOn} colourOf={colourOf} selected={selected} today={view?.today ?? dateKey(now)} onSelect={select} onEvent={(event) => setEventTarget({ event, day: selected })} onNew={(day, time) => setEventTarget({ event: null, day, time })} /> : span === "day" ? <WeekGrid days={[selected]} events={view?.events ?? []} quests={questsOn} colourOf={colourOf} selected={selected} today={view?.today ?? dateKey(now)} onSelect={select} onEvent={(event) => setEventTarget({ event, day: selected })} onNew={(day, time) => setEventTarget({ event: null, day, time })} /> : <Agenda view={view} from={selected} onSelect={select} onEvent={(event) => setEventTarget({ event, day: selected })} />}
     </Stack>
   );
   const page = <DayPage view={view} day={selected} onEvent={(event) => setEventTarget({ event, day: selected })} onNewEvent={() => setEventTarget({ event: null, day: selected })} onQuest={setQuestTarget} />;

@@ -63,3 +63,14 @@ describe("HP", () => {
     expect(mentionsHp("Whip")).toBe(false);
   });
 });
+
+describe("meterUnits", () => {
+  it("keeps a minutes target to a readable number of segments", async () => {
+    const { meterUnits } = await import("./shared");
+    expect(meterUnits(0, 120)).toEqual({ value: 0, max: 12 });
+    expect(meterUnits(117, 180)).toEqual({ value: 7, max: 12 });
+    expect(meterUnits(500, 120)).toEqual({ value: 12, max: 12 });
+    expect(meterUnits(30, 20)).toEqual({ value: 4, max: 4 });
+    expect(meterUnits(10, 0).max).toBe(1);
+  });
+});

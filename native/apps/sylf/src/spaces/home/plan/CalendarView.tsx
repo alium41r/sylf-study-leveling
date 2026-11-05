@@ -15,6 +15,7 @@ import { EventSheet, type EventTarget } from "./EventSheet";
 import { addDays, clock, dateKey, dayDensity, dayTitle, deviceTimezone, eventsOn, instantOf, monthRows, questDone, questFailed, questMinutes, questOverdue, shortDay, validTime, weekOf } from "./shared";
 import { QuestSheet, type QuestTarget } from "./QuestSheet";
 import { refreshPlan, useMonth, type MonthView } from "./usePlan";
+import { meterUnits } from "../progress/shared";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const GRID_HOURS = Array.from({ length: 18 }, (_, index) => index + 6);
@@ -214,7 +215,7 @@ function DayPage({ view, day, onEvent, onNewEvent, onQuest }: { view: MonthView 
     <Plane level="raised" radius="lg" testID="plan-day-page" style={{ padding: space.lg, gap: space.md }}>
       <Stack gap="xs">
         <Text variant="subheading" role="heading" aria-level={2}>{dayTitle(day)}</Text>
-        {rest ? <Text variant="small" tone="soft">{floating ? "A rest day you chose." : "A rest day."}</Text> : data ? <Meter value={Math.min(data.totalMinutes, data.dailyGoalMinutes)} max={data.dailyGoalMinutes} label={`${formatMinutes(data.totalMinutes)} of ${formatMinutes(data.dailyGoalMinutes)} studied`} /> : null}
+        {rest ? <Text variant="small" tone="soft">{floating ? "A rest day you chose." : "A rest day."}</Text> : data ? <Meter {...meterUnits(data.totalMinutes, data.dailyGoalMinutes)} label={`${formatMinutes(data.totalMinutes)} of ${formatMinutes(data.dailyGoalMinutes)} studied`} /> : null}
       </Stack>
       {milestones.map((item) => <Text key={item.id} variant="small">{`Goal due: ${item.title}`}</Text>)}
       {events.map((event) => <View key={event.id} testID={`plan-event-${event.id}`}><ListRow title={event.title} detail={event.allDay ? "All day" : `${clock(event.startsAt!)}${event.endsAt ? ` to ${clock(event.endsAt)}` : ""}`} onPress={() => onEvent(event)} /></View>)}

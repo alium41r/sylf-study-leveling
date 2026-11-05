@@ -220,3 +220,37 @@ describe("a study party between two real accounts (owner decision E-13)", () => 
     expect((await a.student.backend.reads.party(signal())).activeParty).toBeNull();
   });
 });
+
+describe("profiles and the weekly focus quest on the real server (Part 5)", () => {
+  it("reads a friend's profile with the server's own permissions, and never keeps HP", async () => {
+    const { a, b } = await friends();
+    const view = await a.student.backend.reads.profiles.profile(b.input.username, signal());
+    expect(view.relationship).toBe("FRIEND");
+    expect(view.profile.username).toBe(b.input.username);
+    expect(view.permissions).toMatchObject({ canSendMessage: true, canRemoveFriend: true, canBlock: true });
+    expect("hp" in view.profile || "maxHp" in view.profile).toBe(false);
+  });
+  it("offers a stranger a friend request and no friend actions", async () => {
+    const a = await account();
+    const b = await account();
+    const view = await a.student.backend.reads.profiles.profile(b.input.username, signal());
+    expect(view.permissions?.canRemoveFriend).not.toBe(true);
+    expect(view.permissions?.canSendFriendRequest).toBe(true);
+  });
+  it("shows a blocked person to the blocker with Unblock, and gives the blocked person a restricted view with no way to reach out", async () => {
+    const { a, b } = await friends();
+    await a.student.backend.reads.social.block(id(b.student));
+    const mine = await a.student.backend.reads.profiles.profile(b.input.username, signal());
+    expect(mine.permissions?.canUnblock).toBe(true);
+    const theirs = await b.student.backend.reads.profiles.profile(a.input.username, signal());
+    expect(theirs.permissions?.canSendMessage).not.toBe(true);
+    expect(theirs.permissions?.canSendFriendRequest).not.toBe(true);
+  });
+  it("reads this week's focus quest for a new account", async () => {
+    const a = await account();
+    const quest = await a.student.backend.reads.progress.weeklyQuest(signal());
+    expect(quest.targetMinutes).toBeGreaterThan(0);
+    expect(quest.progressMinutes).toBe(0);
+    expect(quest.isCompleted).toBe(false);
+  });
+});

@@ -38,3 +38,7 @@ An optional nudge, off unless `EXPO_PUBLIC_SYLF_REALTIME_URL` and `EXPO_PUBLIC_S
 - Companion drawing (Part 1 chose prerendered sprites; no sprite pipeline exists).
 - A presence channel (presence comes from `/api/friends` and the heartbeat).
 - Message attachments (the schema has none).
+
+## Part 5 (5 November 2026)
+
+**Profiles**: anyone you see opens a full profile (`shell/profile/`, `GET /api/profile/[username]`) with the actions the server allows; hidden values are absent, never zero; HP is never read. **Messages** is a chat (bubbles, day separators, tap your own message to edit or delete, the title opens their profile). People are avatar rows with presence.

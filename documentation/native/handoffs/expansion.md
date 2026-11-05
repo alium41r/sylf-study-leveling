@@ -2,6 +2,8 @@
 
 **Written 5 November 2026.** Parts 1 to 3 are built. Part 4 was **partly performed**: everything that can run on a disposable local backend ran and passed (see its [report](../reports/expansion-part-4/report.md)); the tablet, the hosted checks, measurements and a real Planner run did not, by rule or by missing authorization. Nothing is merged or deployed, hosted data was never touched, and the branch is `expansion-part-3` (it contains Parts 2 and 3).
 
+**Part 5 (5 November 2026) then rebuilt much of the frontend**: see its [report](../reports/expansion-part-5/report.md) and [handoff](expansion-part-5.md).
+
 Start with the [Part 4 report](../reports/expansion-part-4/report.md) §1 (what was not done), then the [Part 3 report](../reports/expansion-part-3/report.md) and [handoff](expansion-part-3.md).
 
 ## What the owner needs to decide or do

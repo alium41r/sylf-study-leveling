@@ -36,3 +36,7 @@ Files: `spaces/home/destinations/PlanDestination.tsx` and `spaces/home/plan/` (`
 - Reminders as local notifications.
 - Connecting an external calendar, and shared calendars, stay on the web (G-13).
 - Notebook, annotations and ink wait for Phase 14.
+
+## Part 5 (5 November 2026)
+
+Quests carry their subject colour, XP and a Study action; goals are cards with progress and days left. The calendar has Month, Week, Day and Agenda, a quest lane in Week and Day, week and day navigation, and **natural-language events** through `lib/calendar/quick-add` (the draft is previewed before it is saved). Not built: notebooks and ink (Phase 14), shared calendars, external connections.

@@ -1,6 +1,6 @@
 // A person's public profile, as the server decides to show it to this viewer (`getProfileDossier`). The server applies privacy: a hidden rank, hours or
 // achievements arrive as absent, and `permissions` says which actions are allowed, so nothing here works out who may do what. HP is in the answer for the
-// web. Native never reads it (ADR 0017), and the schema below does not keep it.
+// web. Native never reads it (ADR 0017): the nested profile schema is not loose, so `hp` and `maxHp` are dropped when the answer is parsed.
 import { z } from "zod";
 import type { BackendClient } from "./client";
 
@@ -13,7 +13,7 @@ const profileSchema = z.object({
   completedQuestsCount: z.number().optional(), achievementsCount: z.number().optional(),
   recentAchievements: z.array(z.object({ title: z.string().optional(), name: z.string().optional(), rarity: z.string().optional() }).loose()).optional(),
   createdAt: z.string().optional(),
-}).loose();
+});
 export const profileViewSchema = z.object({
   profile: profileSchema,
   relationship: z.string().optional(),

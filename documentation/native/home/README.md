@@ -146,3 +146,7 @@ New log line: `SYLF_HOME_MOUNT <destination> <ms>`, once per destination per Hom
 3. Use `Section`, `HomeColumns` and `HomePage`. Do not add a second scroller, a second persistence path, or per-theme layout.
 4. Keep text at `soft` or stronger: `faint` is 3:1, for marks and not for words.
 5. Run `npm run desktop:home-check`, `npm run android:home-check` and the memory sweep.
+
+## Part 5 (5 November 2026)
+
+Today gained a status line, the weekly focus quest, a real "What's ahead" list and Sylvie's insights; the Sylvie sheet continues earlier conversations. See the [Part 5 report](../reports/expansion-part-5/report.md) for the parity table against Web.

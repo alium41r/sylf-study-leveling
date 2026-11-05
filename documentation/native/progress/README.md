@@ -28,3 +28,7 @@ Files: `spaces/home/destinations/ProgressDestination.tsx`, `spaces/home/progress
 - **Objectives** on Stats: the summary does not carry them, and a full read would break the budget.
 - **Weekly milestone** on Overview: the week is measured against the schedule's own target instead.
 - A Codex deep link from "what's this?": the view exists, and the entry route does not yet.
+
+## Part 5 (5 November 2026)
+
+Overview and Stats now draw real bar charts (`shell/charts/Bars.tsx`) scaled to the person's own target, and show the **weekly focus quest** (`GET /api/quests/weekly`, `WeeklyQuestCard`). Standing rows open a profile. Meters use `meterUnits` so a minutes target never becomes a hundred segments.

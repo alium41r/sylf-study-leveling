@@ -24,7 +24,10 @@ Native: http://127.0.0.1:3200/?space=home&home=today (Web: http://127.0.0.1:3111
 - **Public profile sheet** (`shell/profile/`) opened from Circle, Standing, Find people and party rooms; server-applied privacy and permissions; HP never shown.
 - Circle: avatar rows.
 
-## Next (in order)
+## Also done since
+- Sylvie sheet continues earlier conversations; chat-style Messages; Stats bar chart; Day view; unit tests for the new helpers; real-server tests for profiles and the weekly quest; live Electron stage extended (31 checks) with phone, tablet and light captures. **Part 5 is complete; see `reports/expansion-part-5/report.md`.**
+
+## Next (was, now superseded by the report)
 Sylvie hub (conversation history and continue) · Stats view with charts · Messages polish · Focus page polish · phone and tablet checks of every page · verification (unit, integration, live Electron stage, a new Part 5 live stage) · feature-parity report with screenshots · handoff.
 
 ## Honest exceptions (documented, not hidden)

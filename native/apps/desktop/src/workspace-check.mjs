@@ -363,6 +363,9 @@ async function dockGroup(t) {
   const box = await t.rect("[data-testid=workspace-dock]");
   results.dock = box;
   checks.dockCentered = Math.abs(box.x + box.width / 2 - (await t.js("innerWidth")) / 2) <= 1;
+  // Every button in the Command Center shares one centre line.
+  results.dockButtonCentres = await t.js(`[...document.querySelectorAll('[data-testid=workspace-dock] [role=button], [data-testid=workspace-dock] button')].map((e) => { const r = e.getBoundingClientRect(); return Math.round(r.top + r.height / 2); })`);
+  checks.dockButtonsAligned = Math.max(...results.dockButtonCentres) - Math.min(...results.dockButtonCentres) <= 1;
   await t.clickOn(t.dock("notes"));
   await t.sleep(500);
   let state = await t.workspace();

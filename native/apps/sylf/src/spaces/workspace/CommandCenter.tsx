@@ -127,9 +127,12 @@ export const CommandCenter = memo(function CommandCenter({ state, height }: { st
           {(tooltip) => <IconButton {...tooltip} icon={LAYOUT_ICONS[state.layout]} size="small" bare label={`Layout: ${LAYOUT_LABELS[state.layout]}`} testID="dock-layout" expanded={layoutOpen} active={state.layout !== "free"} onPress={() => setLayoutOpen(true)} />}
         </Tooltip>
       </View>
-      <Tooltip text="Windows: open several, close or clear">
-        {(tooltip) => <IconButton {...tooltip} icon="layers" size="small" bare label="Windows" testID="dock-windows" style={{ alignSelf: "center" }} onPress={() => setManaging(true)} />}
-      </Tooltip>
+      {/* A tooltip's anchor sits at the start of its line, so it is wrapped, as Layout is, to centre with the row. */}
+      <View>
+        <Tooltip text="Windows: open several, close or clear">
+          {(tooltip) => <IconButton {...tooltip} icon="layers" size="small" bare label="Windows" testID="dock-windows" onPress={() => setManaging(true)} />}
+        </Tooltip>
+      </View>
       {roomy ? <IconButton icon="expand" size="small" bare label="Fit Workspace" testID="canvas-fit" style={{ alignSelf: "center" }} onPress={() => model.fit()} /> : null}
       {roomy ? <IconButton icon="reset" size="small" bare label="Reset View" testID="canvas-reset" style={{ alignSelf: "center" }} onPress={() => model.resetView()} /> : null}
       <View ref={zoomAnchor} collapsable={false}>

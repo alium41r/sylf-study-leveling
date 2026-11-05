@@ -15,7 +15,7 @@ import { appendFile, type PickedFile } from "./files";
 /** The server's limits (lib/ai/sylvie/image-contract.ts). Saying so before the upload saves a slow request that is certain to fail. */
 export const SYLVIE_IMAGE_LIMIT = 4;
 export const SYLVIE_IMAGE_BYTES = 5 * 1024 * 1024;
-import { pendingActionSchema, type PendingAction, achievementsSchema, calendarRangeSchema, chatMessagesSchema, chatsSchema, cosmeticsSchema, earnedThisWeekSchema, focusPartySchema, friendRequestsSchema, friendsSchema, goalsSchema, plannerCapabilitiesSchema, questDaySchema, recentSessionsSchema, soundsSchema, studyScheduleSchema, studySummarySchema, subjectsSchema, userStatsSchema, type Quest } from "./contracts";
+import { insightsSchema, pendingActionSchema, type PendingAction, achievementsSchema, calendarRangeSchema, chatMessagesSchema, chatsSchema, cosmeticsSchema, earnedThisWeekSchema, focusPartySchema, friendRequestsSchema, friendsSchema, goalsSchema, plannerCapabilitiesSchema, questDaySchema, recentSessionsSchema, soundsSchema, studyScheduleSchema, studySummarySchema, subjectsSchema, userStatsSchema, type Quest } from "./contracts";
 
 export interface SylvieTurn {
   /** Text so far, as it arrives. */
@@ -69,6 +69,8 @@ export function createReads(client: BackendClient) {
     cosmetics: (signal: AbortSignal) => client.get("/api/cosmetics", cosmeticsSchema, { signal }),
     earnedThisWeek: (signal: AbortSignal) => client.get("/api/user/earned-this-week", earnedThisWeekSchema, { signal }),
     sounds: (signal: AbortSignal) => client.get("/api/acoustics", soundsSchema, { signal }),
+    /** What Sylvie noticed lately. Read-only: the server has no way to dismiss one. */
+    insights: (signal: AbortSignal) => client.get("/api/insights", insightsSchema, { signal }),
     /** Today's unread briefing, if the morning job wrote one. Never required: an empty answer is normal. */
     briefing: (signal: AbortSignal) => client.get("/api/system-messages?type=DAILY_BRIEFING&global=true&limit=1&unreadOnly=true", chatMessagesSchema, { signal }),
     chats: (signal: AbortSignal) => client.get("/api/chats?limit=20", chatsSchema, { signal }),

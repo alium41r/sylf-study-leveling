@@ -9,7 +9,7 @@ import { useSylvieTurn } from "../../../shell/sylvie/useSylvieTurn";
 import { useHomeNavigation } from "../../../shell/context";
 import { setPlanPrefill } from "../plan/prefill";
 
-export function QuickAsk({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function QuickAsk({ open, onClose, onLeave }: { open: boolean; onClose: () => void; /** Called when an answer sends the person to another page, so a layer above the Spaces (the Focus environment) can step aside. The session keeps going. */ onLeave?: () => void }) {
   const { color, shape, space } = useTheme();
   const backend = useLiveBackend();
   const turn = useSylvieTurn(backend);
@@ -33,7 +33,7 @@ export function QuickAsk({ open, onClose }: { open: boolean; onClose: () => void
               </View>
             </View>
           ) : null}
-          {turn.planRequest && !turn.working ? <Button title="Review in Plans" testID="quick-ask-plan" onPress={() => { setPlanPrefill(turn.planRequest!); turn.reset(); onClose(); navigation.setView("plan", "plans"); navigation.select("plan"); }} /> : null}
+          {turn.planRequest && !turn.working ? <Button title="Review in Plans" testID="quick-ask-plan" onPress={() => { setPlanPrefill(turn.planRequest!); turn.reset(); onClose(); onLeave?.(); navigation.setView("plan", "plans"); navigation.select("plan"); }} /> : null}
           {turn.failure ? <Text variant="caption" tone="critical" testID="quick-ask-failure">{turn.failure}</Text> : null}
           <TextField label="Ask Sylvie" hideLabel placeholder="Ask Sylvie" value={text} onChangeText={setText} editable={!turn.working} returnKeyType="send" onSubmitEditing={() => void submit()} testID="quick-ask-input" />
           <Button title={turn.working ? "Sylvie is answering" : "Send"} variant="emphasis" disabled={!text.trim() || turn.working} testID="quick-ask-send" onPress={() => void submit()} />

@@ -11,6 +11,7 @@ import { useHomeResult } from "../data";
 import type { DayEntry, DayTarget, HomeDataAdapter, Objective } from "../data/contracts";
 import { formatMinutes, greetingFor, pickNext, plannedMinutes } from "../format";
 import { TodayBriefing } from "./TodayBriefing";
+import { TodayInvites } from "./TodayInvites";
 import { QuickAsk } from "./QuickAsk";
 import { EmptyPage, FailedPage, HomeColumns, HomePage, LoadingPage, PageTitle, Section } from "../HomePage";
 
@@ -149,6 +150,7 @@ export function TodayDestination() {
         <>
           <PageTitle title={greeting} detail={today!.summary} />
           <TodayBriefing />
+          <TodayInvites />
           {backend ? <View style={{ flexDirection: "row" }}><Button title="Ask Sylvie" size="small" icon="sylvie" testID="today-ask" onPress={() => setAsking(true)} /></View> : null}
           <QuickAsk open={asking} onClose={() => setAsking(false)} />
           <HomeColumns

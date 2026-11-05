@@ -172,5 +172,9 @@ export const chatImageSchema = z.object({ index: z.number().int(), url: z.string
 export type ChatImage = z.infer<typeof chatImageSchema>;
 export const chatMessagesSchema = z.object({ messages: z.array(z.object({ id: z.number().int(), content: z.string(), type: z.string(), pendingAction: pendingActionSchema.optional().catch(undefined), attachments: z.array(chatImageSchema).optional().catch(undefined) }).loose()) });
 
+/** GET /api/insights: what Sylvie noticed. Warnings are not included by the server, and there is no dismiss route, so these are read-only. */
+export const insightsSchema = z.array(z.object({ id: z.number().int(), category: z.string(), content: z.string(), createdAt: z.string().optional() }).loose());
+export type Insight = z.infer<typeof insightsSchema>[number];
+
 /** GET /api/user/earned-this-week. What the ledgers credited since the student's own Monday. */
 export const earnedThisWeekSchema = z.object({ xp: z.number(), sylph: z.number() });

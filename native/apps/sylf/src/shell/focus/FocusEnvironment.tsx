@@ -10,6 +10,8 @@ import { IconButton, Text, fade, useDismiss, useTheme } from "@sylf/design-syste
 import { modes } from "@sylf/shared";
 import { formatSessionClock, sessionModeSettings } from "@sylf/spaces";
 import { useSessionReadout, useSessionState, useStudySession } from "../context";
+import { QuickAsk } from "../../spaces/home/destinations/QuickAsk";
+import { useLiveBackend } from "../backend";
 import { RoomStrip } from "../party/RoomStrip";
 import { SessionActions, SessionNote } from "../session/SessionParts";
 import { audioEngine, useAudio } from "../audio/engine";
@@ -65,6 +67,8 @@ export function FocusEnvironment() {
   const { chosen } = useFocusBackground();
   const { shown, wake } = useControlsShown();
   const [dim, setDim] = useState(false);
+  const [asking, setAsking] = useState(false);
+  const signedIn = useLiveBackend() !== null;
   const opacity = useSharedValue(1);
   useEffect(() => { opacity.value = fade(shown ? 1 : 0, motion); }, [shown, motion, opacity]);
   const controls = useAnimatedStyle(() => ({ opacity: opacity.value }));
@@ -104,6 +108,7 @@ export function FocusEnvironment() {
         <View style={{ position: "absolute", top: space.xl, left: space.xl, right: space.xl, flexDirection: "row", alignItems: "center", gap: space.sm }}>
           <IconButton icon="chevronLeft" label="Leave. The session keeps going" testID="environment-leave" onPress={leave} />
           <View style={{ flex: 1 }} />
+          {signedIn ? <IconButton icon="sylvie" label="Ask Sylvie" testID="environment-ask" onPress={() => { setAsking(true); wake(); }} /> : null}
           <IconButton icon={dim ? "sun" : "moon"} label={dim ? "Brighter" : "Dimmer"} testID="environment-dim" onPress={() => { setDim(!dim); wake(); }} />
           <IconButton icon="audio" label={audio.playing ? `Pause ${audio.title ?? "sound"}` : "Play the last sound"} testID="environment-sound" disabled={!audio.url} onPress={() => { if (audio.playing) audioEngine.pause(); else if (audio.trackId && audio.url) void audioEngine.play({ id: audio.trackId, title: audio.title ?? "", url: audio.url }); wake(); }} />
         </View>
@@ -114,6 +119,7 @@ export function FocusEnvironment() {
           </View>
         </View>
       </Animated.View>
+      {signedIn ? <QuickAsk open={asking} onClose={() => setAsking(false)} onLeave={leave} /> : null}
     </View>
   );
 }

@@ -14,12 +14,24 @@ export function TodayBriefing() {
   const [open, setOpen] = useState(false);
   const resource = useMemo(() => (backend ? backend.resources.resource({ key: "today-briefing", tags: ["sylvie"], ttlMs: 10 * 60_000, load: async (signal) => (await backend.reads.briefing(signal)).messages[0] ?? null }) : null), [backend]);
   const briefing = useOptionalResource(resource)?.data ?? null;
-  if (!briefing) return null;
+  const insightsResource = useMemo(() => (backend ? backend.resources.resource({ key: "today-insights", tags: ["sylvie"], ttlMs: 30 * 60_000, load: (signal) => backend.reads.insights(signal) }) : null), [backend]);
+  const insights = (useOptionalResource(insightsResource)?.data ?? []).filter((item) => item.category !== "warning").slice(0, 3);
+  if (!briefing && !insights.length) return null;
   return (
     <View testID="today-briefing" style={{ gap: space.sm, padding: space.md, borderRadius: shape.radius.md, borderWidth: 1, borderColor: color.line }}>
-      <Text variant="small" tone="soft">Sylvie's note for today</Text>
-      {open ? <RichText text={briefing.content} /> : <Text variant="small" numberOfLines={2}>{firstLine(briefing.content)}</Text>}
-      <View style={{ flexDirection: "row" }}><Button title={open ? "Show less" : "Read more"} size="small" testID="today-briefing-toggle" onPress={() => setOpen(!open)} /></View>
+      {briefing ? (
+        <>
+          <Text variant="small" tone="soft">Sylvie's note for today</Text>
+          {open ? <RichText text={briefing.content} /> : <Text variant="small" numberOfLines={2}>{firstLine(briefing.content)}</Text>}
+          <View style={{ flexDirection: "row" }}><Button title={open ? "Show less" : "Read more"} size="small" testID="today-briefing-toggle" onPress={() => setOpen(!open)} /></View>
+        </>
+      ) : null}
+      {insights.length ? (
+        <View style={{ gap: space.xs }} testID="today-insights">
+          <Text variant="small" tone="soft">Sylvie noticed</Text>
+          {insights.map((item) => <RichText key={item.id} text={item.content} />)}
+        </View>
+      ) : null}
     </View>
   );
 }

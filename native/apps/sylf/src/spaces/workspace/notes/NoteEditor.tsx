@@ -27,8 +27,11 @@ export type NoteMode = "type" | "write";
 const GAP = 20, SNAP = 96, MARGIN = 160;
 // An endless page keeps this much empty paper below whatever is written on it, in page units: write into it and the page grows.
 const ENDLESS_ROOM = 640;
-// Below the last page of a paged note: pull (or, with a wheel, keep scrolling) through this to add a page.
-const PULL = 120, WHEEL_PULL = 320;
+// Below the last page of a paged note: pull (or, with a wheel, keep scrolling) through this to add a page. Its content sits high, clear
+// of full screen's "Tools" handle along the bottom edge.
+const PULL = 200, WHEEL_PULL = 320;
+// The fastest release, in points per millisecond, that still counts as a pull rather than a fling.
+const PULL_RELEASE_SPEED = 1.2;
 const RULED = new Set(["ruled", "cornell", "journal"]);
 // The system face on both sides: the WebView on Android has none of the app's fonts, and the native text must match it.
 const FONT = '-apple-system, BlinkMacSystemFont, Roboto, "Segoe UI", system-ui, sans-serif';
@@ -190,8 +193,14 @@ export default function NoteEditor({ library, document, editable, initialPage, o
   // Pull to add a page: on touch, release with the zone below the last page fully shown; with a wheel, keep scrolling at the end.
   const [wheelPull, setWheelPull] = useState(0);
   const adding = useRef(false);
-  // How much of the zone showed when the drag began: a pull starts with the zone in view, so dragging or flinging to the end adds nothing.
-  const pullStart = useRef(0);
+  // On touch the zone springs back out of view after any scroll that drifts into it. A pull is a drag that starts at the end of the last
+  // page and is released with the zone fully shown; a fling or a drag from further up only springs back. (Android hands a drag to the
+  // native scroll view and JavaScript gets a cancel, so this reads the scroll view's own drag events, not touches.)
+  const [armed, setArmed] = useState(false);
+  const settleZone = (y: number) => {
+    const hidden = pagesHeight - size.height;
+    if (Platform.OS !== "web" && pullable && hidden >= 0 && y > hidden + 1) vertical.current?.scrollTo({ y: hidden, animated: true });
+  };
   const addPageAtEnd = () => {
     if (adding.current || !pullable) return;
     adding.current = true;
@@ -224,7 +233,7 @@ export default function NoteEditor({ library, document, editable, initialPage, o
     return () => { node.removeEventListener("wheel", onWheel); clearTimeout(idle); };
   }, [pullable, size.width > 0]);
   const revealed = Math.max(0, Math.min(1, (scroll.y + size.height - pagesHeight) / PULL));
-  const pullProgress = Platform.OS === "web" ? wheelPull : revealed;
+  const pullProgress = Platform.OS === "web" ? wheelPull : armed ? revealed : 0;
 
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const y = event.nativeEvent.contentOffset.y;
@@ -241,8 +250,14 @@ export default function NoteEditor({ library, document, editable, initialPage, o
         {size.width ? (
           <ScrollView ref={horizontal} horizontal keyboardShouldPersistTaps="handled" scrollEnabled={contentWidth > size.width + 1} showsHorizontalScrollIndicator={contentWidth > size.width + 1} onScroll={(e) => setScroll((s) => ({ ...s, x: e.nativeEvent.contentOffset.x }))} scrollEventThrottle={32} contentContainerStyle={{ width: contentWidth }}>
             <ScrollView ref={vertical} keyboardShouldPersistTaps="handled" {...({ dataSet: { ownsWheel: "scroll" } } as object)} style={{ width: contentWidth, height: size.height }} onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ height: contentHeight }}
-              onScrollBeginDrag={(e) => { pullStart.current = (e.nativeEvent.contentOffset.y + size.height - pagesHeight) / PULL; }}
-              onScrollEndDrag={(e) => { if (pullable && pullStart.current > 0.25 && e.nativeEvent.contentOffset.y + size.height >= contentHeight - 12) addPageAtEnd(); }}>
+              onScrollBeginDrag={(e) => setArmed(pullable && e.nativeEvent.contentOffset.y + size.height >= pagesHeight - 24)}
+              onScrollEndDrag={(e) => {
+                const y = e.nativeEvent.contentOffset.y, speed = Math.abs(e.nativeEvent.velocity?.y ?? 0);
+                // A pull ends held, not flung: a flick at the end of the note is someone scrolling, not asking for a page.
+                if (armed && y + size.height >= contentHeight - 16 && speed < PULL_RELEASE_SPEED) addPageAtEnd(); else settleZone(y);
+                setArmed(false);
+              }}
+              onMomentumScrollEnd={(e) => settleZone(e.nativeEvent.contentOffset.y)}>
               {layout.map((row) => {
                 const left = (contentWidth - row.width) / 2;
                 const near = row.top + row.height > scroll.y - size.height && row.top < scroll.y + size.height * 2;
@@ -289,12 +304,12 @@ export default function NoteEditor({ library, document, editable, initialPage, o
                 );
               })}
               {pullable ? (
-                <View pointerEvents="none" style={{ position: "absolute", top: pagesHeight, left: 0, width: contentWidth, height: PULL, alignItems: "center", justifyContent: "center", gap: 8, opacity: 0.35 + pullProgress * 0.65 }} testID="note-pull-zone">
-                  <View style={{ width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center", backgroundColor: pullProgress >= 1 ? color.accent.fill : color.raised, transform: [{ scale: 0.85 + pullProgress * 0.15 }] }}>
-                    <Icon name="pagePlus" size={20} color={pullProgress >= 1 ? color.accent.on : color.inkSoft} />
+                <View pointerEvents="none" style={{ position: "absolute", top: pagesHeight, left: 0, width: contentWidth, height: PULL, alignItems: "center", justifyContent: "flex-start", paddingTop: 18, gap: 8, opacity: 0.35 + Math.max(pullProgress, revealed * 0.4) * 0.65 }} testID="note-pull-zone">
+                  <View style={{ width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center", backgroundColor: pullProgress >= 0.95 ? color.accent.fill : color.raised, transform: [{ scale: 0.85 + pullProgress * 0.15 }] }}>
+                    <Icon name="pagePlus" size={20} color={pullProgress >= 0.95 ? color.accent.on : color.inkSoft} />
                   </View>
                   <View style={{ width: 96, height: 3, borderRadius: 2, backgroundColor: color.line, overflow: "hidden" }}><View style={{ width: 96 * pullProgress, height: 3, backgroundColor: color.accent.fill }} /></View>
-                  <Text variant="caption" tone="soft">{Platform.OS === "web" ? "Keep scrolling to add a page" : pullProgress >= 1 ? "Release to add a page" : "Pull to add a page"}</Text>
+                  <Text variant="caption" tone="soft">{pullProgress >= 0.95 ? "Release to add a page" : Platform.OS === "web" ? "Keep scrolling to add a page" : "Pull up to add a page"}</Text>
                 </View>
               ) : null}
             </ScrollView>

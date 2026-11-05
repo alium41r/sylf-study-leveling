@@ -43,7 +43,7 @@ export function PersonSheet({ person, onClose, onMessage }: { person: CirclePers
         </Stack>
       </View>
       <Dialog open={confirm === "remove"} onClose={() => setConfirm(null)} title="Remove this friend?" message="You can send a request again later." actions={[{ label: "Keep", onPress: () => setConfirm(null) }, { label: "Remove", variant: "critical", onPress: () => { setConfirm(null); void run(() => backend!.reads.social.removeFriend(userId), "Friend removed."); } }]} />
-      <Dialog open={confirm === "block"} onClose={() => setConfirm(null)} title="Block this person?" message="They can't message you or see you, and you stop being friends. You can unblock them from your account." actions={[{ label: "Cancel", onPress: () => setConfirm(null) }, { label: "Block", variant: "critical", onPress: () => { setConfirm(null); void run(() => backend!.reads.social.block(userId), "Blocked."); } }]} />
+      <Dialog open={confirm === "block"} onClose={() => setConfirm(null)} title="Block this person?" message="They can't message you or see you, and you stop being friends. You can unblock them later from Blocked, at the top of Circle." actions={[{ label: "Cancel", onPress: () => setConfirm(null) }, { label: "Block", variant: "critical", onPress: () => { setConfirm(null); void run(() => backend!.reads.social.block(userId), "Blocked."); } }]} />
     </Sheet>
   );
 }

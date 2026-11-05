@@ -10,6 +10,7 @@ import { useHomeNavigation, useShellMetrics } from "../../../shell/context";
 import { useHomeResult } from "../data";
 import type { CirclePerson, HomeDataAdapter } from "../data/contracts";
 import { EmptyPage, FailedPage, HomeColumns, HomePage, LoadingPage, PageTitle, Section, SubNav, useHomeView } from "../HomePage";
+import { BlockedSheet } from "../circle/BlockedSheet";
 import { FindPeopleSheet } from "../circle/FindPeopleSheet";
 import { MessagesView } from "../circle/MessagesView";
 import { PartiesView } from "../circle/PartiesView";
@@ -75,6 +76,7 @@ export function CircleDestination() {
   const navigation = useHomeNavigation();
   const [finding, setFinding] = useState(false);
   const [notifying, setNotifying] = useState(false);
+  const [blocked, setBlocked] = useState(false);
   const [managing, setManaging] = useState<CirclePerson | null>(null);
   const [conversation, setConversation] = useState<number | null>(null);
   const circle = result?.data;
@@ -87,7 +89,7 @@ export function CircleDestination() {
       {!result ? <LoadingPage title="Circle" /> : !circle && result.live?.failure ? <FailedPage title="Circle" icon="circle" live={result.live} /> : !circle || lonely ? <EmptyPage title="Circle" icon="circle" heading="Your circle is empty" message={live ? "Friends you add on Sylf for the web appear here, with who is studying right now." : "Friends and study parties will appear here."} /> : (
         <>
           <PageTitle title="Circle" />
-          {live ? <View style={{ flexDirection: "row" }}><Button title="Notifications" size="small" icon="bell" testID="circle-notifications" onPress={() => setNotifying(true)} /></View> : null}
+          {live ? <View style={{ flexDirection: "row", gap: space.sm }}><Button title="Notifications" size="small" icon="bell" testID="circle-notifications" onPress={() => setNotifying(true)} /><Button title="Blocked" size="small" variant="ghost" testID="circle-blocked" onPress={() => setBlocked(true)} /></View> : null}
           {live ? <SubNav destination="circle" label="Circle views" labels={{ people: "People", messages: "Messages", parties: "Parties" }} /> : null}
           {live && view === "messages" ? <MessagesView openId={conversation} onOpened={() => setConversation(null)} /> : live && view === "parties" ? <PartiesView /> : <HomeColumns
             primary={
@@ -136,6 +138,7 @@ export function CircleDestination() {
           />}
           <FindPeopleSheet open={finding} onClose={() => setFinding(false)} />
           <NotificationsSheet open={notifying} onClose={() => setNotifying(false)} />
+          <BlockedSheet open={blocked} onClose={() => setBlocked(false)} />
           <PersonSheet person={managing} onClose={() => setManaging(null)} onMessage={(id) => { setConversation(id); navigation.setView("circle", "messages"); }} />
         </>
       )}

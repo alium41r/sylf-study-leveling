@@ -25,6 +25,7 @@ export const conversationSchema = z.object({
   messages: z.array(messageSchema), hasMore: z.boolean(),
 }).loose();
 export type Conversation = z.infer<typeof conversationSchema>;
+export const blockedListSchema = z.object({ blocked: z.array(z.object({ id: z.number().int(), username: z.string(), name: z.string().nullable().optional(), blockedAt: z.string().optional() })) });
 export const notificationsSchema = z.array(z.object({ id: z.number().int(), content: z.string(), type: z.string(), read: z.boolean(), createdAt: z.string() }).loose());
 export type AppNotification = z.infer<typeof notificationsSchema>[number];
 const newerSchema = z.object({ messages: z.array(messageSchema) });
@@ -37,6 +38,8 @@ export function createSocialReads(client: BackendClient) {
     sendRequest: (receiverId: number) => client.send("POST", "/api/friends/requests", { body: { receiverId } }),
     removeFriend: (userId: number) => client.send("POST", "/api/friends/remove", { body: { targetUserId: userId } }),
     block: (userId: number) => client.send("POST", "/api/friends/block", { body: { targetUserId: userId } }),
+    /** Only people this account blocked. A block placed against it is never listed. */
+    blocked: async (signal: AbortSignal) => (await client.get("/api/friends/blocked", blockedListSchema, { signal })).blocked,
     unblock: (userId: number) => client.send("POST", "/api/friends/unblock", { body: { targetUserId: userId } }),
 
     /** The newest 15. Local only: nothing here is pushed to the device. */

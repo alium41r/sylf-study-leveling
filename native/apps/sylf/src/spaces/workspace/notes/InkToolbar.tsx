@@ -36,7 +36,7 @@ export default function InkToolbar({ tool, onTool, canUndo, canRedo, onUndo, onR
   const shapeAnchor = useRef<ViewHandle>(null), eraserAnchor = useRef<ViewHandle>(null), penAnchor = useRef<ViewHandle>(null), highlighterAnchor = useRef<ViewHandle>(null);
   const set = (patch: Partial<InkToolState>) => onTool({ ...tool, ...patch });
   const pick = (name: InkToolState["tool"]) => set({ tool: name, color: name === "highlighter" && !HIGHLIGHTS.includes(tool.color) ? HIGHLIGHTS[0] : name === "pen" && HIGHLIGHTS.includes(tool.color) ? INKS[0] : tool.color });
-  const button = (name: InkToolState["tool"], icon: IconName, label: string) => <IconButton key={name} icon={icon} size="small" label={label} active={tool.tool === name} onPress={() => (tool.tool !== name ? pick(name) : name === "shape" || name === "eraser" ? setMenu(name) : name === "pen" || name === "highlighter" ? setMenu("pen") : undefined)} />;
+  const button = (name: InkToolState["tool"], icon: IconName, label: string, hint?: string) => <IconButton key={name} icon={icon} size="small" label={label} hint={tool.tool === name ? hint : undefined} active={tool.tool === name} onPress={() => (tool.tool !== name ? pick(name) : name === "shape" || name === "eraser" ? setMenu(name) : name === "pen" || name === "highlighter" ? setMenu("pen") : undefined)} />;
   // The colour in hand is always on the bar, even one from the panel's other sets.
   const quick = tool.tool === "highlighter" ? HIGHLIGHTS : INKS;
   const palette = quick.includes(tool.color) ? quick : [tool.color, ...quick];
@@ -66,8 +66,8 @@ export default function InkToolbar({ tool, onTool, canUndo, canRedo, onUndo, onR
           <IconButton icon="undo" size="small" label="Undo" disabled={!canUndo} onPress={onUndo} />
           <IconButton icon="redo" size="small" label="Redo" disabled={!canRedo} onPress={onRedo} />
           <Divider vertical style={{ height: 18, marginHorizontal: 4 }} />
-          <View ref={penAnchor} collapsable={false}>{button("pen", "pen", tool.tool === "pen" ? "Pen: settings" : "Pen")}</View>
-          <View ref={highlighterAnchor} collapsable={false}>{button("highlighter", "highlighter", tool.tool === "highlighter" ? "Highlighter: settings" : "Highlighter")}</View>
+          <View ref={penAnchor} collapsable={false}>{button("pen", "pen", "Pen", "Tap again for the pen's settings")}</View>
+          <View ref={highlighterAnchor} collapsable={false}>{button("highlighter", "highlighter", "Highlighter", "Tap again for the highlighter's settings")}</View>
           <View ref={eraserAnchor} collapsable={false}>{button("eraser", "eraser", tool.eraser === "precise" ? "Eraser, precise" : "Eraser")}</View>
           {button("lasso", "lasso", "Lasso: select and move")}
           <View ref={shapeAnchor} collapsable={false}>{button("shape", "shapes", `Shape: ${tool.shape}`)}</View>

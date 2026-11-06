@@ -12,6 +12,7 @@ import { HomeNavigationProvider, SpacesProvider, StudySessionProvider, Workspace
 import { connectBackend, currentBackend, noteForeground, prepareBackend, useBackend, useBackendPhase } from "./shell/backend";
 import { DEV_TOOLS, closeShowcase, openProbe, openShowcase, setHomeDataScenario, setWorldScenarios, useDevSurface, worldHostScenario } from "./shell/dev-surface";
 import { parseAppLink } from "./shell/links";
+import { enableWebDebugging } from "@sylf/native-platform";
 import { onForegroundChange } from "./shell/focus/alerts";
 import { SpacesShell } from "./shell/SpacesShell";
 import { flushNotes } from "./shell/notes/library";
@@ -95,6 +96,7 @@ function useDevLinks() {
   const appearance = useAppearanceStore();
   useEffect(() => {
     if (!DEV_TOOLS) return;
+    enableWebDebugging();
     const apply = (url: string | null | undefined) => {
       const link = parseAppLink(url);
       if (!link) return;

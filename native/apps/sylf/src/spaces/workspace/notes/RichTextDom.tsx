@@ -135,7 +135,14 @@ export default function RichTextDom({ ref, initial, template, look, editable, on
   };
 
   return (
-    <div data-editable={String(editable)} style={page ? { position: "relative", height: "100%", overflow: "visible", background: "transparent" } : { position: "relative", height: "100%", overflow: "auto", background: look.paper, WebkitOverflowScrolling: "touch" }}>
+    <div data-editable={String(editable)} style={page ? { position: "relative", height: "100%", minHeight: "100vh", overflow: "visible", background: "transparent" } : { position: "relative", height: "100%", overflow: "auto", background: look.paper, WebkitOverflowScrolling: "touch" }}
+      // The editor is only as tall as its text, and a page is mostly empty paper: a tap anywhere else on it types at the end.
+      onClick={page ? (event) => {
+        const editor = editorRef.current;
+        if (!editor || !editable || (event.target as HTMLElement).closest(".bn-editor, [role=listbox]")) return;
+        editor.focus();
+        try { editor.setTextCursorPosition(editor.document[editor.document.length - 1], "end"); } catch { /* An empty page has nowhere to put it yet. */ }
+      } : undefined}>
       <style>{css(look) + (page ? pageCss(page.lineHeight) : "")}</style>
       {/* BlockNote mounts on the inner element and adds its own classes there, so the styles above reach it as a descendant. */}
       <div className={page ? "sylf-note sylf-page" : "sylf-note"} style={page ? { zoom: page.zoom, minHeight: "100%" } as object : { minHeight: "100%", paddingBottom: 120 }}><div ref={host} /></div>
@@ -211,7 +218,8 @@ const css = (look: RichTextLook) => `
 
 /** On a page, text sits on the paper's rule: no inner padding, and every line the rule's height. */
 const pageCss = (line: number) => `
-.sylf-page .bn-editor { padding: 0 !important; background: transparent; line-height: ${line}px; }
+html, body, #root { height: 100%; margin: 0; background: transparent; }
+.sylf-page .bn-editor { padding: 0 !important; background: transparent; line-height: ${line}px; width: 100%; min-width: 100%; }
 .sylf-page .bn-block-content { padding: 0; }
 .sylf-page [data-content-type="heading"] { padding-top: 14px; line-height: 1.3; }
 .sylf-page .bn-block-content:has(.ProseMirror-trailingBreak:only-child)::after { opacity: 0.7; }

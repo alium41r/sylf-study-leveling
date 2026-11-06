@@ -105,10 +105,35 @@ export default function NoteEditor({ library, document, editable, initialPage, o
   // Typing starts on the page in view; switching to Write leaves no editor running.
   useEffect(() => { if (mode === "write") setTyping(null); else if (!typing && pages[current]) setTyping(pages[current].pageId); }, [mode]);
 
-  const pinch = (factor: number) => setZoom((z) => Math.max(0.5, Math.min(3, z * factor)));
+  // Zoom about a point of the view (the middle for the buttons, between the fingers for a pinch): what is under it stays under it.
+  const zoomRef = useRef(1);
+  zoomRef.current = zoom;
+  const offsetRef = useRef({ x: 0, y: 0 });
+  // A pinch sends many small steps a frame: they are gathered and applied once per frame, about the latest point between the fingers.
+  const pinching = useRef<{ factor: number; vx: number; vy: number } | null>(null);
+  const pinch = (factor: number, vx = size.width / 2, vy = size.height / 2) => {
+    const pending = pinching.current;
+    if (pending) { pending.factor *= factor; pending.vx = vx; pending.vy = vy; return; }
+    pinching.current = { factor, vx, vy };
+    requestAnimationFrame(() => {
+      const step = pinching.current!;
+      pinching.current = null;
+      const before = zoomRef.current, next = Math.max(0.5, Math.min(3, before * step.factor));
+      if (next === before) return;
+      const ratio = Math.max(0.15, fit * next) / Math.max(0.15, fit * before);
+      const at = offsetRef.current, target = { x: Math.max(0, (at.x + step.vx) * ratio - step.vx), y: Math.max(0, (at.y + step.vy) * ratio - step.vy) };
+      zoomRef.current = next;
+      offsetRef.current = target;
+      setZoom(next);
+      requestAnimationFrame(() => { vertical.current?.scrollTo({ y: target.y, animated: false }); horizontal.current?.scrollTo({ x: target.x, animated: false }); });
+    });
+  };
+
   const pan = (dx: number, dy: number) => {
-    vertical.current?.scrollTo({ y: Math.max(0, scroll.y - dy), animated: false });
-    if (contentWidth > size.width) horizontal.current?.scrollTo({ x: Math.max(0, scroll.x - dx), animated: false });
+    const at = offsetRef.current, next = { x: contentWidth > size.width ? Math.max(0, at.x - dx) : at.x, y: Math.max(0, at.y - dy) };
+    offsetRef.current = next;
+    vertical.current?.scrollTo({ y: next.y, animated: false });
+    if (contentWidth > size.width) horizontal.current?.scrollTo({ x: next.x, animated: false });
   };
   const activePage = layout[current]?.page;
   const activeScene = activePage ? scene(activePage) : null;
@@ -237,6 +262,7 @@ export default function NoteEditor({ library, document, editable, initialPage, o
 
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const y = event.nativeEvent.contentOffset.y;
+    offsetRef.current.y = y;
     if (Math.abs(y - scroll.y) >= 8) setScroll((s) => ({ ...s, y }));
   };
 
@@ -248,7 +274,7 @@ export default function NoteEditor({ library, document, editable, initialPage, o
             selection={selection?.ids.length ?? 0} onSelectionAction={onSelectionAction} leading={switcher} trailing={trailing} end={corner} />) : null}
       <View style={{ flex: 1, backgroundColor: color.sunken }} onLayout={(e: LayoutChangeEvent) => setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}>
         {size.width ? (
-          <ScrollView ref={horizontal} horizontal keyboardShouldPersistTaps="handled" scrollEnabled={contentWidth > size.width + 1} showsHorizontalScrollIndicator={contentWidth > size.width + 1} onScroll={(e) => setScroll((s) => ({ ...s, x: e.nativeEvent.contentOffset.x }))} scrollEventThrottle={32} contentContainerStyle={{ width: contentWidth }}>
+          <ScrollView ref={horizontal} horizontal keyboardShouldPersistTaps="handled" scrollEnabled={contentWidth > size.width + 1} showsHorizontalScrollIndicator={contentWidth > size.width + 1} onScroll={(e) => { offsetRef.current.x = e.nativeEvent.contentOffset.x; setScroll((s) => ({ ...s, x: e.nativeEvent.contentOffset.x })); }} scrollEventThrottle={32} contentContainerStyle={{ width: contentWidth }}>
             <ScrollView ref={vertical} keyboardShouldPersistTaps="handled" {...({ dataSet: { ownsWheel: "scroll" } } as object)} style={{ width: contentWidth, height: size.height }} onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ height: contentHeight }}
               onScrollBeginDrag={(e) => setArmed(pullable && e.nativeEvent.contentOffset.y + size.height >= pagesHeight - 24)}
               onScrollEndDrag={(e) => {
@@ -286,7 +312,7 @@ export default function NoteEditor({ library, document, editable, initialPage, o
                             onFormat={setFormat} pendingImage={pendingImage} onImageDone={() => setPendingImage(null)} onHeight={(h) => document.growPage(row.page.pageId, box.top + h + (endless ? ENDLESS_ROOM : 80))} />
                         </View>
                       ) : (
-                        <Press label="Type on this page" disabled={mode !== "type" || !editable} feedback="none" onPress={() => setTyping(row.page.pageId)}
+                        <Press label="Type on this page" feedback="none" onPress={() => { if (mode === "type" && editable) setTyping(row.page.pageId); }}
                           style={{ position: "absolute", left: box.left * scale, top: box.top * scale, width: box.width * scale, height: (row.page.height - box.top - 24) * scale }} pointerEvents={mode === "type" ? "auto" : "none"}>
                           <View style={{ width: box.width, transform: [{ scale }], transformOrigin: "0 0" } as object} pointerEvents="none"><StaticText doc={text} look={look} width={box.width} /></View>
                         </Press>
@@ -297,7 +323,7 @@ export default function NoteEditor({ library, document, editable, initialPage, o
                       <View style={{ position: "absolute", left: x0, top: y0 }} pointerEvents={mode === "write" ? "auto" : "none"}>
                         <InkView scene={s} pageWidth={row.page.width} pageHeight={row.page.height} camera={{ x: x0 / scale, y: y0 / scale, zoom: scale }} width={x1 - x0} height={y1 - y0}
                           tool={tool} drawPaper={false} editable={editable && mode === "write"} selection={selection?.page === row.page.pageId ? selection.ids : []}
-                          onSelection={(ids) => setSelection(ids.length ? { page: row.page.pageId, ids } : null)} onPan={pan} onPinch={(factor) => pinch(factor)} onPenSeen={penSeen} wheel="zoom" />
+                          onSelection={(ids) => setSelection(ids.length ? { page: row.page.pageId, ids } : null)} onPan={pan} onPinch={(factor, x, y) => pinch(factor, left + x0 - offsetRef.current.x + x, row.top + y0 - offsetRef.current.y + y)} onPenSeen={penSeen} wheel="zoom" />
                       </View>
                     ) : null}
                   </View>

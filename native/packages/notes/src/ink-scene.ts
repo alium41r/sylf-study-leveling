@@ -150,6 +150,20 @@ export const unionOf = (rects: readonly Rect[]): Rect => {
   return { x, y, width: Math.max(...rects.map((r) => r.x + r.width)) - x, height: Math.max(...rects.map((r) => r.y + r.height)) - y };
 };
 
+/**
+ * What a shape gesture becomes: a line from its first point to its last, or for a rectangle or ellipse the two corners of everything
+ * drawn, so a rough circle becomes a circle of that size and a drag from corner to corner still works. The web reads a shape stroke
+ * by its first and last points, so these two samples are all it needs.
+ */
+export function shapeSamples(points: readonly InkSample[], shape: ShapeKind | undefined): InkSample[] {
+  if (points.length < 2) return [...points];
+  const first = points[0], last = points[points.length - 1];
+  if (!shape || shape === "line") return [first, last];
+  let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
+  for (const p of points) { x1 = Math.min(x1, p[0]); y1 = Math.min(y1, p[1]); x2 = Math.max(x2, p[0]); y2 = Math.max(y2, p[1]); }
+  return [[x1, y1, 0.5, first[3], 0, 0, 0, 0], [x2, y2, 0.5, last[3], 0, 0, 0, 0]];
+}
+
 /** The live stroke's outline while the pen is down, drawn the same way as a finished one, so pen-up never changes its shape. */
 export function liveOutline(points: readonly InkSample[], style: InkBrush) {
   if (!points.length) return "";

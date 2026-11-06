@@ -4,7 +4,7 @@
 import { useEffect, useRef } from "react";
 import { View } from "react-native";
 import { inkOutline } from "@sylf/shared";
-import { brushFor, liveOutline, type Point, type RenderStroke } from "@sylf/notes";
+import { brushFor, liveOutline, shapeSamples, type Point, type RenderStroke } from "@sylf/notes";
 import { eraserRadius, type InkViewProps } from "./ink-types";
 
 type Sample = [number, number, number, number, number, number, number, number];
@@ -93,7 +93,7 @@ export default function InkView(props: InkViewProps) {
     if (g.kind === "draw" && g.style) {
       ctx.globalAlpha = g.style.opacity ?? (g.style.tool === "highlighter" ? 0.28 : 1);
       ctx.fillStyle = g.style.color;
-      const d = liveOutline(g.points, g.style);
+      const d = liveOutline(g.style.shape ? shapeSamples(g.points, g.style.shape) : g.points, g.style);
       if (d) ctx.fill(new Path2D(d));
       ctx.globalAlpha = 1;
     } else if (g.kind === "lasso" && g.path.length > 1) {
@@ -185,7 +185,8 @@ export default function InkView(props: InkViewProps) {
     gesture.current = { kind: "draw", pointer: native.pointerId, started: native.timeStamp, points: [], path: [], style };
     const first = sample(native, native.timeStamp);
     gesture.current.points.push(first);
-    p.scene.append([first]);
+    // A shape is committed once, at the end, from the whole gesture.
+    if (!style.shape) p.scene.append([first]);
     requestLive();
   };
   const eraseAlong = (path: Point[]) => {
@@ -212,7 +213,7 @@ export default function InkView(props: InkViewProps) {
     if (g.kind === "draw") {
       const samples = (events.length ? events : [native]).map((e) => sample(e, g.started));
       g.points.push(...samples);
-      try { p.scene.append(samples); } catch { gesture.current = null; }
+      try { if (!g.style?.shape) p.scene.append(samples); } catch { gesture.current = null; }
     } else {
       const points = (events.length ? events : [native]).map((e) => pagePoint(e)), previous = g.last;
       g.last = points.at(-1);
@@ -227,7 +228,10 @@ export default function InkView(props: InkViewProps) {
     if (native.pointerType === "touch") touches.current.delete(native.pointerId);
     if (!g || g.pointer !== native.pointerId) { if (g?.kind === "pan" && !touches.current.size) gesture.current = null; return; }
     gesture.current = null;
-    if (g.kind === "draw") { if (native.type === "pointercancel") p.scene.cancel(); else p.scene.end(); }
+    if (g.kind === "draw") {
+      if (native.type === "pointercancel") p.scene.cancel();
+      else { try { if (g.style?.shape) p.scene.append(shapeSamples(g.points, g.style.shape)); } catch { /* A full page refuses the shape. */ } p.scene.end(); }
+    }
     else if (g.kind === "erase") p.scene.endSweep();
     else if (g.kind === "lasso") p.onSelection(p.scene.select(g.path));
     else if (g.kind === "move" && g.origin && g.last) { p.scene.move(p.selection, g.last.x - g.origin.x, g.last.y - g.origin.y); }

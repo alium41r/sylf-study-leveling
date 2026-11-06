@@ -56,7 +56,8 @@ function BlockView({ block, look, index, depth }: { block: Block; look: TextLook
   const level = Number(block.props.level ?? 1);
   const size = block.type === "heading" ? look.size * (HEADING[level] ?? 1) : look.size;
   const lineHeight = block.type === "heading" ? Math.max(look.line, size * 1.3) : look.line;
-  const text = <RNText style={{ flex: 1, color: block.type === "quote" ? look.soft : look.ink, fontSize: size, lineHeight, fontWeight: block.type === "heading" ? "700" : "400", fontFamily: look.font }}><Runs runs={block.runs} />{block.runs.length ? null : " "}</RNText>;
+  // Grows beside a list marker, but never from a zero basis: `flex: 1` collapses a paragraph to no height on Android (the web forgives it).
+  const text = <RNText style={{ flexGrow: 1, flexShrink: 1, flexBasis: "auto", color: block.type === "quote" ? look.soft : look.ink, fontSize: size, lineHeight, fontWeight: block.type === "heading" ? "700" : "400", fontFamily: look.font }}><Runs runs={block.runs} />{block.runs.length ? null : " "}</RNText>;
   const marker = block.type === "bulletListItem" ? "•" : block.type === "numberedListItem" ? `${index + 1}.` : null;
   let body: ReactNode = text;
   if (marker) body = <View style={{ flexDirection: "row" }}><RNText style={{ width: 24, textAlign: "center", color: look.ink, fontSize: look.size, lineHeight }}>{marker}</RNText>{text}</View>;

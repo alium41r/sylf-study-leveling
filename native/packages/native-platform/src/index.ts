@@ -18,6 +18,7 @@ interface SylfNativePlatformModule {
   pdfPrepare?(key: string, bytes: Uint8Array): Promise<{ width: number; height: number }[]>;
   pdfPages?(key: string): Promise<{ width: number; height: number }[]>;
   pdfRender?(key: string, index: number, width: number): Promise<string>;
+  enableWebDebugging?(): Promise<void>;
 }
 
 const nativeModule = () => requireOptionalNativeModule<SylfNativePlatformModule>("SylfNativePlatform");
@@ -32,6 +33,11 @@ export function nativePreferences() {
 export function readNativeDeviceInfo(): NativeDeviceInfo | undefined {
   const module = nativeModule();
   try { return module?.getDeviceInfo(); } catch { return undefined; }
+}
+
+/** Development builds only: lets chrome://inspect reach the app's WebViews (the typed-note editors). */
+export function enableWebDebugging() {
+  void nativeModule()?.enableWebDebugging?.().catch(() => undefined);
 }
 
 /** Android's PdfRenderer behind the module (Phase 14). Undefined where the module or its PDF functions are absent (iOS today, web, tests). */

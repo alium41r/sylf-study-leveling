@@ -23,6 +23,9 @@ class SylfNativePlatformModule : Module() {
     Name("SylfNativePlatform")
 
     // PDFs (Phase 14). Work runs off the JavaScript thread; each call is short and cached.
+    // Development builds only (the app calls it when its development tools are on): lets chrome://inspect reach the WebViews
+    // that run typed notes. A store build never calls it.
+    AsyncFunction("enableWebDebugging") { android.webkit.WebView.setWebContentsDebuggingEnabled(true) }.runOnQueue(expo.modules.kotlin.functions.Queues.MAIN)
     AsyncFunction("pdfHas") { key: String -> pdf.has(key) }
     AsyncFunction("pdfPrepare") { key: String, bytes: Uint8Array ->
       val data = ByteArray(bytes.byteLength)
@@ -39,6 +42,9 @@ class SylfNativePlatformModule : Module() {
       Prop("penOnly") { view: SylfInkView, value: Boolean -> view.penOnly = value }
       Prop("fingerGestures") { view: SylfInkView, value: Boolean -> view.fingerGestures = value }
       Prop("editable") { view: SylfInkView, value: Boolean -> view.editable = value }
+      Prop("pinchZoom") { view: SylfInkView, value: Boolean -> view.pinchZoom = value }
+      Prop("inkThinning") { view: SylfInkView, value: Double -> view.inkThinning = value.toFloat() }
+      Prop("inkShape") { view: SylfInkView, value: String -> view.inkShape = value }
       Prop("inkColor") { view: SylfInkView, value: String -> view.inkColor = android.graphics.Color.parseColor(value); view.invalidate() }
       Prop("inkWidth") { view: SylfInkView, value: Double -> view.inkWidth = value.toFloat() }
       Prop("inkOpacity") { view: SylfInkView, value: Double -> view.inkOpacity = value.toFloat() }

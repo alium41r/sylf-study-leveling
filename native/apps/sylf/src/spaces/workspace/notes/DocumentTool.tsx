@@ -123,9 +123,14 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
     if (workspace.layout !== "fill") model.setLayout("fill");
   };
   // Set apart at the toolbar's right end, with its name on it, so it reads as the way into and out of full screen.
-  const pageOnlyButton = narrow
-    ? <IconButton icon={pageOnly ? "collapse" : "expand"} size="small" active={pageOnly} label={pageOnly ? "Exit full screen" : "Full screen"} testID="document-page-only" onPress={togglePageOnly} />
-    : <Button title={pageOnly ? "Exit full screen" : "Full screen"} icon={pageOnly ? "collapse" : "expand"} size="small" variant={pageOnly ? "emphasis" : "solid"} testID="document-page-only" onPress={togglePageOnly} />;
+  // Small, so it does not compete with the tools: a quiet pill with a short label, tinted while full screen is on.
+  const pageOnlyButton = (
+    <Press label={pageOnly ? "Exit full screen" : "Full screen"} onPress={togglePageOnly} testID="document-page-only" feedback="surface"
+      bodyStyle={{ flexDirection: "row", alignItems: "center", gap: 5, height: 28, paddingHorizontal: narrow ? 7 : 9, borderRadius: 8, borderWidth: 1, borderColor: pageOnly ? color.accent.fill : color.line, backgroundColor: pageOnly ? color.accent.wash : "transparent" }}>
+      <Icon name={pageOnly ? "collapse" : "expand"} size={14} color={pageOnly ? color.accent.ink : color.inkSoft} />
+      {narrow ? null : <Text variant="caption" style={{ color: pageOnly ? color.accent.ink : color.inkSoft }}>{pageOnly ? "Exit" : "Full screen"}</Text>}
+    </Press>
+  );
   const toolbarHoldsFullScreen = editable && !!document && (kind !== "note" || isLayeredNote(document.descriptor()));
   const home = snapshot.notebooks.find((n) => n.id === entry.notebookId)?.title ?? (primary === "pdf" ? "PDFs" : primary === "board" ? "Boards" : "Notes");
 

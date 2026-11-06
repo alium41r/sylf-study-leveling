@@ -21,6 +21,12 @@ export interface NativeInkProps extends NativeInkEvents {
   tool: string;
   penOnly: boolean;
   fingerGestures: boolean;
+  /** Pages: two fingers zoom while one scrolls. */
+  pinchZoom?: boolean;
+  /** The brush's thinning, so the live width follows pressure as the finished outline does. */
+  inkThinning?: number;
+  /** "line", "rectangle" or "ellipse" while the shape tool is chosen: the live stroke shows the shape. */
+  inkShape?: string;
   editable: boolean;
   inkColor: string;
   inkWidth: number;

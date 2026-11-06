@@ -6,7 +6,7 @@ import { View } from "react-native";
 import Svg, { Path, Rect } from "react-native-svg";
 import { nativeInkView, type NativeInkHandle } from "@sylf/native-platform";
 import { inkOutline, type InkSample } from "@sylf/shared";
-import { brushFor, type Point } from "@sylf/notes";
+import { brushFor, shapeSamples, type Point } from "@sylf/notes";
 import { eraserRadius, type InkViewProps } from "./ink-types";
 
 const NativeInk = nativeInkView();
@@ -68,10 +68,13 @@ function NativeInkSurface(props: InkViewProps) {
   const box = props.selection.length ? scene.boundsOf(props.selection) : null;
   const highlighter = tool.tool === "highlighter";
   const brushTool = tool.tool === "highlighter" ? "highlighter" : tool.tool === "shape" ? "shape" : "pen";
+  // The live stroke narrows with pressure as the finished outline will, and a shape shows as the shape.
+  const thinning = inkOutline.inkThinning(brushFor(brushTool, { color: tool.color, width: tool.width, input: "pen", shape: tool.shape }));
 
   return (
     <Native ref={ref} style={{ width: props.width, height: props.height }}
       tool={tool.tool} penOnly={tool.penOnly} fingerGestures={!!props.fingersMove} editable={props.editable && !props.paperOnly}
+      pinchZoom={!props.fingersMove && !!props.onPinch && !props.paperOnly} inkThinning={thinning} inkShape={tool.tool === "shape" ? tool.shape : ""}
       inkColor={tool.color} inkWidth={highlighter ? Math.max(8, tool.width * 4) : tool.width} inkOpacity={highlighter ? 0.28 : 1} eraserRadius={eraserRadius(tool)}
       camera={[props.camera.x, props.camera.y, props.camera.zoom]} selectionBox={box ? [box.x, box.y, box.width, box.height] : null} paper={paper}
       onPenSeen={() => latest.current.onPenSeen?.()}
@@ -92,7 +95,7 @@ function NativeInkSurface(props: InkViewProps) {
         const style = brushFor(brushTool, { color: p.tool.color, width: highlighter ? Math.max(8, p.tool.width * 4) : p.tool.width, input: pointer === "pen" ? "pen" : pointer === "mouse" ? "mouse" : "touch", shape: p.tool.shape });
         try {
           p.scene.begin(style);
-          const all = samplesOf(samples);
+          const all = brushTool === "shape" ? shapeSamples(samplesOf(samples), p.tool.shape) : samplesOf(samples);
           for (let i = 0; i < all.length; i += 256) p.scene.append(all.slice(i, i + 256));
           p.scene.end();
         } catch { p.scene.cancel(); }

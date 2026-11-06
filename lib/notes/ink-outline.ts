@@ -10,6 +10,15 @@ interface PaperRect {
   width: number;
   height: number;
 }
+/** How much pressure narrows a stroke (perfect-freehand's thinning). Native's live stroke uses the same value, so pen-up keeps its width. */
+export function inkThinning(style: InkBrush) {
+  return style.tool === "highlighter" || style.nib === "fineliner"
+    ? 0
+    : (style.pressure ?? 1) *
+        ({ ballpoint: 0.45, fountain: 0.8, brush: 1, pencil: 0.35 }[
+          style.nib as "ballpoint"
+        ] ?? 0.55);
+}
 export function inkOutline(
   points: readonly InkSample[],
   style: InkBrush,
@@ -28,6 +37,19 @@ export function inkOutline(
         ) / points.length
       : 0);
   const smoothing = style.smoothing ?? 0.65;
+  // A shape is a few corner points. Smoothed and streamlined like handwriting they become a leaf, so a shape is drawn as an even
+  // line: points every unit or so along each edge, and no thinning, smoothing or streamline.
+  if (style.shape) {
+    const dense: number[][] = [];
+    for (let i = 0; i < points.length; i++) {
+      const a = points[i], b = points[i + 1];
+      dense.push([a[0], a[1], 0.5]);
+      if (!b) break;
+      const steps = Math.min(400, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 1.5));
+      for (let k = 1; k < steps; k++) dense.push([a[0] + ((b[0] - a[0]) * k) / steps, a[1] + ((b[1] - a[1]) * k) / steps, 0.5]);
+    }
+    return getStroke(dense, { size: style.width, thinning: 0, smoothing: 0.2, streamline: 0, simulatePressure: false, last, start: { cap: true }, end: { cap: true } });
+  }
   return getStroke(
     points.map((p) => [
       p[0],
@@ -43,13 +65,7 @@ export function inkOutline(
     ]),
     {
       size: style.width * (1 + tilt * 1.8),
-      thinning:
-        style.tool === "highlighter" || style.nib === "fineliner"
-          ? 0
-          : (style.pressure ?? 1) *
-            ({ ballpoint: 0.45, fountain: 0.8, brush: 1, pencil: 0.35 }[
-              style.nib as "ballpoint"
-            ] ?? 0.55),
+      thinning: inkThinning(style),
       smoothing,
       streamline: Math.min(0.42, Math.max(0.08, smoothing * 0.34)),
       simulatePressure: style.input !== "pen",

@@ -111,8 +111,16 @@ export default function RichTextDom({ ref, initial, template, look, editable, on
     host.current!.addEventListener("keydown", keys, true);
     // A page layer reports its height whenever it changes, and takes the cursor when it opens.
     let lastHeight = 0;
-    const measure = new ResizeObserver(() => { const height = Math.ceil(host.current?.scrollHeight ?? 0); if (height && Math.abs(height - lastHeight) > 2) { lastHeight = height; void onHeight?.(height); } });
+    // The text's own height, from its blocks: on a page the editable area fills the page so any tap types, so its box is not the text.
+    const textHeight = () => {
+      const group = host.current?.querySelector<HTMLElement>(".bn-block-group");
+      return Math.ceil(page ? (group ? group.offsetTop + group.offsetHeight : 0) : (host.current?.scrollHeight ?? 0));
+    };
+    const measure = new ResizeObserver(() => { const height = textHeight(); if (height && Math.abs(height - lastHeight) > 2) { lastHeight = height; void onHeight?.(height); } });
     measure.observe(host.current!);
+    // On a page the editor box is the page's height, so the blocks are watched as well: they are what grows as text is added.
+    const group = host.current!.querySelector(".bn-block-group");
+    if (page && group) measure.observe(group);
     if (page?.focus) setTimeout(() => { editor.focus(); try { editor.setTextCursorPosition(editor.document[editor.document.length - 1], "end"); } catch { /* An empty page has nowhere to put it yet. */ } }, 30);
     return () => {
       host.current?.removeEventListener("keydown", keys, true);
@@ -145,7 +153,7 @@ export default function RichTextDom({ ref, initial, template, look, editable, on
       } : undefined}>
       <style>{css(look) + (page ? pageCss(page.lineHeight) : "")}</style>
       {/* BlockNote mounts on the inner element and adds its own classes there, so the styles above reach it as a descendant. */}
-      <div className={page ? "sylf-note sylf-page" : "sylf-note"} style={page ? { zoom: page.zoom, minHeight: "100%" } as object : { minHeight: "100%", paddingBottom: 120 }}><div ref={host} /></div>
+      <div className={page ? "sylf-note sylf-page" : "sylf-note"} style={page ? { zoom: page.zoom, minHeight: "100%", ["--sylf-zoom" as string]: page.zoom } as object : { minHeight: "100%", paddingBottom: 120 }}><div ref={host} /></div>
       {slash && slash.items.length ? (
         <div role="listbox" aria-label="Blocks" style={{ position: "absolute", left: Math.max(8, slash.left), top: slash.top, width: 236, maxHeight: 320, overflow: "auto", background: look.menu, color: look.menuInk, borderRadius: 12, boxShadow: "0 10px 30px rgba(20,24,40,0.18), 0 0 0 1px rgba(20,24,40,0.08)", padding: 6, zIndex: 10, fontFamily: look.font }}>
           {slash.items.map((item, index) => (
@@ -219,7 +227,10 @@ const css = (look: RichTextLook) => `
 /** On a page, text sits on the paper's rule: no inner padding, and every line the rule's height. */
 const pageCss = (line: number) => `
 html, body, #root { height: 100%; margin: 0; background: transparent; }
-.sylf-page .bn-editor { padding: 0 !important; background: transparent; line-height: ${line}px; width: 100%; min-width: 100%; }
+/* The page's text area is the whole page, in both directions, whatever the zoom, so a tap anywhere on it types. */
+.sylf-page { width: calc(100vw / var(--sylf-zoom, 1)); }
+.sylf-page > div, .sylf-page .bn-container { width: 100%; }
+.sylf-page .bn-editor { padding: 0 !important; background: transparent; line-height: ${line}px; width: 100%; min-width: 100%; box-sizing: border-box; min-height: calc(100vh / var(--sylf-zoom, 1)); }
 .sylf-page .bn-block-content { padding: 0; }
 .sylf-page [data-content-type="heading"] { padding-top: 14px; line-height: 1.3; }
 .sylf-page .bn-block-content:has(.ProseMirror-trailingBreak:only-child)::after { opacity: 0.7; }

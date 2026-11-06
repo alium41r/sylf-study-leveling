@@ -290,3 +290,8 @@ Run on the tablet by the agent with `adb input stylus` and `npm run android:note
 13. **Full screen.** In a note, press Full screen at the toolbar's right end: only the toolbar and page remain. Exit full screen restores everything. Full-screen two notes and the Calculator, drag a seam, and dock a tile against another's edge.
 14. **Folders.** Make a folder and a subfolder, colour and icon them, move a note in, search for it from the top level.
 15. **Search and sound.** The search button at the top right opens the palette; type part of a note's text and open it. Open the timer, choose a sound in Sound, play it: the bars beside the timer move, and they rest when paused.
+16. **Text in Write.** Type two lines, switch to Write: the text stays, at full strength, and writing goes over it.
+17. **Pinch a note.** Two fingers zoom about the point between them; one finger still scrolls. Same on a whiteboard.
+18. **Ink weight.** Write slowly and quickly with light and firm pressure: the line should not change width when the pen lifts.
+19. **Shapes.** Rectangle, ellipse and line: draw them roughly; each becomes a clean shape of that size.
+20. **New and names.** The gear sets the note style; New asks for a name and opens the note in that style; tapping the name in the title bar renames it.

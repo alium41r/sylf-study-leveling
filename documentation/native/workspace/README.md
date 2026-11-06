@@ -197,7 +197,12 @@ Interactions:
 | Keep a layout | Layout menu, "Save this layout" | Same |
 | Add a page at the end | At the end of the last page, pull up until the zone below is fully shown, and let go without flicking. A fling or a short pull adds nothing, and the zone springs back | Pause at the end, then keep scrolling |
 | Endless note | New, "Note, endless", or Page settings, Endless: writing near the end extends the page | Same |
-| Only the page and toolbar | **Full screen** at the toolbar's right end; Exit full screen brings the bars back and leaves full screen | Same |
+| Only the page and toolbar | The small **Full screen** pill at the toolbar's right end; Exit brings the bars back and leaves full screen | Same |
+| Zoom a page | Two fingers (one finger scrolls) | Control or Command and the wheel, or a trackpad pinch |
+| Shapes | Choose line, rectangle or ellipse, then draw roughly: the shape takes the bounds of what you drew (a line goes end to end) | Same, or drag corner to corner |
+| New note or whiteboard | **New**, give it a name (or none for an automatic title); it opens in the note style | Same |
+| Note style | The **gear** in the library: pages or endless, layout, spacing, paper, starting template, Type or Write, whiteboard background | Same |
+| Rename | Tap the name in the window's title bar | Click it |
 | Find or do anything | The search button at the top right of every Space | Command or Control + K |
 
 Budgets: typed-note editors run for the most recently used two windows on Android and six on desktop. The rest show their text, and a touch brings the editor back.

@@ -17,6 +17,7 @@ const stylusDevice = (() => { try { return detectCapabilities().input.stylus ===
 import { openBeside, openDocumentWindow } from "./open-window";
 import { useWorkspaceModel, useWorkspaceState } from "../../../shell/context";
 import { LIVE_EDITORS } from "./editor-budget";
+import { useNoteStyle } from "./note-style";
 
 // BlockNote and ProseMirror are large: they load with the first typed note, never with the app.
 const RichTextEditor = lazy(() => import("./RichTextEditor"));
@@ -65,7 +66,9 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
   }, [entry?.title, id, snapshot.ready]);
   useEffect(() => { if (entry?.trashed) patch({ document: null, title: null }); }, [entry?.trashed]);
 
-  const open = (next: LibraryEntry) => patch({ document: next.id, title: next.title, page: 0, bx: null, by: null, bz: null });
+  // A note opens in the mode the note style asks for; the window remembers a switch only for the note it was made on.
+  const open = (next: LibraryEntry) => patch({ document: next.id, title: next.title, page: 0, bx: null, by: null, bz: null, mode: null });
+  const opensIn = useNoteStyle().opensIn;
   const close = () => patch({ document: null, title: null });
   const editable = isSeen(lifecycle);
   const workspace = useWorkspaceState();
@@ -159,7 +162,7 @@ export default function DocumentTool({ window, lifecycle, patch, onProvenance, k
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}><Activity label="Opening" /></View>
       ) : kind === "note" && isLayeredNote(document.descriptor()) ? (
         <NoteEditor key={document.id} library={library} document={document} editable={editable} narrow={narrow} corner={pageOnlyButton}
-          mode={window.state.mode === "type" || window.state.mode === "write" ? window.state.mode : stylusDevice ? "write" : "type"} onMode={(mode) => patch({ mode })}
+          mode={window.state.mode === "type" || window.state.mode === "write" ? window.state.mode : opensIn !== "auto" ? opensIn : stylusDevice ? "write" : "type"} onMode={(mode) => patch({ mode })}
           initialPage={typeof window.state.page === "number" ? window.state.page : 0} onPage={(page) => { if (page !== window.state.page) patch({ page }); }} />
       ) : kind === "note" && !liveEditor ? (
         <Press label="Edit this note" onPress={() => model.focus(window.id)} feedback="none" style={{ flex: 1 }} bodyStyle={{ flex: 1, backgroundColor: DOCUMENT_DEFAULTS.paper, padding: space.xl }}>

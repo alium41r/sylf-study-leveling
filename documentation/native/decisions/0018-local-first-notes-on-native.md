@@ -20,6 +20,8 @@ Sylf Web's Notes is a mature system: an encrypted IndexedDB repository with a co
 10. **Paper is per page and changeable at any time** (layout, spacing, colour, or a picture), for one page or every page, stored as the web's paper record in each ink stream. **Endless notes** are one page that grows as it is written near its end; the choice is kept in `extensions.sylfNative.flow`, and the web reads such a note as one tall page (height capped at 60000, inside the schema's limit).
 11. **Folders are library records, not documents.** A notebook record has an optional parent, colour and icon; deleting a folder moves its contents up, and a move that would make a loop is refused. Descriptors keep only `folderId`, as on the web.
 12. **One shared fix in the web's ink model.** `InkModel` advanced its scene version only when a stroke was drawn or redrawn, so erasing the last stroke left every cached view showing it. A stroke leaving the scene now advances the version too (`lib/notes/ink.ts`, with a web regression test).
+13. **Shapes and live ink follow the shared outline.** A shape stroke stores two samples: its first and last point for a line, otherwise the corners of the whole gesture's bounds, so the web reads it unchanged. The shared outline draws shape strokes as even lines (no thinning, smoothing or streamline), and exports `inkThinning` so Android's live stroke narrows with pressure exactly as the finished outline does.
+14. **How new notes start is a device preference** (the note style: pages or endless, layout, spacing, paper, starting template, opening mode, whiteboard background). It is not part of any document; each note's own page settings change it afterwards.
 
 ## Consequences
 

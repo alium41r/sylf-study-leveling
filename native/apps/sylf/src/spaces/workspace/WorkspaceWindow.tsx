@@ -14,6 +14,7 @@ import { TOOL_ICONS } from "./icons";
 import { ToolHost } from "./ToolHost";
 import { FillArrangeContext } from "./FillDividers";
 import { useCanvasPinch } from "./WorkspaceCanvas";
+import { EditableTitle } from "./notes/EditableTitle";
 
 export interface WindowViewProps {
   window: WindowRecord;
@@ -274,7 +275,9 @@ export const WindowView = memo(function WindowView({ window, title, focused, lif
             >
               {focused ? <Marker /> : null}
               <Icon name={TOOL_ICONS[tool]} size={16} color={focused ? color.ink : color.inkSoft} />
-              <Text variant="small" tone={focused ? "ink" : "soft"} numberOfLines={1} style={{ flexShrink: 1 }}>{title}</Text>
+              {typeof window.state.document === "string" && (tool === "notes" || tool === "pdfs" || tool === "whiteboard")
+                ? <EditableTitle documentId={window.state.document} title={title} focused={focused} />
+                : <Text variant="small" tone={focused ? "ink" : "soft"} numberOfLines={1} style={{ flexShrink: 1 }}>{title}</Text>}
               {sample ? <View aria-label="Sample data. Nothing in this window is real yet."><Badge label="Sample" /></View> : null}
               {barFocused && inputMode === "keyboard" ? <FocusRing radius={shape.radius.sm} inset={2} /> : null}
             </View>

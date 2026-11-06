@@ -7,26 +7,9 @@ import { Button, Icon, Press, Segmented, Sheet, Text, useNotice, useTheme } from
 import { ink, type DocumentDescriptor, type InkPaper } from "@sylf/shared";
 import { InkScene, PAPER_TEMPLATES, flowOf, type NotesLibrary, type OpenDocument, type PaperTemplate } from "@sylf/notes";
 import { pickImage } from "./pick-image";
+import { PAPERS, spacingsFor, type Spacing } from "./note-style";
 
 type Page = DocumentDescriptor["pages"][number];
-type Spacing = "narrow" | "medium" | "wide";
-const SPACINGS: Record<string, Record<Spacing, number>> = {
-  grid: { narrow: 16, medium: 24, wide: 32 },
-  dotted: { narrow: 16, medium: 24, wide: 32 },
-  music: { narrow: 12, medium: 14, wide: 18 },
-  lined: { narrow: 22, medium: 28, wide: 36 },
-};
-const spacingsFor = (template: PaperTemplate) => SPACINGS[template] ?? SPACINGS.lined;
-export const PAPERS = [
-  { label: "White", color: "#ffffff", rule: "#d9dfea" },
-  { label: "Cream", color: "#fffdf7", rule: "#d9dfea" },
-  { label: "Mint", color: "#f3faf6", rule: "#cfe3d8" },
-  { label: "Sky", color: "#f2f6fd", rule: "#cdd9ee" },
-  { label: "Blush", color: "#fdf4f4", rule: "#ecd4d4" },
-  { label: "Sand", color: "#f8f3e8", rule: "#e2d7bf" },
-  { label: "Graphite", color: "#23252a", rule: "#43474f" },
-];
-
 export default function PageSettings({ open, onClose, library, document, page, scenes }: { open: boolean; onClose(): void; library: NotesLibrary; document: OpenDocument; page: Page | null; scenes: Map<string, InkScene> }) {
   const { space, color } = useTheme();
   const notice = useNotice();
@@ -108,7 +91,7 @@ export default function PageSettings({ open, onClose, library, document, page, s
 }
 
 /** A small page in the chosen layout and paper, drawn with plain views. */
-function PaperPreview({ template, paper, selected }: { template: PaperTemplate; paper: InkPaper; selected: boolean }) {
+export function PaperPreview({ template, paper, selected }: { template: PaperTemplate; paper: InkPaper; selected: boolean }) {
   const { color } = useTheme();
   const rule = paper.rule, lines: number[] = [6, 14, 22, 30, 38, 46, 54, 62, 70];
   return (

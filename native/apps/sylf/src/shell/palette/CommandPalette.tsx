@@ -3,13 +3,14 @@
 import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { Platform, ScrollView, TextInput, View } from "react-native";
 import { Dialog, Icon, Press, Spotlight, Text, useNotice, useTheme, type IconName } from "@sylf/design-system";
-import { BOARD_TEMPLATES, type LibraryEntry, type NoteKind } from "@sylf/notes";
+import type { LibraryEntry, NoteKind } from "@sylf/notes";
 import { HOME_DESTINATIONS, HOME_LABELS, LAYOUT_LABELS, SPACE_LABELS, TOOLS, LAUNCHER_TOOLS, windowTitle, type HomeDestination, type ToolId, type WorkspaceLayout } from "@sylf/spaces";
 import { useAccountEntry, useHomeNavigation, useSessionState, useSpacesStore, useStudySession, useWorkspaceModel, useWorkspaceState } from "../context";
 import { focusEnvironment } from "../focus/environment";
 import { useLibrarySnapshot, useNotesLibrary } from "../notes/library";
 import { TOOL_ICONS } from "../../spaces/workspace/icons";
 import { openDocumentWindow } from "../../spaces/workspace/notes/open-window";
+import { createOptions, noteStyle } from "../../spaces/workspace/notes/note-style";
 import { commandPalette, rankCommands, type Command } from "./palette";
 
 const KIND: Record<NoteKind, { label: string; icon: "notes" | "pdf" | "whiteboard" }> = { note: { label: "Note", icon: "notes" }, handwriting: { label: "Note", icon: "notes" }, pdf: { label: "PDF", icon: "pdf" }, board: { label: "Whiteboard", icon: "whiteboard" } };
@@ -53,9 +54,11 @@ export default function CommandPalette({ open }: { open: boolean }) {
     const toWorkspace = () => store.select("workspace");
     const studying = sessionState.active?.subjectId ?? sessionState.plan?.subjectId ?? null;
     const openEntry = (entry: Pick<LibraryEntry, "id" | "kind" | "title">) => { toWorkspace(); if (!openDocumentWindow(model, entry, null)) notice("The Workspace is full. Close a window first."); };
-    const create = async (kind: "note" | "board", paper: string, flow?: "endless") => {
+    // New notes and boards take the note style set behind the Notes library's gear.
+    const create = async (kind: "note" | "board", flow?: "endless") => {
       try {
-        const id = await library.create({ ...(kind === "board" ? { kind, paper } : { kind, template: "blank", paper, flow }), subjectId: studying == null ? null : String(studying) } as never);
+        const style = noteStyle.get();
+        const id = await library.create({ ...createOptions(kind, flow ? { ...style, flow } : style, undefined), subjectId: studying == null ? null : String(studying) });
         const entry = library.getSnapshot().entries.find((e) => e.id === id);
         if (entry) openEntry(entry);
       } catch (error) { notice(error instanceof Error ? error.message : "That could not be created."); }
@@ -77,11 +80,9 @@ export default function CommandPalette({ open }: { open: boolean }) {
 
     if (hasWorkspace) {
       out.push(
-        { id: "new:note", title: "New note", detail: "Type and write, ruled", icon: "notes", group: "Create", keywords: ["create", "page", "handwriting", "typing"], suggested: true, run: () => void create("note", "ruled") },
-        { id: "new:note-grid", title: "New note, grid", icon: "notes", group: "Create", keywords: ["create", "squared", "maths"], run: () => void create("note", "grid") },
-        { id: "new:note-dotted", title: "New note, dotted", icon: "notes", group: "Create", keywords: ["create", "dots"], run: () => void create("note", "dotted") },
-        { id: "new:note-endless", title: "New endless note", detail: "One page that grows as you write", icon: "notes", group: "Create", keywords: ["create", "infinite", "scroll", "continuous"], run: () => void create("note", "ruled", "endless") },
-        { id: "new:board", title: "New whiteboard", icon: "whiteboard", group: "Create", keywords: ["create", "board", "draw", "sketch"], run: () => void create("board", BOARD_TEMPLATES[0].id) },
+        { id: "new:note", title: "New note", detail: "In your note style", icon: "notes", group: "Create", keywords: ["create", "page", "handwriting", "typing"], suggested: true, run: () => void create("note") },
+        { id: "new:note-endless", title: "New endless note", detail: "One page that grows as you write", icon: "notes", group: "Create", keywords: ["create", "infinite", "scroll", "continuous"], run: () => void create("note", "endless") },
+        { id: "new:board", title: "New whiteboard", icon: "whiteboard", group: "Create", keywords: ["create", "board", "draw", "sketch"], run: () => void create("board") },
         { id: "new:pdf", title: "Import a PDF", icon: "pdf", group: "Create", keywords: ["add", "open", "paper", "file"], run: () => void importPdf() },
       );
     }

@@ -2,12 +2,14 @@
 // notes take a colour and an emoji. Everything acts on the one Notes library, so a change here appears in Resources and every window.
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import { ScrollView, View, type LayoutChangeEvent } from "react-native";
-import { Button, Chip, ContextArea, Dialog, EmptyState, Icon, Menu, Press, Text, TextField, useNotice, useTheme, type IconName, type MenuItem, type PressProps, type ViewHandle } from "@sylf/design-system";
-import { BOARD_TEMPLATES, PAPER_TEMPLATES, TYPED_TEMPLATES, type LibraryEntry, type NoteKind, type Notebook, type NotesLibrary } from "@sylf/notes";
+import { Button, Chip, ContextArea, Dialog, EmptyState, Icon, IconButton, Press, Text, TextField, useNotice, useTheme, type IconName, type MenuItem, type PressProps, type ViewHandle } from "@sylf/design-system";
+import { type LibraryEntry, type NoteKind, type Notebook, type NotesLibrary } from "@sylf/notes";
 import { useLibrarySnapshot } from "../../../shell/notes/library";
 import { importPdfFile } from "./pdf-import";
 import { useDragSource, useDropTarget } from "../drop";
 import { useSessionState } from "../../../shell/context";
+import NoteStyleSheet from "./NoteStyleSheet";
+import { createOptions, noteStyle } from "./note-style";
 
 export const KIND_ICON: Record<NoteKind, IconName> = { note: "notes", handwriting: "notes", pdf: "pdf", board: "whiteboard" };
 export const KIND_LABEL: Record<NoteKind, string> = { note: "Note", handwriting: "Note", pdf: "PDF", board: "Whiteboard" };
@@ -50,8 +52,8 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, onOpen
   const [query, setQuery] = useState("");
   const [place, setPlace] = useState<Place>({ folder: null });
   const [width, setWidth] = useState(480);
-  const [creating, setCreating] = useState(false);
-  const [naming, setNaming] = useState<{ title: string; value: string; apply(value: string): Promise<unknown> } | null>(null);
+  const [naming, setNaming] = useState<{ title: string; value: string; apply(value: string): Promise<unknown>; action?: string; placeholder?: string; allowEmpty?: boolean } | null>(null);
+  const [styling, setStyling] = useState(false);
   const [moving, setMoving] = useState<{ title: string; apply(folder: string | null): Promise<unknown>; exclude?: string } | null>(null);
   const [customizing, setCustomizing] = useState<Customizing | null>(null);
   const newButton = useRef<ViewHandle>(null);
@@ -76,17 +78,15 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, onOpen
   }, [snapshot.entries, kinds, inTrash, folderId, query]);
 
   const run = (task: Promise<unknown>, done?: string) => { void task.then(() => { if (done) notice(done); }, (error: unknown) => notice(error instanceof Error ? error.message : "That didn't work.")); };
-  const create = async (kind: Exclude<NoteKind, "pdf">, template?: string, paper?: string, flow?: "endless") => {
-    setCreating(false);
+  // New notes and boards take the style set behind the gear, and the name given here (none keeps the automatic title).
+  const create = async (kind: "note" | "board", title: string) => {
     try {
-      const options = kind === "board" ? { kind, paper: (paper ?? template) as never } : { kind: "note" as const, template: template ?? "blank", paper: (paper ?? "ruled") as never, title: template && template !== "blank" ? TYPED_TEMPLATES.find((t) => t.id === template)?.label : undefined, flow };
-      const id = await library.create({ ...options, notebookId: folderId, subjectId: studying });
+      const id = await library.create({ ...createOptions(kind, noteStyle.get(), title.trim() || undefined), notebookId: folderId, subjectId: studying });
       const entry = library.getSnapshot().entries.find((e) => e.id === id);
       if (entry) onOpen(entry);
     } catch (error) { notice(error instanceof Error ? error.message : "The note could not be created."); }
   };
   const importPdf = async () => {
-    setCreating(false);
     try {
       const id = await importPdfFile(library, folderId, studying);
       const entry = id ? library.getSnapshot().entries.find((e) => e.id === id) : null;
@@ -95,21 +95,13 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, onOpen
   };
   const newFolder = () => setNaming({ title: folder ? `New folder in ${folder.title}` : "New folder", value: "", apply: async (v) => { await library.createNotebook(v, folderId); } });
 
-  const notes = kinds.includes("note");
-  const createItems: MenuItem[] = [
-    ...(notes ? PAPER_TEMPLATES.slice(0, 4).map((t) => ({ key: `note-${t.id}`, label: `Note, ${t.label.toLowerCase()}`, detail: "Type and write on the same pages", icon: "notes" as IconName, onSelect: () => void create("note", "blank", t.id) })) : []),
-    ...(notes ? [{ key: "note-endless", label: "Note, endless", detail: "One page that grows as you write", icon: "notes" as IconName, onSelect: () => void create("note", "blank", "ruled", "endless") }] : []),
-    ...(notes ? TYPED_TEMPLATES.filter((t) => t.id !== "blank").map((t) => ({ key: `tpl-${t.id}`, label: t.label, detail: t.detail, icon: "bulletList" as IconName, onSelect: () => void create("note", t.id, "ruled") })) : []),
-    ...(kinds.includes("board") ? BOARD_TEMPLATES.map((t) => ({ key: `board-${t.id}`, label: `Whiteboard, ${t.label.toLowerCase()}`, icon: "whiteboard" as IconName, onSelect: () => void create("board", t.id) })) : []),
-    ...(kinds.includes("pdf") ? [{ key: "pdf", label: "Import a PDF", icon: "fileImport" as IconName, onSelect: () => void importPdf() }] : []),
-    { key: "folder", label: folder ? "New subfolder" : "New folder", icon: "folder", onSelect: () => { setCreating(false); newFolder(); } },
-  ];
+  const askName = (kind: "note" | "board") => setNaming({ title: kind === "board" ? "New whiteboard" : "New note", value: "", action: "Create", allowEmpty: true, placeholder: kind === "board" ? "Whiteboard" : "Untitled note", apply: (v) => create(kind, v) });
   const primaryAction = () => {
     if (primary === "pdf") void importPdf();
-    else if (primary === "board") void create("board", "dotted");
-    else setCreating(true);
+    else askName(primary === "board" ? "board" : "note");
   };
 
+  const submitName = () => { const n = naming; setNaming(null); if (n && (n.allowEmpty || n.value.trim())) run(n.apply(n.value.trim())); };
   const pickFolder = (title: string, apply: (folder: string | null) => Promise<unknown>, exclude?: string) => setMoving({ title, apply, exclude });
   const entryMenu = (entry: LibraryEntry): MenuItem[] => entry.trashed ? [
     { key: "restore", label: "Restore", icon: "reset", onSelect: () => run(library.restore(entry.id), "Restored") },
@@ -141,10 +133,9 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, onOpen
     <View style={{ flex: 1 }} onLayout={(e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width)}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm, paddingHorizontal: space.md, paddingTop: space.md }}>
         <View style={{ flex: 1, minWidth: 0 }}><TextField label="Search" hideLabel icon="search" placeholder="Search every folder" value={query} onChangeText={setQuery} returnKeyType="search" /></View>
-        <View ref={newButton} collapsable={false}><Button title={primary === "pdf" ? "Import" : "New"} icon={primary === "pdf" ? "fileImport" : "plus"} variant="emphasis" size="small" onPress={primaryAction} onLongPress={() => setCreating(true)} /></View>
-        {primary === "pdf" || primary === "board" ? <IconMore anchor={newButton} items={createItems} /> : null}
+        {primary !== "pdf" ? <IconButton icon="settings" label={primary === "board" ? "Whiteboard style" : "Note style"} testID="note-style-open" onPress={() => setStyling(true)} /> : null}
+        <View ref={newButton} collapsable={false}><Button title={primary === "pdf" ? "Import" : "New"} icon={primary === "pdf" ? "fileImport" : "plus"} variant="emphasis" size="small" testID="library-new" onPress={primaryAction} /></View>
       </View>
-      <Menu open={creating} anchor={newButton} onClose={() => setCreating(false)} items={createItems} label="Create" side="bottom" />
       {/* Where you are: the top, then each folder down to this one. */}
       <ScrollView keyboardShouldPersistTaps="handled" horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: space.xs, alignItems: "center", paddingHorizontal: space.md, paddingVertical: space.sm }}>
         <Chip label="All" icon="home" selected={!inTrash && !folderId} onPress={() => setPlace({ folder: null })} />
@@ -171,14 +162,15 @@ export default function LibraryBrowser({ library, kinds, primary, onOpen, onOpen
           </ContextArea>
         )) : childFolders.length ? null : (
           <View style={{ width: "100%", paddingTop: space.xl }}>
-            {searching ? <EmptyState icon="search" title="Nothing matches" message="Try another word." /> : inTrash ? <EmptyState icon="trash" title="Trash is empty" message="Deleted notes wait here until you remove them." /> : folder ? <EmptyState icon="folder" title={`${folder.title} is empty`} message="New notes made here are kept in this folder." /> : <Starter kinds={kinds} onCreate={create} onImport={importPdf} />}
+            {searching ? <EmptyState icon="search" title="Nothing matches" message="Try another word." /> : inTrash ? <EmptyState icon="trash" title="Trash is empty" message="Deleted notes wait here until you remove them." /> : folder ? <EmptyState icon="folder" title={`${folder.title} is empty`} message="New notes made here are kept in this folder." /> : <Starter kinds={kinds} onCreate={askName} onImport={importPdf} onStyle={() => setStyling(true)} />}
           </View>
         )}
       </ScrollView>
       {footer}
-      <Dialog open={!!naming} onClose={() => setNaming(null)} title={naming?.title ?? ""} actions={[{ label: "Cancel", onPress: () => setNaming(null) }, { label: "Save", variant: "emphasis", onPress: () => { const n = naming; setNaming(null); if (n?.value.trim()) run(n.apply(n.value)); } }]}>
-        <TextField label="Name" hideLabel autoFocus value={naming?.value ?? ""} onChangeText={(value) => setNaming((n) => (n ? { ...n, value } : n))} onSubmitEditing={() => { const n = naming; setNaming(null); if (n?.value.trim()) run(n.apply(n.value)); }} />
+      <Dialog open={!!naming} onClose={() => setNaming(null)} title={naming?.title ?? ""} actions={[{ label: "Cancel", onPress: () => setNaming(null) }, { label: naming?.action ?? "Save", variant: "emphasis", onPress: () => submitName() }]}>
+        <TextField label="Name" hideLabel autoFocus placeholder={naming?.placeholder} value={naming?.value ?? ""} onChangeText={(value) => setNaming((n) => (n ? { ...n, value } : n))} onSubmitEditing={() => submitName()} testID="library-name" />
       </Dialog>
+      <NoteStyleSheet open={styling} onClose={() => setStyling(false)} notes={kinds.includes("note")} boards={kinds.includes("board")} />
       <Dialog open={!!moving} onClose={() => setMoving(null)} title={moving?.title ?? ""} actions={[{ label: "Cancel", onPress: () => setMoving(null) }]}>
         <ScrollView style={{ maxHeight: 360 }} keyboardShouldPersistTaps="handled">
           <FolderRow title="Top level" icon={null} depth={0} onPress={() => { const m = moving; setMoving(null); if (m) run(m.apply(null), "Moved"); }} />
@@ -270,27 +262,16 @@ function Card({ entry, width, onOpen, onLongPress }: { entry: LibraryEntry; widt
   );
 }
 
-function IconMore({ anchor, items }: { anchor: React.RefObject<ViewHandle | null>; items: MenuItem[] }) {
-  const [open, setOpen] = useState(false);
-  const { color } = useTheme();
-  return (
-    <>
-      <Press label="More ways to create" onPress={() => setOpen(true)} style={{ width: 32, height: 32, alignItems: "center", justifyContent: "center" }}><Icon name="chevronDown" size={18} color={color.inkSoft} /></Press>
-      <Menu open={open} anchor={anchor } onClose={() => setOpen(false)} items={items} label="Create" side="bottom" />
-    </>
-  );
-}
 
 /** First run: three ways in, with no paragraph to read. */
-function Starter({ kinds, onCreate, onImport }: { kinds: NoteKind[]; onCreate(kind: Exclude<NoteKind, "pdf">, template?: string, paper?: string): void; onImport(): void }) {
+function Starter({ kinds, onCreate, onImport, onStyle }: { kinds: NoteKind[]; onCreate(kind: "note" | "board"): void; onImport(): void; onStyle(): void }) {
   const { space } = useTheme();
   const options: { key: string; icon: IconName; title: string; detail: string; onPress(): void }[] = [];
   if (kinds.includes("note")) options.push(
-    { key: "note", icon: "notes", title: "New note", detail: "Type and write on the same pages", onPress: () => onCreate("note", "blank", "ruled") },
-    { key: "lecture", icon: "bulletList", title: "Lecture notes", detail: "Key ideas, questions, summary", onPress: () => onCreate("note", "lecture", "ruled") },
-    { key: "grid", icon: "pen", title: "Note on grid paper", detail: "For working and diagrams", onPress: () => onCreate("note", "blank", "grid") },
+    { key: "note", icon: "notes", title: "New note", detail: "Type and write on the same pages", onPress: () => onCreate("note") },
+    { key: "style", icon: "settings", title: "Note style", detail: "Paper, spacing, endless pages and more", onPress: onStyle },
   );
-  if (kinds.includes("board")) options.push({ key: "board", icon: "whiteboard", title: "Whiteboard", detail: "An open canvas to think on", onPress: () => onCreate("board", "dotted") });
+  if (kinds.includes("board")) options.push({ key: "board", icon: "whiteboard", title: "New whiteboard", detail: "An open canvas to think on", onPress: () => onCreate("board") });
   if (kinds.includes("pdf")) options.push({ key: "pdf", icon: "fileImport", title: "Import a PDF", detail: "Read and annotate past papers", onPress: onImport });
   return (
     <View style={{ gap: space.sm, alignItems: "stretch", maxWidth: 420, alignSelf: "center", width: "100%" }}>

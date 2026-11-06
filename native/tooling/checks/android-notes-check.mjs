@@ -94,14 +94,15 @@ const writingArea = () => {
   const top = pen.y2 + 60, bottom = Math.min(frame.y1 + 1300, 2100);
   return { x1: frame.x1 + 60, x2: frame.x2 - 60, y1: top, y2: bottom, cx: Math.round((frame.x1 + frame.x2) / 2), cy: Math.round((top + bottom) / 2) };
 };
-const create = async (label) => { await tapLabel("New", 900); await tapLabel(label, 3000); };
+// New asks for a name; Create with none keeps the automatic title.
+const create = async () => { await tapLabel("New", 1200); await tapLabel("Create", 3000); };
 
 await link("space=workspace&wsClear=1&wsOpen=notes", 6000);
 shot("01-library");
 check("library opens", !!find(dump(), "New"));
 
 // The one note kind: switch to Write, then handwriting with the stylus tool type.
-await create("Note, ruled");
+await create();
 if (find(dump(), "Write")) await tapLabel("Write", 900);
 const page = writingArea();
 check("pen case is shown when the note is in Write", !!page);
@@ -141,7 +142,7 @@ if (page) {
 
 // A whiteboard: pen draws, two-finger moves are on the by-hand list.
 await link("space=workspace&wsClear=1&wsOpen=whiteboard", 4000);
-await tapLabel("New", 2500);
+await create();
 const board = writingArea();
 if (board) {
   for (let i = 0; i < 4; i++) stylus({ x: board.cx - 300, y: board.cy - 150 + i * 90 }, { x: board.cx + 300, y: board.cy - 100 + i * 90 }, 600);
@@ -152,7 +153,7 @@ shot("04-whiteboard");
 
 // Typing on the same kind of note: BlockNote in a WebView on the page being typed on.
 await link("space=workspace&wsClear=1&wsOpen=notes", 4000);
-await create("Note, ruled");
+await create();
 if (find(dump(), "Type")) await tapLabel("Type", 1200);
 let web = dump().find((n) => n.cls.includes("WebView"));
 if (!web) { const area = find(dump(), "Type on this page"); if (area) { tap(area.cx, area.y1 + 60); await sleep(2500); web = dump().find((n) => n.cls.includes("WebView")); } }
@@ -160,6 +161,13 @@ check("typed note runs in a WebView", !!web);
 if (web) { tap(web.cx, web.y1 + 120); await sleep(600); adb("shell", "input", "text", "Complex%snumbers"); await sleep(1200); }
 shot("05-typed-note");
 results.memoryTypedNote = memory();
+// Typed text stays on the page in Write, drawn natively once the editor closes.
+if (web) {
+  await tapLabel("Write", 2000);
+  results.textInWrite = darkPixels({ x1: web.x1, x2: Math.min(web.x2, web.x1 + 700), y1: web.y1, y2: web.y1 + 160 });
+  check("typed text shows in Write", results.textInWrite > 80, { darkPixels: results.textInWrite });
+  shot("05b-text-in-write");
+}
 
 // The command palette from the corner, and sound in the timer dock.
 await link("space=home", 3500);

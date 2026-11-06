@@ -1102,11 +1102,15 @@ async function notesGroup(t) {
   await js(`new Promise((resolve) => { const r = indexedDB.deleteDatabase('sylf-native-notes'); r.onsuccess = r.onerror = r.onblocked = () => resolve(true); })`);
   await t.open("space=workspace&wsOpen=notes&wsLayout=focus");
   await t.sleep(900);
-  checks.notesStartsWithTemplates = (await says("New note")) && (await says("Lecture notes"));
+  checks.notesStartsWithNewAndStyle = (await says("New note")) && (await t.has("[data-testid=note-style-open]"));
   await t.shot("notes-01-empty-library");
 
   // One note kind: typing on the page with real keys, markdown shortcuts, autosave, an automatic title, and it survives a reload.
+  // New asks for a name first; none keeps the automatic title from the first line.
   await t.clickOn(label("New note"));
+  await t.sleep(400);
+  checks.newAsksForAName = await t.has("[data-testid=library-name]");
+  await t.key("Return");
   for (let wait = 0; wait < 40 && !(await t.has(".sylf-note .bn-editor")); wait++) await t.sleep(250);
   await t.clickOn(".sylf-note .bn-editor");
   await typeText("# Complex numbers");
@@ -1133,10 +1137,12 @@ async function notesGroup(t) {
   // Handwriting: a mouse stroke through the real input path, then pen strokes with pressure; erase, undo.
   await t.clickOn(label("Back to Notes"));
   await t.sleep(500);
-  await t.clickOn(label("New"));
-  await t.sleep(300);
-  await menuItem("Note, ruled");
+  await t.clickOn("[data-testid=library-new]");
+  await t.sleep(400);
+  await typeText("Handwriting");
+  await t.key("Return");
   await t.sleep(1000);
+  checks.newOpensTheNamedNote = (await t.workspace())?.windows?.some((/** @type {any} */ w) => w.state.title === "Handwriting");
   await t.clickOn("[data-testid=note-mode-write]");
   await t.sleep(400);
   checks.noteSwitchesToWriting = await t.has(label("Eraser"));
@@ -1161,10 +1167,12 @@ async function notesGroup(t) {
   checks.undoRestoresStroke = (await inked()) > afterErase;
   // One sweep over everything leaves nothing, the last stroke included, and one undo brings it all back.
   await t.clickOn(label("Eraser"));
-  await t.drag({ x: page.x + 60, y: page.y + 90 }, { x: page.x + 60, y: page.y + 380 }, 6, 16);
-  await t.drag({ x: page.x + 60, y: page.y + 380 }, { x: page.x + 560, y: page.y + 90 }, 6, 16);
-  await t.drag({ x: page.x + 560, y: page.y + 90 }, { x: page.x + 560, y: page.y + 380 }, 6, 16);
-  for (let x = 90; x <= 560; x += 40) await t.drag({ x: page.x + x, y: page.y + 90 }, { x: page.x + x, y: page.y + 380 }, 4, 12);
+  // Inside the page, whatever the window's size: a drag that leaves the window would move the canvas instead.
+  const right = Math.min(page.width - 30, 560), bottom = Math.min(page.height - 30, 380);
+  await t.drag({ x: page.x + 60, y: page.y + 90 }, { x: page.x + 60, y: page.y + bottom }, 6, 16);
+  await t.drag({ x: page.x + 60, y: page.y + bottom }, { x: page.x + right, y: page.y + 90 }, 6, 16);
+  await t.drag({ x: page.x + right, y: page.y + 90 }, { x: page.x + right, y: page.y + bottom }, 6, 16);
+  for (let x = 90; x <= right; x += 40) await t.drag({ x: page.x + x, y: page.y + 90 }, { x: page.x + x, y: page.y + bottom }, 4, 12);
   results.inkAfterSweep = await inked();
   checks.eraserRemovesEveryStroke = results.inkAfterSweep < 20;
   await t.clickOn(label("Undo"));
@@ -1196,11 +1204,25 @@ async function notesGroup(t) {
   checks.pageOnlyComesBack = (await t.has("[data-testid^=window-bar-]")) && (await t.has(label("Back to Notes"))) && (await t.workspace()).layout !== "fill";
 
   // An endless note grows as it is written near its end.
+  // Renamed where the title is read: the window's title bar.
+  await t.clickOn("[data-testid=window-title]");
+  await t.sleep(300);
+  await t.key("a", [process.platform === "darwin" ? "meta" : "control"]);
+  await typeText("Renamed");
+  await t.key("Return");
+  await t.sleep(600);
+  checks.renameFromTitleBar = (await t.workspace())?.windows?.some((/** @type {any} */ w) => w.state.title === "Renamed");
+  // The note style behind the gear: endless pages for the next note, then back to separate pages.
   await t.clickOn(label("Back to Notes"));
   await t.sleep(400);
-  await t.clickOn(label("New"));
-  await t.sleep(300);
-  await menuItem("Note, endless");
+  await t.clickOn("[data-testid=note-style-open]");
+  await t.sleep(500);
+  await t.clickOn(label("Endless"));
+  await t.key("Escape");
+  await t.sleep(400);
+  await t.clickOn("[data-testid=library-new]");
+  await t.sleep(400);
+  await t.key("Return");
   await t.sleep(1000);
   await t.clickOn("[data-testid=note-mode-write]");
   await t.sleep(300);
@@ -1215,6 +1237,13 @@ async function notesGroup(t) {
   await t.sleep(600);
   results.endlessPage = { before: endlessBefore, after: (await t.rect('[data-testid=ink-page]')).height };
   checks.endlessNoteGrows = results.endlessPage.after > results.endlessPage.before;
+  await t.clickOn(label("Back to Notes"));
+  await t.sleep(400);
+  await t.clickOn("[data-testid=note-style-open]");
+  await t.sleep(500);
+  await t.clickOn(label("Separate pages"));
+  await t.key("Escape");
+  await t.sleep(300);
 
   // PDFs: a file dropped on Workspace is imported, rendered by pdf.js, and annotated.
   await t.open("space=workspace&wsClear=1");
@@ -1269,7 +1298,9 @@ async function notesGroup(t) {
   // Whiteboard: draw, zoom with Control and the wheel, and the camera is kept in the window.
   await t.open("space=workspace&wsClear=1&wsOpen=whiteboard&wsLayout=focus");
   await t.sleep(800);
-  await t.clickOn(label("New"));
+  await t.clickOn("[data-testid=library-new]");
+  await t.sleep(400);
+  await t.key("Return");
   for (let wait = 0; wait < 30 && !(await t.has('[data-testid=board-canvas] canvas')); wait++) await t.sleep(200);
   const board = await t.rect('[data-testid=board-canvas]');
   results.boardStroke = await pen('[data-testid=board-canvas] canvas[aria-label="Writing surface"]', wave(board.width / 2 - 150, board.height / 2, 120));

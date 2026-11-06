@@ -202,7 +202,7 @@ export default function NoteEditor({ library, document, editable, initialPage, o
     <>
       <Divider vertical style={{ height: 18, marginHorizontal: 4 }} />
       <View ref={insertAnchor} collapsable={false}><IconButton icon="plus" size="small" label="Insert a picture, PDF or page" onPress={() => setInserting(true)} /></View>
-      <IconButton icon="layers" size="small" label="Page layout" testID="note-page-settings" onPress={() => setSettings(true)} />
+      <IconButton icon="settings" size="small" label="Note settings" testID="note-page-settings" onPress={() => setSettings(true)} />
       <IconButton icon="minus" size="small" label="Zoom out" onPress={() => pinch(1 / 1.25)} />
       <Text variant="micro" tone="soft" style={{ minWidth: 36, textAlign: "center" }}>{Math.round(zoom * 100)}%</Text>
       <IconButton icon="plus" size="small" label="Zoom in" onPress={() => pinch(1.25)} />

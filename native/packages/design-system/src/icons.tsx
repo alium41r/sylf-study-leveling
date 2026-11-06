@@ -40,6 +40,8 @@ const glyphs = {
   arrowRight: { d: "M3 10h13.5M11 4.5l5.5 5.5-5.5 5.5" },
   search: { d: "M14 8.75a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0ZM12.5 12.5l5 5", mark: [8.75, 8.75] },
   sliders: { d: "M2.5 6h7M14 6h3.5M2.5 14h3M10 14h7.5", mark: [11.75, 6] },
+  // A cog: a ring with eight short teeth, the mark at its hub.
+  settings: { d: "M15.5 10a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0ZM10 2v2.5M10 15.5V18M2 10h2.5M15.5 10H18M4.3 4.3l1.8 1.8M13.9 13.9l1.8 1.8M4.3 15.7l1.8-1.8M13.9 6.1l1.8-1.8", mark: [10, 10] },
   more: { d: "", mark: [10, 10] },
   pin: { d: "M7 2.5h6l-.8 6 2.8 3H5l2.8-3ZM10 11.5v6" },
   split: { d: "M2.5 3.5h15v13h-15ZM10 3.5v13" },

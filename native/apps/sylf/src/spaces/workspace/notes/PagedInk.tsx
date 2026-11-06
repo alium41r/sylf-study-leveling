@@ -10,6 +10,8 @@ import InkView from "./InkView";
 import PdfPageImage from "./PdfPageImage";
 import { DEFAULT_TOOL } from "./ink-types";
 import { useInkTool } from "./ink-tool";
+import Animated from "react-native-reanimated";
+import { usePagePinch } from "./page-pinch";
 
 type Page = DocumentDescriptor["pages"][number];
 const GAP = 20, SNAP = 96, MARGIN = 160;
@@ -70,6 +72,8 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
 
   // Two fingers zoom around a point; keep that point still.
   const pinch = (factor: number) => setZoom((z) => Math.max(0.5, Math.min(3, z * factor)));
+  const offsetRef = useRef({ x: 0, y: 0 });
+  const preview = usePagePinch({ zoom, setZoom, scaleAt: (z) => Math.max(0.15, fit * z), offset: offsetRef, vertical, horizontal });
   const pan = (dx: number, dy: number) => {
     vertical.current?.scrollTo({ y: Math.max(0, scroll.y - dy), animated: false });
     if (contentWidth > size.width) horizontal.current?.scrollTo({ x: Math.max(0, scroll.x - dx), animated: false });
@@ -95,6 +99,7 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
 
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const y = event.nativeEvent.contentOffset.y;
+    offsetRef.current.y = y;
     if (Math.abs(y - scroll.y) >= 8) setScroll((s) => ({ ...s, y }));
   };
 
@@ -114,9 +119,10 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
           } end={corner} />
       ) : null}
       {header}
-      <View style={{ flex: 1, backgroundColor: color.sunken }} onLayout={(e: LayoutChangeEvent) => setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}>
+      <View ref={preview.area} collapsable={false} style={{ flex: 1, backgroundColor: color.sunken, overflow: "hidden" }} onLayout={(e: LayoutChangeEvent) => { setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height }); preview.onAreaLayout(); }}>
+        <Animated.View style={[{ flex: 1, transformOrigin: "0 0" } as object, preview.style]}>
         {size.width ? (
-          <ScrollView keyboardShouldPersistTaps="handled" ref={horizontal} horizontal scrollEnabled={contentWidth > size.width + 1} showsHorizontalScrollIndicator={contentWidth > size.width + 1} onScroll={(e) => setScroll((s) => ({ ...s, x: e.nativeEvent.contentOffset.x }))} scrollEventThrottle={32} contentContainerStyle={{ width: contentWidth }}>
+          <ScrollView keyboardShouldPersistTaps="handled" ref={horizontal} horizontal scrollEnabled={contentWidth > size.width + 1} showsHorizontalScrollIndicator={contentWidth > size.width + 1} onScroll={(e) => { offsetRef.current.x = e.nativeEvent.contentOffset.x; setScroll((s) => ({ ...s, x: e.nativeEvent.contentOffset.x })); }} scrollEventThrottle={32} contentContainerStyle={{ width: contentWidth }}>
             <ScrollView keyboardShouldPersistTaps="handled" ref={vertical} {...({ dataSet: { ownsWheel: "scroll" } } as object)} style={{ width: contentWidth, height: size.height }} onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator contentContainerStyle={{ height: contentHeight }}>
               {layout.map((row) => {
                 const left = (contentWidth - row.width) / 2;
@@ -134,7 +140,7 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
                         <InkView scene={s} pageWidth={row.page.width} pageHeight={row.page.height} camera={{ x: x0 / scale, y: y0 / scale, zoom: scale }} width={x1 - x0} height={y1 - y0}
                           tool={tool} drawPaper={!pdf} editable={editable} selection={selection?.page === row.page.pageId ? selection.ids : []}
                           onSelection={(ids) => { setSelection(ids.length ? { page: row.page.pageId, ids } : null); }}
-                          onPan={pan} onPinch={(factor) => pinch(factor)} onPenSeen={penSeen} wheel="zoom" />
+                          onPan={pan} onPinch={(factor) => pinch(factor)} onPagePinch={preview.onPagePinch} onPenSeen={penSeen} wheel="zoom" />
                       </View>
                     ) : null}
                   </View>
@@ -143,6 +149,7 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
             </ScrollView>
           </ScrollView>
         ) : null}
+        </Animated.View>
         {pages.length > 1 ? (
           <View pointerEvents="none" style={{ position: "absolute", right: space.md, bottom: space.md, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: "rgba(20,24,40,0.55)" }}>
             <Text variant="micro" style={{ color: "#ffffff" }}>{current + 1} / {pages.length}</Text>

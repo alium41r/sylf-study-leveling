@@ -25,7 +25,8 @@ export interface RichTextProps {
   onText(text: string): Promise<void>;
   onFormat(state: string): Promise<void>;
   /** A page's text layer rather than a whole note: transparent over the paper, drawn at the page's zoom, lines on the paper's rule. */
-  page?: { zoom: number; lineHeight: number; focus: boolean } | null;
+  /** A page's text layer: its zoom, rule height, and the size of the text area in page units (the editable area fills it). */
+  page?: { zoom: number; lineHeight: number; focus: boolean; width: number; height: number } | null;
   /** The text's height in page units, so a page can grow to hold it. */
   onHeight?(height: number): Promise<void>;
   dom?: DOMProps;
@@ -143,7 +144,7 @@ export default function RichTextDom({ ref, initial, template, look, editable, on
   };
 
   return (
-    <div data-editable={String(editable)} style={page ? { position: "relative", height: "100%", minHeight: "100vh", overflow: "visible", background: "transparent" } : { position: "relative", height: "100%", overflow: "auto", background: look.paper, WebkitOverflowScrolling: "touch" }}
+    <div data-editable={String(editable)} style={page ? { position: "relative", height: "100%", overflow: "visible", background: "transparent" } : { position: "relative", height: "100%", overflow: "auto", background: look.paper, WebkitOverflowScrolling: "touch" }}
       // The editor is only as tall as its text, and a page is mostly empty paper: a tap anywhere else on it types at the end.
       onClick={page ? (event) => {
         const editor = editorRef.current;
@@ -151,9 +152,9 @@ export default function RichTextDom({ ref, initial, template, look, editable, on
         editor.focus();
         try { editor.setTextCursorPosition(editor.document[editor.document.length - 1], "end"); } catch { /* An empty page has nowhere to put it yet. */ }
       } : undefined}>
-      <style>{css(look) + (page ? pageCss(page.lineHeight) : "")}</style>
+      <style>{css(look) + (page ? pageCss(page.lineHeight, page.width, page.height) : "")}</style>
       {/* BlockNote mounts on the inner element and adds its own classes there, so the styles above reach it as a descendant. */}
-      <div className={page ? "sylf-note sylf-page" : "sylf-note"} style={page ? { zoom: page.zoom, minHeight: "100%", ["--sylf-zoom" as string]: page.zoom } as object : { minHeight: "100%", paddingBottom: 120 }}><div ref={host} /></div>
+      <div className={page ? "sylf-note sylf-page" : "sylf-note"} style={page ? { zoom: page.zoom, minHeight: "100%" } as object : { minHeight: "100%", paddingBottom: 120 }}><div ref={host} /></div>
       {slash && slash.items.length ? (
         <div role="listbox" aria-label="Blocks" style={{ position: "absolute", left: Math.max(8, slash.left), top: slash.top, width: 236, maxHeight: 320, overflow: "auto", background: look.menu, color: look.menuInk, borderRadius: 12, boxShadow: "0 10px 30px rgba(20,24,40,0.18), 0 0 0 1px rgba(20,24,40,0.08)", padding: 6, zIndex: 10, fontFamily: look.font }}>
           {slash.items.map((item, index) => (
@@ -225,12 +226,16 @@ const css = (look: RichTextLook) => `
 `;
 
 /** On a page, text sits on the paper's rule: no inner padding, and every line the rule's height. */
-const pageCss = (line: number) => `
-html, body, #root { height: 100%; margin: 0; background: transparent; }
-/* The page's text area is the whole page, in both directions, whatever the zoom, so a tap anywhere on it types. */
-.sylf-page { width: calc(100vw / var(--sylf-zoom, 1)); }
+// In the WebView on Android the document is the editor's own, so it is sized to fill it; inline on desktop it is the app's page and is
+// left alone.
+const inWebView = typeof window !== "undefined" && !!(window as unknown as { ReactNativeWebView?: unknown }).ReactNativeWebView;
+const pageCss = (line: number, width: number, height: number) => `
+${inWebView ? "html, body, #root { height: 100%; margin: 0; background: transparent; }" : ""}
+/* The text area is the whole page area, in page units (the zoom scales it), so a tap anywhere on it types. Never the window's units:
+   inline on desktop those are the app's, and the editor would cover the note's own header. */
+.sylf-page { width: ${width}px; }
 .sylf-page > div, .sylf-page .bn-container { width: 100%; }
-.sylf-page .bn-editor { padding: 0 !important; background: transparent; line-height: ${line}px; width: 100%; min-width: 100%; box-sizing: border-box; min-height: calc(100vh / var(--sylf-zoom, 1)); }
+.sylf-page .bn-editor { padding: 0 !important; background: transparent; line-height: ${line}px; width: 100%; box-sizing: border-box; min-height: ${height}px; }
 .sylf-page .bn-block-content { padding: 0; }
 .sylf-page [data-content-type="heading"] { padding-top: 14px; line-height: 1.3; }
 .sylf-page .bn-block-content:has(.ProseMirror-trailingBreak:only-child)::after { opacity: 0.7; }

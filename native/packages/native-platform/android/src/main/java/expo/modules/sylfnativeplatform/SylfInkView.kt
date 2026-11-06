@@ -46,6 +46,12 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
   var inkThinning = 0f
   /** "line", "rectangle" or "ellipse" while the shape tool is chosen. */
   var inkShape = ""
+  /** The brush's smoothing (style.smoothing, 0.65 when unset), which sets perfect-freehand's smoothing and streamline. */
+  var inkSmoothing = 0.65f
+  /** A brush nib under a pen eases pressure (pressure^0.75), as the web outline does. */
+  var inkBrushCurve = false
+  // Whether the stroke being drawn comes from a pen: fingers and mice simulate pressure from speed instead.
+  private var penStroke = true
   var editable = true
   var inkColor = Color.BLACK
   var inkWidth = 2.6f
@@ -76,9 +82,11 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
   private val livePath = Path()
   private var liveLast: FloatArray? = null
   /** Strokes finished here and waiting for their outline from JavaScript, drawn exactly as they were live. */
-  private class Pending(val samples: FloatArray, val color: Int, val alpha: Int, val width: Float, val thinning: Float, val shape: String)
+  private class Pending(val samples: FloatArray, val color: Int, val alpha: Int, val width: Float, val thinning: Float, val shape: String, val pen: Boolean)
   private val pending = HashMap<Int, Pending>()
   private var pageFinger = false
+  private var pinchStart = 0f
+  private val lastPinch = floatArrayOf(1f, 0f, 0f)
   private var liveSeq = 0
   private val erasePoints = ArrayList<Float>()
   private var moveFrom: FloatArray? = null
@@ -152,8 +160,8 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
     }
     val offset = if (kind == Kind.MOVE) moveTo?.let { to -> moveFrom?.let { from -> floatArrayOf(to[0] - from[0], to[1] - from[1]) } } else null
     for ((_, s) in strokes) { fill.color = s.color; fill.alpha = s.alpha; canvas.drawPath(s.path, fill) }
-    for (p in pending.values) drawLive(canvas, p.samples, p.samples.size, p.color, p.alpha, p.width, p.thinning, p.shape)
-    if (kind == Kind.DRAW) drawLive(canvas, null, samples.size, inkColor, (inkOpacity * 255).toInt(), inkWidth, inkThinning, if (tool == "shape") inkShape else "")
+    for (p in pending.values) drawLive(canvas, p.samples, p.samples.size, p.color, p.alpha, p.width, p.thinning, p.shape, p.pen)
+    if (kind == Kind.DRAW) drawLive(canvas, null, samples.size, inkColor, (inkOpacity * 255).toInt(), inkWidth, inkThinning, if (tool == "shape") inkShape else "", penStroke)
     selection?.let { s ->
       dashed.strokeWidth = 1.4f / zoom; dashed.pathEffect = DashPathEffect(floatArrayOf(6f / zoom, 4f / zoom), 0f)
       val dx = offset?.get(0) ?: 0f; val dy = offset?.get(1) ?: 0f
@@ -180,7 +188,7 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
    * brush's thinning, as perfect-freehand's outline does (width × (1 − 2 × thinning × (0.5 − pressure))). `from` is null for the
    * stroke in progress, whose samples are still in `samples`.
    */
-  private fun drawLive(canvas: Canvas, from: FloatArray?, size: Int, color: Int, alpha: Int, width: Float, thinning: Float, shape: String) {
+  private fun drawLive(canvas: Canvas, from: FloatArray?, size: Int, color: Int, alpha: Int, width: Float, thinning: Float, shape: String, pen: Boolean) {
     if (size < 8) return
     val at = { i: Int -> if (from != null) from[i] else samples[i] }
     line.color = color; line.alpha = alpha; line.strokeWidth = width
@@ -193,26 +201,15 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
       if (shape == "rectangle") canvas.drawRect(shapeBox, line) else canvas.drawOval(shapeBox, line)
       return
     }
-    // No thinning (highlighters, fineliners): one even line, drawn as a path so a translucent ink does not darken where segments meet.
-    if (thinning <= 0f) {
-      if (from == null) { canvas.drawPath(livePath, line); return }
-      val path = Path(); path.moveTo(from[0], from[1]); var j = 8
-      while (j + 1 < size) { path.lineTo(from[j], from[j + 1]); j += 8 }
-      canvas.drawPath(path, line); return
-    }
-    // Pressure is eased a little, as the outline smooths it, so a single noisy sample does not make a bead.
-    var pressure = at(2)
-    var i = 8
-    if (size == 8) { line.strokeWidth = width * widthFactor(pressure, thinning); canvas.drawPoint(at(0), at(1), line); return }
-    while (i + 2 < size) {
-      pressure += (at(i + 2) - pressure) * 0.35f
-      line.strokeWidth = width * widthFactor(pressure, thinning)
-      canvas.drawLine(at(i - 8), at(i - 7), at(i), at(i + 1), line)
-      i += 8
-    }
+    // Everything else is drawn with the finished stroke's own outline (perfect-freehand, as the web draws it), so it is smooth
+    // while it is written and does not change when the pen lifts.
+    val samplesNow = from ?: samples.toFloatArray()
+    val path = FreehandOutline.path(samplesNow, size, outlineOptions(width, thinning, pen), from != null) ?: return
+    fill.color = color; fill.alpha = alpha
+    canvas.drawPath(path, fill)
   }
 
-  private fun widthFactor(pressure: Float, thinning: Float) = max(0.12f, 1f - 2f * thinning * (0.5f - pressure.coerceIn(0f, 1f)))
+  private fun outlineOptions(width: Float, thinning: Float, pen: Boolean) = FreehandOutline.Options(width, thinning, inkSmoothing, !pen, pen && inkBrushCurve)
 
   private fun sample(event: MotionEvent, index: Int, history: Int) {
     val h = history >= 0
@@ -253,6 +250,7 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
         samples.clear(); livePath.reset(); liveLast = null; erasePoints.clear()
         val x = pageX(event.getX(index)); val y = pageY(event.getY(index))
         val eraserTip = type == MotionEvent.TOOL_TYPE_ERASER || (event.buttonState and MotionEvent.BUTTON_STYLUS_PRIMARY) != 0
+        penStroke = type == MotionEvent.TOOL_TYPE_STYLUS || type == MotionEvent.TOOL_TYPE_ERASER
         kind = when {
           inSelection(x, y) -> Kind.MOVE
           eraserTip || tool == "eraser" -> Kind.ERASE
@@ -308,7 +306,7 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
         if (!cancelled && samples.size >= 8) {
           val id = ++liveSeq
           // The live copy stays until the finished outline is drawn, then JavaScript drops it.
-          pending[id] = Pending(samples.toFloatArray(), inkColor, (inkOpacity * 255).toInt(), inkWidth, inkThinning, if (tool == "shape") inkShape else "")
+          pending[id] = Pending(samples.toFloatArray(), inkColor, (inkOpacity * 255).toInt(), inkWidth, inkThinning, if (tool == "shape") inkShape else "", penStroke)
           onStroke(mapOf("kind" to "draw", "samples" to samples.map { it.toDouble() }, "pointer" to pointerName(type), "live" to id))
         }
       }
@@ -335,35 +333,63 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
       MotionEvent.ACTION_POINTER_DOWN -> {
         if (kind == Kind.DRAW) { samples.clear(); livePath.reset(); liveLast = null }
         if (kind != Kind.DRAW && kind != Kind.NONE && kind != Kind.PINCH) return null
-        kind = Kind.PINCH; pageFinger = false
-        parent?.requestDisallowInterceptTouchEvent(true)
-        pinchCentre = centre(event); pinchDistance = spread(event)
-        invalidate()
+        if (kind != Kind.PINCH) {
+          kind = Kind.PINCH; pageFinger = false
+          parent?.requestDisallowInterceptTouchEvent(true)
+          pinchStart = rawSpread(event)
+          emitPagePinch(event, "start", -1)
+          invalidate()
+        }
         return true
       }
       MotionEvent.ACTION_MOVE -> {
-        if (kind == Kind.PINCH) {
-          val c = centre(event); val d = spread(event)
-          onPan(mapOf("dx" to ((c[0] - pinchCentre[0]) / density).toDouble(), "dy" to ((c[1] - pinchCentre[1]) / density).toDouble()))
-          if (event.pointerCount > 1 && pinchDistance > 0 && d > 0) onPinch(mapOf("factor" to (d / pinchDistance).toDouble(), "x" to (c[0] / density).toDouble(), "y" to (c[1] / density).toDouble()))
-          pinchCentre = c; pinchDistance = d
-          return true
-        }
+        if (kind == Kind.PINCH) { if (event.pointerCount > 1) emitPagePinch(event, "move", -1); return true }
         return if (pageFinger) true else null
       }
       MotionEvent.ACTION_POINTER_UP -> {
         if (kind != Kind.PINCH) return null
-        pinchCentre = centre(event, event.actionIndex); pinchDistance = spread(event, event.actionIndex)
+        // The pinch ends when a hand lifts a finger; the other finger then does nothing until it lifts.
+        if (pinchStart > 0 && event.pointerCount <= 2) { emitPagePinch(event, "end", event.actionIndex); pinchStart = 0f }
         return true
       }
       MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
         if (kind != Kind.PINCH && !pageFinger) return null
+        if (kind == Kind.PINCH && pinchStart > 0) { emitPagePinch(event, "end", -1); pinchStart = 0f }
         kind = Kind.NONE; pageFinger = false
         parent?.requestDisallowInterceptTouchEvent(false)
         return true
       }
     }
     return null
+  }
+
+  /**
+   * A page pinch for JavaScript: the scale since the fingers landed and the point between them on the screen, in layout points.
+   * Screen coordinates, not this view's: the page moves under the fingers as it zooms, and measuring against it would feed back.
+   */
+  private fun emitPagePinch(event: MotionEvent, phase: String, @Suppress("UNUSED_PARAMETER") skip: Int) {
+    // The end repeats the last reading: once a finger lifts there is no spread left to measure.
+    if (phase != "end") {
+      // On the screen, never in this view's own coordinates: the page this view sits in is scaled on screen while it is
+      // pinched, so its own coordinates shrink as it grows. Measured that way the zoom fed back on itself and the page shook.
+      var x = 0f; var y = 0f
+      for (i in 0 until event.pointerCount) { val p = raw(event, i); x += p[0]; y += p[1] }
+      val d = rawSpread(event)
+      lastPinch[0] = if (pinchStart > 0 && d > 0) d / pinchStart else 1f
+      lastPinch[1] = x / event.pointerCount / density; lastPinch[2] = y / event.pointerCount / density
+    }
+    onPinch(mapOf("phase" to phase, "scale" to lastPinch[0].toDouble(), "factor" to 1.0, "x" to lastPinch[1].toDouble(), "y" to lastPinch[2].toDouble()))
+  }
+
+  /** A pointer on the screen. Each pointer's own raw position where Android has it (API 29); before that, the first pointer's offset. */
+  private fun raw(event: MotionEvent, i: Int): FloatArray =
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) floatArrayOf(event.getRawX(i), event.getRawY(i))
+    else floatArrayOf(event.getX(i) + event.rawX - event.getX(0), event.getY(i) + event.rawY - event.getY(0))
+
+  private fun rawSpread(event: MotionEvent): Float {
+    if (event.pointerCount < 2) return 0f
+    val a = raw(event, 0); val b = raw(event, 1)
+    return hypot(a[0] - b[0], a[1] - b[1])
   }
 
   /** Board navigation: one finger pans, two pan and pinch. Values go to JavaScript in layout points, which owns the camera. */

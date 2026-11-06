@@ -1207,11 +1207,13 @@ async function notesGroup(t) {
   // Renamed where the title is read: the window's title bar.
   await t.clickOn("[data-testid=window-title]");
   await t.sleep(300);
+  results.renameField = await js(`({ open: !!document.querySelector('[data-testid=window-title-input]'), focused: document.activeElement?.getAttribute('data-testid') })`);
   await t.key("a", [process.platform === "darwin" ? "meta" : "control"]);
   await typeText("Renamed");
   await t.key("Return");
   await t.sleep(600);
-  checks.renameFromTitleBar = (await t.workspace())?.windows?.some((/** @type {any} */ w) => w.state.title === "Renamed");
+  results.titlesAfterRename = (await t.workspace())?.windows?.map((/** @type {any} */ w) => w.state.title);
+  checks.renameFromTitleBar = results.titlesAfterRename?.includes("Renamed");
   // The note style behind the gear: endless pages for the next note, then back to separate pages.
   await t.clickOn(label("Back to Notes"));
   await t.sleep(400);
@@ -1327,7 +1329,11 @@ async function notesGroup(t) {
   await t.sleep(900);
   await t.clickOn("[data-testid=palette-open]");
   for (let wait = 0; wait < 30 && !(await t.has("[data-testid=command-palette]")); wait++) await t.sleep(200);
+  // The field takes focus a moment after the palette appears; keys sent before that are lost.
+  for (let wait = 0; wait < 30 && !(await js(`document.activeElement?.getAttribute('aria-label') === 'Search Sylf'`)); wait++) await t.sleep(100);
   await typeText("origin");
+  await t.sleep(300);
+  checks.paletteTypedQuery = await js(`document.activeElement?.value === 'origin'`);
   await t.sleep(300);
   await t.shot("notes-08-command-palette");
   await t.key("Return");

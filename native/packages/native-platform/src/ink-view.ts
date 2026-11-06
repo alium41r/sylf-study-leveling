@@ -6,7 +6,8 @@ export interface NativeInkEvents {
   onStroke(event: { nativeEvent: { kind: "draw" | "lasso" | "move"; samples: number[]; pointer: "pen" | "touch" | "mouse"; live: number } }): void;
   onErase(event: { nativeEvent: { points: number[]; pointer: string; phase?: "start" | "move" | "end" } }): void;
   onPan(event: { nativeEvent: { dx: number; dy: number } }): void;
-  onPinch(event: { nativeEvent: { factor: number; x: number; y: number } }): void;
+  /** Boards: `factor` since the last event, at a point in the view. Pages: `phase` and `scale` since the fingers landed, at a point on the screen. */
+  onPinch(event: { nativeEvent: { factor: number; x: number; y: number; phase?: "start" | "move" | "end"; scale?: number } }): void;
   onPenSeen(event: { nativeEvent: object }): void;
 }
 export interface NativeInkHandle {
@@ -27,6 +28,10 @@ export interface NativeInkProps extends NativeInkEvents {
   inkThinning?: number;
   /** "line", "rectangle" or "ellipse" while the shape tool is chosen: the live stroke shows the shape. */
   inkShape?: string;
+  /** The brush's smoothing (0.65 unless set), so the live outline is the finished one. */
+  inkSmoothing?: number;
+  /** A brush nib eases pen pressure, as the web outline does. */
+  inkBrushCurve?: boolean;
   editable: boolean;
   inkColor: string;
   inkWidth: number;

@@ -25,6 +25,8 @@ export interface InkViewProps {
   /** A finger on a pen-only page, or two fingers anywhere: the surface's owner moves the view. */
   onPan?(dx: number, dy: number): void;
   onPinch?(factor: number, x: number, y: number): void;
+  /** Pages on a tablet: a pinch as it happens (scale since the fingers landed, at a point on the screen), previewed and then laid out once. */
+  onPagePinch?(phase: "start" | "move" | "end", scale: number, x: number, y: number): void;
   /** On desktop: "all" when the wheel pans this surface (a whiteboard), "zoom" when only Control and the wheel zoom it. */
   wheel?: "all" | "zoom";
   /** A whiteboard: fingers move and zoom the view rather than scroll a page around it. */

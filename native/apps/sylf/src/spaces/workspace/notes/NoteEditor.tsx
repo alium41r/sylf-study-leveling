@@ -21,6 +21,8 @@ import { pickImage } from "./pick-image";
 import { inspectPdf } from "./pdf-engine";
 import { looksLikePdf } from "./pdf-import";
 import * as DocumentPicker from "expo-document-picker";
+import Animated from "react-native-reanimated";
+import { usePagePinch } from "./page-pinch";
 
 type Page = DocumentDescriptor["pages"][number];
 export type NoteMode = "type" | "write";
@@ -129,6 +131,7 @@ export default function NoteEditor({ library, document, editable, initialPage, o
     });
   };
 
+  const preview = usePagePinch({ zoom, setZoom: (z) => { zoomRef.current = z; setZoom(z); }, scaleAt: (z) => Math.max(0.15, fit * z), offset: offsetRef, vertical, horizontal });
   const pan = (dx: number, dy: number) => {
     const at = offsetRef.current, next = { x: contentWidth > size.width ? Math.max(0, at.x - dx) : at.x, y: Math.max(0, at.y - dy) };
     offsetRef.current = next;
@@ -272,7 +275,8 @@ export default function NoteEditor({ library, document, editable, initialPage, o
         ? <FormatBar format={format} send={send} narrow={narrow} leading={switcher} trailing={trailing} end={corner} onImage={() => void insertImage()} />
         : <InkToolbar tool={tool} onTool={setTool} stylusKnown={stylusKnown} canUndo={!!activeScene?.canUndo()} canRedo={!!activeScene?.canRedo()} onUndo={() => activeScene?.undo()} onRedo={() => activeScene?.redo()}
             selection={selection?.ids.length ?? 0} onSelectionAction={onSelectionAction} leading={switcher} trailing={trailing} end={corner} />) : null}
-      <View style={{ flex: 1, backgroundColor: color.sunken }} onLayout={(e: LayoutChangeEvent) => setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}>
+      <View ref={preview.area} collapsable={false} style={{ flex: 1, backgroundColor: color.sunken, overflow: "hidden" }} onLayout={(e: LayoutChangeEvent) => { setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height }); preview.onAreaLayout(); }}>
+        <Animated.View style={[{ flex: 1, transformOrigin: "0 0" } as object, preview.style]}>
         {size.width ? (
           <ScrollView ref={horizontal} horizontal keyboardShouldPersistTaps="handled" scrollEnabled={contentWidth > size.width + 1} showsHorizontalScrollIndicator={contentWidth > size.width + 1} onScroll={(e) => { offsetRef.current.x = e.nativeEvent.contentOffset.x; setScroll((s) => ({ ...s, x: e.nativeEvent.contentOffset.x })); }} scrollEventThrottle={32} contentContainerStyle={{ width: contentWidth }}>
             <ScrollView ref={vertical} keyboardShouldPersistTaps="handled" {...({ dataSet: { ownsWheel: "scroll" } } as object)} style={{ width: contentWidth, height: size.height }} onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ height: contentHeight }}
@@ -308,7 +312,7 @@ export default function NoteEditor({ library, document, editable, initialPage, o
                     {text ? (
                       typingHere ? (
                         <View style={{ position: "absolute", left: box.left * scale, top: box.top * scale, width: box.width * scale, height: (row.page.height - box.top - 24) * scale }}>
-                          <PageTextEditor key={row.page.pageId} handle={editor} doc={text} document={document} page={row.page} scale={scale} line={box.line} template={row === layout[0] ? JSON.stringify(typedTemplate(templateOf(descriptor)).blocks) : "[]"}
+                          <PageTextEditor key={row.page.pageId} handle={editor} doc={text} document={document} page={row.page} scale={scale} line={box.line} area={{ width: box.width, height: row.page.height - box.top - 24 }} template={row === layout[0] ? JSON.stringify(typedTemplate(templateOf(descriptor)).blocks) : "[]"}
                             onFormat={setFormat} pendingImage={pendingImage} onImageDone={() => setPendingImage(null)} onHeight={(h) => document.growPage(row.page.pageId, box.top + h + (endless ? ENDLESS_ROOM : 80))} />
                         </View>
                       ) : (
@@ -323,7 +327,7 @@ export default function NoteEditor({ library, document, editable, initialPage, o
                       <View style={{ position: "absolute", left: x0, top: y0 }} pointerEvents={mode === "write" ? "auto" : "none"}>
                         <InkView scene={s} pageWidth={row.page.width} pageHeight={row.page.height} camera={{ x: x0 / scale, y: y0 / scale, zoom: scale }} width={x1 - x0} height={y1 - y0}
                           tool={tool} drawPaper={false} editable={editable && mode === "write"} selection={selection?.page === row.page.pageId ? selection.ids : []}
-                          onSelection={(ids) => setSelection(ids.length ? { page: row.page.pageId, ids } : null)} onPan={pan} onPinch={(factor, x, y) => pinch(factor, left + x0 - offsetRef.current.x + x, row.top + y0 - offsetRef.current.y + y)} onPenSeen={penSeen} wheel="zoom" />
+                          onSelection={(ids) => setSelection(ids.length ? { page: row.page.pageId, ids } : null)} onPan={pan} onPinch={(factor, x, y) => pinch(factor, left + x0 - offsetRef.current.x + x, row.top + y0 - offsetRef.current.y + y)} onPagePinch={preview.onPagePinch} onPenSeen={penSeen} wheel="zoom" />
                       </View>
                     ) : null}
                   </View>
@@ -341,6 +345,7 @@ export default function NoteEditor({ library, document, editable, initialPage, o
             </ScrollView>
           </ScrollView>
         ) : null}
+        </Animated.View>
         {pages.length > 1 ? (
           <View pointerEvents="none" style={{ position: "absolute", right: space.md, bottom: space.md, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: "rgba(20,24,40,0.55)" }}>
             <Text variant="micro" style={{ color: "#ffffff" }}>{current + 1} / {pages.length}</Text>
@@ -372,8 +377,8 @@ function PictureBackground({ library, hash, width, height }: { library: NotesLib
 }
 
 /** The editor for the page being typed on: BlockNote over the paper, at the page's zoom, on its rule. */
-function PageTextEditor({ handle, doc, document, page, scale, line, template, onFormat, pendingImage, onImageDone, onHeight }: {
-  handle: React.RefObject<RichTextHandle | null>; doc: Y.Doc; document: OpenDocument; page: Page; scale: number; line: number; template: string;
+function PageTextEditor({ handle, doc, document, page, scale, line, area, template, onFormat, pendingImage, onImageDone, onHeight }: {
+  handle: React.RefObject<RichTextHandle | null>; doc: Y.Doc; document: OpenDocument; page: Page; scale: number; line: number; area: { width: number; height: number }; template: string;
   onFormat(format: Format): void; pendingImage: { url: string; name: string; width: number } | null; onImageDone(): void; onHeight(height: number): void;
 }) {
   const theme = useTheme();
@@ -391,7 +396,7 @@ function PageTextEditor({ handle, doc, document, page, scale, line, template, on
     return () => clearTimeout(timer);
   }, [pendingImage]);
   return (
-    <RichTextDom ref={handle} initial={initial} template={template} look={look} editable page={{ zoom: scale, lineHeight: line, focus: true }}
+    <RichTextDom ref={handle} initial={initial} template={template} look={look} editable page={{ zoom: scale, lineHeight: line, focus: true, width: area.width, height: area.height }}
       onUpdate={async (update) => { Y.applyUpdate(doc, fromBase64(update), origin); }}
       onText={async (text) => { if (document.descriptor().pages[0]?.pageId === page.pageId) document.setText(text); }}
       onFormat={async (state) => onFormat(JSON.parse(state) as Format)}

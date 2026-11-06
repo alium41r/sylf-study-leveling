@@ -69,17 +69,22 @@ function NativeInkSurface(props: InkViewProps) {
   const highlighter = tool.tool === "highlighter";
   const brushTool = tool.tool === "highlighter" ? "highlighter" : tool.tool === "shape" ? "shape" : "pen";
   // The live stroke narrows with pressure as the finished outline will, and a shape shows as the shape.
-  const thinning = inkOutline.inkThinning(brushFor(brushTool, { color: tool.color, width: tool.width, input: "pen", shape: tool.shape }));
+  const brush = brushFor(brushTool, { color: tool.color, width: tool.width, input: "pen", shape: tool.shape });
+  const thinning = inkOutline.inkThinning(brush);
 
   return (
     <Native ref={ref} style={{ width: props.width, height: props.height }}
       tool={tool.tool} penOnly={tool.penOnly} fingerGestures={!!props.fingersMove} editable={props.editable && !props.paperOnly}
-      pinchZoom={!props.fingersMove && !!props.onPinch && !props.paperOnly} inkThinning={thinning} inkShape={tool.tool === "shape" ? tool.shape : ""}
+      pinchZoom={!props.fingersMove && !!props.onPagePinch && !props.paperOnly} inkThinning={thinning} inkShape={tool.tool === "shape" ? tool.shape : ""} inkSmoothing={brush.smoothing ?? 0.65} inkBrushCurve={brush.nib === "brush"}
       inkColor={tool.color} inkWidth={highlighter ? Math.max(8, tool.width * 4) : tool.width} inkOpacity={highlighter ? 0.28 : 1} eraserRadius={eraserRadius(tool)}
       camera={[props.camera.x, props.camera.y, props.camera.zoom]} selectionBox={box ? [box.x, box.y, box.width, box.height] : null} paper={paper}
       onPenSeen={() => latest.current.onPenSeen?.()}
       onPan={(e) => latest.current.onPan?.(e.nativeEvent.dx, e.nativeEvent.dy)}
-      onPinch={(e) => latest.current.onPinch?.(e.nativeEvent.factor, e.nativeEvent.x, e.nativeEvent.y)}
+      onPinch={(e) => {
+        const { phase, scale, factor, x, y } = e.nativeEvent, p = latest.current;
+        if (phase && p.onPagePinch) p.onPagePinch(phase, scale ?? 1, x, y);
+        else if (!phase) p.onPinch?.(factor, x, y);
+      }}
       onErase={(e) => {
         const p = latest.current, { points, phase } = e.nativeEvent, path = pointsOf(points, 2);
         // A sweep is one undo step. Builds before the phase was sent erase batch by batch.

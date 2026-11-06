@@ -3,9 +3,9 @@
 // stroke, lasso and eraser draw on their own layer every frame. Each canvas is the size of the view, never of the page.
 import { useEffect, useRef } from "react";
 import { View } from "react-native";
-import { inkOutline } from "@sylf/shared";
-import { brushFor, liveOutline, shapeSamples, type Point, type RenderStroke } from "@sylf/notes";
-import { eraserRadius, type InkViewProps } from "./ink-types";
+import { inkGeometry, inkOutline, type InkBrush } from "@sylf/shared";
+import { liveOutline, shapeSamples, type Point, type RenderStroke } from "@sylf/notes";
+import { brushOf, eraserRadius, type InkViewProps } from "./ink-types";
 
 type Sample = [number, number, number, number, number, number, number, number];
 /** A pointer that was cancelled before this handler ran cannot be captured; the stroke still works without capture. */
@@ -18,7 +18,7 @@ export default function InkView(props: InkViewProps) {
   latest.current = props;
   useEffect(() => { if (__DEV__ && live.current) (live.current as unknown as { sylf: unknown }).sylf = { latest, gesture }; });
   const paths = useRef(new Map<string, { version: number; path: Path2D }>());
-  const gesture = useRef<{ kind: "draw" | "erase" | "lasso" | "move" | "pan"; pointer: number; started: number; points: Sample[]; path: Point[]; origin?: Point; last?: Point; style?: ReturnType<typeof brushFor> } | null>(null);
+  const gesture = useRef<{ kind: "draw" | "erase" | "lasso" | "move" | "pan"; pointer: number; started: number; points: Sample[]; path: Point[]; origin?: Point; last?: Point; style?: InkBrush } | null>(null);
   const touches = useRef(new Map<number, Point>());
   const frame = useRef(0);
   const dpr = typeof window === "undefined" ? 1 : Math.min(2, window.devicePixelRatio || 1);
@@ -91,7 +91,7 @@ export default function InkView(props: InkViewProps) {
     transform(ctx);
     const zoom = latest.current.camera.zoom;
     if (g.kind === "draw" && g.style) {
-      ctx.globalAlpha = g.style.opacity ?? (g.style.tool === "highlighter" ? 0.28 : 1);
+      ctx.globalAlpha = inkGeometry.inkOpacity(g.style);
       ctx.fillStyle = g.style.color;
       const d = liveOutline(g.style.shape ? shapeSamples(g.points, g.style.shape) : g.points, g.style);
       if (d) ctx.fill(new Path2D(d));
@@ -180,7 +180,7 @@ export default function InkView(props: InkViewProps) {
     const tool = native.pointerType === "pen" && native.button === 5 ? "eraser" : p.tool.tool;
     if (tool === "eraser") { gesture.current = { kind: "erase", pointer: native.pointerId, started: native.timeStamp, points: [], path: [point], last: point }; p.scene.beginSweep(); eraseAlong([point]); requestLive(); return; }
     if (tool === "lasso") { gesture.current = { kind: "lasso", pointer: native.pointerId, started: native.timeStamp, points: [], path: [point] }; return; }
-    const style = brushFor(tool === "highlighter" ? "highlighter" : tool === "shape" ? "shape" : "pen", { color: p.tool.color, width: tool === "highlighter" ? Math.max(8, p.tool.width * 4) : p.tool.width, input: native.pointerType === "pen" ? "pen" : native.pointerType === "touch" ? "touch" : "mouse", shape: p.tool.shape });
+    const style = brushOf({ ...p.tool, tool }, native.pointerType === "pen" ? "pen" : native.pointerType === "touch" ? "touch" : "mouse");
     try { p.scene.begin(style); } catch { return; }
     gesture.current = { kind: "draw", pointer: native.pointerId, started: native.timeStamp, points: [], path: [], style };
     const first = sample(native, native.timeStamp);

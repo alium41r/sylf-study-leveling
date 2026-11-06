@@ -5,9 +5,9 @@ import { useEffect, useMemo, useRef } from "react";
 import { View } from "react-native";
 import Svg, { Path, Rect } from "react-native-svg";
 import { nativeInkView, type NativeInkHandle } from "@sylf/native-platform";
-import { inkOutline, type InkSample } from "@sylf/shared";
-import { brushFor, shapeSamples, type Point } from "@sylf/notes";
-import { eraserRadius, type InkViewProps } from "./ink-types";
+import { inkGeometry, inkOutline, type InkSample } from "@sylf/shared";
+import { shapeSamples, type Point } from "@sylf/notes";
+import { brushOf, eraserRadius, type InkViewProps } from "./ink-types";
 
 const NativeInk = nativeInkView();
 const CHUNK = 120;
@@ -78,17 +78,17 @@ function NativeInkSurface(props: InkViewProps) {
   }, [props.drawPaper, props.pageWidth, props.pageHeight, scene, scene.paper()]);
 
   const box = props.selection.length ? scene.boundsOf(props.selection) : null;
-  const highlighter = tool.tool === "highlighter";
-  const brushTool = tool.tool === "highlighter" ? "highlighter" : tool.tool === "shape" ? "shape" : "pen";
-  // The live stroke narrows with pressure as the finished outline will, and a shape shows as the shape.
-  const brush = brushFor(brushTool, { color: tool.color, width: tool.width, input: "pen", shape: tool.shape });
+  // The live stroke is drawn from the brush the finished stroke will have: it narrows with pressure only when pressure is on, is
+  // dashed, dotted or straightened as it will be, a pencil shades with tilt, and a shape shows as the shape.
+  const brush = brushOf(tool, "pen");
   const thinning = inkOutline.inkThinning(brush);
 
   return (
     <Native ref={ref} style={{ width: props.width, height: props.height }}
       tool={tool.tool} penOnly={tool.penOnly} fingerGestures={!!props.fingersMove} editable={props.editable && !props.paperOnly}
       pinchZoom={!props.fingersMove && !!props.onPagePinch && !props.paperOnly} inkThinning={thinning} inkShape={tool.tool === "shape" ? tool.shape : ""} inkSmoothing={brush.smoothing ?? 0.65} inkBrushCurve={brush.nib === "brush"}
-      inkColor={tool.color} inkWidth={highlighter ? Math.max(8, tool.width * 4) : tool.width} inkOpacity={highlighter ? 0.28 : 1} eraserRadius={eraserRadius(tool)}
+      inkPencil={brush.nib === "pencil"} inkLineStyle={brush.lineStyle ?? "solid"} inkStraighten={!!brush.straighten && !brush.shape}
+      inkColor={tool.color} inkWidth={brush.width} inkOpacity={inkGeometry.inkOpacity(brush)} eraserRadius={eraserRadius(tool)}
       camera={[props.camera.x, props.camera.y, props.camera.zoom]} selectionBox={box ? [box.x, box.y, box.width, box.height] : null} paper={paper}
       onPenSeen={() => latest.current.onPenSeen?.()}
       onPan={(e) => latest.current.onPan?.(e.nativeEvent.dx, e.nativeEvent.dy)}
@@ -109,10 +109,10 @@ function NativeInkSurface(props: InkViewProps) {
         if (kind === "lasso") { p.onSelection(p.scene.select(pointsOf(samples, 8))); return; }
         if (kind === "move") { p.scene.move(p.selection, samples[2] - samples[0], samples[3] - samples[1]); return; }
         if (p.selection.length) p.onSelection([]);
-        const style = brushFor(brushTool, { color: p.tool.color, width: highlighter ? Math.max(8, p.tool.width * 4) : p.tool.width, input: pointer === "pen" ? "pen" : pointer === "mouse" ? "mouse" : "touch", shape: p.tool.shape });
+        const style = brushOf(p.tool, pointer === "pen" ? "pen" : pointer === "mouse" ? "mouse" : "touch");
         try {
           p.scene.begin(style);
-          const all = brushTool === "shape" ? shapeSamples(samplesOf(samples), p.tool.shape) : samplesOf(samples);
+          const all = style.shape ? shapeSamples(samplesOf(samples), style.shape) : samplesOf(samples);
           for (let i = 0; i < all.length; i += 256) p.scene.append(all.slice(i, i + 256));
           p.scene.end();
         } catch { p.scene.cancel(); }

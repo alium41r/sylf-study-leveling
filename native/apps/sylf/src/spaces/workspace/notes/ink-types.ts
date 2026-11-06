@@ -1,10 +1,28 @@
 // What every ink surface receives. One page and one camera: a paged document gives each page a view of itself, and a whiteboard
 // gives its one page a view that pans and zooms. The surface writes to the scene and keeps no strokes of its own.
-import type { InkScene, InkTool, ShapeKind } from "@sylf/notes";
+import { brushFor, type InkScene, type InkTool, type LineStyle, type ShapeKind } from "@sylf/notes";
+import type { InkBrush } from "@sylf/shared";
 
+export type Nib = NonNullable<InkBrush["nib"]>;
 export interface InkCamera { x: number; y: number; zoom: number }
-export interface InkToolState { tool: InkTool; color: string; width: number; shape: ShapeKind; eraser: "stroke" | "precise"; penOnly: boolean }
-export const DEFAULT_TOOL: InkToolState = { tool: "pen", color: "#1f2a44", width: 2.6, shape: "rectangle", eraser: "stroke", penOnly: false };
+export interface InkToolState {
+  tool: InkTool; color: string; width: number; shape: ShapeKind; eraser: "stroke" | "precise"; penOnly: boolean;
+  /** The pen's kind, as sylf-ink/1 names it. */
+  nib: Nib;
+  /** Off: every stroke is the same width whatever the pen presses. */
+  pressure: boolean;
+  lineStyle: LineStyle;
+  /** A nearly straight stroke becomes a straight line. */
+  straighten: boolean;
+}
+export const DEFAULT_TOOL: InkToolState = { tool: "pen", color: "#1f2a44", width: 2.6, shape: "rectangle", eraser: "stroke", penOnly: false, nib: "ballpoint", pressure: true, lineStyle: "solid", straighten: false };
+export const WIDTH_RANGE = { min: 0.6, max: 8, step: 0.2 } as const;
+
+/** The brush a stroke is written with: one rule for the live stroke and the finished one, on every surface. */
+export function brushOf(tool: InkToolState, input: InkBrush["input"]): InkBrush {
+  const kind = tool.tool === "highlighter" ? "highlighter" : tool.tool === "shape" ? "shape" : "pen";
+  return brushFor(kind, { color: tool.color, width: kind === "highlighter" ? Math.max(8, tool.width * 4) : tool.width, input, shape: tool.shape, nib: kind === "pen" ? tool.nib : undefined, pressure: tool.pressure, lineStyle: tool.lineStyle, straighten: tool.straighten });
+}
 
 export interface InkViewProps {
   scene: InkScene;

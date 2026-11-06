@@ -50,6 +50,12 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
   var inkSmoothing = 0.65f
   /** A brush nib under a pen eases pressure (pressure^0.75), as the web outline does. */
   var inkBrushCurve = false
+  /** A pencil nib: under a pen, tilt shades into pressure and widens the stroke, as the web outline does. */
+  var inkPencil = false
+  /** "solid", "dashed" or "dotted": the live stroke is cut into the finished stroke's dashes. */
+  var inkLineStyle = "solid"
+  /** The brush straightens: a nearly straight stroke shows as the line it becomes. */
+  var inkStraighten = false
   // Whether the stroke being drawn comes from a pen: fingers and mice simulate pressure from speed instead.
   private var penStroke = true
   var editable = true
@@ -81,8 +87,11 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
   private val samples = ArrayList<Float>(2048)
   private val livePath = Path()
   private var liveLast: FloatArray? = null
+  /** The brush a stroke is drawn with, taken when it starts to be drawn, so a stroke waiting for its outline keeps its look. */
+  private class LiveStyle(val color: Int, val alpha: Int, val width: Float, val thinning: Float, val shape: String, val pen: Boolean, val smoothing: Float, val brushCurve: Boolean, val pencil: Boolean, val lineStyle: String, val straighten: Boolean)
+  private fun liveStyle() = LiveStyle(inkColor, (inkOpacity * 255).toInt(), inkWidth, inkThinning, if (tool == "shape") inkShape else "", penStroke, inkSmoothing, inkBrushCurve, inkPencil && penStroke, inkLineStyle, inkStraighten)
   /** Strokes finished here and waiting for their outline from JavaScript, drawn exactly as they were live. */
-  private class Pending(val samples: FloatArray, val color: Int, val alpha: Int, val width: Float, val thinning: Float, val shape: String, val pen: Boolean)
+  private class Pending(val samples: FloatArray, val style: LiveStyle)
   private val pending = HashMap<Int, Pending>()
   private var pageFinger = false
   private var pinchStart = 0f
@@ -160,8 +169,8 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
     }
     val offset = if (kind == Kind.MOVE) moveTo?.let { to -> moveFrom?.let { from -> floatArrayOf(to[0] - from[0], to[1] - from[1]) } } else null
     for ((_, s) in strokes) { fill.color = s.color; fill.alpha = s.alpha; canvas.drawPath(s.path, fill) }
-    for (p in pending.values) drawLive(canvas, p.samples, p.samples.size, p.color, p.alpha, p.width, p.thinning, p.shape, p.pen)
-    if (kind == Kind.DRAW) drawLive(canvas, null, samples.size, inkColor, (inkOpacity * 255).toInt(), inkWidth, inkThinning, if (tool == "shape") inkShape else "", penStroke)
+    for (p in pending.values) drawLive(canvas, p.samples, p.samples.size, p.style)
+    if (kind == Kind.DRAW) drawLive(canvas, null, samples.size, liveStyle())
     selection?.let { s ->
       dashed.strokeWidth = 1.4f / zoom; dashed.pathEffect = DashPathEffect(floatArrayOf(6f / zoom, 4f / zoom), 0f)
       val dx = offset?.get(0) ?: 0f; val dy = offset?.get(1) ?: 0f
@@ -185,13 +194,14 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
   /**
    * A stroke as it is being written, or finished and waiting for its outline: a shape as the shape it becomes (the bounds of what was
    * drawn, so a rough circle becomes a circle; a line from end to end), otherwise segments whose width follows pressure with the
-   * brush's thinning, as perfect-freehand's outline does (width × (1 − 2 × thinning × (0.5 − pressure))). `from` is null for the
-   * stroke in progress, whose samples are still in `samples`.
+   * brush's thinning, as perfect-freehand's outline does (width × (1 − 2 × thinning × (0.5 − pressure))); with pressure off the
+   * thinning is 0 and the width is constant. `from` is null for the stroke in progress, whose samples are still in `samples`.
    */
-  private fun drawLive(canvas: Canvas, from: FloatArray?, size: Int, color: Int, alpha: Int, width: Float, thinning: Float, shape: String, pen: Boolean) {
+  private fun drawLive(canvas: Canvas, from: FloatArray?, size: Int, style: LiveStyle) {
     if (size < 8) return
     val at = { i: Int -> if (from != null) from[i] else samples[i] }
-    line.color = color; line.alpha = alpha; line.strokeWidth = width
+    val shape = style.shape
+    line.color = style.color; line.alpha = style.alpha; line.strokeWidth = style.width
     if (shape.isNotEmpty()) {
       if (shape == "line") { canvas.drawLine(at(0), at(1), at(size - 8), at(size - 7), line); return }
       var x1 = Float.MAX_VALUE; var y1 = Float.MAX_VALUE; var x2 = -Float.MAX_VALUE; var y2 = -Float.MAX_VALUE
@@ -201,15 +211,17 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
       if (shape == "rectangle") canvas.drawRect(shapeBox, line) else canvas.drawOval(shapeBox, line)
       return
     }
-    // Everything else is drawn with the finished stroke's own outline (perfect-freehand, as the web draws it), so it is smooth
-    // while it is written and does not change when the pen lifts.
+    // Everything else is drawn with the finished stroke's own geometry and outline (perfect-freehand, as the web draws it), so it is
+    // smooth while it is written and does not change when the pen lifts.
     val samplesNow = from ?: samples.toFloatArray()
-    val path = FreehandOutline.path(samplesNow, size, outlineOptions(width, thinning, pen), from != null) ?: return
-    fill.color = color; fill.alpha = alpha
-    canvas.drawPath(path, fill)
+    val straight = if (style.straighten) InkGeometry.straightened(samplesNow, size) else null
+    val options = FreehandOutline.Options(style.width, style.thinning, style.smoothing, !style.pen, style.pen && style.brushCurve, style.pencil)
+    fill.color = style.color; fill.alpha = style.alpha
+    for (segment in InkGeometry.segments(straight ?: samplesNow, straight?.size ?: size, style.lineStyle, style.width)) {
+      val path = FreehandOutline.path(segment, segment.size, options, from != null) ?: continue
+      canvas.drawPath(path, fill)
+    }
   }
-
-  private fun outlineOptions(width: Float, thinning: Float, pen: Boolean) = FreehandOutline.Options(width, thinning, inkSmoothing, !pen, pen && inkBrushCurve)
 
   private fun sample(event: MotionEvent, index: Int, history: Int) {
     val h = history >= 0
@@ -306,7 +318,7 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
         if (!cancelled && samples.size >= 8) {
           val id = ++liveSeq
           // The live copy stays until the finished outline is drawn, then JavaScript drops it.
-          pending[id] = Pending(samples.toFloatArray(), inkColor, (inkOpacity * 255).toInt(), inkWidth, inkThinning, if (tool == "shape") inkShape else "", penStroke)
+          pending[id] = Pending(samples.toFloatArray(), liveStyle())
           onStroke(mapOf("kind" to "draw", "samples" to samples.map { it.toDouble() }, "pointer" to pointerName(type), "live" to id))
         }
       }

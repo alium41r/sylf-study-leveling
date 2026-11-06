@@ -16,7 +16,7 @@ import kotlin.math.sin
  * change at pen-up. Samples are sylf-ink/1's, eight floats each: x, y, pressure, then time and tilt, which this does not use.
  */
 internal object FreehandOutline {
-  class Options(val size: Float, val thinning: Float, val smoothing: Float, val simulatePressure: Boolean, val brushCurve: Boolean)
+  class Options(val size: Float, val thinning: Float, val smoothing: Float, val simulatePressure: Boolean, val brushCurve: Boolean, val pencil: Boolean = false)
 
   private const val RATE_OF_PRESSURE_CHANGE = 0.275
   private const val FIXED_PI = PI + 0.0001
@@ -29,7 +29,13 @@ internal object FreehandOutline {
   private class StrokePoint(val x: Double, val y: Double, val pressure: Double, var vx: Double, var vy: Double, val distance: Double, val runningLength: Double)
 
   fun path(samples: FloatArray, count: Int, options: Options, last: Boolean): Path? {
-    val outline = outline(samples, count, options, last)
+    // A pencil under a pen is wider the more it leans, by its mean tilt over the stroke, as `inkOutline` sizes it.
+    val sized = if (options.pencil && count >= 8) {
+      var tilt = 0.0
+      for (i in 0 until count / 8) tilt += min(1.0, hypot(samples[i * 8 + 4].toDouble(), samples[i * 8 + 5].toDouble()) / 80)
+      Options((options.size * (1 + tilt / (count / 8) * 1.8)).toFloat(), options.thinning, options.smoothing, options.simulatePressure, options.brushCurve, true)
+    } else options
+    val outline = outline(samples, count, sized, last)
     if (outline.isEmpty()) return null
     val path = Path()
     path.moveTo(outline[0][0].toFloat(), outline[0][1].toFloat())
@@ -41,9 +47,10 @@ internal object FreehandOutline {
     return path
   }
 
-  private fun pressureOf(samples: FloatArray, i: Int, brushCurve: Boolean): Double {
+  private fun pressureOf(samples: FloatArray, i: Int, options: Options): Double {
     val p = samples[i * 8 + 2].toDouble()
-    return if (brushCurve) p.pow(0.75) else p
+    if (options.pencil) return min(1.0, p * 0.75 + min(1.0, hypot(samples[i * 8 + 4].toDouble(), samples[i * 8 + 5].toDouble()) / 80) * 0.4)
+    return if (options.brushCurve) p.pow(0.75) else p
   }
 
   private fun streamlineOf(smoothing: Float) = min(0.42, max(0.08, smoothing * 0.34))
@@ -53,7 +60,7 @@ internal object FreehandOutline {
     if (n == 0) return emptyList()
     val t = 0.15 + (1 - streamlineOf(options.smoothing)) * 0.85
     // [x, y, pressure] as perfect-freehand reads them.
-    var pts: MutableList<DoubleArray> = MutableList(n) { doubleArrayOf(samples[it * 8].toDouble(), samples[it * 8 + 1].toDouble(), pressureOf(samples, it, options.brushCurve)) }
+    var pts: MutableList<DoubleArray> = MutableList(n) { doubleArrayOf(samples[it * 8].toDouble(), samples[it * 8 + 1].toDouble(), pressureOf(samples, it, options)) }
     if (pts.size == 2) {
       val end = pts[1]; val first = pts[0]
       pts = mutableListOf(first)

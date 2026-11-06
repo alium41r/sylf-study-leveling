@@ -47,6 +47,9 @@ class SylfNativePlatformModule : Module() {
       Prop("inkShape") { view: SylfInkView, value: String -> view.inkShape = value }
       Prop("inkSmoothing") { view: SylfInkView, value: Double -> view.inkSmoothing = value.toFloat() }
       Prop("inkBrushCurve") { view: SylfInkView, value: Boolean -> view.inkBrushCurve = value }
+      Prop("inkPencil") { view: SylfInkView, value: Boolean -> view.inkPencil = value }
+      Prop("inkLineStyle") { view: SylfInkView, value: String -> view.inkLineStyle = value }
+      Prop("inkStraighten") { view: SylfInkView, value: Boolean -> view.inkStraighten = value }
       Prop("inkColor") { view: SylfInkView, value: String -> view.inkColor = android.graphics.Color.parseColor(value); view.invalidate() }
       Prop("inkWidth") { view: SylfInkView, value: Double -> view.inkWidth = value.toFloat() }
       Prop("inkOpacity") { view: SylfInkView, value: Double -> view.inkOpacity = value.toFloat() }

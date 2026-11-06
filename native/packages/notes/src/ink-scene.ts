@@ -164,19 +164,30 @@ export function shapeSamples(points: readonly InkSample[], shape: ShapeKind | un
   return [[x1, y1, 0.5, first[3], 0, 0, 0, 0], [x2, y2, 0.5, last[3], 0, 0, 0, 0]];
 }
 
-/** The live stroke's outline while the pen is down, drawn the same way as a finished one, so pen-up never changes its shape. */
+/** The live stroke's outline while the pen is down, drawn the same way as a finished one (straightened, dashed or dotted as it will
+ * be), so pen-up never changes its shape. */
 export function liveOutline(points: readonly InkSample[], style: InkBrush) {
   if (!points.length) return "";
-  return inkOutline.outlineSvg(inkOutline.inkOutline(inkGeometry.inkGeometry(points, style), style, false));
+  return inkGeometry.inkSegments(points, style).map((segment) => inkOutline.outlineSvg(inkOutline.inkOutline(segment, style, false))).filter(Boolean).join(" ");
 }
 
-/** A pen preset as a sylf-ink/1 brush. `input` records what drew it, which changes how pressure is simulated. */
-export function brushFor(tool: "pen" | "highlighter" | "shape", options: { color: string; width: number; input: InkBrush["input"]; nib?: InkBrush["nib"]; shape?: ShapeKind }): InkBrush {
-  const highlighter = tool === "highlighter";
+export type LineStyle = NonNullable<InkBrush["lineStyle"]>;
+export interface PenOptions { color: string; width: number; input: InkBrush["input"]; nib?: InkBrush["nib"]; shape?: ShapeKind; pressure?: boolean; lineStyle?: LineStyle; straighten?: boolean }
+
+/**
+ * A pen preset as a sylf-ink/1 brush. `input` records what drew it, which changes how pressure is simulated. With `pressure: false`
+ * the brush records pressure 0, which makes its thinning 0: every stroke is the brush's full width whatever the pen pressed, live and
+ * finished. Line style and straightening are a pen's; a highlighter always straightens and a shape is always one even line.
+ */
+export function brushFor(tool: "pen" | "highlighter" | "shape", options: PenOptions): InkBrush {
+  const highlighter = tool === "highlighter", pen = tool === "pen";
   return {
     tool: highlighter ? "highlighter" : "pen", color: options.color, width: options.width, input: options.input, brush: "perfect-freehand/1.2.3:sylf-1",
     nib: highlighter ? "fineliner" : (options.nib ?? "ballpoint"),
     ...(highlighter ? { opacity: 0.28, straighten: true } : {}),
     ...(tool === "shape" && options.shape ? { shape: options.shape } : {}),
+    ...(!highlighter && options.pressure === false ? { pressure: 0 } : {}),
+    ...(pen && options.lineStyle && options.lineStyle !== "solid" ? { lineStyle: options.lineStyle } : {}),
+    ...(pen && options.straighten ? { straighten: true } : {}),
   };
 }

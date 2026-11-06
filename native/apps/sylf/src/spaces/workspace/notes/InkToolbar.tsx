@@ -1,14 +1,15 @@
 // The pen case: tools, a few inks, three widths, undo. Colours are the document's, not the theme's, because ink is written on paper.
-// With a selection, the bar becomes what can be done to it.
+// Tapping the pen or highlighter already in hand opens its settings (PenPanel). With a selection, the bar becomes what can be done to it.
 import { useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { Divider, IconButton, Menu, Press, Text, useTheme, type IconName, type MenuItem , type ViewHandle } from "@sylf/design-system";
 import type { ShapeKind } from "@sylf/notes";
 import type { InkToolState } from "./ink-types";
 import { ToolbarRow } from "./FormatBar";
+import PenPanel from "./PenPanel";
+import { HIGHLIGHTS, INKS } from "./pen-palettes";
 
-export const INKS = ["#1f2a44", "#345bc6", "#c8423b", "#2f8f5b", "#7a4fd0", "#555b63"];
-export const HIGHLIGHTS = ["#e4b930", "#7ed3a3", "#f29bc1", "#8ec5ff"];
+export { HIGHLIGHTS, INKS };
 const WIDTHS = [{ value: 1.6, label: "Fine" }, { value: 2.6, label: "Medium" }, { value: 4.4, label: "Bold" }];
 const SHAPES: { value: ShapeKind; label: string }[] = [{ value: "line", label: "Line" }, { value: "rectangle", label: "Rectangle" }, { value: "ellipse", label: "Ellipse" }];
 
@@ -31,12 +32,14 @@ interface Props {
 
 export default function InkToolbar({ tool, onTool, canUndo, canRedo, onUndo, onRedo, selection, onSelectionAction, leading, trailing, end, stylusKnown }: Props) {
   const { space, color } = useTheme();
-  const [menu, setMenu] = useState<"shape" | "eraser" | null>(null);
-  const shapeAnchor = useRef<ViewHandle>(null), eraserAnchor = useRef<ViewHandle>(null);
+  const [menu, setMenu] = useState<"shape" | "eraser" | "pen" | null>(null);
+  const shapeAnchor = useRef<ViewHandle>(null), eraserAnchor = useRef<ViewHandle>(null), penAnchor = useRef<ViewHandle>(null), highlighterAnchor = useRef<ViewHandle>(null);
   const set = (patch: Partial<InkToolState>) => onTool({ ...tool, ...patch });
   const pick = (name: InkToolState["tool"]) => set({ tool: name, color: name === "highlighter" && !HIGHLIGHTS.includes(tool.color) ? HIGHLIGHTS[0] : name === "pen" && HIGHLIGHTS.includes(tool.color) ? INKS[0] : tool.color });
-  const button = (name: InkToolState["tool"], icon: IconName, label: string) => <IconButton key={name} icon={icon} size="small" label={label} active={tool.tool === name} onPress={() => (tool.tool === name && (name === "shape" || name === "eraser") ? setMenu(name) : pick(name))} />;
-  const palette = tool.tool === "highlighter" ? HIGHLIGHTS : INKS;
+  const button = (name: InkToolState["tool"], icon: IconName, label: string) => <IconButton key={name} icon={icon} size="small" label={label} active={tool.tool === name} onPress={() => (tool.tool !== name ? pick(name) : name === "shape" || name === "eraser" ? setMenu(name) : name === "pen" || name === "highlighter" ? setMenu("pen") : undefined)} />;
+  // The colour in hand is always on the bar, even one from the panel's other sets.
+  const quick = tool.tool === "highlighter" ? HIGHLIGHTS : INKS;
+  const palette = quick.includes(tool.color) ? quick : [tool.color, ...quick];
   const swatch = (value: string, onPress: () => void, selected: boolean) => (
     <Press key={value} label={`Colour ${value}`} selected={selected} onPress={onPress} feedback="none" style={{ width: 28, height: 28, alignItems: "center", justifyContent: "center" }}>
       <View style={{ width: selected ? 20 : 16, height: selected ? 20 : 16, borderRadius: 10, backgroundColor: value, borderWidth: selected ? 2 : 1, borderColor: selected ? color.ink : "rgba(0,0,0,0.12)" }} />
@@ -63,8 +66,8 @@ export default function InkToolbar({ tool, onTool, canUndo, canRedo, onUndo, onR
           <IconButton icon="undo" size="small" label="Undo" disabled={!canUndo} onPress={onUndo} />
           <IconButton icon="redo" size="small" label="Redo" disabled={!canRedo} onPress={onRedo} />
           <Divider vertical style={{ height: 18, marginHorizontal: 4 }} />
-          {button("pen", "pen", "Pen")}
-          {button("highlighter", "highlighter", "Highlighter")}
+          <View ref={penAnchor} collapsable={false}>{button("pen", "pen", tool.tool === "pen" ? "Pen: settings" : "Pen")}</View>
+          <View ref={highlighterAnchor} collapsable={false}>{button("highlighter", "highlighter", tool.tool === "highlighter" ? "Highlighter: settings" : "Highlighter")}</View>
           <View ref={eraserAnchor} collapsable={false}>{button("eraser", "eraser", tool.eraser === "precise" ? "Eraser, precise" : "Eraser")}</View>
           {button("lasso", "lasso", "Lasso: select and move")}
           <View ref={shapeAnchor} collapsable={false}>{button("shape", "shapes", `Shape: ${tool.shape}`)}</View>
@@ -91,6 +94,7 @@ export default function InkToolbar({ tool, onTool, canUndo, canRedo, onUndo, onR
       )}
       <Menu open={menu === "shape"} anchor={shapeAnchor } onClose={() => setMenu(null)} items={shapeItems} label="Shapes" side="bottom" />
       <Menu open={menu === "eraser"} anchor={eraserAnchor } onClose={() => setMenu(null)} items={eraserItems} label="Eraser" side="bottom" />
+      <PenPanel open={menu === "pen" && (tool.tool === "pen" || tool.tool === "highlighter")} anchor={tool.tool === "highlighter" ? highlighterAnchor : penAnchor} onClose={() => setMenu(null)} tool={tool} onTool={onTool} />
     </ScrollView>
     </ToolbarRow>
   );

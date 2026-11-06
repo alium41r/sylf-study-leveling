@@ -32,6 +32,12 @@ export interface NativeInkProps extends NativeInkEvents {
   inkSmoothing?: number;
   /** A brush nib eases pen pressure, as the web outline does. */
   inkBrushCurve?: boolean;
+  /** A pencil under a pen mixes tilt into pressure and widens with it, as the web outline does. */
+  inkPencil?: boolean;
+  /** "solid", "dashed" or "dotted": the live stroke is cut into the finished stroke's dashes. */
+  inkLineStyle?: string;
+  /** A nearly straight stroke shows as the straight line it becomes. */
+  inkStraighten?: boolean;
   editable: boolean;
   inkColor: string;
   inkWidth: number;

@@ -295,3 +295,4 @@ Run on the tablet by the agent with `adb input stylus` and `npm run android:note
 18. **Ink weight.** Write slowly and quickly with light and firm pressure: the line should not change width when the pen lifts.
 19. **Shapes.** Rectangle, ellipse and line: draw them roughly; each becomes a clean shape of that size.
 20. **New and names.** The gear sets the note style; New asks for a name and opens the note in that style; tapping the name in the title bar renames it.
+21. **Pen settings.** Tap the pen in hand: its panel opens. Turn **Pen pressure** off and write lightly, then press hard: the line keeps one width, while you write and after the pen lifts. Turn it on again and the hard part is wider. Try each pen kind, the size slider, dashed and dotted lines, Straighten lines (a nearly straight line becomes straight), a colour from another set and one you mix. Force-stop the app: the pen is as you left it. Does the S Pen feel right with pressure off?

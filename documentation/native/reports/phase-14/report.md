@@ -99,6 +99,7 @@ Desktop (Electron, production export, earlier): [empty library](evidence/desktop
 | PDF geometry from Android | Page units match pdf.js except UserUnit and the crop offset (`geometry: "native"`) | A future PDF export corrects it |
 | PDF text search and export, text boxes on boards | Not built | Later |
 | Hardware keyboard hook on tablets (ADR 0008 decision 27) | Not built | Later |
+| **Note pinch zoom on the tablet** | Open, reported by the owner after `3819650`: the view can jump after a pinch, and zooming out shows only what was on screen. Whiteboards are smooth. See [the handoff](../../handoffs/phase-14-notes-zoom.md) | Next session |
 | Typed-note toolbar on phones | Scrolls sideways; works, not tuned | Later |
 
 Nothing was deployed. No hosted service, database or AI provider was touched. The tablet's study timer and the owner's files in the system picker were left alone; the test PDF was pushed to Downloads and can be deleted.

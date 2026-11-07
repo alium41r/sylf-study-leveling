@@ -1,8 +1,9 @@
-// Pen pressure on a connected tablet, through the real app: a virtual stylus (Android's own `uinput` tool, which `adb input stylus`
+// Pen settings on a connected tablet, through the real app: a virtual stylus (Android's own `uinput` tool, which `adb input stylus`
 // cannot replace because it sends no pressure) writes a line lightly for its first half and hard for its second, once with Pen
 // pressure on and once off. The line's thickness is read from the screen while the pen is still down (the native live stroke) and
 // after it lifts (the finished outline). Pressure on: the hard half is wider. Pressure off: both halves are as wide, live and
-// finished. The virtual device goes with the `uinput` process; nothing stays on the tablet. Stops if the screen is locked or a
+// finished. Then a dotted line and a wavering line with Straighten lines on and off, live against finished. The owner's theme is
+// left as it is. The virtual device goes with the `uinput` process; nothing stays on the tablet. Stops if the screen is locked or a
 // security dialog holds it: both are the owner's. Usage: node tooling/checks/android-pen-check.mjs [--out=dir]
 import { execFileSync, spawn } from "node:child_process";
 import fs from "node:fs";
@@ -56,7 +57,7 @@ function decode(png) {
   return { width, height, channels, rows };
 }
 /** The ink's thickness in pixels across a horizontal line at x: dark pixels in the column near y, the median of nine columns. */
-function thickness(image, x, y, reach = 60) {
+function thickness(image, x, y, reach = 40) {
   const counts = [];
   for (let dx = -8; dx <= 8; dx += 2) {
     let n = 0;
@@ -91,21 +92,29 @@ const inject = (events) => JSON.stringify({ id: 1, command: "inject", events: [.
 const wait = (duration) => JSON.stringify({ id: 1, command: "delay", duration });
 const at = (x, y, pressure) => { const [rx, ry] = raw(x, y); return ["EV_ABS", "ABS_X", rx, "EV_ABS", "ABS_Y", ry, "EV_ABS", "ABS_PRESSURE", Math.round(pressure * PRESSURE_MAX)]; };
 
-/** A straight line from x0 to x1: light (0.08) for the first half, hard (1) for the second, held down for `hold` ms at its end. */
-function lineScript(x0, x1, y, hold) {
+const isInk = (image, x, y) => { const row = image.rows[y], i = x * image.channels; return !!row && row[i] + row[i + 1] + row[i + 2] < 300; };
+/** Ink along a line's band: how many pixels, and how far it strays up and down from y. */
+function band(image, x0, x1, y, reach = 40) {
+  let ink = 0, top = Infinity, bottom = -Infinity;
+  for (let yy = y - reach; yy <= y + reach; yy++) for (let x = x0; x <= x1; x++) if (isInk(image, x, yy)) { ink++; top = Math.min(top, yy); bottom = Math.max(bottom, yy); }
+  return { ink, spread: ink ? bottom - top + 1 : 0 };
+}
+
+/** A straight line from x0 to x1 (or one that wavers by `wobble` pixels): light (0.08) for the first half, hard (1) for the second, held down for `hold` ms at its end. */
+function lineScript(x0, x1, y, hold, wobble) {
   const steps = 70, lines = [JSON.stringify(REGISTER), wait(900)];
   lines.push(inject([...at(x0, y, 0), "EV_KEY", "BTN_TOOL_PEN", 1]), wait(60));
   for (let i = 0; i <= steps; i++) {
     const t = i / steps;
-    lines.push(inject([...at(x0 + (x1 - x0) * t, y, t < 0.45 ? 0.08 : t > 0.55 ? 1 : 0.08 + (t - 0.45) * 9.2), ...(i === 0 ? ["EV_KEY", "BTN_TOUCH", 1] : [])]), wait(14));
+    lines.push(inject([...at(x0 + (x1 - x0) * t, y + wobble * Math.sin(t * Math.PI * 4), t < 0.45 ? 0.08 : t > 0.55 ? 1 : 0.08 + (t - 0.45) * 9.2), ...(i === 0 ? ["EV_KEY", "BTN_TOUCH", 1] : [])]), wait(14));
   }
   lines.push(wait(hold));
   lines.push(inject([...at(x1, y, 0), "EV_KEY", "BTN_TOUCH", 0]), wait(40), inject(["EV_KEY", "BTN_TOOL_PEN", 0]), wait(300));
   return lines.join("\n");
 }
 /** Writes the line, takes a screenshot while the pen is still down, and another once the finished stroke has replaced it. */
-async function writeLine(x0, x1, y) {
-  fs.writeFileSync("/tmp/sylf-pen.json", lineScript(x0, x1, y, 3200) + "\n");
+async function writeLine(x0, x1, y, wobble = 0) {
+  fs.writeFileSync("/tmp/sylf-pen.json", lineScript(x0, x1, y, 3200, wobble) + "\n");
   adb("push", "/tmp/sylf-pen.json", "/data/local/tmp/sylf-pen.json");
   const run = spawn(ADB, ["shell", "uinput", "/data/local/tmp/sylf-pen.json"], { stdio: "ignore" });
   const done = new Promise((resolve) => run.on("exit", resolve));
@@ -130,34 +139,45 @@ fs.mkdirSync(out, { recursive: true });
 adb("logcat", "-c");
 
 // A fresh whiteboard, the pen in hand.
-await link("space=workspace&wsClear=1&wsOpen=whiteboard&theme=signature&mode=light", 5000);
+await link("space=workspace&wsClear=1&wsOpen=whiteboard", 5000);
 await tapLabel("New", 1200);
 await tapLabel("Create", 3000);
+// Full screen: the page fills the screen, whatever size the window opened at.
+await tapLabel("Full screen", 1800);
 let nodes = dump();
-const pen = find(nodes, "Pen"), frame = nodes.find((n) => n.desc.includes("Move with the arrow keys"));
-if (!pen || !frame) stop("No whiteboard with a pen case");
-const area = { x1: frame.x1 + 80, x2: frame.x2 - 80, y1: pen.y2 + 120, y2: Math.min(frame.y2 - 80, pen.y2 + 1000) };
+const pen = find(nodes, "Pen"), frame = { x1: 0, x2: CUR_W };
+if (!pen || !find(nodes, "Exit full screen")) stop("No full-screen whiteboard with a pen case");
+// The paper: from below the pen case down the middle of the window until the light page ends, so a window of any size works.
+const paperBottom = (() => {
+  const image = decode(screencap()), x = Math.round((frame.x1 + frame.x2) / 2);
+  const light = (y) => { const row = image.rows[y], i = x * image.channels; return !!row && row[i] + row[i + 1] + row[i + 2] > 600; };
+  let y = pen.y2 + 30;
+  while (y < image.height && !light(y)) y++;
+  while (y < image.height && light(y)) y++;
+  return y;
+})();
+const area = { x1: frame.x1 + 80, x2: frame.x2 - 80, y1: pen.y2 + 60, y2: paperBottom - 40 };
+if (area.y2 - area.y1 < 520) stop(`The whiteboard's page is too short to write five lines on (${area.y2 - area.y1} px)`);
 
-/** The Pen pressure switch: the control labelled so (its text beside it has no label of its own). */
-const switchOf = (list) => list.find((n) => n.desc === "Pen pressure");
-/** Opens the pen's panel (tap the pen in hand), makes it a solid ballpoint with pressure as asked, and closes it. */
-async function setPen(pressure) {
+/** A switch in the panel: the control labelled so (the text beside it has no label of its own). */
+const switchOf = (list, label = "Pen pressure") => list.find((n) => n.desc === label);
+const setSwitch = async (label, value) => { const toggle = switchOf(dump(), label); if (toggle.checked !== value) { tap(toggle.cx, toggle.cy); await sleep(500); } return switchOf(dump(), label)?.checked; };
+/** Opens the pen's panel (tap the pen in hand), makes it a ballpoint with the pressure, line and straightening asked, and closes it. */
+async function setPen({ pressure, line = "Solid", straighten = false, shot }) {
   await tapLabel("Pen", 700);
   if (!find(dump(), "Pen pressure")) await tapLabel("Pen", 900);
-  nodes = dump();
-  if (!find(nodes, "Pen pressure")) throw new Error("the pen's panel did not open");
+  if (!find(dump(), "Pen pressure")) throw new Error("the pen's panel did not open");
   await tapLabel("Ballpoint pen", 400);
-  await tapLabel("Solid", 400);
-  const toggle = switchOf(dump());
-  if (toggle.checked !== pressure) { tap(toggle.cx, toggle.cy); await sleep(500); }
-  results[`panelPressure${pressure ? "On" : "Off"}`] = switchOf(dump())?.checked;
-  fs.writeFileSync(path.join(out, `pen-panel-pressure-${pressure ? "on" : "off"}.png`), screencap());
+  await tapLabel(line, 400);
+  const set = { pressure: await setSwitch("Pen pressure", pressure), straighten: await setSwitch("Straighten lines", straighten) };
+  if (shot) fs.writeFileSync(path.join(out, `${shot}.png`), screencap());
   await tapLabel("Close", 800);
+  return set;
 }
 
 const x0 = area.x1 + 60, x1 = area.x2 - 60, light = Math.round(x0 + (x1 - x0) * 0.22), hard = Math.round(x0 + (x1 - x0) * 0.8);
 const measure = async (pressure, y) => {
-  await setPen(pressure);
+  results[`panelPressure${pressure ? "On" : "Off"}`] = (await setPen({ pressure, shot: `pen-panel-pressure-${pressure ? "on" : "off"}` })).pressure;
   const shots = await writeLine(x0, x1, y);
   const name = pressure ? "on" : "off";
   fs.writeFileSync(path.join(out, `pressure-${name}-live.png`), shots.live);
@@ -165,8 +185,10 @@ const measure = async (pressure, y) => {
   const live = decode(shots.live), finished = decode(shots.finished);
   return { live: { light: thickness(live, light, y), hard: thickness(live, hard, y) }, finished: { light: thickness(finished, light, y), hard: thickness(finished, hard, y) } };
 };
-const on = await measure(true, area.y1 + 120);
-const off = await measure(false, area.y1 + 420);
+const rows = [0, 1, 2, 3, 4].map((i) => Math.round(area.y1 + 40 + i * Math.min(120, (area.y2 - area.y1 - 80) / 4)));
+results.rows = rows;
+const on = await measure(true, rows[0]);
+const off = await measure(false, rows[1]);
 results.on = on;
 results.off = off;
 
@@ -176,17 +198,37 @@ check("pressure off: light and hard are the same width", off.finished.light > 0 
 check("pressure off: the live line is the finished line", Math.abs(off.live.light - off.finished.light) <= 2 && Math.abs(off.live.hard - off.finished.hard) <= 2, off);
 check("the panel shows the switch as set", results.panelPressureOn === true && results.panelPressureOff === false, { on: results.panelPressureOn, off: results.panelPressureOff });
 
+/** A line in a style: its ink live and finished, read from the screen, with screenshots kept under `name`. */
+const written = async (name, options, y, wobble) => {
+  await setPen({ pressure: false, ...options });
+  const shots = await writeLine(x0, x1, y, wobble);
+  fs.writeFileSync(path.join(out, `${name}-live.png`), shots.live);
+  fs.writeFileSync(path.join(out, `${name}-finished.png`), shots.finished);
+  return { live: band(decode(shots.live), x0, x1, y), finished: band(decode(shots.finished), x0, x1, y) };
+};
+const solid = band(decode(screencap()), x0, x1, rows[1]);
+const dotted = await written("dotted", { line: "Dotted" }, rows[2], 0);
+results.dotted = { ...dotted, solid };
+const close = (a, b, share) => Math.abs(a - b) <= Math.max(a, b) * share;
+check("dotted: the line is broken into dots, live and finished alike", dotted.finished.ink > 0 && dotted.finished.ink < solid.ink * 0.75 && close(dotted.live.ink, dotted.finished.ink, 0.15), results.dotted);
+const straight = await written("straighten-on", { straighten: true }, rows[3], 14);
+const wavy = await written("straighten-off", { straighten: false }, rows[4], 14);
+results.straighten = { on: straight, off: wavy };
+check("straighten lines: a wavering line becomes straight, live and finished", wavy.finished.spread >= 24 && straight.finished.ink > 0 && straight.live.ink > 0 && straight.finished.spread <= 12 && straight.live.spread <= 12, results.straighten);
+
+await tapLabel("Exit full screen", 1200).catch(() => undefined);
+
 // Kept: after the app is stopped and opened again, the pen still has pressure off.
 adb("shell", "am", "force-stop", PACKAGE);
 await sleep(800);
-await link("space=workspace&wsClear=1&wsOpen=whiteboard&theme=signature&mode=dark", 6000);
+await link("space=workspace&wsClear=1&wsOpen=whiteboard", 6000);
 await tapLabel("Whiteboard", 3000).catch(() => undefined);
 nodes = dump();
 if (find(nodes, "Pen")) {
   await tapLabel("Pen", 700);
   if (!find(dump(), "Pen pressure")) await tapLabel("Pen", 900);
   const toggle = switchOf(dump());
-  fs.writeFileSync(path.join(out, "pen-panel-after-restart-dark.png"), screencap());
+  fs.writeFileSync(path.join(out, "pen-panel-after-restart.png"), screencap());
   check("pressure off is kept after a restart", toggle && toggle.checked === false, { checked: toggle?.checked });
   await tapLabel("Close", 600).catch(() => undefined);
 } else check("pressure off is kept after a restart", false, { error: "no pen case after reopening" });

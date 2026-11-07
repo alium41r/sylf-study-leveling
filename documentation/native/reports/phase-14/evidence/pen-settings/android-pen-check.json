@@ -1,0 +1,168 @@
+{
+  "passed": true,
+  "failed": [],
+  "crashed": false,
+  "rotation": 0,
+  "results": {
+    "rows": [
+      234,
+      354,
+      474,
+      594,
+      714
+    ],
+    "panelPressureOn": true,
+    "panelPressureOff": false,
+    "on": {
+      "live": {
+        "light": 2,
+        "hard": 6
+      },
+      "finished": {
+        "light": 2,
+        "hard": 6
+      }
+    },
+    "off": {
+      "live": {
+        "light": 4,
+        "hard": 4
+      },
+      "finished": {
+        "light": 4,
+        "hard": 4
+      }
+    },
+    "pressure on: a hard press writes wider": {
+      "ok": true,
+      "detail": {
+        "light": 2,
+        "hard": 6
+      }
+    },
+    "pressure on: the live line is the finished line": {
+      "ok": true,
+      "detail": {
+        "live": {
+          "light": 2,
+          "hard": 6
+        },
+        "finished": {
+          "light": 2,
+          "hard": 6
+        }
+      }
+    },
+    "pressure off: light and hard are the same width": {
+      "ok": true,
+      "detail": {
+        "light": 4,
+        "hard": 4
+      }
+    },
+    "pressure off: the live line is the finished line": {
+      "ok": true,
+      "detail": {
+        "live": {
+          "light": 4,
+          "hard": 4
+        },
+        "finished": {
+          "light": 4,
+          "hard": 4
+        }
+      }
+    },
+    "the panel shows the switch as set": {
+      "ok": true,
+      "detail": {
+        "on": true,
+        "off": false
+      }
+    },
+    "dotted": {
+      "live": {
+        "ink": 1514,
+        "spread": 4
+      },
+      "finished": {
+        "ink": 1542,
+        "spread": 4
+      },
+      "solid": {
+        "ink": 4644,
+        "spread": 4
+      }
+    },
+    "dotted: the line is broken into dots, live and finished alike": {
+      "ok": true,
+      "detail": {
+        "live": {
+          "ink": 1514,
+          "spread": 4
+        },
+        "finished": {
+          "ink": 1542,
+          "spread": 4
+        },
+        "solid": {
+          "ink": 4644,
+          "spread": 4
+        }
+      }
+    },
+    "straighten": {
+      "on": {
+        "live": {
+          "ink": 4378,
+          "spread": 4
+        },
+        "finished": {
+          "ink": 4644,
+          "spread": 4
+        }
+      },
+      "off": {
+        "live": {
+          "ink": 4742,
+          "spread": 32
+        },
+        "finished": {
+          "ink": 4755,
+          "spread": 32
+        }
+      }
+    },
+    "straighten lines: a wavering line becomes straight, live and finished": {
+      "ok": true,
+      "detail": {
+        "on": {
+          "live": {
+            "ink": 4378,
+            "spread": 4
+          },
+          "finished": {
+            "ink": 4644,
+            "spread": 4
+          }
+        },
+        "off": {
+          "live": {
+            "ink": 4742,
+            "spread": 32
+          },
+          "finished": {
+            "ink": 4755,
+            "spread": 32
+          }
+        }
+      }
+    },
+    "pressure off is kept after a restart": {
+      "ok": true,
+      "detail": {
+        "checked": false
+      }
+    }
+  }
+}

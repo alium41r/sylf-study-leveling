@@ -131,6 +131,24 @@ describe("pen settings are kept", () => {
     expect(new Set(tools.inks()).size).toBe(8);
   });
 
+  it("keeps the toolbar's three colours for pens and for highlighters, each set on its own", async () => {
+    let tools = await load();
+    expect(tools.quick("pen")).toEqual(["#1f2a44", "#345bc6", "#c8423b"]);
+    expect(tools.quick("highlighter")).toEqual(["#e4b930", "#7ed3a3", "#f29bc1"]);
+    tools.setQuick("pen", 1, "#00AA55");
+    tools.setQuick("highlighter", 0, "#ffcc00");
+    tools.setQuick("pen", 3, "#123456");
+    tools.setQuick("pen", 2, "red");
+    vi.resetModules();
+    tools = await load();
+    expect(tools.quick("pen")).toEqual(["#1f2a44", "#00aa55", "#c8423b"]);
+    expect(tools.quick("highlighter")).toEqual(["#ffcc00", "#7ed3a3", "#f29bc1"]);
+    prefs.set("sylf.notes.pens.v1", JSON.stringify({ quick: { pen: ["#111111"], highlighter: "no" } }));
+    vi.resetModules();
+    tools = await load();
+    expect(tools.quick("pen")).toEqual(["#1f2a44", "#345bc6", "#c8423b"]);
+  });
+
   it("ignores a store it cannot read, and any kept value that is out of range", async () => {
     prefs.set("sylf.notes.pens.v1", "{not json");
     expect((await load()).get("page", DEFAULT_TOOL)).toEqual(DEFAULT_TOOL);

@@ -3,9 +3,10 @@
 // Colours are the document's, not the theme's, because ink is written on paper.
 import { useMemo, useState, type RefObject } from "react";
 import { View } from "react-native";
-import Svg, { Path } from "react-native-svg";
-import { ColorPicker, DOCUMENT_DEFAULTS, Icon, IconButton, oklchToHex, Popover, Press, Segmented, Slider, Text, Toggle, useTheme, type ViewHandle } from "@sylf/design-system";
+import Svg, { Line, Path } from "react-native-svg";
+import { DOCUMENT_DEFAULTS, Icon, IconButton, Popover, Press, Slider, Text, Toggle, useTheme, type ViewHandle } from "@sylf/design-system";
 import { inkGeometry, inkOutline, type InkSample } from "@sylf/shared";
+import ColourSpectrum from "./ColourSpectrum";
 import { addPaletteInk, inkPages } from "./pen-palettes";
 import { brushOf, WIDTH_RANGE, type InkToolState, type Nib } from "./ink-types";
 import { inkTools, useCustomInks } from "./ink-tool";
@@ -17,8 +18,6 @@ export const NIBS: { value: Nib; label: string }[] = [
   { value: "pencil", label: "Pencil" },
   { value: "brush", label: "Brush" },
 ];
-/** A ring of hues, deep enough to read on paper, so one tap mixes a colour; Fine tune does the rest. */
-const HUES = Array.from({ length: 12 }, (_, i) => ({ name: `Hue ${i * 30}°`, hex: oklchToHex({ l: 0.52, c: 0.16, h: i * 30 }) }));
 const LINES: { value: InkToolState["lineStyle"]; label: string }[] = [{ value: "solid", label: "Solid" }, { value: "dashed", label: "Dashed" }, { value: "dotted", label: "Dotted" }];
 
 /** A pen's sample: a wave written lightly, then hard, then lightly again, leaning a little, as a hand would. */
@@ -55,7 +54,6 @@ export default function PenPanel({ open, anchor, onClose, tool, onTool }: Props)
   const [page, setPage] = useState(() => Math.max(0, pages.findIndex((p) => p.inks.includes(tool.color))));
   const [mixing, setMixing] = useState(false);
   const [size, setSize] = useState<number | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
   const set = (patch: Partial<InkToolState>) => onTool({ ...tool, ...patch });
   const shown = pages[Math.min(page, pages.length - 1)];
   const step = (direction: number) => set({ width: Math.round(Math.min(WIDTH_RANGE.max, Math.max(WIDTH_RANGE.min, tool.width + direction * WIDTH_RANGE.step)) * 10) / 10 });
@@ -66,91 +64,94 @@ export default function PenPanel({ open, anchor, onClose, tool, onTool }: Props)
   const swatch = (value: string) => {
     const selected = tool.color.toLowerCase() === value.toLowerCase();
     return (
-      <Press key={value} label={`Colour ${value}`} selected={selected} onPress={() => set({ color: value })} feedback="none" style={{ width: 30, height: 32, alignItems: "center", justifyContent: "center" }}>
-        <View style={{ width: 26, height: 26, borderRadius: 13, alignItems: "center", justifyContent: "center", borderWidth: selected ? 2 : 0, borderColor: color.ink }}>
-          <View style={{ width: selected ? 18 : 24, height: selected ? 18 : 24, borderRadius: 12, backgroundColor: value, borderWidth: 1, borderColor: "rgba(0,0,0,0.12)" }} />
+      <Press key={value} label={`Colour ${value}`} selected={selected} onPress={() => set({ color: value })} feedback="none" style={{ width: 28, height: 30, alignItems: "center", justifyContent: "center" }}>
+        <View style={{ width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center", borderWidth: selected ? 2 : 0, borderColor: color.ink }}>
+          <View style={{ width: selected ? 16 : 22, height: selected ? 16 : 22, borderRadius: 11, backgroundColor: value, borderWidth: 1, borderColor: "rgba(0,0,0,0.12)" }} />
         </View>
       </Press>
     );
   };
-  const row = (label: string, hint: string, value: boolean, onChange: (v: boolean) => void) => (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
-      <View style={{ flex: 1 }}>
-        <Text variant="label">{label}</Text>
-        <Text variant="caption" tone="soft">{hint}</Text>
-      </View>
-      <Toggle label={label} hint={hint} value={value} onChange={onChange} />
+  const toggle = (label: string, value: boolean, onChange: (v: boolean) => void) => (
+    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.md }}>
+      <Text variant="label">{label}</Text>
+      <Toggle label={label} value={value} onChange={onChange} />
     </View>
   );
+  const closeButton = <IconButton icon="close" size="small" label="Close" onPress={close} />;
 
   return (
-    <Popover open={open} anchor={anchor} onClose={close} label={pen ? "Pen settings" : "Highlighter settings"} width={340} side="bottom">
-      <View style={{ padding: space.lg, gap: space.md }}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
-          {mixing ? <IconButton icon="chevronLeft" size="small" label="Back to the pen" onPress={finishMixing} /> : null}
-          <Text variant="subheading" style={{ flex: 1 }}>{mixing ? "Your colour" : pen ? `${NIBS.find((n) => n.value === tool.nib)?.label ?? "Ballpoint"} pen` : "Highlighter"}</Text>
-          <IconButton icon="close" size="small" label="Close" onPress={close} />
-        </View>
+    <Popover open={open} anchor={anchor} onClose={close} label={pen ? "Pen settings" : "Highlighter settings"} width={296} side="bottom">
+      <View style={{ padding: space.md, gap: space.sm }}>
         {mixing ? (
           <>
-            <View style={[paper, { alignItems: "center", overflow: "hidden" }]}>
-              <InkSampleView tool={{ ...tool, color: preview ?? tool.color }} width={300} height={52} />
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+              <IconButton icon="chevronLeft" size="small" label="Back to the pen" onPress={finishMixing} />
+              {closeButton}
             </View>
-            <ColorPicker label="Ink" value={tool.color} onPreview={setPreview} onCommit={(hex) => { setPreview(null); set({ color: hex }); }} swatches={HUES} recents={custom} note="Kept with your colours" />
+            <ColourSpectrum value={tool.color} onPick={(hex) => { set({ color: hex }); addPaletteInk(hex, pages, inkTools.addInk); setMixing(false); }} />
           </>
         ) : (
           <>
-            {pen ? (
-              <View role="radiogroup" aria-label="Pen kind" style={{ flexDirection: "row", gap: space.xs }}>
-                {NIBS.map((nib) => {
-                  const on = tool.nib === nib.value;
-                  return (
-                    <Press key={nib.value} role="radio" checked={on} label={`${nib.label} pen`} onPress={() => set({ nib: nib.value })} feedback="none" radius={shape.radius.sm} style={{ flex: 1 }} bodyStyle={{ alignItems: "center" }}>
-                      <View style={[paper, { borderColor: on ? color.accent.ink : color.line, borderWidth: on ? 2 : 1, overflow: "hidden" }]}>
-                        <InkSampleView tool={{ ...tool, nib: nib.value, width: Math.max(2.2, Math.min(tool.width, 4)), lineStyle: "solid" }} width={52} height={38} />
-                      </View>
-                    </Press>
-                  );
-                })}
-              </View>
-            ) : null}
-            <View style={[paper, { alignItems: "center", overflow: "hidden" }]} aria-label="How the pen writes">
-              <InkSampleView tool={{ ...tool, width: size ?? tool.width }} width={300} height={52} />
+            <View style={{ flexDirection: "row", alignItems: "center", gap: space.xs }}>
+              {pen ? (
+                <View role="radiogroup" aria-label="Pen kind" style={{ flex: 1, flexDirection: "row", gap: space.xs }}>
+                  {NIBS.map((nib) => {
+                    const on = tool.nib === nib.value;
+                    return (
+                      <Press key={nib.value} role="radio" checked={on} label={`${nib.label} pen`} onPress={() => set({ nib: nib.value })} feedback="none" radius={shape.radius.sm} style={{ flex: 1 }} bodyStyle={{ alignItems: "center" }}>
+                        <View style={[paper, { borderColor: on ? color.accent.ink : color.line, borderWidth: on ? 2 : 1, overflow: "hidden" }]}>
+                          <InkSampleView tool={{ ...tool, nib: nib.value, width: Math.max(2.2, Math.min(tool.width, 4)), lineStyle: "solid" }} width={38} height={30} />
+                        </View>
+                      </Press>
+                    );
+                  })}
+                </View>
+              ) : <View style={{ flex: 1 }} />}
+              {closeButton}
             </View>
-            <View style={{ flexDirection: "row", alignItems: "flex-end", gap: space.xs }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: space.xs }}>
               <IconButton icon="minus" size="small" label="Thinner" disabled={tool.width <= WIDTH_RANGE.min} onPress={() => step(-1)} />
               <View style={{ flex: 1 }}>
-                <Slider label="Size" value={size ?? tool.width} min={WIDTH_RANGE.min} max={WIDTH_RANGE.max} step={WIDTH_RANGE.step} format={(v) => v.toFixed(1)} onChange={setSize} onCommit={(v) => { setSize(null); set({ width: Math.round(v * 10) / 10 }); }} />
+                <Slider label="Size" hideValue value={size ?? tool.width} min={WIDTH_RANGE.min} max={WIDTH_RANGE.max} step={WIDTH_RANGE.step} format={(v) => v.toFixed(1)} onChange={setSize} onCommit={(v) => { setSize(null); set({ width: Math.round(v * 10) / 10 }); }} />
               </View>
+              <Text variant="micro" tone="soft" style={{ minWidth: 22, textAlign: "center" }}>{(size ?? tool.width).toFixed(1)}</Text>
               <IconButton icon="plus" size="small" label="Thicker" disabled={tool.width >= WIDTH_RANGE.max} onPress={() => step(1)} />
             </View>
             {pen ? (
               <>
-                <Segmented label="Line" fit value={tool.lineStyle} options={LINES} onChange={(lineStyle) => set({ lineStyle })} />
-                {row("Pen pressure", tool.pressure ? "Pressing harder writes wider" : "Every line is the same width", tool.pressure, (pressure) => set({ pressure }))}
-                {row("Straighten lines", "A nearly straight line becomes straight", tool.straighten, (straighten) => set({ straighten }))}
+                <View role="radiogroup" aria-label="Line" style={{ flexDirection: "row", gap: space.xs }}>
+                  {LINES.map((line) => {
+                    const on = tool.lineStyle === line.value;
+                    return (
+                      <Press key={line.value} role="radio" checked={on} label={line.label} onPress={() => set({ lineStyle: line.value })} feedback="surface" radius={16} style={{ flex: 1 }} bodyStyle={{ height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center", backgroundColor: on ? color.selected : color.sunken, borderWidth: 1, borderColor: on ? color.lineStrong : "transparent" }}>
+                        <Svg width={44} height={6}>
+                          <Line x1={3} y1={3} x2={41} y2={3} stroke={on ? color.ink : color.inkSoft} strokeWidth={3} strokeLinecap="round" strokeDasharray={line.value === "dashed" ? "9 7" : line.value === "dotted" ? "0.1 6" : undefined} />
+                        </Svg>
+                      </Press>
+                    );
+                  })}
+                </View>
+                {toggle("Pen pressure", tool.pressure, (pressure) => set({ pressure }))}
+                {toggle("Straighten lines", tool.straighten, (straighten) => set({ straighten }))}
               </>
             ) : null}
-            <View style={{ gap: space.xs }}>
-              <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" }}>
-                <Text variant="caption" tone="soft">{shown.label}</Text>
-                <View role="tablist" aria-label="Colour sets" style={{ flexDirection: "row" }}>
-                  {pages.map((p, i) => (
-                    <Press key={p.label} role="tab" selected={i === page} label={`${p.label} colours`} onPress={() => setPage(i)} feedback="none" minHit={28} style={{ width: 20, height: 20, alignItems: "center", justifyContent: "center" }}>
-                      <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: i === page ? color.ink : color.inkGhost }} />
-                    </Press>
-                  ))}
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+              {shown.inks.map(swatch)}
+              <Press label="Mix a colour" onPress={() => setMixing(true)} feedback="none" style={{ width: 28, height: 30, alignItems: "center", justifyContent: "center" }}>
+                <View style={{ width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: color.lineStrong, borderStyle: "dashed", alignItems: "center", justifyContent: "center" }}>
+                  <Icon name="plus" size={12} color={color.inkSoft} />
                 </View>
-              </View>
-              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                {shown.inks.map(swatch)}
-                <Press label="Mix a colour" onPress={() => setMixing(true)} feedback="none" style={{ width: 30, height: 32, alignItems: "center", justifyContent: "center" }}>
-                  <View style={{ width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: color.lineStrong, borderStyle: "dashed", alignItems: "center", justifyContent: "center" }}>
-                    <Icon name="plus" size={14} color={color.inkSoft} />
-                  </View>
-                </Press>
-              </View>
+              </Press>
             </View>
+            {pages.length > 1 ? (
+              <View role="tablist" aria-label="Colour sets" style={{ flexDirection: "row", justifyContent: "center" }}>
+                {pages.map((p, i) => (
+                  <Press key={p.label} role="tab" selected={i === page} label={`${p.label} colours`} onPress={() => setPage(i)} feedback="none" minHit={28} style={{ width: 18, height: 14, alignItems: "center", justifyContent: "center" }}>
+                    <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: i === page ? color.ink : color.inkGhost }} />
+                  </Press>
+                ))}
+              </View>
+            ) : null}
           </>
         )}
       </View>

@@ -1,15 +1,19 @@
 // The pen you picked stays picked: one choice per surface (pages, PDFs, whiteboards), shared by every page and window, as a pen case
-// would be. The pen's settings (kind, colour, size, pressure, line style, straightening) and the colours you mixed are kept with the
-// device's other preferences (SharedPreferences on Android, localStorage on desktop); which tool is in hand is for this run only.
+// would be. The pen's settings (kind, colour, size, pressure, line style, straightening), the colours you mixed and the three colours
+// you keep on the toolbar (one set for pens, one for highlighters) are kept with the device's other preferences (SharedPreferences on Android, localStorage on desktop); which tool is in hand is for this run only.
 // The first pen stroke turns fingers into scrolling, which is what people expect on a tablet; the toolbar can turn it back.
 import { useCallback, useSyncExternalStore } from "react";
 import { nativePreferences } from "@sylf/native-platform";
 import { detectCapabilities } from "@sylf/platform";
 import { WIDTH_RANGE, type InkToolState } from "./ink-types";
+import { HIGHLIGHTS, INKS } from "./pen-palettes";
 
 const KEY = "sylf.notes.pens.v1";
 const MAX_INKS = 8;
-interface Saved { tools: Record<string, Partial<InkToolState>>; inks: string[] }
+export type QuickKind = "pen" | "highlighter";
+interface Saved { tools: Record<string, Partial<InkToolState>>; inks: string[]; quick: Record<QuickKind, string[]> }
+/** The toolbar's three colours until you set them. */
+export const DEFAULT_QUICK: Record<QuickKind, string[]> = { pen: INKS.slice(0, 3), highlighter: HIGHLIGHTS.slice(0, 3) };
 
 const storage = (() => {
   const native = nativePreferences();
@@ -37,8 +41,10 @@ function read(): Saved {
   try {
     const raw = storage?.getItem(KEY);
     const parsed = raw ? (JSON.parse(raw) as Partial<Saved>) : {};
-    return { tools: parsed.tools && typeof parsed.tools === "object" ? parsed.tools : {}, inks: Array.isArray(parsed.inks) ? parsed.inks.filter((c) => typeof c === "string" && HEX.test(c)).slice(0, MAX_INKS) : [] };
-  } catch { return { tools: {}, inks: [] }; }
+    const colours = (list: unknown) => (Array.isArray(list) ? list.filter((c): c is string => typeof c === "string" && HEX.test(c)) : []);
+    const quick = (kind: QuickKind) => { const kept = colours(parsed.quick?.[kind]); return kept.length === 3 ? kept : DEFAULT_QUICK[kind]; };
+    return { tools: parsed.tools && typeof parsed.tools === "object" ? parsed.tools : {}, inks: colours(parsed.inks).slice(0, MAX_INKS), quick: { pen: quick("pen"), highlighter: quick("highlighter") } };
+  } catch { return { tools: {}, inks: [], quick: DEFAULT_QUICK }; }
 }
 const saved = read();
 const write = () => { try { storage?.setItem(KEY, JSON.stringify(saved)); } catch { /* Kept for this run. */ } };
@@ -85,6 +91,14 @@ export const inkTools = {
     write();
     emit();
   },
+  /** The toolbar's three colours for pens (and shapes) or highlighters. */
+  quick: (kind: QuickKind) => saved.quick[kind],
+  setQuick(kind: QuickKind, index: number, hex: string) {
+    if (!HEX.test(hex) || index < 0 || index > 2) return;
+    saved.quick = { ...saved.quick, [kind]: saved.quick[kind].map((c, i) => (i === index ? hex.toLowerCase() : c)) };
+    write();
+    emit();
+  },
 };
 
 export function useInkTool(initial: InkToolState, key = initial.tool === "highlighter" ? "pdf" : "page"): [InkToolState, (next: InkToolState) => void, boolean, () => void] {
@@ -101,3 +115,4 @@ export function useInkTool(initial: InkToolState, key = initial.tool === "highli
 }
 
 export const useCustomInks = () => useSyncExternalStore(subscribe, inkTools.inks);
+export const useQuickInks = (kind: QuickKind) => useSyncExternalStore(subscribe, () => inkTools.quick(kind));

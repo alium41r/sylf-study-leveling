@@ -60,6 +60,13 @@ class SylfNativePlatformModule : Module() {
       AsyncFunction("dropLive") { view: SylfInkView, id: Int -> view.dropLive(id) }
     }
 
+    // Two-finger zoom over a whole paged document, wherever the fingers land.
+    View(SylfPinchArea::class) {
+      Name("SylfPinchArea")
+      Events("onPinch")
+      Prop("pinchEnabled") { view: SylfPinchArea, value: Boolean -> view.pinchEnabled = value }
+    }
+
     // Synchronous on purpose: appearance must be known before the first frame renders.
     Function("getPreference") { key: String -> preferences.getString(key, null) }
     Function("setPreference") { key: String, value: String -> preferences.edit().putString(key, value).apply() }

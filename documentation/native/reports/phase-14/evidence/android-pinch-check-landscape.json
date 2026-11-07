@@ -1,0 +1,119 @@
+{
+  "passed": true,
+  "rotation": 90,
+  "failed": [],
+  "skipped": [
+    "calculator-canvas-in",
+    "calculator-canvas-out",
+    "calculator-canvas-lifted",
+    "calculator-inside-in",
+    "calculator-inside-out",
+    "calculator-edge-in",
+    "calculator-edge-out",
+    "timer-inside-out",
+    "notes-inside-in",
+    "notes-inside-out",
+    "pdfs-inside-out",
+    "notes-edge-in",
+    "notes-edge-out"
+  ],
+  "crashed": false,
+  "results": [
+    {
+      "name": "note-page-out-top",
+      "zoomBefore": 100,
+      "zoomAfter": 50,
+      "zoomRatio": 0.5,
+      "cross": {
+        "held": {
+          "x": 1163,
+          "y": 506,
+          "n": 257
+        },
+        "landed": {
+          "x": 1163,
+          "y": 506,
+          "n": 256
+        }
+      },
+      "jumpPx": 0,
+      "changedPercent": 0.01,
+      "paper": {
+        "held": 851,
+        "landed": 851
+      },
+      "frames": {
+        "total": 41,
+        "janky": 6,
+        "p50": 13,
+        "p90": 14,
+        "p99": 16
+      },
+      "ok": true
+    },
+    {
+      "name": "note-page-in-aside",
+      "zoomBefore": 50,
+      "zoomAfter": 151,
+      "zoomRatio": 3.02,
+      "cross": {
+        "held": {
+          "x": 1085,
+          "y": 512,
+          "n": 480
+        },
+        "landed": {
+          "x": 1083,
+          "y": 512,
+          "n": 480
+        }
+      },
+      "jumpPx": 2,
+      "changedPercent": 0.06,
+      "paper": {
+        "held": 851,
+        "landed": 851
+      },
+      "frames": {
+        "total": 61,
+        "janky": 7,
+        "p50": 13,
+        "p90": 16,
+        "p99": 22
+      },
+      "ok": true
+    },
+    {
+      "name": "note-page-out-scrolled",
+      "zoomBefore": 151,
+      "zoomAfter": 90,
+      "zoomRatio": 0.596,
+      "cross": {
+        "held": {
+          "x": 1172,
+          "y": 481,
+          "n": 614
+        },
+        "landed": {
+          "x": 1171,
+          "y": 481,
+          "n": 615
+        }
+      },
+      "jumpPx": 1,
+      "changedPercent": 0.02,
+      "paper": {
+        "held": 851,
+        "landed": 851
+      },
+      "frames": {
+        "total": 62,
+        "janky": 8,
+        "p50": 14,
+        "p90": 19,
+        "p99": 29
+      },
+      "ok": true
+    }
+  ]
+}

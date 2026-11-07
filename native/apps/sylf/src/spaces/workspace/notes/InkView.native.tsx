@@ -32,29 +32,41 @@ function NativeInkSurface(props: InkViewProps) {
   const sent = useRef(new Map<string, number>());
   const { scene, tool } = props;
 
-  // Finished strokes go across in batches, and only those that changed.
+  // Finished strokes go across in batches, and only those that changed. A surface that has just mounted may not be on screen yet,
+  // and a call to it then fails: everything is sent again on a later frame, or the page would stay blank until its ink next changed.
   const sync = useRef<() => Promise<void>>(async () => undefined);
+  const retry = useRef({ frame: 0, tries: 0 });
+  const again = () => {
+    sent.current.clear();
+    if (retry.current.frame || retry.current.tries >= 120) return;
+    retry.current.tries++;
+    retry.current.frame = requestAnimationFrame(() => { retry.current.frame = 0; void ref.current?.clearStrokes().then(() => sync.current(), again); });
+  };
   sync.current = async () => {
     const handle = ref.current;
-    if (!handle) return;
-    const strokes = latest.current.scene.strokes();
-    const live = new Set(strokes.map((s) => s.id));
-    const gone = [...sent.current.keys()].filter((id) => !live.has(id));
-    const changed = strokes.filter((s) => sent.current.get(s.id) !== s.version);
-    for (const id of gone) sent.current.delete(id);
-    if (gone.length) await handle.removeStrokes(gone);
-    for (let i = 0; i < changed.length; i += CHUNK) {
-      const part = changed.slice(i, i + CHUNK);
-      for (const s of part) sent.current.set(s.id, s.version);
-      await handle.upsertStrokes(JSON.stringify(part.map((s) => ({ id: s.id, d: s.d, color: s.color, opacity: s.opacity }))));
-    }
+    if (!handle) return again();
+    try {
+      const strokes = latest.current.scene.strokes();
+      const live = new Set(strokes.map((s) => s.id));
+      const gone = [...sent.current.keys()].filter((id) => !live.has(id));
+      const changed = strokes.filter((s) => sent.current.get(s.id) !== s.version);
+      for (const id of gone) sent.current.delete(id);
+      if (gone.length) await handle.removeStrokes(gone);
+      for (let i = 0; i < changed.length; i += CHUNK) {
+        const part = changed.slice(i, i + CHUNK);
+        for (const s of part) sent.current.set(s.id, s.version);
+        await handle.upsertStrokes(JSON.stringify(part.map((s) => ({ id: s.id, d: s.d, color: s.color, opacity: s.opacity }))));
+      }
+      retry.current.tries = 0;
+    } catch { again(); }
   };
   useEffect(() => () => scene.endSweep(), [scene]);
   useEffect(() => {
     if (props.paperOnly) return;
     sent.current.clear();
-    void ref.current?.clearStrokes().then(() => sync.current());
-    return scene.subscribe(() => void sync.current());
+    void (ref.current ? ref.current.clearStrokes().then(() => sync.current(), again) : again());
+    const unsubscribe = scene.subscribe(() => void sync.current());
+    return () => { unsubscribe(); cancelAnimationFrame(retry.current.frame); retry.current = { frame: 0, tries: 0 }; };
   }, [scene, props.paperOnly]);
 
   const paper = useMemo(() => {

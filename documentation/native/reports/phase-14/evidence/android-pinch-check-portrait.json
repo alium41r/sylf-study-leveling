@@ -1,0 +1,504 @@
+{
+  "passed": true,
+  "rotation": 0,
+  "failed": [],
+  "skipped": [
+    "note-page-two-pages"
+  ],
+  "crashed": false,
+  "results": [
+    {
+      "name": "calculator-canvas-in",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 336,
+        "top": 303,
+        "right": 929,
+        "edge": 1096,
+        "zoom": 132
+      },
+      "zoomRatio": 1.32,
+      "fingerRatio": 1.533,
+      "errorPx": 4,
+      "frames": {
+        "total": 28,
+        "janky": 4,
+        "p50": 16,
+        "p90": 20,
+        "p99": 22
+      },
+      "ok": true
+    },
+    {
+      "name": "calculator-canvas-out",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 548,
+        "top": 1129,
+        "right": 814,
+        "edge": 889,
+        "zoom": 59
+      },
+      "zoomRatio": 0.59,
+      "fingerRatio": 0.522,
+      "errorPx": 0,
+      "frames": {
+        "total": 34,
+        "janky": 2,
+        "p50": 14,
+        "p90": 16,
+        "p99": 22
+      },
+      "ok": true
+    },
+    {
+      "name": "calculator-canvas-lifted",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 332,
+        "top": 287,
+        "right": 932,
+        "edge": 1101,
+        "zoom": 133
+      },
+      "zoomRatio": 1.33,
+      "fingerRatio": 1.533,
+      "errorPx": 1,
+      "frames": {
+        "total": 29,
+        "janky": 4,
+        "p50": 15,
+        "p90": 18,
+        "p99": 22
+      },
+      "ok": true
+    },
+    {
+      "name": "calculator-inside-in",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 337,
+        "top": 526,
+        "right": 970,
+        "edge": 1148,
+        "zoom": 140
+      },
+      "zoomRatio": 1.4,
+      "fingerRatio": 1.7,
+      "errorPx": 1,
+      "frames": {
+        "total": 29,
+        "janky": 3,
+        "p50": 14,
+        "p90": 16,
+        "p99": 22
+      },
+      "ok": true
+    },
+    {
+      "name": "calculator-inside-out",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 515,
+        "top": 794,
+        "right": 792,
+        "edge": 870,
+        "zoom": 61
+      },
+      "zoomRatio": 0.61,
+      "fingerRatio": 0.529,
+      "errorPx": 2,
+      "frames": {
+        "total": 30,
+        "janky": 4,
+        "p50": 13,
+        "p90": 17,
+        "p99": 22
+      },
+      "ok": true
+    },
+    {
+      "name": "calculator-edge-in",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 271,
+        "top": 573,
+        "right": 841,
+        "edge": 1002,
+        "zoom": 127
+      },
+      "zoomRatio": 1.27,
+      "fingerRatio": 1.5,
+      "errorPx": 2,
+      "frames": {
+        "total": 26,
+        "janky": 3,
+        "p50": 14,
+        "p90": 17,
+        "p99": 22
+      },
+      "ok": true
+    },
+    {
+      "name": "calculator-edge-out",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 663,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 619,
+        "top": 772,
+        "right": 925,
+        "edge": 1011,
+        "zoom": 68
+      },
+      "zoomRatio": 0.68,
+      "fingerRatio": 0.588,
+      "errorPx": 0,
+      "frames": {
+        "total": 28,
+        "janky": 4,
+        "p50": 15,
+        "p90": 18,
+        "p99": 23
+      },
+      "ok": true
+    },
+    {
+      "name": "timer-inside-out",
+      "still": false,
+      "before": {
+        "left": 428,
+        "top": 810,
+        "right": 879,
+        "edge": 1006,
+        "zoom": 100
+      },
+      "after": {
+        "left": 501,
+        "top": 919,
+        "right": 806,
+        "edge": 893,
+        "zoom": 68
+      },
+      "zoomRatio": 0.68,
+      "fingerRatio": 0.571,
+      "errorPx": 0,
+      "frames": {
+        "total": 27,
+        "janky": 3,
+        "p50": 14,
+        "p90": 15,
+        "p99": 23
+      },
+      "ok": true
+    },
+    {
+      "name": "notes-inside-in",
+      "still": true,
+      "before": {
+        "left": 232,
+        "top": 565,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "after": {
+        "left": 232,
+        "top": 565,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "zoomRatio": 1,
+      "fingerRatio": 1.7,
+      "errorPx": 0,
+      "frames": {
+        "total": 71,
+        "janky": 5,
+        "p50": 14,
+        "p90": 18,
+        "p99": 24
+      },
+      "ok": true
+    },
+    {
+      "name": "notes-inside-out",
+      "still": true,
+      "before": {
+        "left": 232,
+        "top": 565,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "after": {
+        "left": 232,
+        "top": 565,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "zoomRatio": 1,
+      "fingerRatio": 0.529,
+      "errorPx": 0,
+      "frames": {
+        "total": 72,
+        "janky": 3,
+        "p50": 17,
+        "p90": 19,
+        "p99": 28
+      },
+      "ok": true
+    },
+    {
+      "name": "pdfs-inside-out",
+      "still": true,
+      "before": {
+        "left": 232,
+        "top": 467,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "after": {
+        "left": 232,
+        "top": 467,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "zoomRatio": 1,
+      "fingerRatio": 0.529,
+      "errorPx": 0,
+      "frames": {
+        "total": 36,
+        "janky": 3,
+        "p50": 14,
+        "p90": 17,
+        "p99": 38
+      },
+      "ok": true
+    },
+    {
+      "name": "notes-edge-in",
+      "still": false,
+      "before": {
+        "left": 232,
+        "top": 565,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "after": {
+        "left": 0,
+        "top": 478,
+        "right": 1088,
+        "edge": 1247,
+        "zoom": 125
+      },
+      "zoomRatio": 1.25,
+      "fingerRatio": 1.5,
+      "errorPx": 2,
+      "frames": {
+        "total": 51,
+        "janky": 4,
+        "p50": 20,
+        "p90": 22,
+        "p99": 26
+      },
+      "ok": true
+    },
+    {
+      "name": "notes-edge-out",
+      "still": false,
+      "before": {
+        "left": 232,
+        "top": 565,
+        "right": 1124,
+        "edge": 1251,
+        "zoom": 100
+      },
+      "after": {
+        "left": 564,
+        "top": 674,
+        "right": 1170,
+        "edge": 1256,
+        "zoom": 68
+      },
+      "zoomRatio": 0.68,
+      "fingerRatio": 0.588,
+      "errorPx": 0,
+      "frames": {
+        "total": 26,
+        "janky": 5,
+        "p50": 17,
+        "p90": 21,
+        "p99": 27
+      },
+      "ok": true
+    },
+    {
+      "name": "note-page-out-top",
+      "zoomBefore": null,
+      "zoomAfter": null,
+      "zoomRatio": null,
+      "movedPercent": 76.16,
+      "cross": {
+        "held": {
+          "x": 718,
+          "y": 572,
+          "n": 262
+        },
+        "landed": {
+          "x": 718,
+          "y": 572,
+          "n": 265
+        }
+      },
+      "jumpPx": 0,
+      "changedPercent": 0.01,
+      "paper": {
+        "held": 999,
+        "landed": 999
+      },
+      "frames": {
+        "total": 40,
+        "janky": 5,
+        "p50": 13,
+        "p90": 16,
+        "p99": 16
+      },
+      "ok": true
+    },
+    {
+      "name": "note-page-in-aside",
+      "zoomBefore": null,
+      "zoomAfter": null,
+      "zoomRatio": null,
+      "movedPercent": 76.33,
+      "cross": {
+        "held": {
+          "x": 610,
+          "y": 441,
+          "n": 2234
+        },
+        "landed": {
+          "x": 610,
+          "y": 440,
+          "n": 2116
+        }
+      },
+      "jumpPx": 1,
+      "changedPercent": 0.02,
+      "paper": {
+        "held": 2016,
+        "landed": 2016
+      },
+      "frames": {
+        "total": 57,
+        "janky": 5,
+        "p50": 13,
+        "p90": 17,
+        "p99": 24
+      },
+      "ok": true
+    },
+    {
+      "name": "note-page-out-scrolled",
+      "zoomBefore": null,
+      "zoomAfter": null,
+      "zoomRatio": null,
+      "movedPercent": 23.13,
+      "cross": {
+        "held": {
+          "x": 717,
+          "y": 914,
+          "n": 782
+        },
+        "landed": {
+          "x": 717,
+          "y": 914,
+          "n": 784
+        }
+      },
+      "jumpPx": 0,
+      "changedPercent": 0.09,
+      "paper": {
+        "held": 1806,
+        "landed": 1806
+      },
+      "frames": {
+        "total": 63,
+        "janky": 6,
+        "p50": 13,
+        "p90": 19,
+        "p99": 25
+      },
+      "ok": true
+    },
+    {
+      "name": "note-page-margin-in",
+      "zoomBefore": null,
+      "zoomAfter": null,
+      "zoomRatio": null,
+      "movedPercent": 75.11,
+      "zoomedIn": true,
+      "changedPercent": 0.02,
+      "frames": {
+        "total": 62,
+        "janky": 7,
+        "p50": 14,
+        "p90": 17,
+        "p99": 25
+      },
+      "ok": true
+    }
+  ]
+}

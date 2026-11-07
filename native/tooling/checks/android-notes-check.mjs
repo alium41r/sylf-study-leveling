@@ -94,8 +94,8 @@ const writingArea = () => {
   const top = pen.y2 + 60, bottom = Math.min(frame.y1 + 1300, 2100);
   return { x1: frame.x1 + 60, x2: frame.x2 - 60, y1: top, y2: bottom, cx: Math.round((frame.x1 + frame.x2) / 2), cy: Math.round((top + bottom) / 2) };
 };
-// New asks for a name; Create with none keeps the automatic title.
-const create = async () => { await tapLabel("New", 1200); await tapLabel("Create", 3000); };
+// New asks for a name; Enter with none keeps the automatic title. (Enter, not Create: in landscape the keyboard covers the button.)
+const create = async () => { await tapLabel("New", 1200); adb("shell", "input", "keyevent", "KEYCODE_ENTER"); await sleep(3000); };
 
 await link("space=workspace&wsClear=1&wsOpen=notes", 6000);
 shot("01-library");

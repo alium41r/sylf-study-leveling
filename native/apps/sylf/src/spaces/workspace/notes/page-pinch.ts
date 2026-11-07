@@ -1,69 +1,125 @@
-// Two-finger zoom for paged documents (notes and PDFs), smooth on a tablet. While the fingers move, the pages are only scaled on screen,
-// on the UI thread, about the point where the fingers landed and following it as it moves: nothing is laid out again, so nothing
-// shakes. When the fingers lift, the document is laid out once at the new zoom and scrolled so the point between the fingers stays put.
+// Two-finger zoom for paged documents (notes and PDFs), smooth on a tablet. While the fingers move, the pages are only scaled on screen
+// about the point where the fingers landed, following it as it moves: nothing is laid out again, so nothing shakes. Each step is placed
+// with the layout the zoom will have, so the preview already shows where the page lands, edges and centring included. When the fingers
+// lift, the document is laid out once at the new zoom, in the same commit that takes the on-screen scale away, so nothing jumps.
 // Points arrive in screen coordinates: the page moves under the fingers as it zooms, so measuring against it would feed back.
-import { useLayoutEffect, useRef, type ComponentRef, type RefObject } from "react";
-import type { ScrollView, View } from "react-native";
-import { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import { createElement, useLayoutEffect, useRef, useState, type ComponentRef, type ReactNode, type RefObject } from "react";
+import { View, type ScrollView } from "react-native";
+import { nativePinchArea } from "@sylf/native-platform";
 
 export const MIN_ZOOM = 0.5, MAX_ZOOM = 3;
 
+type Point = { x: number; y: number };
+export interface Box { top: number; left: number; width: number; height: number }
+/** A paged document laid out: where each page is, and the size of what scrolls. */
+export interface Stack { rows: Box[]; width: number; height: number }
+export interface Transform { scale: number; x: number; y: number }
+const IDENTITY: Transform = { scale: 1, x: 0, y: 0 };
+
+/** Pages one under another, `gap` apart and around, centred when narrower than the view: the one rule a document renders with and a pinch predicts with. */
+export function stackPages(sizes: readonly { width: number; height: number }[], scale: number, view: number, gap: number): Stack {
+  const width = Math.max(view, Math.max(1, ...sizes.map((size) => size.width)) * scale + gap * 2);
+  let top = gap;
+  const rows = sizes.map((size) => {
+    const row = { top, left: (width - size.width * scale) / 2, width: size.width * scale, height: size.height * scale };
+    top += row.height + gap;
+    return row;
+  });
+  return { rows, width, height: top };
+}
+
+const clamp = (value: number, low: number, high: number) => Math.max(low, Math.min(high, value));
+
+/**
+ * Where a pinch leaves the view. The page point that was under `start` (a point of the view, with the content scrolled to `offset`)
+ * goes under `point` in the `after` layout, as far as that layout can scroll. `transform` shows the `before` layout on screen exactly
+ * so, which is what makes letting go move nothing: at the top of a note, or with pages narrower than the view, the page stays where the
+ * layout will keep it rather than following the fingers and jumping back.
+ */
+export function pinchTarget(before: Stack, after: Stack, view: { width: number; height: number }, offset: Point, start: Point, point: Point): { scroll: Point; transform: Transform } {
+  const at = { x: offset.x + start.x, y: offset.y + start.y };
+  // The page under the fingers, or the one below the gap they are in: places on a page scale with it, the gaps between pages do not.
+  const found = before.rows.findIndex((row) => at.y < row.top + row.height);
+  const index = found < 0 ? before.rows.length - 1 : found;
+  const from = before.rows[index], to = after.rows[index];
+  const there = from && to ? { x: to.left + ((at.x - from.left) / from.width) * to.width, y: to.top + ((at.y - from.top) / from.height) * to.height } : at;
+  const scroll = { x: clamp(there.x - point.x, 0, Math.max(0, after.width - view.width)), y: clamp(there.y - point.y, 0, Math.max(0, after.height - view.height)) };
+  const scale = from && to ? to.width / from.width : 1;
+  return { scroll, transform: { scale, x: there.x - scroll.x - scale * start.x, y: there.y - scroll.y - scale * start.y } };
+}
+
 interface Options {
   zoom: number;
-  setZoom(zoom: number): void;
-  /** Pixels per page unit at a zoom: the document's own scale rule. */
-  scaleAt(zoom: number): number;
-  offset: RefObject<{ x: number; y: number }>;
+  /** The document laid out at a zoom, by the rule it renders with. */
+  layoutAt(zoom: number): Stack;
+  view: { width: number; height: number };
+  offset: RefObject<Point>;
+  /** The fingers lifted: lay out at this zoom, scrolled here. Called in the same update that takes the on-screen scale away. */
+  commit(zoom: number, scroll: Point): void;
   vertical: RefObject<ComponentRef<typeof ScrollView> | null>;
   horizontal: RefObject<ComponentRef<typeof ScrollView> | null>;
 }
 
-export function usePagePinch({ zoom, setZoom, scaleAt, offset, vertical, horizontal }: Options) {
-  const scale = useSharedValue(1), tx = useSharedValue(0), ty = useSharedValue(0);
-  const style = useAnimatedStyle(() => ({ transform: [{ translateX: tx.value }, { translateY: ty.value }, { scale: scale.value }] }));
+export function usePagePinch({ zoom, layoutAt, view, offset, commit, vertical, horizontal }: Options) {
+  const stage = useRef<((transform: Transform) => void) | null>(null);
+  // True from the fingers landing to their lifting: the document then draws what shrinking can bring into view, once, as it starts.
+  const [pinching, setPinching] = useState(false);
   const area = useRef<ComponentRef<typeof View>>(null);
   const origin = useRef({ x: 0, y: 0 });
-  const gesture = useRef<{ start: { x: number; y: number }; scale: number; at: { x: number; y: number } } | null>(null);
-  const settle = useRef<{ x: number; y: number } | null>(null);
+  const gesture = useRef<{ start: Point; zoom: number; before: Stack } | null>(null);
+  const settle = useRef<Point | null>(null);
 
   const measure = () => area.current?.measureInWindow((x, y) => { origin.current = { x, y }; });
   const local = (x: number, y: number) => ({ x: x - origin.current.x, y: y - origin.current.y });
 
   const onPagePinch = (phase: "start" | "move" | "end", raw: number, sx: number, sy: number) => {
-    if (phase === "start") { measure(); gesture.current = { start: { x: sx, y: sy }, scale: 1, at: { x: sx, y: sy } }; return; }
+    if (phase === "start") {
+      measure();
+      gesture.current = { start: { x: sx, y: sy }, zoom, before: layoutAt(zoom) };
+      setPinching(true);
+      return;
+    }
     const g = gesture.current;
     if (!g) return;
     // Both points through the same origin, so a measurement that lands mid-gesture moves nothing.
     const start = local(g.start.x, g.start.y), point = local(sx, sy);
     // The zoom stays within its limits while the fingers move, so letting go never jumps.
-    const s = Math.max(MIN_ZOOM / zoom, Math.min(MAX_ZOOM / zoom, raw));
-    g.scale = s; g.at = point;
-    scale.value = s;
-    tx.value = point.x - s * start.x;
-    ty.value = point.y - s * start.y;
-    if (phase !== "end") return;
+    const next = clamp(g.zoom * raw, MIN_ZOOM, MAX_ZOOM);
+    const { scroll, transform } = pinchTarget(g.before, layoutAt(next), view, offset.current, start, point);
+    if (phase !== "end") { stage.current?.(transform); return; }
     gesture.current = null;
-    const next = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom * s));
-    const ratio = scaleAt(next) / scaleAt(zoom);
-    const at = offset.current;
-    // The page point the fingers started over ends up under where they lifted.
-    const target = { x: Math.max(0, (at.x + start.x) * ratio - point.x), y: Math.max(0, (at.y + start.y) * ratio - point.y) };
-    if (next === zoom) { reset(); return; }
-    settle.current = target;
-    offset.current = target;
-    setZoom(next);
+    settle.current = scroll;
+    offset.current.x = scroll.x; offset.current.y = scroll.y;
+    stage.current?.(IDENTITY);
+    setPinching(false);
+    commit(next, scroll);
   };
-  const reset = () => { scale.value = 1; tx.value = 0; ty.value = 0; };
 
-  // After the one layout at the new zoom, the scroll moves and the on-screen scale goes, in the same frame.
+  // The commit lays out the new zoom and takes the on-screen scale away; the scroll goes with it. Android runs scroll commands before
+  // the layout they arrive with, so the content stays grown to the largest zoom until this commit and the scroll is never cut short.
   useLayoutEffect(() => {
     const target = settle.current;
     if (!target) return;
     settle.current = null;
     vertical.current?.scrollTo({ y: target.y, animated: false });
     horizontal.current?.scrollTo({ x: target.x, animated: false });
-    reset();
-  }, [zoom]);
+  });
 
-  return { style, area, onAreaLayout: measure, onPagePinch };
+  // Where the build has a pinch area over the whole document, it reports the pinch and the pages leave it alone.
+  return { stage, pinching, area, onAreaLayout: measure, onPagePinch, inkPinch: nativePinchArea() ? undefined : onPagePinch };
+}
+
+/**
+ * What a pinch scales on screen. The transform is this view's own state, so a finger moving renders this view and not the document in
+ * it. Around it, where the build has one, the pinch area that hears two fingers anywhere over the document: margins, gaps, two pages.
+ */
+export function PinchStage({ stage, onPagePinch, children }: { stage: RefObject<((transform: Transform) => void) | null>; onPagePinch: ReturnType<typeof usePagePinch>["onPagePinch"]; children: ReactNode }) {
+  const [transform, setTransform] = useState(IDENTITY);
+  useLayoutEffect(() => { stage.current = setTransform; return () => { stage.current = null; }; }, [stage]);
+  // At rest there is no transform at all: on the web even an identity transform makes a containing block, which moves the editor's popups.
+  // Never flattened away, so the first transform does not create a view and move the pages under the fingers, which cancels the pinch.
+  const moved = transform !== IDENTITY;
+  const scaled = createElement(View, { collapsable: false, style: moved ? { flex: 1, transformOrigin: "0 0", transform: [{ translateX: transform.x }, { translateY: transform.y }, { scale: transform.scale }] } : { flex: 1 } }, children);
+  const Area = nativePinchArea();
+  return Area ? createElement(Area, { style: { flex: 1 }, onPinch: (event) => { const { phase, scale, x, y } = event.nativeEvent; onPagePinch(phase, scale, x, y); } }, scaled) : scaled;
 }

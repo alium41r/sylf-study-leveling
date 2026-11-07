@@ -10,8 +10,7 @@ import InkView from "./InkView";
 import PdfPageImage from "./PdfPageImage";
 import { DEFAULT_TOOL } from "./ink-types";
 import { useInkTool } from "./ink-tool";
-import Animated from "react-native-reanimated";
-import { usePagePinch } from "./page-pinch";
+import { MAX_ZOOM, MIN_ZOOM, PinchStage, stackPages, usePagePinch } from "./page-pinch";
 
 type Page = DocumentDescriptor["pages"][number];
 const GAP = 20, SNAP = 96, MARGIN = 160;
@@ -46,20 +45,17 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
   };
   useEffect(() => () => { for (const s of scenes.current.values()) s.close(); scenes.current.clear(); }, []);
 
-  const widest = Math.max(1, ...pages.map((p) => (pdf ? notesPdf.displayedPageSize(p).width : p.width)));
+  const shown = useMemo(() => pages.map((page) => (pdf ? notesPdf.displayedPageSize(page) : { width: page.width, height: page.height })), [pages, pdf]);
+  const widest = Math.max(1, ...shown.map((p) => p.width));
   const fit = size.width ? (size.width - GAP * 2) / widest : 0.5;
-  const scale = Math.max(0.15, fit * zoom);
-  const layout = useMemo(() => {
-    let top = GAP;
-    return pages.map((page) => {
-      const shown = pdf ? notesPdf.displayedPageSize(page) : { width: page.width, height: page.height };
-      const row = { page, top, width: shown.width * scale, height: shown.height * scale };
-      top += row.height + GAP;
-      return row;
-    });
-  }, [pages, scale, pdf]);
-  const contentHeight = (layout.at(-1)?.top ?? 0) + (layout.at(-1)?.height ?? 0) + GAP;
-  const contentWidth = Math.max(size.width, widest * scale + GAP * 2);
+  const scaleAt = (z: number) => Math.max(0.15, fit * z);
+  const scale = scaleAt(zoom);
+  // Gaps scale with the zoom, as in a note, so a pinch previews every page exactly.
+  const layoutAt = (z: number) => stackPages(shown, scaleAt(z), size.width, GAP * z);
+  const stack = useMemo(() => stackPages(shown, scale, size.width, GAP * zoom), [shown, scale, size.width, zoom]);
+  const layout = useMemo(() => stack.rows.map((row, i) => ({ ...row, page: pages[i] })), [stack]);
+  const contentHeight = stack.height;
+  const contentWidth = stack.width;
   const current = Math.max(0, layout.findIndex((row) => row.top + row.height > scroll.y + size.height / 3));
 
   useEffect(() => { onPage(current); }, [current]);
@@ -73,7 +69,14 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
   // Two fingers zoom around a point; keep that point still.
   const pinch = (factor: number) => setZoom((z) => Math.max(0.5, Math.min(3, z * factor)));
   const offsetRef = useRef({ x: 0, y: 0 });
-  const preview = usePagePinch({ zoom, setZoom, scaleAt: (z) => Math.max(0.15, fit * z), offset: offsetRef, vertical, horizontal });
+  const preview = usePagePinch({ zoom, layoutAt, view: size, offset: offsetRef, vertical, horizontal, commit: (z, at) => { setZoom(z); setScroll(at); } });
+  // As in a note: while a pinch can zoom out, the pages around the view are drawn too, and the scrolled content is as large as the
+  // largest zoom so the landing scroll is never cut short.
+  const reach = preview.pinching ? Math.min(2, zoom / MIN_ZOOM - 1) : 0;
+  const reachX = MARGIN + reach * size.width, reachY = MARGIN + reach * size.height;
+  const largest = preview.pinching ? layoutAt(MAX_ZOOM) : null;
+  const spanWidth = Math.max(contentWidth, largest?.width ?? 0), spanHeight = Math.max(contentHeight, largest?.height ?? 0);
+  const drawOutside = preview.pinching ? { overflow: "visible" as const } : null;
   const pan = (dx: number, dy: number) => {
     vertical.current?.scrollTo({ y: Math.max(0, scroll.y - dy), animated: false });
     if (contentWidth > size.width) horizontal.current?.scrollTo({ x: Math.max(0, scroll.x - dx), animated: false });
@@ -120,17 +123,17 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
       ) : null}
       {header}
       <View ref={preview.area} collapsable={false} style={{ flex: 1, backgroundColor: color.sunken, overflow: "hidden" }} onLayout={(e: LayoutChangeEvent) => { setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height }); preview.onAreaLayout(); }}>
-        <Animated.View style={[{ flex: 1, transformOrigin: "0 0" } as object, preview.style]}>
+        <PinchStage stage={preview.stage} onPagePinch={preview.onPagePinch}>
         {size.width ? (
-          <ScrollView keyboardShouldPersistTaps="handled" ref={horizontal} horizontal scrollEnabled={contentWidth > size.width + 1} showsHorizontalScrollIndicator={contentWidth > size.width + 1} onScroll={(e) => { offsetRef.current.x = e.nativeEvent.contentOffset.x; setScroll((s) => ({ ...s, x: e.nativeEvent.contentOffset.x })); }} scrollEventThrottle={32} contentContainerStyle={{ width: contentWidth }}>
-            <ScrollView keyboardShouldPersistTaps="handled" ref={vertical} {...({ dataSet: { ownsWheel: "scroll" } } as object)} style={{ width: contentWidth, height: size.height }} onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator contentContainerStyle={{ height: contentHeight }}>
+          <ScrollView keyboardShouldPersistTaps="handled" ref={horizontal} horizontal style={drawOutside} scrollEnabled={contentWidth > size.width + 1} showsHorizontalScrollIndicator={contentWidth > size.width + 1} onScroll={(e) => { offsetRef.current.x = e.nativeEvent.contentOffset.x; setScroll((s) => ({ ...s, x: e.nativeEvent.contentOffset.x })); }} scrollEventThrottle={32} contentContainerStyle={{ width: spanWidth }}>
+            <ScrollView keyboardShouldPersistTaps="handled" ref={vertical} {...({ dataSet: { ownsWheel: "scroll" } } as object)} style={{ width: spanWidth, height: size.height, ...drawOutside }} onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator contentContainerStyle={{ height: spanHeight }}>
               {layout.map((row) => {
-                const left = (contentWidth - row.width) / 2;
-                const near = row.top + row.height > scroll.y - size.height && row.top < scroll.y + size.height * 2;
+                const left = row.left;
+                const near = row.top + row.height > scroll.y - size.height * (1 + reach) && row.top < scroll.y + size.height * (2 + reach);
                 if (!near) return <View key={row.page.pageId} style={{ position: "absolute", top: row.top, left, width: row.width, height: row.height, backgroundColor: "#ffffff", opacity: 0.6 }} />;
                 // The visible part of this page, snapped so small scrolls do not move the surface.
-                const x0 = Math.max(0, Math.floor((scroll.x - left - MARGIN) / SNAP) * SNAP), y0 = Math.max(0, Math.floor((scroll.y - row.top - MARGIN) / SNAP) * SNAP);
-                const x1 = Math.min(row.width, Math.ceil((scroll.x + size.width - left + MARGIN) / SNAP) * SNAP), y1 = Math.min(row.height, Math.ceil((scroll.y + size.height - row.top + MARGIN) / SNAP) * SNAP);
+                const x0 = Math.max(0, Math.floor((scroll.x - left - reachX) / SNAP) * SNAP), y0 = Math.max(0, Math.floor((scroll.y - row.top - reachY) / SNAP) * SNAP);
+                const x1 = Math.min(row.width, Math.ceil((scroll.x + size.width - left + reachX) / SNAP) * SNAP), y1 = Math.min(row.height, Math.ceil((scroll.y + size.height - row.top + reachY) / SNAP) * SNAP);
                 const s = scene(row.page);
                 return (
                   <View key={row.page.pageId} style={{ position: "absolute", top: row.top, left, width: row.width, height: row.height, backgroundColor: "#ffffff", overflow: "hidden", boxShadow: "0 1px 3px rgba(20,24,40,0.12), 0 6px 18px rgba(20,24,40,0.08)" }} testID="ink-page">
@@ -140,7 +143,7 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
                         <InkView scene={s} pageWidth={row.page.width} pageHeight={row.page.height} camera={{ x: x0 / scale, y: y0 / scale, zoom: scale }} width={x1 - x0} height={y1 - y0}
                           tool={tool} drawPaper={!pdf} editable={editable} selection={selection?.page === row.page.pageId ? selection.ids : []}
                           onSelection={(ids) => { setSelection(ids.length ? { page: row.page.pageId, ids } : null); }}
-                          onPan={pan} onPinch={(factor) => pinch(factor)} onPagePinch={preview.onPagePinch} onPenSeen={penSeen} wheel="zoom" />
+                          onPan={pan} onPinch={(factor) => pinch(factor)} onPagePinch={preview.inkPinch} onPenSeen={penSeen} wheel="zoom" />
                       </View>
                     ) : null}
                   </View>
@@ -149,7 +152,7 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
             </ScrollView>
           </ScrollView>
         ) : null}
-        </Animated.View>
+        </PinchStage>
         {pages.length > 1 ? (
           <View pointerEvents="none" style={{ position: "absolute", right: space.md, bottom: space.md, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: "rgba(20,24,40,0.55)" }}>
             <Text variant="micro" style={{ color: "#ffffff" }}>{current + 1} / {pages.length}</Text>

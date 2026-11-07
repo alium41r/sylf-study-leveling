@@ -1,4 +1,6 @@
-# Handoff: note pinch zoom on the tablet (open, 6 November 2026)
+# Handoff: note pinch zoom on the tablet (fixed, 7 November 2026)
+
+**Resolved.** What was wrong and what changed is in the [Phase 14 report, §6](../reports/phase-14/report.md#6-bugs-found-and-fixed); the checks are in §3. In short: each pinch step is placed with the layout the zoom will have (`pinchTarget` and `stackPages` in `notes/page-pinch.ts`, page gaps scaling with the zoom), the on-screen scale goes in the same commit as the new layout, the scroll views draw past their bounds while pinched, a native `SylfPinchArea` hears two fingers anywhere over the document, and `InkView.native.tsx` resends a page's strokes until its surface takes them. `npm run android:pinch-check` now covers note pinches in any orientation (`--only=note-page`, `--shots=<dir>` keeps the screenshots). Still open: a note's toolbar is too wide for a portrait tablet (§7). The rest of this page is the brief as it was written, kept for the measuring method.
 
 Phase 14 is otherwise finished ([report](../reports/phase-14/report.md), [Phase 15 handoff](phase-14.md)). This page is the one open defect, reported by the owner on the Galaxy Tab S9 FE after `3819650`. **Sylf World is not to be started.**
 

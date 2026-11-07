@@ -1,5 +1,5 @@
 // The native writing surface, when this build has one (Android since Phase 14). Loaded lazily so web and tests never touch it.
-import type { ComponentType, Ref } from "react";
+import type { ComponentType, ReactNode, Ref } from "react";
 import { requireNativeView, requireOptionalNativeModule } from "expo";
 
 export interface NativeInkEvents {
@@ -51,4 +51,22 @@ export function nativeInkView(): ComponentType<NativeInkProps> | null {
     view = module?.pdfRender ? requireNativeView<NativeInkProps>("SylfNativePlatform") : null;
   } catch { view = null; }
   return view ?? null;
+}
+
+export interface NativePinchAreaProps {
+  style?: object;
+  children?: ReactNode;
+  pinchEnabled?: boolean;
+  /** `phase` and `scale` since the fingers landed, at the point between them on the screen. */
+  onPinch(event: { nativeEvent: { phase: "start" | "move" | "end"; scale: number; x: number; y: number } }): void;
+}
+
+let pinchArea: ComponentType<NativePinchAreaProps> | null | undefined;
+/** Two-finger zoom over a whole paged document. Null where the build has no such view (web, iOS, an older build): pages pinch on their own then. */
+export function nativePinchArea(): ComponentType<NativePinchAreaProps> | null {
+  if (pinchArea !== undefined) return pinchArea;
+  try {
+    pinchArea = nativeInkView() ? requireNativeView<NativePinchAreaProps>("SylfNativePlatform", "SylfPinchArea") : null;
+  } catch { pinchArea = null; }
+  return pinchArea ?? null;
 }

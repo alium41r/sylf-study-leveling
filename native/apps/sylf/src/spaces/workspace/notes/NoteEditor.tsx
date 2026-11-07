@@ -21,8 +21,7 @@ import { pickImage } from "./pick-image";
 import { inspectPdf } from "./pdf-engine";
 import { looksLikePdf } from "./pdf-import";
 import * as DocumentPicker from "expo-document-picker";
-import Animated from "react-native-reanimated";
-import { usePagePinch } from "./page-pinch";
+import { MAX_ZOOM, MIN_ZOOM, PinchStage, stackPages, usePagePinch } from "./page-pinch";
 
 type Page = DocumentDescriptor["pages"][number];
 export type NoteMode = "type" | "write";
@@ -86,16 +85,18 @@ export default function NoteEditor({ library, document, editable, initialPage, o
 
   const widest = Math.max(1, ...pages.map((p) => p.width));
   const fit = size.width ? (size.width - GAP * 2) / widest : 0.5;
-  const scale = Math.max(0.15, fit * zoom);
-  const layout = useMemo(() => {
-    let top = GAP;
-    return pages.map((page) => { const row = { page, top, width: page.width * scale, height: page.height * scale }; top += row.height + GAP; return row; });
-  }, [pages, scale]);
+  const scaleAt = (z: number) => Math.max(0.15, fit * z);
+  const scale = scaleAt(zoom);
+  // The gaps between pages scale with the zoom as the pages do, so a pinch previews every page on screen exactly, not only the one under the fingers.
+  const stack = useMemo(() => stackPages(pages, scale, size.width, GAP * zoom), [pages, scale, size.width, zoom]);
+  const layout = useMemo(() => stack.rows.map((row, i) => ({ ...row, page: pages[i] })), [stack]);
   const endless = flowOf(descriptor) === "endless";
   const pullable = editable && !endless && !!pages.length;
-  const pagesHeight = (layout.at(-1)?.top ?? 0) + (layout.at(-1)?.height ?? 0) + GAP;
+  const pagesHeight = stack.height;
   const contentHeight = pagesHeight + (pullable ? PULL : 0);
-  const contentWidth = Math.max(size.width, widest * scale + GAP * 2);
+  const contentWidth = stack.width;
+  // What scrolls at a zoom, the pull zone included: the layout a pinch places its preview with.
+  const layoutAt = (z: number) => { const at = stackPages(pages, scaleAt(z), size.width, GAP * z); return { ...at, height: at.height + (pullable ? PULL : 0) }; };
   const current = Math.max(0, layout.findIndex((row) => row.top + row.height > scroll.y + size.height / 3));
   useEffect(() => { onPage(current); }, [current]);
   useEffect(() => {
@@ -131,7 +132,14 @@ export default function NoteEditor({ library, document, editable, initialPage, o
     });
   };
 
-  const preview = usePagePinch({ zoom, setZoom: (z) => { zoomRef.current = z; setZoom(z); }, scaleAt: (z) => Math.max(0.15, fit * z), offset: offsetRef, vertical, horizontal });
+  const preview = usePagePinch({ zoom, layoutAt, view: size, offset: offsetRef, vertical, horizontal, commit: (z, at) => { zoomRef.current = z; setZoom(z); setScroll(at); } });
+  // While a pinch can zoom out, the pages around the view are drawn as well, so shrinking shows them rather than an edge. The scrolled
+  // content is as large as the largest zoom, so the scroll that lands the pinch is never cut short (see page-pinch).
+  const reach = preview.pinching ? Math.min(2, zoom / MIN_ZOOM - 1) : 0;
+  const reachX = MARGIN + reach * size.width, reachY = MARGIN + reach * size.height;
+  const largest = preview.pinching ? layoutAt(MAX_ZOOM) : null;
+  const spanWidth = Math.max(contentWidth, largest?.width ?? 0), spanHeight = Math.max(contentHeight, largest?.height ?? 0);
+  const drawOutside = preview.pinching ? { overflow: "visible" as const } : null;
   const pan = (dx: number, dy: number) => {
     const at = offsetRef.current, next = { x: contentWidth > size.width ? Math.max(0, at.x - dx) : at.x, y: Math.max(0, at.y - dy) };
     offsetRef.current = next;
@@ -276,10 +284,10 @@ export default function NoteEditor({ library, document, editable, initialPage, o
         : <InkToolbar tool={tool} onTool={setTool} stylusKnown={stylusKnown} canUndo={!!activeScene?.canUndo()} canRedo={!!activeScene?.canRedo()} onUndo={() => activeScene?.undo()} onRedo={() => activeScene?.redo()}
             selection={selection?.ids.length ?? 0} onSelectionAction={onSelectionAction} leading={switcher} trailing={trailing} end={corner} />) : null}
       <View ref={preview.area} collapsable={false} style={{ flex: 1, backgroundColor: color.sunken, overflow: "hidden" }} onLayout={(e: LayoutChangeEvent) => { setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height }); preview.onAreaLayout(); }}>
-        <Animated.View style={[{ flex: 1, transformOrigin: "0 0" } as object, preview.style]}>
+        <PinchStage stage={preview.stage} onPagePinch={preview.onPagePinch}>
         {size.width ? (
-          <ScrollView ref={horizontal} horizontal keyboardShouldPersistTaps="handled" scrollEnabled={contentWidth > size.width + 1} showsHorizontalScrollIndicator={contentWidth > size.width + 1} onScroll={(e) => { offsetRef.current.x = e.nativeEvent.contentOffset.x; setScroll((s) => ({ ...s, x: e.nativeEvent.contentOffset.x })); }} scrollEventThrottle={32} contentContainerStyle={{ width: contentWidth }}>
-            <ScrollView ref={vertical} keyboardShouldPersistTaps="handled" {...({ dataSet: { ownsWheel: "scroll" } } as object)} style={{ width: contentWidth, height: size.height }} onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ height: contentHeight }}
+          <ScrollView ref={horizontal} horizontal style={drawOutside} keyboardShouldPersistTaps="handled" scrollEnabled={contentWidth > size.width + 1} showsHorizontalScrollIndicator={contentWidth > size.width + 1} onScroll={(e) => { offsetRef.current.x = e.nativeEvent.contentOffset.x; setScroll((s) => ({ ...s, x: e.nativeEvent.contentOffset.x })); }} scrollEventThrottle={32} contentContainerStyle={{ width: spanWidth }}>
+            <ScrollView ref={vertical} keyboardShouldPersistTaps="handled" {...({ dataSet: { ownsWheel: "scroll" } } as object)} style={{ width: spanWidth, height: size.height, ...drawOutside }} onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ height: spanHeight }}
               onScrollBeginDrag={(e) => setArmed(pullable && e.nativeEvent.contentOffset.y + size.height >= pagesHeight - 24)}
               onScrollEndDrag={(e) => {
                 const y = e.nativeEvent.contentOffset.y, speed = Math.abs(e.nativeEvent.velocity?.y ?? 0);
@@ -289,11 +297,11 @@ export default function NoteEditor({ library, document, editable, initialPage, o
               }}
               onMomentumScrollEnd={(e) => settleZone(e.nativeEvent.contentOffset.y)}>
               {layout.map((row) => {
-                const left = (contentWidth - row.width) / 2;
-                const near = row.top + row.height > scroll.y - size.height && row.top < scroll.y + size.height * 2;
+                const left = row.left;
+                const near = row.top + row.height > scroll.y - size.height * (1 + reach) && row.top < scroll.y + size.height * (2 + reach);
                 if (!near) return <View key={row.page.pageId} style={{ position: "absolute", top: row.top, left, width: row.width, height: row.height, backgroundColor: "#ffffff", opacity: 0.6 }} />;
-                const x0 = Math.max(0, Math.floor((scroll.x - left - MARGIN) / SNAP) * SNAP), y0 = Math.max(0, Math.floor((scroll.y - row.top - MARGIN) / SNAP) * SNAP);
-                const x1 = Math.min(row.width, Math.ceil((scroll.x + size.width - left + MARGIN) / SNAP) * SNAP), y1 = Math.min(row.height, Math.ceil((scroll.y + size.height - row.top + MARGIN) / SNAP) * SNAP);
+                const x0 = Math.max(0, Math.floor((scroll.x - left - reachX) / SNAP) * SNAP), y0 = Math.max(0, Math.floor((scroll.y - row.top - reachY) / SNAP) * SNAP);
+                const x1 = Math.min(row.width, Math.ceil((scroll.x + size.width - left + reachX) / SNAP) * SNAP), y1 = Math.min(row.height, Math.ceil((scroll.y + size.height - row.top + reachY) / SNAP) * SNAP);
                 const s = scene(row.page), paper = row.page.originalAssetId ? null : s.paper();
                 const background = typeof row.page.extensions.backgroundAssetId === "string" ? row.page.extensions.backgroundAssetId : null;
                 const text = textDoc(row.page), box = textBox(row.page, paper);
@@ -327,7 +335,7 @@ export default function NoteEditor({ library, document, editable, initialPage, o
                       <View style={{ position: "absolute", left: x0, top: y0 }} pointerEvents={mode === "write" ? "auto" : "none"}>
                         <InkView scene={s} pageWidth={row.page.width} pageHeight={row.page.height} camera={{ x: x0 / scale, y: y0 / scale, zoom: scale }} width={x1 - x0} height={y1 - y0}
                           tool={tool} drawPaper={false} editable={editable && mode === "write"} selection={selection?.page === row.page.pageId ? selection.ids : []}
-                          onSelection={(ids) => setSelection(ids.length ? { page: row.page.pageId, ids } : null)} onPan={pan} onPinch={(factor, x, y) => pinch(factor, left + x0 - offsetRef.current.x + x, row.top + y0 - offsetRef.current.y + y)} onPagePinch={preview.onPagePinch} onPenSeen={penSeen} wheel="zoom" />
+                          onSelection={(ids) => setSelection(ids.length ? { page: row.page.pageId, ids } : null)} onPan={pan} onPinch={(factor, x, y) => pinch(factor, left + x0 - offsetRef.current.x + x, row.top + y0 - offsetRef.current.y + y)} onPagePinch={preview.inkPinch} onPenSeen={penSeen} wheel="zoom" />
                       </View>
                     ) : null}
                   </View>
@@ -345,7 +353,7 @@ export default function NoteEditor({ library, document, editable, initialPage, o
             </ScrollView>
           </ScrollView>
         ) : null}
-        </Animated.View>
+        </PinchStage>
         {pages.length > 1 ? (
           <View pointerEvents="none" style={{ position: "absolute", right: space.md, bottom: space.md, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: "rgba(20,24,40,0.55)" }}>
             <Text variant="micro" style={{ color: "#ffffff" }}>{current + 1} / {pages.length}</Text>

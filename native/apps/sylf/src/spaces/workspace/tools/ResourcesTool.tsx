@@ -1,6 +1,6 @@
 // The Resource Shelf: one view over everything in the Notes library, never a second store. It filters by kind, subject and notebook,
 // puts the subject being studied right now first, and opens each document in the tool that owns it, in a window of its own.
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { Chip, ContextArea, EmptyState, Icon, Press, Text, TextField, useNotice, useTheme, type IconName, type MenuItem, type PressProps, type ViewHandle } from "@sylf/design-system";
 import type { LibraryEntry, NoteKind } from "@sylf/notes";
@@ -10,12 +10,12 @@ import { useLibrarySnapshot, useNotesLibrary } from "../../../shell/notes/librar
 import { useDragSource } from "../drop";
 import { KIND_ICON, KIND_LABEL, relativeTime } from "../notes/LibraryBrowser";
 import { openDocumentWindow } from "../notes/open-window";
-import { ToolPage, type ToolProps } from "./shared";
+import { ToolPage } from "./shared";
 
 const KINDS: { value: NoteKind | "all"; label: string; icon?: IconName }[] = [{ value: "all", label: "All" }, { value: "note", label: "Notes", icon: "notes" }, { value: "pdf", label: "PDFs", icon: "pdf" }, { value: "board", label: "Boards", icon: "whiteboard" }];
 
-export default function ResourcesTool({ onProvenance }: ToolProps) {
-  const { space, color } = useTheme();
+export default function ResourcesTool() {
+  const { space } = useTheme();
   const model = useWorkspaceModel();
   const notice = useNotice();
   const library = useNotesLibrary();
@@ -25,7 +25,6 @@ export default function ResourcesTool({ onProvenance }: ToolProps) {
   const [kind, setKind] = useState<NoteKind | "all">("all");
   const [subject, setSubject] = useState<string | null>(null);
   const [query, setQuery] = useState("");
-  useEffect(() => { onProvenance(false); }, [onProvenance]);
 
   const studying = session.active?.subjectId ?? session.plan?.subjectId ?? null;
   const subjectName = (id: string | null) => subjects.find((s) => String(s.id) === id)?.name ?? null;
@@ -51,9 +50,9 @@ export default function ResourcesTool({ onProvenance }: ToolProps) {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ paddingHorizontal: space.md, paddingTop: space.md }}><TextField label="Search" hideLabel icon="search" placeholder="Search everything" value={query} onChangeText={setQuery} /></View>
-      <ScrollView keyboardShouldPersistTaps="handled" horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: space.xs, paddingHorizontal: space.md, paddingTop: space.sm }}>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xs, paddingHorizontal: space.md, paddingTop: space.sm }}>
         {KINDS.map((k) => <Chip key={k.value} label={k.label} icon={k.icon} selected={kind === k.value} onPress={() => setKind(k.value)} />)}
-      </ScrollView>
+      </View>
       {used.length ? (
         <ScrollView keyboardShouldPersistTaps="handled" horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: space.xs, paddingHorizontal: space.md, paddingTop: space.xs }}>
           {used.map((id) => <Chip key={id} label={subjectName(id) ?? "Subject"} icon={id === String(studying) ? "focus" : undefined} selected={subject === id} onPress={() => setSubject(subject === id ? null : id)} />)}
@@ -68,7 +67,7 @@ export default function ResourcesTool({ onProvenance }: ToolProps) {
           )) : <EmptyState icon="search" title="Nothing matches" message="Try another filter." />}
         </View>
       </ToolPage>
-      <Text variant="micro" tone="faint" style={{ paddingHorizontal: space.lg, paddingBottom: space.sm, color: color.inkFaint }}>{shown.length} of {snapshot.entries.filter((e) => !e.trashed).length}</Text>
+      <Text variant="caption" tone="soft" style={{ paddingHorizontal: space.lg, paddingBottom: space.sm }}>{shown.length} of {snapshot.entries.filter((e) => !e.trashed).length}</Text>
     </View>
   );
 }

@@ -10,11 +10,11 @@ import { runParitySuite } from "@sylf/shared/parity";
 import { availableSpaces, createHomeNavigation, createSpacesStore, createStudySessionModel, createWorkspaceModel, createWorldController } from "@sylf/spaces";
 import { HomeNavigationProvider, SpacesProvider, StudySessionProvider, WorkspaceModelProvider, WorldControllerProvider } from "./shell/context";
 import { connectBackend, currentBackend, noteForeground, prepareBackend, useBackend, useBackendPhase } from "./shell/backend";
-import { DEV_TOOLS, closeShowcase, openProbe, openShowcase, setHomeDataScenario, setWorldScenarios, useDevSurface, worldHostScenario } from "./shell/dev-surface";
+import { DEV_TOOLS, closeShowcase, openProbe, openShowcase, setWorldHostScenario, useDevSurface, worldHostScenario } from "./shell/dev-surface";
 import { parseAppLink } from "./shell/links";
 import { enableWebDebugging } from "@sylf/native-platform";
 import { onForegroundChange } from "./shell/focus/alerts";
-import { SpacesShell } from "./shell/SpacesShell";
+import { AccountAccessStatus } from "./shell/account/AccountAccessStatus";
 import { flushNotes } from "./shell/notes/library";
 
 const Showcase = lazy(() => import("./showcase/Showcase"));
@@ -106,11 +106,10 @@ function useDevLinks() {
       if (Object.keys(link.colors).length) appearance.tweak(link.colors);
       if (link.space) spacesStore.select(link.space);
       if (link.home) homeNavigation.select(link.home);
-      if (link.homeData) setHomeDataScenario(link.homeData);
-      if (link.worldData || link.worldHost) setWorldScenarios(link.worldData, link.worldHost);
+      if (link.worldHost) setWorldHostScenario(link.worldHost);
       if (link.session) studySession.end();
       if (link.sessionLength !== undefined) studySession.setLength(link.sessionLength);
-      if (link.session === "running" || link.session === "paused") studySession.start({ title: "Waves and optics", subject: "Physics" });
+      if (link.session === "running" || link.session === "paused") studySession.start();
       if (link.session === "paused") studySession.pause();
       if (link.worldSky) worldController.updateSnapshot({ sky: link.worldSky });
       if (link.worldSection) worldController.updateSnapshot({ section: link.worldSection });
@@ -136,13 +135,12 @@ function Root() {
   return showcase ? <Suspense fallback={null}><Showcase chapter={chapter} request={request} onExit={closeShowcase} /></Suspense> : <Connected />;
 }
 
-/** Spaces alone with no backend. With one, the account decides what shows, and that code loads only then. */
+/** A configured backend and a restored account are required before the study Spaces can mount. */
 function Connected() {
   const backend = useBackend();
   const phase = useBackendPhase();
-  if (phase === "pending") return null;
-  if (!backend) return <SpacesShell />;
-  return <Suspense fallback={null}><AccountGate backend={backend} workspace={workspaceModel} home={homeNavigation} /></Suspense>;
+  if (!backend) return <AccountAccessStatus waiting={phase === "pending"} />;
+  return <Suspense fallback={<AccountAccessStatus waiting />}><AccountGate backend={backend} workspace={workspaceModel} home={homeNavigation} /></Suspense>;
 }
 
 export default function App() {

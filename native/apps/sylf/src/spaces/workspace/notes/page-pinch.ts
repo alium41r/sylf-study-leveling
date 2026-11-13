@@ -3,8 +3,8 @@
 // with the layout the zoom will have, so the preview already shows where the page lands, edges and centring included. When the fingers
 // lift, the document is laid out once at the new zoom, in the same commit that takes the on-screen scale away, so nothing jumps.
 // Points arrive in screen coordinates: the page moves under the fingers as it zooms, so measuring against it would feed back.
-import { createElement, useLayoutEffect, useRef, useState, type ComponentRef, type ReactNode, type RefObject } from "react";
-import { View, type ScrollView } from "react-native";
+import { createElement, useEffect, useLayoutEffect, useRef, useState, type ComponentRef, type ReactNode, type RefObject } from "react";
+import { Platform, View, type ScrollView } from "react-native";
 import { nativePinchArea } from "@sylf/native-platform";
 
 export const MIN_ZOOM = 0.5, MAX_ZOOM = 3;
@@ -30,6 +30,10 @@ export function stackPages(sizes: readonly { width: number; height: number }[], 
 
 const clamp = (value: number, low: number, high: number) => Math.max(low, Math.min(high, value));
 
+export function clampPageScroll(offset: Point, content: { width: number; height: number }, view: { width: number; height: number }): Point {
+  return { x: clamp(offset.x, 0, content.width - view.width), y: clamp(offset.y, 0, content.height - view.height) };
+}
+
 /**
  * Where a pinch leaves the view. The page point that was under `start` (a point of the view, with the content scrolled to `offset`)
  * goes under `point` in the `after` layout, as far as that layout can scroll. `transform` shows the `before` layout on screen exactly
@@ -43,7 +47,7 @@ export function pinchTarget(before: Stack, after: Stack, view: { width: number; 
   const index = found < 0 ? before.rows.length - 1 : found;
   const from = before.rows[index], to = after.rows[index];
   const there = from && to ? { x: to.left + ((at.x - from.left) / from.width) * to.width, y: to.top + ((at.y - from.top) / from.height) * to.height } : at;
-  const scroll = { x: clamp(there.x - point.x, 0, Math.max(0, after.width - view.width)), y: clamp(there.y - point.y, 0, Math.max(0, after.height - view.height)) };
+  const scroll = clampPageScroll({ x: there.x - point.x, y: there.y - point.y }, after, view);
   const scale = from && to ? to.width / from.width : 1;
   return { scroll, transform: { scale, x: there.x - scroll.x - scale * start.x, y: there.y - scroll.y - scale * start.y } };
 }
@@ -53,30 +57,87 @@ interface Options {
   /** The document laid out at a zoom, by the rule it renders with. */
   layoutAt(zoom: number): Stack;
   view: { width: number; height: number };
+  content: { width: number; height: number };
   offset: RefObject<Point>;
   /** The fingers lifted: lay out at this zoom, scrolled here. Called in the same update that takes the on-screen scale away. */
   commit(zoom: number, scroll: Point): void;
   vertical: RefObject<ComponentRef<typeof ScrollView> | null>;
   horizontal: RefObject<ComponentRef<typeof ScrollView> | null>;
+  /** The zoom as it changes, before anything is laid out: every step of a pinch, a wheel or a zoom control. */
+  onZoom?(zoom: number): void;
 }
 
-export function usePagePinch({ zoom, layoutAt, view, offset, commit, vertical, horizontal }: Options) {
+export function usePagePinch({ zoom, layoutAt, view, content, offset, commit, vertical, horizontal, onZoom }: Options) {
   const stage = useRef<((transform: Transform) => void) | null>(null);
   // True from the fingers landing to their lifting: the document then draws what shrinking can bring into view, once, as it starts.
   const [pinching, setPinching] = useState(false);
   const area = useRef<ComponentRef<typeof View>>(null);
   const origin = useRef({ x: 0, y: 0 });
-  const gesture = useRef<{ start: Point; zoom: number; before: Stack } | null>(null);
+  const gesture = useRef<{ start: Point; zoom: number; before: Stack; offset: Point } | null>(null);
   const settle = useRef<Point | null>(null);
+  const pending = useRef<{ zoom: number; point: Point } | null>(null);
+  const frame = useRef(0);
+  const latest = useRef({ zoom, view, layoutAt, commit, onZoom });
+  latest.current = { zoom, view, layoutAt, commit, onZoom };
 
-  const measure = () => area.current?.measureInWindow((x, y) => { origin.current = { x, y }; });
-  const local = (x: number, y: number) => ({ x: x - origin.current.x, y: y - origin.current.y });
+  const measure = () => {
+    if (Platform.OS !== "web") area.current?.measureInWindow((x, y) => { origin.current = { x, y }; });
+  };
+  const local = (x: number, y: number) => {
+    if (Platform.OS === "web") {
+      const box = (area.current as unknown as HTMLElement | null)?.getBoundingClientRect();
+      if (box?.width && box.height) return { x: (x - box.left) * latest.current.view.width / box.width, y: (y - box.top) * latest.current.view.height / box.height };
+    }
+    return { x: x - origin.current.x, y: y - origin.current.y };
+  };
+  const finish = (next: number, scroll: Point) => {
+    settle.current = scroll;
+    offset.current = scroll;
+    latest.current.zoom = next;
+    latest.current.commit(next, scroll);
+  };
+  const zoomBy = (factor: number, x?: number, y?: number) => {
+    if (gesture.current || !(factor > 0)) return;
+    const current = latest.current;
+    const next = clamp((pending.current?.zoom ?? current.zoom) * factor, MIN_ZOOM, MAX_ZOOM);
+    pending.current = { zoom: next, point: { x: x ?? current.view.width / 2, y: y ?? current.view.height / 2 } };
+    current.onZoom?.(next);
+    if (frame.current) return;
+    frame.current = requestAnimationFrame(() => {
+      frame.current = 0;
+      const target = pending.current;
+      pending.current = null;
+      const { zoom, view, layoutAt } = latest.current;
+      if (!target || target.zoom === zoom) return;
+      const { scroll } = pinchTarget(layoutAt(zoom), layoutAt(target.zoom), view, offset.current, target.point, target.point);
+      finish(target.zoom, scroll);
+    });
+  };
+  const wheelZoom = useRef(zoomBy);
+  wheelZoom.current = zoomBy;
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    const node = area.current as unknown as HTMLElement | null;
+    if (!node) return;
+    const onWheel = (event: WheelEvent) => {
+      if (!event.ctrlKey && !event.metaKey) return;
+      event.preventDefault();
+      const point = local(event.clientX, event.clientY);
+      const units = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? node.clientHeight : 1;
+      wheelZoom.current(Math.exp(-event.deltaY * units * 0.01), point.x, point.y);
+    };
+    node.addEventListener("wheel", onWheel, { passive: false });
+    return () => node.removeEventListener("wheel", onWheel);
+  }, []);
+  useEffect(() => () => cancelAnimationFrame(frame.current), []);
 
   const onPagePinch = (phase: "start" | "move" | "end", raw: number, sx: number, sy: number) => {
     if (phase === "start") {
       measure();
-      gesture.current = { start: { x: sx, y: sy }, zoom, before: layoutAt(zoom) };
+      pending.current = null;
+      gesture.current = { start: { x: sx, y: sy }, zoom, before: layoutAt(zoom), offset: { ...offset.current } };
       setPinching(true);
+      onZoom?.(zoom);
       return;
     }
     const g = gesture.current;
@@ -85,28 +146,35 @@ export function usePagePinch({ zoom, layoutAt, view, offset, commit, vertical, h
     const start = local(g.start.x, g.start.y), point = local(sx, sy);
     // The zoom stays within its limits while the fingers move, so letting go never jumps.
     const next = clamp(g.zoom * raw, MIN_ZOOM, MAX_ZOOM);
-    const { scroll, transform } = pinchTarget(g.before, layoutAt(next), view, offset.current, start, point);
+    onZoom?.(next);
+    const { scroll, transform } = pinchTarget(g.before, layoutAt(next), view, g.offset, start, point);
     if (phase !== "end") { stage.current?.(transform); return; }
     gesture.current = null;
-    settle.current = scroll;
-    offset.current.x = scroll.x; offset.current.y = scroll.y;
     stage.current?.(IDENTITY);
     setPinching(false);
-    commit(next, scroll);
+    finish(next, scroll);
   };
 
   // The commit lays out the new zoom and takes the on-screen scale away; the scroll goes with it. Android runs scroll commands before
   // the layout they arrive with, so the content stays grown to the largest zoom until this commit and the scroll is never cut short.
   useLayoutEffect(() => {
-    const target = settle.current;
-    if (!target) return;
+    if (pinching) return;
+    const landing = settle.current;
+    const current = offset.current;
+    const target = clampPageScroll(landing ?? current, content, view);
+    if (!landing && current.x === target.x && current.y === target.y) return;
     settle.current = null;
+    if (current.x !== target.x || current.y !== target.y) {
+      // Resizing may shrink the native scroll extent without sending a scroll event. Keep the virtual ink slices in bounds too.
+      offset.current = target;
+      commit(zoom, target);
+    }
     vertical.current?.scrollTo({ y: target.y, animated: false });
     horizontal.current?.scrollTo({ x: target.x, animated: false });
   });
 
   // Where the build has a pinch area over the whole document, it reports the pinch and the pages leave it alone.
-  return { stage, pinching, area, onAreaLayout: measure, onPagePinch, inkPinch: nativePinchArea() ? undefined : onPagePinch };
+  return { stage, pinching, area, zoomBy, onAreaLayout: measure, onPagePinch, inkPinch: nativePinchArea() ? undefined : onPagePinch };
 }
 
 /**

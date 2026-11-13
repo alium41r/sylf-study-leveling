@@ -87,7 +87,7 @@ export function Press({ children, label, hint, role = "button", disabled, busy, 
       onBlur={(event) => { setFocused(false); onFocusChange?.(false); onBlur?.(event); }}
       style={[inert ? webDisabled : webPointer, style]}
     >
-      <Animated.View style={[height !== undefined ? { minHeight: height } : null, { borderRadius: cornerRadius }, bodyStyle, sink, inert ? { opacity: 0.5 } : null]}>
+      <Animated.View style={[height !== undefined ? { minHeight: height } : null, { borderRadius: cornerRadius }, bodyStyle, feedback === "sink" ? sink : null, inert ? { opacity: 0.5 } : null]}>
         {feedback !== "none" ? <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: cornerRadius, backgroundColor: color.press }, overlay]} /> : null}
         {children}
       </Animated.View>

@@ -1,0 +1,10 @@
+{
+  "afterReorder": [
+    "Vectors, Note",
+    "Proofs, Note"
+  ],
+  "afterReload": [
+    "Vector spaces, Note",
+    "Proofs, Note"
+  ]
+}

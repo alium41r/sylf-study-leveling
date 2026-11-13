@@ -24,7 +24,7 @@ Labels: **Confirmed** came from the owner's brief or master plan. **Proposed** i
 | Art | `art/` | Baked plates, the generated index, `skies.ts` |
 | Art source | `native/tooling/world-art/` | The voxel renderer and the scenes. Runs by hand, and nothing in it ships |
 | Stand-in host | `host/preview.ts`, `host/PreviewSurface.tsx` | Everything a host does except the game. Phase 15 replaces these two files |
-| Data | `data/` | Typed contracts, the sample and empty adapters, the one binding point |
+| Data | `data/` | Typed Traveller and Collection reads for the signed-in account |
 
 `@sylf/spaces` stays free of React and UI, so the lifecycle is tested without a renderer.
 
@@ -33,7 +33,7 @@ Labels: **Confirmed** came from the owner's brief or master plan. **Proposed** i
 | Section | Holds | Real now | Waits |
 | --- | --- | --- | --- |
 | **Gate** | The name, the way in, a plate with level, rank and Sylph | The way in and out | The game behind it |
-| **Traveller** | Identity, level progress, rank, Sylph, what was earned this week | Real with an account, sample with no backend in a development build | Appearance and the companion, which are reserved rows |
+| **Traveller** | Identity, level progress, rank, Sylph, what was earned this week | Read from the signed-in account | Appearance and the companion, which are reserved rows |
 | **Collection** | Frames, titles and name colors | Real with an account, named from `lib/cosmetics-catalog` | Locker and Shop, which are reserved rows (master plan H1) |
 | **Preparations** | Sky, Drift | Both, saved on this device | Sound, Detail and Controls, which are reserved rows |
 
@@ -168,7 +168,7 @@ The lobby adds no server concept.
 | Locker, Shop | Existing ledgers and inventory, in Phase 15 |
 | World's saves, terrain and builds | **New, and deferred.** A storage contract is decided in Phase 15 (master plan §2.3) |
 
-Without `DEV_TOOLS` the empty adapter binds, so no sample can reach a store build. Sample cosmetic names are invented for the template, and the catalog stays the owner of the real ones.
+The lobby uses signed-in reads and names owned cosmetics from the existing catalog. The gate still offers the labelled host preview.
 
 ## 8. Performance rules
 
@@ -187,7 +187,6 @@ Without `DEV_TOOLS` the empty adapter binds, so no sample can reach a store buil
 | `?space=world&worldSky=night` | One sky, or `auto` |
 | `&worldSection=traveller` | One section |
 | `&session=running` | A running study session, the real one |
-| `&worldData=empty` or `slow` | No data, or slow data |
 | `&worldHost=fail-load` or `fail-save` | A host that fails |
 | `&worldHost=slow` | A host four times slower |
 

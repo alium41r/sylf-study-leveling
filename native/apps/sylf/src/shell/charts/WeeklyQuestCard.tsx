@@ -1,7 +1,7 @@
 // The week's focus quest, from the server: how much of the week's target is done, when it resets, and what finishing it pays. Nothing is computed here, and the
 // reward is the server's own (it scales with level). Shown on Today and on Progress, from one component, so they always agree.
 import { View } from "react-native";
-import { Meter, Text, useTheme } from "@sylf/design-system";
+import { Meter, Plane, Text, useTheme } from "@sylf/design-system";
 import type { WeeklyQuest } from "@sylf/backend";
 import { formatMinutes } from "../../spaces/home/format";
 import { meterUnits } from "../../spaces/home/progress/shared";
@@ -29,18 +29,20 @@ export function WeeklyQuestCard({ quest }: { quest: WeeklyQuest }) {
   );
 }
 
-/** The same quest as one inline block, for places that already sit inside a card (a card inside a card is clutter). */
+/** The same quest as one inline block, anchored in a raised surface at the end of the quests section. */
 export function WeeklyQuestInline({ quest }: { quest: WeeklyQuest }) {
   const { space } = useTheme();
   const progress = Math.min(quest.progressMinutes, quest.targetMinutes);
   return (
-    <View testID="weekly-quest" style={{ gap: space.xs }}>
-      <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", gap: space.md }}>
-        <Text variant="caption" tone="soft">Focus quest this week</Text>
-        <Text variant="caption" tone="soft">{quest.isCompleted ? "Done" : weeklyQuestLine(quest).replace(/\.$/, "")}</Text>
+    <Plane level="raised" pad="md" radius="md">
+      <View testID="weekly-quest" style={{ gap: space.sm }}>
+        <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", gap: space.md }}>
+          <Text variant="caption" tone="soft">Focus quest this week</Text>
+          <Text variant="caption" tone="soft">{quest.isCompleted ? "Done" : weeklyQuestLine(quest).replace(/\.$/, "")}</Text>
+        </View>
+        <Meter {...meterUnits(progress, quest.targetMinutes)} label={`${formatMinutes(quest.progressMinutes)} of ${formatMinutes(quest.targetMinutes)} this week`} />
+        <Text variant="small">{`${formatMinutes(quest.progressMinutes)} of ${formatMinutes(quest.targetMinutes)}`}</Text>
       </View>
-      <Meter {...meterUnits(progress, quest.targetMinutes)} label={`${formatMinutes(quest.progressMinutes)} of ${formatMinutes(quest.targetMinutes)} this week`} />
-      <Text variant="small">{`${formatMinutes(quest.progressMinutes)} of ${formatMinutes(quest.targetMinutes)}`}</Text>
-    </View>
+    </Plane>
   );
 }

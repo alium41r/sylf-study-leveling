@@ -1,0 +1,356 @@
+{
+  "passed": true,
+  "steps": [
+    "Sign-in gate, then a dashboard of the account's own progress, plan and circle",
+    "The island animates on the compositor only, pauses off screen, stops for reduced motion and adds no script, layout or frames",
+    "A friend request is accepted and a party invitation declined on the dashboard, a quest fills in Focus, and Calendar opens from Today",
+    "The hub at the middle begins the next quest in Focus with its title, then offers the way back",
+    "A second account gets its own empty dashboard"
+  ],
+  "viewports": [
+    {
+      "name": "desktop-1440",
+      "width": 1440,
+      "height": 900,
+      "allTabsReachable": true,
+      "unboxed": true,
+      "clipped": 0,
+      "hub": {
+        "centred": true,
+        "clear": true,
+        "between": true,
+        "onScreen": true,
+        "insideObjectives": false
+      },
+      "layout": "grid",
+      "twoByTwo": true,
+      "within": true,
+      "horizontalOverflow": false,
+      "beyond": []
+    },
+    {
+      "name": "desktop-1280",
+      "width": 1280,
+      "height": 755,
+      "allTabsReachable": true,
+      "unboxed": true,
+      "clipped": 0,
+      "hub": {
+        "centred": true,
+        "clear": true,
+        "between": true,
+        "onScreen": true,
+        "insideObjectives": false
+      },
+      "layout": "grid",
+      "twoByTwo": true,
+      "within": true,
+      "horizontalOverflow": false,
+      "beyond": []
+    },
+    {
+      "name": "tablet-landscape",
+      "width": 1024,
+      "height": 720,
+      "allTabsReachable": true,
+      "unboxed": true,
+      "clipped": 0,
+      "hub": {
+        "centred": true,
+        "clear": true,
+        "between": true,
+        "onScreen": false,
+        "insideObjectives": false
+      },
+      "layout": "grid",
+      "twoByTwo": true,
+      "within": true,
+      "horizontalOverflow": false,
+      "beyond": []
+    },
+    {
+      "name": "short-900x480",
+      "width": 900,
+      "height": 480,
+      "allTabsReachable": true,
+      "unboxed": true,
+      "clipped": 0,
+      "hub": {
+        "centred": true,
+        "clear": true,
+        "between": true,
+        "onScreen": false,
+        "insideObjectives": false
+      },
+      "layout": "paired",
+      "twoByTwo": false,
+      "within": true,
+      "horizontalOverflow": false,
+      "beyond": []
+    },
+    {
+      "name": "tablet-portrait-820",
+      "width": 820,
+      "height": 1180,
+      "allTabsReachable": true,
+      "unboxed": true,
+      "clipped": 0,
+      "hub": {
+        "centred": true,
+        "clear": true,
+        "between": true,
+        "onScreen": true,
+        "insideObjectives": false
+      },
+      "layout": "paired",
+      "twoByTwo": false,
+      "within": true,
+      "horizontalOverflow": false,
+      "beyond": []
+    },
+    {
+      "name": "tablet-portrait-744",
+      "width": 744,
+      "height": 1133,
+      "allTabsReachable": true,
+      "unboxed": true,
+      "clipped": 0,
+      "hub": {
+        "centred": true,
+        "clear": true,
+        "between": true,
+        "onScreen": true,
+        "insideObjectives": false
+      },
+      "layout": "paired",
+      "twoByTwo": false,
+      "within": true,
+      "horizontalOverflow": false,
+      "beyond": []
+    },
+    {
+      "name": "phone-390",
+      "width": 390,
+      "height": 844,
+      "allTabsReachable": true,
+      "unboxed": true,
+      "clipped": 0,
+      "hub": {
+        "centred": true,
+        "clear": true,
+        "between": true,
+        "onScreen": true,
+        "insideObjectives": false
+      },
+      "layout": "stack",
+      "twoByTwo": false,
+      "within": true,
+      "horizontalOverflow": false,
+      "beyond": []
+    },
+    {
+      "name": "cozy-light-1440",
+      "width": 1440,
+      "height": 900,
+      "allTabsReachable": true,
+      "unboxed": true,
+      "clipped": 0,
+      "hub": {
+        "centred": true,
+        "clear": true,
+        "between": true,
+        "onScreen": true,
+        "insideObjectives": false
+      },
+      "layout": "grid",
+      "twoByTwo": true,
+      "within": true,
+      "horizontalOverflow": false,
+      "beyond": []
+    },
+    {
+      "name": "voxel-custom-1280",
+      "width": 1280,
+      "height": 755,
+      "allTabsReachable": true,
+      "unboxed": true,
+      "clipped": 0,
+      "hub": {
+        "centred": true,
+        "clear": true,
+        "between": true,
+        "onScreen": true,
+        "insideObjectives": false
+      },
+      "layout": "grid",
+      "twoByTwo": true,
+      "within": true,
+      "horizontalOverflow": false,
+      "beyond": []
+    },
+    {
+      "name": "signature-light-custom-1440",
+      "width": 1440,
+      "height": 900,
+      "allTabsReachable": true,
+      "unboxed": true,
+      "clipped": 0,
+      "hub": {
+        "centred": true,
+        "clear": true,
+        "between": true,
+        "onScreen": true,
+        "insideObjectives": false
+      },
+      "layout": "grid",
+      "twoByTwo": true,
+      "within": true,
+      "horizontalOverflow": false,
+      "beyond": []
+    },
+    {
+      "name": "voxel-custom-744",
+      "width": 744,
+      "height": 1133,
+      "allTabsReachable": true,
+      "unboxed": true,
+      "clipped": 0,
+      "hub": {
+        "centred": true,
+        "clear": true,
+        "between": true,
+        "onScreen": true,
+        "insideObjectives": false
+      },
+      "layout": "paired",
+      "twoByTwo": false,
+      "within": true,
+      "horizontalOverflow": false,
+      "beyond": []
+    },
+    {
+      "name": "cozy-light-390",
+      "width": 390,
+      "height": 844,
+      "allTabsReachable": true,
+      "unboxed": true,
+      "clipped": 0,
+      "hub": {
+        "centred": true,
+        "clear": true,
+        "between": true,
+        "onScreen": true,
+        "insideObjectives": false
+      },
+      "layout": "stack",
+      "twoByTwo": false,
+      "within": true,
+      "horizontalOverflow": false,
+      "beyond": []
+    },
+    {
+      "name": "empty-1440",
+      "width": 1440,
+      "height": 900,
+      "allTabsReachable": true,
+      "unboxed": true,
+      "clipped": 0,
+      "hub": {
+        "centred": true,
+        "clear": true,
+        "between": true,
+        "onScreen": true,
+        "insideObjectives": false
+      },
+      "layout": "grid",
+      "twoByTwo": true,
+      "within": true,
+      "horizontalOverflow": false,
+      "beyond": []
+    },
+    {
+      "name": "empty-390",
+      "width": 390,
+      "height": 844,
+      "allTabsReachable": true,
+      "unboxed": true,
+      "clipped": 0,
+      "hub": {
+        "centred": true,
+        "clear": true,
+        "between": true,
+        "onScreen": true,
+        "insideObjectives": false
+      },
+      "layout": "stack",
+      "twoByTwo": false,
+      "within": true,
+      "horizontalOverflow": false,
+      "beyond": []
+    }
+  ],
+  "island": {
+    "running": {
+      "state": "running",
+      "images": 8,
+      "animations": 5,
+      "css": true,
+      "running": 5,
+      "properties": [
+        "opacity",
+        "transform"
+      ]
+    },
+    "paused": {
+      "state": "paused",
+      "images": 8,
+      "animations": 5,
+      "css": true,
+      "running": 0,
+      "properties": [
+        "opacity",
+        "transform"
+      ]
+    },
+    "still": {
+      "state": "still",
+      "images": 8,
+      "animations": 0,
+      "css": true,
+      "running": 0,
+      "properties": []
+    },
+    "whileRunning": {
+      "ms": 4000,
+      "scriptSeconds": 0,
+      "taskSeconds": 0.009,
+      "layouts": 0,
+      "styleRecalcs": 6,
+      "animationFrameRequests": 0,
+      "domMutations": 0
+    },
+    "whilePaused": {
+      "ms": 4000,
+      "scriptSeconds": 0.032,
+      "taskSeconds": 0.146,
+      "layouts": 0,
+      "styleRecalcs": 142,
+      "animationFrameRequests": 88,
+      "domMutations": 71
+    },
+    "stepped": {
+      "state": "running",
+      "images": 8,
+      "animations": 5,
+      "css": true,
+      "running": 5,
+      "properties": [
+        "opacity",
+        "transform"
+      ]
+    }
+  },
+  "media": [],
+  "errors": [],
+  "error": null
+}

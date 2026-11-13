@@ -14,9 +14,17 @@ export interface InkToolState {
   lineStyle: LineStyle;
   /** A nearly straight stroke becomes a straight line. */
   straighten: boolean;
+  /** Holding the pen's side button erases. Off for a hand that presses it by accident. */
+  buttonErases: boolean;
+  /** The eraser's radius in page units, its own and not the pen's. */
+  eraserSize: number;
 }
-export const DEFAULT_TOOL: InkToolState = { tool: "pen", color: "#1f2a44", width: 2.6, shape: "rectangle", eraser: "stroke", penOnly: false, nib: "ballpoint", pressure: true, lineStyle: "solid", straighten: false };
+export const DEFAULT_TOOL: InkToolState = { tool: "pen", color: "#1f2a44", width: 2.6, shape: "rectangle", eraser: "stroke", penOnly: false, nib: "ballpoint", pressure: true, lineStyle: "solid", straighten: false, buttonErases: true, eraserSize: 8 };
 export const WIDTH_RANGE = { min: 0.6, max: 8, step: 0.2 } as const;
+export const ERASER_RANGE = { min: 4, max: 40, step: 1 } as const;
+/** Three sizes kept on the toolbar: a fine line, the everyday one and a bold one. */
+export const QUICK_WIDTHS = [1.4, 2.6, 4.6] as const;
+export const QUICK_ERASERS = [8, 16, 28] as const;
 
 /** The brush a stroke is written with: one rule for the live stroke and the finished one, on every surface. */
 export function brushOf(tool: InkToolState, input: InkBrush["input"]): InkBrush {
@@ -53,5 +61,5 @@ export interface InkViewProps {
   onPenSeen?(): void;
 }
 
-/** Eraser radius in page units for a given pen width. */
-export const eraserRadius = (tool: InkToolState) => Math.max(6, tool.width * 3);
+/** The eraser's radius in page units. */
+export const eraserRadius = (tool: InkToolState) => Math.max(ERASER_RANGE.min, Math.min(ERASER_RANGE.max, tool.eraserSize));

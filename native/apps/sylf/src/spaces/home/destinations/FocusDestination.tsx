@@ -17,11 +17,10 @@ import { studyWith, useStudyWith } from "../../../shell/party/studyWith";
 import { RoomStrip } from "../../../shell/party/RoomStrip";
 import { usePartySummary } from "../../../shell/party/useParty";
 import { useHomeResult } from "../data";
-import type { FocusView, HomeDataAdapter, Objective } from "../data/contracts";
+import type { Objective } from "../data/contracts";
 import { formatMinutes } from "../format";
 import { HomeColumns, HomePage, PageTitle, Section } from "../HomePage";
 
-const load = (adapter: HomeDataAdapter) => adapter.focus();
 
 /** The clock renders only while this page is showing, because a hidden destination stays mounted. */
 function useFocusIsShowing() {
@@ -38,7 +37,6 @@ function ElsewhereNote() {
   return <Text variant="caption" tone="soft" align="center" testID="focus-elsewhere">A session is already running on another device. End it there before starting here.</Text>;
 }
 
-const loadToday = (adapter: HomeDataAdapter) => adapter.today(new Date());
 
 /** What the next session is about: a quest from today, which fills in its subject, or just a subject. Fixed once a session exists. */
 function WhatPicker({ quests }: { quests: Objective[] }) {
@@ -108,12 +106,12 @@ function WherePicker() {
   );
 }
 
-function Threshold({ focus }: { focus: FocusView | null }) {
+function Threshold() {
   const { space } = useTheme();
   const session = useStudySession();
   const { active } = useSessionState();
   const showing = useFocusIsShowing();
-  const today = useHomeResult("today", loadToday);
+  const today = useHomeResult("today");
   const enter = useEnterFocus();
   const status = session.status();
   const quests = (today?.data?.objectives ?? []).filter((objective) => !objective.done && objective.questId !== undefined).slice(0, 6);
@@ -137,7 +135,7 @@ function Threshold({ focus }: { focus: FocusView | null }) {
       )}
       <Stack gap="sm" style={{ alignSelf: "stretch" }}>
         <ElsewhereNote />
-        <Button title={active ? "Back to your session" : "Enter"} variant="emphasis" icon="focus" fill testID="focus-enter" onPress={() => enter({ title: focus?.topic || undefined, subject: focus?.subject || undefined })} />
+        <Button title={active ? "Back to your session" : "Enter"} variant="emphasis" icon="focus" fill testID="focus-enter" onPress={() => enter()} />
         {active ? <SessionActions surface="focus" /> : null}
         <SessionNote />
       </Stack>
@@ -169,7 +167,7 @@ function CreditNote() {
 
 export function FocusDestination() {
   const { space } = useTheme();
-  const result = useHomeResult("focus", load);
+  const result = useHomeResult("focus");
   const state = useSessionState();
   const { userId } = useAuth();
   // Only this person's, and only what the server has not accepted. Once it has, it belongs to Recent sessions.
@@ -183,12 +181,12 @@ export function FocusDestination() {
   ) : null;
 
   return (
-    <HomePage destination="focus" eyebrow="Study sessions" provenance={result?.provenance} live={result?.live} ready={result !== null}>
+    <HomePage destination="focus" eyebrow="Study sessions" live={result?.live} ready={result !== null}>
       <>
         <PageTitle title="Focus" />
         {/* A running session needs nothing from this read, so its controls never wait for one. Only the history does. */}
         <HomeColumns
-            primary={<Threshold focus={focus} />}
+            primary={<Threshold />}
             secondary={[
               ...(local ? [local] : []),
               ...(focus ? [

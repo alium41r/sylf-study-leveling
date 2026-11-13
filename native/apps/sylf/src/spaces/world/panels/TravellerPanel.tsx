@@ -3,14 +3,12 @@
 import { View } from "react-native";
 import { Avatar, Divider, Progress, Readout, Row, Stack, Text, useTheme } from "@sylf/design-system";
 import { useWorldResult } from "../data";
-import type { WorldDataAdapter } from "../data/contracts";
-import { PanelEmpty, PanelLoading, ReservedRow, SampleNotice, SectionHeading } from "./shared";
+import { PanelEmpty, PanelLoading, ReservedRow, SectionHeading } from "./shared";
 
-const loadTraveller = (adapter: WorldDataAdapter) => adapter.traveller();
 
 export function TravellerPanel() {
   const { space } = useTheme();
-  const result = useWorldResult("traveller", loadTraveller);
+  const result = useWorldResult("traveller");
   if (!result) return <PanelLoading />;
   const traveller = result.data;
   return (
@@ -23,7 +21,6 @@ export function TravellerPanel() {
               <Text variant="heading" numberOfLines={1}>{traveller.name}</Text>
               <Text variant="small" tone="soft" numberOfLines={1}>{`${traveller.title}, ${traveller.studyClass}`}</Text>
             </View>
-            <SampleNotice provenance={result.provenance} />
           </Row>
           <Progress value={traveller.levelProgress} label={`Level ${traveller.level}`} showValue />
           <Row gap="xl" wrap>
@@ -42,7 +39,7 @@ export function TravellerPanel() {
           </Stack>
           <Divider />
         </>
-      ) : <PanelEmpty icon="progress" title="No traveller yet" message={result.live?.failure ?? "Your level, rank and Sylph appear here once you sign in."} />}
+      ) : <PanelEmpty icon="progress" title="No traveller yet" message={result.live?.failure ?? "Your level, rank and Sylph could not be loaded."} />}
       <Stack gap="xs" style={{ marginHorizontal: -space.md }}>
         <ReservedRow title="Appearance" detail="Arrives with the game" />
         <ReservedRow title="Companion" detail="Arrives with the game" />

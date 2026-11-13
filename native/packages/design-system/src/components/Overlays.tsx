@@ -266,7 +266,7 @@ function SheetBody({ open, onClose, title, children, footer, width = 420, modal 
     : { right: space.sm + insets.right, top: space.sm + insets.top, bottom: space.sm + insets.bottom, width: Math.min(width, windowWidth - 2 * space.sm) };
 
   return (
-    <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
+    <View pointerEvents="box-none" style={[StyleSheet.absoluteFill, { overflow: "hidden" }]}>
       {modal ? <Scrim open={open} onPress={onClose} /> : null}
       <Animated.View ref={body as never} role="dialog" aria-modal={modal || undefined} aria-label={title} accessibilityViewIsModal={modal} style={[surface("float", "xl"), { position: "absolute", overflow: "hidden" }, placement, animated]}>
         <GestureDetector gesture={drag}>

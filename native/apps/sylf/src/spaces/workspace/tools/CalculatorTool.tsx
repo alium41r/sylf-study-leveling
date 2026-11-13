@@ -2,7 +2,7 @@
 // keeps its own expression, angle mode and recent answers. This tool has no sample data and needs no backend.
 import { useMemo, useState } from "react";
 import { Platform, ScrollView, View } from "react-native";
-import { FocusRing, Press, Segmented, Text, useInputMode, useTheme } from "@sylf/design-system";
+import { FocusRing, Press, Segmented, Text, useControlHeight, useInputFormat, useInputMode, useTheme } from "@sylf/design-system";
 import { calculator } from "@sylf/shared";
 import type { ToolProps } from "./shared";
 
@@ -15,6 +15,9 @@ const HISTORY = 4;
 export default function CalculatorTool({ window, patch }: ToolProps) {
   const { color, shape, space } = useTheme();
   const inputMode = useInputMode();
+  const format = useInputFormat();
+  const control = useControlHeight();
+  const keyHeight = format === "touch" ? Math.max(control, 44) : Math.round(control * 0.82);
   const [focused, setFocused] = useState(false);
   const expression = typeof window.state.expression === "string" ? window.state.expression : "";
   const angle: AngleMode = window.state.angle === "RAD" ? "RAD" : "DEG";
@@ -36,30 +39,32 @@ export default function CalculatorTool({ window, patch }: ToolProps) {
   };
 
   return (
-    <View testID={`calculator-${window.id}`} {...(Platform.OS === "web" ? { onKeyDown, tabIndex: 0, onFocus: () => setFocused(true), onBlur: () => setFocused(false) } as object : {})} style={[{ flex: 1, padding: space.md, gap: space.sm }, Platform.select({ web: { outlineStyle: "none" } as object, default: {} })]}>
+    <View testID={`calculator-${window.id}`} {...(Platform.OS === "web" ? { onKeyDown, tabIndex: 0, onFocus: () => setFocused(true), onBlur: () => setFocused(false) } as object : {})} style={[{ flex: 1 }, Platform.select({ web: { outlineStyle: "none" } as object, default: {} })]}>
       {focused && inputMode === "keyboard" ? <FocusRing radius={shape.radius.sm} inset={4} /> : null}
+      <ScrollView keyboardShouldPersistTaps="handled" nestedScrollEnabled contentContainerStyle={{ flexGrow: 1, width: "100%", maxWidth: 560, alignSelf: "center", justifyContent: "center", padding: space.sm, gap: space.xs }}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.sm }}>
         <Segmented label="Angle unit" value={angle} onChange={(next) => patch({ angle: next })} options={[{ value: "DEG", label: "Deg" }, { value: "RAD", label: "Rad" }]} />
         <Press label="Clear" radius={shape.radius.sm} height={32} onPress={() => patch({ expression: "" })} bodyStyle={{ paddingHorizontal: space.md, height: 32, justifyContent: "center" }}><Text variant="small" tone="soft">Clear</Text></Press>
       </View>
-      <ScrollView keyboardShouldPersistTaps="handled" style={{ flexGrow: 0, maxHeight: 56 }} showsVerticalScrollIndicator={false}>
+      {history.length ? <ScrollView keyboardShouldPersistTaps="handled" style={{ flexGrow: 0, maxHeight: 56 }} showsVerticalScrollIndicator={false}>
         {history.slice().reverse().map((line, index) => <Text key={`${line}${index}`} variant="micro" tone="soft" align="right" numberOfLines={1}>{line}</Text>)}
-      </ScrollView>
-      <View accessible aria-label={`Expression ${expression || "empty"}. Result ${preview?.result ?? "none"}`} style={{ minHeight: 64, justifyContent: "flex-end", alignItems: "flex-end", gap: 2 }}>
+      </ScrollView> : null}
+      <View accessible aria-label={`Expression ${expression || "empty"}. Result ${preview?.result ?? "none"}`} style={{ minHeight: space.xxl, justifyContent: "flex-end", alignItems: "flex-end", gap: space.hair }}>
         <Text variant="readout" numberOfLines={1} ellipsizeMode="head" testID={`calculator-expression-${window.id}`}>{expression || "0"}</Text>
         <Text variant="small" tone={preview && !preview.success ? "critical" : "soft"} numberOfLines={1} testID={`calculator-result-${window.id}`}>{preview ? preview.result : " "}</Text>
       </View>
-      <View style={{ flex: 1, gap: space.xs }}>
+      <View style={{ flexGrow: 1, minHeight: KEYS.length * keyHeight + (KEYS.length - 1) * space.xs, maxHeight: 440, gap: space.xs }}>
         {KEYS.map((row) => (
           <View key={row[0]} style={{ flex: 1, flexDirection: "row", gap: space.xs }}>
             {row.map((key) => (
-              <Press key={key} testID={`calc-key-${key}`} label={NAMES[key] ?? key.replace("(", "")} radius={shape.radius.sm} onPress={() => press(key)} style={{ flex: 1 }} bodyStyle={{ flex: 1, minHeight: 34, alignItems: "center", justifyContent: "center", backgroundColor: key === "=" ? color.emphasis.fill : color.selected }}>
+              <Press key={key} testID={`calc-key-${key}`} label={NAMES[key] ?? key.replace("(", "")} radius={shape.radius.sm} onPress={() => press(key)} style={{ flex: 1 }} bodyStyle={{ flex: 1, minHeight: keyHeight, alignItems: "center", justifyContent: "center", backgroundColor: key === "=" ? color.emphasis.fill : color.selected }}>
                 <Text variant="small" numberOfLines={1} style={key === "=" ? { color: color.emphasis.on } : undefined}>{key.replace("(", key.length > 2 ? "" : "(")}</Text>
               </Press>
             ))}
           </View>
         ))}
       </View>
+      </ScrollView>
     </View>
   );
 }

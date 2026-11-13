@@ -54,6 +54,7 @@ class SylfNativePlatformModule : Module() {
       Prop("inkWidth") { view: SylfInkView, value: Double -> view.inkWidth = value.toFloat() }
       Prop("inkOpacity") { view: SylfInkView, value: Double -> view.inkOpacity = value.toFloat() }
       Prop("eraserRadius") { view: SylfInkView, value: Double -> view.eraserRadius = value.toFloat() }
+      Prop("buttonErases") { view: SylfInkView, value: Boolean -> view.buttonErases = value }
       Prop("camera") { view: SylfInkView, value: List<Double> -> view.setCamera(value) }
       Prop("selectionBox") { view: SylfInkView, value: List<Double>? -> view.setSelection(value) }
       Prop("paper") { view: SylfInkView, value: String? -> view.setPaper(value) }

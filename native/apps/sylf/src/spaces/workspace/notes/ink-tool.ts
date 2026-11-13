@@ -5,7 +5,7 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { nativePreferences } from "@sylf/native-platform";
 import { detectCapabilities } from "@sylf/platform";
-import { WIDTH_RANGE, type InkToolState } from "./ink-types";
+import { ERASER_RANGE, WIDTH_RANGE, type InkToolState } from "./ink-types";
 import { HIGHLIGHTS, INKS } from "./pen-palettes";
 
 const KEY = "sylf.notes.pens.v1";
@@ -35,6 +35,8 @@ const KEPT: { [K in keyof InkToolState]?: (v: unknown) => boolean } = {
   pressure: bool,
   lineStyle: oneOf(["solid", "dashed", "dotted"]),
   straighten: bool,
+  buttonErases: bool,
+  eraserSize: (v) => typeof v === "number" && v >= ERASER_RANGE.min && v <= ERASER_RANGE.max,
 };
 
 function read(): Saved {

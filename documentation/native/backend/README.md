@@ -2,7 +2,7 @@
 
 The current contract for how Sylf Native reaches the existing Sylf backend. **Source, tests, schema and configuration win over this page.** Decisions are in [ADR 0009](../decisions/0009-native-authentication.md) (authentication), [ADR 0010](../decisions/0010-session-ownership-before-sign-in.md) (who owns a session) and [ADR 0011](../decisions/0011-shared-backend-foundation.md) (this foundation).
 
-**State: built in Phase 12 and connected in Phase 13, tested locally on real SQL and in real Electron.** Nothing here has run on a device or against hosted services. A build with no backend behaves as Phase 10 did. [ADR 0012](../decisions/0012-connected-app.md) records how the app is joined.
+The backend client was built in Phase 12 and connected in Phase 13. The Native frontend now requires a configured backend and a signed-in account. The connection screen covers a missing origin, and an authenticated installation can continue through the existing offline session and journal paths.
 
 **Planned (1 November 2026, not built).** The [Expansion stage](../expansion/README.md) extends this foundation with a heartbeat, one Realtime connection, a narrow visible-only fallback ([ADR 0013](../decisions/0013-expansion-stage.md) decision 7) and many more named reads. The [feature map](../expansion/feature-map.md#1-how-far-native-reaches-today) shows what Native reaches today.
 
@@ -32,7 +32,7 @@ const stats = useMemo(() => backend?.resources.resource({
 const state = useOptionalResource(stats);
 ```
 
-A read has a name in `packages/backend/src/reads.ts`, so a screen holds no path and no schema. Each Space composes its reads in `spaces/<space>/data/live.ts`, into one resource per destination, with pure mappers that import only types. `toLiveResult` turns a resource's state into what a screen reads, so all three Spaces say loading, offline and failed the same way.
+A read has a name in `packages/backend/src/reads.ts`, so a screen holds no path and no schema. Home and World compose typed resources in their respective `data/live.ts` files. Workspace tools read through the same client, and audio shares one catalog resource. `toLiveResult` turns a resource's state into what a screen reads, so all three Spaces say loading, offline and failed the same way.
 
 **Tags that matter:** `sessions`, `progress`, `today` and `traveller` are invalidated by the bridge when the server accepts a session. `subjects`, `circle`, `calendar` and `sylvie` by their own mutations.
 
@@ -106,7 +106,7 @@ Typed: `recentSessionsSchema`, `studySummarySchema`, `questPageSchema`, `userSta
 | --- | --- |
 | `backend.timer.current()` | The signed-in owner's `TimerSync`, started, or `null`. Stops at sign-out, wakes on reconnection and foreground, retries while anything is pending |
 | Journal storage | `createJournalStorage(preferences)`, one preference value, `sylf.native.timer-journal.v1` |
-| `ownerId` on the session model | Stamped at start. Ownerless when nobody was signed in, and then never delivered unless the person accepts |
+| `ownerId` on the session model | Stamped at start. Legacy ownerless sessions are delivered only if the person accepts |
 | The bridge | `currentBridge()`. Writes a session and its operations to the journal, and turns `onAccepted` into `settleAccepted` and `applyAccepted`. `flush`, `claim`, `decline` |
 | `saved` | Flips in `settleAccepted`, on the server's answer, and nowhere else |
 | `useSessionSync()` | `pending`, `offline`, `error`, `lastSaved`, for the words beside a session |

@@ -1,7 +1,6 @@
 // Sylf Native's way to the backend, joined once. It decides which client this is, and everything else lives in @sylf/backend.
 //
-// A build with no backend makes no request and does not load that package, so Sample data, "Not saved" and start-up are exactly what they
-// were. Electron's host says whether it has one. On a device it is `EXPO_PUBLIC_SYLF_API_ORIGIN`. Screens read `useLiveBackend()`, and
+// A build with no backend opens the connection screen and does not load that package. Electron's host says whether it has one. On a device it is `EXPO_PUBLIC_SYLF_API_ORIGIN`. Screens read `useLiveBackend()`, and
 // `useResource` gives them loading, empty, offline and failed through the same pattern as every other long-lived object here.
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { Linking } from "react-native";
@@ -37,7 +36,7 @@ export function useAuth(): AuthSnapshot {
   return useSyncExternalStore(joined?.auth.subscribe ?? noSubscribe, joined?.auth.getSnapshot ?? (() => NO_AUTH));
 }
 
-/** The backend, only while someone is signed in. This is what lets real data replace the sample and empty adapters, and go with the person. */
+/** The backend, only while someone is signed in. */
 export function useLiveBackend(): Backend | null {
   const joined = useBackend();
   return useAuth().status === "signed-in" ? joined : null;
@@ -109,7 +108,7 @@ export async function connectBackend(adapters: PlatformAdapters, capabilities: P
   const desktop = capabilities.runtime === "desktop";
   const configuredOrigin = process.env.EXPO_PUBLIC_SYLF_API_ORIGIN;
   if (desktop ? !(await hostHasBackend()) : !(capabilities.runtime === "native" && configuredOrigin)) { settle("none"); return; }
-  // A chunk that will not load must not leave the app on a blank page: it opens as a build with no backend, and studying still works.
+  // A chunk that will not load falls back to the connection screen.
   const loaded = await import("@sylf/backend").catch(() => null);
   if (!loaded) { console.warn("SYLF_BACKEND could not load its code."); settle("none"); return; }
   const { createBackend, createBearerGateway, createHostGateway, createPartyPresence, createRealtime, createSessionBridge, createSupabaseSocket, parseBackendOrigin } = loaded;

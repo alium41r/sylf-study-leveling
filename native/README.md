@@ -12,7 +12,7 @@ Sylf Native is the tablet-first native app (iPad, Android tablets), its Electron
 - World: [World guide](../documentation/native/world/README.md) and [ADR 0007](../documentation/native/decisions/0007-world-lobby-and-host.md).
 - The study session and the timer dock: [Spaces guide §10](../documentation/native/spaces/README.md#10-the-study-session-and-the-timer-dock) and [ADR 0008](../documentation/native/decisions/0008-study-session-and-timer-dock.md).
 
-**Status: Phase 13 complete on the Mac (awaiting review), which ends Stage 3. With a backend configured, this is a real client: sign-in, one study session delivered through the existing journal, and Home, Workspace and World on real data. With none, it is the Phase 10 app. Nothing from Phases 9 to 13 has run on a device.**
+**Current Native worktree.** Home, Workspace and World open after sign-in. Set `SYLF_BACKEND_ORIGIN` when launching Electron and `EXPO_PUBLIC_SYLF_API_ORIGIN` when building for a device. Unconfigured builds open the connection screen. Notes, PDFs and boards use the signed-in account's library on this device. See the [frontend refinement report](../documentation/native/reports/2026-11-10-frontend-refinement/README.md).
 
 ## Layout
 
@@ -52,8 +52,8 @@ native/
 | Boundary audit / single-copy check | `npm run check:boundaries` / `npm run check:single-copy` |
 | Expo dev server (Android dev client, web) | `npm run start` / `npm run web` |
 | Web build (desktop payload) | `npm run build:web` → `apps/sylf/dist/` |
-| Desktop app | `npm run desktop:start` (builds web, launches Electron) |
-| Desktop against the Expo dev server | `npm run web`, then `npm run desktop:dev` (loopback only) |
+| Desktop app | `SYLF_BACKEND_ORIGIN="$sylf_server" npm run desktop:start` (builds web, launches Electron) |
+| Expo web and Electron development server | `npm run web`, then `npm run desktop:dev` for the development Showcase. Use the packaged renderer for signed-in Electron checks. |
 | Desktop security self-test | `npm run desktop:self-test` (exit 0 = all checks pass) |
 | Android release build (arm64 by default) | `npm run android:build`. Set `SYLF_ANDROID_ABIS=armeabi-v7a,arm64-v8a,x86,x86_64` for all ABIs |
 | Android install + smoke test on a device | `npm run android:smoke` |
@@ -61,7 +61,8 @@ native/
 | Desktop design check (every theme, keyboard, pointer, window sizes, frame pacing) | `SYLF_DESIGN_CHECK_OUT=<dir> npm run desktop:design-check` |
 | Desktop Spaces check (switcher, World flow, restoration, window sizes, every theme) | `SYLF_SPACES_CHECK_OUT=<dir> npm run desktop:spaces-check` |
 | Desktop review captures (Showcase chapters at every scroll position, for a person to inspect) | `SYLF_REVIEW_OUT=<dir> npm --workspace @sylf/desktop run review-capture` |
-| Desktop Home check | `SYLF_HOME_CHECK_OUT=<dir> npm run desktop:home-check` |
+| Signed-in desktop frontend check | `npm run desktop:frontend-check`. Uses a disposable profile and a loopback fixture with real repository audio files. |
+| Desktop Home check (legacy layout suite) | `SYLF_HOME_CHECK_OUT=<dir> npm run desktop:home-check` |
 | Desktop Workspace check (canvas, windows, presets, restoration, suspension, keys, frames, retention). `SYLF_WORKSPACE_CHECK_ONLY=<groups>` runs part of it | `SYLF_WORKSPACE_CHECK_OUT=<dir> npm run desktop:workspace-check` |
 | Desktop World check (lobby, sections, skies, the host's lifecycle and failures, isolation, reduced motion, contrast against the sky, sizes, themes, frames, retention). `SYLF_WORLD_CHECK_ONLY=<groups>` runs part of it | `SYLF_WORLD_CHECK_OUT=<dir> npm run desktop:world-check` |
 | Desktop session check (one session across the dock, Focus and Timer, restarts, countdowns, World's safeguards, keys, the dock at ten window shapes, themes, rendering, frames, retention). `SYLF_SESSION_CHECK_ONLY=<groups>` runs part of it | `SYLF_SESSION_CHECK_OUT=<dir> npm run desktop:session-check` |
@@ -86,6 +87,6 @@ native/
 7. **Design.** Sylf Native has an original visual language, **Aloft** (master plan §7.2, [design guide](../documentation/native/design/README.md)). The web app is a reference for functionality, branding and user preferences only. Build from `@sylf/design-system`: no hardcoded colors, fonts, radii or durations, and no branching on a theme id. Give non-button controls `accessible`. Themes never touch authored documents (`DocumentSurface`).
 8. **Spaces.** One Space is mounted at a time. Keep restorable state in `@sylf/spaces` snapshots, never only in a component. Set `tabIndex` on web only: on Android a `tabIndex` of -1 hides a control from TalkBack.
 9. **The study session.** There is one, in `@sylf/spaces`. No screen keeps time or a copy of it, and no screen reads `snapshot`. Use `shell/session/SessionParts.tsx`, and pass `live={false}` when hidden. Local time is never called a record ([ADR 0008](../documentation/native/decisions/0008-study-session-and-timer-dock.md)).
-10. **Backend.** Everything goes through `@sylf/backend`, and no screen calls `fetch`. It stays behind `import()` in `apps/sylf/src/shell/backend.ts`, which the audit enforces, so a build with no origin loads none of it. See the [backend guide](../documentation/native/backend/README.md). No token reaches Electron's renderer. Rewards and time accounting stay on the server.
+10. **Backend.** Everything goes through `@sylf/backend`, and no screen calls `fetch`. It stays behind `import()` in `apps/sylf/src/shell/backend.ts`, which the audit enforces, so an unconfigured build shows the connection screen without loading the backend package. See the [backend guide](../documentation/native/backend/README.md). No token reaches Electron's renderer. Rewards and time accounting stay on the server.
 11. **World.** Nothing outside `spaces/world/` may statically import it, and nothing may statically import its host. The audit enforces both. Art is authored, and any text over it is measured against rendered pixels ([World guide](../documentation/native/world/README.md)).
 12. **Development tools.** The Showcase and app links need `DEV_TOOLS`. `build:web` and `build:android` set `EXPO_PUBLIC_SYLF_DEV_TOOLS=1`, and a store build must not.

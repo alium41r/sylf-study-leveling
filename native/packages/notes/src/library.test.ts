@@ -1,7 +1,7 @@
 import * as Y from "yjs";
 import { describe, expect, it } from "vitest";
 import { notesContracts } from "@sylf/shared";
-import { createMemoryStorage, createNotesLibrary, InkScene, brushFor, flowOf, kindOf, DEVICE_OWNER, ownerKey, type NotesStorage } from "./index";
+import { createMemoryStorage, createNotesLibrary, inLibraryOrder, InkScene, brushFor, flowOf, kindOf, DEVICE_OWNER, ownerKey, type NotesStorage } from "./index";
 
 const sha256 = async (bytes: Uint8Array) => {
   const { createHash } = await import("node:crypto");
@@ -46,6 +46,43 @@ describe("Notes library", () => {
     const again = new InkScene(reopened.stream(reopened.descriptor().pages[0].streamId));
     expect(again.strokes()).toHaveLength(1);
     expect(again.strokes()[0].d).toBe(scene.strokes()[0].d);
+  });
+
+  it("reads first-page ink, paper and legacy text after reopening without changing the library history", async () => {
+    const storage = createMemoryStorage();
+    const owner = "user:12";
+    const library = make(storage, owner);
+    const id = await library.create({ kind: "note", title: "Mechanics" });
+    const document = await library.open(id);
+    const firstPage = document.descriptor().pages[0];
+    const textLayer = document.stream(firstPage.extensions.textStreamId as string);
+    const paragraph = new Y.XmlElement("paragraph");
+    const line = new Y.XmlText();
+    line.insert(0, "The net force changes momentum.", { bold: {} });
+    paragraph.insert(0, [line]);
+    textLayer.getXmlFragment("body").insert(0, [paragraph]);
+    const scene = new InkScene(document.stream(firstPage.streamId));
+    scene.setPaper({ template: "grid", color: "#23252a", rule: "#626773", spacing: 16 });
+    scene.begin(brushFor("pen", { color: "#fff5da", width: 3, input: "pen" }));
+    scene.append([sample(40, 80, 0), sample(78, 110, 8), sample(135, 88, 16)]);
+    scene.end();
+    const secondPage = document.addPage();
+    expect(secondPage).not.toBe(firstPage.pageId);
+    const [stroke] = scene.strokes();
+    scene.close();
+    document.release();
+    await library.close();
+
+    const reopened = make(storage, owner);
+    await reopened.ready();
+    const snapshot = reopened.getSnapshot();
+    const preview = await reopened.previewPage(id);
+    expect(preview.text).toBe("The net force changes momentum.");
+    expect(preview.paper).toMatchObject({ template: "grid", spacing: 16 });
+    expect(preview.strokes).toEqual([{ id: stroke.id, d: stroke.d, color: stroke.color, opacity: stroke.opacity }]);
+    expect(reopened.getSnapshot()).toBe(snapshot);
+    await expect(make(storage, "user:17").previewPage(id)).rejects.toThrow("no longer here");
+    await reopened.close();
   });
 
   it("shares one replica between windows and saves after a pause", async () => {
@@ -259,7 +296,65 @@ describe("Notes library", () => {
     await library.deleteNotebook(sub);
     expect(library.getSnapshot().entries.find((e) => e.id === id)?.notebookId).toBe(top);
     await library.setCover(id, { color: "#2f9e8f", icon: "📘" });
-    expect(library.getSnapshot().entries.find((e) => e.id === id)?.cover).toEqual({ color: "#2f9e8f", icon: "📘" });
+    expect(library.getSnapshot().entries.find((e) => e.id === id)?.cover).toEqual({ color: "#2f9e8f", icon: "📘", image: null });
   });
+  it("serializes folder edits and keeps manual sibling order after reopening", async () => {
+    const storage = createMemoryStorage();
+    const library = make(storage);
+    const [maths, physics] = await Promise.all([library.createNotebook("Maths"), library.createNotebook("Physics")]);
+    const [a, b] = await Promise.all([
+      library.create({ kind: "note", notebookId: maths, title: "Proofs" }),
+      library.create({ kind: "note", notebookId: maths, title: "Vectors" }),
+      library.updateNotebook(maths, { color: "#813ddd" }),
+      library.renameNotebook(maths, "Mathematics"),
+    ]);
+    await Promise.all([library.reorder(physics, maths, "before"), library.reorder(a, b, "before")]);
+    await expect(library.reorder(a, physics, "before")).rejects.toThrow("same folder");
+    await expect(library.move(a, "missing")).rejects.toThrow("no longer here");
+    await library.close();
+    const reopened = make(storage);
+    await reopened.ready();
+    const { notebooks, entries, order, failure } = reopened.getSnapshot();
+    expect(failure).toBeNull();
+    expect(inLibraryOrder(notebooks, order?.[""]).map(({ id }) => id)).toEqual([physics, maths]);
+    expect(notebooks.find(({ id }) => id === maths)).toMatchObject({ title: "Mathematics", color: "#813ddd" });
+    expect(inLibraryOrder(entries, order?.[maths]).map(({ id }) => id)).toEqual([a, b]);
+  });
+
+  it("keeps a cover and concurrent editor changes in the same owner library", async () => {
+    const storage = createMemoryStorage();
+    const library = make(storage, "user:42");
+    const id = await library.create({ kind: "note" });
+    const document = await library.open(id);
+    const png = { bytes: new Uint8Array([137, 80, 78, 71]), mediaType: "image/png", name: "cover.png" };
+    const cover = library.setCover(id, { color: "#2f9e8f", image: png });
+    const page = document.addPage();
+    document.setText("Vector spaces");
+    await Promise.all([cover, library.rename(id, "Linear algebra"), library.pin(id, true)]);
+    const copy = await library.duplicate(id);
+    document.release();
+    await library.close();
+
+    const reopened = make(storage, "user:42");
+    const original = await reopened.open(id);
+    expect(original.descriptor().pages.map((item) => item.pageId)).toContain(page);
+    expect(() => notesContracts.documentSchema.parse(original.descriptor())).not.toThrow();
+    const info = reopened.getSnapshot().entries.find((item) => item.id === id)!;
+    expect(info).toMatchObject({ title: "Linear algebra", pinned: true, text: "Vector spaces", cover: { color: "#2f9e8f", image: { mediaType: "image/png" } } });
+    const hash = info.cover.image!.hash;
+    expect(await reopened.asset(hash)).toEqual(png.bytes);
+    expect(await make(storage, "user:43").asset(hash)).toBeNull();
+    await reopened.setCover(id, { image: null });
+    expect(reopened.getSnapshot().entries.find((item) => item.id === id)?.cover.image).toBeNull();
+    original.release();
+    await reopened.trash(id);
+    await reopened.remove(id);
+    expect(await reopened.asset(hash)).toEqual(png.bytes);
+    await reopened.trash(copy);
+    await reopened.remove(copy);
+    expect(await reopened.asset(hash)).toBeNull();
+    await reopened.close();
+  });
+
 });
 

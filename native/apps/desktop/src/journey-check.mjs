@@ -589,36 +589,18 @@ async function runStage(window, { stub }, stage, out) {
   check("the server agrees: this is someone else", (await api("/api/user/stats")).json?.email === bob.email);
   check("the second person's record is empty", (await serverSessions()).length === 0);
 
-  // Sign out, study with no account, and be asked once.
+  // Sign out and confirm that accessing any Space requires an account.
   await open("space=home&home=today");
   await accountSheet();
   await clickOn(tid("account-sign-out"));
   check("signing out returns to the sign-in page", await until(tid("signin-surface"), 10000));
   await shot("22-signed-out");
   check("signing out by choice does not claim the server ended anything", !(await has(tid("signin-ended"))));
-  await clickOn(tid("signin-later"));
-  await until(tid("home-rail-focus"));
-  await rail("focus");
-  check("with no account, Phase 10's words stand", (await textOf(tid("session-note")))?.includes("Not saved to your study record yet"));
-  await clickOn(tid("focus-begin"));
-  await sleep(2300);
-  await clickOn(tid("focus-end"));
-  await until('[role="alertdialog"]');
-  await clickOn(`[role="alertdialog"] [aria-label="End session"]`);
-  await sleep(500);
-  const local = (await record()).ended.find((/** @type {any} */ item) => item.ownerId === null);
-  check("a session with nobody signed in stays ownerless", !!local);
-  await accountSheet();
-  await clickOn(tid("account-sign-in"));
-  await until(tid("signin-surface"));
+  check("the sign-in screen has no guest route", !(await has(tid("signin-later"))) && !(await has(tid("space-home"))));
+  await open("space=workspace");
+  check("a Workspace link also requires sign-in", await until(tid("signin-surface")) && !(await has(tid("workspace-root"))));
   await signInUi(alice.email);
-  check("signing in asks once about the ownerless session", await until('[role="alertdialog"]', 10000) && await says("Add this to your study record?"));
-  await shot("23-claim");
-  await clickOn(`[role="alertdialog"] [aria-label="Add to my record"]`);
-  const claimedEnd = Date.now() + 15000;
-  while (Date.now() < claimedEnd && !(await record()).ended.find((/** @type {any} */ item) => item.clientKey === local.clientKey)?.saved) await sleep(250);
-  check("accepting delivers it to that account", (await record()).ended.find((/** @type {any} */ item) => item.clientKey === local.clientKey)?.saved === true);
-  check("the first person is back with their own data", (await serverSessions()).length === sessionsBefore + 1);
+  check("the first person is back with their own data", await until(tid("spaces-icon")) && (await serverSessions()).length === sessionsBefore);
   await open("space=home&home=progress&mode=dark");
   check("their record is on screen again", await says(`Level ${after.level}`) && await says("Physics"));
   await noSample("the first person's return");

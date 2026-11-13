@@ -66,3 +66,13 @@ export function openPdfSource(hash: string, load: () => Promise<Uint8Array | nul
     },
   };
 }
+
+/** A gallery raster at a bounded size. Release the parser as soon as the thumbnail is ready. */
+export async function renderPdfThumbnail(hash: string, load: () => Promise<Uint8Array | null>, index: number, pixels: number): Promise<string> {
+  const source = openPdfSource(hash, load);
+  try {
+    const canvas = document.createElement("canvas");
+    await source.render(index, canvas, pixels);
+    return canvas.toDataURL("image/jpeg", 0.82);
+  } finally { source.release(); }
+}

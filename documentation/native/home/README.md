@@ -4,11 +4,11 @@
 
 Labels: **Confirmed** came from the owner's brief or master plan. **Proposed** is a Phase 6 decision the owner can still change.
 
-**Updated 4 November 2026 (Expansion Part 2).** Home now has **five destinations: Today, Plan, Focus, Circle and Progress**, and the account is a page reached from the rail's foot. Plan holds Calendar, Quests and goals, and Plans ([Plan guide](../plan/README.md)). Progress holds Overview, Stats, Standing, Honours, Skills and the Codex ([Progress guide](../progress/README.md)). Focus is the threshold to the Focus environment ([Focus guide](../focus/README.md)). The account has seven sections ([Account guide](../account/README.md)). Circle still has one view: People, Messages and Parties arrive in Part 3. Sections 2 and 3 below were written for four destinations and a template on sample data, and are corrected where this paragraph says so. **Planner and Calendar left Workspace** ([ADR 0014](../decisions/0014-home-hub-and-workspace-scope.md)).
+**Updated 10 November 2026.** Home opens after account sign-in. Its five destinations are Today, Plan, Focus, Circle and Progress. The account sits at the rail's foot. [Plan](../plan/README.md), [Circle](../circle/README.md), [Focus](../focus/README.md), [Progress](../progress/README.md), [Account](../account/README.md).
 
 ## 1. What exists
 
-Home is a frontend template. It loads no real person's data and contacts no server. Since Phase 10, Focus runs the one study session, tracked on this device ([Spaces guide](../spaces/README.md#10-the-study-session-and-the-timer-dock)).
+Home reads the signed-in person's schedule, quests, study record and social data through the Native backend client. The timer dock and Focus still share one study session.
 
 | Layer | Location | Owns |
 | --- | --- | --- |
@@ -17,7 +17,7 @@ Home is a frontend template. It loads no real person's data and contacts no serv
 | Rail | `spaces/home/HomeRail.tsx` | The five destinations, as a column or a bottom bar, with the account at its foot |
 | Page | `spaces/home/HomePage.tsx` | The still strip, the scrolling page, restoration, columns, `Section`, `PageTitle`, the empty and loading pages |
 | Destinations | `spaces/home/destinations/` | Today, Plan, Focus, Circle, Progress. Plan and Progress mount their views from `spaces/home/plan/` and `spaces/home/progress/`, each on first visit |
-| Data | `spaces/home/data/` | Typed contracts, the sample and empty adapters, the one binding point |
+| Data | `spaces/home/data/` | Typed view models composed from authenticated reads |
 | Words and numbers | `spaces/home/format.ts` | Greeting, durations, and the day's summary |
 
 ## 2. The rail
@@ -30,29 +30,29 @@ Home is a frontend template. It loads no real person's data and contacts no serv
 - **Labels stay visible.** The plan proposed icons with a label on hover or long press, but a tablet has no hover, and an abstract icon should not have to be tapped to learn what it is. The column is still only 60 pt with a mouse and 68 pt with touch. Labels go only when the window is too short for them, and the icons keep their names for assistive technology and gain a tooltip.
 - **The Marker flies along the left edge.** `TravellingMarker` gained `axis="y"`, so every theme's body and flight still apply. A line-shaped Marker stands upright. The icon's own mark also lights, so selection is never shown by color alone.
 - **A compact window (under 600 pt) gets a bottom bar.** A rail would take a fifth of a 340 pt window. It is the same element in both shapes, so crossing the line moves it without remounting it.
-- **Account and settings are not on the rail.** The plan reserves the bottom of the rail for them, but no account exists until Phases 11 and 12, and a control that did nothing would suggest otherwise.
+- **Account sits at the end of the rail.** In the bottom bar, its width is reserved before the five destinations divide the safe-area width. The marker sits below the selected label.
 
 | Input | Behavior |
 | --- | --- |
 | Touch, stylus | Tap. Targets are at least 44 pt |
 | Mouse, trackpad | Click, with a hover tint. An open Spaces bar takes the click, so it never reaches the rail underneath |
-| Keyboard (desktop) | Order is the Spaces icon, then the rail, then the page. Up and Down move and wrap (Left and Right in the bottom bar), Home and End jump, Enter or Space selects. Focus stays on the rail. Tab leaves for the page |
+| Keyboard (desktop) | Order starts with the Spaces icon and timer dock, then the rail and page. Up and Down move and wrap (Left and Right in the bottom bar), Home and End jump, Enter or Space selects. Focus stays on the rail. Tab leaves for the page |
 | Android Back | Keeps the system's behavior. Home has nothing to close |
 | Screen readers | A labelled tab list with tab panels. A destination change is announced. **TalkBack itself has not been run** |
 
 ## 3. Destinations
 
-Each page has a still strip at the top, level with the Spaces icon and the timer dock, and a page that scrolls beneath it. The strip holds a short line of context and, for sample data, a **Sample data** badge. Because the strip does not scroll, the badge stays on screen however far a page is scrolled. The strip stops short of the dock, and in a narrow window the line of context steps aside and the badge stays.
+A page scrolls below the shell controls. Today keeps the date with the greeting, and other destinations may show context in the top strip when there is room. Offline status moves into the page in narrow layouts.
 
 | Destination | Layout | Real actions | Disabled until later |
 | --- | --- | --- | --- |
-| **Today** | A greeting, one sentence about the day, then the day as a single line: what has gone, the one next thing with the Marker on it, and what follows. Objectives and quick actions beside it | Prepare in Focus, Start studying, Open Workspace, Open World. These navigate for real | Nothing |
+| **Today** | The dashboard: four parts with no surface around any of them. Progress under the greeting, the World island, what there is to do, and Circle, with the timer button at the middle where they meet. Two by two with room, see [Today](#today) | Begin focus, Study this, tick a quest, Calendar, Enter World, Progress, Circle, and answering a friend request or a party invitation. All real | Nothing |
 | **Plan** | Calendar (Month, Week, Agenda beside a day page, with one add field), Quests and goals, Plans | Create, move and complete quests and events, rest days, goals and subjects, and build, watch, answer and confirm an AI plan (Plans) | Drag to move or resize in Week; plan materials upload |
 | **Focus** (replaced in Part 2 by the threshold: what, rhythm, where, **Enter**) | An instrument: subject, length, and Begin, then the running session. What is on this device, study desks and recent sessions beside it | Everything about a session: lengths, Begin, Pause, Resume, End. It is the same session as the dock and Workspace's Timer. A desk is still a preview, and says so | Nothing |
 | **Circle** (three views since Part 3) | People (the ring and list), Messages, Parties, with Notifications and Find people as sheets | Find people, requests, message, remove, block; conversations, groups; party invitations, start, invite, leave | Realtime, party sessions, blocked list |
 | **Progress** (six views since Part 2) | Overview, Stats, Standing, Honours, Skills, Codex. Level on one quiet line, no HP | Claim all, raise an attribute | Skill nodes |
 
-Today also carries Sylvie: a daily briefing line when she wrote one (`TodayBriefing`) and **Ask Sylvie** (`QuickAsk`), a sheet on the same conversation runtime as Workspace. See the [Circle guide](../circle/README.md) and the [Plan guide](../plan/README.md).
+Today also carries Sylvie's daily briefing line when she wrote one (`TodayBriefing`); quick conversation sheets (`QuickAsk`) stay available from Focus. See the [Circle guide](../circle/README.md) and the [Plan guide](../plan/README.md).
 
 Gamification stays quiet by design, as master plan §2.1 asks: one line for the level, no celebration, and no reward styling.
 
@@ -84,7 +84,7 @@ The check changed the template in three places:
 
 - **A friend's subject is not shown.** The friends API says someone is studying and since when, not what. The sample once said "Studying biology". It now says "Studying, 40 min".
 - **Parties have no schedule.** `FocusParty` has members and sessions, with no start time and no seat count. The sample once showed "Tonight" and "3 of 6 seats". It now shows members and whether a session is running.
-- **The day's summary is not a server field.** It is `summarizeDay()`, from the entries.
+- **The day's summary is composed by `mapToday()` from timed entries, all-day events and quests.
 
 **Deferred future possibilities, needing backend work.** Scheduled study parties. Showing what a friend is studying. A "desk" that bundles a background with sound and a layout. None is built, and none is implied by the template.
 
@@ -94,12 +94,12 @@ The check changed the template in three places:
 | --- | --- | --- |
 | Destination | The Home snapshot, written the moment it changes | Space changes, remounts, window changes, process kill, restart |
 | Each destination's scroll position | Same snapshot, written after a 160 ms pause, on a destination change, when Home leaves, and on backgrounding | Same |
-| Chosen desk on Focus | Component state | Nothing. It changes nothing yet, so there is nothing to keep |
+| Focus background | Existing account preference | Across signed-in clients |
 | Chosen length, the session | The study session's own record | Everything ([Spaces guide](../spaces/README.md#10-the-study-session-and-the-timer-dock)) |
 
 `createHomeNavigation(store)` is created beside the Spaces store in `App.tsx`, outside React. It keeps no copy of the truth: it reads the store's `home` snapshot, so a change from anywhere reaches the rail. Its listeners fire when the destination changes and never for a scroll, so a scrolling page renders nothing.
 
-A snapshot is `{ destination, scroll: { today, focus, circle, progress } }`. `parseHomeSnapshot` carries Phase 5's `{ scrollY }` over to Today and drops anything unknown. A scroll position is restored once the page's real content is there, because before that it would be clamped to the height of the loading state.
+A snapshot is `{ destination, scroll: { today, plan, focus, circle, progress } }`. `parseHomeSnapshot` carries Phase 5's `{ scrollY }` over to Today and drops anything unknown. A scroll position is restored once the page's real content is there, because before that it would be clamped to the height of the loading state.
 
 ## 6. Mounting and memory
 
@@ -107,7 +107,7 @@ A destination mounts on its first visit and stays mounted and hidden until Home 
 
 - **Hidden means gone for every purpose but memory:** opacity 0, no touches, out of the accessibility tree (`importantForAccessibility`, `aria-hidden`), and on web `visibility: hidden`, which also removes it from the tab order. Not `display: none`: Fabric drops the native views of a `display: none` subtree, so showing it again would rebuild them.
 - **The old page goes at once and the new one arrives.** Two pages crossing over each other is harder to read than either.
-- **No `breathing` Marker and no looping animation in a settled Home.** It would drain battery, and `uiautomator` could not read the screen (Phase 5 rule 5). Only the loading state pulses.
+- **No `breathing` Marker and no looping animation in a settled Home.** It would drain battery, and `uiautomator` could not read the screen (Phase 5 rule 5). Only the loading state pulses. **One exception since 12 November 2026:** the island on Today, which the owner asked for. It is paused whenever the dashboard is not on screen and absent with reduced motion ([Today](#today)). Its effect on `uiautomator` and on battery has not been measured on a device.
 - **No full-window SVG, and no shadow on anything that changes size** (Phase 5 rules 1 and 2). The ring in Circle is a bordered view, and the chart is plain views.
 
 Measured figures are in the [Phase 6 report](../reports/phase-6/report.md#5-memory). `npm run android:memory-check -- --sweep=destinations --budget-native=<mb>` keeps this a regression check.
@@ -116,46 +116,57 @@ Measured figures are in the [Phase 6 report](../reports/phase-6/report.md#5-memo
 
 **Phase 13 connected all four destinations.** Today puts timed events on the line and quests after it, in order, with no invented time, and "Study this" fills in Focus. Focus lists what the server accepted under Recent sessions, and what it has not under On this device. Progress reads the server's level, rank, XP and streak, the week from `detailed-stats?summary=true`, and offers Claim on an achievement that is ready. Circle shows friends, says hidden for what a friend hides, answers friend requests, and lists a party and invitations with no schedule. Desks are gone from a signed-in Focus ([ADR 0012](../decisions/0012-connected-app.md)). The table in §4 is the audit: this paragraph is what was built.
 
-Screens never import sample data. They call `useHomeResult(view, load)`, which reads the adapter from `data/index.ts`, and each result carries `provenance`. The Sample data badge comes from that field, so a real adapter removes the badge with no screen change.
-
-| Build | Adapter |
-| --- | --- |
-| Someone signed in | Live. `data/live.ts`, one resource per destination |
-| A backend, and nobody signed in | Empty |
-| No backend, `DEV_TOOLS` on (a development build) | Sample. Invented people and invented numbers, all marked sample |
-| No backend, `DEV_TOOLS` off | Empty. **A store build cannot show sample content**, and a test covers this |
-| App link `homeData=empty` or `homeData=slow` | The empty state or the loading state, for review |
-
-The sample day is built around the current time, so the line always has a next item. The sample week adds its totals up from the same days the chart draws.
-
-Each destination has five states: loading, empty, ready, offline and failed. Empty pages are written for a real person. Offline shows a badge in the strip, over the last good copy if there is one. A failure with nothing to show says why and offers Try again.
+`useHomeResult(view)` binds each view to the signed-in backend. Empty, loading, offline and failed states come from those resources. Cached results clear when the account changes. The connection and sign-in screens appear before Home mounts.
 
 ## 8. Development and diagnostics
 
 | Link | Web | Android |
 | --- | --- | --- |
 | A destination | `?space=home&home=circle` | `sylf-native://spaces?space=home&home=circle` |
-| A data state | add `&homeData=empty` | same |
 
 New log line: `SYLF_HOME_MOUNT <destination> <ms>`, once per destination per Home mount.
 
 ## 9. Extending Home
 
 1. Name the existing backend owner first, and add it to §4. No owner means defer it and write it down.
-2. Add to `data/contracts.ts`, then to the sample and empty adapters. Screens read view models, never server records.
+2. Add view models in `data/contracts.ts` and compose them from typed reads in `data/live.ts`.
 3. Use `Section`, `HomeColumns` and `HomePage`. Do not add a second scroller, a second persistence path, or per-theme layout.
 4. Keep text at `soft` or stronger: `faint` is 3:1, for marks and not for words.
-5. Run `npm run desktop:home-check`, `npm run android:home-check` and the memory sweep.
+5. Run `npm run desktop:frontend-check`. The historical Home checks contain template-era expectations. Verify tablet gestures and safe areas on a signed-in device when one is available.
 
 ## Part 5 (5 November 2026)
 
 Today gained a status line, the weekly focus quest, a real "What's ahead" list and Sylvie's insights; the Sylvie sheet continues earlier conversations. See the [Part 5 report](../reports/expansion-part-5/report.md) for the parity table against Web.
 
-## The Today dashboard (5 November 2026)
+## Today
 
-Today is a dashboard, not a list. From the top: a greeting with a small mark for the hour (sun or moon) and Sylvie one press away; any study party invitation as a single quiet row (hidden while a session runs); the **hero**; Sylvie's note and insights; then two columns (one on a phone): **Your day** (the line through the day, quests with their subject colour, and what is coming up) beside **Your momentum** (level and XP, the week as bars against your own target, the run of days, Sylph, and the week's focus quest), a slim **Sylf World** row and a **Circle** card (friends studying now, as faces).
+**Redesigned 12 November 2026.** Today is a dashboard of four parts. None has a card, panel, fill, border or shadow: a part is set apart by air, by where its heading sits, and by one hairline between the rows. Decisions, the island's measurement and the screenshots are in the [Home redesign report](../reports/2026-11-12-home-redesign/README.md).
 
-- **The hero** is what to do now. Its **ring** is today's target (the number a student checks); while a countdown runs the ring is the session and the live clock sits in its middle (the one clock: the same readout the dock shows, beating only while Today is on screen), with the Marker at the leading edge. **Begin** is the page's only filled control.
-- **The scenery** is one piece, in the hero: a window onto Sylf World's own baked sky for the hour (dawn, day, sunset, dusk, night), with the gate standing in a sea of cloud. Home and World share one place and one light. It follows the clock, not a theme, because World's art is authored like a document, and it is drawn as still images in a frame that bleeds to the card's edge. Text never goes over it, so contrast never depends on it.
-- **Aloft's rules, and why this fits them.** Aloft avoids decorative gradients, glass and blur, and cards as the default container. The dashboard uses none of the first two: the richness is art (baked plates), not effects. Modules are surfaces only where they hold a distinct job (hero, day, momentum, circle, world), at two elevations (`raised` for the working modules, `plane` for the links), with no card inside a card (the weekly quest is inline in Momentum). Every colour is a theme token, so it holds in light and dark and with custom accent and background colours.
-- **Files:** `spaces/home/destinations/Today*.tsx`, `todaySky.ts`, `todayRing.ts`, `shell/charts/Ring.tsx`, and the window in `spaces/world/DashboardWindow.tsx` (World's art may only be imported from World, so Home loads it with `import()` through `TodayScenery`). A day with nothing planned still shows the whole dashboard: the Day card says so and offers the plan.
+| Part | Where (desktop) | Shows | Reads |
+| --- | --- | --- | --- |
+| **Progress** (`TodayHeader`, `TodayProgress`) | Top left | The date, the greeting and the day in one sentence. Then level, rank and XP on a rule, today's study against the daily target as cells, the run of days, the last seven days, Sylph, and the week as bars. Opens Progress | The shell's `user-stats`, Progress's `progress-record`, and the day's target from `home-today` |
+| **World** (`TodayWorld`, `TodayScenery`, `spaces/world/DashboardWindow`) | Top right | The island: the gate on its dais in the sea of cloud, in the hour's sky, moving slightly. The picture and the Enter link open World | `user-stats` for Sylph. The art is loaded with `import()` |
+| **Objectives** (`TodayObjectives`, `QuestPath`, `TodayAhead`, `TodayBriefing`) | Bottom left | The day's timed events on a line, today's quests along a connected completion path, coming up quests on a matching path, the week's focus quest anchored at the bottom of the quests section, full-width open goals, and Sylvie's note. Opens Calendar | `home-today`, `progress-weekly-quest`, Plan's `plan-quests`, the briefing and insights |
+| **Circle** (`TodaySocial`, `circle/AnswerRows`) | Bottom right | Party invitations and friend requests, answered in place; who is studying or online now; the party you are in. Opens Circle | `home-circle` |
+
+**The hub** (`TodayHub`) is the way into a session: one button (Begin focus, Back to focus, or View calendar when an event is next) on the hairline between the rows. In the grid its middle is the gutter between the columns, which is the point where the four parts meet. It is in the page's flow, so it never covers content, and its position comes from the row's own measured width. It behaves as the button always did: it begins the next quest in Focus with its subject and title, returns to a running session, or opens Calendar for an event. What it will begin is named beside it in Objectives.
+
+**Layout** comes from the page's own content width, inside the rail, padding and safe areas (`todayLayout.ts`), never from the device:
+
+| Content width | Layout | Order |
+| --- | --- | --- |
+| 880 pt and up | `grid`: two rows of two, left to right 6 : 5 | Progress, World / the hub at the middle / Objectives, Circle |
+| 560 to 879 pt | `paired`: the greeting, then Progress beside the island, then one column | Progress and World, the hub centred on the hairline, Objectives, Circle |
+| Under 560 pt | `stack`: one column, with the way into a session first | Greeting, the hub, Objectives, Progress, World, Circle |
+
+The page may be 1200 pt wide on Today (`HomePage`'s `wide`), and 1080 pt elsewhere.
+
+**Behaviour that did not change.** A quest opens Focus with its subject and title (the hub's Begin focus enters the environment, and Study this prepares Focus). An upcoming event opens Calendar. The active clock reads the shared session and ticks only while the dashboard is on screen. A missing daily target has its own setup action, and a rest day says so. Timed events go on the line and quests follow with no invented time.
+
+**Honest states.** The whole page waits for the day's read, and says so if it fails. Inside it, level and Circle each show a placeholder until their own read answers, and a short failure line with Try again if it fails. A list with nothing in it draws no heading: no goals, nothing coming up, no invitations and no briefing each render nothing. With no friends, Circle says so and offers Find people. An offline friend is not listed as around.
+
+**Invitations** are answered on the dashboard through the same calls as in Circle (`acceptFriend`, `parties.answerInvite`), from one pair of rows in `circle/AnswerRows.tsx` that Circle's People and Parties views also use.
+
+**The island** is the only thing on a settled Home that moves, which is the one exception to §6's rule of no looping animation, made because the owner's brief asks for it. It is five CSS animations of `transform` or `opacity` (Reanimated's CSS engine: real `@keyframes` on the web, the UI thread on a device), a few pixels each, alternating so there is no seam. React renders nothing while it runs and no JavaScript runs between frames. `useDashboardLive` pauses it whenever Today is not the destination on screen, the account page or the Focus environment is over it, or the app is in the background; Home unmounts when another Space is chosen. With reduced motion or the Still intensity no animation is created. A stepped theme moves it one whole pixel per step. The motion plan is `spaces/world/dashboardMotion.ts`. **It shows the lobby's gate, because no island art exists yet** (the World itself is Phase 15): it reuses the World's baked plates and adds no bitmap.
+
+`npm run desktop:frontend-check` checks the arrangement at seven viewports and five theme combinations, that no part is boxed, that the hub sits where the parts meet and over none of them, the island's animations and idle cost, and the answers. `SYLF_FRONTEND_CHECK_ONLY=home` runs only Home's part.

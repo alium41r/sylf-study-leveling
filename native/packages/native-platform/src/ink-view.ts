@@ -43,6 +43,8 @@ export interface NativeInkProps extends NativeInkEvents {
   inkWidth: number;
   inkOpacity: number;
   eraserRadius: number;
+  /** Holding the pen's side button erases (the default). */
+  buttonErases?: boolean;
   camera: number[];
   selectionBox: number[] | null;
   paper: string | null;

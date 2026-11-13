@@ -27,6 +27,7 @@
     "desktop:workspace-check": "npm run build:web && npm --workspace @sylf/desktop run workspace-check",
     "desktop:world-check": "npm run build:web && npm --workspace @sylf/desktop run world-check",
     "desktop:session-check": "npm run build:web && npm --workspace @sylf/desktop run session-check",
+    "desktop:frontend-check": "npm run build:web && npm --workspace @sylf/desktop run frontend-check",
     "desktop:backend-check": "npm run build:web && npm --workspace @sylf/desktop run backend-check",
     "android:design-check": "node tooling/checks/android-design-check.mjs",
     "android:interaction-check": "node tooling/checks/android-interaction-check.mjs",

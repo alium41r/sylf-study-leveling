@@ -24,3 +24,10 @@ export async function pickImages(limit: number): Promise<PickedFile[]> {
     return { uri: asset.uri, name, mimeType: mimeFor(name, asset.mimeType), ...(asset.fileSize !== undefined ? { size: asset.fileSize } : {}), ...(asset.file ? { blob: asset.file } : {}) };
   });
 }
+
+/** Plays only the file the person chooses. Web returns a Blob URL, native copies it into the app cache. */
+export async function pickAudioFile(): Promise<{ uri: string; name: string } | null> {
+  const result = await DocumentPicker.getDocumentAsync({ type: "audio/*", copyToCacheDirectory: true, multiple: false, base64: false });
+  const asset = result.canceled ? null : result.assets[0];
+  return asset ? { uri: asset.uri, name: asset.name } : null;
+}

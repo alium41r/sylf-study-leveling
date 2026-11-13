@@ -1,13 +1,6 @@
-// What the lobby's panels share: a heading with the sample notice, and the row for something that arrives with the game.
+// What the lobby's panels share: section headings, and the row for something that arrives with the game.
 import type { ReactNode } from "react";
-import { View } from "react-native";
 import { Badge, EmptyState, ListRow, Placeholder, Stack, Text, useTheme, type IconName } from "@sylf/design-system";
-import type { Provenance } from "../data/contracts";
-
-export function SampleNotice({ provenance }: { provenance?: Provenance }) {
-  return provenance === "sample" ? <View aria-label="Sample data. Nothing here is real yet."><Badge label="Sample data" /></View> : null;
-}
-
 export function SectionHeading({ children }: { children: ReactNode }) {
   return <Text variant="label" tone="soft" role="heading" aria-level={3}>{children}</Text>;
 }

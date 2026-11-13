@@ -8,7 +8,6 @@ import { speakSessionClock } from "@sylf/spaces";
 import { currentBridge, useBackend, useSessionSync } from "../backend";
 import { useHomeNavigation, useShellMetrics, useStudySession } from "../context";
 import { useStats } from "../live";
-import { useAccountEntry } from "../context";
 import { AppearanceSection } from "./sections/AppearanceSection";
 import { LeavingSection } from "./sections/LeavingSection";
 import { NotificationsSection } from "./sections/NotificationsSection";
@@ -39,7 +38,6 @@ export default function AccountPage() {
   const wide = size !== "compact";
   const { top, control } = useShellMetrics();
   const navigation = useHomeNavigation();
-  const entry = useAccountEntry();
   const backend = useBackend();
   const session = useStudySession();
   const stats = useStats();
@@ -54,7 +52,6 @@ export default function AccountPage() {
   const jump = (id: string) => scroller.current?.scrollTo({ y: Math.max(0, (places.current[id] ?? 0) - space.md), animated: true });
   const close = () => navigation.setAccountOpen(false);
   useDismiss(!studio, close);
-  const signedIn = auth.status === "signed-in";
   const name = stats?.name || stats?.username || auth.user?.name || auth.user?.username || "Your account";
 
   const leave = async () => {
@@ -88,37 +85,30 @@ export default function AccountPage() {
   );
   return (
     <View testID="account-page" style={{ flex: 1, paddingTop: top + control + space.sm }}>
-      <View style={{ flex: 1, flexDirection: wide && signedIn && stats ? "row" : "column", alignSelf: "center", width: "100%", maxWidth: wide ? 960 : 720, paddingHorizontal: space.xl, gap: space.xl }}>
-        {wide && signedIn && stats ? <View style={{ paddingTop: control + space.md }}>{index}</View> : null}
+      <View style={{ flex: 1, flexDirection: wide && stats ? "row" : "column", alignSelf: "center", width: "100%", maxWidth: wide ? 960 : 720, paddingHorizontal: space.xl, gap: space.xl }}>
+        {wide && stats ? <View style={{ paddingTop: control + space.md }}>{index}</View> : null}
         <ScrollView ref={scroller} keyboardShouldPersistTaps="handled" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: space.sky }}>
           <View style={{ width: "100%", maxWidth: 720, alignSelf: "center", gap: space.xl }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
               <IconButton icon="chevronLeft" label="Back" testID="account-back" onPress={close} />
               <Text variant="display" role="heading" aria-level={1}>Account</Text>
             </View>
-            {signedIn ? (
-              <Stack gap="xl">
-                {!wide && stats ? index : null}
-                {sync.pending ? <Callout tone="caution" title="A session is still being saved" message="If you sign out now it stays on this device, and is saved the next time you sign in here." /> : null}
-                {stats ? (
-                  <>
-                    <YouSection stats={stats} onPlace={place} />
-                    <StudySection onPlace={place} onLeave={close} />
-                    <AppearanceSection onPlace={place} onOpen={() => setStudio(true)} />
-                    <PrivacySection onPlace={place} />
-                    <NotificationsSection onPlace={place} />
-                    <SecuritySection stats={stats} onPlace={place} />
-                    <LeavingSection stats={stats} onPlace={place} onDeleted={close} />
-                  </>
-                ) : <Text tone="soft" testID="account-loading">{name}</Text>}
-                <View style={{ flexDirection: "row" }}><Button title={leaving ? "Signing out" : "Sign out"} disabled={leaving} testID="account-sign-out" onPress={signOut} /></View>
-              </Stack>
-            ) : (
-              <Stack gap="lg">
-                <Text variant="small" tone="soft">You're using Sylf on this device only. Time you track stays here and earns nothing until you add it to an account.</Text>
-                <View style={{ flexDirection: "row" }}><Button title="Sign in" variant="emphasis" testID="account-sign-in" onPress={() => { close(); entry?.signIn(); }} /></View>
-              </Stack>
-            )}
+            <Stack gap="xl">
+              {!wide && stats ? index : null}
+              {sync.pending ? <Callout tone="caution" title="A session is still being saved" message="If you sign out now it stays on this device, and is saved the next time you sign in here." /> : null}
+              {stats ? (
+                <>
+                  <YouSection stats={stats} onPlace={place} />
+                  <StudySection onPlace={place} onLeave={close} />
+                  <AppearanceSection onPlace={place} onOpen={() => setStudio(true)} />
+                  <PrivacySection onPlace={place} />
+                  <NotificationsSection onPlace={place} />
+                  <SecuritySection stats={stats} onPlace={place} />
+                  <LeavingSection stats={stats} onPlace={place} onDeleted={close} />
+                </>
+              ) : <Text tone="soft" testID="account-loading">{name}</Text>}
+              <View style={{ flexDirection: "row" }}><Button title={leaving ? "Signing out" : "Sign out"} disabled={leaving} testID="account-sign-out" onPress={signOut} /></View>
+            </Stack>
           </View>
         </ScrollView>
       </View>

@@ -6,3 +6,7 @@ export async function inspectPdf(bytes: Uint8Array): Promise<PdfSourcePage[]> {
   void bytes;
   throw new Error("Reading PDFs needs the app.");
 }
+
+export const renderPdfThumbnail: (hash: string, load: () => Promise<Uint8Array | null>, index: number, pixels: number) => Promise<string> = async () => {
+  throw new Error("Reading PDFs needs the app.");
+};

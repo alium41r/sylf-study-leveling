@@ -3,50 +3,24 @@
 // People, Messages and Parties are views of this page: friend requests, finding people, groups, and studying together all work here.
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import { Avatar, Button, Stack, Text, useNotice, useTheme, useWindowClass } from "@sylf/design-system";
-import { useLiveBackend } from "../../../shell/backend";
-import { describeFailureText } from "../../../shell/account/failure";
+import { Avatar, Button, Stack, Text, useTheme, useWindowClass } from "@sylf/design-system";
 import { useShellMetrics } from "../../../shell/context";
 import { useHomeResult } from "../data";
-import type { CirclePerson, HomeDataAdapter } from "../data/contracts";
-import { EmptyPage, FailedPage, HomeColumns, HomePage, LoadingPage, PageTitle, Section, SubNav, useHomeView } from "../HomePage";
+import type { CirclePerson } from "../data/contracts";
+import { FailedPage, HomeColumns, HomePage, LoadingPage, PageTitle, Section, SubNav, useHomeView } from "../HomePage";
 import { BlockedSheet } from "../circle/BlockedSheet";
 import { FindPeopleSheet } from "../circle/FindPeopleSheet";
 import { MessagesView } from "../circle/MessagesView";
 import { PartiesView } from "../circle/PartiesView";
+import { FriendRequestRow } from "../circle/AnswerRows";
 import { PersonRow } from "../circle/PersonRow";
 import { NotificationsSheet } from "../circle/NotificationsSheet";
 import { conversationRequest, useConversationRequest } from "../../../shell/profile/store";
 
-const load = (adapter: HomeDataAdapter) => adapter.circle();
 const AVATAR = 48;
 const MAX_RING = 320;
 /** The ring stays a ring. Everyone is in the list beside it. */
 const RING_SEATS = 12;
-
-function FriendRequest({ request }: { request: { id: number; name: string } }) {
-  const { space } = useTheme();
-  const backend = useLiveBackend();
-  const notice = useNotice();
-  const [busy, setBusy] = useState(false);
-  const answer = async (accept: boolean) => {
-    if (!backend) return;
-    setBusy(true);
-    try { await backend.reads.acceptFriend(request.id, accept); }
-    catch (error) { notice(describeFailureText(error)); }
-    setBusy(false);
-    backend.resources.invalidate("circle");
-  };
-  return (
-    <View style={{ gap: space.xs }}>
-      <Text variant="small">{request.name}</Text>
-      <View style={{ flexDirection: "row", gap: space.xs }}>
-        <Button title="Accept" size="small" disabled={busy} testID={`circle-accept-${request.id}`} onPress={() => void answer(true)} />
-        <Button title="Not now" size="small" variant="ghost" disabled={busy} onPress={() => void answer(false)} />
-      </View>
-    </View>
-  );
-}
 
 function Ring({ people, size }: { people: CirclePerson[]; size: number }) {
   const { color } = useTheme();
@@ -72,7 +46,7 @@ export function CircleDestination() {
   const { space } = useTheme();
   const { width } = useWindowClass();
   const { insets } = useShellMetrics();
-  const result = useHomeResult("circle", load);
+  const result = useHomeResult("circle");
   const view = useHomeView("circle");
   const [finding, setFinding] = useState(false);
   const [notifying, setNotifying] = useState(false);
@@ -81,59 +55,37 @@ export function CircleDestination() {
   const requested = useConversationRequest();
   useEffect(() => { if (requested !== null) { setConversation(requested); conversationRequest.ask(null); } }, [requested]);
   const circle = result?.data;
-  const live = result?.provenance === "live" && Boolean(result.live);
-  const lonely = !live && circle !== undefined && circle !== null && !circle.people.length && !circle.parties.length && !circle.invites?.length && !circle.requests?.length;
   const ringSize = Math.min(MAX_RING, width - insets.left - insets.right - space.lg * 2);
 
   return (
-    <HomePage destination="circle" eyebrow="Friends and study parties" provenance={result?.provenance} live={result?.live} ready={result !== null}>
-      {!result ? <LoadingPage title="Circle" /> : !circle && result.live?.failure ? <FailedPage title="Circle" icon="circle" live={result.live} /> : !circle || lonely ? <EmptyPage title="Circle" icon="circle" heading="Your circle is empty" message={live ? "Friends you add on Sylf for the web appear here, with who is studying right now." : "Friends and study parties will appear here."} /> : (
-        <>
-          <PageTitle title="Circle" />
-          {live ? <View style={{ flexDirection: "row", gap: space.sm }}><Button title="Notifications" size="small" icon="bell" testID="circle-notifications" onPress={() => setNotifying(true)} /><Button title="Blocked" size="small" variant="ghost" testID="circle-blocked" onPress={() => setBlocked(true)} /></View> : null}
-          {live ? <SubNav destination="circle" label="Circle views" labels={{ people: "People", messages: "Messages", parties: "Parties" }} /> : null}
-          {live && view === "messages" ? <MessagesView openId={conversation} onOpened={() => setConversation(null)} /> : live && view === "parties" ? <PartiesView /> : <HomeColumns
-            primary={
-              <Stack gap="xl">
-                {circle.people.length && view !== "parties" ? <Ring people={circle.people} size={ringSize} /> : null}
-                {live ? <Button title="Find people" icon="plus" variant="emphasis" testID="circle-find" style={{ alignSelf: "center" }} onPress={() => setFinding(true)} /> : (
-                  <Stack gap="sm" align="center">
-                    <Button title="Invite a friend" icon="plus" disabled testID="circle-invite" style={{ alignSelf: "center" }} />
-                    <Text variant="caption" tone="soft" align="center">Social features arrive in a later phase. Everyone shown here is invented.</Text>
-                  </Stack>
-                )}
-              </Stack>
-            }
-            secondary={[
-              ...(view === "people" && circle.requests?.length ? [<Section key="requests" title="Friend requests"><Stack gap="md">{circle.requests.map((request) => <FriendRequest key={request.id} request={request} />)}</Stack></Section>] : []),
-              ...(view === "people" && circle.people.length ? [<Section key="people" title="People">
-                <Stack gap="xs">
-                  {circle.people.map((person) => <PersonRow key={person.id} person={person} live={live} />)}
-                </Stack>
-              </Section>] : []),
-              ...(view === "parties" && (circle.parties.length || circle.invites?.length) ? [<Section key="parties" title="Study parties">
-                <Stack gap="md">
-                  {circle.parties.map((party) => (
-                    <View key={party.id} accessible>
-                      <Text variant="small">{party.name}</Text>
-                      <Text variant="caption" tone="soft">{party.members} members{party.inSession ? ", session running" : ""}</Text>
-                    </View>
-                  ))}
-                  {circle.invites?.map((invite) => (
-                    <View key={invite.id} accessible>
-                      <Text variant="small">{invite.name}</Text>
-                      <Text variant="caption" tone="soft">{`Invited by ${invite.from}`}</Text>
-                    </View>
-                  ))}
-                </Stack>
-              </Section>] : []),
-            ]}
-          />}
-          <FindPeopleSheet open={finding} onClose={() => setFinding(false)} />
-          <NotificationsSheet open={notifying} onClose={() => setNotifying(false)} />
-          <BlockedSheet open={blocked} onClose={() => setBlocked(false)} />
-        </>
+    <HomePage destination="circle" eyebrow="Friends and study parties" live={result?.live} ready={result !== null}>
+      <PageTitle title="Circle" />
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
+        <Button title="Notifications" size="small" icon="bell" testID="circle-notifications" onPress={() => setNotifying(true)} />
+        <Button title="Blocked" size="small" variant="ghost" testID="circle-blocked" onPress={() => setBlocked(true)} />
+      </View>
+      <SubNav destination="circle" label="Circle views" labels={{ people: "People", messages: "Messages", parties: "Parties" }} />
+      {view === "messages" ? <MessagesView openId={conversation} onOpened={() => setConversation(null)} /> : view === "parties" ? <PartiesView /> : !result ? (
+        <LoadingPage />
+      ) : !circle ? (
+        <FailedPage icon="circle" live={result.live} />
+      ) : (
+        <HomeColumns
+          primary={
+            <Stack gap="lg">
+              {circle.people.length ? <Ring people={circle.people} size={ringSize} /> : <Text tone="soft" align="center">Find friends to study alongside them.</Text>}
+              <Button title="Find people" icon="plus" variant="emphasis" testID="circle-find" style={{ alignSelf: "center" }} onPress={() => setFinding(true)} />
+            </Stack>
+          }
+          secondary={[
+            ...(circle.requests?.length ? [<Section key="requests" title="Friend requests"><Stack gap="md">{circle.requests.map((request) => <FriendRequestRow key={request.id} request={request} />)}</Stack></Section>] : []),
+            ...(circle.people.length ? [<Section key="people" title="People"><Stack gap="xs">{circle.people.map((person) => <PersonRow key={person.id} person={person} />)}</Stack></Section>] : []),
+          ]}
+        />
       )}
+      <FindPeopleSheet open={finding} onClose={() => setFinding(false)} />
+      <NotificationsSheet open={notifying} onClose={() => setNotifying(false)} />
+      <BlockedSheet open={blocked} onClose={() => setBlocked(false)} />
     </HomePage>
   );
 }

@@ -49,7 +49,7 @@ function AccountControl({ extent }: { extent: number }) {
 export function HomeRail({ destination, axis }: { destination: HomeDestination; axis: "vertical" | "horizontal" }) {
   const { space, type } = useTheme();
   const { control, edge, insets, rail, top } = useShellMetrics();
-  const { fontScale } = useWindowDimensions();
+  const { width, fontScale } = useWindowDimensions();
   const navigation = useHomeNavigation();
   const list = useRef<ViewHandle>(null);
   const [room, setRoom] = useState<number | null>(null);
@@ -60,7 +60,11 @@ export function HomeRail({ destination, axis }: { destination: HomeDestination; 
   const labelledExtent = Math.max(control, Math.ceil(ICON + space.hair + labelHeight + space.sm * 2));
   const gap = vertical ? space.xs : 0;
   const count = HOME_DESTINATIONS.length;
-  const labelled = !vertical || room === null || labelledExtent * count + gap * (count - 1) <= room;
+  const account = useAccountEntry() !== null;
+  const accountExtent = Math.max(44, control);
+  const itemWidth = vertical ? rail : (width - insets.left - insets.right - (account ? accountExtent : 0)) / count;
+  const labelWidth = (type.caption.fontSize ?? 12) * Math.min(fontScale, type.caption.maxScale) * 4.5;
+  const labelled = vertical ? room === null || labelledExtent * count + gap * (count - 1) <= room : itemWidth >= labelWidth;
   const extent = labelled ? labelledExtent : Math.max(44, control);
   const index = HOME_DESTINATIONS.indexOf(destination);
 
@@ -70,16 +74,14 @@ export function HomeRail({ destination, axis }: { destination: HomeDestination; 
     const next = railTargetForKey(event.key, nodes.indexOf(document.activeElement as HTMLElement), nodes.length, axis);
     if (next !== null) { event.preventDefault(); nodes[next]?.focus(); }
   };
-  const onLayout = (event: LayoutChangeEvent) => { const { width, height } = event.nativeEvent.layout; setRoom(vertical ? height : width); };
+  const onLayout = (event: LayoutChangeEvent) => setRoom(event.nativeEvent.layout.height);
 
-  const account = useAccountEntry() !== null;
-  const itemWidth = vertical ? rail : ((room ?? 0) - (account ? extent : 0)) / count;
-  const items = room === null && !vertical ? null : (
+  const items = (
     <View ref={list} role="tablist" aria-label="Home" aria-orientation={axis} {...(Platform.OS === "web" ? { onKeyDown } as object : {})} style={vertical ? { gap } : { flexDirection: "row" }}>
       {HOME_DESTINATIONS.map((id) => <RailItem key={id} id={id} selected={id === destination} labelled={labelled} width={itemWidth} height={extent} onSelect={() => select(id)} />)}
       {vertical
         ? <TravellingMarker axis="y" x={index * (extent + gap) + space.md} width={extent - space.md * 2} baseline={space.xs} />
-        : <TravellingMarker x={index * itemWidth + itemWidth * 0.3} width={itemWidth * 0.4} baseline={extent - space.xs} />}
+        : <TravellingMarker x={index * itemWidth + itemWidth * 0.3} width={itemWidth * 0.4} baseline={space.xs} />}
     </View>
   );
 
@@ -92,9 +94,9 @@ export function HomeRail({ destination, axis }: { destination: HomeDestination; 
     );
   }
   return (
-    <View onLayout={onLayout} style={{ minHeight: extent, marginBottom: insets.bottom, marginLeft: insets.left, marginRight: insets.right, flexDirection: "row", alignItems: "center" }}>
+    <View style={{ minHeight: extent, marginBottom: insets.bottom, marginLeft: insets.left, marginRight: insets.right, flexDirection: "row", alignItems: "center" }}>
       <View style={{ flex: 1, minWidth: 0 }}>{items}</View>
-      <AccountControl extent={extent} />
+      <AccountControl extent={accountExtent} />
     </View>
   );
 }

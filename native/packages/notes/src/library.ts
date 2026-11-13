@@ -2,9 +2,10 @@
 // several windows share one set of Yjs replicas, so two windows on one note are the same note. Writes are queued in order, an
 // acknowledged save is in the store, and a failure stops writing and says so rather than losing the next edit quietly.
 import * as Y from "yjs";
-import type { DocumentDescriptor, InkPaper, PdfSourcePage } from "@sylf/shared";
-import type { DocumentMeta, LibraryEntry, LibraryRecord, LibrarySnapshot, NoteKind, Notebook, NotesStorage, StoredDocument, StoredUpdate } from "./contracts";
-import { LAYER_FEATURES, board, coverOf, inkPage, isLayeredNote, kindOf, layeredPage, newId, note, pdf, type Created, type PageFlow } from "./documents";
+import { ink, notesPdf, type DocumentDescriptor, type InkPaper, type PdfSourcePage } from "@sylf/shared";
+import type { Cover, DocumentMeta, LibraryEntry, LibraryRecord, LibrarySnapshot, NoteKind, Notebook, NotesStorage, StoredDocument, StoredUpdate } from "./contracts";
+import { LAYER_FEATURES, RICH_TEXT_ADAPTER, board, coverOf, firstPageOf, inkPage, isLayeredNote, kindOf, layeredPage, newId, note, pdf, type Created, type PageFlow } from "./documents";
+import { inkThumbnail } from "./ink-scene";
 import { boardPaper, paperFor, type PaperTemplate } from "./templates";
 
 export const DEVICE_OWNER = "device";
@@ -12,6 +13,7 @@ export const ownerKey = (userId: number | null) => (userId ? `user:${userId}` : 
 const SAVE_DELAY_MS = 250;
 const COMPACT_AFTER = 48;
 const PDF_BYTES = 50 * 1024 * 1024;
+const COVER_BYTES = 3 * 1024 * 1024;
 // An endless page grows to this, about seventy A4 pages; the web's schema allows 100000.
 const MAX_PAGE_HEIGHT = 60000;
 const NOTEBOOK_COLORS = ["#5b7cfa", "#2f9e8f", "#d9822b", "#c2547a", "#7a62d6", "#4f8a3a"];
@@ -59,6 +61,8 @@ export interface NotesLibrary {
   create(options: CreateOptions): Promise<string>;
   importPdf(input: PdfImport): Promise<string>;
   open(id: string): Promise<OpenDocument>;
+  /** Read the first page for a gallery card without opening an editor or changing the document's history. */
+  previewPage(id: string): Promise<LibraryPreview>;
   rename(id: string, title: string): Promise<void>;
   move(id: string, notebookId: string | null): Promise<void>;
   setSubject(id: string, subjectId: string | null): Promise<void>;
@@ -71,7 +75,9 @@ export interface NotesLibrary {
   asset(hash: string): Promise<Uint8Array | null>;
   /** Keeps a file's bytes under their SHA-256 for this owner, for a document to point at. */
   storeAsset(bytes: Uint8Array, mediaType: string, name: string): Promise<StoredAssetRef>;
-  setCover(id: string, cover: { color?: string | null; icon?: string | null }): Promise<void>;
+  setCover(id: string, cover: Partial<Pick<Cover, "color" | "icon">> & { image?: { bytes: Uint8Array; mediaType: string; name: string } | null }): Promise<void>;
+  /** Moves a folder or document just before or after a sibling, within its section. */
+  reorder(id: string, neighborId: string, side: "before" | "after"): Promise<void>;
   createNotebook(title: string, parentId?: string | null): Promise<string>;
   renameNotebook(id: string, title: string): Promise<void>;
   updateNotebook(id: string, patch: Partial<Pick<Notebook, "title" | "color" | "icon" | "parentId">>): Promise<void>;
@@ -85,12 +91,29 @@ export interface NotesLibrary {
 
 export interface LibraryOptions { sha256(bytes: Uint8Array): Promise<string>; now?: () => number }
 
+interface LibraryPreview {
+  paper: InkPaper | null;
+  strokes: ReturnType<typeof inkThumbnail>["strokes"];
+  text: string;
+}
+
+const PREVIEW_TEXT_LIMIT = 540;
 const plain = (text: string, max: number) => text.replace(/\s+/g, " ").trim().slice(0, max);
+
+/** Applies manual positions to items that are already in their default order. */
+export function inLibraryOrder<T extends { id: string }>(items: T[], order: readonly string[] | undefined): T[] {
+  if (!order?.length) return items;
+  const rank = new Map(order.map((id, index) => [id, index]));
+  return [...items].sort((a, b) => (rank.get(a.id) ?? order.length) - (rank.get(b.id) ?? order.length));
+}
+
+// Stale actions in another window or invalid destinations must leave the library writable.
+class LibraryActionError extends Error {}
 
 export function createNotesLibrary(storage: NotesStorage, owner: string, options: LibraryOptions): NotesLibrary {
   const now = options.now ?? Date.now;
   const documents = new Map<string, StoredDocument>();
-  const open = new Map<string, { handle: OpenDocument; refs: number; dispose(): Promise<void> }>();
+  const open = new Map<string, { handle: Handle; refs: number; dispose(): Promise<void> }>();
   const opening = new Map<string, Promise<OpenDocument>>();
   const listeners = new Set<() => void>();
   let record: LibraryRecord = { libraryId: newId(), notebooks: [] };
@@ -103,9 +126,10 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
     created: d.meta.created, updated: d.meta.updated, opened: d.meta.opened, pages: d.descriptor.pages.length, pinned: d.meta.pinned, trashed: d.meta.trashed, preview: d.meta.preview, text: d.meta.text ?? "",
     linkedTo: (d.descriptor.extensions.sylfNative as { linkedTo?: string } | undefined)?.linkedTo ?? null,
     cover: coverOf(d.descriptor),
+    firstPage: firstPageOf(d.descriptor),
   });
   const emit = () => {
-    snapshot = { ...snapshot, entries: [...documents.values()].map(entry).sort((a, b) => b.updated - a.updated), notebooks: [...record.notebooks] };
+    snapshot = { ...snapshot, entries: [...documents.values()].map(entry).sort((a, b) => b.updated - a.updated), notebooks: [...record.notebooks], order: record.order };
     listeners.forEach((listener) => listener());
   };
   const fail = (error: unknown) => {
@@ -114,13 +138,17 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
   };
   /** Runs writes one after another. A failed write fails the library, and later writes are refused rather than reordered. */
   const write = <T,>(task: () => Promise<T>): Promise<T> => {
-    const next = queue.then(() => {
+    const next = queue.then(async () => {
       if (snapshot.failure) throw new Error(snapshot.failure);
       if (closed) throw new Error("The library is closed.");
-      return task();
+      try { return await task(); }
+      catch (error) {
+        if (!(error instanceof LibraryActionError)) fail(error);
+        throw error;
+      }
     });
     queue = next.catch(() => undefined);
-    return next.catch((error: unknown) => { if (!snapshot.failure) fail(error); throw error; });
+    return next;
   };
 
   const loaded = (async () => {
@@ -138,37 +166,55 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
 
   const need = (id: string) => {
     const found = documents.get(id);
-    if (!found) throw new Error("This document is no longer here.");
+    if (!found) throw new LibraryActionError("This document is no longer here.");
     return found;
   };
   const meta = (time: number): DocumentMeta => ({ created: time, updated: time, opened: time, pinned: false, trashed: false, preview: "", text: "" });
-  const save = async (created: Created) => {
-    await loaded;
+  const folderAt = (id: string | null) => {
+    if (id === null) return null;
+    const folder = record.notebooks.find((item) => item.id === id);
+    if (!folder) throw new LibraryActionError("This folder is no longer here.");
+    return folder;
+  };
+  const save = async (created: Created, summary?: Pick<DocumentMeta, "preview" | "text">) => {
+    folderAt(created.descriptor.folderId);
     const time = now();
-    const stored: StoredDocument = { id: created.descriptor.documentId, owner, descriptor: created.descriptor, meta: meta(time) };
-    await write(() => storage.appendUpdates(stored, created.updates));
+    const stored: StoredDocument = { id: created.descriptor.documentId, owner, descriptor: created.descriptor, meta: { ...meta(time), ...summary } };
+    await storage.appendUpdates(stored, created.updates);
     documents.set(stored.id, stored);
     emit();
     return stored.id;
   };
-  const change = async (id: string, edit: (d: StoredDocument) => void, touch = true) => {
-    await loaded;
-    const handle = open.get(id);
+  /** Called in the write queue. An open editor persists its pending streams with the new metadata. */
+  const editDocument = async (id: string, edit: (d: StoredDocument) => void, touch: boolean) => {
     const next = structuredCloneDocument(need(id));
     edit(next);
     if (touch) next.meta.updated = now();
-    await write(() => storage.putDocument(next));
-    documents.set(id, next);
-    if (handle) (handle.handle as Handle).adopt(next);
+    const handle = open.get(id)?.handle;
+    if (handle) await handle.commit(next);
+    else {
+      await storage.putDocument(next);
+      documents.set(id, next);
+      emit();
+    }
+  };
+  const change = async (id: string, edit: (d: StoredDocument) => void, touch = true) => {
+    await loaded;
+    return write(() => editDocument(id, edit, touch));
+  };
+  const putLibrary = async (next: LibraryRecord) => {
+    await storage.putLibrary(owner, next);
+    record = next;
     emit();
   };
-  const putLibrary = (next: LibraryRecord) => write(async () => { await storage.putLibrary(owner, next); record = next; emit(); });
 
-  type Handle = OpenDocument & { adopt(next: StoredDocument): void };
+  type Handle = OpenDocument & { commit(next?: StoredDocument): Promise<StoredDocument | undefined> };
 
   async function openDocument(id: string): Promise<OpenDocument> {
     await loaded;
-    let stored = need(id);
+    // A prior window may have released its handle while its last save is still in the queue.
+    await queue;
+    need(id);
     const updates = await storage.readUpdates(id);
     const byStream = new Map<string, Uint8Array[]>();
     for (const u of updates) byStream.set(u.streamId, [...(byStream.get(u.streamId) ?? []), u.bytes]);
@@ -179,6 +225,8 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       await write(() => storage.compact(id, streamId, merged));
       byStream.set(streamId, [merged]);
     }
+    await queue;
+    need(id);
     const replicas = new Map<string, Y.Doc>();
     const handleListeners = new Set<() => void>();
     let pending: StoredUpdate[] = [];
@@ -190,20 +238,34 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
     const tell = () => handleListeners.forEach((listener) => listener());
     const setState = (next: SaveState) => { if (state !== next) { state = next; tell(); } };
 
+    // Drain at execution time, so descriptor changes and their stream updates always travel together.
+    const commit: Handle["commit"] = async (next) => {
+      const current = next ?? documents.get(id);
+      if (!current || (!next && !pending.length && !descriptorDirty)) return current;
+      if (timer) { clearTimeout(timer); timer = undefined; }
+      const batch = pending;
+      pending = [];
+      descriptorDirty = false;
+      const stored = batch.length || touched ? { ...current, meta: { ...current.meta, updated: now() } } : current;
+      touched = false;
+      documents.set(id, stored);
+      setState("saving");
+      if (next) tell();
+      try {
+        await storage.appendUpdates(stored, batch);
+        emit();
+        if (!pending.length && !descriptorDirty) setState("saved");
+        return stored;
+      } catch (error) {
+        setState("failed");
+        throw error;
+      }
+    };
     const persist = () => {
       if (timer) { clearTimeout(timer); timer = undefined; }
       if (!pending.length && !descriptorDirty) return flushing;
-      const batch = pending; pending = [];
-      descriptorDirty = false;
-      if (batch.length || touched) stored = { ...stored, meta: { ...stored.meta, updated: now() } };
-      touched = false;
-      const snapshotOf = stored;
       setState("saving");
-      flushing = write(() => storage.appendUpdates(snapshotOf, batch)).then(() => {
-        documents.set(id, snapshotOf);
-        emit();
-        if (!pending.length && !descriptorDirty) setState("saved");
-      }, () => setState("failed"));
+      flushing = write(() => commit()).then(() => undefined, () => setState("failed"));
       return flushing;
     };
     const schedule = () => {
@@ -213,7 +275,7 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
     const replica = (streamId: string) => {
       const existing = replicas.get(streamId);
       if (existing) return existing;
-      if (!stored.descriptor.streams.some((s) => s.streamId === streamId)) throw new Error("This page is not part of the document.");
+      if (!need(id).descriptor.streams.some((s) => s.streamId === streamId)) throw new Error("This page is not part of the document.");
       const doc = new Y.Doc();
       for (const bytes of byStream.get(streamId) ?? []) Y.applyUpdate(doc, bytes, LOADED);
       byStream.delete(streamId);
@@ -226,9 +288,10 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       return doc;
     };
     const mutate = (edit: (d: DocumentDescriptor) => Uint8Array | void, streamId?: string) => {
+      const stored = need(id);
       const descriptor = structuredCloneDocument(stored).descriptor;
       const bytes = edit(descriptor);
-      stored = { ...stored, descriptor };
+      documents.set(id, { ...stored, descriptor });
       if (bytes && streamId) pending.push({ streamId, bytes });
       descriptorDirty = true;
       touched = true;
@@ -236,25 +299,27 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       emitDescriptor();
     };
     const mutateMany = (edit: (d: DocumentDescriptor) => void, updates: StoredUpdate[]) => {
+      const stored = need(id);
       const descriptor = structuredCloneDocument(stored).descriptor;
       edit(descriptor);
-      stored = { ...stored, descriptor };
+      documents.set(id, { ...stored, descriptor });
       pending.push(...updates);
       descriptorDirty = true;
       touched = true;
       schedule();
       emitDescriptor();
     };
-    const emitDescriptor = () => { documents.set(id, stored); emit(); tell(); };
+    const emitDescriptor = () => { emit(); tell(); };
 
     const handle: Handle = {
       id,
-      descriptor: () => stored.descriptor,
-      kind: () => kindOf(stored.descriptor),
+      descriptor: () => need(id).descriptor,
+      kind: () => kindOf(need(id).descriptor),
       stream: replica,
       saveState: () => state,
       subscribe(listener) { handleListeners.add(listener); return () => { handleListeners.delete(listener); }; },
       addPage(afterIndex, template) {
+        const stored = need(id);
         const pages = stored.descriptor.pages;
         const current = pages[Math.max(0, Math.min(afterIndex ?? pages.length - 1, pages.length - 1))];
         const defaultPaper = (stored.descriptor.extensions.noteStyle as { paper?: InkPaper } | undefined)?.paper;
@@ -302,7 +367,7 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
         mutate((d) => { d.extensions.noteStyle = { ...(d.extensions.noteStyle as object), paper }; });
       },
       growPage(pageId, height) {
-        const page = stored.descriptor.pages.find((p) => p.pageId === pageId);
+        const page = need(id).descriptor.pages.find((p) => p.pageId === pageId);
         if (!page || page.originalAssetId || height <= page.height) return;
         height = Math.min(height, MAX_PAGE_HEIGHT);
         if (height <= page.height) return;
@@ -312,7 +377,7 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
         mutate((d) => { const native = { ...(d.extensions.sylfNative as object) } as Record<string, unknown>; if (flow === "endless") native.flow = flow; else delete native.flow; d.extensions.sylfNative = native as never; });
       },
       removePage(pageId) {
-        if (stored.descriptor.pages.length <= 1) return;
+        if (need(id).descriptor.pages.length <= 1) return;
         // The page's stream and its history stay in the descriptor, as the web's archive does; only the page entry goes.
         mutate((d) => { d.pages = d.pages.filter((p) => p.pageId !== pageId); });
       },
@@ -325,12 +390,14 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
         });
       },
       setText(text) {
+        const stored = need(id);
         const preview = plain(text, 140), body = plain(text, 4000);
         const native = stored.descriptor.extensions.sylfNative as { autoTitle?: boolean } | undefined;
         const first = plain(text.split("\n").find((line) => line.trim()) ?? "", 80);
         if (native?.autoTitle && first && first !== stored.descriptor.title) mutate((d) => { d.title = first; });
         if (preview === stored.meta.preview && body === stored.meta.text) return;
-        stored = { ...stored, meta: { ...stored.meta, preview, text: body } };
+        const current = need(id);
+        documents.set(id, { ...current, meta: { ...current.meta, preview, text: body } });
         descriptorDirty = true;
         touched = true;
         schedule();
@@ -347,9 +414,10 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
         entry.refs -= 1;
         if (entry.refs <= 0) { open.delete(id); void entry.dispose(); }
       },
-      adopt(next) { stored = { ...next, meta: { ...next.meta, preview: stored.meta.preview, text: stored.meta.text } }; tell(); },
+      commit,
     };
-    stored = { ...stored, meta: { ...stored.meta, opened: now() } };
+    const stored = need(id);
+    documents.set(id, { ...stored, meta: { ...stored.meta, opened: now() } });
     descriptorDirty = true;
     void persist();
     open.set(id, {
@@ -364,27 +432,56 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
     return handle;
   }
 
+  // The normal editor keeps an excerpt in metadata. Read old text layers on demand if the excerpt is missing.
+  function excerpt(doc: Y.Doc) {
+    let text = "";
+    for (const node of doc.getXmlFragment("body").createTreeWalker((node) => node instanceof Y.XmlText)) {
+      if (!(node instanceof Y.XmlText)) continue;
+      for (const op of node.toDelta() as { insert: unknown }[]) {
+        if (typeof op.insert === "string") text += op.insert.slice(0, PREVIEW_TEXT_LIMIT);
+        if (text.length >= PREVIEW_TEXT_LIMIT) return plain(text, PREVIEW_TEXT_LIMIT);
+      }
+      if (text) text += " ";
+    }
+    return plain(text, PREVIEW_TEXT_LIMIT);
+  }
+
+  async function readReplica<T>(id: string, streamId: string, read: (doc: Y.Doc) => T) {
+    const handle = open.get(id)?.handle;
+    if (handle) return read(handle.stream(streamId));
+    const doc = new Y.Doc();
+    try {
+      for (const update of await storage.readUpdates(id, streamId)) Y.applyUpdate(doc, update.bytes, LOADED);
+      return read(doc);
+    } finally { doc.destroy(); }
+  }
+
   const library: NotesLibrary = {
     owner,
     getSnapshot: () => snapshot,
     subscribe(listener) { listeners.add(listener); return () => { listeners.delete(listener); }; },
     ready: () => loaded,
-    create(input) {
+    async create(input) {
+      await loaded;
       const folder = input.notebookId ?? null;
       // Typed and handwritten notes are one kind now: pages with a text layer and an ink layer. "handwriting" only picks the paper.
       const created = input.kind === "board" ? board(record.libraryId, input.title ?? "Whiteboard", folder, boardPaper(input.paper ?? "dotted"))
         : note(record.libraryId, input.title ?? null, folder, input.paperSpec ?? paperFor(input.paper ?? "ruled"), input.template ?? "blank", input.flow);
       if (input.subjectId) created.descriptor.subjectId = input.subjectId.slice(0, 128);
       if (input.linkedTo && documents.has(input.linkedTo)) created.descriptor.extensions.sylfNative = { ...(created.descriptor.extensions.sylfNative as object), linkedTo: input.linkedTo };
-      return save(created);
+      return write(() => save(created));
     },
     async importPdf(input) {
       if (input.bytes.length > PDF_BYTES) throw new Error("Choose a PDF up to 50 MB.");
       if (!input.pages.length) throw new Error("This PDF has no pages.");
       await loaded;
       const hash = await options.sha256(input.bytes);
-      await write(() => storage.putAsset(owner, { hash, mediaType: "application/pdf", name: input.name, bytes: input.bytes }));
-      return save(pdf(record.libraryId, input.name.replace(/\.pdf$/i, "") || "Imported PDF", input.notebookId ?? null, { hash, size: input.bytes.length, name: input.name }, input.pages, input.geometry, input.subjectId ?? null));
+      return write(async () => {
+        const folder = input.notebookId ?? null;
+        folderAt(folder);
+        await storage.putAsset(owner, { hash, mediaType: "application/pdf", name: input.name, bytes: input.bytes });
+        return save(pdf(record.libraryId, input.name.replace(/\.pdf$/i, "") || "Imported PDF", folder, { hash, size: input.bytes.length, name: input.name }, input.pages, input.geometry, input.subjectId ?? null));
+      });
     },
     open(id) {
       const found = open.get(id);
@@ -395,40 +492,60 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       opening.set(id, task);
       return task;
     },
+    async previewPage(id) {
+      await loaded;
+      await queue;
+      const { descriptor, meta } = need(id);
+      const page = descriptor.pages[0];
+      let text = (meta.text || meta.preview).slice(0, PREVIEW_TEXT_LIMIT);
+      if (!text) {
+        const textId = page?.extensions.textStreamId;
+        const stream = descriptor.streams.find((item) => item.adapter === RICH_TEXT_ADAPTER && (page ? item.streamId === textId : descriptor.kind === "flow"));
+        if (stream) text = await readReplica(id, stream.streamId, excerpt);
+      }
+      const stream = page && descriptor.streams.find((item) => item.streamId === page.streamId);
+      if (!page || (stream?.adapter !== ink.INK_ADAPTER && stream?.adapter !== notesPdf.PDF_ADAPTER)) return { paper: null, strokes: [], text };
+      const bounds = { x: 0, y: 0, width: page.width, height: Math.min(page.height, page.width * 1.5) };
+      const thumbnail = await readReplica(id, page.streamId, (doc) => inkThumbnail(doc, bounds, stream.adapter === notesPdf.PDF_ADAPTER ? notesPdf.pdfPageMaps(doc).ink : undefined));
+      return { ...thumbnail, text };
+    },
     rename: (id, title) => change(id, (d) => {
       const next = title.trim().slice(0, 500);
       if (!next) return;
       d.descriptor.title = next;
       if (d.descriptor.extensions.sylfNative) d.descriptor.extensions.sylfNative = { ...(d.descriptor.extensions.sylfNative as object), autoTitle: false };
     }),
-    move: (id, notebookId) => change(id, (d) => { d.descriptor.folderId = notebookId; }),
+    move: (id, notebookId) => change(id, (d) => { folderAt(notebookId); d.descriptor.folderId = notebookId; }),
     setSubject: (id, subjectId) => change(id, (d) => { d.descriptor.subjectId = subjectId; }),
     pin: (id, pinned) => change(id, (d) => { d.meta.pinned = pinned; }, false),
     trash: (id) => change(id, (d) => { d.meta.trashed = true; d.meta.pinned = false; }),
     restore: (id) => change(id, (d) => { d.meta.trashed = false; }),
     async remove(id) {
       await loaded;
-      const found = need(id);
-      if (!found.meta.trashed) throw new Error("Move it to the trash first.");
-      const assets = found.descriptor.assets.map((a) => a.assetId).filter((hash) => ![...documents.values()].some((d) => d.id !== id && d.descriptor.assets.some((a) => a.assetId === hash)));
-      await write(async () => { await storage.deleteDocument(id); for (const hash of assets) await storage.deleteAsset(owner, hash); });
-      documents.delete(id);
-      emit();
+      await write(async () => {
+        const found = need(id);
+        if (!found.meta.trashed) throw new LibraryActionError("Move it to the trash first.");
+        await storage.deleteDocument(id);
+        documents.delete(id);
+        emit();
+        for (const { assetId } of found.descriptor.assets) {
+          if (![...documents.values()].some((d) => d.descriptor.assets.some((a) => a.assetId === assetId))) await storage.deleteAsset(owner, assetId);
+        }
+      });
     },
     async duplicate(id) {
       await loaded;
-      const found = need(id);
-      const handle = open.get(id)?.handle;
-      if (handle) await handle.flush();
-      const updates = await storage.readUpdates(id);
-      const descriptor = structuredCloneDocument(found).descriptor;
-      descriptor.documentId = newId();
-      descriptor.title = `${descriptor.title} copy`.slice(0, 500);
-      const merged = new Map<string, Uint8Array[]>();
-      for (const u of updates) merged.set(u.streamId, [...(merged.get(u.streamId) ?? []), u.bytes]);
-      const id2 = await save({ descriptor, updates: [...merged].map(([streamId, list]) => ({ streamId, bytes: Y.mergeUpdates(list) })) });
-      await change(id2, (d) => { d.meta.preview = found.meta.preview; d.meta.text = found.meta.text; }, false);
-      return id2;
+      return write(async () => {
+        const found = (await open.get(id)?.handle.commit()) ?? need(id);
+        const updates = await storage.readUpdates(id);
+        const descriptor = structuredCloneDocument(found).descriptor;
+        descriptor.documentId = newId();
+        descriptor.title = `${descriptor.title.slice(0, 495)} copy`;
+        if (descriptor.extensions.sylfNative) descriptor.extensions.sylfNative = { ...(descriptor.extensions.sylfNative as object), autoTitle: false };
+        const merged = new Map<string, Uint8Array[]>();
+        for (const u of updates) merged.set(u.streamId, [...(merged.get(u.streamId) ?? []), u.bytes]);
+        return save({ descriptor, updates: [...merged].map(([streamId, list]) => ({ streamId, bytes: Y.mergeUpdates(list) })) }, { preview: found.meta.preview, text: found.meta.text });
+      });
     },
     async asset(hash) { await loaded; return (await storage.readAsset(owner, hash))?.bytes ?? null; },
     async storeAsset(bytes, mediaType, name) {
@@ -437,35 +554,90 @@ export function createNotesLibrary(storage: NotesStorage, owner: string, options
       await write(() => storage.putAsset(owner, { hash, mediaType, name, bytes }));
       return { hash, size: bytes.length, name, mediaType };
     },
-    setCover: (id, cover) => change(id, (d) => {
-      const native = (d.descriptor.extensions.sylfNative as Record<string, unknown> | undefined) ?? {};
-      const current = (native.cover as { color?: string | null; icon?: string | null } | undefined) ?? {};
-      d.descriptor.extensions.sylfNative = { ...native, cover: { color: cover.color === undefined ? current.color ?? null : cover.color, icon: cover.icon === undefined ? current.icon ?? null : cover.icon } };
-    }, false),
+    async setCover(id, cover) {
+      await loaded;
+      const image = cover.image;
+      if (image && (!image.bytes.length || image.bytes.length > COVER_BYTES || !/^(image\/png|image\/jpeg)$/.test(image.mediaType))) {
+        throw new LibraryActionError("Choose a PNG or JPEG cover up to 3 MB.");
+      }
+      const asset = image ? { ...image, hash: await options.sha256(image.bytes) } : null;
+      await write(async () => {
+        need(id);
+        if (asset) await storage.putAsset(owner, asset);
+        await editDocument(id, (d) => {
+          const native = (d.descriptor.extensions.sylfNative as Record<string, unknown> | undefined) ?? {};
+          const current = (native.cover as { color?: string | null; icon?: string | null; imageAssetId?: string | null } | undefined) ?? {};
+          if (asset && !d.descriptor.assets.some((a) => a.assetId === asset.hash)) {
+            const size = asset.bytes.length;
+            d.descriptor.assets.push({ assetId: asset.hash, mediaType: asset.mediaType, name: asset.name.slice(0, 500), content: { hash: asset.hash, size, parts: [{ hash: asset.hash, size }] }, extensions: {} });
+          }
+          d.descriptor.extensions.sylfNative = { ...native, cover: {
+            ...current,
+            ...(cover.color !== undefined ? { color: cover.color } : {}),
+            ...(cover.icon !== undefined ? { icon: cover.icon } : {}),
+            ...(image !== undefined ? { imageAssetId: asset?.hash ?? null } : {}),
+          } };
+        }, false);
+      });
+    },
+    async reorder(id, neighborId, side) {
+      await loaded;
+      if (id === neighborId) return;
+      await write(async () => {
+        const folder = record.notebooks.find((item) => item.id === id);
+        const document = folder ? null : need(id);
+        const parent = folder ? folder.parentId ?? null : document!.descriptor.folderId;
+        const key = parent ?? "";
+        const folders = record.notebooks.filter((item) => (item.parentId ?? null) === parent).sort((a, b) => a.title.localeCompare(b.title));
+        const entries = [...documents.values()].filter((item) => !item.meta.trashed && item.descriptor.folderId === parent).sort((a, b) => b.meta.updated - a.meta.updated);
+        const peer = folder ? folders.some((item) => item.id === neighborId)
+          : !document!.meta.trashed && entries.some((item) => item.id === neighborId && item.meta.pinned === document!.meta.pinned);
+        if (!peer) throw new LibraryActionError("The items must be in the same folder and section.");
+        const ids = inLibraryOrder([...folders, ...entries], record.order?.[key]).map((item) => item.id);
+        ids.splice(ids.indexOf(id), 1);
+        const index = ids.indexOf(neighborId) + Number(side === "after");
+        ids.splice(index, 0, id);
+        await putLibrary({ ...record, order: { ...record.order, [key]: ids } });
+      });
+    },
     async createNotebook(title, parentId = null) {
       await loaded;
-      const notebook: Notebook = { id: newId(), title: title.trim().slice(0, 80) || "Folder", color: NOTEBOOK_COLORS[record.notebooks.length % NOTEBOOK_COLORS.length], created: now(), parentId: parentId && record.notebooks.some((n) => n.id === parentId) ? parentId : null, icon: null };
-      await putLibrary({ ...record, notebooks: [...record.notebooks, notebook] });
-      return notebook.id;
+      return write(async () => {
+        folderAt(parentId);
+        const notebook: Notebook = { id: newId(), title: title.trim().slice(0, 80) || "Folder", color: NOTEBOOK_COLORS[record.notebooks.length % NOTEBOOK_COLORS.length], created: now(), parentId, icon: null };
+        await putLibrary({ ...record, notebooks: [...record.notebooks, notebook] });
+        return notebook.id;
+      });
     },
-    async renameNotebook(id, title) {
-      await loaded;
-      const next = title.trim().slice(0, 80);
-      if (next) await putLibrary({ ...record, notebooks: record.notebooks.map((n) => (n.id === id ? { ...n, title: next } : n)) });
-    },
+    renameNotebook: (id, title) => library.updateNotebook(id, { title }),
     async updateNotebook(id, patch) {
       await loaded;
-      // A folder can never be moved inside itself or one of its own subfolders.
-      const inside = (candidate: string | null | undefined): boolean => !!candidate && (candidate === id || inside(record.notebooks.find((n) => n.id === candidate)?.parentId));
-      if (patch.parentId !== undefined && inside(patch.parentId)) throw new Error("A folder cannot go inside itself.");
-      const title = patch.title?.trim().slice(0, 80);
-      await putLibrary({ ...record, notebooks: record.notebooks.map((n) => (n.id === id ? { ...n, ...patch, ...(title ? { title } : { title: n.title }) } : n)) });
+      await write(async () => {
+        const folder = folderAt(id)!;
+        const seen = new Set([id]);
+        if (patch.parentId !== undefined) {
+          for (let parent = folderAt(patch.parentId); parent; parent = folderAt(parent.parentId ?? null)) {
+            if (seen.has(parent.id)) throw new LibraryActionError("A folder cannot go inside itself.");
+            seen.add(parent.id);
+          }
+        }
+        const next = { ...folder, ...patch, title: patch.title?.trim().slice(0, 80) || folder.title };
+        await putLibrary({ ...record, notebooks: record.notebooks.map((item) => item.id === id ? next : item) });
+      });
     },
     async deleteNotebook(id) {
       await loaded;
-      const parent = record.notebooks.find((n) => n.id === id)?.parentId ?? null;
-      for (const d of [...documents.values()]) if (d.descriptor.folderId === id) await change(d.id, (next) => { next.descriptor.folderId = parent; }, false);
-      await putLibrary({ ...record, notebooks: record.notebooks.filter((n) => n.id !== id).map((n) => (n.parentId === id ? { ...n, parentId: parent } : n)) });
+      await write(async () => {
+        const folder = folderAt(id)!;
+        const parentId = folder.parentId ?? null;
+        // Keep the folder until every document has been moved, so a failed write can be retried.
+        for (const d of documents.values()) {
+          if (d.descriptor.folderId === id) await editDocument(d.id, (next) => { next.descriptor.folderId = parentId; }, false);
+        }
+        const order = { ...record.order };
+        delete order[id];
+        await putLibrary({ ...record, order, notebooks: record.notebooks.filter((n) => n.id !== id).map((n) => n.parentId === id ? { ...n, parentId } : n) });
+      });
     },
     async adopt(from) {
       await loaded;

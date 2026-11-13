@@ -14,7 +14,8 @@ import { QuickAsk } from "../../spaces/home/destinations/QuickAsk";
 import { useLiveBackend } from "../backend";
 import { RoomStrip } from "../party/RoomStrip";
 import { SessionActions, SessionNote } from "../session/SessionParts";
-import { audioEngine, useAudio } from "../audio/engine";
+import { useAudio } from "../audio/engine";
+import { TimerDock } from "../TimerDock";
 import { focusEnvironment } from "./environment";
 import { PhaseLine } from "./PhaseLine";
 import { useFocusBackground } from "./useFocusBackground";
@@ -73,6 +74,7 @@ export function FocusEnvironment() {
   const { shown, wake } = useControlsShown();
   const [dim, setDim] = useState(false);
   const [asking, setAsking] = useState(false);
+  const [sounds, setSounds] = useState(false);
   const signedIn = useLiveBackend() !== null;
   const opacity = useSharedValue(1);
   useEffect(() => { opacity.value = fade(shown ? 1 : 0, motion); }, [shown, motion, opacity]);
@@ -83,7 +85,7 @@ export function FocusEnvironment() {
   useEffect(() => {
     if (Platform.OS !== "web") return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.code !== "Space" || (event.target as HTMLElement)?.tagName === "INPUT") return;
+      if (sounds || event.defaultPrevented || event.code !== "Space" || (event.target as HTMLElement)?.closest("input,textarea,[contenteditable],button,[role=button],[role=slider]")) return;
       event.preventDefault();
       const status = session.status();
       if (status === "running") session.pause(); else if (status === "paused") session.resume();
@@ -91,7 +93,7 @@ export function FocusEnvironment() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [session, wake]);
+  }, [session, sounds, wake]);
 
   const active = state.active;
   const breaking = readout.phase !== "focus" && readout.phase !== "done";
@@ -115,7 +117,7 @@ export function FocusEnvironment() {
           <View style={{ flex: 1 }} />
           {signedIn ? <IconButton icon="sylvie" label="Ask Sylvie" testID="environment-ask" onPress={() => { setAsking(true); wake(); }} /> : null}
           <IconButton icon={dim ? "sun" : "moon"} label={dim ? "Brighter" : "Dimmer"} testID="environment-dim" onPress={() => { setDim(!dim); wake(); }} />
-          <IconButton icon="audio" label={audio.playing ? `Pause ${audio.title ?? "sound"}` : "Play the last sound"} testID="environment-sound" disabled={!audio.url} onPress={() => { if (audio.playing) audioEngine.pause(); else if (audio.trackId && audio.url) void audioEngine.play({ id: audio.trackId, title: audio.title ?? "", url: audio.url }); wake(); }} />
+          <IconButton icon="audio" label="Sounds" testID="environment-sound" active={audio.status === "playing"} onPress={() => { setSounds(true); wake(); }} />
         </View>
         <View style={{ position: "absolute", bottom: space.xl, left: space.xl, right: space.xl, alignItems: "center", gap: space.sm }}>
           <View style={{ width: "100%", maxWidth: 420, gap: space.sm }}>
@@ -124,6 +126,7 @@ export function FocusEnvironment() {
           </View>
         </View>
       </Animated.View>
+      {sounds ? <TimerDock barReach={null} audioOnly onCloseAudio={() => { setSounds(false); wake(); }} /> : null}
       {signedIn ? <QuickAsk open={asking} onClose={() => setAsking(false)} onLeave={leave} /> : null}
     </View>
   );

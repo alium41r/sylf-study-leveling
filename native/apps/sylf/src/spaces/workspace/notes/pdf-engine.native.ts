@@ -28,3 +28,7 @@ export async function ensurePdf(hash: string, load: () => Promise<Uint8Array | n
   await pdf.prepare(hash, bytes);
   return pdf;
 }
+
+export async function renderPdfThumbnail(hash: string, load: () => Promise<Uint8Array | null>, index: number, pixels: number): Promise<string> {
+  return (await ensurePdf(hash, load)).render(hash, index, pixels);
+}

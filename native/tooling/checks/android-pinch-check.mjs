@@ -87,7 +87,7 @@ function dump() {
   return [...xml.matchAll(/<node [^>]*>/g)].map((m) => {
     const attr = (name) => new RegExp(` ${name}="([^"]*)"`).exec(m[0])?.[1] ?? "";
     const [x1, y1, x2, y2] = (/\[(\d+),(\d+)\]\[(\d+),(\d+)\]/.exec(attr("bounds")) ?? [0, 0, 0, 0, 0]).slice(1).map(Number);
-    return { desc: attr("content-desc"), text: attr("text"), x1, y1, x2, y2 };
+    return { desc: attr("content-desc"), text: attr("text"), selected: attr("selected") === "true", x1, y1, x2, y2 };
   });
 }
 const read = () => {
@@ -156,29 +156,49 @@ await scenario("notes-edge-out", "notes", edge, STRADDLE_OUT);
 // A note's pinch, on a note of its own, in any orientation. The fingers stay down while a screenshot is taken, then lift; the page as
 // it was previewed and as it was laid out must match, and the blue cross drawn on it must not move.
 const tap = (node) => adb("shell", "input", "tap", String(Math.round((node.x1 + node.x2) / 2)), String(Math.round((node.y1 + node.y2) / 2)));
-const labelled = (label) => dump().find((n) => n.desc.toLowerCase() === label.toLowerCase() || n.text.toLowerCase() === label.toLowerCase());
+const labelled = (label) => {
+  const want = label.toLowerCase();
+  return dump().find((n) => n.desc.toLowerCase() === want || n.text.toLowerCase() === want || n.desc.toLowerCase().startsWith(`${want},`));
+};
 const tapLabel = async (label, wait = 900) => { const node = labelled(label); if (!node) throw new Error(`nothing labelled ${label}`); tap(node); await sleep(wait); };
 const blue = ([r, g, b]) => b > 150 && b - r > 50 && b - g > 30;
 const light = ([r, g, b]) => r + g + b > 600;
 /** Rows of paper in one column of the page area: a page cut off where the screen ended has fewer. */
 const paperRows = (image, x, area) => { let n = 0; for (let y = area.y1; y < area.y2; y++) if (light(image.pixel(x, y))) n++; return n; };
-/** The note's zoom, read beside its Zoom out button. */
-const noteZoom = () => { const nodes = dump(), out = nodes.find((n) => n.desc === "Zoom out"); return Number(/^(\d+)%$/.exec(nodes.find((n) => out && /^\d+%$/.test(n.text) && n.y1 >= out.y1 - 10 && n.y2 <= out.y2 + 10)?.text ?? "")?.[1]); };
+/** Read the zoom from Document options when the accessibility tree includes its detail. */
+const noteZoom = async () => {
+  await tapLabel("Document options", 600);
+  const zoom = dump().map((node) => `${node.text} ${node.desc}`).find((text) => text.includes("fit width at 100%"));
+  adb("shell", "input", "keyevent", "KEYCODE_BACK");
+  await sleep(450);
+  return Number(/(\d+)%/.exec(zoom ?? "")?.[1]);
+};
+const chooseBlue = async () => {
+  const label = "Colour #345bc6";
+  const inTray = !labelled(label);
+  if (inTray) await tapLabel("Writing tools", 600);
+  const swatch = labelled(label);
+  if (!swatch) throw new Error(`nothing labelled ${label}`);
+  if (!swatch.selected) { tap(swatch); await sleep(800); }
+  if (inTray) {
+    adb("shell", "input", "keyevent", "KEYCODE_BACK");
+    await sleep(600);
+  }
+};
 
 async function notePage() {
   const names = ["note-page-out-top", "note-page-in-aside", "note-page-out-scrolled", "note-page-margin-in", "note-page-two-pages"].filter(wanted);
   if (!names.length) return;
   // No theme here: ink and paper are told apart by colour on any theme, and the owner's own theme stays as it is.
   await link("space=workspace&wsClear=1&wsOpen=notes", 4000);
-  await tapLabel("New", 1200);
+  await tapLabel("New note", 1200);
   adb("shell", "input", "text", "Pinch%scheck");
   // Enter creates it: in landscape the keyboard can cover the Create button.
   adb("shell", "input", "keyevent", "KEYCODE_ENTER");
   await sleep(3000);
   if (labelled("Write")) await tapLabel("Write", 900);
-  // Full screen gives the toolbar room for every pen control, in either orientation.
-  if (labelled("Full screen")) await tapLabel("Full screen", 3000);
-  if (labelled("Bold line")) await tapLabel("Bold line", 400);
+  if (!labelled("Full screen")) await tapLabel("Document options", 600);
+  await tapLabel("Full screen", 3000);
   // The page, found on the screen: the accessibility tree can lag a switch to Full screen by seconds, so its positions are not used.
   const findPage = () => {
     const page = screen(), middle = Math.round(WIDTH / 2);
@@ -195,7 +215,7 @@ async function notePage() {
   // on the page and chosen again if missed, and the page is found again afterwards.
   let area = findPage();
   for (let attempt = 0; attempt < 3 && area && !centroid(screen(), area, blue).n; attempt++) {
-    await tapLabel("Colour #345bc6", 1500);
+    await chooseBlue();
     area = findPage();
     if (!area) break;
     const x = Math.round((area.x1 + area.x2) / 2), y = Math.round(area.y1 + (area.y2 - area.y1) * 0.45);
@@ -216,11 +236,11 @@ async function notePage() {
   ];
   let cross = { x: cx, y: cy };
   for (const step of steps) {
-    const zoomBefore = noteZoom(), before = screen();
+    const zoomBefore = await noteZoom(), before = screen();
     adb("shell", "dumpsys", "gfxinfo", PACKAGE, "reset");
     const held = await pinchHeld({ ...step.at(cross), from: step.from, to: step.to });
     await sleep(1200);
-    const pinchFrames = frames(), landed = screen(), zoomAfter = noteZoom();
+    const pinchFrames = frames(), landed = screen(), zoomAfter = await noteZoom();
     keep(`${step.name}-0-before`, before); keep(`${step.name}-1-held`, held); keep(`${step.name}-2-landed`, landed);
     const a = centroid(held, area, blue), b = centroid(landed, area, blue);
     if (b.n) cross = b;
@@ -230,7 +250,7 @@ async function notePage() {
     const column = Math.min(area.x2 - 1, Math.round(b.n ? b.x + 120 : cx + 120));
     const paper = { held: paperRows(held, column, area), landed: paperRows(landed, column, area) };
     const ratio = zoomAfter / zoomBefore, moved = +(difference(before, landed, area) * 100).toFixed(2);
-    // The zoom label is read where the toolbar shows it (in portrait it can be off the edge); otherwise the page must visibly change.
+    // When the tree omits the menu detail, check the visible scale change.
     const zoomed = Number.isFinite(ratio) ? step.zoomed(ratio) : moved > 10;
     const entry = { name: step.name, zoomBefore, zoomAfter, zoomRatio: +ratio.toFixed(3), movedPercent: moved, cross: { held: a, landed: b }, jumpPx, changedPercent: changed, paper, frames: pinchFrames,
       ok: zoomed && jumpPx !== null && jumpPx <= 6 && changed <= 1 && paper.held >= paper.landed - 8 };
@@ -240,14 +260,14 @@ async function notePage() {
   // Two fingers zoom wherever they land, not only on a page: first in the margin beside a page narrower than the view.
   const record = (entry) => { if (wanted(entry.name)) { results.push(entry); console.log(JSON.stringify(entry)); } };
   const measured = async (name, at, from, to) => {
-    const zoomBefore = noteZoom(), before = screen();
+    const zoomBefore = await noteZoom(), before = screen();
     adb("shell", "dumpsys", "gfxinfo", PACKAGE, "reset");
     const held = await pinchHeld({ ...at, from, to });
     await sleep(1200);
-    const landed = screen(), zoomAfter = noteZoom();
+    const pinchFrames = frames(), landed = screen(), zoomAfter = await noteZoom();
     keep(`${name}-0-before`, before); keep(`${name}-1-held`, held); keep(`${name}-2-landed`, landed);
     const zoomRatio = zoomAfter / zoomBefore, movedPercent = +(difference(before, landed, area) * 100).toFixed(2);
-    return { name, zoomBefore, zoomAfter, zoomRatio: +zoomRatio.toFixed(3), movedPercent, zoomedIn: Number.isFinite(zoomRatio) ? zoomRatio > 1.4 : movedPercent > 10, changedPercent: +(difference(held, landed, area, 60, 3) * 100).toFixed(2), frames: frames(), held, landed };
+    return { name, zoomBefore, zoomAfter, zoomRatio: +zoomRatio.toFixed(3), movedPercent, zoomedIn: Number.isFinite(zoomRatio) ? zoomRatio > 1.4 : movedPercent > 10, changedPercent: +(difference(held, landed, area, 60, 3) * 100).toFixed(2), frames: pinchFrames, held, landed };
   };
   // The screenshots stay out of the report.
   const report = (entry, ok) => { const rest = { ...entry }; delete rest.held; delete rest.landed; record({ ...rest, ok }); };
@@ -259,11 +279,11 @@ async function notePage() {
   // Then one finger on each of two pages, across the gap between them. Both pages' ink must still show once the pinch lands (a page
   // whose surface had just appeared used to stay blank until its ink next changed).
   if (!wanted("note-page-two-pages")) return;
-  // A second page comes from Insert, which a portrait toolbar can leave off the edge of the screen.
-  try {
-    await tapLabel("Insert a picture, PDF or page", 900);
-    await tapLabel("Blank page", 1500);
-  } catch { skipped.push("note-page-two-pages"); adb("shell", "input", "keyevent", "KEYCODE_BACK"); return; }
+  // Adding a page opens it. Go back to the first page so the original ink stays in the pinch comparison.
+  await tapLabel("Pages", 900);
+  await tapLabel("Add page", 1500);
+  await tapLabel("Pages", 900);
+  await tapLabel("Page 1", 1500);
   pinch({ cx, cy: area.y1 + 0.3 * h, from: 0.3 * w, to: 0.08 * w });
   await sleep(1500);
   // The gap: a band of the backdrop between paper above and below, down the middle of the page.

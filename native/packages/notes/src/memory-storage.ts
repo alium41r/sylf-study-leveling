@@ -14,7 +14,7 @@ export function createMemoryStorage(): NotesStorage & { size(): { documents: num
     async putDocument(document) { documents.set(document.id, clone(document)); },
     async putLibrary(owner, library) { libraries.set(owner, clone(library)); },
     async appendUpdates(document, list) { documents.set(document.id, clone(document)); updates.set(document.id, [...(updates.get(document.id) ?? []), ...list.map((u) => ({ streamId: u.streamId, bytes: copy(u.bytes) }))]); },
-    async readUpdates(id) { return (updates.get(id) ?? []).map((u) => ({ streamId: u.streamId, bytes: copy(u.bytes) })); },
+    async readUpdates(id, streamId) { return (updates.get(id) ?? []).filter((u) => !streamId || u.streamId === streamId).map((u) => ({ streamId: u.streamId, bytes: copy(u.bytes) })); },
     async compact(id, streamId, merged) { updates.set(id, [...(updates.get(id) ?? []).filter((u) => u.streamId !== streamId), { streamId, bytes: copy(merged) }]); },
     async deleteDocument(id) { documents.delete(id); updates.delete(id); },
     async putAsset(owner, asset) { assets.set(`${owner}:${asset.hash}`, { ...asset, bytes: copy(asset.bytes) }); },

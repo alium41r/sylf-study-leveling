@@ -1,22 +1,17 @@
 // A conversation with Sylvie. With an account she answers for real, as she types: `sendToSylvie` reads the same route the web uses, so quotas, tools,
-// confirmations and every model choice stay on the server, and a proposal she makes is previewed here and applied only when the person confirms it. Without one it is a sample, the field
-// is disabled, and it says why. The Assistant layout puts this window beside the main tool.
+// confirmations and every model choice stay on the server, and a proposal she makes is previewed here and applied only when the person confirms it. The Assistant layout puts this window beside the main tool.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { type ComponentRef } from "react";
 import { ScrollView, View } from "react-native";
-import { Button, IconButton, Select, Text, TextField, useTheme } from "@sylf/design-system";
+import { Button, EmptyState, IconButton, Select, Text, TextField, useTheme } from "@sylf/design-system";
 import { useLiveBackend, useOptionalResource } from "../../../shell/backend";
 import { describeFailureText } from "../../../shell/account/failure";
 import { toLiveResult } from "../../../shell/live-result";
 import type { Backend, ChatImage as ChatImageRecord, PickedFile } from "@sylf/backend";
-import type { WorkspaceDataAdapter } from "../data/contracts";
-import { useToolResult } from "../data";
 import { RichText } from "../../../shell/rich-text/RichText";
 import { ChatImage } from "../../../shell/sylvie/ChatImage";
 import { pickImages } from "../../../shell/files/pick";
-import { ToolEmpty, ToolLoading, ToolPage, type ToolProps } from "./shared";
-
-const load = (adapter: WorkspaceDataAdapter) => adapter.sylvie();
+import { ToolLoading, ToolPage, type ToolProps } from "./shared";
 
 function PersonBubble({ text, images }: { text: string; images?: ChatImageRecord[] }) {
   const { color, shape, space } = useTheme();
@@ -28,7 +23,7 @@ function PersonBubble({ text, images }: { text: string; images?: ChatImageRecord
   );
 }
 
-function LiveSylvie({ backend, window, patch, onProvenance }: ToolProps & { backend: Backend }) {
+function LiveSylvie({ backend, window, patch }: ToolProps & { backend: Backend }) {
   const { color, space } = useTheme();
   const threadsResource = useMemo(() => backend.resources.resource({ key: "sylvie-threads", tags: ["sylvie"], ttlMs: 60_000, load: (signal) => backend.reads.chats(signal) }), [backend]);
   const threads = toLiveResult(useOptionalResource(threadsResource), threadsResource);
@@ -46,7 +41,6 @@ function LiveSylvie({ backend, window, patch, onProvenance }: ToolProps & { back
   const [dismissed, setDismissed] = useState<string | null>(null);
   const flight = useRef<AbortController | null>(null);
   const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
-  useEffect(() => { onProvenance(false); }, [onProvenance]);
   useEffect(() => () => flight.current?.abort(), []);
 
   const send = async () => {
@@ -96,17 +90,20 @@ function LiveSylvie({ backend, window, patch, onProvenance }: ToolProps & { back
   };
   const list = threads?.data?.sessions ?? [];
   if (!threads) return <ToolLoading />;
+  const empty = !messages.length && !turn;
+  const column = { width: "100%" as const, maxWidth: 680, alignSelf: "center" as const };
   return (
     <View style={{ flex: 1 }}>
-      {list.length > 1 ? <View style={{ paddingHorizontal: space.md, paddingTop: space.sm, flexDirection: "row", gap: space.sm, alignItems: "center" }}><View style={{ flex: 1, minWidth: 0 }}><Select label="Conversation" hideLabel value={String(threadId)} options={list.map((item) => ({ value: String(item.id), label: item.title }))} onChange={(value) => patch({ thread: Number(value) })} /></View><Button title="New" size="small" variant="ghost" onPress={() => patch({ thread: null })} /></View> : null}
-      <ToolPage ref={scroller} onContentSizeChange={() => scroller.current?.scrollToEnd({ animated: false })}>
-        {!messages.length && !turn ? <Text variant="small" tone="soft" testID="sylvie-empty">Ask Sylvie about your plan, your progress or what you're studying.</Text> : null}
+      {list.length > 1 ? <View style={[column, { paddingHorizontal: space.md, paddingTop: space.sm, flexDirection: "row", gap: space.sm, alignItems: "center" }]}><View style={{ flex: 1, minWidth: 0 }}><Select label="Conversation" hideLabel value={String(threadId)} options={list.map((item) => ({ value: String(item.id), label: item.title }))} onChange={(value) => patch({ thread: Number(value) })} /></View><Button title="New" size="small" variant="ghost" onPress={() => patch({ thread: null })} /></View> : null}
+      <ToolPage ref={scroller} onContentSizeChange={() => scroller.current?.scrollToEnd({ animated: false })}
+        contentContainerStyle={[column, { flexGrow: 1, justifyContent: empty ? "center" : "flex-start", padding: space.md, gap: space.lg }]}>
+        {empty ? <View testID="sylvie-empty"><EmptyState compact icon="sylvie" title="Ask Sylvie" message="Get help with your plan, your progress or what you’re studying." /></View> : null}
         {messages.map((message) => (message.type === "USER" ? <PersonBubble key={message.id} text={message.content} images={message.attachments} /> : <RichText key={message.id} text={message.content} testID="sylvie-reply" />))}
         {turn ? <PersonBubble text={turn.asked} /> : null}
         {turn ? (turn.reply ? <RichText text={turn.reply} testID="sylvie-streaming" /> : <Text variant="small" tone="soft" testID="sylvie-streaming">{status ?? "Thinking"}</Text>) : null}
         {offered && !turn ? <View testID="sylvie-proposal" style={{ gap: space.sm, padding: space.md, borderRadius: 12, borderWidth: 1, borderColor: color.line }}><Text variant="small" tone="soft">Sylvie suggests</Text><Text variant="small">{offered.summary}</Text><View style={{ flexDirection: "row", gap: space.sm }}><Button title={confirming ? "Applying" : "Apply"} size="small" variant="emphasis" disabled={confirming} testID="sylvie-confirm" onPress={() => void confirm()} /><Button title="Not now" size="small" disabled={confirming} testID="sylvie-dismiss" onPress={() => { setProposal(null); setDismissed(offered.token); }} /></View></View> : null}
       </ToolPage>
-      <View style={{ paddingHorizontal: space.md, paddingBottom: space.sm, gap: space.xs }}>
+      <View style={[column, { paddingHorizontal: space.md, paddingBottom: space.sm, gap: space.xs }]}>
         {failure ? <View testID="sylvie-failure"><Text variant="caption" tone="critical">{failure}</Text></View> : null}
         {attached.length ? (
           <View testID="sylvie-attachments" style={{ gap: space.xs }}>
@@ -124,28 +121,5 @@ function LiveSylvie({ backend, window, patch, onProvenance }: ToolProps & { back
 
 export default function SylvieTool(props: ToolProps) {
   const backend = useLiveBackend();
-  return backend ? <LiveSylvie {...props} backend={backend} /> : <SampleSylvie {...props} />;
-}
-
-function SampleSylvie({ onProvenance }: ToolProps) {
-  const { color, shape, space } = useTheme();
-  const result = useToolResult("sylvie", load);
-  useEffect(() => { if (result) onProvenance(result.provenance === "sample"); }, [result, onProvenance]);
-  if (!result) return <ToolLoading />;
-  const thread = result.data?.[0];
-  if (!thread) return <ToolEmpty icon="sylvie" title="No conversations yet" message="Conversations with Sylvie will appear here." />;
-  return (
-    <View style={{ flex: 1 }}>
-      <ToolPage>
-        {thread.messages.map((message) => (
-          message.from === "person"
-            ? <View key={message.id} style={{ alignSelf: "flex-end", maxWidth: "86%", paddingHorizontal: space.md, paddingVertical: space.sm, borderRadius: shape.radius.md, backgroundColor: color.selected }}><Text variant="small">{message.text}</Text></View>
-            : <Text key={message.id} variant="small">{message.text}</Text>
-        ))}
-      </ToolPage>
-      <View style={{ paddingHorizontal: space.md, paddingBottom: space.sm }}>
-        <TextField label="Ask Sylvie" hideLabel placeholder="Ask Sylvie" editable={false} helper="Sylvie connects when the backend does." />
-      </View>
-    </View>
-  );
+  return backend ? <LiveSylvie {...props} backend={backend} /> : null;
 }

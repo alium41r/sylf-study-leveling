@@ -1,7 +1,7 @@
 // Ink on tablets: the native writing surface captures every pen sample and draws the live stroke itself; this side turns what it
 // sends into sylf-ink/1 through the same scene the web uses, and hands back finished outlines to draw. Without the native view
 // (iOS until it is built, an old development build), strokes show read-only and the page says so.
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { View } from "react-native";
 import Svg, { Path, Rect } from "react-native-svg";
 import { nativeInkView, type NativeInkHandle } from "@sylf/native-platform";
@@ -29,44 +29,64 @@ function NativeInkSurface(props: InkViewProps) {
   const ref = useRef<NativeInkHandle>(null);
   const latest = useRef(props);
   latest.current = props;
-  const sent = useRef(new Map<string, number>());
+  const sync = useRef(() => {});
+  const completed = useRef(new Set<number>());
   const { scene, tool } = props;
+  // The selection box is drawn from the scene, so it follows a move, a resize or an undo while something is selected.
+  const [, redraw] = useState(0);
+  const selecting = props.selection.length > 0;
+  useEffect(() => (selecting ? scene.subscribe(() => redraw((n) => n + 1)) : undefined), [scene, selecting]);
 
-  // Finished strokes go across in batches, and only those that changed. A surface that has just mounted may not be on screen yet,
-  // and a call to it then fails: everything is sent again on a later frame, or the page would stay blank until its ink next changed.
-  const sync = useRef<() => Promise<void>>(async () => undefined);
-  const retry = useRef({ frame: 0, tries: 0 });
-  const again = () => {
-    sent.current.clear();
-    if (retry.current.frame || retry.current.tries >= 120) return;
-    retry.current.tries++;
-    retry.current.frame = requestAnimationFrame(() => { retry.current.frame = 0; void ref.current?.clearStrokes().then(() => sync.current(), again); });
-  };
-  sync.current = async () => {
-    const handle = ref.current;
-    if (!handle) return again();
-    try {
-      const strokes = latest.current.scene.strokes();
-      const live = new Set(strokes.map((s) => s.id));
-      const gone = [...sent.current.keys()].filter((id) => !live.has(id));
-      const changed = strokes.filter((s) => sent.current.get(s.id) !== s.version);
-      for (const id of gone) sent.current.delete(id);
-      if (gone.length) await handle.removeStrokes(gone);
-      for (let i = 0; i < changed.length; i += CHUNK) {
-        const part = changed.slice(i, i + CHUNK);
-        for (const s of part) sent.current.set(s.id, s.version);
-        await handle.upsertStrokes(JSON.stringify(part.map((s) => ({ id: s.id, d: s.d, color: s.color, opacity: s.opacity }))));
-      }
-      retry.current.tries = 0;
-    } catch { again(); }
-  };
-  useEffect(() => () => scene.endSweep(), [scene]);
+  useEffect(() => () => { if (!props.paperOnly) scene.endSweep(); }, [scene, props.paperOnly]);
   useEffect(() => {
     if (props.paperOnly) return;
-    sent.current.clear();
-    void (ref.current ? ref.current.clearStrokes().then(() => sync.current(), again) : again());
-    const unsubscribe = scene.subscribe(() => void sync.current());
-    return () => { unsubscribe(); cancelAnimationFrame(retry.current.frame); retry.current = { frame: 0, tries: 0 }; };
+    const sent = new Map<string, number>();
+    let active = true, running = false, dirty = false, reset = true, frame = 0, tries = 0;
+    const send = async () => {
+      dirty = true;
+      if (running || frame || !active) return;
+      running = true;
+      try {
+        while (dirty && active) {
+          dirty = false;
+          const handle = ref.current;
+          if (!handle) throw new Error("The ink surface is mounting.");
+          if (reset) {
+            await handle.clearStrokes();
+            sent.clear();
+            reset = false;
+          }
+          if (!active) return;
+          const drops = [...completed.current];
+          const strokes = scene.strokes();
+          const live = new Set(strokes.map((stroke) => stroke.id));
+          const gone = [...sent.keys()].filter((id) => !live.has(id));
+          if (gone.length) await handle.removeStrokes(gone);
+          for (const id of gone) sent.delete(id);
+          const changed = strokes.filter((stroke) => sent.get(stroke.id) !== stroke.version);
+          for (let i = 0; i < changed.length && active; i += CHUNK) {
+            const part = changed.slice(i, i + CHUNK);
+            await handle.upsertStrokes(JSON.stringify(part.map(({ id, d, color, opacity }) => ({ id, d, color, opacity }))));
+            for (const stroke of part) sent.set(stroke.id, stroke.version);
+          }
+          // Keep the native preview until its final outline has actually reached the canvas.
+          for (const id of drops) {
+            if (!active) return;
+            await handle.dropLive(id);
+            completed.current.delete(id);
+          }
+          tries = 0;
+        }
+      } catch {
+        reset = true;
+        if (active && tries++ < 120) frame = requestAnimationFrame(() => { frame = 0; void send(); });
+      } finally { running = false; }
+    };
+    const update = () => { void send(); };
+    sync.current = update;
+    const unsubscribe = scene.subscribe(update);
+    update();
+    return () => { active = false; unsubscribe(); cancelAnimationFrame(frame); };
   }, [scene, props.paperOnly]);
 
   const paper = useMemo(() => {
@@ -88,7 +108,7 @@ function NativeInkSurface(props: InkViewProps) {
       tool={tool.tool} penOnly={tool.penOnly} fingerGestures={!!props.fingersMove} editable={props.editable && !props.paperOnly}
       pinchZoom={!props.fingersMove && !!props.onPagePinch && !props.paperOnly} inkThinning={thinning} inkShape={tool.tool === "shape" ? tool.shape : ""} inkSmoothing={brush.smoothing ?? 0.65} inkBrushCurve={brush.nib === "brush"}
       inkPencil={brush.nib === "pencil"} inkLineStyle={brush.lineStyle ?? "solid"} inkStraighten={!!brush.straighten && !brush.shape}
-      inkColor={tool.color} inkWidth={brush.width} inkOpacity={inkGeometry.inkOpacity(brush)} eraserRadius={eraserRadius(tool)}
+      inkColor={tool.color} inkWidth={brush.width} inkOpacity={inkGeometry.inkOpacity(brush)} eraserRadius={eraserRadius(tool)} buttonErases={tool.buttonErases}
       camera={[props.camera.x, props.camera.y, props.camera.zoom]} selectionBox={box ? [box.x, box.y, box.width, box.height] : null} paper={paper}
       onPenSeen={() => latest.current.onPenSeen?.()}
       onPan={(e) => latest.current.onPan?.(e.nativeEvent.dx, e.nativeEvent.dy)}
@@ -116,7 +136,8 @@ function NativeInkSurface(props: InkViewProps) {
           for (let i = 0; i < all.length; i += 256) p.scene.append(all.slice(i, i + 256));
           p.scene.end();
         } catch { p.scene.cancel(); }
-        void sync.current().then(() => ref.current?.dropLive(live));
+        completed.current.add(live);
+        sync.current();
       }} />
   );
 }

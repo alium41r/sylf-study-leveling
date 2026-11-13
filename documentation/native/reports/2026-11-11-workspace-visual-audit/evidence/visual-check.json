@@ -1,0 +1,198 @@
+{
+  "summary": {
+    "passed": true,
+    "total": 9,
+    "failed": []
+  },
+  "checks": {
+    "windowSheetDoesNotOverflowDuringEntrance": true,
+    "toolsClearSylvieComposer": true,
+    "toolsClearTimerNote": true,
+    "toolsClearCalculatorKeys": true,
+    "compactDockShowsFocusedTool": true,
+    "compactResourceFiltersFit": true,
+    "compactWindowsCanScrollToClear": true,
+    "visualViewportDoesNotOverflow": true,
+    "noConsoleErrors": true
+  },
+  "results": {
+    "visualBounds": {
+      "01-canvas": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "02-free-windows": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "03-layout-menu": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "04-windows-sheet": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "05-single": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "06-landscape-split": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "07-assistant": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "08-tiles": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "wide-notes": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "wide-pdfs": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "wide-whiteboard": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "wide-sylvie": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "wide-timer": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "wide-calculator": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "wide-audio": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "wide-resources": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "09-sounds-dock": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "10-before-pdf": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "11-pdf-open": {
+        "width": 1280,
+        "height": 752,
+        "overflow": false
+      },
+      "12-portrait-split": {
+        "width": 744,
+        "height": 752,
+        "overflow": false
+      },
+      "13-portrait-tiles": {
+        "width": 744,
+        "height": 752,
+        "overflow": false
+      },
+      "14-short-assistant": {
+        "width": 900,
+        "height": 480,
+        "overflow": false
+      },
+      "15-short-timer": {
+        "width": 900,
+        "height": 480,
+        "overflow": false
+      },
+      "16-compact-canvas": {
+        "width": 320,
+        "height": 650,
+        "overflow": false
+      },
+      "compact-notes": {
+        "width": 320,
+        "height": 650,
+        "overflow": false
+      },
+      "compact-pdfs": {
+        "width": 320,
+        "height": 650,
+        "overflow": false
+      },
+      "compact-whiteboard": {
+        "width": 320,
+        "height": 650,
+        "overflow": false
+      },
+      "compact-sylvie": {
+        "width": 320,
+        "height": 650,
+        "overflow": false
+      },
+      "compact-timer": {
+        "width": 320,
+        "height": 650,
+        "overflow": false
+      },
+      "compact-calculator": {
+        "width": 320,
+        "height": 650,
+        "overflow": false
+      },
+      "compact-audio": {
+        "width": 320,
+        "height": 650,
+        "overflow": false
+      },
+      "compact-resources": {
+        "width": 320,
+        "height": 650,
+        "overflow": false
+      },
+      "17-compact-sounds-dock": {
+        "width": 320,
+        "height": 650,
+        "overflow": false
+      },
+      "18-compact-custom": {
+        "width": 320,
+        "height": 650,
+        "overflow": false
+      },
+      "19-compact-windows-scrolled": {
+        "width": 320,
+        "height": 650,
+        "overflow": false
+      }
+    },
+    "consoleErrors": []
+  }
+}

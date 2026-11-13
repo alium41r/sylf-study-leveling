@@ -202,14 +202,16 @@ async function runChecks(window) {
     await sleep(100);
     await key("Escape");
 
-    // A tool can be reached from the dock in any Space, and it lands in the view. From World it comes to the canvas.
-    await openPanel();
-    await clickOn(tid("dock-go-audio"));
-    await until("[data-testid^=workspace-window-]");
-    await sleep(700);
-    const audio = await js(`(() => { const e = [...document.querySelectorAll('[data-testid^=workspace-window-]')].pop().getBoundingClientRect(); return { x: e.x, y: e.y, right: e.right, bottom: e.bottom }; })()`);
-    checks.audioLandsInView = inside(audio, await js(`({ width: innerWidth, height: innerHeight })`));
-    checks.audioIsOpen = await js(`JSON.parse(localStorage.getItem('sylf.native.spaces.v1')).snapshots.workspace.windows.some((w) => w.tool === 'audio')`);
+    // Sounds opens over the current Space and keeps the paused timer in view.
+    await clickOn(tid("dock-sounds-open"));
+    await until(tid("dock-audio-panel"));
+    await sleep(460);
+    checks.soundsOpensInWorld = await panelOpen() && await has('[data-testid=dock-panel][aria-label=Sounds]') && await has(tid("world-lobby"));
+    checks.soundsFitsInView = inside(await rectOf(tid("dock-panel")), await js(`({ width: innerWidth, height: innerHeight })`));
+    const inSounds = (await record()).active;
+    checks.soundsKeepsPausedSession = inSounds?.clientKey === clientKey && inSounds.snapshot.isPaused && (await textOf("dock-audio-clock")) === (await textOf("dock-clock"));
+    await shot("sounds-world-paused");
+    await closePanel();
 
     // End from Focus. It asks first, and the time stays on this device, marked as not saved.
     await space("Home");

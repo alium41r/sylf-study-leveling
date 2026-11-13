@@ -38,8 +38,12 @@ export function createPlatformNotesStorage(): NotesStorage {
         for (const u of updates) await t.runAsync("INSERT INTO updates (document_id, stream_id, bytes) VALUES (?, ?, ?)", document.id, u.streamId, u.bytes);
       });
     },
-    async readUpdates(documentId) {
-      const rows = await (await db()).getAllAsync<{ stream_id: string; bytes: Uint8Array }>("SELECT stream_id, bytes FROM updates WHERE document_id = ? ORDER BY seq", documentId);
+    async readUpdates(documentId, streamId) {
+      const d = await db();
+      const rows = await d.getAllAsync<{ stream_id: string; bytes: Uint8Array }>(
+        streamId ? "SELECT stream_id, bytes FROM updates WHERE document_id = ? AND stream_id = ? ORDER BY seq" : "SELECT stream_id, bytes FROM updates WHERE document_id = ? ORDER BY seq",
+        ...(streamId ? [documentId, streamId] : [documentId]),
+      );
       return rows.map((r) => ({ streamId: r.stream_id, bytes: new Uint8Array(r.bytes) }));
     },
     async compact(documentId, streamId, merged) {

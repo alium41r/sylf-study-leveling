@@ -4,7 +4,7 @@ import { EDGE_GUTTER, GRID, HOME_CAMERA, MIN_DOT_SPACING, OVERVIEW_ZOOM, WORLD, 
 import { DEFAULT_BUDGET, planLifecycles, seenWindowIds } from "./lifecycle";
 import { createWorkspaceModel } from "./model";
 import { TOOLS, TOOL_IDS } from "./tools";
-import { INITIAL_WORKSPACE, MAX_TOOL_STATE, MAX_WINDOWS, applyLayout, applyNamedLayout, closeWindow, deleteNamedLayout, saveNamedLayout, cycleFocus, fitWorkspace, focusWindow, minimizeWindow, minimizedWindows, moveWindow, openWindow, openWindows, parseWorkspaceState, pinchOwner, pinchRegions, resizeWindow, restoreArrangement, restoreWindow, setToolState, windowTitle, fillTiles, fillSeams, effectiveFill, dockInFill, resizeFillSeam, parseWorkspaceState as parse2, type WorkspaceState } from "./windows";
+import { INITIAL_WORKSPACE, MAX_TOOL_STATE, MAX_WINDOWS, applyLayout, applyNamedLayout, closeWindow, deleteNamedLayout, saveNamedLayout, cycleFocus, fitWorkspace, focusWindow, minimizeWindow, minimizedWindows, moveWindow, openWindow, openWindows, parseWorkspaceState, pinchOwner, pinchRegions, resizeWindow, restoreArrangement, restoreWindow, setToolState, windowTitle, fillTiles, presetTiles, fillSeams, effectiveFill, dockInFill, resizeFillSeam, parseWorkspaceState as parse2, type WorkspaceState } from "./windows";
 
 const viewport = { width: 1280, height: 820 };
 const frame: Frame = { viewport, insets: { top: 72, right: 16, bottom: 96, left: 16 } };
@@ -315,6 +315,23 @@ describe("layouts", () => {
     expect(Math.abs(left.width - right.width)).toBeLessThanOrEqual(GRID);
   });
 
+  it("fills the screen frame in either split orientation and retains the canvas arrangement", () => {
+    const canvas = opened(INITIAL_WORKSPACE, "notes", "calculator");
+    const split = applyLayout(canvas, "split", frame);
+    const [left, right] = Object.values(presetTiles(split, { x: 5, y: 70, width: 1001, height: 660 }, false));
+    expect(left.x + left.width).toBe(right.x);
+    expect(left.width + right.width).toBe(1001);
+    expect(left.height).toBe(660);
+    expect(right.height).toBe(660);
+
+    const [top, bottom] = Object.values(presetTiles(split, { x: 2, y: 70, width: 744, height: 693 }, true));
+    expect(top.y + top.height).toBe(bottom.y);
+    expect(top.height + bottom.height).toBe(693);
+    expect(top.width).toBe(744);
+    expect(bottom.width).toBe(744);
+    expect(restoreArrangement(split).windows).toEqual(canvas.windows);
+  });
+
   it("Assistant puts Sylvie beside the main tool, and keeps Sylvie the smaller", () => {
     const state = applyLayout(opened(INITIAL_WORKSPACE, "pdfs"), "assistant", frame);
     const [main, sylvie] = [...openWindows(state)].sort((a, b) => a.x - b.x);
@@ -564,6 +581,71 @@ describe("summoning a tool from outside Workspace", () => {
     expect(model.state().windows.map((window) => window.tool)).toEqual(["timer"]);
     expect(model.state().focused).toBe(model.state().windows[0].id);
   });
+  it("opens tools at a drop, on the grid and within the clear canvas", () => {
+    const model = createWorkspaceModel(createSpacesStore(storage(), "tablet"));
+    expect(model.openAt("timer", { x: 120, y: 200 })).toBeNull();
+    model.setFrame(frame);
+    model.zoomTo(0.8);
+    const id = model.openAt("timer", { x: 280, y: 300 });
+    expect(id).not.toBeNull();
+    const first = model.state().windows[0];
+    expect(first.x % GRID).toBe(0);
+    expect(first.y % GRID).toBe(0);
+    expect(contains(clearWorld(model.state().camera, frame), first)).toBe(true);
+    expect(model.openAt("timer", { x: 680, y: 300 })).toBe(id);
+    expect(model.state().windows).toHaveLength(1);
+    expect(model.state().windows[0].x).toBeGreaterThan(first.x);
+  });
+
+  it("fits a tall tool at the drop rather than moving it to the top of the canvas", () => {
+    const model = createWorkspaceModel(createSpacesStore(storage(), "tablet"));
+    model.setFrame(frame);
+    const drop = { x: 390, y: 265 };
+    model.openAt("notes", drop);
+    const { windows, camera } = model.state();
+    const note = windows[0];
+    const topLeft = worldToScreen(note, camera, viewport);
+    expect(Math.abs(topLeft.x - drop.x)).toBeLessThan(GRID * 1.5);
+    expect(Math.abs(topLeft.y - drop.y)).toBeLessThan(GRID);
+    expect(note.height).toBeGreaterThanOrEqual(TOOLS.notes.min.height);
+    expect(note.height).toBeLessThan(TOOLS.notes.preferred.height);
+    expect(contains(clearWorld(camera, frame), note)).toBe(true);
+  });
+
+  it.each(["close", "minimize"] as const)("restores sibling windows before %s removes a page-only tile", (action) => {
+    const model = createWorkspaceModel(createSpacesStore(storage(), "tablet"));
+    model.setFrame(frame);
+    const sibling = model.open("calculator")!;
+    const page = model.open("notes")!;
+    model.setLayout("fill");
+    model.patchTool(page, { bare: true });
+    model.minimize(sibling);
+    model[action](page);
+    expect(model.state().layout).toBe("free");
+    expect(model.state().focused).toBe(sibling);
+    expect(openWindows(model.state()).map((window) => window.id)).toEqual([sibling]);
+  });
+
+  it("reflows the same split windows in portrait and preserves focus and the saved canvas", () => {
+    const model = createWorkspaceModel(createSpacesStore(storage(), "tablet"));
+    model.setFrame(frame);
+    const first = model.open("notes")!;
+    const second = model.open("pdfs")!;
+    const canvas = model.state().windows;
+    model.setLayout("split");
+    model.focus(first);
+    const portrait = { ...frame, viewport: { width: 800, height: 1140 } };
+    model.setFrame(portrait);
+    const split = model.state();
+    const [top, bottom] = [...openWindows(split)].sort((a, b) => a.y - b.y);
+    expect([top.id, bottom.id]).toEqual([second, first]);
+    expect(top.x).toBe(bottom.x);
+    expect(top.y + top.height + GRID).toBe(bottom.y);
+    expect(split.focused).toBe(first);
+    model.setLayout("free");
+    expect(model.state().windows.map(({ x, y, width, height }) => ({ x, y, width, height }))).toEqual(canvas.map(({ x, y, width, height }) => ({ x, y, width, height })));
+  });
+
   it("brings an open window forward rather than opening a second", () => {
     const model = createWorkspaceModel(createSpacesStore(storage(), "tablet"));
     model.setFrame(framed);

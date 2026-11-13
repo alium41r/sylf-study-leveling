@@ -4,8 +4,8 @@ import * as ImagePicker from "expo-image-picker";
 
 export interface PickedImage { url: string; name: string; width: number; height: number; bytes: Uint8Array; mediaType: string }
 
-export async function pickImage(): Promise<PickedImage | null> {
-  const picked = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 0.7, base64: true, allowsMultipleSelection: false });
+export async function pickImage(maxSide = 1600): Promise<PickedImage | null> {
+  const picked = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: maxSide <= 512 ? 0.5 : 0.7, base64: true, allowsMultipleSelection: false });
   const asset = picked.canceled ? null : picked.assets[0];
   if (!asset?.base64) return null;
   if (asset.base64.length > 4_000_000) throw new Error("That picture is too large. Choose a smaller one.");

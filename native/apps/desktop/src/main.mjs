@@ -29,11 +29,13 @@ const WORKSPACE_CHECK = process.argv.includes("--sylf-workspace-check");
 const WORLD_CHECK = process.argv.includes("--sylf-world-check");
 const SESSION_CHECK = process.argv.includes("--sylf-session-check");
 const REVIEW_CAPTURE = process.argv.includes("--sylf-review-capture");
+const FRONTEND_CHECK = process.argv.includes("--sylf-frontend-check");
+const FIXTURE_CHECK = FRONTEND_CHECK || SPACES_CHECK || HOME_CHECK || WORKSPACE_CHECK || WORLD_CHECK || SESSION_CHECK;
 const BACKEND_CHECK = process.argv.includes("--sylf-backend-check");
 const JOURNEY_CHECK = process.argv.includes("--sylf-journey-check");
 
 // Verification runs use a throwaway profile so they neither read nor overwrite the user's preferences.
-if (DESIGN_CHECK || SPACES_CHECK || HOME_CHECK || WORKSPACE_CHECK || WORLD_CHECK || SESSION_CHECK || REVIEW_CAPTURE || BACKEND_CHECK) app.setPath("userData", fs.mkdtempSync(path.join(app.getPath("temp"), "sylf-design-check-")));
+if (DESIGN_CHECK || FIXTURE_CHECK || REVIEW_CAPTURE || BACKEND_CHECK) app.setPath("userData", fs.mkdtempSync(path.join(app.getPath("temp"), "sylf-design-check-")));
 // The journey's two runs share one throwaway profile, because a real restart keeps what is on disk.
 if (JOURNEY_CHECK) app.setPath("userData", process.env.SYLF_JOURNEY_PROFILE ?? fs.mkdtempSync(path.join(app.getPath("temp"), "sylf-journey-")));
 
@@ -93,14 +95,14 @@ function createWindow() {
 }
 
 /** One client for this install. Its name is what a person sees in Settings beside their browsers. @param {string | null} origin */
-function createBackend(origin) {
+function createBackend(origin, vault = createSessionVault(safeStorage, path.join(app.getPath("userData"), "session.bin"))) {
   const name = process.platform === "darwin" ? "Sylf for Mac" : process.platform === "win32" ? "Sylf for Windows" : "Sylf for Linux";
   return createBackendProxy({
     origin,
     // Node's fetch, not net.fetch. Chromium's stack adds Sec-Fetch-Site to every request, even from this process, and the server rightly
     // refuses any bearer token that arrives with one (ADR 0009 decision 6). The backend check proves it. The cost: no system proxy.
     fetch: (input, init) => globalThis.fetch(input, init),
-    vault: createSessionVault(safeStorage, path.join(app.getPath("userData"), "session.bin")),
+    vault,
     clientName: name,
     openExternal: (url) => shell.openExternal(url),
     log: (event) => console.log(`SYLF_BACKEND ${event}`),
@@ -118,9 +120,33 @@ app.whenReady().then(async () => {
       return;
     }
     // The check puts a recording stub in front of the real server, so the origin is only known once that is listening.
-    const stub = BACKEND_CHECK || JOURNEY_CHECK ? await startBackendStub() : null;
-    const backend = createBackend(stub ? stub.origin : parseBackendOrigin(process.env.SYLF_BACKEND_ORIGIN));
+    const stub = !FIXTURE_CHECK && (BACKEND_CHECK || JOURNEY_CHECK) ? await startBackendStub() : null;
+    const fixtureModule = FIXTURE_CHECK ? await import("./frontend-fixture.mjs") : null;
+    const fixture = fixtureModule ? await fixtureModule.startFrontendFixture() : null;
+    let testSession = null;
+    const vault = fixture ? {
+      durable: async () => false,
+      read: async () => testSession,
+      write: async (value) => { testSession = value; },
+      clear: async () => { testSession = null; },
+    } : undefined;
+    const backend = createBackend(stub?.origin ?? fixture?.origin ?? parseBackendOrigin(process.env.SYLF_BACKEND_ORIGIN), vault);
+    if (fixture) {
+      app.once("before-quit", fixture.close);
+      if (!FRONTEND_CHECK && fixtureModule) {
+        const response = await backend.handle(new Request(`${APP_ORIGIN}/api/auth/native/login`, { method: "POST", body: JSON.stringify(fixtureModule.FIXTURE_LOGIN) }));
+        if (!response.ok) throw new Error("Unable to open the local fixture session.");
+      }
+    }
     serveWebBuild(backend);
+    if (FRONTEND_CHECK && fixture) {
+      const window = createWindow();
+      if (process.env.SYLF_FRONTEND_INSPECT !== "1") {
+        const { runFrontendCheck } = await import("./frontend-check.mjs");
+        void runFrontendCheck(window, fixture);
+      }
+      return;
+    }
     if (BACKEND_CHECK && stub) { void runBackendCheck(createWindow(), { stub, backend, createBackend }); return; }
     if (JOURNEY_CHECK && stub) { void runJourneyCheck(createWindow(), { stub, backend }); return; }
   }

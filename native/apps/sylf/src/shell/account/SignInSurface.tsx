@@ -1,6 +1,3 @@
-// The way into Sylf with a backend behind it. One quiet page on the app's own ground: what Sylf keeps for you on one side, and the door on the
-// other. It never appears in a build with no backend. Everything it says is true of this build: there is no password reset on any client, so
-// it says that, and it says what happens to study time on this device, because that is what someone locked out wants to know.
 import { useRef, useState, type ComponentRef } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, TextInput, View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -16,7 +13,7 @@ const PROVIDERS: { id: OAuthProvider; label: string }[] = [{ id: "google", label
 const KEPT = ["Your sessions, subjects and streak", "Today's plan, on every device", "Your friends and study parties"];
 const timezone = () => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch { return undefined; } };
 
-export function SignInSurface({ backend, ended, onLater }: { backend: Backend; ended: boolean; onLater: () => void }) {
+export function SignInSurface({ backend, ended }: { backend: Backend; ended: boolean }) {
   const { color, space } = useTheme();
   const { size } = useWindowClass();
   const insets = useSafeAreaInsets();
@@ -115,8 +112,6 @@ export function SignInSurface({ backend, ended, onLater }: { backend: Backend; e
                 {KEPT.map((line) => <View key={line} style={{ flexDirection: "row", alignItems: "center", gap: space.md }}><Marker /><Text variant="small" tone="soft">{line}</Text></View>)}
               </Stack>
             ) : null}
-            <Button title="Study without an account" variant="ghost" size="small" testID="signin-later" style={{ alignSelf: "flex-start" }} onPress={onLater} />
-            <Text variant="caption" tone="soft" style={{ maxWidth: 360 }}>Without an account, time stays on this device and earns nothing.</Text>
           </Stack>
           <View style={{ flex: wide ? 1 : undefined, alignItems: wide ? "flex-end" : "stretch" }}>{door}</View>
         </View>

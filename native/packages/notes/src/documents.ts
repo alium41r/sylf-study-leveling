@@ -2,7 +2,7 @@
 // so a document written here is one the web reader already understands. Native adds only `extensions.sylfNative`.
 import * as Y from "yjs";
 import { ink, notesPdf, noteStyle, type DocumentDescriptor, type InkPaper, type PdfSourcePage } from "@sylf/shared";
-import type { NoteKind } from "./contracts";
+import type { Cover, LibraryPage, NoteKind } from "./contracts";
 
 export const RICH_TEXT_ADAPTER = "blocknote/0.56.0";
 export const BOARD_SIZE = { width: 3200, height: 2200 };
@@ -123,7 +123,22 @@ export const templateOf = (descriptor: DocumentDescriptor) => (descriptor.extens
 
 /** Whether this document uses per-page text and ink layers (the one note), rather than a single typed flow. */
 export const isLayeredNote = (descriptor: DocumentDescriptor) => descriptor.kind === "notebook" && (descriptor.extensions.sylfNative as { surface?: string } | undefined)?.surface !== "board";
-export const coverOf = (descriptor: DocumentDescriptor) => {
-  const cover = (descriptor.extensions.sylfNative as { cover?: { color?: string | null; icon?: string | null } } | undefined)?.cover;
-  return { color: cover?.color ?? null, icon: cover?.icon ?? null };
-};
+function imageOf(descriptor: DocumentDescriptor, id: unknown): Cover["image"] {
+  if (typeof id !== "string") return null;
+  const asset = descriptor.assets.find((item) => item.assetId === id);
+  return asset && /^(image\/png|image\/jpeg)$/.test(asset.mediaType) ? { hash: asset.assetId, mediaType: asset.mediaType } : null;
+}
+
+export function coverOf(descriptor: DocumentDescriptor): Cover {
+  const cover = (descriptor.extensions.sylfNative as { cover?: { color?: string | null; icon?: string | null; imageAssetId?: string | null } } | undefined)?.cover;
+  return { color: cover?.color ?? null, icon: cover?.icon ?? null, image: imageOf(descriptor, cover?.imageAssetId) };
+}
+
+export function firstPageOf(descriptor: DocumentDescriptor): LibraryPage | null {
+  const page = descriptor.pages[0];
+  if (!page) return null;
+  const source = page.originalAssetId ? { hash: page.originalAssetId, index: page.sourcePage ?? 0 } : null;
+  const size = descriptor.kind === "pdf" ? notesPdf.displayedPageSize(page) : page;
+  const paper = (page.extensions.noteStyle as { paper?: InkPaper } | undefined)?.paper ?? ink.DEFAULT_PAPER;
+  return { id: page.pageId, width: size.width, height: size.height, paper: source ? null : paper, source, picture: imageOf(descriptor, page.extensions.backgroundAssetId) };
+}

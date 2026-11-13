@@ -63,6 +63,8 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
   var inkWidth = 2.6f
   var inkOpacity = 1f
   var eraserRadius = 8f
+  /** Holding the pen's side button erases. Off for people who press it by accident while they write. */
+  var buttonErases = true
   private var camX = 0f
   private var camY = 0f
   private var zoom = 1f
@@ -85,8 +87,6 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
   private var pointer = -1
   private var started = 0L
   private val samples = ArrayList<Float>(2048)
-  private val livePath = Path()
-  private var liveLast: FloatArray? = null
   /** The brush a stroke is drawn with, taken when it starts to be drawn, so a stroke waiting for its outline keeps its look. */
   private class LiveStyle(val color: Int, val alpha: Int, val width: Float, val thinning: Float, val shape: String, val pen: Boolean, val smoothing: Float, val brushCurve: Boolean, val pencil: Boolean, val lineStyle: String, val straighten: Boolean)
   private fun liveStyle() = LiveStyle(inkColor, (inkOpacity * 255).toInt(), inkWidth, inkThinning, if (tool == "shape") inkShape else "", penStroke, inkSmoothing, inkBrushCurve, inkPencil && penStroke, inkLineStyle, inkStraighten)
@@ -94,6 +94,10 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
   private class Pending(val samples: FloatArray, val style: LiveStyle)
   private val pending = HashMap<Int, Pending>()
   private var pageFinger = false
+  /** The tool type that began the gesture under way: its events are named by it, whichever pointer an event happens to lead with. */
+  private var strokeType = MotionEvent.TOOL_TYPE_UNKNOWN
+  /** The pen lifted while a palm was still down: the rest of that gesture is swallowed. */
+  private var resting = false
   private var pinchStart = 0f
   private val lastPinch = floatArrayOf(1f, 0f, 0f)
   private var liveSeq = 0
@@ -223,81 +227,126 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
     }
   }
 
-  private fun sample(event: MotionEvent, index: Int, history: Int) {
+  private fun sample(event: MotionEvent, index: Int, history: Int, lift: Boolean = false) {
     val h = history >= 0
     val x = pageX(if (h) event.getHistoricalX(index, history) else event.getX(index))
     val y = pageY(if (h) event.getHistoricalY(index, history) else event.getY(index))
+    val last = samples.size - 8
+    if (lift && last >= 0 && x == samples[last] && y == samples[last + 1]) return
     val pressure = (if (h) event.getHistoricalPressure(index, history) else event.getPressure(index)).coerceIn(0f, 1f)
+    val keepPen = lift && penStroke && pressure == 0f && last >= 0
     val time = (if (h) event.getHistoricalEventTime(history) else event.eventTime) - started
     val tilt = Math.toDegrees((if (h) event.getHistoricalAxisValue(MotionEvent.AXIS_TILT, index, history) else event.getAxisValue(MotionEvent.AXIS_TILT, index)).toDouble())
     val orientation = (if (h) event.getHistoricalAxisValue(MotionEvent.AXIS_ORIENTATION, index, history) else event.getAxisValue(MotionEvent.AXIS_ORIENTATION, index)).toDouble()
     val finger = event.getToolType(index) == MotionEvent.TOOL_TYPE_FINGER
     // sylf-ink/1 samples: [x, y, pressure, ms since the stroke began, tiltX, tiltY, twist, tangential pressure].
-    samples.add(x); samples.add(y); samples.add(if (finger) 0.5f else pressure); samples.add(time.coerceIn(0, 86_400_000).toFloat())
-    samples.add((tilt * sin(orientation)).toFloat().coerceIn(-90f, 90f)); samples.add((-tilt * cos(orientation)).toFloat().coerceIn(-90f, 90f)); samples.add(0f); samples.add(0f)
-    val last = liveLast
-    if (last == null) livePath.moveTo(x, y) else livePath.quadTo(last[0], last[1], (last[0] + x) / 2, (last[1] + y) / 2)
-    liveLast = floatArrayOf(x, y)
+    samples.add(x); samples.add(y)
+    samples.add(if (keepPen) samples[last + 2] else if (finger) 0.5f else pressure)
+    samples.add(time.coerceIn(0, 86_400_000).toFloat())
+    samples.add(if (keepPen) samples[last + 4] else (tilt * sin(orientation)).toFloat().coerceIn(-90f, 90f))
+    samples.add(if (keepPen) samples[last + 5] else (-tilt * cos(orientation)).toFloat().coerceIn(-90f, 90f))
+    samples.add(0f); samples.add(0f)
   }
 
   private fun inSelection(x: Float, y: Float) = selection?.let { s -> x >= s[0] - 8 && x <= s[0] + s[2] + 8 && y >= s[1] - 8 && y <= s[1] + s[3] + 8 } ?: false
 
+  private fun isPen(type: Int) = type == MotionEvent.TOOL_TYPE_STYLUS || type == MotionEvent.TOOL_TYPE_ERASER
+
   @SuppressLint("ClickableViewAccessibility")
   override fun onTouchEvent(event: MotionEvent): Boolean {
+    val action = event.actionMasked
     val index = event.actionIndex
     val type = event.getToolType(index)
-    val pen = type == MotionEvent.TOOL_TYPE_STYLUS || type == MotionEvent.TOOL_TYPE_ERASER
-    if (pen && event.actionMasked == MotionEvent.ACTION_DOWN) onPenSeen(mapOf<String, Any>())
+    val pen = isPen(type)
+    if (pen && (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN)) onPenSeen(mapOf<String, Any>())
+    // A pen stroke under way owns every event until the pen lifts. Events are told apart by the stroke's own pointer, never by
+    // the first pointer in the event: with a palm resting first, the first pointer is the palm, and reading the event as a
+    // finger's used to swallow the pen's samples.
+    if (penStroke && pointer != -1) return penEvent(event, action, index)
+    // The pen lands beside fingers that are already down (a resting palm, or a finger that had begun to write or zoom): the pen
+    // takes the gesture.
+    if (pen && action == MotionEvent.ACTION_POINTER_DOWN && editable) { yieldFingers(event); begin(event, index, type); return true }
+    // What is left of a gesture after its pen lifted is the resting palm: it neither writes nor scrolls the page.
+    if (resting) {
+      if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) { resting = false; parent?.requestDisallowInterceptTouchEvent(false) }
+      return true
+    }
     // Pages: two fingers zoom and move the page; one finger stays with the scroll view, or writes on a page that is not pen-only.
     if (!pen && pinchZoom && !fingerGestures) pagePinch(event)?.let { return it }
     // Fingers: two always move the view; one writes only on a page that is not pen-only.
     if (!pen && (fingerGestures && (penOnly || event.pointerCount > 1 || !editable) || kind == Kind.PINCH)) return fingerGesture(event)
     if (!pen && (penOnly || !editable) && kind == Kind.NONE) return false
     if (!editable) return false
-    when (event.actionMasked) {
-      MotionEvent.ACTION_DOWN -> {
-        parent?.requestDisallowInterceptTouchEvent(true)
-        requestUnbufferedDispatch(event)
-        pointer = event.getPointerId(index); started = event.eventTime
-        samples.clear(); livePath.reset(); liveLast = null; erasePoints.clear()
-        val x = pageX(event.getX(index)); val y = pageY(event.getY(index))
-        val eraserTip = type == MotionEvent.TOOL_TYPE_ERASER || (event.buttonState and MotionEvent.BUTTON_STYLUS_PRIMARY) != 0
-        penStroke = type == MotionEvent.TOOL_TYPE_STYLUS || type == MotionEvent.TOOL_TYPE_ERASER
-        kind = when {
-          inSelection(x, y) -> Kind.MOVE
-          eraserTip || tool == "eraser" -> Kind.ERASE
-          tool == "lasso" -> Kind.LASSO
-          else -> Kind.DRAW
-        }
-        if (kind == Kind.MOVE) { moveFrom = floatArrayOf(x, y); moveTo = moveFrom }
-        else if (kind == Kind.ERASE) { erasePoints.add(x); erasePoints.add(y); emitErase(type, "start") }
-        else sample(event, index, -1)
-        invalidate()
-        return true
-      }
-      MotionEvent.ACTION_MOVE -> {
-        val i = event.findPointerIndex(pointer)
-        if (i < 0 || kind == Kind.NONE) return true
-        when (kind) {
-          Kind.DRAW, Kind.LASSO -> { for (h in 0 until event.historySize) sample(event, i, h); sample(event, i, -1) }
-          Kind.ERASE -> {
-            for (h in 0 until event.historySize) { erasePoints.add(pageX(event.getHistoricalX(i, h))); erasePoints.add(pageY(event.getHistoricalY(i, h))) }
-            erasePoints.add(pageX(event.getX(i))); erasePoints.add(pageY(event.getY(i)))
-            if (erasePoints.size >= 12) emitErase(type, "move")
-          }
-          Kind.MOVE -> moveTo = floatArrayOf(pageX(event.getX(i)), pageY(event.getY(i)))
-          else -> {}
-        }
-        invalidate()
-        return true
-      }
-      MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-        val cancelled = event.actionMasked == MotionEvent.ACTION_CANCEL || (event.flags and MotionEvent.FLAG_CANCELED) != 0
-        finish(event, type, cancelled)
-        return true
+    when (action) {
+      MotionEvent.ACTION_DOWN -> begin(event, index, type)
+      MotionEvent.ACTION_MOVE -> strokeMove(event)
+      MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+        if (action == MotionEvent.ACTION_POINTER_UP && event.getPointerId(index) != pointer) return true
+        finish(event, action == MotionEvent.ACTION_CANCEL || (event.flags and MotionEvent.FLAG_CANCELED) != 0)
       }
     }
     return true
+  }
+
+  /** The pen's own events while it writes, erases, selects or moves a selection. Other pointers (a palm, a stray finger) do nothing. */
+  private fun penEvent(event: MotionEvent, action: Int, index: Int): Boolean {
+    when (action) {
+      MotionEvent.ACTION_MOVE -> strokeMove(event)
+      MotionEvent.ACTION_POINTER_UP -> if (event.getPointerId(index) == pointer) {
+        finish(event, (event.flags and MotionEvent.FLAG_CANCELED) != 0)
+        // The palm is still down. It keeps the gesture until it lifts, so the scroll view cannot take the page from under the hand.
+        resting = true
+        parent?.requestDisallowInterceptTouchEvent(true)
+      }
+      MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> finish(event, action == MotionEvent.ACTION_CANCEL || (event.flags and MotionEvent.FLAG_CANCELED) != 0)
+    }
+    return true
+  }
+
+  /** Fingers give way to the pen: a pinch ends where it is, a finger's sweep closes, and a finger's stroke is dropped. */
+  private fun yieldFingers(event: MotionEvent) {
+    if (kind == Kind.PINCH && pinchStart > 0) { emitPagePinch(event, "end", -1); pinchStart = 0f }
+    if (kind == Kind.ERASE) { erasePoints.clear(); emitErase(MotionEvent.TOOL_TYPE_FINGER, "end") }
+    kind = Kind.NONE; pointer = -1; pageFinger = false; resting = false
+    samples.clear(); erasePoints.clear(); moveFrom = null; moveTo = null
+  }
+
+  private fun begin(event: MotionEvent, index: Int, type: Int) {
+    parent?.requestDisallowInterceptTouchEvent(true)
+    requestUnbufferedDispatch(event)
+    pointer = event.getPointerId(index); started = event.eventTime; strokeType = type
+    samples.clear(); erasePoints.clear()
+    val x = pageX(event.getX(index)); val y = pageY(event.getY(index))
+    // The eraser end of a pen always erases. The side button erases while it is held, unless that is turned off.
+    val eraserTip = type == MotionEvent.TOOL_TYPE_ERASER || (buttonErases && (event.buttonState and MotionEvent.BUTTON_STYLUS_PRIMARY) != 0)
+    penStroke = isPen(type)
+    kind = when {
+      inSelection(x, y) -> Kind.MOVE
+      eraserTip || tool == "eraser" -> Kind.ERASE
+      tool == "lasso" -> Kind.LASSO
+      else -> Kind.DRAW
+    }
+    if (kind == Kind.MOVE) { moveFrom = floatArrayOf(x, y); moveTo = moveFrom }
+    else if (kind == Kind.ERASE) { erasePoints.add(x); erasePoints.add(y); emitErase(type, "start") }
+    else sample(event, index, -1)
+    invalidate()
+  }
+
+  private fun strokeMove(event: MotionEvent) {
+    val i = event.findPointerIndex(pointer)
+    if (i < 0 || kind == Kind.NONE) return
+    when (kind) {
+      Kind.DRAW, Kind.LASSO -> { for (h in 0 until event.historySize) sample(event, i, h); sample(event, i, -1) }
+      Kind.ERASE -> {
+        for (h in 0 until event.historySize) { erasePoints.add(pageX(event.getHistoricalX(i, h))); erasePoints.add(pageY(event.getHistoricalY(i, h))) }
+        erasePoints.add(pageX(event.getX(i))); erasePoints.add(pageY(event.getY(i)))
+        // One batch for each frame of input: the eraser keeps up with the pen however fast it moves.
+        emitErase(strokeType, "move")
+      }
+      Kind.MOVE -> moveTo = floatArrayOf(pageX(event.getX(i)), pageY(event.getY(i)))
+      else -> {}
+    }
+    invalidate()
   }
 
   /** One sweep is "start", any "move"s, then "end", so JavaScript can make the whole sweep one undo step. */
@@ -310,11 +359,12 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
     erasePoints.clear(); erasePoints.add(x); erasePoints.add(y)
   }
 
-  private fun finish(event: MotionEvent, type: Int, cancelled: Boolean) {
+  private fun finish(event: MotionEvent, cancelled: Boolean) {
+    val type = strokeType
     val i = event.findPointerIndex(pointer)
     when (kind) {
       Kind.DRAW -> {
-        if (i >= 0 && !cancelled) sample(event, i, -1)
+        if (i >= 0 && !cancelled) sample(event, i, -1, lift = true)
         if (!cancelled && samples.size >= 8) {
           val id = ++liveSeq
           // The live copy stays until the finished outline is drawn, then JavaScript drops it.
@@ -327,7 +377,7 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
       Kind.MOVE -> { val from = moveFrom; val to = moveTo; if (!cancelled && from != null && to != null) onStroke(mapOf("kind" to "move", "samples" to listOf(from[0], from[1], to[0], to[1]).map { it.toDouble() }, "pointer" to pointerName(type), "live" to 0)) }
       else -> {}
     }
-    kind = Kind.NONE; pointer = -1; livePath.reset(); liveLast = null; samples.clear(); erasePoints.clear(); moveFrom = null; moveTo = null
+    kind = Kind.NONE; pointer = -1; penStroke = false; samples.clear(); erasePoints.clear(); moveFrom = null; moveTo = null
     parent?.requestDisallowInterceptTouchEvent(false)
     invalidate()
   }
@@ -343,7 +393,7 @@ class SylfInkView(context: Context, appContext: AppContext) : ExpoView(context, 
     when (event.actionMasked) {
       MotionEvent.ACTION_DOWN -> { if (penOnly || !editable) { kind = Kind.NONE; pageFinger = true; return true }; return null }
       MotionEvent.ACTION_POINTER_DOWN -> {
-        if (kind == Kind.DRAW) { samples.clear(); livePath.reset(); liveLast = null }
+        if (kind == Kind.DRAW) { samples.clear() }
         if (kind != Kind.DRAW && kind != Kind.NONE && kind != Kind.PINCH) return null
         if (kind != Kind.PINCH) {
           kind = Kind.PINCH; pageFinger = false

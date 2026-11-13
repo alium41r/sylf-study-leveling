@@ -41,7 +41,7 @@ export function createIndexedDbStorage(factory: IDBFactory = indexedDB): NotesSt
     async load(owner) {
       const t = await tx(["documents", "libraries"], "readonly");
       const [documents, library] = await Promise.all([result(t.objectStore("documents").index("owner").getAll(IDBKeyRange.only(owner))), result(t.objectStore("libraries").get(owner))]);
-      return { documents: documents as StoredDocument[], library: library ? ({ libraryId: library.libraryId, notebooks: library.notebooks } as LibraryRecord) : null };
+      return { documents: documents as StoredDocument[], library: library ? ({ libraryId: library.libraryId, notebooks: library.notebooks, order: library.order } as LibraryRecord) : null };
     },
     async putDocument(document) { const t = await tx(["documents"], "readwrite"); t.objectStore("documents").put(document); await done(t); },
     async putLibrary(owner, library) { const t = await tx(["libraries"], "readwrite"); t.objectStore("libraries").put({ owner, ...library }); await done(t); },
@@ -52,10 +52,10 @@ export function createIndexedDbStorage(factory: IDBFactory = indexedDB): NotesSt
       for (const u of updates) store.add({ documentId: document.id, streamId: u.streamId, bytes: u.bytes });
       await done(t);
     },
-    async readUpdates(documentId) {
+    async readUpdates(documentId, streamId) {
       const t = await tx(["updates"], "readonly");
       const rows = (await result(t.objectStore("updates").index("document").getAll(IDBKeyRange.only(documentId)))) as (StoredUpdate & { documentId: string })[];
-      return rows.map((row) => ({ streamId: row.streamId, bytes: new Uint8Array(row.bytes) }));
+      return rows.filter((row) => !streamId || row.streamId === streamId).map((row) => ({ streamId: row.streamId, bytes: new Uint8Array(row.bytes) }));
     },
     async compact(documentId, streamId, merged) {
       const t = await tx(["updates"], "readwrite");

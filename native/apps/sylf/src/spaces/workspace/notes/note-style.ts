@@ -30,11 +30,16 @@ export const spacingsFor = (layout: PaperTemplate) => SPACINGS[layout] ?? SPACIN
 export const PAPERS = [
   { label: "White", color: "#ffffff", rule: "#d9dfea" },
   { label: "Cream", color: "#fffdf7", rule: "#d9dfea" },
+  { label: "Sand", color: "#f8f3e8", rule: "#e2d7bf" },
+  { label: "Mist", color: "#e8eef2", rule: "#c7d2db" },
+  { label: "Graphite", color: "#23252a", rule: "#626773" },
+  { label: "Midnight", color: "#111827", rule: "#485671" },
+  { label: "Peach", color: "#fdf0e4", rule: "#ecd0b8" },
+  { label: "Butter", color: "#fff6d7", rule: "#e6d7a4" },
   { label: "Mint", color: "#f3faf6", rule: "#cfe3d8" },
   { label: "Sky", color: "#f2f6fd", rule: "#cdd9ee" },
+  { label: "Lavender", color: "#eeeafa", rule: "#d6c9f0" },
   { label: "Blush", color: "#fdf4f4", rule: "#ecd4d4" },
-  { label: "Sand", color: "#f8f3e8", rule: "#e2d7bf" },
-  { label: "Graphite", color: "#23252a", rule: "#43474f" },
 ];
 
 const KEY = "sylf.notes.style.v1";

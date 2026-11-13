@@ -1,6 +1,6 @@
 // A typed note: the host side of the BlockNote DOM component. The document's own replica lives here, in the Notes library, and the
 // editor's copy follows it. The format bar is native, so it looks like the rest of Sylf, and talks to the editor by command.
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { View } from "react-native";
 import * as Y from "yjs";
 import { DOCUMENT_DEFAULTS, useTheme } from "@sylf/design-system";
@@ -16,7 +16,7 @@ export function richTextStream(document: OpenDocument) {
   return d.kind === "flow" ? d.streams.find((s) => s.adapter === RICH_TEXT_ADAPTER)!.streamId : d.pages[0].streamId;
 }
 
-export default function RichTextEditor({ document, editable, narrow }: { document: OpenDocument; editable: boolean; narrow: boolean }) {
+export default function RichTextEditor({ document, editable, compact, leading, end }: { document: OpenDocument; editable: boolean; compact: boolean; leading?: ReactNode; end?: ReactNode }) {
   const theme = useTheme();
   const editor = useRef<RichTextHandle>(null);
   const origin = useMemo(() => ({}), []);
@@ -38,7 +38,7 @@ export default function RichTextEditor({ document, editable, narrow }: { documen
 
   return (
     <View style={{ flex: 1 }}>
-      {editable ? <FormatBar format={format} send={send} narrow={narrow} /> : null}
+      {editable ? <FormatBar format={format} send={send} compact={compact} leading={leading} end={end} /> : null}
       <View style={{ flex: 1, backgroundColor: DOCUMENT_DEFAULTS.paper }}>
         <RichTextDom ref={editor} initial={initial} template={template} look={look} editable={editable}
           onUpdate={async (update) => { Y.applyUpdate(doc, fromBase64(update), origin); }}

@@ -1,37 +1,92 @@
-// What is coming in the next week, from the real quest list: the next few quests not yet done, each with the day and its subject. It replaces a button
-// that only said "open your plan". Nothing here is invented: with nothing scheduled it says so and offers the plan.
-import { useMemo } from "react";
+// What is past today: the next few dated quests and the goals they serve. Both come from Plan's own read of quests and goals, so Today and Plan never
+// disagree and nothing is fetched twice. Either list renders nothing when it is empty: the dashboard never draws a heading over no content.
+import { memo, useCallback, useMemo } from "react";
 import { View } from "react-native";
-import { Button, Stack, Text, useTheme } from "@sylf/design-system";
+import { Divider, Press, Progress, Stack, Text, useTheme } from "@sylf/design-system";
 import { useHomeNavigation } from "../../../shell/context";
-import { useLiveBackend, useOptionalResource } from "../../../shell/backend";
-import { useSubjects } from "../../../shell/live";
-import { dayWords } from "./ahead";
+import { useSubjectColour, useSubjects } from "../../../shell/live";
+import { useQuestsAndGoals } from "../plan/usePlan";
+import { upcomingQuests } from "./ahead";
+import { QuestPath } from "./QuestPath";
+import { buildUpcomingQuestSteps } from "./questSteps";
+import { GroupLabel } from "./TodayParts";
 
-const DAY = 86_400_000;
-const keyOf = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+const MAX_GOALS = 3;
+const shortDate = (date: string) => new Date(`${date.slice(0, 10)}T12:00:00`).toLocaleDateString([], { day: "numeric", month: "short" });
 
-export function TodayAhead() {
+/** Chronological dated quests coming up after today, connected along a quiet timeline. */
+export const TodayUpcoming = memo(function TodayUpcoming({ divided }: { divided?: boolean }) {
   const { space } = useTheme();
-  const backend = useLiveBackend();
   const navigation = useHomeNavigation();
   const subjects = useSubjects();
+  const colourOf = useSubjectColour();
   const now = useMemo(() => new Date(), []);
-  const resource = useMemo(() => (backend ? backend.resources.resource({ key: "today-ahead", tags: ["today", "plan", "quests"], ttlMs: 60_000, load: async (signal) => (await backend.reads.plan.questPage(null, signal)).quests }) : null), [backend]);
-  const quests = useOptionalResource(resource)?.data ?? null;
-  const today = keyOf(now);
-  const horizon = keyOf(new Date(now.getTime() + 7 * DAY));
-  const upcoming = (quests ?? []).filter((quest) => quest.status !== "COMPLETED" && quest.scheduledFor && quest.scheduledFor.slice(0, 10) > today && quest.scheduledFor.slice(0, 10) <= horizon).sort((a, b) => String(a.scheduledFor).localeCompare(String(b.scheduledFor))).slice(0, 4);
-  return (
-    <Stack gap="sm" testID="today-ahead">
-      {upcoming.map((quest) => (
-        <View key={quest.id} style={{ gap: 0 }}>
-          <Text variant="small" numberOfLines={1}>{quest.title}</Text>
-          <Text variant="caption" tone="soft" numberOfLines={1}>{[dayWords(quest.scheduledFor!, now), subjects.find((subject) => subject.id === quest.subjectId)?.name, quest.targetMinutes ? `${quest.targetMinutes} min` : null].filter(Boolean).join(", ")}</Text>
-        </View>
-      ))}
-      {quests && !upcoming.length ? <Text variant="small" tone="soft">Nothing else scheduled this week.</Text> : null}
-      <View style={{ flexDirection: "row", paddingTop: space.xs }}><Button title="Open your plan" size="small" trailingIcon="arrowRight" testID="today-plan" onPress={() => navigation.select("plan")} /></View>
-    </Stack>
+  const data = useQuestsAndGoals()?.data;
+  const upcoming = useMemo(() => upcomingQuests(data?.quests ?? [], now), [data, now]);
+  const subjectNames = useMemo(() => new Map(subjects.map((subject) => [subject.id, subject.name])), [subjects]);
+  const openQuests = useCallback(() => { navigation.setView("plan", "quests"); navigation.select("plan"); }, [navigation]);
+
+  const steps = useMemo(
+    () => buildUpcomingQuestSteps({ upcoming, subjectNames, colourOf, now, onOpen: openQuests }),
+    [colourOf, now, openQuests, subjectNames, upcoming],
   );
-}
+
+  if (!steps.length) return null;
+
+  return (
+    <>
+      {divided ? <Divider /> : null}
+      <Stack gap="md" testID="today-ahead">
+        <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", gap: space.md }}>
+          <GroupLabel>Coming up</GroupLabel>
+          <Text variant="caption" tone="soft">{`${steps.length} scheduled`}</Text>
+        </View>
+        <QuestPath steps={steps} />
+      </Stack>
+    </>
+  );
+});
+
+/** Active long-horizon goals, given full column width so titles breathe without truncation clutter. */
+export const TodayGoals = memo(function TodayGoals({ divided }: { divided?: boolean }) {
+  const { space } = useTheme();
+  const navigation = useHomeNavigation();
+  const data = useQuestsAndGoals()?.data;
+  const goals = useMemo(() => (data?.goals ?? []).filter((goal) => goal.status !== "COMPLETED").slice(0, MAX_GOALS), [data]);
+  const openGoals = useCallback(() => { navigation.setView("plan", "quests"); navigation.select("plan"); }, [navigation]);
+
+  if (!goals.length) return null;
+
+  return (
+    <>
+      {divided ? <Divider /> : null}
+      <Stack gap="md" testID="today-goals">
+        <GroupLabel>Goals</GroupLabel>
+        <Stack gap="md">
+          {goals.map((goal) => {
+            const total = goal.quests?.length ?? 0;
+            const finished = goal.quests?.filter((quest) => quest.status === "COMPLETED").length ?? 0;
+            const detail = [
+              goal.targetDate ? `By ${shortDate(goal.targetDate)}` : null,
+              total ? `${finished} of ${total} quests done` : "No quests yet",
+            ].filter(Boolean).join(" · ");
+            return (
+              <Press
+                key={goal.id}
+                role="button"
+                label={`${goal.title}. ${detail}. Open goals`}
+                testID={`today-goal-${goal.id}`}
+                onPress={openGoals}
+                bodyStyle={{ gap: space.xs, paddingVertical: space.xs }}
+              >
+                <Text variant="small" numberOfLines={2}>{goal.title}</Text>
+                <Text variant="caption" tone="soft" numberOfLines={1}>{detail}</Text>
+                {total ? <Progress value={finished / total} label={`${goal.title} progress`} /> : null}
+              </Press>
+            );
+          })}
+        </Stack>
+      </Stack>
+    </>
+  );
+});

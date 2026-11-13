@@ -11,6 +11,7 @@ import { focusEnvironment } from "../../../shell/focus/environment";
 import { studyWith } from "../../../shell/party/studyWith";
 import { RoomMembers } from "../../../shell/party/RoomMembers";
 import { usePartySummary, useRoom } from "../../../shell/party/useParty";
+import { PartyInviteRow } from "./AnswerRows";
 import { useDestinationSeen } from "./useSeen";
 
 export function PartiesView() {
@@ -59,18 +60,9 @@ export function PartiesView() {
   return (
     <Stack gap="lg" testID="circle-parties">
       {summary.pendingInvites.length ? (
-        <Stack gap="xs">
+        <Stack gap="sm">
           <Text variant="subheading" role="heading" aria-level={2}>Invitations</Text>
-          {summary.pendingInvites.map((invite) => (
-            <View key={invite.id} testID={`party-invite-${invite.id}`} style={{ gap: space.xs }}>
-              <Text variant="small">{invite.partyName}</Text>
-              <Text variant="caption" tone="soft">Invited by {invite.senderName ?? invite.senderUsername}</Text>
-              <View style={{ flexDirection: "row", gap: space.xs }}>
-                <Button title="Join" size="small" variant="emphasis" disabled={busy} onPress={() => void run(() => backend.reads.parties.answerInvite(invite.id, true), "You joined the party.")} />
-                <Button title="Not now" size="small" disabled={busy} onPress={() => void run(() => backend.reads.parties.answerInvite(invite.id, false), "Invitation declined.")} />
-              </View>
-            </View>
-          ))}
+          {summary.pendingInvites.map((invite) => <PartyInviteRow key={invite.id} invite={{ id: invite.id, partyName: invite.partyName, from: invite.senderName ?? invite.senderUsername }} />)}
         </Stack>
       ) : null}
       {party ? (

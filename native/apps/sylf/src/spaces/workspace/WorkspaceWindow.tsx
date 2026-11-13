@@ -2,12 +2,12 @@
 // in React until the drop. Position and size live in shared values that follow the model. The shadow is a still layer of its
 // own at the size the model last agreed: a blurred shadow on anything that changes size is redrawn at every size and the GPU keeps
 // each one (Phase 5), so it steps aside while the window resizes and comes back at the end.
-import { memo, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, View, type ViewStyle } from "react-native";
 import { GestureDetector, MouseButton, usePanGesture, useSimultaneousGestures, useTapGesture } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, type SharedValue } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
-import { Badge, Corners, FocusRing, Icon, IconButton, Marker, Text, fade, getInputMode, move, useInputFormat, useInputMode, useTheme } from "@sylf/design-system";
+import { Corners, FocusRing, Icon, IconButton, Marker, Text, fade, getInputMode, move, useControlHeight, useInputFormat, useInputMode, useTheme } from "@sylf/design-system";
 import { GRID, TOOLS, WORLD, clamp, type Rect, type ToolLifecycle, type WorkspaceWindow as WindowRecord } from "@sylf/spaces";
 import { useWorkspaceModel } from "../../shell/context";
 import { TOOL_ICONS } from "./icons";
@@ -21,7 +21,6 @@ export interface WindowViewProps {
   title: string;
   focused: boolean;
   lifecycle: ToolLifecycle;
-  sample: boolean;
   fresh: boolean;
   fillOrder: number;
   overview: boolean;
@@ -29,13 +28,14 @@ export interface WindowViewProps {
   stacked: Rect | null;
   /** Full screen: placed in a tile of the screen, always shown, with square edges and no shadow. */
   tiled?: boolean;
+  bottomInset: number;
+  preset?: boolean;
   zoom: SharedValue<number>;
-  onProvenance: (id: string, sample: boolean) => void;
+  single: boolean;
 }
 
 interface LiveRect { x: SharedValue<number>; y: SharedValue<number>; width: SharedValue<number>; height: SharedValue<number> }
 
-const BAR = 40;
 const webOnly = (style: object) => Platform.select<ViewStyle>({ web: style as ViewStyle, default: {} });
 const hiddenOnWeb = webOnly({ visibility: "hidden" });
 const HANDLES = [
@@ -95,14 +95,15 @@ function ResizeHandle({ handle, rect, zoom, size, limits, onStart, onEnd }: { ha
   );
 }
 
-export const WindowView = memo(function WindowView({ window, title, focused, lifecycle, sample, fresh, fillOrder, overview, stacked, tiled, zoom, onProvenance }: WindowViewProps) {
+export const WindowView = memo(function WindowView({ window, title, focused, lifecycle, fresh, fillOrder, overview, stacked, tiled, preset, single, zoom, bottomInset }: WindowViewProps) {
   const { color, motion, shape, space, surface } = useTheme();
   const format = useInputFormat();
   const inputMode = useInputMode();
+  const barHeight = Math.max(useControlHeight(), 40);
   const model = useWorkspaceModel();
   const [barFocused, setBarFocused] = useState(false);
   const { id, tool, z, minimized } = window;
-  const hidden = minimized || (!!stacked && !focused && !tiled);
+  const hidden = minimized || (!!stacked && !focused && !tiled && !preset);
   const placed = stacked ?? window;
   const spec = TOOLS[tool];
 
@@ -141,11 +142,20 @@ export const WindowView = memo(function WindowView({ window, title, focused, lif
     if (resized) showShadow();
   }, [hideShadow, height, motion, showShadow, width, x, y]);
 
-  useEffect(() => {
+  const wasStacked = useRef(!!stacked);
+  useLayoutEffect(() => {
     const { x: nx, y: ny, width: nw, height: nh } = placed;
+    const next = { x: nx, y: ny, width: nw, height: nh };
     const held = rest.current;
-    if (held.x !== nx || held.y !== ny || held.width !== nw || held.height !== nh) settle({ x: nx, y: ny, width: nw, height: nh }, "glide");
-  }, [placed, settle]);
+    const instant = !!stacked || wasStacked.current;
+    wasStacked.current = !!stacked;
+    if (held.x === nx && held.y === ny && held.width === nw && held.height === nh) return;
+    if (instant) {
+      // Screen panes must meet while a seam or the viewport moves. World coordinates resume on the same frame.
+      rest.current = next;
+      x.value = nx; y.value = ny; width.value = nw; height.value = nh;
+    } else settle(next, "glide");
+  }, [placed, stacked, settle, x, y, width, height]);
 
   useEffect(() => {
     if (hidden) {
@@ -161,10 +171,19 @@ export const WindowView = memo(function WindowView({ window, title, focused, lif
 
   const focus = useCallback(() => model.focus(id), [model, id]);
   const drop = useCallback((nextX: number, nextY: number) => {
-    model.move(id, nextX, nextY);
-    const window = model.state().windows.find((item) => item.id === id);
-    if (window) settle(window);
-  }, [model, id, settle]);
+    const current = model.state().windows.find((item) => item.id === id);
+    if (!current) return;
+    if (preset) {
+      const before = rest.current;
+      model.move(id, current.x + nextX - before.x, current.y + nextY - before.y);
+      // A very short drag may snap to the same point and stay in the preset.
+      if (model.state().layout !== "free") settle(before);
+    } else {
+      model.move(id, nextX, nextY);
+      const window = model.state().windows.find((item) => item.id === id);
+      if (window) settle(window);
+    }
+  }, [model, id, preset, settle]);
   const resized = useCallback((next: Rect) => {
     model.resize(id, next);
     const window = model.state().windows.find((item) => item.id === id);
@@ -172,7 +191,12 @@ export const WindowView = memo(function WindowView({ window, title, focused, lif
   }, [model, id, settle, hideShadow]);
   const frame = useCallback(() => model.frameWindow(id), [model, id]);
 
-  const movable = !stacked;
+  const movable = !stacked || (preset && !single);
+  const leaving = single || tiled;
+  const toggleSize = () => {
+    if (!leaving) model.focus(id);
+    model.setLayout(leaving ? "free" : "focus");
+  };
   const pinch = useCanvasPinch();
   const halted = useSharedValue(false);
   const drag = usePanGesture({
@@ -196,16 +220,21 @@ export const WindowView = memo(function WindowView({ window, title, focused, lif
       // A pinch took over, so the window stays where it is and lands there.
       if (pinch.pinched.value) halted.value = true;
       if (halted.value) return;
-      x.value = clamp(startX.value + (event.absoluteX - originX.value) / zoom.value, 0, WORLD.width - width.value);
-      y.value = clamp(startY.value + (event.absoluteY - originY.value) / zoom.value, 0, WORLD.height - height.value);
+      const scale = preset ? 1 : zoom.value;
+      x.value = clamp(startX.value + (event.absoluteX - originX.value) / scale, 0, WORLD.width - width.value);
+      y.value = clamp(startY.value + (event.absoluteY - originY.value) / scale, 0, WORLD.height - height.value);
     },
-    onDeactivate: () => { "worklet"; lifted.value = move(0, motion); scheduleOnRN(drop, x.value, y.value); },
+    onDeactivate: (event) => {
+      "worklet";
+      lifted.value = move(0, motion);
+      scheduleOnRN(drop, event.canceled ? startX.value : x.value, event.canceled ? startY.value : y.value);
+    },
   });
   const doubleTap = useTapGesture({ enabled: movable, numberOfTaps: 2, onDeactivate: (event) => { "worklet"; if (!event.canceled) scheduleOnRN(frame); } });
   // In full screen the title bar does not move the window: it carries it to another tile, to dock beside it or swap.
   const arrange = useContext(FillArrangeContext);
   const arrangeMove = useCallback((nx: number, ny: number) => arrange?.move(id, nx, ny), [arrange, id]);
-  const arrangeEnd = useCallback(() => arrange?.end(id), [arrange, id]);
+  const arrangeEnd = useCallback((cancelled: boolean) => arrange?.end(id, cancelled), [arrange, id]);
   const carry = usePanGesture({
     enabled: !!tiled,
     maxPointers: 1,
@@ -213,11 +242,11 @@ export const WindowView = memo(function WindowView({ window, title, focused, lif
     mouseButton: MouseButton.LEFT,
     onBegin: () => { "worklet"; scheduleOnRN(focus); },
     onUpdate: (event) => { "worklet"; scheduleOnRN(arrangeMove, event.absoluteX, event.absoluteY); },
-    onDeactivate: () => { "worklet"; scheduleOnRN(arrangeEnd); },
+    onDeactivate: (event) => { "worklet"; scheduleOnRN(arrangeEnd, event.canceled); },
   });
   const bar = useSimultaneousGestures(drag, doubleTap, carry);
 
-  const lift = 0.012 * motion.amount;
+  const lift = stacked ? 0 : 0.012 * motion.amount;
   const enter = 1 - (1 - motion.enterScale) * motion.amount;
   const frameStyle = useAnimatedStyle(() => ({
     width: width.value,
@@ -228,11 +257,12 @@ export const WindowView = memo(function WindowView({ window, title, focused, lif
   const still = useAnimatedStyle(() => ({ opacity: shadow.value }));
 
   const nudge = (dx: number, dy: number, resize: boolean) => {
-    const current = rest.current;
+    const current = preset ? window : rest.current;
     if (resize) model.resize(id, { ...current, width: current.width + dx * GRID, height: current.height + dy * GRID });
     else model.move(id, current.x + dx * GRID, current.y + dy * GRID);
   };
   const onKeyDown = (event: { key: string; shiftKey: boolean; preventDefault(): void }) => {
+    if (!movable) return;
     const step = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[event.key];
     if (!step) return;
     event.preventDefault();
@@ -240,7 +270,7 @@ export const WindowView = memo(function WindowView({ window, title, focused, lif
   };
   const onAction = (name: string) => {
     if (name === "minimize") model.minimize(id);
-    else if (name === "frame") model.frameWindow(id);
+    else if (name === "frame") toggleSize();
     else nudge(name === "moveLeft" ? -2 : name === "moveRight" ? 2 : 0, name === "moveUp" ? -2 : name === "moveDown" ? 2 : 0, false);
   };
 
@@ -256,41 +286,40 @@ export const WindowView = memo(function WindowView({ window, title, focused, lif
       pointerEvents={hidden ? "none" : "box-none"}
       onStartShouldSetResponderCapture={() => { focus(); return false; }}
       {...(Platform.OS === "web" ? { onFocus: () => { if (getInputMode() === "keyboard") { focus(); model.reveal(id); } } } as object : {})}
-      style={[{ position: "absolute", left: 0, top: 0, zIndex: stacked ? 1 : z }, gone ? hiddenOnWeb : null, frameStyle]}
+      style={[{ position: "absolute", left: 0, top: 0, zIndex: stacked && !preset ? 1 : z }, gone ? hiddenOnWeb : null, frameStyle]}
     >
-      {boxShadow && !tiled ? <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: window.width, height: window.height, borderRadius: shape.radius.lg, boxShadow }, still]} /> : null}
-      <View style={[StyleSheet.absoluteFill, flat, { overflow: "hidden" }, tiled ? { borderRadius: 0, borderWidth: 0, borderRightWidth: StyleSheet.hairlineWidth, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: color.line } : null, webOnly({ cursor: "default" })]}>
-        {/* Page only (a document's toolbar button) hides the bar of a full-screen tile; leaving full screen brings it back. */}
-        {tiled && window.state.bare === true ? null : <View style={{ height: BAR, flexDirection: "row", alignItems: "center", paddingRight: space.xs, borderBottomWidth: 1, borderBottomColor: color.line }}>
+      {boxShadow && !stacked ? <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, top: 0, width: window.width, height: window.height, borderRadius: shape.radius.lg, boxShadow }, still]} /> : null}
+      <View style={[StyleSheet.absoluteFill, flat, { overflow: "hidden" }, (tiled || preset) ? { borderRadius: 0, borderWidth: 0, borderRightWidth: StyleSheet.hairlineWidth, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: color.line } : null, webOnly({ cursor: "default" })]}>
+        {/* Page only hides the title bar in full screen, including the compact stacked view. */}
+        {(tiled || stacked) && window.state.bare === true ? null : <View style={{ height: barHeight, flexDirection: "row", alignItems: "center", paddingRight: space.xs, borderBottomWidth: 1, borderBottomColor: color.line }}>
           <GestureDetector gesture={bar} userSelect="none">
             <View
               testID={`window-bar-${id}`}
               accessible
               role="button"
-              aria-label={`${title}. Move with the arrow keys, resize with Shift and the arrow keys.`}
+              aria-label={tiled ? `${title}. Drag to rearrange tiles.` : movable ? `${title}. Move with the arrow keys, resize with Shift and the arrow keys.` : title}
               accessibilityActions={[{ name: "moveLeft", label: "Move left" }, { name: "moveRight", label: "Move right" }, { name: "moveUp", label: "Move up" }, { name: "moveDown", label: "Move down" }, { name: "frame", label: "Fill the view" }, { name: "minimize", label: "Minimize" }]}
               onAccessibilityAction={(event) => onAction(event.nativeEvent.actionName)}
               {...(Platform.OS === "web" ? { tabIndex: 0, onKeyDown, onFocus: () => setBarFocused(true), onBlur: () => setBarFocused(false) } as object : {})}
-              style={[{ flex: 1, minWidth: 0, height: BAR, flexDirection: "row", alignItems: "center", gap: space.sm, paddingLeft: space.md }, webOnly({ cursor: movable || tiled ? "grab" : "default", outlineStyle: "none", touchAction: "none" })]}
+              style={[{ flex: 1, minWidth: 0, height: barHeight, flexDirection: "row", alignItems: "center", gap: space.sm, paddingLeft: space.md }, webOnly({ cursor: movable || tiled ? "grab" : "default", outlineStyle: "none", touchAction: "none" })]}
             >
               {focused ? <Marker /> : null}
               <Icon name={TOOL_ICONS[tool]} size={16} color={focused ? color.ink : color.inkSoft} />
               {typeof window.state.document === "string" && (tool === "notes" || tool === "pdfs" || tool === "whiteboard")
                 ? <EditableTitle documentId={window.state.document} title={title} focused={focused} />
                 : <Text variant="small" tone={focused ? "ink" : "soft"} numberOfLines={1} style={{ flexShrink: 1 }}>{title}</Text>}
-              {sample ? <View aria-label="Sample data. Nothing in this window is real yet."><Badge label="Sample" /></View> : null}
               {barFocused && inputMode === "keyboard" ? <FocusRing radius={shape.radius.sm} inset={2} /> : null}
             </View>
           </GestureDetector>
-          {tiled ? <IconButton icon="collapse" size="small" bare label="Leave full screen" testID={`window-unfill-${id}`} style={{ alignSelf: "center" }} onPress={() => model.setLayout("free")} /> : null}
+          {movable || tiled || single ? <IconButton icon={leaving ? "collapse" : "expand"} size="small" bare label={leaving ? "Return to canvas" : `Expand ${title}`} testID={leaving ? `window-unfill-${id}` : `window-fill-${id}`} style={{ alignSelf: "center" }} onPress={toggleSize} /> : null}
           <IconButton icon="minus" size="small" bare label={`Minimize ${title}`} testID={`window-minimize-${id}`} style={{ alignSelf: "center" }} onPress={() => model.minimize(id)} />
           <IconButton icon="close" size="small" bare label={`Close ${title}`} testID={`window-close-${id}`} style={{ alignSelf: "center" }} onPress={() => model.close(id)} />
         </View>}
-        <ToolHost window={window} lifecycle={lifecycle} title={title} fillOrder={fillOrder} overview={overview} onProvenance={onProvenance} />
+        <ToolHost window={window} lifecycle={lifecycle} title={title} fillOrder={fillOrder} overview={overview} bottomInset={bottomInset} />
       </View>
-      {tiled ? null : <Corners behind={color.ground} />}
-      {focused && movable && !overview && format === "touch" ? <View pointerEvents="none" aria-hidden style={{ position: "absolute", right: 3, bottom: 3 }}><Icon name="grip" size={12} color={color.inkFaint} /></View> : null}
-      {focused && movable && !overview ? HANDLES.map((handle) => <ResizeHandle key={handle.id} handle={handle} rect={live} zoom={zoom} size={handleSize} limits={spec} onStart={hideShadow} onEnd={resized} />) : null}
+      {tiled || preset ? null : <Corners behind={color.ground} />}
+      {focused && !stacked && !overview && format === "touch" ? <View pointerEvents="none" aria-hidden style={{ position: "absolute", right: 3, bottom: 3 }}><Icon name="grip" size={12} color={color.inkFaint} /></View> : null}
+      {focused && !stacked && !overview ? HANDLES.map((handle) => <ResizeHandle key={handle.id} handle={handle} rect={live} zoom={zoom} size={handleSize} limits={spec} onStart={hideShadow} onEnd={resized} />) : null}
     </Animated.View>
   );
 });

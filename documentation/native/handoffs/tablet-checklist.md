@@ -296,3 +296,16 @@ Run on the tablet by the agent with `adb input stylus` and `npm run android:note
 19. **Shapes.** Rectangle, ellipse and line: draw them roughly; each becomes a clean shape of that size.
 20. **New and names.** The gear sets the note style; New asks for a name and opens the note in that style; tapping the name in the title bar renames it.
 21. **Pen settings.** Tap the pen in hand: its panel opens. Turn **Pen pressure** off and write lightly, then press hard: the line keeps one width, while you write and after the pen lifts. Turn it on again and the hard part is wider. Try each pen kind, the size slider, dashed and dotted lines, Straighten lines (a nearly straight line becomes straight), a colour from another set and one you mix. On the toolbar, tap the colour in hand again and choose another from the spectrum: that slot keeps it. Force-stop the app: the pen is as you left it. Does the S Pen feel right with pressure off?
+
+## Notes input and toolbar (12 November 2026, unrun)
+
+From the [quality pass](../reports/2026-11-12-notes-workspace-quality/README.md). Needs a fresh build with the changed native module.
+
+- [ ] Sweep the eraser fast across a page of many strokes: every stroke it crosses goes, with no lag behind the pen. One Undo brings the sweep back, for both Strokes and Precise.
+- [ ] Erase, tap Pen and write at once: the stroke writes. Repeat quickly ten times.
+- [ ] Rest the palm on the page first, then write several strokes without lifting the palm: every stroke writes, and the page does not scroll under the hand.
+- [ ] Hold the S Pen's side button and write: it erases. Turn **Pen button erases** off in the eraser's settings: it writes.
+- [ ] Pinch a note, a PDF and a whiteboard: the percentage at the top right follows the fingers and fades after they lift.
+- [ ] Lasso some strokes and drag them: the selection box follows.
+- [ ] `npm run android:notes-check`, `android:pen-check` and `android:pinch-check` pass.
+

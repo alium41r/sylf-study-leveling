@@ -34,6 +34,19 @@ function dump() {
 // Themes may show labels in capitals, so labels match regardless of case.
 const find = (nodes, label) => { const want = label.toLowerCase(); return nodes.find((n) => n.desc.toLowerCase() === want || n.text.toLowerCase() === want || n.desc.toLowerCase().startsWith(`${want},`)); };
 const tapLabel = async (label, wait = 900) => { const node = find(dump(), label); if (!node) throw new Error(`nothing labelled ${label}`); tap(node.cx, node.cy); await sleep(wait); return node; };
+const fullScreen = async () => {
+  if (!find(dump(), "Full screen")) await tapLabel("Document options", 600);
+  await tapLabel("Full screen", 1800);
+};
+const tapInk = async (label, wait) => {
+  const inTray = !find(dump(), label);
+  if (inTray) await tapLabel("Writing tools", 600);
+  await tapLabel(label, wait);
+  if (inTray && label === "Undo") {
+    adb("shell", "input", "keyevent", "KEYCODE_BACK");
+    await sleep(400);
+  }
+};
 /** Dark pixels in a region of the screen, read from a screenshot (8-bit RGBA or RGB PNG, as screencap writes). Ink is dark; paper and rules are not. */
 function darkPixels(rect) {
   const png = execFileSync(ADB, ["exec-out", "screencap", "-p"], { maxBuffer: 64 * 1024 * 1024 });
@@ -95,15 +108,16 @@ const writingArea = () => {
   return { x1: frame.x1 + 60, x2: frame.x2 - 60, y1: top, y2: bottom, cx: Math.round((frame.x1 + frame.x2) / 2), cy: Math.round((top + bottom) / 2) };
 };
 // New asks for a name; Enter with none keeps the automatic title. (Enter, not Create: in landscape the keyboard covers the button.)
-const create = async () => { await tapLabel("New", 1200); adb("shell", "input", "keyevent", "KEYCODE_ENTER"); await sleep(3000); };
+const create = async (label = "New note") => { await tapLabel(label, 1200); adb("shell", "input", "keyevent", "KEYCODE_ENTER"); await sleep(3000); };
 
 await link("space=workspace&wsClear=1&wsOpen=notes", 6000);
 shot("01-library");
-check("library opens", !!find(dump(), "New"));
+check("library opens", !!find(dump(), "New note"));
 
 // The one note kind: switch to Write, then handwriting with the stylus tool type.
 await create();
 if (find(dump(), "Write")) await tapLabel("Write", 900);
+if (!find(dump(), "Pen")) await tapInk("Pen", 600);
 const page = writingArea();
 check("pen case is shown when the note is in Write", !!page);
 if (page) {
@@ -116,22 +130,22 @@ if (page) {
   // One eraser sweep over everything leaves nothing, the last stroke included; one Undo brings it back.
   const region = { x1: x - 20, x2: x + 720, y1: y - 40, y2: y + 6 * 70 + 50 };
   results.inkBeforeErase = darkPixels(region);
-  await tapLabel("Eraser", 600);
+  await tapInk("Eraser", 600);
   for (let dx = 0; dx <= 760; dx += 40) stylus({ x: x + dx, y: y - 60 }, { x: x + dx, y: y + 6 * 70 + 60 }, 250);
   await sleep(900);
   results.inkAfterErase = darkPixels(region);
   shot("03b-erased");
   check("eraser removes every stroke, the last one too", results.inkBeforeErase > 200 && results.inkAfterErase < results.inkBeforeErase * 0.05, { before: results.inkBeforeErase, after: results.inkAfterErase });
-  await tapLabel("Undo", 1200);
-  await tapLabel("Pen", 400);
+  await tapInk("Undo", 1200);
+  await tapInk("Pen", 400);
   // A finger on a pen-only page scrolls instead of writing.
   // Well inside the page: a finger on the window's edge would resize it.
   finger({ x: x + 300, y: page.cy + 150 }, { x: x + 300, y: page.cy - 150 }, 500);
   await sleep(700);
   shot("03-finger-scrolls");
   results.memoryHandwriting = memory();
-  // Full screen: only the toolbar and the page, then back.
-  await tapLabel("Full screen", 1800);
+  // Full screen keeps the toolbar and page in view.
+  await fullScreen();
   let nodes = dump();
   check("full screen leaves only the toolbar and page", !nodes.some((n) => n.desc.includes("Move with the arrow keys")) && !!find(nodes, "Exit full screen") && !!find(nodes, "Pen"));
   shot("03c-full-screen");
@@ -142,7 +156,8 @@ if (page) {
 
 // A whiteboard: pen draws, two-finger moves are on the by-hand list.
 await link("space=workspace&wsClear=1&wsOpen=whiteboard", 4000);
-await create();
+await create("New whiteboard");
+if (!find(dump(), "Pen")) await tapInk("Pen", 600);
 const board = writingArea();
 if (board) {
   for (let i = 0; i < 4; i++) stylus({ x: board.cx - 300, y: board.cy - 150 + i * 90 }, { x: board.cx + 300, y: board.cy - 100 + i * 90 }, 600);
@@ -169,7 +184,7 @@ if (web) {
   shot("05b-text-in-write");
 }
 
-// The command palette from the corner, and sound in the timer dock.
+// Find Notes actions from the command palette.
 await link("space=home", 3500);
 await tapLabel("Search Sylf", 2500);
 check("search opens the command palette", !!find(dump(), "New note"));
@@ -179,12 +194,6 @@ adb("shell", "input", "keyevent", "KEYCODE_BACK");
 await sleep(700);
 if (find(dump(), "Search notes, tools, places and actions") || dump().some((n) => n.desc === "Close Search Sylf")) { adb("shell", "input", "keyevent", "KEYCODE_BACK"); await sleep(900); }
 check("back closes the palette", !dump().some((n) => n.desc === "Close Search Sylf"));
-const timer = dump().find((n) => n.desc.startsWith("Timer."));
-if (timer) { tap(timer.cx, timer.cy); await sleep(1500); }
-check("the timer dock has Sound", !!find(dump(), "Sound"));
-shot("07-dock-sound");
-adb("shell", "input", "keyevent", "KEYCODE_BACK");
-
 const crashes = adb("logcat", "-d", "-b", "crash");
 check("no crash in logcat", !crashes.includes(PACKAGE), crashes.slice(0, 400) || undefined);
 fs.writeFileSync(path.join(out, "android-notes-check.json"), JSON.stringify(results, null, 2));

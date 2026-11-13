@@ -2,6 +2,8 @@
 
 One long page with an index beside it, reached from the foot of Home's rail (`shell/account/AccountPage.tsx`). Only Home has it ([ADR 0012](../decisions/0012-connected-app.md) decision 17). Source wins over this page.
 
+Sign in is required before the Spaces mount. Signing out clears cached reads and releases the current audio source. Saved notes stay in the local library for their owner. The existing account flows can still adopt older device-only notes or claim older ownerless time.
+
 ## Sections
 
 | Section | Does | Owner |

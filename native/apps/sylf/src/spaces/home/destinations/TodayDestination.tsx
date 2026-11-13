@@ -1,58 +1,67 @@
-// Today answers one question: what should I do right now? One card holds the next thing and the way to start it. The line through the day keeps its
-// place below, with what has no time of day waiting at the end of it, ticked off where it stands.
-import { useMemo, useState, useSyncExternalStore } from "react";
-import { useNotice } from "@sylf/design-system";
+// The dashboard. Four parts, each with its own job and its own reads: where you stand (with the greeting at its head), your World, what there is to do, and
+// who is around. With room they sit two by two, set apart by air and one hairline, with no surface around any of them. A portrait tablet pairs progress with
+// the island and runs the rest in one column, and a phone is one column with the next thing to do first. The way into a session is the hub: one button
+// on the hairline at the middle, where the four parts meet. This file only arranges them and owns the actions
+// that leave the page. Each part is memoised and reads its own data, so one read answering renders one part.
+import { useCallback, useMemo, useState } from "react";
+import { Platform, View } from "react-native";
+import { Divider, useNotice, useTheme } from "@sylf/design-system";
 import { useLiveBackend } from "../../../shell/backend";
 import { describeFailureText } from "../../../shell/account/failure";
 import { useHomeNavigation, useSessionState, useStudySession } from "../../../shell/context";
 import { useEnterFocus } from "../../../shell/focus/enter";
-import { useSubjectColour } from "../../../shell/live";
 import { useHomeResult } from "../data";
-import type { HomeDataAdapter, Objective } from "../data/contracts";
+import type { Objective } from "../data/contracts";
 import { greetingFor, pickNext, plannedMinutes } from "../format";
-import { TodayBriefing } from "./TodayBriefing";
-import { TodayInvites } from "./TodayInvites";
-import { QuickAsk } from "./QuickAsk";
-import { CircleCard } from "./TodayCircle";
-import { DayCard } from "./TodayDay";
+import { FailedPage, HomePage, LoadingPage, useHomeContentWidth } from "../HomePage";
 import { Header } from "./TodayHeader";
-import { MomentumCard } from "./TodayMomentum";
-import { TodayHero } from "./TodayHero";
-import { WorldCard } from "./TodayWorld";
+import { TodayHub } from "./TodayHub";
+import { TodayObjectives } from "./TodayObjectives";
+import { TodayProgress } from "./TodayProgress";
+import { TodaySocial } from "./TodaySocial";
+import { TodayWorld } from "./TodayWorld";
+import { GRID_FLEX, islandBox, todayLayout } from "./todayLayout";
 import { skyAt } from "./todaySky";
-import { FailedPage, HomeColumns, HomePage, LoadingPage } from "../HomePage";
+import { useDashboardLive } from "./useDashboardLive";
 
-const load = (adapter: HomeDataAdapter) => adapter.today(new Date());
-const clock = (time: number) => new Date(time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+const NO_ENTRIES: never[] = [];
 
 export function TodayDestination() {
+  const { space } = useTheme();
   const navigation = useHomeNavigation();
   const session = useStudySession();
   const enter = useEnterFocus();
   const backend = useLiveBackend();
   const notice = useNotice();
-  const result = useHomeResult("today", load);
+  const result = useHomeResult("today");
   const now = useMemo(() => new Date(), []);
   const { active } = useSessionState();
-  const showing = useSyncExternalStore(navigation.subscribe, navigation.destination, navigation.destination) === "today";
+  const live = useDashboardLive();
+  const width = useHomeContentWidth(true);
   const [sending, setSending] = useState<string | null>(null);
-  const [asking, setAsking] = useState(false);
   const today = result?.data;
-  const colourOf = useSubjectColour();
   const greeting = greetingFor(now.getHours());
   const date = now.toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" });
 
-  // A quest has a subject and a title, so beginning it fills in everything Focus would ask, then goes straight into the environment.
+  const objectives = today?.objectives ?? NO_ENTRIES;
+  const entries = today?.entries ?? NO_ENTRIES;
+  const planned = plannedMinutes(entries);
+  const next = pickNext(entries, objectives, now.getTime());
+  const nextQuest = !active && next?.kind === "quest" ? next.objective : undefined;
+  const nextIsEvent = !active && next?.kind === "event";
+  const sky = skyAt(now.getHours());
+  const kind = active ? "session" : next?.kind ?? "ready";
+
+  const plan = useCallback((objective?: Objective) => {
+    if (objective) session.setPlan({ title: objective.title, subject: objective.subject ?? null, subjectId: objective.subjectId ?? null, questId: objective.questId ?? null });
+  }, [session]);
   // "Study this" on a quest only prepares: it shows Focus with that quest chosen, so the rhythm can still be picked.
-  const prepare = (objective?: Objective) => {
-    if (objective) session.setPlan({ title: objective.title, subject: objective.subject ?? null, subjectId: objective.subjectId ?? null, questId: objective.questId ?? null });
-    navigation.select("focus");
-  };
-  const begin = (objective?: Objective) => {
-    if (objective) session.setPlan({ title: objective.title, subject: objective.subject ?? null, subjectId: objective.subjectId ?? null, questId: objective.questId ?? null });
-    enter();
-  };
-  const tick = async (objective: Objective) => {
+  const prepare = useCallback((objective?: Objective) => { plan(objective); navigation.select("focus"); }, [navigation, plan]);
+  const calendar = useCallback(() => { navigation.setView("plan", "calendar"); navigation.select("plan"); }, [navigation]);
+  const targetSettings = useCallback(() => { navigation.setView("plan", "quests"); navigation.select("plan"); }, [navigation]);
+  // A quest has a subject and a title, so beginning it fills in everything Focus would ask, then goes straight into the environment.
+  const onBegin = useCallback(() => { if (nextIsEvent) calendar(); else { plan(nextQuest); enter(); } }, [calendar, enter, nextIsEvent, nextQuest, plan]);
+  const tick = useCallback(async (objective: Objective) => {
     if (!backend || !objective.completion || sending) return;
     setSending(objective.id);
     try { await backend.reads.completeQuest(objective.completion); notice("Quest done."); }
@@ -61,33 +70,71 @@ export function TodayDestination() {
     backend.resources.invalidate("today");
     backend.resources.invalidate("progress");
     backend.resources.invalidate("traveller");
-  };
+  }, [backend, notice, sending]);
+  const onTick = useCallback((objective: Objective) => { void tick(objective); }, [tick]);
 
-  const objectives = today?.objectives ?? [];
-  const entries = today?.entries ?? [];
-  const planned = plannedMinutes(entries);
-  const next = pickNext(entries, objectives, now.getTime());
-  const nextTitle = active ? active.title : next?.kind === "quest" ? next.objective.title : next?.kind === "event" ? next.entry.title : "";
-  const nextDetail = active ? active.subject ?? "" : next?.kind === "quest" ? next.objective.detail : next?.kind === "event" ? `${clock(next.entry.startsAt)}. ${next.entry.detail}` : "";
-  const nextSubject = !active && next?.kind === "quest" ? colourOf(next.objective.subjectId) : null;
-  const sky = skyAt(now.getHours());
-  const onBegin = () => begin(!active && next?.kind === "quest" ? next.objective : undefined);
-  const canStudy = (objective: Objective) => !(objective.done || active || objective.questId === undefined);
+  const layout = todayLayout(width);
+  const gap = layout === "grid" ? space.xxl : space.xl;
+  const columnGap = layout === "grid" ? space.air : space.xl;
+  const island = islandBox(layout, width, columnGap);
+
+  const header = <Header date={date} greeting={greeting} detail={today?.summary} compact={layout === "stack"} />;
+  const progress = <TodayProgress target={today?.target} onTarget={targetSettings} />;
+  const world = <TodayWorld sky={sky} playing={live} height={island.height} {...(layout === "stack" ? { maxWidth: 420 } : {})} />;
+  const objectivesPart = (
+    <TodayObjectives
+      entries={entries} objectives={objectives} allDay={today?.allDay} planned={planned} sending={sending !== null} busy={Boolean(active)}
+      onTick={onTick} onStudy={prepare} onPlan={calendar}
+    />
+  );
+  const social = <TodaySocial />;
+  // On a desktop the hub's middle is the gutter between the columns, which is where the four parts meet.
+  const split = useMemo(() => ({ ...GRID_FLEX, gap: columnGap }), [columnGap]);
+  const hub = <TodayHub kind={kind} width={width} onBegin={onBegin} {...(layout === "grid" ? { split } : {})} />;
+  const column = { minWidth: 0 } as const;
 
   return (
-    <HomePage destination="today" eyebrow={date} provenance={result?.provenance} live={result?.live} ready={result !== null}>
-      {!result ? <LoadingPage title={greeting} /> : !today && result.live?.failure ? <FailedPage title={greeting} icon="today" live={result.live} /> : (
-        <>
-          <Header greeting={greeting} detail={today?.summary} sky={sky} onAsk={backend ? () => setAsking(true) : undefined} />
-          <QuickAsk open={asking} onClose={() => setAsking(false)} />
-          <TodayInvites />
-          <TodayHero sky={sky} target={today?.target} title={nextTitle} detail={nextDetail} subjectColour={nextSubject} active={active !== null} live={showing} onBegin={onBegin} onChoose={() => prepare(!active && next?.kind === "quest" ? next.objective : undefined)} />
-          <TodayBriefing />
-          <HomeColumns
-            primary={<DayCard entries={entries} objectives={objectives} allDay={today?.allDay} planned={planned} sending={sending !== null} canStudy={canStudy} onTick={(objective) => void tick(objective)} onStudy={prepare} onPlan={() => navigation.select("plan")} />}
-            secondary={[<MomentumCard key="momentum" />, <WorldCard key="world" />, <CircleCard key="circle" />]}
-          />
-        </>
+    <HomePage destination="today" live={result?.live} ready={result !== null} wide>
+      {!result ? <LoadingPage title={greeting} /> : !today ? <FailedPage title={greeting} icon="today" live={result.live} /> : (
+        <View testID="today-dashboard" {...(Platform.OS === "web" ? { dataSet: { layout } } as object : {})} style={{ gap }}>
+          {layout === "grid" ? (
+            <>
+              <View style={{ flexDirection: "row", alignItems: "flex-start", gap: columnGap }}>
+                <View testID="today-part-progress" style={[column, { flex: GRID_FLEX.left, gap: space.xl }]}>{header}{progress}</View>
+                <View testID="today-part-world" style={[column, { flex: GRID_FLEX.right }]}>{world}</View>
+              </View>
+              {hub}
+              <View style={{ flexDirection: "row", alignItems: "flex-start", gap: columnGap }}>
+                <View testID="today-part-objectives" style={[column, { flex: GRID_FLEX.left }]}>{objectivesPart}</View>
+                <View testID="today-part-social" style={[column, { flex: GRID_FLEX.right }]}>{social}</View>
+              </View>
+            </>
+          ) : layout === "paired" ? (
+            <>
+              {header}
+              <View style={{ flexDirection: "row", alignItems: "flex-start", gap: columnGap }}>
+                <View testID="today-part-progress" style={[column, { flex: 1 }]}>{progress}</View>
+                <View testID="today-part-world" style={{ width: island.width }}>{world}</View>
+              </View>
+              {hub}
+              <View testID="today-part-objectives" style={column}>{objectivesPart}</View>
+              <Divider />
+              <View testID="today-part-social" style={column}>{social}</View>
+            </>
+          ) : (
+            <>
+              {header}
+              {hub}
+              <View testID="today-part-objectives" style={column}>{objectivesPart}</View>
+              <Divider />
+              <View testID="today-part-progress" style={column}>{progress}</View>
+              <Divider />
+              <View testID="today-part-world" style={column}>{world}</View>
+              <Divider />
+              <View testID="today-part-social" style={column}>{social}</View>
+            </>
+          )}
+        </View>
       )}
     </HomePage>
   );

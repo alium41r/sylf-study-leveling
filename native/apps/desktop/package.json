@@ -14,6 +14,7 @@
     "workspace-check": "electron . --sylf-workspace-check",
     "world-check": "electron . --sylf-world-check",
     "session-check": "electron . --sylf-session-check",
+    "frontend-check": "electron . --sylf-frontend-check",
     "backend-check": "electron . --sylf-backend-check",
     "journey-check": "electron . --sylf-journey-check",
     "review-capture": "electron . --sylf-review-capture"

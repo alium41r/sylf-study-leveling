@@ -140,10 +140,15 @@ adb("logcat", "-c");
 
 // A fresh whiteboard, the pen in hand.
 await link("space=workspace&wsClear=1&wsOpen=whiteboard", 5000);
-await tapLabel("New", 1200);
+await tapLabel("New whiteboard", 1200);
 await tapLabel("Create", 3000);
-// Full screen: the page fills the screen, whatever size the window opened at.
+// Full screen gives the pressure measurements a larger page.
+if (!find(dump(), "Full screen")) await tapLabel("Document options", 600);
 await tapLabel("Full screen", 1800);
+if (!find(dump(), "Pen")) {
+  await tapLabel("Writing tools", 600);
+  await tapLabel("Pen", 700);
+}
 let nodes = dump();
 const pen = find(nodes, "Pen"), frame = { x1: 0, x2: CUR_W };
 if (!pen || !find(nodes, "Exit full screen")) stop("No full-screen whiteboard with a pen case");
@@ -224,6 +229,11 @@ await sleep(800);
 await link("space=workspace&wsClear=1&wsOpen=whiteboard", 6000);
 await tapLabel("Whiteboard", 3000).catch(() => undefined);
 nodes = dump();
+if (!find(nodes, "Pen") && find(nodes, "Writing tools")) {
+  await tapLabel("Writing tools", 600);
+  await tapLabel("Pen", 700);
+  nodes = dump();
+}
 if (find(nodes, "Pen")) {
   await tapLabel("Pen", 700);
   if (!find(dump(), "Pen pressure")) await tapLabel("Pen", 900);

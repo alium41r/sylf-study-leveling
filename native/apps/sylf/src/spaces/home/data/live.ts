@@ -26,7 +26,7 @@ export function mapToday(events: CalendarEvent[], quests: Quest[], schedule: Stu
     const past = endsAt < now.getTime() || (endsAt === startsAt && startsAt < now.getTime());
     const state = past ? "past" : nextGiven ? "later" : "next";
     if (state === "next") nextGiven = true;
-    return { id: event.occurrenceDate ? `${event.id}:${event.occurrenceDate}` : event.id, startsAt, title: event.title, detail: minutes > 0 ? `${formatMinutes(minutes)}, until ${clock(endsAt)}` : "Event", kind: event.category === "time-block" ? "session" : "class", state };
+    return { id: event.occurrenceDate ? `${event.id}:${event.occurrenceDate}` : event.id, startsAt, title: event.title, detail: minutes > 0 ? `${formatMinutes(minutes)}, until ${clock(endsAt)}` : "Event", kind: event.category === "time-block" ? "session" : "class", state, ...(event.category === "time-block" && minutes > 0 ? { minutes } : {}) };
   });
   // Open work first, in the server's order. A plan's order is the student's own.
   const objectives: Objective[] = [...quests.filter((quest) => quest.status !== "COMPLETED"), ...quests.filter((quest) => quest.status === "COMPLETED")].map((quest) => {
@@ -38,8 +38,8 @@ export function mapToday(events: CalendarEvent[], quests: Quest[], schedule: Stu
   const open = objectives.filter((objective) => !objective.done).length;
   const ahead = entries.filter((entry) => entry.state !== "past").length;
   const parts = [open ? `${plural(open, "quest")} to finish` : null, ahead ? `${plural(ahead, "event")} ahead` : null].filter(Boolean);
-  const line = parts.length ? `${sentence(parts.join(", and "))}.` : objectives.length ? "Everything for today is done." : restDay ? "A rest day. Nothing is planned." : "Nothing is planned yet.";
-  const target = schedule ? { studied: Math.round(summary?.dailyStudy.find((entry) => entry.date === serverDay)?.minutes ?? 0), goal: schedule.dailyGoalMinutes, rest: restDay } : undefined;
+  const line = parts.length ? `${sentence(parts.join(", and "))}.` : allDay.length ? sentence(plural(allDay.length, "all-day event")) + "." : objectives.length ? "Everything for today is done." : restDay ? "A rest day. Nothing is planned." : "Nothing is planned yet.";
+  const target = schedule && summary ? { studied: Math.round(summary.dailyStudy.find((entry) => entry.date === serverDay)?.minutes ?? 0), goal: schedule.dailyGoalMinutes, rest: restDay } : undefined;
   return { entries, objectives, allDay, summary: line, target };
 }
 
@@ -113,11 +113,12 @@ export function mapCircle(friends: Friend[], party: FocusParty, requests: Friend
   };
 }
 
-export type HomeView = "today" | "focus" | "circle" | "progress";
+export interface HomeViews { today: TodayView; focus: FocusView; circle: CircleView }
+export type HomeView = keyof HomeViews;
 
 export function liveHomeViews(backend: Backend) {
   const { reads } = backend;
-  const views: { today: ResourceDefinition<TodayView>; focus: ResourceDefinition<FocusView>; circle: ResourceDefinition<CircleView>; progress: ResourceDefinition<ProgressView> } = {
+  const views: { [K in HomeView]: ResourceDefinition<HomeViews[K]> } = {
     today: {
       key: "home-today", tags: ["today", "sessions", "plan"], ttlMs: 60_000,
       async load(signal) {
@@ -128,20 +129,13 @@ export function liveHomeViews(backend: Backend) {
     },
     focus: {
       key: "home-focus", tags: ["sessions"], ttlMs: 60_000,
-      async load(signal) { return { subject: "", topic: "", desks: [], recent: mapRecent(await reads.recentSessions(20, signal), new Date()) }; },
+      async load(signal) { return { recent: mapRecent(await reads.recentSessions(20, signal), new Date()) }; },
     },
     circle: {
       key: "home-circle", tags: ["circle"], ttlMs: 30_000,
       async load(signal) {
         const [friends, party, requests] = await Promise.all([reads.friends(signal), reads.party(signal), reads.friendRequests(signal)]);
         return mapCircle(friends, party, requests, new Date());
-      },
-    },
-    progress: {
-      key: "home-progress", tags: ["progress"], ttlMs: 60_000,
-      async load(signal) {
-        const [stats, summary, achievements] = await Promise.all([reads.stats(signal), reads.studySummary(signal), reads.achievements(signal)]);
-        return mapProgress(stats, summary, achievements.achievements);
       },
     },
   };

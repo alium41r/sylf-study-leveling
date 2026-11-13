@@ -96,7 +96,7 @@ When on, it adds a palette button at the top right that opens the Showcase, and 
 | A Space | `?space=workspace&theme=cozy&mode=dark` | `sylf-native://spaces?space=workspace&theme=cozy&mode=dark` |
 | Custom colors | add `&accent=e5ff00&day=7f8088&night=101010` | same |
 | Workspace tools | add `&wsClear=1&wsOpen=notes,pdfs&wsZoom=0.5&wsLayout=split` | same |
-| World states | add `&worldSky=night&worldSection=traveller&worldData=empty&worldHost=fail-save` ([World guide](../world/README.md#9-development-tools)) | same |
+| World states | add `&worldSky=night&worldSection=traveller&worldHost=fail-save` ([World guide](../world/README.md#9-development-tools)) | same |
 | The study session | add `&session=running`, `paused` or `clear`, and `&sessionLength=25` or `open` | same |
 | Text size | add `&textScale=1.3` | same |
 
@@ -161,7 +161,9 @@ interface StudySessionModel {
 | Paused | A pause mark and the time, quiet | Resume, End |
 | Finished | A check and 00:00 | Finish, Keep going |
 
-Every state also has Focus, Timer and Audio, which go to Home's Focus, the Timer window and the Audio window. **Audio only opens the tool,** because playback waits for the native audio engine.
+Focus and Timer open their existing destinations. The resting island includes a **Sounds** control beside its timer. Press it to expand the same dock with soundscapes, local file playback, volume and the session clock. **Timer** and **Sounds** switch views without closing the dock. A downward swipe on the resting island opens Sounds, and an upward swipe on the expanded header closes it. The audio glyph lights while a sound plays.
+
+Playback lives in the shell and continues across Space changes. Focus opens the same expanded dock in Sounds mode from its audio button. Signing out releases the player and the current file's Blob URL.
 
 - **Where.** On the Spaces icon's line, in the middle of the window, or at the right of a compact window. It is sized from the type, with room for an hours place, so it does not resize as time passes. `placeDock` holds this, and it is tested with no renderer. `useDockMetrics()` gives the same answer to anything that shares the line, as Home's strip does.
 - **It sits above the Spaces,** so a Space changing underneath does not move it. It keeps the person's own theme on World's sky, on an opaque plate.

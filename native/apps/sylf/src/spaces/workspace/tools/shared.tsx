@@ -11,8 +11,6 @@ export interface ToolProps {
   window: WorkspaceWindow;
   lifecycle: ToolLifecycle;
   patch: (state: ToolState) => void;
-  /** Says what the window should tell people about its data. */
-  onProvenance: (sample: boolean) => void;
 }
 
 export const isSeen = (lifecycle: ToolLifecycle) => lifecycle === "active" || lifecycle === "visible";

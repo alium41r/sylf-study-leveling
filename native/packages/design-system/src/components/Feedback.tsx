@@ -116,12 +116,12 @@ export function Readout({ value, label, unit, size = "regular" }: { value: strin
   );
 }
 
-export function EmptyState({ title, message, icon, action }: { title: string; message: string; icon?: IconName; action?: React.ReactNode }) {
+export function EmptyState({ title, message, icon, action, compact = false }: { title: string; message: string; icon?: IconName; action?: React.ReactNode; compact?: boolean }) {
   const { space } = useTheme();
   return (
-    <View style={{ alignItems: "center", gap: space.sm, paddingVertical: space.xl, paddingHorizontal: space.lg }}>
+    <View style={{ alignItems: "center", gap: space.sm, paddingVertical: compact ? space.md : space.xl, paddingHorizontal: space.lg }}>
       {icon ? <Icon name={icon} size={26} active /> : <Marker scale={1.4} breathing />}
-      <Text variant="title" align="center">{title}</Text>
+      <Text variant={compact ? "heading" : "title"} align="center">{title}</Text>
       <Text variant="small" tone="soft" align="center" style={{ maxWidth: 340 }}>{message}</Text>
       {action}
     </View>

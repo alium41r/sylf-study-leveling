@@ -10,18 +10,25 @@ import InkView from "./InkView";
 import PdfPageImage from "./PdfPageImage";
 import { DEFAULT_TOOL } from "./ink-types";
 import { useInkTool } from "./ink-tool";
-import { MAX_ZOOM, MIN_ZOOM, PinchStage, stackPages, usePagePinch } from "./page-pinch";
+import { MAX_ZOOM, MIN_ZOOM, PinchStage, clampPageScroll, stackPages, usePagePinch } from "./page-pinch";
+
+import { pageAt, pageOffset } from "./page-navigation";
+import { watchScene } from "./scene-face";
+import { ZoomBadge, type ZoomBadgeHandle } from "./ZoomBadge";
 
 type Page = DocumentDescriptor["pages"][number];
-const GAP = 20, SNAP = 96, MARGIN = 160;
+const SNAP = 96, MARGIN = 160;
+// How far a scroll moves before the pages are laid out again: well inside MARGIN, so ink is always drawn where it shows.
+const SCROLL_STEP = 40;
 
 function sceneFor(document: OpenDocument, page: Page, pdf: boolean) {
   const doc = document.stream(page.streamId);
   return new InkScene(doc, pdf ? { records: notesPdf.pdfPageMaps(doc).ink } : {});
 }
 
-export default function PagedInk({ library, document, pdf, editable, initialPage, onPage, header, corner }: { library: NotesLibrary; document: OpenDocument; pdf: boolean; editable: boolean; initialPage: number; onPage(page: number): void; header?: ReactNode; corner?: ReactNode }) {
-  const { space, color } = useTheme();
+export default function PagedInk({ library, document, pdf, editable, initialPage, onPage, leading, corner, compact, compactUndo }: { library: NotesLibrary; document: OpenDocument; pdf: boolean; editable: boolean; initialPage: number; onPage(page: number): void; leading?: ReactNode; corner?: ReactNode; compact?: boolean; compactUndo?: boolean }) {
+  const { space, color, surface } = useTheme();
+  const gap = space.md;
   const [descriptor, setDescriptor] = useState(document.descriptor());
   useEffect(() => document.subscribe(() => setDescriptor(document.descriptor())), [document]);
   const pages = descriptor.pages;
@@ -40,36 +47,39 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
   const scenes = useRef(new Map<string, InkScene>());
   const scene = (page: Page) => {
     let found = scenes.current.get(page.pageId);
-    if (!found) { found = sceneFor(document, page, pdf); scenes.current.set(page.pageId, found); found.subscribe(() => bump((n) => n + 1)); }
+    if (!found) { found = sceneFor(document, page, pdf); scenes.current.set(page.pageId, found); watchScene(found, () => bump((n) => n + 1)); }
     return found;
   };
   useEffect(() => () => { for (const s of scenes.current.values()) s.close(); scenes.current.clear(); }, []);
 
   const shown = useMemo(() => pages.map((page) => (pdf ? notesPdf.displayedPageSize(page) : { width: page.width, height: page.height })), [pages, pdf]);
   const widest = Math.max(1, ...shown.map((p) => p.width));
-  const fit = size.width ? (size.width - GAP * 2) / widest : 0.5;
-  const scaleAt = (z: number) => Math.max(0.15, fit * z);
+  const fit = size.width ? Math.max(1, size.width - gap * 2) / widest : 0.5;
+  const scaleAt = (z: number) => fit * z;
   const scale = scaleAt(zoom);
   // Gaps scale with the zoom, as in a note, so a pinch previews every page exactly.
-  const layoutAt = (z: number) => stackPages(shown, scaleAt(z), size.width, GAP * z);
-  const stack = useMemo(() => stackPages(shown, scale, size.width, GAP * zoom), [shown, scale, size.width, zoom]);
+  const layoutAt = (z: number) => stackPages(shown, scaleAt(z), size.width, gap * z);
+  const stack = useMemo(() => stackPages(shown, scale, size.width, gap * zoom), [shown, scale, size.width, gap, zoom]);
   const layout = useMemo(() => stack.rows.map((row, i) => ({ ...row, page: pages[i] })), [stack]);
   const contentHeight = stack.height;
   const contentWidth = stack.width;
-  const current = Math.max(0, layout.findIndex((row) => row.top + row.height > scroll.y + size.height / 3));
-
-  useEffect(() => { onPage(current); }, [current]);
+  const current = pageAt(layout, scroll.y, size.height);
+  const offsetRef = useRef({ x: 0, y: 0 });
+  useEffect(() => { if (restored.current) onPage(current); }, [current]);
   useEffect(() => {
     if (restored.current || !size.height || !layout.length) return;
-    restored.current = true;
-    const row = layout[Math.min(initialPage, layout.length - 1)];
-    if (row && initialPage > 0) requestAnimationFrame(() => vertical.current?.scrollTo({ y: row.top - GAP, animated: false }));
-  }, [size.height, layout.length]);
-
-  // Two fingers zoom around a point; keep that point still.
-  const pinch = (factor: number) => setZoom((z) => Math.max(0.5, Math.min(3, z * factor)));
-  const offsetRef = useRef({ x: 0, y: 0 });
-  const preview = usePagePinch({ zoom, layoutAt, view: size, offset: offsetRef, vertical, horizontal, commit: (z, at) => { setZoom(z); setScroll(at); } });
+    const row = layout[Math.max(0, Math.min(initialPage, layout.length - 1))];
+    const y = pageOffset(row, gap * zoom, contentHeight, size.height);
+    const frame = requestAnimationFrame(() => {
+      restored.current = true;
+      offsetRef.current.y = y;
+      setScroll((at) => ({ ...at, y }));
+      vertical.current?.scrollTo({ y, animated: false });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [size.height, layout, contentHeight, gap, zoom]);
+  const zoomBadge = useRef<ZoomBadgeHandle>(null);
+  const preview = usePagePinch({ onZoom: (z) => zoomBadge.current?.show(z), zoom, layoutAt, view: size, content: stack, offset: offsetRef, vertical, horizontal, commit: (z, at) => { setZoom(z); setScroll(at); } });
   // As in a note: while a pinch can zoom out, the pages around the view are drawn too, and the scrolled content is as large as the
   // largest zoom so the landing scroll is never cut short.
   const reach = preview.pinching ? Math.min(2, zoom / MIN_ZOOM - 1) : 0;
@@ -78,8 +88,11 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
   const spanWidth = Math.max(contentWidth, largest?.width ?? 0), spanHeight = Math.max(contentHeight, largest?.height ?? 0);
   const drawOutside = preview.pinching ? { overflow: "visible" as const } : null;
   const pan = (dx: number, dy: number) => {
-    vertical.current?.scrollTo({ y: Math.max(0, scroll.y - dy), animated: false });
-    if (contentWidth > size.width) horizontal.current?.scrollTo({ x: Math.max(0, scroll.x - dx), animated: false });
+    const at = offsetRef.current;
+    const next = clampPageScroll({ x: at.x - dx, y: at.y - dy }, stack, size);
+    offsetRef.current = next;
+    vertical.current?.scrollTo({ y: next.y, animated: false });
+    if (contentWidth > size.width) horizontal.current?.scrollTo({ x: next.x, animated: false });
   };
 
   const active = layout[current]?.page;
@@ -101,9 +114,11 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
   };
 
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const y = event.nativeEvent.contentOffset.y;
+    if (preview.pinching) return;
+    const { y } = clampPageScroll(event.nativeEvent.contentOffset, stack, size);
     offsetRef.current.y = y;
-    if (Math.abs(y - scroll.y) >= 8) setScroll((s) => ({ ...s, y }));
+    const atEnd = y <= 0 || y >= contentHeight - size.height - 1;
+    if (Math.abs(y - scroll.y) >= SCROLL_STEP || (atEnd && y !== scroll.y)) setScroll((s) => ({ ...s, y }));
   };
 
   return (
@@ -111,22 +126,27 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
       {editable ? (
         <InkToolbar tool={tool} onTool={setTool} stylusKnown={stylusKnown}
           canUndo={!!activeScene?.canUndo()} canRedo={!!activeScene?.canRedo()} onUndo={() => activeScene?.undo()} onRedo={() => activeScene?.redo()}
-          selection={selection?.ids.length ?? 0} onSelectionAction={onSelectionAction}
+          selection={selection?.ids.length ?? 0} onSelectionAction={onSelectionAction} leading={leading} compact={compact} compactUndo={compactUndo}
+          onClearPage={activeScene ? () => { const all = activeScene.strokes().map((stroke) => stroke.id); if (all.length) { setSelection(null); activeScene.remove(all); } } : undefined}
           trailing={
             <>
-              <IconButton icon="minus" size="small" label="Zoom out" onPress={() => pinch(1 / 1.25)} />
+              <IconButton icon="minus" size="small" label="Zoom out" disabled={zoom <= MIN_ZOOM} onPress={() => preview.zoomBy(1 / 1.25)} />
               <Text variant="micro" tone="soft" style={{ minWidth: 36, textAlign: "center" }}>{Math.round(zoom * 100)}%</Text>
-              <IconButton icon="plus" size="small" label="Zoom in" onPress={() => pinch(1.25)} />
+              <IconButton icon="plus" size="small" label="Zoom in" disabled={zoom >= MAX_ZOOM} onPress={() => preview.zoomBy(1.25)} />
               {pdf ? null : <View ref={pageMenuAnchor} collapsable={false}><IconButton icon="pagePlus" size="small" label="Pages and paper" onPress={() => setPageMenu(true)} /></View>}
             </>
           } end={corner} />
       ) : null}
-      {header}
-      <View ref={preview.area} collapsable={false} style={{ flex: 1, backgroundColor: color.sunken, overflow: "hidden" }} onLayout={(e: LayoutChangeEvent) => { setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height }); preview.onAreaLayout(); }}>
+      <View ref={preview.area} collapsable={false} {...({ dataSet: { ownsWheel: "all" } } as object)} style={{ flex: 1, backgroundColor: color.sunken, overflow: "hidden" }} onLayout={(e: LayoutChangeEvent) => { setSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height }); preview.onAreaLayout(); }}>
         <PinchStage stage={preview.stage} onPagePinch={preview.onPagePinch}>
         {size.width ? (
-          <ScrollView keyboardShouldPersistTaps="handled" ref={horizontal} horizontal style={drawOutside} scrollEnabled={contentWidth > size.width + 1} showsHorizontalScrollIndicator={contentWidth > size.width + 1} onScroll={(e) => { offsetRef.current.x = e.nativeEvent.contentOffset.x; setScroll((s) => ({ ...s, x: e.nativeEvent.contentOffset.x })); }} scrollEventThrottle={32} contentContainerStyle={{ width: spanWidth }}>
-            <ScrollView keyboardShouldPersistTaps="handled" ref={vertical} {...({ dataSet: { ownsWheel: "scroll" } } as object)} style={{ width: spanWidth, height: size.height, ...drawOutside }} onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator contentContainerStyle={{ height: spanHeight }}>
+          <ScrollView keyboardShouldPersistTaps="handled" ref={horizontal} horizontal style={drawOutside} bounces={false} overScrollMode="never" scrollEnabled={contentWidth > size.width + 1} showsHorizontalScrollIndicator={contentWidth > size.width + 1} onScroll={(e) => {
+            if (preview.pinching) return;
+            const { x } = clampPageScroll(e.nativeEvent.contentOffset, stack, size);
+            offsetRef.current.x = x;
+            setScroll((s) => (Math.abs(x - s.x) >= SCROLL_STEP || x === 0 ? { ...s, x } : s));
+          }} scrollEventThrottle={32} contentContainerStyle={{ width: spanWidth }}>
+            <ScrollView keyboardShouldPersistTaps="handled" ref={vertical} bounces={false} overScrollMode="never" style={{ width: spanWidth, height: size.height, ...drawOutside }} onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator contentContainerStyle={{ height: spanHeight }}>
               {layout.map((row) => {
                 const left = row.left;
                 const near = row.top + row.height > scroll.y - size.height * (1 + reach) && row.top < scroll.y + size.height * (2 + reach);
@@ -143,7 +163,7 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
                         <InkView scene={s} pageWidth={row.page.width} pageHeight={row.page.height} camera={{ x: x0 / scale, y: y0 / scale, zoom: scale }} width={x1 - x0} height={y1 - y0}
                           tool={tool} drawPaper={!pdf} editable={editable} selection={selection?.page === row.page.pageId ? selection.ids : []}
                           onSelection={(ids) => { setSelection(ids.length ? { page: row.page.pageId, ids } : null); }}
-                          onPan={pan} onPinch={(factor) => pinch(factor)} onPagePinch={preview.inkPinch} onPenSeen={penSeen} wheel="zoom" />
+                          onPan={pan} onPagePinch={preview.inkPinch} onPenSeen={penSeen} />
                       </View>
                     ) : null}
                   </View>
@@ -153,9 +173,10 @@ export default function PagedInk({ library, document, pdf, editable, initialPage
           </ScrollView>
         ) : null}
         </PinchStage>
+        <ZoomBadge ref={zoomBadge} />
         {pages.length > 1 ? (
-          <View pointerEvents="none" style={{ position: "absolute", right: space.md, bottom: space.md, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: "rgba(20,24,40,0.55)" }}>
-            <Text variant="micro" style={{ color: "#ffffff" }}>{current + 1} / {pages.length}</Text>
+          <View pointerEvents="none" style={[surface("float", "sm"), { position: "absolute", right: space.md, bottom: space.md, paddingHorizontal: space.sm, paddingVertical: space.xs }]}>
+            <Text variant="micro" tone="soft">{current + 1} / {pages.length}</Text>
           </View>
         ) : null}
       </View>

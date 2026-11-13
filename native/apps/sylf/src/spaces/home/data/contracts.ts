@@ -1,13 +1,4 @@
-// What Home needs to draw, shaped as view models and not as server records. Everything here has an existing owner in Sylf's
-// backend, named beside it: Home adds no server concept. Phase 11 checks these against the real contracts and Phase 13 replaces
-// the adapter, so screens do not change when real data arrives. Every result says where it came from: screens show the
-// sample notice from `provenance`, and never decide it themselves.
-import type { LiveStatus } from "../../../shell/live-result";
-
-export type Provenance = "sample" | "live";
-
-export interface HomeResult<T> { provenance: Provenance; data: T | null; live?: LiveStatus }
-
+// View models composed from Home's authenticated backend reads.
 export type DayEntryKind = "session" | "class" | "deadline";
 export type DayEntryState = "past" | "next" | "later";
 
@@ -30,15 +21,13 @@ export interface TodayView {
   target?: DayTarget;
 }
 
-/** A desk is a focus background from the existing catalog (FocusBackground, UserFocusBackground), not a new kind of thing. */
-export interface StudyDesk { id: string; name: string; category: string; art: { kind: "image"; url: string } | { kind: "sample"; layout: "window" | "lamp" | "shelf" } }
 /** A finished StudySession, named after its quest or subject. */
 export interface RecentSession { id: string; title: string; detail: string; minutes: number }
 /** Session lengths are not here: they belong to the one study session, in @sylf/spaces. */
-export interface FocusView { subject: string; topic: string; desks: StudyDesk[]; recent: RecentSession[] }
+export interface FocusView { recent: RecentSession[] }
 
 /** /api/friends: online, studying, and when the session began. It does not say what a friend is studying, so neither does Home. */
-export interface CirclePerson { id: string; /** Needed to open their profile. Absent in the sample. */ username?: string; name: string; status: string; detail?: string; presence?: "online" | "focusing" }
+export interface CirclePerson { id: string; username: string; name: string; status: string; detail?: string; presence?: "online" | "focusing" }
 /** /api/focus-party: parties exist now and have members. There is no schedule and no seat limit to show. */
 export interface StudyParty { id: string; name: string; members: number; inSession: boolean }
 export interface CircleView {
@@ -62,11 +51,4 @@ export interface ProgressView {
   week: StudyDay[];
   subjects: SubjectShare[];
   achievements: Achievement[];
-}
-
-export interface HomeDataAdapter {
-  today(now: Date): Promise<HomeResult<TodayView>>;
-  focus(): Promise<HomeResult<FocusView>>;
-  circle(): Promise<HomeResult<CircleView>>;
-  progress(now: Date): Promise<HomeResult<ProgressView>>;
 }

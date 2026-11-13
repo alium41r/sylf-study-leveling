@@ -89,7 +89,7 @@ export function SessionSubject() {
  * Start, pause, resume and end. `testID` names the surface, so each surface's buttons can be told apart. Ending a session that is still
  * going asks first, because it cannot be undone. A countdown that has finished has nothing left to lose, so it does not.
  */
-export function SessionActions({ surface, title, subject, onEnded }: { surface: string; title?: string; subject?: string | null; onEnded?: () => void }) {
+export function SessionActions({ surface, title, subject, onEnded, compact = false }: { surface: string; title?: string; subject?: string | null; onEnded?: () => void; compact?: boolean }) {
   const { space } = useTheme();
   const session = useStudySession();
   const notice = useNotice();
@@ -111,11 +111,11 @@ export function SessionActions({ surface, title, subject, onEnded }: { surface: 
   const askToEnd = () => setAsking(speakSessionClock(session.readout().focusSeconds));
   // Free Flow and Flowtime have no schedule, so a break is the person's to ask for, and its length follows how long they have focused.
   const canBreak = status === "running" && Boolean(active?.phase) && modes.takesBreaksOnDemand(active!.phase!.mode) && active!.snapshot.phase === "focus";
-  const row = { flexDirection: "row", gap: space.sm, alignSelf: "stretch" } as const;
-  const wide = { flex: 1 } as const;
+  const row = { flexDirection: compact ? "column" : "row", gap: space.sm, alignSelf: "stretch" } as const;
+  const wide = compact ? { alignSelf: "stretch" as const } : { flex: 1 };
   return (
     <>
-      {status === "idle" ? <Button title="Begin session" variant="emphasis" icon="play" fill testID={`${surface}-begin`} onPress={() => session.start({ title, subject, ...takeParty() })} /> : null}
+      {status === "idle" ? <Button title={compact ? "Begin" : "Begin session"} variant="emphasis" icon="play" fill testID={`${surface}-begin`} onPress={() => session.start({ title, subject, ...takeParty() })} /> : null}
       {canBreak ? <Button title="Take a break" variant="ghost" icon="pause" fill testID={`${surface}-break`} onPress={() => session.takeBreak()} /> : null}
       {status === "running" ? <View style={row}><Button title="Pause" icon="pause" testID={`${surface}-pause`} style={wide} onPress={() => session.pause()} /><Button title="End" variant="ghost" icon="stop" testID={`${surface}-end`} style={wide} onPress={askToEnd} /></View> : null}
       {status === "paused" ? <View style={row}><Button title="Resume" variant="emphasis" icon="play" testID={`${surface}-resume`} style={wide} onPress={() => session.resume()} /><Button title="End" variant="ghost" icon="stop" testID={`${surface}-end`} style={wide} onPress={askToEnd} /></View> : null}

@@ -1,24 +1,30 @@
-// The way to Sylf World, as a slim row: what you have earned toward it, and one press to open the gate. The scenery lives once on this page, in the hero, so this
-// stays quiet. Level, rank and Sylph are the server's. Time in World never counts as study (G1), and nothing here suggests it does.
+// The person's World, seen from Home: the island a little way off, and the way in. The whole picture opens World, and so does the link under it, which is the
+// one a keyboard or a screen reader meets. The art is loaded on first draw and paused whenever the dashboard is not what is on screen.
+import { memo, useCallback } from "react";
 import { View } from "react-native";
-import { Icon, Plane, Press, Text, useTheme } from "@sylf/design-system";
+import { Button, Press, Text, useTheme } from "@sylf/design-system";
+import type { WorldSky } from "@sylf/spaces";
 import { useSpacesStore } from "../../../shell/context";
-import { useStats } from "../../../shell/live";
+import { useStatsResult } from "../data";
+import { Scenery } from "./TodayScenery";
 
-export function WorldCard() {
-  const { color, shape, space } = useTheme();
+export const TodayWorld = memo(function TodayWorld({ sky, playing, height, maxWidth }: { sky: WorldSky; playing: boolean; height: number; maxWidth?: number }) {
+  const { shape, space } = useTheme();
   const store = useSpacesStore();
-  const stats = useStats();
+  const stats = useStatsResult()?.data;
+  const open = useCallback(() => { store.select("world"); }, [store]);
   return (
-    <Plane level="plane" radius="lg" testID="today-world" style={{ padding: space.lg }}>
-      <Press role="button" label="Sylf World. Open the gate" onPress={() => store.select("world")} bodyStyle={{ flexDirection: "row", alignItems: "center", gap: space.md }}>
-        <View aria-hidden style={{ width: 44, height: 44, borderRadius: shape.radius.md, backgroundColor: color.accent.wash, alignItems: "center", justifyContent: "center" }}><Icon name="world" color={color.accent.mote} /></View>
-        <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-          <Text variant="subheading">Sylf World</Text>
-          <Text variant="caption" tone="soft">{stats?.sylph !== undefined ? `${stats.sylph.toLocaleString()} Sylph to spend` : "A place you earn by studying"}</Text>
-        </View>
-        <Icon name="chevronRight" color={color.inkSoft} />
+    <View testID="today-world" style={{ gap: space.md, width: "100%", ...(maxWidth ? { maxWidth, alignSelf: "center" } : {}) }}>
+      <Press role="button" label="Open Sylf World" feedback="none" radius={shape.radius.xl} testID="today-world-open" onPress={open} bodyStyle={{ height }}>
+        <Scenery sky={sky} playing={playing} testID="today-window" />
       </Press>
-    </Plane>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.md }}>
+        <View style={{ flexShrink: 1, minWidth: 0 }}>
+          <Text variant="heading" role="heading" aria-level={2} numberOfLines={1}>Sylf World</Text>
+          <Text variant="caption" tone="soft" numberOfLines={1}>{stats?.sylph !== undefined ? `${stats.sylph.toLocaleString()} Sylph` : "Traveller and collection"}</Text>
+        </View>
+        <Button title="Enter" size="small" variant="ghost" trailingIcon="arrowRight" testID="today-enter-world" onPress={open} />
+      </View>
+    </View>
   );
-}
+});

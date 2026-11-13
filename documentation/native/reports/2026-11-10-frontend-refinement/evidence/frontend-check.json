@@ -1,0 +1,78 @@
+{
+  "passed": true,
+  "steps": [
+    "Sign-in gate, account-backed agenda and daily target",
+    "Downward touch swipe opens Sounds in the island and upward swipe closes it",
+    "One island switches between Timer and Sounds, and decoded Ogg playback keeps going as volume changes",
+    "Mouse drag opens one tool, split reflows in portrait, and single and tiled layouts return to the canvas",
+    "Playback survives Home, Workspace and World, a failed track recovers, and a picked WAV plays locally",
+    "The paused timer holds its value in Sounds and Focus plays the same local file",
+    "The timer runs during audio, sign-out releases the player, and a second account gets its own empty dashboard"
+  ],
+  "viewports": [
+    {
+      "name": "wide",
+      "width": 1280,
+      "height": 755,
+      "allTabsReachable": true,
+      "within": true,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "tablet-landscape",
+      "width": 960,
+      "height": 620,
+      "allTabsReachable": true,
+      "within": true,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "tablet-portrait",
+      "width": 720,
+      "height": 755,
+      "allTabsReachable": true,
+      "within": true,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "compact",
+      "width": 390,
+      "height": 720,
+      "allTabsReachable": true,
+      "within": true,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "cozy-light",
+      "width": 960,
+      "height": 620,
+      "allTabsReachable": true,
+      "within": true,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "voxel-custom",
+      "width": 720,
+      "height": 755,
+      "allTabsReachable": true,
+      "within": true,
+      "horizontalOverflow": false
+    }
+  ],
+  "media": [
+    {
+      "path": "/audio/ambient/wind.ogg",
+      "status": 206,
+      "bytes": 289537,
+      "credentials": false
+    },
+    {
+      "path": "/audio/ambient/keyboard.wav",
+      "status": 206,
+      "bytes": 2646044,
+      "credentials": false
+    }
+  ],
+  "errors": [],
+  "error": null
+}

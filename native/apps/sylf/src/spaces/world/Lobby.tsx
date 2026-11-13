@@ -8,11 +8,9 @@ import { Badge, Button, Callout, IconButton, Plane, Press, Stack, Text, Travelli
 import { DEFAULT_SESSION_TITLE, LOBBY_LABELS, LOBBY_SECTIONS, railTargetForKey, worldEntryBlock, type LobbySection, type WorldFault, type WorldSky } from "@sylf/spaces";
 import { useSessionState, useShellMetrics, useStudySession } from "../../shell/context";
 import { useWorldResult } from "./data";
-import type { WorldDataAdapter } from "./data/contracts";
 import { CollectionPanel } from "./panels/CollectionPanel";
 import { PreparationsPanel } from "./panels/PreparationsPanel";
 import { TravellerPanel } from "./panels/TravellerPanel";
-import { SampleNotice } from "./panels/shared";
 
 const offScreen = Platform.select<ViewStyle>({ web: { visibility: "hidden" } as unknown as ViewStyle, default: {} });
 const COLUMN = 320;
@@ -20,7 +18,6 @@ const PANEL = 440;
 /** The narrowest window where the glance and the way in can share the bottom edge. */
 const GLANCE_WIDTH = 720;
 
-const loadTraveller = (adapter: WorldDataAdapter) => adapter.traveller();
 
 function lastVisit(leftAt: number | undefined) {
   return leftAt ? `Last here at ${new Date(leftAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : null;
@@ -94,7 +91,7 @@ function PanelLayer({ id, active, sky, onClose }: { id: Exclude<LobbySection, "g
 /** Who is entering, at a glance, in the corner away from the menu. It goes while a panel shows the same thing in full. */
 function TravellerGlance() {
   const { space } = useTheme();
-  const result = useWorldResult("traveller", loadTraveller);
+  const result = useWorldResult("traveller");
   const traveller = result?.data;
   if (!traveller) return null;
   return (
@@ -102,7 +99,6 @@ function TravellerGlance() {
       <Text variant="small">{`Level ${traveller.level}`}</Text>
       <Text variant="small" tone="soft">{traveller.rank}</Text>
       <Text variant="small" tone="soft">{`${traveller.sylph.toLocaleString()} Sylph`}</Text>
-      <SampleNotice provenance={result.provenance} />
     </Plane>
   );
 }

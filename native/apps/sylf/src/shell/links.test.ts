@@ -3,17 +3,17 @@ import { devToolsEnabled, parseAppLink } from "./links";
 
 describe("App links", () => {
   it("reads Showcase links on both runtimes", () => {
-    expect(parseAppLink("sylf-native://showcase?chapter=studio&theme=voxel&mode=light")).toEqual({ surface: "showcase", chapter: "studio", theme: "voxel", mode: "light", space: null, home: null, homeData: null, workspaceOpen: [], workspaceClear: false, workspaceLayout: null, workspaceZoom: null, worldData: null, worldHost: null, worldSky: null, worldSection: null, session: null, sessionLength: undefined, textScale: null, probe: false, colors: {} });
+    expect(parseAppLink("sylf-native://showcase?chapter=studio&theme=voxel&mode=light")).toEqual({ surface: "showcase", chapter: "studio", theme: "voxel", mode: "light", space: null, home: null, workspaceOpen: [], workspaceClear: false, workspaceLayout: null, workspaceZoom: null, worldHost: null, worldSky: null, worldSection: null, session: null, sessionLength: undefined, textScale: null, probe: false, colors: {} });
     expect(parseAppLink("sylf://app/?chapter=controls")?.surface).toBe("showcase");
     expect(parseAppLink("sylf-native://showcase")?.surface).toBe("showcase");
   });
   it("reads Space links on both runtimes", () => {
-    expect(parseAppLink("sylf-native://spaces?space=world&mode=dark")).toEqual({ surface: "spaces", chapter: null, theme: null, mode: "dark", space: "world", home: null, homeData: null, workspaceOpen: [], workspaceClear: false, workspaceLayout: null, workspaceZoom: null, worldData: null, worldHost: null, worldSky: null, worldSection: null, session: null, sessionLength: undefined, textScale: null, probe: false, colors: {} });
+    expect(parseAppLink("sylf-native://spaces?space=world&mode=dark")).toEqual({ surface: "spaces", chapter: null, theme: null, mode: "dark", space: "world", home: null, workspaceOpen: [], workspaceClear: false, workspaceLayout: null, workspaceZoom: null, worldHost: null, worldSky: null, worldSection: null, session: null, sessionLength: undefined, textScale: null, probe: false, colors: {} });
     expect(parseAppLink("sylf://app/?space=workspace&theme=cozy")?.space).toBe("workspace");
   });
-  it("reads Home destinations and data scenarios", () => {
-    expect(parseAppLink("sylf-native://spaces?space=home&home=circle&homeData=empty")).toMatchObject({ space: "home", home: "circle", homeData: "empty" });
-    expect(parseAppLink("sylf://app/?home=today&homeData=everything")).toMatchObject({ home: "today", homeData: null });
+  it("reads Home destinations and ignores retired data scenarios", () => {
+    expect(parseAppLink("sylf-native://spaces?space=home&home=circle&homeData=empty")).toMatchObject({ space: "home", home: "circle" });
+    expect(parseAppLink("sylf://app/?home=today&homeData=sample")).not.toHaveProperty("homeData");
     expect(parseAppLink("sylf://app/?home=garden")?.home).toBeNull();
   });
   it("reads Workspace sweeps", () => {
@@ -21,9 +21,9 @@ describe("App links", () => {
     expect(parseAppLink("sylf://app/?wsLayout=grid&wsZoom=none")).toMatchObject({ workspaceLayout: null, workspaceZoom: null, workspaceOpen: [] });
   });
   it("reads World's states", () => {
-    expect(parseAppLink("sylf-native://spaces?space=world&worldData=empty&worldHost=fail-save&worldSky=dusk&worldSection=traveller")).toMatchObject({ worldData: "empty", worldHost: "fail-save", worldSky: "dusk", worldSection: "traveller" });
+    expect(parseAppLink("sylf-native://spaces?space=world&worldData=empty&worldHost=fail-save&worldSky=dusk&worldSection=traveller")).toMatchObject({ worldHost: "fail-save", worldSky: "dusk", worldSection: "traveller" });
     expect(parseAppLink("sylf://app/?worldSky=auto")?.worldSky).toBe("auto");
-    expect(parseAppLink("sylf://app/?worldData=all&worldHost=real&worldSky=green&worldSection=shop")).toMatchObject({ worldData: null, worldHost: null, worldSky: null, worldSection: null });
+    expect(parseAppLink("sylf://app/?worldData=all&worldHost=real&worldSky=green&worldSection=shop")).toMatchObject({ worldHost: null, worldSky: null, worldSection: null });
   });
   it("reads custom colors and rejects anything that is not a hex", () => {
     expect(parseAppLink("sylf-native://spaces?accent=E5FF00&day=7f8088&night=nope")?.colors).toEqual({ accentHex: "#e5ff00", groundDay: "#7f8088" });

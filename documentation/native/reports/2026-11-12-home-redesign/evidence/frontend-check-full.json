@@ -1,0 +1,9 @@
+{
+  "passed": false,
+  "steps": [],
+  "viewports": [],
+  "island": null,
+  "media": [],
+  "errors": [],
+  "error": "Error: Timed out waiting for [data-testid=\"today-momentum\"]\n    at waitFor (file:///Users/aliumair/Desktop/sylf-pen-settings/native/apps/desktop/src/frontend-check.mjs:35:11)\n    at async runFrontendCheck (file:///Users/aliumair/Desktop/sylf-pen-settings/native/apps/desktop/src/frontend-check.mjs:210:5)"
+}

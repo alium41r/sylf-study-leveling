@@ -1,13 +1,14 @@
 // Managing many windows at once: choose tools to open together, choose open windows to close, minimize or put in full screen,
 // or clear the canvas. Documents live in their own stores, so closing a window never loses work.
 import { useEffect, useState } from "react";
-import { View } from "react-native";
-import { Button, Checkbox, Dialog, Icon, Press, Sheet, Text, useNotice, useTheme } from "@sylf/design-system";
+import { ScrollView, View } from "react-native";
+import { Button, Checkbox, Dialog, Icon, Press, Sheet, Text, useNotice, useTheme, useWindowClass } from "@sylf/design-system";
 import { MAX_WINDOWS, TOOLS, LAUNCHER_TOOLS, windowTitle, type ToolId, type WorkspaceModel, type WorkspaceState } from "@sylf/spaces";
 import { TOOL_ICONS } from "./icons";
 
 export function WindowsSheet({ open, onClose, state, model }: { open: boolean; onClose(): void; state: WorkspaceState; model: WorkspaceModel }) {
-  const { space, color } = useTheme();
+  const { space, color, shape } = useTheme();
+  const compact = useWindowClass().size === "compact";
   const notice = useNotice();
   const [tools, setTools] = useState<ToolId[]>([]);
   const [chosen, setChosen] = useState<string[]>([]);
@@ -35,7 +36,7 @@ export function WindowsSheet({ open, onClose, state, model }: { open: boolean; o
   return (
     <>
       <Sheet open={open} onClose={onClose} title="Windows" width={440}
-        footer={
+        footer={tools.length || chosen.length ? (
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
             {tools.length ? <Button title={`Open ${tools.length}`} icon="plus" variant="emphasis" size="small" onPress={openChosen} /> : null}
             {chosen.length ? (
@@ -46,8 +47,8 @@ export function WindowsSheet({ open, onClose, state, model }: { open: boolean; o
               </>
             ) : null}
           </View>
-        }>
-        <View style={{ gap: space.lg }}>
+        ) : undefined}>
+        <ScrollView keyboardShouldPersistTaps="handled" style={{ flexShrink: 1 }} contentContainerStyle={{ padding: space.lg, paddingTop: space.sm, gap: space.lg }} testID="workspace-windows-list">
           <View style={{ gap: space.xs }}>
             <Text variant="label" tone="soft">Open together</Text>
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xs }}>
@@ -55,9 +56,9 @@ export function WindowsSheet({ open, onClose, state, model }: { open: boolean; o
                 const selected = tools.includes(tool);
                 return (
                   <Press key={tool} label={`${TOOLS[tool].label}${selected ? ", chosen" : ""}`} selected={selected} onPress={() => setTools(toggle(tools, tool))}
-                    style={{ width: 92 }} bodyStyle={{ alignItems: "center", gap: 6, paddingVertical: space.sm, borderRadius: 12, borderWidth: 1.5, borderColor: selected ? color.accent.fill : color.line, backgroundColor: selected ? color.accent.wash : "transparent" }}>
+                    style={{ width: compact ? "31%" : "23%" }} bodyStyle={{ alignItems: "center", gap: space.xs, paddingVertical: space.sm, borderRadius: shape.radius.md, borderWidth: 1, borderColor: selected ? color.accent.fill : color.line, backgroundColor: selected ? color.accent.wash : "transparent" }}>
                     <Icon name={TOOL_ICONS[tool]} color={selected ? color.accent.ink : color.inkSoft} />
-                    <Text variant="caption" tone={selected ? "ink" : "soft"}>{TOOLS[tool].label}</Text>
+                    <Text variant="caption" tone={selected ? "ink" : "soft"} align="center">{TOOLS[tool].label}</Text>
                   </Press>
                 );
               })}
@@ -75,8 +76,8 @@ export function WindowsSheet({ open, onClose, state, model }: { open: boolean; o
               </View>
             )) : <Text variant="small" tone="faint">No windows open.</Text>}
           </View>
-          {state.windows.length ? <Button title="Close all and clear the canvas" icon="trash" variant="critical" onPress={() => setClearing(true)} /> : null}
-        </View>
+          {state.windows.length ? <Button title="Clear workspace" icon="trash" variant="critical" onPress={() => setClearing(true)} /> : null}
+        </ScrollView>
       </Sheet>
       <Dialog open={clearing} onClose={() => setClearing(false)} title="Clear the Workspace?" message="Every window closes. Your notes, PDFs and boards are kept, and saved layouts stay."
         actions={[{ label: "Cancel", onPress: () => setClearing(false) }, { label: "Clear", variant: "critical", onPress: () => { setClearing(false); model.clear(); onClose(); notice("Workspace cleared"); } }]} />

@@ -6,7 +6,7 @@ import { TOOLS, isToolId, type ToolId } from "./tools";
 
 export const WORKSPACE_LAYOUTS = ["free", "focus", "split", "assistant", "fill"] as const;
 export type WorkspaceLayout = (typeof WORKSPACE_LAYOUTS)[number];
-export const LAYOUT_LABELS: Record<WorkspaceLayout, string> = { free: "Free", focus: "Focus", split: "Split", assistant: "Assistant", fill: "Full screen" };
+export const LAYOUT_LABELS: Record<WorkspaceLayout, string> = { free: "Canvas", focus: "Single window", split: "Split screen", assistant: "Assistant", fill: "Tile windows" };
 
 /** A tool's own restorable state: small, serializable, and never a document. Documents stay with their owners. */
 export type ToolState = Record<string, string | number | boolean | null | (string | number)[]>;
@@ -192,14 +192,21 @@ export function focusWindow(state: WorkspaceState, id: string): WorkspaceState {
   return { ...state, focused: id, recent: touched(state, id), windows: window.z === topZ(state) ? state.windows : replace(state, id, { z: topZ(state) + 1 }) };
 }
 
+/** Snap inside the clear canvas so a tool placed at an edge keeps its controls reachable. */
+function placeOnGrid(point: Point, { width, height }: Size, area: Rect): Rect {
+  const position = (value: number, start: number, end: number) => {
+    const low = Math.ceil(start / GRID) * GRID;
+    return clamp(snapToGrid(value), low, Math.max(low, Math.floor(end / GRID) * GRID));
+  };
+  return inWorld({ x: position(point.x, area.x, area.x + area.width - width), y: position(point.y, area.y, area.y + area.height - height), width, height });
+}
+
 /** The clear part of the view, side by side with what is there before stacking on top of it. */
 export function placeWindow(state: WorkspaceState, size: Size, frame: Frame): Point {
   const area = clearWorld(state.camera, frame);
   const center = { x: area.x + (area.width - size.width) / 2, y: area.y + (area.height - size.height) / 2 };
   const open = openWindows(state);
-  // Snapping must not push a window that fits out of the clear area and under the chrome.
-  const onGrid = (value: number, low: number, high: number) => clamp(snapToGrid(value), Math.ceil(low / GRID) * GRID, Math.max(Math.ceil(low / GRID), Math.floor(high / GRID)) * GRID);
-  const settle = (point: Point): Rect => inWorld({ x: onGrid(point.x, area.x, area.x + area.width - size.width), y: onGrid(point.y, area.y, area.y + area.height - size.height), ...size });
+  const settle = (point: Point): Rect => placeOnGrid(point, size, area);
   const free = (rect: Rect) => !open.some((window) => intersects(window, rect, GRID / 2 - 1));
   const home = settle(center);
   if (free(home) && contains(area, home)) return home;
@@ -239,19 +246,29 @@ export function placeWindow(state: WorkspaceState, size: Size, frame: Frame): Po
 export interface OpenResult { state: WorkspaceState; id: string | null }
 
 /** Opens a tool. A tool that allows one copy comes forward instead, and a full Workspace opens nothing (`id` is null). */
-export function openWindow(state: WorkspaceState, tool: ToolId, frame: Frame, initial: ToolState = {}): OpenResult {
+export function openWindow(state: WorkspaceState, tool: ToolId, frame: Frame, initial: ToolState = {}, at?: Point): OpenResult {
   const spec = TOOLS[tool];
   if (!spec.multiple) {
     const existing = windowsOf(state, tool)[0];
-    if (existing) return { state: restoreWindow(state, existing.id), id: existing.id };
+    if (existing) {
+      const restored = restoreWindow(state, existing.id);
+      if (!at) return { state: restored, id: existing.id };
+      const rect = placeOnGrid(at, existing, clearWorld(restored.camera, frame));
+      const moved = moveWindow(restored, existing.id, rect.x, rect.y);
+      return { state: { ...moved, camera: revealRect(moved.camera, rect, frame) }, id: existing.id };
+    }
   }
   if (state.windows.length >= MAX_WINDOWS) return { state, id: null };
   const area = clearWorld(state.camera, frame);
-  const onGridRoom = (room: number) => Math.floor((room - GRID) / GRID) * GRID;
-  const size = fitSpec(tool, Math.min(spec.preferred.width, onGridRoom(area.width)), Math.min(spec.preferred.height, onGridRoom(area.height)));
+  // Give a dropped tool the room beside and below the pointer, keeping its minimum usable size.
+  const anchor = at ? placeOnGrid(at, spec.min, area) : null;
+  const onGridRoom = (room: number) => Math.floor(room / GRID) * GRID;
+  const width = onGridRoom(anchor ? area.x + area.width - anchor.x : area.width - GRID);
+  const height = onGridRoom(anchor ? area.y + area.height - anchor.y : area.height - GRID);
+  const size = fitSpec(tool, Math.min(spec.preferred.width, width), Math.min(spec.preferred.height, height));
   const sequence = state.sequence + 1;
   const id = `w${sequence}`;
-  const window: WorkspaceWindow = { id, tool, ...placeWindow(state, size, frame), ...size, z: topZ(state) + 1, minimized: false, state: parseToolState(initial) };
+  const window: WorkspaceWindow = { id, tool, ...(anchor ?? placeWindow(state, size, frame)), ...size, z: topZ(state) + 1, minimized: false, state: parseToolState(initial) };
   const next = { ...state, ...keep(state), sequence, focused: id, recent: [id, ...state.recent], windows: [...state.windows, window] };
   return { state: { ...next, camera: revealRect(next.camera, window, frame) }, id };
 }
@@ -348,9 +365,6 @@ export function applyLayout(state: WorkspaceState, layout: WorkspaceLayout, fram
   if (layout === "free") return restoreArrangement(state);
   // Full screen keeps every window where it is on the canvas; the tiles are computed for the screen (fillTiles).
   if (layout === "fill") return openWindows(state).length ? { ...state, layout: "fill", saved: saveArrangement(state) } : state;
-  // Focus hides the Command Center, so the tool can have the room it would have covered.
-  const room: Frame = layout === "focus" ? { ...frame, insets: { ...frame.insets, bottom: Math.min(frame.insets.bottom, GRID * 2) } } : frame;
-  const saved = saveArrangement(state);
   let next = state;
   const ensure = (tool: ToolId): WorkspaceWindow | null => {
     const existing = next.recent.map((id) => find(next, id)).find((window) => window?.tool === tool);
@@ -362,41 +376,61 @@ export function applyLayout(state: WorkspaceState, layout: WorkspaceLayout, fram
 
   const primary = primaryOf(next) ?? ensure("notes");
   if (!primary) return state;
-  const area = presetArea(room);
-  const gap = GRID;
-  const parts: { window: WorkspaceWindow; width: number; left: number }[] = [];
-  if (layout === "focus") parts.push({ window: primary, width: area.width, left: 0 });
-  else {
-    const main = layout === "assistant" && primary.tool === "sylvie" ? frontmost(next, primary.id) ?? ensure("notes") : primary;
-    const other = layout === "assistant"
-      ? primary.tool === "sylvie" ? primary : ensure("sylvie")
-      : frontmost(next, primary.id) ?? ensure(COMPANIONS[primary.tool] ?? "notes");
-    if (!main || !other) return state;
-    const share = layout === "assistant" ? snapToGrid((area.width - gap) * (2 / 3)) : snapToGrid((area.width - gap) / 2);
-    parts.push({ window: main, width: share, left: 0 }, { window: other, width: area.width - gap - share, left: share + gap });
-  }
-
-  // Each part takes what its tool allows, so a tool with a size limit leaves no hole: the group stays together and centered.
-  const sized = parts.map((part) => ({ id: part.window.id, ...fitSpec(part.window.tool, part.width, area.height) }));
-  const last = sized[sized.length - 1];
-  if (layout === "split") last.width = fitSpec(next.windows.find((window) => window.id === last.id)!.tool, area.width - gap - sized[0].width, area.height).width;
-  const groupWidth = sized.reduce((sum, part) => sum + part.width, 0) + gap * (sized.length - 1);
-  const groupHeight = Math.max(...sized.map((part) => part.height));
-  const anchor = { x: clamp(snapToGrid(next.camera.x - groupWidth / 2), 0, WORLD.width - groupWidth), y: clamp(snapToGrid(next.camera.y - groupHeight / 2), 0, WORLD.height - groupHeight) };
-  const used = new Set(sized.map((part) => part.id));
-  let left = 0;
-  const lefts = new Map(sized.map((part) => { const at = left; left += part.width + gap; return [part.id, at]; }));
-  const windows = next.windows.map((window) => {
-    const part = sized.find((item) => item.id === window.id);
-    if (!part) return { ...window, minimized: true };
-    return { ...window, ...inWorld({ x: anchor.x + (lefts.get(part.id) ?? 0), y: anchor.y, width: part.width, height: part.height }), minimized: false };
-  });
-  const placed = windows.filter((window) => used.has(window.id));
-  const focused = parts[0].window.id;
-  const bounds = boundsOf(placed) as Rect;
-  const arranged: WorkspaceState = { ...next, windows, focused, layout, saved, camera: frameRect(bounds, room, GRID, 1) };
-  return { ...focusWindow(arranged, focused), layout, saved };
+  if (layout === "focus") return arrangePreset(next, layout, frame, [primary], primary.id, saveArrangement(state));
+  const main = layout === "assistant" && primary.tool === "sylvie" ? frontmost(next, primary.id) ?? ensure("notes") : primary;
+  const other = layout === "assistant"
+    ? primary.tool === "sylvie" ? primary : ensure("sylvie")
+    : frontmost(next, primary.id) ?? ensure(COMPANIONS[primary.tool] ?? "notes");
+  if (!main || !other) return state;
+  return arrangePreset(next, layout, frame, [main, other], main.id, saveArrangement(state));
 }
+
+/** On resize or rotation, keep the same tools, ordering and focus. Only the preset's geometry changes. */
+export function reflowPreset(state: WorkspaceState, frame: Frame): WorkspaceState {
+  const { layout, focused, saved } = state;
+  if (layout === "free" || layout === "fill") return state;
+  const parts = openWindows(state).sort((a, b) => a.x - b.x || a.y - b.y);
+  if (!parts.length) return state;
+  return arrangePreset(state, layout, frame, parts, focused, saved);
+}
+
+function arrangePreset(state: WorkspaceState, layout: "focus" | "split" | "assistant", frame: Frame, parts: WorkspaceWindow[], focused: string | null, saved: SavedArrangement | null): WorkspaceState {
+  // The Tools shelf tucks in single-window mode. A tall tablet can split above and below at a usable scale.
+  const room = layout === "focus" ? { ...frame, insets: { ...frame.insets, bottom: Math.min(frame.insets.bottom, GRID * 2) } } : frame;
+  const area = presetArea(room);
+  const vertical = parts.length === 2 && frame.viewport.height > frame.viewport.width;
+  const axis = vertical ? "height" : "width";
+  const cross = vertical ? "width" : "height";
+  const gap = GRID * (parts.length - 1);
+  const length = area[axis] - gap;
+  const first = parts.length === 1 ? length : snapToGrid(length * (layout === "assistant" ? 2 / 3 : 1 / 2));
+  const sized = parts.map((window, index) => {
+    const extent = index === 0 ? first : length - first;
+    return { id: window.id, ...fitSpec(window.tool, vertical ? area.width : extent, vertical ? extent : area.height) };
+  });
+  if (layout === "split" && sized.length === 2) {
+    const limits = TOOLS[parts[1].tool];
+    sized[1][axis] = clamp(length - sized[0][axis], limits.min[axis], limits.max[axis]);
+  }
+  const mainSize = sized.reduce((sum, part) => sum + part[axis], gap);
+  const crossSize = Math.max(...sized.map((part) => part[cross]));
+  const size = vertical ? { width: crossSize, height: mainSize } : { width: mainSize, height: crossSize };
+  const anchor = { x: clamp(snapToGrid(state.camera.x - size.width / 2), 0, WORLD.width - size.width), y: clamp(snapToGrid(state.camera.y - size.height / 2), 0, WORLD.height - size.height) };
+  const placements = new Map<string, Rect>();
+  let offset = 0;
+  for (const { id, width, height } of sized) {
+    placements.set(id, inWorld({ x: anchor.x + (vertical ? 0 : offset), y: anchor.y + (vertical ? offset : 0), width, height }));
+    offset += (vertical ? height : width) + GRID;
+  }
+  const windows = state.windows.map((window) => {
+    const rect = placements.get(window.id);
+    return rect ? { ...window, ...rect, minimized: false } : { ...window, minimized: true };
+  });
+  const bounds = boundsOf([...placements.values()])!;
+  const arranged = { ...state, windows, focused, layout, saved, camera: frameRect(bounds, room, GRID, 1) };
+  return focused ? focusWindow(arranged, focused) : arranged;
+}
+
 
 export function fitWorkspace(state: WorkspaceState, frame: Frame): Camera {
   const bounds = boundsOf(openWindows(state));
@@ -473,6 +507,18 @@ export function fillRects(node: FillNode | null, area: Rect, out: Record<string,
     fillRects(child, part, out);
   });
   return out;
+}
+
+/** Presets keep their world arrangement for restoration and title-bar dragging. Their visible panes use screen points. */
+export function presetTiles(state: WorkspaceState, area: Rect, portrait: boolean): Record<string, Rect> {
+  const windows = openWindows(state).sort((a, b) => a.x - b.x || a.y - b.y);
+  if (!windows.length) return {};
+  if (windows.length === 1) return fillRects({ id: windows[0].id }, area);
+  return fillRects({
+    dir: portrait ? "col" : "row",
+    children: windows.map(({ id }) => ({ id })),
+    weights: windows.map((_, index) => state.layout === "assistant" && index === 0 ? 2 : 1),
+  }, area);
 }
 
 /** Full screen: the open windows cover the area edge to edge, as arranged (effectiveFill). */

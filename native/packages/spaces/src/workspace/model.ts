@@ -1,8 +1,8 @@
 // The Workspace's owner, kept outside React like the Spaces store it writes through, so a layout survives a Space change, a
 // recreated root and a process kill. There is no second copy and no second persistence path: the state is the `workspace`
 // snapshot. Screens call these actions and read `state()`. The camera commits here only when it comes to rest.
-import { HOME_CAMERA, NO_INSETS, clampCamera, frameRect, revealRect, zoomAt, type Camera, type Frame, type Rect, type Size } from "./canvas";
-import { INITIAL_WORKSPACE, applyLayout, applyNamedLayout, closeWindow, cycleFocus, deleteNamedLayout, fitWorkspace, focusWindow, minimizeWindow, moveWindow, openWindow, parseWorkspaceState, resizeWindow, restoreWindow, dockInFill, resizeFillSeam, saveNamedLayout, setCamera, setToolState, type DockZone, type ToolState, type WorkspaceLayout, type WorkspaceState } from "./windows";
+import { HOME_CAMERA, NO_INSETS, clampCamera, frameRect, revealRect, screenToWorld, zoomAt, GRID, type Camera, type Frame, type Point, type Rect, type Size } from "./canvas";
+import { INITIAL_WORKSPACE, applyLayout, applyNamedLayout, closeWindow, cycleFocus, deleteNamedLayout, fitWorkspace, focusWindow, minimizeWindow, moveWindow, openWindow, parseWorkspaceState, reflowPreset, resizeWindow, restoreArrangement, restoreWindow, dockInFill, resizeFillSeam, saveNamedLayout, setCamera, setToolState, type DockZone, type ToolState, type WorkspaceLayout, type WorkspaceState } from "./windows";
 import type { ToolId } from "./tools";
 import type { SpacesStore } from "../store";
 
@@ -16,6 +16,8 @@ export interface WorkspaceModel {
   detach(): void;
   /** Returns the window's id, or null when the Workspace is full. */
   open(tool: ToolId, initial?: ToolState): string | null;
+  /** Places a tool from a drop point in the current canvas viewport. */
+  openAt(tool: ToolId, point: Point): string | null;
   /** Brings a tool forward, opening it if it must, from outside Workspace. It waits for the canvas, so it lands in the real view. */
   summon(tool: ToolId): void;
   close(id: string): void;
@@ -78,6 +80,10 @@ export function createWorkspaceModel(store: Pick<SpacesStore, "getSnapshot" | "s
   };
   const pointCamera = (camera: Camera) => write(setCamera(current, camera, frame.viewport));
   const windowOf = (id: string) => current.windows.find((window) => window.id === id);
+  // Page only temporarily minimizes its siblings. Restore them before removing its window.
+  const beforeRemoving = (id: string) => current.layout === "fill" && windowOf(id)?.state.bare === true
+    ? setToolState(restoreArrangement(current), id, { bare: false })
+    : current;
   const bringForward = (tool: ToolId) => {
     const window = current.windows.find((item) => item.tool === tool);
     const next = window ? restoreWindow(current, window.id) : openWindow(current, tool, frame).state;
@@ -89,9 +95,11 @@ export function createWorkspaceModel(store: Pick<SpacesStore, "getSnapshot" | "s
     state: () => current,
     subscribe(listener) { listeners.add(listener); return () => { listeners.delete(listener); }; },
     setFrame(next) {
+      const changedSize = next.viewport.width !== frame.viewport.width || next.viewport.height !== frame.viewport.height;
       frame = next;
       attached = true;
-      write(setCamera(current, current.camera, frame.viewport));
+      const clamped = setCamera(current, current.camera, frame.viewport);
+      write(changedSize ? reflowPreset(clamped, frame) : clamped);
       if (summoned) { const tool = summoned; summoned = null; bringForward(tool); }
     },
     frame: () => frame,
@@ -101,10 +109,17 @@ export function createWorkspaceModel(store: Pick<SpacesStore, "getSnapshot" | "s
       write(state);
       return id;
     },
+    openAt(tool, point) {
+      if (!attached || current.layout !== "free") return null;
+      const at = screenToWorld({ x: point.x - GRID, y: point.y - GRID / 2 }, current.camera, frame.viewport);
+      const { state, id } = openWindow(current, tool, frame, {}, at);
+      write(state);
+      return id;
+    },
     summon(tool) { if (attached) bringForward(tool); else summoned = tool; },
-    close: (id) => write(closeWindow(current, id)),
+    close: (id) => write(closeWindow(beforeRemoving(id), id)),
     focus: (id) => write(focusWindow(current, id)),
-    minimize: (id) => write(minimizeWindow(current, id)),
+    minimize: (id) => write(minimizeWindow(beforeRemoving(id), id)),
     restore(id) {
       const next = restoreWindow(current, id);
       const window = next.windows.find((item) => item.id === id);

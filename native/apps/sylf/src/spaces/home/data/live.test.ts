@@ -19,6 +19,14 @@ describe("Today", () => {
     expect(view.summary).toBe("2 quests to finish, and 2 events ahead.");
   });
 
+  it("counts real study blocks toward planned time, without including a class", () => {
+    const view = mapToday([event("class", at(8), at(9)), event("study", at(12), at(12, 45), { category: "time-block" })], [], schedule, { dailyStudy: [], todayDate: "2026-11-02" }, at(11));
+    expect(view.entries[0].minutes).toBeUndefined();
+    expect(view.entries[1].minutes).toBe(45);
+    expect(view.target).toEqual({ studied: 0, goal: 120, rest: false });
+    expect(mapToday([], [], schedule, null, at(11)).target).toBeUndefined();
+  });
+
   it("keeps an event that started before now and has not ended as the next thing", () => {
     expect(mapToday([event("now", at(10), at(12))], [], schedule, null, at(11)).entries[0].state).toBe("next");
   });

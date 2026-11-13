@@ -5,11 +5,10 @@ import { Avatar, Press, Text, useTheme } from "@sylf/design-system";
 import type { CirclePerson } from "../data/contracts";
 import { openProfile } from "../../../shell/profile/store";
 
-export function PersonRow({ person, live }: { person: CirclePerson; live: boolean }) {
+export function PersonRow({ person, testID = "circle-person" }: { person: CirclePerson; testID?: string }) {
   const { space } = useTheme();
-  const open = live && person.username ? () => openProfile(person.username!) : undefined;
   return (
-    <Press role={open ? "button" : undefined} label={`${person.name}. ${person.status}. ${person.detail ?? ""}`} onPress={open} disabled={!open} testID="circle-person" bodyStyle={{ flexDirection: "row", alignItems: "center", gap: space.md, paddingVertical: space.xs }}>
+    <Press role="button" label={`${person.name}. ${person.status}. ${person.detail ?? ""}`} onPress={() => openProfile(person.username)} testID={testID} bodyStyle={{ flexDirection: "row", alignItems: "center", gap: space.md, paddingVertical: space.xs }}>
       <Avatar name={person.name} size={40} presence={person.presence} />
       <View style={{ flex: 1, minWidth: 0, gap: 1 }}>
         <Text variant="small" numberOfLines={1}>{person.name}</Text>

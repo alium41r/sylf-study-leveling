@@ -6,6 +6,10 @@ Sylf Native is a planned, new tablet-first native application for iPad and Andro
 
 | Document | Role |
 | --- | --- |
+| [Frontend refinement](reports/2026-11-10-frontend-refinement/README.md) | Home layout and account gate, Workspace arrangements, Notes, audio and verification |
+| [Notes gallery refinement](reports/2026-11-10-notes-gallery/README.md) | Responsive library and folder navigation, document thumbnails, paper styles and verification |
+| [Workspace visual audit](reports/2026-11-11-workspace-visual-audit/README.md) | Canvas, layouts, eight tools, compact controls and packaged Electron evidence |
+| [Notes and Workspace quality pass](reports/2026-11-12-notes-workspace-quality/README.md) | Eraser and pen input fixes, live zoom badge, writing toolbar and eraser settings; verified on the Mac, not yet on the tablet |
 | [Master vision and development plan](master-plan.md) | Product vision, the three Spaces, navigation and Command Center, platform strategy, architecture direction, reusable systems, risks and open questions, and the Phase 2 handoff. Statements are labelled Confirmed, Proposed or Open. |
 | [Phase 1 report](reports/phase-1/report.md) | How the plan was established, repository observations and recommendations for Phase 2. |
 | [ADR 0001: technology stack](decisions/0001-technology-stack.md) | Accepted stack and platform architecture, with rejected alternatives. |

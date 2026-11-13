@@ -1,42 +1,123 @@
-// The one audio engine. Workspace's Audio tool and the Focus environment are both views of it, so there is only ever one sound playing. It loads
-// the native player only when something first plays, and releases it on stop, so a person who never plays a sound pays nothing for it.
+// Sound is owned by the shell, so changing Spaces, closing the dock or opening a second control never creates another player.
 import { useSyncExternalStore } from "react";
+import { createPlayer } from "./player";
 
-export interface AudioState { trackId: string | null; title: string | null; url: string | null; playing: boolean; volume: number; failed: boolean }
-type Player = { play(): void; pause(): void; remove(): void; loop: boolean; volume: number };
+export interface AudioTrack { id: string; title: string; url: string; release?: () => void }
+export type Playback = "loading" | "playing" | "paused" | "failed";
+export interface AudioState { track: AudioTrack | null; status: Playback | "idle"; volume: number }
+export interface Player { play(): void; pause(): void; setVolume(volume: number): void; dispose(): void }
+export type PlayerFactory = (url: string, report: (status: Playback) => void) => Player | Promise<Player>;
 
-let state: AudioState = { trackId: null, title: null, url: null, playing: false, volume: 0.6, failed: false };
-let player: Player | null = null;
-const listeners = new Set<() => void>();
-const set = (next: Partial<AudioState>) => { state = { ...state, ...next }; listeners.forEach((listener) => listener()); };
+const LOAD_TIMEOUT = 15_000;
 
-async function makePlayer(url: string): Promise<Player> {
-  const audio = await import("expo-audio");
-  // Playing on with the screen off is what ambient sound is for. Not mixing keeps it from stacking on other apps' sound.
-  await audio.setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: true, interruptionMode: "doNotMix" }).catch(() => undefined);
-  return audio.createAudioPlayer({ uri: url }) as unknown as Player;
+export function createAudioEngine(makePlayer: PlayerFactory) {
+  let state: AudioState = { track: null, status: "idle", volume: 0.6 };
+  let player: Player | null = null;
+  let generation = 0;
+  let wanted = false;
+  let deadline: ReturnType<typeof setTimeout> | undefined;
+  const listeners = new Set<() => void>();
+
+  function publish(next: Partial<AudioState>) {
+    if (Object.entries(next).every(([key, value]) => state[key as keyof AudioState] === value)) return;
+    state = { ...state, ...next };
+    listeners.forEach((listener) => listener());
+  }
+
+  function unload() {
+    generation += 1;
+    wanted = false;
+    clearTimeout(deadline);
+    const previous = player;
+    player = null;
+    previous?.dispose();
+  }
+
+  function fail() {
+    unload();
+    publish({ status: "failed" });
+  }
+
+  function waitForPlayback() {
+    clearTimeout(deadline);
+    deadline = setTimeout(fail, LOAD_TIMEOUT);
+  }
+
+  function play(track: AudioTrack) {
+    if (state.track?.id !== track.id || state.track.url !== track.url) {
+      unload();
+      state.track?.release?.();
+      publish({ track });
+    }
+    if (wanted && state.status !== "paused") return;
+
+    wanted = true;
+    publish({ status: "loading" });
+    waitForPlayback();
+    const attempt = generation;
+    const report = (status: Playback) => {
+      if (generation !== attempt) return;
+      if (status === "failed") { fail(); return; }
+      if (!wanted) return;
+      if (status === "loading") {
+        if (state.status !== "loading") waitForPlayback();
+        publish({ status });
+      } else if (status === "playing") {
+        clearTimeout(deadline);
+        publish({ status });
+      } else if (state.status === "playing") {
+        // An interruption paused the player. It can be resumed from any sound control.
+        clearTimeout(deadline);
+        publish({ status });
+      }
+    };
+
+    const begin = (ready: Player) => {
+      if (attempt !== generation || !wanted) { ready.dispose(); return; }
+      player = ready;
+      try { ready.setVolume(state.volume); ready.play(); }
+      catch { fail(); }
+    };
+    try {
+      if (player) begin(player);
+      else {
+        const created = makePlayer(track.url, report);
+        // Web playback starts in the same user gesture that chose the sound.
+        if (created instanceof Promise) void created.then(begin, () => { if (attempt === generation) fail(); });
+        else begin(created);
+      }
+    } catch {
+      fail();
+    }
+  }
+
+  function pause() {
+    if (!state.track) return;
+    wanted = false;
+    clearTimeout(deadline);
+    if (!player || state.status === "loading") unload();
+    else player.pause();
+    publish({ status: "paused" });
+  }
+
+  return {
+    state: () => state,
+    subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
+    play,
+    pause,
+    toggle() { if (state.status === "playing" || state.status === "loading") pause(); else if (state.track) play(state.track); },
+    stop() {
+      unload();
+      state.track?.release?.();
+      publish({ status: "idle", track: null, volume: 0.6 });
+    },
+    setVolume(volume: number) {
+      const next = Math.max(0, Math.min(1, volume));
+      player?.setVolume(next);
+      publish({ volume: next });
+    },
+  };
 }
 
-export const audioEngine = {
-  state: () => state,
-  subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
-  async play(track: { id: string; title: string; url: string }) {
-    if (state.trackId === track.id && player) { player.play(); set({ playing: true }); return; }
-    this.stop();
-    try {
-      player = await makePlayer(track.url);
-      player.loop = true;
-      player.volume = state.volume;
-      player.play();
-      set({ trackId: track.id, title: track.title, url: track.url, playing: true, failed: false });
-    } catch {
-      player = null;
-      set({ trackId: track.id, title: track.title, url: track.url, playing: false, failed: true });
-    }
-  },
-  pause() { player?.pause(); set({ playing: false }); },
-  stop() { player?.pause(); player?.remove(); player = null; set({ playing: false, trackId: null, title: null, url: null }); },
-  setVolume(volume: number) { const next = Math.max(0, Math.min(1, volume)); if (player) player.volume = next; set({ volume: next }); },
-};
-
+export const audioEngine = createAudioEngine(createPlayer);
 export const useAudio = () => useSyncExternalStore(audioEngine.subscribe, audioEngine.state, audioEngine.state);

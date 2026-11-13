@@ -10,6 +10,7 @@ import { minimizedWindows, windowTitle, type WorkspaceModel, type WorkspaceState
 import { TOOL_ICONS } from "./icons";
 
 const LINGER_MS = 1800;
+export const TOOLS_HANDLE_HEIGHT = 44;
 
 function MinimizedRow({ state, model }: { state: WorkspaceState; model: WorkspaceModel }) {
   const { color, shape, space, surface } = useTheme();
@@ -30,7 +31,7 @@ function MinimizedRow({ state, model }: { state: WorkspaceState; model: Workspac
   );
 }
 
-export function DockShelf({ state, model, tuckable, bottom, sides, children }: { state: WorkspaceState; model: WorkspaceModel; tuckable: boolean; bottom: number; sides: { left: number; right: number }; children: ReactNode }) {
+export function DockShelf({ state, model, tuckable, bottom, safeBottom, sides, children }: { state: WorkspaceState; model: WorkspaceModel; tuckable: boolean; bottom: number; safeBottom: number; sides: { left: number; right: number }; children: ReactNode }) {
   const { color, motion, space, surface } = useTheme();
   const [revealed, setRevealed] = useState(false);
   const away = useSharedValue(tuckable ? 1 : 0);
@@ -53,9 +54,9 @@ export function DockShelf({ state, model, tuckable, bottom, sides, children }: {
       {/* On a touch screen nothing "leaves" the dock, so a tap anywhere else tucks it and the chrome away again. */}
       {tuckable && revealed && Platform.OS !== "web" ? <Pressable aria-hidden accessible={false} onPress={() => setRevealed(false)} style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }} /> : null}
       {tucked ? (
-        <View pointerEvents="box-none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 44, alignItems: "center", justifyContent: "flex-end" }}>
+        <View pointerEvents="box-none" style={{ position: "absolute", left: 0, right: 0, bottom: safeBottom, height: TOOLS_HANDLE_HEIGHT, alignItems: "center", justifyContent: "flex-end" }}>
           {/* A labelled pull-up, not a bare line: people looking for their tools could not find the old handle (owner, Phase 14). */}
-          <Pressable testID="dock-reveal" role="button" aria-label="Show the Command Center" onPress={reveal} onHoverIn={reveal} style={{ height: 44, alignItems: "center", justifyContent: "flex-end", paddingBottom: Math.max(4, bottom - 8) }}>
+          <Pressable testID="dock-reveal" role="button" aria-label="Show the Command Center" onPress={reveal} onHoverIn={reveal} style={{ height: TOOLS_HANDLE_HEIGHT, alignItems: "center", justifyContent: "flex-end", paddingBottom: Math.max(4, bottom - safeBottom - 8) }}>
             <View style={[surface("float", "full"), { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, height: 30, opacity: 0.92 }]}>
               <Icon name="chevronUp" size={14} color={color.inkSoft} />
               <Text variant="caption" tone="soft">Tools</Text>

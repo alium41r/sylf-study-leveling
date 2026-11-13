@@ -8,7 +8,7 @@ import { effectiveFill, fillSeams, type DockZone, type FillSeam, type Rect, type
 const GRAB = 14;
 
 /** What a tiled window's title bar reports while it is dragged. */
-export const FillArrangeContext = createContext<{ move(id: string, x: number, y: number): void; end(id: string): void } | null>(null);
+export const FillArrangeContext = createContext<{ move(id: string, x: number, y: number): void; end(id: string, cancelled: boolean): void } | null>(null);
 
 /** Which tile a point is over, and which part: the middle third swaps, otherwise the nearest edge. */
 export function dropZone(tiles: Record<string, Rect>, moving: string, x: number, y: number): { target: string; zone: DockZone; preview: Rect } | null {
@@ -58,6 +58,6 @@ function Seam({ seam, area, model }: { seam: FillSeam; area: Rect; model: Worksp
 }
 
 export function DropPreview({ rect }: { rect: Rect }) {
-  const { color } = useTheme();
-  return <View pointerEvents="none" style={{ position: "absolute", left: rect.x + 4, top: rect.y + 4, width: rect.width - 8, height: rect.height - 8, zIndex: 20, borderRadius: 14, borderWidth: 2, borderColor: color.accent.fill, backgroundColor: color.accent.wash }} />;
+  const { color, shape, space } = useTheme();
+  return <View pointerEvents="none" style={{ position: "absolute", left: rect.x + space.xs, top: rect.y + space.xs, width: Math.max(0, rect.width - space.xs * 2), height: Math.max(0, rect.height - space.xs * 2), zIndex: 20, borderRadius: shape.radius.md, borderWidth: 2, borderColor: color.accent.fill, backgroundColor: color.accent.wash }} />;
 }

@@ -18,7 +18,7 @@ const SessionContext = createContext<StudySessionModel | null>(null);
 export const StudySessionProvider = SessionContext.Provider;
 
 /** How to reach the account page, and sign in from it. Null in a build with no backend, so nothing is drawn for it. */
-const AccountEntryContext = createContext<{ open(): void; signIn(): void } | null>(null);
+const AccountEntryContext = createContext<{ open(): void } | null>(null);
 export const AccountEntryProvider = AccountEntryContext.Provider;
 export const useAccountEntry = () => useContext(AccountEntryContext);
 
@@ -109,6 +109,11 @@ export function useDockMetrics() {
   const { space, type } = useTheme();
   const { control, edge, insets, top } = useShellMetrics();
   const { width, height, fontScale } = useWindowDimensions();
-  const restWidth = Math.ceil(type.value.fontSize! * Math.min(fontScale, type.value.maxScale) * 5.2) + 16 + space.sm + space.md * 2;
-  return { restWidth, height: control, top, ...placeDock({ window: { width, height }, insets, top, edge, control, gap: space.sm, restWidth, reservedRight: (control + space.sm) * 2 + (DEV_TOOLS ? control + space.sm : 0) }) };
+  const preferredClock = Math.ceil(type.value.fontSize! * Math.min(fontScale, type.value.maxScale) * 5.2) + 16 + space.sm + space.md * 2;
+  const reservedRight = (control + space.sm) * (DEV_TOOLS ? 2 : 1);
+  const band = width - insets.left - insets.right - edge * 2 - control - space.sm - reservedRight;
+  const soundWidth = control + space.xs * 2 + 1;
+  const clockWidth = Math.min(preferredClock, Math.max(64, band - soundWidth));
+  const restWidth = clockWidth + soundWidth;
+  return { restWidth, clockWidth, tight: clockWidth < preferredClock, height: control, top, ...placeDock({ window: { width, height }, insets, top, edge, control, gap: space.sm, restWidth, reservedRight }) };
 }

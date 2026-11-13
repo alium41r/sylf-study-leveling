@@ -1,6 +1,6 @@
 // What the Notes library shows and stores. A document is always a Sylf Notes descriptor (envelope v1) plus Yjs streams in the
 // web's own adapters, so nothing here is a second format: the kinds below are how Native names the four descriptor shapes.
-import type { DocumentDescriptor } from "@sylf/shared";
+import type { DocumentDescriptor, InkPaper } from "@sylf/shared";
 
 /** note: kind "flow", one blocknote/0.56.0 stream. handwriting: kind "notebook", one sylf-ink/1 stream per page.
  *  pdf: kind "pdf", one sylf-pdf/1 stream per page. board: a one-page notebook marked as a whiteboard. */
@@ -25,17 +25,28 @@ export interface LibraryEntry {
   /** The document this one is about: notes taken beside a PDF point at it. */
   linkedTo: string | null;
   cover: Cover;
+  firstPage: LibraryPage | null;
+}
+
+export interface LibraryPage {
+  id: string;
+  width: number;
+  height: number;
+  paper: InkPaper | null;
+  source: { hash: string; index: number } | null;
+  picture: Cover["image"];
 }
 
 /** A folder of documents, inside another folder or at the top. The web library calls these folders. */
 export interface Notebook { id: string; title: string; color: string; created: number; parentId?: string | null; icon?: string | null }
-/** How a document looks in the library: a colour and an emoji the person chose. */
-export interface Cover { color: string | null; icon: string | null }
+/** An authored library cover. The image, if present, is an attachment in the document descriptor. */
+export interface Cover { color: string | null; icon: string | null; image: { hash: string; mediaType: string } | null }
 
 export interface LibrarySnapshot {
   ready: boolean;
   entries: LibraryEntry[];
   notebooks: Notebook[];
+  order?: Readonly<Record<string, readonly string[]>>;
   /** Says why the library could not open. Writing is refused while it is set. */
   failure: string | null;
 }
@@ -45,7 +56,12 @@ export interface DocumentMeta { created: number; updated: number; opened: number
 export interface StoredDocument { id: string; owner: string; descriptor: DocumentDescriptor; meta: DocumentMeta }
 export interface StoredUpdate { streamId: string; bytes: Uint8Array }
 /** The descriptor libraryId every document of this owner carries, and the notebooks. */
-export interface LibraryRecord { libraryId: string; notebooks: Notebook[] }
+export interface LibraryRecord {
+  libraryId: string;
+  notebooks: Notebook[];
+  /** Manual sibling order by folder id (the empty string is the root). Unlisted items follow the default order. */
+  order?: Record<string, string[]>;
+}
 export interface StoredAsset { hash: string; mediaType: string; name: string; bytes: Uint8Array }
 
 /** One device store, scoped by owner. Every method is atomic on its own, and appendUpdates writes the updates and the document together. */
@@ -54,7 +70,7 @@ export interface NotesStorage {
   putDocument(document: StoredDocument): Promise<void>;
   putLibrary(owner: string, library: LibraryRecord): Promise<void>;
   appendUpdates(document: StoredDocument, updates: StoredUpdate[]): Promise<void>;
-  readUpdates(documentId: string): Promise<StoredUpdate[]>;
+  readUpdates(documentId: string, streamId?: string): Promise<StoredUpdate[]>;
   /** Replaces every stored update of one stream with a single merged one. */
   compact(documentId: string, streamId: string, merged: Uint8Array): Promise<void>;
   deleteDocument(documentId: string): Promise<void>;

@@ -85,6 +85,12 @@ export default function RichTextDom({ ref, initial, template, look, editable, on
       setSlash({ query: state.query, left: state.referencePos.left - box.left, top: state.referencePos.bottom - box.top + host.current!.scrollTop + 6, items, index: 0 });
     });
     let textTimer: ReturnType<typeof setTimeout> | undefined;
+    const reportText = () => {
+      clearTimeout(textTimer);
+      textTimer = undefined;
+      void onText(editor._tiptapEditor.getText({ blockSeparator: "\n" }));
+    };
+    const flushText = () => { if (textTimer) reportText(); };
     const report = () => {
       const styles = editor.getActiveStyles() as Record<string, unknown>;
       const block = editor.getTextCursorPosition().block as { type: string; props: { level?: number } };
@@ -94,9 +100,9 @@ export default function RichTextDom({ ref, initial, template, look, editable, on
     const offChange = editor.onChange(() => {
       report();
       if (textTimer) clearTimeout(textTimer);
-      textTimer = setTimeout(() => void onText(editor._tiptapEditor.getText({ blockSeparator: "\n" })), 600);
+      textTimer = setTimeout(reportText, 600);
     });
-    void onText(editor._tiptapEditor.getText({ blockSeparator: "\n" }));
+    reportText();
     const keys = (event: KeyboardEvent) => {
       const open = slashRef.current;
       if (!open || !open.items.length) return;
@@ -109,7 +115,9 @@ export default function RichTextDom({ ref, initial, template, look, editable, on
         choose(editor, open.items[open.index]);
       } else if (event.key === "Escape") { menu?.closeMenu(); }
     };
-    host.current!.addEventListener("keydown", keys, true);
+    const container = host.current!;
+    container.addEventListener("keydown", keys, true);
+    container.addEventListener("focusout", flushText);
     // A page layer reports its height whenever it changes, and takes the cursor when it opens.
     let lastHeight = 0;
     // The text's own height, from its blocks: on a page the editable area fills the page so any tap types, so its box is not the text.
@@ -124,11 +132,12 @@ export default function RichTextDom({ ref, initial, template, look, editable, on
     if (page && group) measure.observe(group);
     if (page?.focus) setTimeout(() => { editor.focus(); try { editor.setTextCursorPosition(editor.document[editor.document.length - 1], "end"); } catch { /* An empty page has nowhere to put it yet. */ } }, 30);
     return () => {
-      host.current?.removeEventListener("keydown", keys, true);
+      container.removeEventListener("keydown", keys, true);
+      container.removeEventListener("focusout", flushText);
       measure.disconnect();
       unsubscribeMenu?.(); offSelection(); offChange();
       if (timer) { clearTimeout(timer); send(); }
-      if (textTimer) clearTimeout(textTimer);
+      flushText();
       editor._tiptapEditor.destroy();
       doc.destroy();
       editorRef.current = null; docRef.current = null;

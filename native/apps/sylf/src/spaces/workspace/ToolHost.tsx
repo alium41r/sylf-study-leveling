@@ -31,7 +31,7 @@ const ToolResting = memo(function ToolResting({ tool, title, overview, onOpen }:
   return <View style={[StyleSheet.absoluteFill, body]}><Icon name={TOOL_ICONS[tool]} size={28} color={color.inkSoft} /><Text variant="small" tone="soft" align="center" numberOfLines={2}>{title}</Text></View>;
 });
 
-export const ToolHost = memo(function ToolHost({ window, lifecycle, title, fillOrder, overview, onProvenance }: { window: WorkspaceWindow; lifecycle: ToolLifecycle; title: string; fillOrder: number; overview: boolean; onProvenance: (id: string, sample: boolean) => void }) {
+export const ToolHost = memo(function ToolHost({ window, lifecycle, title, fillOrder, overview, bottomInset }: { window: WorkspaceWindow; lifecycle: ToolLifecycle; title: string; fillOrder: number; overview: boolean; bottomInset: number }) {
   const model = useWorkspaceModel();
   const [ready, setReady] = useState(fillOrder === 0);
   const { id, tool } = window;
@@ -41,16 +41,15 @@ export const ToolHost = memo(function ToolHost({ window, lifecycle, title, fillO
     return () => clearTimeout(timer);
   }, [ready, fillOrder]);
   const patch = useCallback((state: ToolState) => model.patchTool(id, state), [model, id]);
-  const report = useCallback((sample: boolean) => onProvenance(id, sample), [id, onProvenance]);
   const onOpen = useCallback(() => { model.focus(id); model.frameWindow(id); }, [model, id]);
   const Tool = VIEWS[tool];
   const mounted = ready && lifecycle !== "suspended";
   const seen = isSeen(lifecycle);
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, paddingBottom: bottomInset }}>
       {mounted ? (
         <View testID={`tool-${id}`} {...({ dataSet: { lifecycle } } as object)} aria-hidden={!seen || undefined} importantForAccessibility={seen ? "auto" : "no-hide-descendants"} pointerEvents={seen ? "auto" : "none"} style={[{ flex: 1 }, seen ? null : hiddenOnWeb, seen ? null : { opacity: 0 }]}>
-          <Suspense fallback={<ToolLoading />}><Tool window={window} lifecycle={lifecycle} patch={patch} onProvenance={report} /></Suspense>
+          <Suspense fallback={<ToolLoading />}><Tool window={window} lifecycle={lifecycle} patch={patch} /></Suspense>
         </View>
       ) : null}
       {seen ? null : <ToolResting tool={tool} title={title} overview={overview} onOpen={onOpen} />}

@@ -1,0 +1,70 @@
+{
+  "summary": {
+    "passed": true,
+    "total": 4,
+    "failed": []
+  },
+  "checks": {
+    "portraitCalculatorScrollsToEquals": true,
+    "shortCalculatorScrollsToEquals": true,
+    "visualViewportDoesNotOverflow": true,
+    "noConsoleErrors": true
+  },
+  "results": {
+    "visualBounds": {
+      "12-portrait-split": {
+        "width": 744,
+        "height": 752,
+        "overflow": false
+      },
+      "12b-portrait-calculator-scrolled": {
+        "width": 744,
+        "height": 752,
+        "overflow": false
+      },
+      "14-short-assistant": {
+        "width": 900,
+        "height": 480,
+        "overflow": false
+      },
+      "14b-short-calculator-scrolled": {
+        "width": 900,
+        "height": 480,
+        "overflow": false
+      }
+    },
+    "portraitCalculator": {
+      "equalsBefore": {
+        "x": 510.25,
+        "y": 401,
+        "width": 131.25,
+        "height": 34
+      },
+      "equalsAfter": {
+        "x": 510.25,
+        "y": 313,
+        "width": 131.25,
+        "height": 34
+      },
+      "reachable": true,
+      "expression": "8"
+    },
+    "shortCalculator": {
+      "equalsBefore": {
+        "x": 438.25,
+        "y": 422,
+        "width": 131.25,
+        "height": 34
+      },
+      "equalsAfter": {
+        "x": 438.25,
+        "y": 296,
+        "width": 131.25,
+        "height": 34
+      },
+      "reachable": true,
+      "expression": "8"
+    },
+    "consoleErrors": []
+  }
+}

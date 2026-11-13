@@ -1,0 +1,105 @@
+{
+  "editor": {
+    "rect": {
+      "x": 261.09375,
+      "y": 183.6875,
+      "width": 765.59375,
+      "height": 1144,
+      "top": 183.6875,
+      "right": 1026.6875,
+      "bottom": 1327.6875,
+      "left": 261.09375
+    },
+    "hit": "<div contenteditable=\"true\" role=\"textbox\" tabindex=\"0\" translate=\"no\" class=\"tiptap ProseMirror bn-editor bn-default-styles placeholder-selector-91e93514-2184-4d1b-8d1d-6a7633c981bf ProseMirror-focused\"><div class=\"bn-block-group\" data-nod"
+  },
+  "typed": "Basis vectors span the space.",
+  "zoomIn": 3,
+  "zoomOut": 0.5,
+  "inkEndpoint": 37,
+  "scrollAtEnd": {
+    "y": 546,
+    "max": 546,
+    "gap": 12,
+    "x": 639.5,
+    "mid": 475
+  },
+  "fullscreen": {
+    "x": 0,
+    "y": 0,
+    "width": 390,
+    "height": 720,
+    "top": 0,
+    "right": 390,
+    "bottom": 720,
+    "left": 0
+  },
+  "splitLandscape": [
+    {
+      "x": 0,
+      "y": 52,
+      "width": 640,
+      "height": 684,
+      "top": 52,
+      "right": 640,
+      "bottom": 736,
+      "left": 0
+    },
+    {
+      "x": 640,
+      "y": 52,
+      "width": 640,
+      "height": 684,
+      "top": 52,
+      "right": 1280,
+      "bottom": 736,
+      "left": 640
+    }
+  ],
+  "splitPortrait": [
+    {
+      "x": 0,
+      "y": 52,
+      "width": 744,
+      "height": 367,
+      "top": 52,
+      "right": 744,
+      "bottom": 419,
+      "left": 0
+    },
+    {
+      "x": 0,
+      "y": 419,
+      "width": 744,
+      "height": 367,
+      "top": 419,
+      "right": 744,
+      "bottom": 786,
+      "left": 0
+    }
+  ],
+  "tile": [
+    {
+      "x": 0,
+      "y": 522,
+      "width": 744,
+      "height": 348,
+      "top": 522,
+      "right": 744,
+      "bottom": 870,
+      "left": 0
+    },
+    {
+      "x": 0,
+      "y": 0,
+      "width": 744,
+      "height": 522,
+      "top": 0,
+      "right": 744,
+      "bottom": 522,
+      "left": 0
+    }
+  ],
+  "paperTopOffsetAfterResize": 0,
+  "touchPinchScale": 1.9523758561643836,
+  "calculatorLastRowFits": true
+}

@@ -33,11 +33,12 @@ export function mapCollection({ cosmetics, active }: Cosmetics, naming: Pick<Bac
   return { groups };
 }
 
-export type WorldView = "traveller" | "collection";
+export interface WorldViews { traveller: TravellerView; collection: CollectionView }
+export type WorldView = keyof WorldViews;
 
 export function liveWorldViews(backend: Backend) {
   const { reads } = backend;
-  const views: { traveller: ResourceDefinition<TravellerView>; collection: ResourceDefinition<CollectionView> } = {
+  const views: { [K in WorldView]: ResourceDefinition<WorldViews[K]> } = {
     traveller: {
       key: "world-traveller", tags: ["traveller"], ttlMs: 60_000,
       async load(signal) {

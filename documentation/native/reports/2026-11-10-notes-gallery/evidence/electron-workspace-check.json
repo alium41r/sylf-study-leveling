@@ -1,0 +1,204 @@
+{
+  "summary": {
+    "passed": true,
+    "total": 90,
+    "failed": []
+  },
+  "checks": {
+    "everyControlNamed": true,
+    "textContrastAtLeast45": true,
+    "minimizedNotTabbable": true,
+    "toolbarNamed": true,
+    "windowsNamed": true,
+    "reducedMotionOpensTool": true,
+    "reducedMotionDoesNotCoast": true,
+    "notesStartsWithNewAndStyle": true,
+    "newAsksForAName": true,
+    "typedHeadingFromMarkdown": true,
+    "typedListFromMarkdown": true,
+    "slashMenuOpens": true,
+    "formattingMenuAppliesAndResumesTyping": true,
+    "typedNoteSaves": true,
+    "typedNoteTitledFromFirstLine": true,
+    "noteZoomStopsAt300": true,
+    "noteZoomStopsAt50": true,
+    "noteZoomLeavesCanvasAlone": true,
+    "typedNoteSurvivesReload": true,
+    "libraryOpensFolder": true,
+    "libraryRestoresQuery": true,
+    "libraryRestoresFolder": true,
+    "newOpensTheNamedNote": true,
+    "noteSwitchesToWriting": true,
+    "mouseStrokeInks": true,
+    "penStrokesInk": true,
+    "penHandlerFast": true,
+    "penFramesSmooth": true,
+    "penTurnsFingersToScrolling": true,
+    "eraserRemovesStroke": true,
+    "undoRestoresStroke": true,
+    "eraserRemovesEveryStroke": true,
+    "oneUndoPerSweep": true,
+    "noPermanentPullZone": true,
+    "scrollingStopsAtPaper": true,
+    "pullShowsProgress": true,
+    "pullAddsPage": true,
+    "pagePickerJumpsToFirstPage": true,
+    "pagePickerAddsAndOpensPage": true,
+    "pagePickerRestoresPage": true,
+    "pageOnlyFillsAndHidesBars": true,
+    "pageOnlyRestoresWindows": true,
+    "renameFromTitleBar": true,
+    "penSettingsReachable": true,
+    "endlessNoteGrows": true,
+    "pdfDropOpensWindow": true,
+    "pdfPageRenders": true,
+    "pdfShowsPageCount": true,
+    "notesBesideOpensSecondWindow": true,
+    "notesBesideRestoresCanvas": true,
+    "notesBesideUsesTemplate": true,
+    "linkedDocumentInOptions": true,
+    "savedLayoutReopensSameDocuments": true,
+    "boardZoomKeptInWindow": true,
+    "boardInks": true,
+    "shelfListsLibrary": true,
+    "shelfOpensDocument": true,
+    "paletteTypedQuery": true,
+    "paletteOpensNoteByText": true,
+    "compactWritingToolsStayReachable": true,
+    "compactPageOnlyCanExit": true,
+    "galleryShowsWideRail": true,
+    "galleryShowsTenBasicPapers": true,
+    "galleryShowsRealSpacing": true,
+    "galleryAcademicPapers": true,
+    "galleryPlannerPapers": true,
+    "galleryJournalPaper": true,
+    "galleryCanCollapseTree": true,
+    "galleryCanExpandTree": true,
+    "galleryTreeOpensChild": true,
+    "galleryDarkPaperReadable": true,
+    "galleryManualOrderApplies": true,
+    "galleryNameSortWorks": true,
+    "galleryListViewWorks": true,
+    "galleryGridViewReturns": true,
+    "galleryRendersRealInk": true,
+    "galleryRendersImportedPdf": true,
+    "galleryAggregatesDocuments": true,
+    "galleryKeepsExcerptOnQuickReturn": true,
+    "galleryFiltersImportedPdfs": true,
+    "galleryManualOrderSurvivesIndexedDb": true,
+    "galleryExpandedFolderKeepsItsTitle": true,
+    "galleryDesktopCardsFit": true,
+    "galleryTabletUsesDrawer": true,
+    "galleryDrawerPreservesPosition": true,
+    "galleryPhoneCardsFit": true,
+    "galleryStylePreservesPosition": true,
+    "gallery320CardsFit": true,
+    "gallerySplitUsesPaneWidth": true,
+    "noConsoleErrors": true
+  },
+  "results": {
+    "audit": {
+      "controls": 75,
+      "unnamed": 0,
+      "names": [],
+      "lowest": 4.52,
+      "sample": {
+        "text": "25 min",
+        "ratio": 4.52
+      },
+      "hiddenTabbable": 0
+    },
+    "reducedPan": {
+      "first": {
+        "x": 2650,
+        "y": 1790,
+        "zoom": 1
+      },
+      "second": {
+        "x": 2650,
+        "y": 1790,
+        "zoom": 1
+      },
+      "start": {
+        "x": 640,
+        "y": 376
+      }
+    },
+    "penStroke": {
+      "handlerP50": 0.40000003576278687,
+      "handlerP95": 0.6000000238418579,
+      "frameP50": 16.69999999999891,
+      "frameP95": 18.600000000000364,
+      "frames": 72
+    },
+    "penStroke2": {
+      "handlerP50": 0.40000003576278687,
+      "handlerP95": 0.699999988079071,
+      "frameP50": 16.69999999999891,
+      "frameP95": 18.69999999999891,
+      "frames": 119
+    },
+    "inkPixels": 2768,
+    "inkAfterSweep": 0,
+    "pagesAfterPull": {
+      "before": 1,
+      "after": 2
+    },
+    "renameField": {
+      "open": true,
+      "focused": "window-title-input"
+    },
+    "titlesAfterRename": [
+      "Renamed",
+      null
+    ],
+    "endlessPage": {
+      "before": 1210,
+      "after": 1865.59375
+    },
+    "pdfPagePixels": 1958,
+    "pdfHighlight": {
+      "handlerP50": 0.5,
+      "handlerP95": 0.8999999761581421,
+      "frameP50": 16.699999999999818,
+      "frameP95": 18.599999999999454,
+      "frames": 24
+    },
+    "boardStroke": {
+      "handlerP50": 0.30000001192092896,
+      "handlerP95": 0.6000000238418579,
+      "frameP50": 16.699999999999818,
+      "frameP95": 18.600000000000364,
+      "frames": 71
+    },
+    "shelfRows": 6,
+    "gallery": {
+      "wide": {
+        "width": 1280,
+        "height": 755,
+        "pane": 1279
+      },
+      "tablet": {
+        "width": 820,
+        "height": 755,
+        "pane": 819
+      },
+      "phone": {
+        "width": 390,
+        "height": 720,
+        "pane": 390
+      },
+      "small": {
+        "width": 320,
+        "height": 640,
+        "pane": 320
+      },
+      "split": {
+        "width": 1280,
+        "height": 755,
+        "pane": 639
+      }
+    },
+    "consoleErrors": []
+  }
+}

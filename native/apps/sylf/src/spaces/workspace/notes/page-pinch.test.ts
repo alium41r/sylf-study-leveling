@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { pinchTarget, stackPages, type Stack, type Transform } from "./page-pinch";
+import { clampPageScroll, pinchTarget, stackPages, type Stack, type Transform } from "./page-pinch";
 
 vi.mock("react-native", () => ({ View: () => null }));
 vi.mock("@sylf/native-platform", () => ({ nativePinchArea: () => null }));
@@ -21,6 +21,13 @@ const onScreen = (stack: Stack, page: number, u: number, v: number, scroll: { x:
 const close = (a: { x: number; y: number }, b: { x: number; y: number }) => { expect(a.x).toBeCloseTo(b.x, 6); expect(a.y).toBeCloseTo(b.y, 6); };
 
 describe("page pinch", () => {
+  it("clamps the last page to the view even at the smallest zoom or after a resize", () => {
+    const short = stackPages([A4], 0.25, VIEW.width, GAP);
+    expect(clampPageScroll({ x: 200, y: 900 }, short, VIEW)).toEqual({ x: 0, y: 0 });
+    const wide = at(3);
+    expect(clampPageScroll({ x: 10000, y: 100000 }, wide, VIEW)).toEqual({ x: wide.width - VIEW.width, y: wide.height - VIEW.height });
+    expect(clampPageScroll({ x: -70, y: -10 }, wide, VIEW)).toEqual({ x: 0, y: 0 });
+  });
   it("stacks pages a gap apart, centred when narrower than the view", () => {
     const small = stackPages([A4, { width: 400, height: 300 }], 0.5, VIEW.width, GAP);
     expect(small.width).toBe(VIEW.width);

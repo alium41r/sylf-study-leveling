@@ -4,6 +4,24 @@
 import type * as Y from "yjs";
 import { ink, inkGeometry, inkOutline, type InkBrush, type InkPaper, type InkSample, type InkStroke } from "@sylf/shared";
 
+/** A small excerpt of the real first-page ink, with a budget for gallery cards. */
+export function inkThumbnail(doc: Y.Doc, bounds: Rect, records?: Y.Map<unknown>) {
+  const model = new ink.InkModel(doc, () => false, records);
+  try {
+    const strokes: Pick<RenderStroke, "id" | "d" | "color" | "opacity">[] = [];
+    let characters = 0;
+    for (const stroke of model.strokes()) {
+      if (!intersects(bounds, stroke.bounds)) continue;
+      const d = svgPath(stroke);
+      if (!d || d.length > 40000) continue;
+      strokes.push({ id: stroke.id, d, color: stroke.style.color, opacity: inkOpacityOf(stroke.style) });
+      characters += d.length;
+      if (strokes.length >= 96 || characters >= 160000) break;
+    }
+    return { paper: model.paper(), strokes };
+  } finally { model.close(); }
+}
+
 export type InkTool = "pen" | "highlighter" | "eraser" | "lasso" | "shape";
 export type ShapeKind = "line" | "rectangle" | "ellipse";
 export interface Rect { x: number; y: number; width: number; height: number }
@@ -45,6 +63,8 @@ export class InkScene {
   private seen = "";
   // Strokes the eraser has passed over in the sweep under way: hidden now, removed in one edit when it lifts, so one sweep is one undo.
   private sweep: Set<string> | null = null;
+  // Each stroke's centre line, kept while its version holds: the eraser tests it many times in one sweep.
+  private readonly geometry = new Map<string, { version: number; pieces: InkSample[][] }>();
   private readonly listeners = new Set<() => void>();
   constructor(doc: Y.Doc, options: InkSceneOptions = {}) {
     this.model = new ink.InkModel(doc, options.writable, options.records);
@@ -70,6 +90,7 @@ export class InkScene {
       return next;
     });
     for (const id of [...this.cache.keys()]) if (!live.has(id)) this.cache.delete(id);
+    for (const id of [...this.geometry.keys()]) if (!live.has(id) && !this.sweep?.has(id)) this.geometry.delete(id);
     return this.list;
   }
   begin(style: InkBrush) { this.endSweep(); return this.model.begin(style); }
@@ -84,17 +105,21 @@ export class InkScene {
     else this.model.edit({ targets, erase: true });
     return targets.length;
   }
-  beginSweep() { this.endSweep(); this.sweep = new Set(); }
+  /** One sweep of either eraser is one undo step, however many batches of samples it arrives in. */
+  beginSweep() { this.endSweep(); this.sweep = new Set(); this.model.undo.stopCapturing(); }
   endSweep() {
     const swept = this.sweep;
+    if (!swept) return;
     this.sweep = null;
-    if (!swept?.size) return;
-    try { this.model.edit({ targets: [...swept], erase: true }); } finally { this.listeners.forEach((listener) => listener()); }
+    try { if (swept.size) this.model.edit({ targets: [...swept], erase: true }); } finally {
+      this.model.undo.stopCapturing();
+      if (swept.size) this.listeners.forEach((listener) => listener());
+    }
   }
-  /** Only the part of each stroke the eraser touched, cut by the web's own geometry. */
+  /** Only the part of each stroke the eraser touched, cut by the web's own geometry. Inside a sweep the cuts share its undo step. */
   erasePrecisely(sampled: readonly Point[], radius: number) {
     const path = densify(sampled, radius), targets = this.hits(path, radius);
-    if (targets.length) this.model.eraseSegments(targets, path.slice(0, 1024).map((p) => ({ x: p.x, y: p.y, radius: Math.max(1, Math.min(100, radius)) })));
+    if (targets.length) this.model.eraseSegments(targets, path.slice(0, 1024).map((p) => ({ x: p.x, y: p.y, radius: Math.max(1, Math.min(100, radius)) })), !!this.sweep);
     return targets.length;
   }
   /** Strokes with most of their points inside the lasso. */
@@ -127,11 +152,18 @@ export class InkScene {
   canUndo() { return this.model.undo.canUndo(); }
   canRedo() { return this.model.undo.canRedo(); }
   close() { this.endSweep(); this.model.close(); }
+  private piecesOf(stroke: InkStroke) {
+    const kept = this.geometry.get(stroke.id);
+    if (kept && kept.version === stroke.version) return kept.pieces;
+    const pieces = stroke.segments ?? [inkGeometry.inkGeometry(stroke.points, stroke.style)];
+    this.geometry.set(stroke.id, { version: stroke.version, pieces });
+    return pieces;
+  }
   private hits(path: readonly Point[], radius: number) {
     if (!path.length) return [];
     const box = boundsOf(path), reach = { x: box.x - radius, y: box.y - radius, width: box.width + radius * 2, height: box.height + radius * 2 };
     return this.model.strokes().filter((s) => intersects(s.bounds, reach)).filter((s) => {
-      const geometry = s.segments ?? [inkGeometry.inkGeometry(s.points, s.style)];
+      const geometry = this.piecesOf(s);
       return path.some((p) => geometry.some((piece) => piece.length === 1 ? Math.hypot(p.x - piece[0][0], p.y - piece[0][1]) <= radius + s.style.width / 2 : piece.some((point, i) => i > 0 && distanceToSegment(p, piece[i - 1], point) <= radius + s.style.width / 2)));
     }).map((s) => s.id);
   }

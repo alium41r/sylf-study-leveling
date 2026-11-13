@@ -1,0 +1,1 @@
+SYLF_WORKSPACE_CHECK {"passed":false,"total":111,"failed":["formattingMenuAppliesAndResumesTyping"]}

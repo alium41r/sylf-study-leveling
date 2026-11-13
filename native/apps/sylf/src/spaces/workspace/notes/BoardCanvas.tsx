@@ -8,21 +8,24 @@ import InkToolbar from "./InkToolbar";
 import InkView from "./InkView";
 import { DEFAULT_TOOL, type InkCamera } from "./ink-types";
 import { useInkTool } from "./ink-tool";
+import { watchScene } from "./scene-face";
+import { ZoomBadge, type ZoomBadgeHandle } from "./ZoomBadge";
 
 const MIN = 0.15, MAX = 4;
 
-export default function BoardCanvas({ document, editable, camera: saved, onCamera, corner }: { document: OpenDocument; editable: boolean; camera: InkCamera | null; onCamera(camera: InkCamera): void; corner?: ReactNode }) {
+export default function BoardCanvas({ document, editable, camera: saved, onCamera, leading, corner, compact, compactUndo }: { document: OpenDocument; editable: boolean; camera: InkCamera | null; onCamera(camera: InkCamera): void; leading?: ReactNode; corner?: ReactNode; compact?: boolean; compactUndo?: boolean }) {
   const { space, color } = useTheme();
   const page = document.descriptor().pages[0];
   const scene = useMemo(() => new InkScene(document.stream(page.streamId)), [document, page.streamId]);
   useEffect(() => () => scene.close(), [scene]);
   const [, bump] = useState(0);
-  useEffect(() => scene.subscribe(() => bump((n) => n + 1)), [scene]);
+  useEffect(() => watchScene(scene, () => bump((n) => n + 1)), [scene]);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [camera, setCamera] = useState<InkCamera | null>(saved);
   const [tool, setTool, stylusKnown, penSeen] = useInkTool(DEFAULT_TOOL, "board");
   const [selection, setSelection] = useState<string[]>([]);
   const save = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const zoomBadge = useRef<ZoomBadgeHandle>(null);
 
   const clamp = (next: InkCamera): InkCamera => {
     const zoom = Math.max(MIN, Math.min(MAX, next.zoom));
@@ -39,6 +42,7 @@ export default function BoardCanvas({ document, editable, camera: saved, onCamer
   useEffect(() => { if (size.width && !camera) setCamera(fit()); }, [size.width]);
   const move = (next: InkCamera) => {
     const clamped = clamp(next);
+    if (camera && clamped.zoom !== camera.zoom) zoomBadge.current?.show(clamped.zoom);
     setCamera(clamped);
     clearTimeout(save.current);
     save.current = setTimeout(() => onCamera(clamped), 400);
@@ -64,7 +68,8 @@ export default function BoardCanvas({ document, editable, camera: saved, onCamer
     <View style={{ flex: 1 }}>
       {editable ? (
         <InkToolbar tool={tool} onTool={setTool} stylusKnown={stylusKnown} canUndo={scene.canUndo()} canRedo={scene.canRedo()} onUndo={() => scene.undo()} onRedo={() => scene.redo()}
-          selection={selection.length} onSelectionAction={onSelectionAction}
+          selection={selection.length} onSelectionAction={onSelectionAction} leading={leading} compact={compact} compactUndo={compactUndo}
+          onClearPage={() => { const all = scene.strokes().map((stroke) => stroke.id); if (all.length) { setSelection([]); scene.remove(all); } }}
           trailing={
             <>
               <IconButton icon="minus" size="small" label="Zoom out" onPress={() => zoomAt(1 / 1.25)} />
@@ -79,6 +84,7 @@ export default function BoardCanvas({ document, editable, camera: saved, onCamer
           <InkView scene={scene} pageWidth={page.width} pageHeight={page.height} camera={camera} width={size.width} height={size.height} tool={tool} drawPaper editable={editable}
             selection={selection} onSelection={setSelection} onPan={pan} onPinch={zoomAt} onPenSeen={penSeen} wheel="all" fingersMove />
         ) : null}
+        <ZoomBadge ref={zoomBadge} />
         {!scene.strokes().length && editable ? (
           <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: space.lg, alignItems: "center" }}>
             <Text variant="caption" tone="faint">{stylusKnown ? "Draw with the pen. Two fingers move the board." : "Draw anywhere. Scroll to move, pinch or Control and scroll to zoom."}</Text>

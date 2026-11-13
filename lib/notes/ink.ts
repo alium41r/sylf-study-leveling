@@ -290,6 +290,9 @@ export class InkModel {
         "This page exceeds the supported operation budget; preserve a native recovery export."
       );
     const dirty = new Set<string>();
+    // Strokes named by an edit that arrived or left. Only these are projected again: every other stroke keeps the same
+    // edits in the same order, so erasing or moving one stroke never recomputes a full page.
+    const editTargets = new Set<string>();
     let editChanged = false,
       paperChanged = false;
     for (const key of keys) {
@@ -298,8 +301,10 @@ export class InkModel {
         this.samples -= old.points.length;
         this.parts.get(old.stroke)?.delete(old.part);
         dirty.add(old.stroke);
-      } else if (old?.kind === "edit") editChanged = true;
-      else if (old?.kind === "paper") paperChanged = true;
+      } else if (old?.kind === "edit") {
+        editChanged = true;
+        for (const target of old.targets) editTargets.add(target);
+      } else if (old?.kind === "paper") paperChanged = true;
       this.parsed.delete(key);
       if (!this.records.has(key)) continue;
       const raw = this.records.get(key);
@@ -333,8 +338,10 @@ export class InkModel {
           );
         parts.set(op.part, op);
         dirty.add(op.stroke);
-      } else if (op.kind === "edit") editChanged = true;
-      else if (op.kind === "paper") paperChanged = true;
+      } else if (op.kind === "edit") {
+        editChanged = true;
+        for (const target of op.targets) editTargets.add(target);
+      } else if (op.kind === "paper") paperChanged = true;
     }
     if (
       this.parsed.size > INK_LIMITS.records ||
@@ -355,9 +362,8 @@ export class InkModel {
           const list = this.edits.get(target) || [];
           list.push(op);
           this.edits.set(target, list);
-          dirty.add(target);
         }
-      for (const id of this.parts.keys()) dirty.add(id);
+      for (const id of editTargets) dirty.add(id);
     }
     if (paperChanged) {
       this.paperOps = [...this.parsed.values()]
@@ -583,7 +589,11 @@ export class InkModel {
     }
     this.undo.stopCapturing();
   }
-  edit(edit: InkEdit, captured = false) {
+  /**
+   * `joined` keeps this edit in the undo step already open, for a gesture that makes several edits (one sweep of the
+   * precise eraser). The caller closes the step with `undo.stopCapturing()` before and after the gesture.
+   */
+  edit(edit: InkEdit, captured = false, joined = false) {
     if (captured) this.assertHealthy();
     else this.assertWritable();
     this.finish();
@@ -594,12 +604,12 @@ export class InkModel {
       id,
       clock: ++this.clock,
     });
-    this.undo.stopCapturing();
+    if (!joined) this.undo.stopCapturing();
     this.doc.transact(() => this.records.set(id, op), this.origin);
-    this.undo.stopCapturing();
+    if (!joined) this.undo.stopCapturing();
   }
   /** Commutative cut geometry stays attached to its original stroke; concurrent erasers cannot duplicate fragments. */
-  eraseSegments(targets: string[], circles: EraseCircle[]) {
+  eraseSegments(targets: string[], circles: EraseCircle[], joined = false) {
     this.assertHealthy();
     this.finish();
     if (!circles.length || !targets.length) return;
@@ -625,7 +635,7 @@ export class InkModel {
           "Precision erasing would exceed this page's geometry budget. Use the stroke eraser or start another page."
         );
     }
-    this.edit({ targets, cut: circles }, true);
+    this.edit({ targets, cut: circles }, true, joined);
   }
   setPaper(paper: InkPaper) {
     const current = this.paper();

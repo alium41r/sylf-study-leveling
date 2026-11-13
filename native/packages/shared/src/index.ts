@@ -16,6 +16,8 @@ export * as notesContracts from "../../../../lib/notes/contracts";
 export * as notesPdf from "../../../../lib/notes/pdf";
 export * as noteStyle from "../../../../lib/notes/note-style";
 export * as inkOutline from "../../../../lib/notes/ink-outline";
+// The planning kernel: the same solver, verifiers, diff and command parser the server commits with, so drags and what-ifs re-solve on the device.
+export * as planning from "../../../../lib/planner/kernel";
 
 export type { InkSample, InkBrush, InkPaper, InkStroke } from "../../../../lib/notes/ink";
 export type { DocumentDescriptor, AssetDescriptor } from "../../../../lib/notes/contracts";

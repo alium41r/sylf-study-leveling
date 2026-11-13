@@ -33,6 +33,12 @@ export const AI_QUOTAS = {
     /** Window type for the quota (Monday-based local week) */
     window: "week" as const,
   },
+  studio: {
+    /** Planning Studio model calls per user per DAY. One unit covers one workflow (an edit, a new goal with its parallel breakdown, a brief);
+     *  drags, what-ifs, repairs and explanations from the solver run on the deterministic path and consume nothing. A heavy day is about 20. */
+    limit: 60,
+    window: "day" as const,
+  },
   compile: {
     /** Maximum syllabus compilations per user per DAY — combined with the
      *  one-compile-per-subject-forever rule, a user with N subjects can

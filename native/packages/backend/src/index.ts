@@ -15,6 +15,7 @@ export * from "./progress";
 export * from "./account";
 export * from "./focus";
 export * from "./planner";
+export * from "./studio";
 export * from "./social";
 export * from "./party";
 export * from "./party-presence";

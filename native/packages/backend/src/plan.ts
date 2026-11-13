@@ -3,6 +3,7 @@
 import { z } from "zod";
 import type { BackendClient } from "./client";
 import { createPlannerReads } from "./planner";
+import { createStudioReads } from "./studio";
 import { calendarEventSchema, calendarRangeSchema, questPageSchema } from "./contracts";
 
 const dayQuestSchema = z.object({ id: z.number().int(), title: z.string(), status: z.string(), difficulty: z.string().optional(), requiredMinutes: z.number().nullable().optional(), plannedMinutes: z.number().nullable().optional(), plannerOwned: z.boolean().optional(), goal: z.object({ id: z.number().int(), title: z.string() }).nullable().optional() }).loose();
@@ -78,6 +79,8 @@ export function createPlanReads(client: BackendClient) {
     plans: (signal: AbortSignal) => client.get("/api/planner/workspace", plansSchema, { signal, headers: PLANNER_CONTRACT }),
     /** Everything between asking for a plan and confirming it (Part 3 A). */
     planner: createPlannerReads(client),
+    /** The Planning Studio: the living plan, its proposals, undo and the streamed planning workflows. */
+    studio: createStudioReads(client),
   };
 }
 export type PlanReads = ReturnType<typeof createPlanReads>;

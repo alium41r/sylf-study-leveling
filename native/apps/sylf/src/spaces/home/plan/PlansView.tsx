@@ -1,12 +1,11 @@
 // AI plans (Part 3 slice A). The list of what exists, whether a new plan can be built here, and the one journey from a goal to confirmed quests.
 // There is one place for plans, and the server owns every decision in it. Plans a student already confirmed show as quests in Today and Calendar.
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { View } from "react-native";
 import { Button, Callout, EmptyState, ListRow, Stack, Text, useTheme } from "@sylf/design-system";
 import { usePlans } from "./usePlan";
 import { NewPlanSheet } from "./NewPlanSheet";
 import { PlannerFlow } from "./PlannerFlow";
-import { onPlanPrefill, takePlanPrefill } from "./prefill";
 
 const STATE_WORDS: Record<string, string> = { DRAFT: "Draft", ACTIVE: "In use", ARCHIVED: "Archived", APPLIED: "In use" };
 
@@ -15,12 +14,8 @@ export function PlansView() {
   const result = usePlans();
   const [open, setOpen] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  // Requests handed over from Sylvie now go to the Planning Studio, which owns new planning; classic plans stay here to finish and review.
   const [prefill, setPrefill] = useState("");
-  useEffect(() => {
-    const take = () => { const carried = takePlanPrefill(); if (carried) { setOpen(null); setPrefill(carried); setCreating(true); } };
-    take();
-    return onPlanPrefill(take);
-  }, []);
   const data = result?.data;
   const plans = data?.plans ?? [];
   if (!result) return <View testID="plan-plans"><Text tone="soft">Loading your plans.</Text></View>;

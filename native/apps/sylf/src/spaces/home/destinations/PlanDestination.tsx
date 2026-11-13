@@ -10,10 +10,11 @@ import { HomePage, PageTitle, SubNav, useHomeView } from "../HomePage";
 const CalendarView = lazy(() => import("../plan/CalendarView").then((module) => ({ default: module.CalendarView })));
 const QuestsView = lazy(() => import("../plan/QuestsView").then((module) => ({ default: module.QuestsView })));
 const PlansView = lazy(() => import("../plan/PlansView").then((module) => ({ default: module.PlansView })));
+const StudioView = lazy(() => import("../plan/studio/StudioView").then((module) => ({ default: module.StudioView })));
 
 type View_ = HomeViewOf<"plan">;
-const LABELS: Record<View_, string> = { calendar: "Calendar", quests: "Quests and goals", plans: "Plans" };
-const SCREENS = { calendar: CalendarView, quests: QuestsView, plans: PlansView };
+const LABELS: Record<View_, string> = { studio: "Planner", calendar: "Calendar", quests: "Quests and goals", plans: "Classic plans" };
+const SCREENS = { studio: StudioView, calendar: CalendarView, quests: QuestsView, plans: PlansView };
 
 export function PlanDestination() {
   const { space } = useTheme();

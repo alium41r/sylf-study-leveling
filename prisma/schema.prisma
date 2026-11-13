@@ -226,6 +226,10 @@ model User {
   plannerPreferences    PlannerPreference[]
   plannerFrictionEvents PlannerFrictionEvent[]
   plannerIntakeSessions PlannerIntakeSession[]
+  planningSpace         PlanningSpace?
+  planVersions          PlanVersion[]
+  planBlocks            PlanBlock[]
+  planItemQuests        PlanItemQuest[]
 
   // AI
   aiMemories     AiMemory[]
@@ -412,6 +416,8 @@ model Quest {
   executionVersion                    Int               @default(0)
   plannerSpec                         Json?
   plannerSpecDigest                   String?
+  planBlocks                          PlanBlock[]
+  planItem                            PlanItemQuest?
 
   @@index([userId, status])
   @@index([subjectNodeId])
@@ -629,6 +635,108 @@ model PlannerIntakeSession {
   @@unique([userId, clientKey])
   @@index([userId, updatedAt])
   @@index([expiresAt])
+}
+
+// Planning Studio (the planning kernel). One living plan per student: a versioned work model the model edits, timed blocks the solver writes and
+// proposals the student accepts or undoes. Quests stay the unit of execution and reward; the planner never grants rewards. Private planner storage:
+// RLS enabled and no client grants. See lib/planner/studio/ and documentation/planner/STUDIO.md.
+model PlanningSpace {
+  id           String          @id @default(uuid()) @db.Uuid
+  userId       Int             @unique
+  /// The committed version; proposals carry the version they were built on.
+  version      Int             @default(0)
+  autonomy     String          @default("SMART")
+  workModel    Json
+  settings     Json
+  calibration  Json?
+  lastRepairAt DateTime?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  versions     PlanVersion[]
+  blocks       PlanBlock[]
+  itemQuests   PlanItemQuest[]
+}
+
+model PlanVersion {
+  id           String        @id @default(uuid()) @db.Uuid
+  spaceId      String        @db.Uuid
+  userId       Int
+  /// PROPOSED | COMMITTED | DISCARDED | SUPERSEDED. Only a proposal changes state; a committed version is immutable.
+  state        String        @default("PROPOSED")
+  /// STUDENT | MODEL | REPAIR | SYSTEM | UNDO
+  source       String
+  workflow     String
+  baseVersion  Int
+  sequence     Int?
+  /// Idempotency key of the request that produced this version.
+  key          String
+  requestHash  String
+  commitKey    String?
+  request      Json?
+  operations   Json
+  workModel    Json
+  result       Json
+  diff         Json
+  summary      String
+  verification Json
+  trace        Json
+  versions     Json
+  undoOf       String?       @db.Uuid
+  createdAt    DateTime      @default(now())
+  committedAt  DateTime?
+  space        PlanningSpace @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([spaceId, key])
+  @@unique([spaceId, sequence])
+  @@index([spaceId, state, createdAt])
+}
+
+model PlanBlock {
+  id             String        @id @default(uuid()) @db.Uuid
+  spaceId        String        @db.Uuid
+  userId         Int
+  /// The kernel's block id, unique among a space's live blocks.
+  blockKey       String
+  itemKey        String
+  questId        Int?
+  localDate      String
+  startMinute    Int
+  endMinute      Int
+  startsAt       DateTime
+  endsAt         DateTime
+  /// COMMITTED | DONE | MISSED | SKIPPED
+  state          String        @default("COMMITTED")
+  pinned         Boolean       @default(false)
+  createdVersion Int
+  removedVersion Int?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  space          PlanningSpace @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quest          Quest?        @relation(fields: [questId], references: [id], onDelete: SetNull)
+
+  @@index([spaceId, removedVersion, localDate])
+  @@index([userId, localDate])
+  @@index([questId])
+}
+
+model PlanItemQuest {
+  id             String        @id @default(uuid()) @db.Uuid
+  spaceId        String        @db.Uuid
+  userId         Int
+  itemKey        String
+  questId        Int?          @unique
+  createdVersion Int
+  releasedAt     DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  space          PlanningSpace @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quest          Quest?        @relation(fields: [questId], references: [id], onDelete: SetNull)
+
+  @@unique([spaceId, itemKey])
 }
 
 model StudySession {

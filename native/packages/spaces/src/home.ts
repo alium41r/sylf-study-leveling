@@ -10,7 +10,7 @@ export const HOME_LABELS: Record<HomeDestination, string> = { today: "Today", pl
 
 /** The views inside a destination. They are one control on the page, not a second rail. A destination not listed here has one view. */
 export const HOME_VIEWS = {
-  plan: ["calendar", "quests", "plans"],
+  plan: ["studio", "calendar", "quests", "plans"],
   progress: ["overview", "stats", "standing", "honours", "skills", "codex"],
   circle: ["people", "messages", "parties"],
 } as const satisfies Partial<Record<HomeDestination, readonly string[]>>;

@@ -1,0 +1,99 @@
+// Pure helpers for the Planning Studio's views: what a block is called, its colour, what a day holds, and how a week reads aloud. No React here, so
+// every rule is tested without rendering.
+import { planning } from "@sylf/shared";
+
+type Block = planning.Block;
+type Model = planning.WorkModel;
+type Snapshot = planning.PlanningSnapshot;
+
+export const { dayLabel, clockLabel, formatMinutes, addDays, weekdayOf, diffDays } = planning;
+
+export const FALLBACK_SUBJECT = "#8B8B99";
+export const live = (block: Block) => block.state === "committed" || block.state === "proposed";
+
+export function itemOf(model: Model, key: string): planning.WorkItem | null {
+  const item = model.items.find((i) => i.key === key);
+  if (item) return item;
+  const at = key.indexOf("@");
+  if (at < 0) return null;
+  const practice = model.practices.find((p) => p.key === key.slice(0, at));
+  return practice ? { key, goal: practice.goal, title: practice.title, kind: "practice", subject: practice.subject, topics: [], est: [practice.minutes, practice.minutes], chunk: [practice.minutes, practice.minutes, practice.minutes], earliest: key.slice(at + 1), due: key.slice(at + 1), after: [], load: 2, method: practice.method, source: "system", confidence: 1, done: 0, status: "open", questId: null, firstStep: null, note: null } : null;
+}
+export const titleOf = (model: Model, key: string) => itemOf(model, key)?.title ?? "Study session";
+
+export function subjectColour(snapshot: Snapshot, subject: number | null | undefined): string {
+  const found = subject == null ? null : snapshot.subjects.find((s) => s.id === subject);
+  return found?.color && /^#[0-9a-f]{6}$/i.test(found.color) ? found.color : FALLBACK_SUBJECT;
+}
+
+export const blockMinutes = (block: Pick<Block, "start" | "end">) => Math.max(0, block.end - block.start);
+
+/** The days a Week view shows: seven days from `start`, inside the snapshot's horizon. */
+export function weekDays(snapshot: Snapshot, page: number): planning.SnapshotDay[] {
+  return snapshot.days.slice(page * 7, page * 7 + 7);
+}
+
+/** The visible hour range: the study day, widened to hold every commitment and block shown. */
+export function hourRange(snapshot: Snapshot, blocks: readonly Block[], days: readonly planning.SnapshotDay[]): [number, number] {
+  let from = snapshot.settings.dayStart; let to = snapshot.settings.dayEnd;
+  const dates = new Set(days.map((d) => d.date));
+  for (const day of days) for (const busy of day.busy) { from = Math.min(from, busy.start); to = Math.max(to, busy.end); }
+  for (const block of blocks) if (dates.has(block.date)) { from = Math.min(from, block.start); to = Math.max(to, block.end); }
+  return [Math.max(0, Math.floor(from / 60)), Math.min(24, Math.ceil(to / 60))];
+}
+
+/** A day's summary for a screen reader: "Tue 25 Nov: 3 sessions, 2 h 15 m, 1 commitment." */
+export function daySummary(day: planning.SnapshotDay, blocks: readonly Block[], model: Model): string {
+  const own = blocks.filter((b) => b.date === day.date && b.state !== "skipped");
+  const minutes = own.filter(live).reduce((s, b) => s + blockMinutes(b), 0);
+  const parts = [dayLabel(day.date)];
+  if (day.rest) parts.push("rest day");
+  if (own.length) parts.push(`${own.length} session${own.length === 1 ? "" : "s"}, ${formatMinutes(minutes)}`);
+  if (day.busy.length) parts.push(`${day.busy.length} commitment${day.busy.length === 1 ? "" : "s"}`);
+  const first = own.filter(live).sort((a, b) => a.start - b.start)[0];
+  if (first) parts.push(`first: ${titleOf(model, first.item)} at ${clockLabel(first.start)}`);
+  return `${parts.join(", ")}.`;
+}
+
+/** Goal progress as minutes done against the calibrated total. */
+export function goalProgress(model: Model, snapshot: Snapshot, goal: string): { done: number; total: number; items: number; finished: number } {
+  const items = model.items.filter((i) => i.goal === goal && i.status !== "dropped");
+  let done = 0; let total = 0;
+  for (const item of items) {
+    const [p50] = planning.calibratedEstimate(item, snapshot.calibration);
+    total += Math.max(p50, item.done);
+    done += item.status === "done" ? Math.max(p50, item.done) : Math.min(item.done, p50);
+  }
+  return { done, total, items: items.length, finished: items.filter((i) => i.status === "done").length };
+}
+
+export const ESTIMATE = (item: planning.WorkItem, snapshot: Snapshot) => {
+  const [p50, p80] = planning.calibratedEstimate(item, snapshot.calibration);
+  return p50 === p80 ? formatMinutes(p50) : `${formatMinutes(p50)}–${formatMinutes(p80)}`;
+};
+
+const METHOD_WORDS: Partial<Record<planning.Method, string>> = {
+  diagnostic: "Diagnostic", learn: "Learn", worked_examples: "Worked examples", retrieval: "Retrieval", spaced_review: "Spaced review", problem_solving: "Problems",
+  timed_paper: "Timed paper", error_log: "Error log", reading: "Reading", research: "Research", outline: "Outline", drafting: "Drafting", revising: "Revising",
+  final_check: "Final check", practice: "Practice", notes: "Notes", admin: "Admin",
+};
+export const methodLabel = (method: planning.Method) => METHOD_WORDS[method] ?? method;
+
+/** Questions go to the planner's answer path rather than becoming changes. */
+export const isQuestion = (text: string) => /\?\s*$/.test(text.trim()) || /^(am|is|are|how|what|when|why|which|will|should|can|do|does)\b/i.test(text.trim());
+
+/** The next session the student can start: today's first block that has not ended. */
+export function nextBlock(blocks: readonly Block[], snapshot: Snapshot): Block | null {
+  return blocks.filter((b) => b.state === "committed" && (b.date > snapshot.today || (b.date === snapshot.today && b.end > snapshot.nowMinute))).sort((a, b) => a.date.localeCompare(b.date) || a.start - b.start)[0] ?? null;
+}
+
+/** Snaps a drag position to the 15-minute grid inside the visible hours. */
+export function snapMinute(minute: number, length: number, range: [number, number]): number {
+  const snapped = Math.round(minute / 15) * 15;
+  return Math.max(range[0] * 60, Math.min(range[1] * 60 - length, snapped));
+}
+
+export const RELATIVE = (date: string, today: string) => {
+  const delta = diffDays(date, today);
+  return delta === 0 ? "today" : delta === 1 ? "tomorrow" : delta > 1 && delta < 7 ? `in ${delta} days` : dayLabel(date);
+};

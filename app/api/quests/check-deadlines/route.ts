@@ -4,6 +4,7 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { DIFFICULTY_CONFIG } from "@/lib/difficulty-engine";
 import { TimezoneService } from "@/lib/timezone-service";
+import { repairBeforeDeadline, studioOwnedQuests } from "@/lib/planner/studio/events";
 
 export async function GET(req: NextRequest) {
   try {
@@ -40,6 +41,11 @@ export async function GET(req: NextRequest) {
       const userLocalDate = TimezoneService.getUserLocalDate(userTimezone);
       return quest.scheduledFor < userLocalDate;
     });
+
+    // Planning Studio quests get one repair first: missed work moves inside the student's slack before anything is failed. The transaction below
+    // re-reads each quest, so a quest the repair moved to today or later is skipped.
+    const studio = await studioOwnedQuests(overdueQuests.map((q) => q.id));
+    for (const userId of new Set(studio.values())) await repairBeforeDeadline(userId);
 
     let processed = 0;
     for (const snapshot of overdueQuests) {

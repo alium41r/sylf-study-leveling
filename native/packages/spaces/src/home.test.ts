@@ -31,7 +31,7 @@ describe("Home navigation", () => {
 
   it("keeps a view through a change of destination, and a saved view through a restart", () => {
     const { navigation, data } = setup();
-    expect(navigation.viewOf("plan")).toBe("calendar");
+    expect(navigation.viewOf("plan")).toBe("studio");
     navigation.setView("plan", "quests");
     navigation.select("focus");
     navigation.select("plan");

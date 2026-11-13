@@ -54,7 +54,7 @@ export function QuickAsk({ open, onClose, onLeave }: { open: boolean; onClose: (
               </View>
             </View>
           ) : null}
-          {turn.planRequest && !turn.working ? <Button title="Review in Plans" testID="quick-ask-plan" onPress={() => { setPlanPrefill(turn.planRequest!); turn.reset(); onClose(); onLeave?.(); navigation.setView("plan", "plans"); navigation.select("plan"); }} /> : null}
+          {turn.planRequest && !turn.working ? <Button title="Plan it in the Planner" testID="quick-ask-plan" onPress={() => { setPlanPrefill(turn.planRequest!); turn.reset(); onClose(); onLeave?.(); navigation.setView("plan", "studio"); navigation.select("plan"); }} /> : null}
           {turn.failure ? <Text variant="caption" tone="critical" testID="quick-ask-failure">{turn.failure}</Text> : null}
           <TextField label="Ask Sylvie" hideLabel placeholder="Ask Sylvie" testID="quick-ask-input" value={text} onChangeText={setText} editable={!turn.working} returnKeyType="send" onSubmitEditing={() => void submit()} />
           <View style={{ flexDirection: "row", gap: space.sm }}>

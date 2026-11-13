@@ -227,17 +227,18 @@ export async function releaseQuota(userId: number, feature: QuotaFeature): Promi
  * Used by the /api/ai-usage endpoint.
  */
 export async function getUsageReport(userId: number): Promise<Record<QuotaFeature, QuotaCheckResult>> {
-  const [chat, planner, plannerExpansion, plannerRebalance, compile, scope] =
+  const [chat, planner, plannerExpansion, plannerRebalance, studio, compile, scope] =
     await Promise.all([
       checkQuota(userId, "chat"),
       checkQuota(userId, "planner"),
       checkQuota(userId, "plannerExpansion"),
       checkQuota(userId, "plannerRebalance"),
+      checkQuota(userId, "studio"),
       checkQuota(userId, "compile"),
       checkQuota(userId, "scope"),
     ]);
 
-  return { chat, planner, plannerExpansion, plannerRebalance, compile, scope };
+  return { chat, planner, plannerExpansion, plannerRebalance, studio, compile, scope };
 }
 
 // Durable receipts and their counter changes share the same policy/SQL owner

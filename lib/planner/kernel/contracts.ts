@@ -1,0 +1,209 @@
+// The planning kernel's contracts: the work model the language model edits, the snapshot of the student's world that the solver reads, and the blocks the
+// solver writes. Pure types and constants, shared by the server and Sylf Native through @sylf/shared. Every value is plain JSON so a plan version can
+// store it unchanged and a device can re-solve from exactly what the server saw.
+
+export const KERNEL_VERSION = "kernel-1.0.0";
+export const SOLVER_VERSION = "solver-1.0.0";
+export const STRATEGY_VERSION = "strategy-1.0.0";
+
+export type DateKey = string;
+export type ItemKind = "learn" | "practice" | "review" | "produce" | "admin";
+export const ITEM_KINDS: readonly ItemKind[] = ["learn", "practice", "review", "produce", "admin"];
+export type Method =
+  | "diagnostic" | "learn" | "worked_examples" | "retrieval" | "spaced_review" | "problem_solving" | "timed_paper" | "error_log"
+  | "reading" | "research" | "outline" | "drafting" | "revising" | "final_check" | "practice" | "notes" | "admin";
+export const METHODS: readonly Method[] = [
+  "diagnostic", "learn", "worked_examples", "retrieval", "spaced_review", "problem_solving", "timed_paper", "error_log",
+  "reading", "research", "outline", "drafting", "revising", "final_check", "practice", "notes", "admin",
+];
+export type GoalType = "exam" | "essay" | "project" | "problem_set" | "reading" | "skill" | "general";
+export const GOAL_TYPES: readonly GoalType[] = ["exam", "essay", "project", "problem_set", "reading", "skill", "general"];
+export type Priority = 1 | 2 | 3;
+export type Load = 1 | 2 | 3;
+export type Source = "model" | "student" | "template" | "import" | "system";
+
+export interface KGoal {
+  key: string;
+  /** Sylf `Goal.id` once the goal exists in Sylf. */
+  ref: number | null;
+  title: string;
+  type: GoalType;
+  due: DateKey | null;
+  priority: Priority;
+  subject: number | null;
+  status: "active" | "done" | "dropped";
+  /** Built on assumptions the student has not confirmed. */
+  draft: boolean;
+  source: Source;
+}
+
+export interface WorkItem {
+  key: string;
+  goal: string | null;
+  /** At most 60 characters. */
+  title: string;
+  kind: ItemKind;
+  subject: number | null;
+  /** `SubjectNode.id`s. */
+  topics: number[];
+  /** Raw estimate before calibration: p50 and p80 minutes. */
+  est: [number, number];
+  /** Minimum, ideal and maximum minutes for one sitting. */
+  chunk: [number, number, number];
+  earliest: DateKey | null;
+  due: DateKey | null;
+  after: string[];
+  load: Load;
+  method: Method;
+  source: Source;
+  confidence: number;
+  /** Minutes already studied, from the linked quest. */
+  done: number;
+  status: "open" | "done" | "dropped";
+  questId: number | null;
+  /** A concrete if-then first step, written lazily for near-term work. */
+  firstStep: string | null;
+  /** One short decision note from the planner. Never chain of thought. */
+  note: string | null;
+}
+
+/** A recurring cadence such as "Spanish, 20 minutes on weekdays". It expands into one item per matching day. */
+export interface Practice {
+  key: string;
+  goal: string | null;
+  title: string;
+  subject: number | null;
+  minutes: number;
+  /** Weekdays, Sunday = 0. */
+  days: number[];
+  from: DateKey | null;
+  until: DateKey | null;
+  method: Method;
+  status: "active" | "paused";
+}
+
+interface ConstraintBase { key: string; hard: boolean; weight: number; provenance: "student" | "inferred" | "default"; label: string }
+export type ConstraintSpec =
+  | { kind: "daily_cap"; minutes: number; days?: number[] }
+  | { kind: "no_study_window"; start: number; end: number; days?: number[]; dates?: DateKey[] }
+  | { kind: "preferred_window"; start: number; end: number; subject?: number | null; days?: number[]; until?: DateKey | null }
+  | { kind: "study_window"; start: number; end: number; days?: number[] }
+  | { kind: "subject_cap"; subject: number; minutes: number }
+  | { kind: "day_off"; dates: DateKey[] }
+  | { kind: "subject_weight"; subject: number; weight: number }
+  | { kind: "exam_buffer"; days: number }
+  /** Extra study time on one date, which also opens a rest day when the student chooses to. */
+  | { kind: "extra_time"; date: DateKey; start: number; end: number };
+export type Constraint = ConstraintBase & ConstraintSpec;
+export type ConstraintKind = ConstraintSpec["kind"];
+export const CONSTRAINT_KINDS: readonly ConstraintKind[] = ["daily_cap", "no_study_window", "preferred_window", "study_window", "subject_cap", "day_off", "subject_weight", "exam_buffer", "extra_time"];
+
+export interface Assumption { key: string; text: string; affects: string[]; confidence: number; ask: boolean }
+export interface Question { key: string; text: string; options: string[]; affects: string[] }
+
+export interface WorkModel {
+  goals: KGoal[];
+  items: WorkItem[];
+  practices: Practice[];
+  constraints: Constraint[];
+  assumptions: Assumption[];
+  questions: Question[];
+}
+export const emptyWorkModel = (): WorkModel => ({ goals: [], items: [], practices: [], constraints: [], assumptions: [], questions: [] });
+
+export type Autonomy = "ASK" | "SMART" | "AUTOPILOT";
+export interface StudioSettings {
+  /** Local minutes. Study never starts before or ends after these unless a window says otherwise. */
+  dayStart: number;
+  dayEnd: number;
+  /** Most minutes a day the planner may fill. */
+  dailyCap: number;
+  breakMinutes: number;
+  /** Space kept free around fixed commitments. */
+  transitionBuffer: number;
+  autonomy: Autonomy;
+  /** Show work by day only, without times. */
+  dayOnly: boolean;
+  horizonDays: number;
+}
+export const DEFAULT_SETTINGS: StudioSettings = { dayStart: 8 * 60, dayEnd: 22 * 60, dailyCap: 240, breakMinutes: 10, transitionBuffer: 10, autonomy: "SMART", dayOnly: false, horizonDays: 14 };
+
+export type BusyKind = "event" | "class" | "exam" | "external" | "work" | "other";
+export interface Busy { start: number; end: number; title: string; kind: BusyKind; ref: string | null }
+export interface SnapshotDay {
+  date: DateKey;
+  weekday: number;
+  rest: false | "fixed" | "floating";
+  /** Base availability, local minutes. Defaults to [dayStart, dayEnd]. */
+  windows: [number, number][];
+  busy: Busy[];
+  allDay: { title: string; kind: BusyKind }[];
+  /** Minutes of other quests already on this day (work Sylf knows about but the plan does not own). They count against the day's capacity. */
+  otherWork?: number;
+}
+export interface SnapshotSubject { id: number; name: string; color: string; code: string }
+export interface SnapshotTopic { id: number; subject: number; ref: string; title: string; progress: number; mastered: boolean; difficulty: number }
+
+export interface Calibration {
+  /** Ratio of actual to planned minutes, keyed `subject:kind` with `*` as a wildcard. 1 means estimates are right. */
+  factors: Record<string, { factor: number; samples: number }>;
+  /** Completion propensity by weekday (Sunday = 0) and hour, 0–100. */
+  energy: number[][];
+  /** Sustainable minutes a day: the rolling p75 of active days plus a small allowance. */
+  capacity: number;
+  /** Sessions the numbers are based on. */
+  samples: number;
+}
+
+export interface PlanningSnapshot {
+  today: DateKey;
+  /** Local minute of the day when the snapshot was taken. Nothing is placed before it today. */
+  nowMinute: number;
+  timezone: string;
+  days: SnapshotDay[];
+  subjects: SnapshotSubject[];
+  topics: SnapshotTopic[];
+  calibration: Calibration;
+  settings: StudioSettings;
+  /** Minutes already studied today, which count against today's cap. */
+  studiedToday: number;
+}
+
+export type BlockState = "proposed" | "committed" | "done" | "missed" | "skipped";
+export interface Block {
+  id: string;
+  item: string;
+  date: DateKey;
+  start: number;
+  end: number;
+  state: BlockState;
+  pinned: boolean;
+  questId: number | null;
+}
+export const blockMinutes = (block: Pick<Block, "start" | "end">) => Math.max(0, block.end - block.start);
+
+export type ReasonCode = "due" | "energy" | "spacing" | "stable" | "preferred" | "pinned" | "capacity" | "dependency" | "practice" | "review" | "fixed";
+export interface Reason { code: ReasonCode; text: string }
+
+export interface Shortage {
+  /** The deadline the shortage is measured against. */
+  due: DateKey;
+  needed: number;
+  available: number;
+  short: number;
+  items: string[];
+}
+export interface DayLoad { date: DateKey; capacity: number; planned: number; sustainable: number; free: number; rest: boolean }
+/** Minutes the rolling horizon leaves to a week beyond the detailed days. */
+export interface WeekBudget { week: DateKey; item: string; minutes: number }
+export type RiskKind = "deadline" | "overload" | "shortage" | "neglected" | "unplaced";
+export interface Risk { kind: RiskKind; text: string; goal: string | null; item: string | null; date: DateKey | null; severity: 1 | 2 | 3 }
+
+export interface Health {
+  plannedMinutes: number;
+  capacityMinutes: number;
+  sustainableMinutes: number;
+  atRisk: { goal: string; title: string; due: DateKey; short: number }[];
+  nextExam: { goal: string; title: string; due: DateKey } | null;
+  quality: number;
+}

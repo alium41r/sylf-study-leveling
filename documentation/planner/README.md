@@ -4,6 +4,8 @@
 
 [**Latest continuation — 3 November**](reports/2026-11-02-workflow-ui/README.md) records the preview persistence correction, exact DeepSeek JSON-recovery diagnosis, overdue-task recovery and simpler frontend. Autonomous live verification continues under reconciled existing spending authority; Research has handed off to Strategy. Scripted passing checks remain distinct from a successful real-model journey.
 
+[**Planner blueprint proposal — 13 November 2026**](reports/2026-11-13-planner-blueprint/README.md) is a research-phase design for the next planner: DeepSeek V4.1 Flash edits a typed work model, a deterministic solver schedules it, verifiers gate every result, and repairs run without model calls. It uses the [7 November end-to-end run](reports/2026-11-07-planner-overhaul/README.md) as its baseline and sets out a staged roadmap. Nothing in it is approved or implemented.
+
 Reports are task history, including files named `FINAL` or `ARCHITECTURE`. Most were untracked when organized on 2 October 2026, so Git cannot establish their chronology. The sequences below follow explicit phase labels and reconciliation statements in their contents; file timestamps are supporting evidence only.
 
 ## Planner V2 target

@@ -3,7 +3,7 @@
 // device reflow as a drag, Pin keeps it put, Skip hands its time back to the plan.
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import { Badge, Button, Chip, IconButton, Plane, Stack, Text, useTheme } from "@sylf/design-system";
+import { Badge, Button, Chip, Disclosure, IconButton, Plane, Stack, Text, useTheme } from "@sylf/design-system";
 import type { StudioState } from "@sylf/backend";
 import type { planning } from "@sylf/shared";
 import { useHomeNavigation, useStudySession } from "../studioShell";
@@ -41,7 +41,7 @@ export function Inspector({ state, studio, blockId, onClose }: { state: StudioSt
         <View style={{ flex: 1, gap: 2 }}>
           <Text variant="heading" role="heading" aria-level={3}>{item?.title ?? "Study session"}</Text>
           <Text variant="small" tone="soft">{`${dayLabel(block.date)} · ${clockLabel(block.start)}–${clockLabel(block.end)} · ${formatMinutes(length)}${subject ? ` · ${subject.name}` : ""}`}</Text>
-          {goal ? <Text variant="caption" tone="soft">{`For ${goal.title}`}</Text> : null}
+          {goal ? <Text variant="caption" tone="soft" numberOfLines={1}>{goal.title}</Text> : null}
         </View>
         <IconButton icon="close" label="Close details" onPress={onClose} />
       </View>
@@ -49,7 +49,7 @@ export function Inspector({ state, studio, blockId, onClose }: { state: StudioSt
         {block.pinned ? <Badge label="Pinned" /> : null}
         {block.state === "done" ? <Badge tone="positive" label="Done" /> : block.state === "missed" ? <Badge tone="caution" label="Missed" /> : block.state === "skipped" ? <Badge label="Skipped" /> : block.state === "proposed" ? <Badge tone="accent" label="Proposed" /> : null}
         {item ? <Badge label={sessionLabel(item)} /> : null}
-        {item ? <Badge label={`Estimate ${ESTIMATE(item, state.snapshot)}`} /> : null}
+        {item ? <Badge label={ESTIMATE(item, state.snapshot)} /> : null}
       </View>
       {item?.details ? (
         <Stack gap="sm" testID="studio-details">
@@ -64,11 +64,14 @@ export function Inspector({ state, studio, blockId, onClose }: { state: StudioSt
         </Stack>
       ) : null}
       {reasons.length ? (
-        <Stack gap="xs" testID="studio-why">
-          <Text variant="label" tone="soft">Why it's here</Text>
-          {reasons.map((r, i) => <Text key={i} variant="small">{r.text}</Text>)}
-          {phrase ? <Text variant="small" tone="soft">{phrase}</Text> : null}
-        </Stack>
+        <View testID="studio-why">
+          <Disclosure title="Why it's here" icon="info">
+            <Stack gap="xs">
+              {reasons.map((r, i) => <Text key={i} variant="small">{r.text}</Text>)}
+              {phrase ? <Text variant="small" tone="soft">{phrase}</Text> : null}
+            </Stack>
+          </Disclosure>
+        </View>
       ) : null}
       {item?.firstStep ? <Stack gap="xs"><Text variant="label" tone="soft">First step</Text><Text variant="small">{item.firstStep}</Text></Stack> : null}
       {item?.note && !item.details ? <Text variant="small" tone="soft">{item.note}</Text> : null}

@@ -2,7 +2,7 @@
 // trigger at most one revision. Both read the solver's output and the inputs it was given, never the model's account of what it did.
 import { addDays, dayLabel, diffDays } from "./dates";
 import { calibratedEstimate } from "./calibration";
-import { applyWhatIf, expandPractices, freeIntervals, isDayOff, isFixed, type SolveInput, type SolveResult } from "./solver";
+import { applyWhatIf, capGroups, expandPractices, freeIntervals, isDayOff, isFixed, type SolveInput, type SolveResult } from "./solver";
 import { SPACED_METHODS, SPACING_DAYS } from "./strategy";
 import { blockMinutes, type Block, type PlanningSnapshot, type WorkModel } from "./contracts";
 
@@ -58,15 +58,16 @@ export function verify(input: SolveInput, result: SolveResult): Verification {
     const fixedMinutes = list.filter((b) => fixedIds.has(b.id)).reduce((s, b) => s + blockMinutes(b), 0) + (date === snapshot.today ? snapshot.studiedToday : 0) + (day.otherWork ?? 0);
     checks++;
     if (placed > 0 && placed + fixedMinutes > Math.max(cap, fixedMinutes)) failures.push({ code: "DAILY_CAP", block: null, item: null, detail: `${dayLabel(date)} plans ${placed + fixedMinutes} min against a cap of ${cap}.` });
-    // Per-subject caps count only what the solver placed.
-    for (const c of model.constraints) {
-      if (c.kind !== "subject_cap") continue;
+    // Cap groups (a goal's or a subject's daily limit) count only what the solver placed.
+    const { caps: groupCaps, groupOf } = capGroups(model.constraints);
+    for (const [group, minutes] of groupCaps) {
+      const c = { minutes };
       checks++;
-      const ofSubject = list.filter((b) => items.get(b.item)?.subject === c.subject && b.state !== "done");
+      const ofSubject = list.filter((b) => { const item = items.get(b.item); return item && groupOf(item) === group && b.state !== "done"; });
       const placedSubject = ofSubject.filter((b) => !fixedIds.has(b.id)).reduce((s, b) => s + blockMinutes(b), 0);
       const fixedSubject = ofSubject.filter((b) => fixedIds.has(b.id)).reduce((s, b) => s + blockMinutes(b), 0);
       const subjectMinutes = placedSubject + fixedSubject;
-      if (placedSubject > 0 && subjectMinutes > Math.max(c.minutes, fixedSubject)) failures.push({ code: "DAILY_CAP", block: null, item: null, detail: `${dayLabel(date)} plans ${subjectMinutes} min of one subject against its cap of ${c.minutes}.` });
+      if (placedSubject > 0 && subjectMinutes > Math.max(c.minutes, fixedSubject)) failures.push({ code: "DAILY_CAP", block: null, item: null, detail: `${dayLabel(date)} plans ${subjectMinutes} min of one ${group.startsWith("g:") ? "plan" : "subject"} against its cap of ${c.minutes}.` });
     }
   }
   // Dependencies in order.

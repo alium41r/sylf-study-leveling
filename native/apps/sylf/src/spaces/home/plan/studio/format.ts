@@ -99,17 +99,28 @@ export const RELATIVE = (date: string, today: string) => {
 };
 
 const ROLE_WORDS: Record<planning.StudyRole, string> = {
-  revise: "Revision", practise: "Past paper practice", mixed: "Mixed review", paper: "Timed paper", corrections: "Corrections", weak: "Weak topics", final: "Final review",
+  revise: "Revision", practise: "Practice", mixed: "Mixed review", paper: "Timed paper", corrections: "Corrections", weak: "Weak topics", final: "Final review",
+  learn: "Study", recall: "Recall check", checkpoint: "Checkpoint", lesson: "Lesson", milestone: "Milestone", read: "Reading",
 };
 /** What a session is, in the words a student uses: "Revision", "Timed paper"; the study method for work that was not compiled from a syllabus. */
 export const sessionLabel = (item: Pick<planning.WorkItem, "method" | "details">) => (item.details ? ROLE_WORDS[item.details.role] : methodLabel(item.method));
 
 export const CONFIDENCE_WORDS: Record<planning.Confidence, string> = { weak: "Weak", okay: "Okay", strong: "Strong" };
 export const SOURCE_WORDS: Record<planning.Syllabus["source"], string> = {
-  catalog: "Topics from Sylf's checked syllabus list",
-  model: "Topics from the AI's knowledge of the course. Check them against your syllabus",
-  student: "Topics from your list",
-  subject: "Topics from your syllabus in Sylf",
+  catalog: "From Sylf's checked syllabus",
+  model: "From the AI · check against your syllabus",
+  student: "From your list",
+  subject: "From your Sylf syllabus",
+};
+
+export const PRESET_WORDS: Record<planning.PlanPreset | "auto", { label: string; icon: string; due: string }> = {
+  auto: { label: "Auto", icon: "auto", due: "Date" },
+  exam: { label: "Exam", icon: "paper", due: "Exam date" },
+  course: { label: "Whole course", icon: "layers", due: "Finish by" },
+  mastery: { label: "Topic mastery", icon: "focus", due: "Finish by" },
+  skill: { label: "Skill", icon: "progress", due: "Target date" },
+  assignment: { label: "Assignment", icon: "notes", due: "Due" },
+  reading: { label: "Reading", icon: "resources", due: "Finish by" },
 };
 
 /** Where a topic stands: revised, practised, or when its next session is. */
@@ -135,7 +146,10 @@ export function agendaFor(model: Model, goal: string, blocks: readonly Block[]):
 /** "Fri 13 Nov – Thu 26 Nov", or one day. */
 export const dateSpan = (from: string | null, to: string | null) => (!from ? "not scheduled yet" : !to || to === from ? dayLabel(from) : `${dayLabel(from)} – ${dayLabel(to)}`);
 
-const SHORT_ROLE: Record<planning.StudyRole, string> = { revise: "Revision", practise: "Past papers", mixed: "Mixed review", paper: "Timed paper", corrections: "Corrections", weak: "Weak topics", final: "Final review" };
+const SHORT_ROLE: Record<planning.StudyRole, string> = {
+  revise: "Revision", practise: "Practice", mixed: "Mixed review", paper: "Timed paper", corrections: "Corrections", weak: "Weak topics", final: "Final review",
+  learn: "Study", recall: "Recall", checkpoint: "Test", lesson: "Lesson", milestone: "Milestone", read: "Reading",
+};
 /**
  * A block's label for a narrow column: the topic on the first line and what kind of session on the second ("Functions" / "Past papers"), so a
  * week beside the study guide never breaks a word in half. Work that was not compiled from a syllabus keeps its title.
@@ -146,7 +160,13 @@ export function compactLabel(item: planning.WorkItem | null): { title: string; s
   if (!d) return { title: item.title, sub: null };
   switch (d.role) {
     case "revise": return { title: item.title.replace(/\s+(revision|quick check)$/i, ""), sub: /quick check$/i.test(item.title) ? "Quick check" : SHORT_ROLE.revise };
-    case "practise": return { title: item.title.replace(/\s+(past paper practice|extra practice)$/i, ""), sub: /extra practice$/i.test(item.title) ? "Extra practice" : SHORT_ROLE.practise };
+    case "practise": return { title: item.title.replace(/\s+(past paper practice|practice questions|extra practice|practice(?: \d+)?)$/i, ""), sub: /extra practice$/i.test(item.title) ? "Extra practice" : /past paper/i.test(item.title) ? "Past papers" : SHORT_ROLE.practise };
+    case "learn": return { title: item.title.replace(/\s+study$/i, ""), sub: SHORT_ROLE.learn };
+    case "lesson": return { title: item.title.replace(/\s+lesson$/i, ""), sub: SHORT_ROLE.lesson };
+    case "milestone": return { title: item.title.replace(/\s+milestone check$/i, ""), sub: SHORT_ROLE.milestone };
+    case "read": return { title: item.title.replace(/^Read:?\s+/i, ""), sub: SHORT_ROLE.read };
+    case "recall": return { title: SHORT_ROLE.recall, sub: d.units.length > 1 ? `${d.units.length} topics` : null };
+    case "checkpoint": return { title: item.title === "Mastery test" ? "Mastery test" : "Checkpoint", sub: `${d.units.length} topics` };
     case "mixed": return { title: SHORT_ROLE.mixed, sub: `${d.units.length} topic${d.units.length === 1 ? "" : "s"}` };
     case "paper": return { title: SHORT_ROLE.paper, sub: item.title.replace(/\s*timed past paper.*$/i, "") || null };
     default: return { title: SHORT_ROLE[d.role], sub: null };

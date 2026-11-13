@@ -3,7 +3,7 @@
 import { KERNEL_VERSION, PATH_VERSION, SOLVER_VERSION, STRATEGY_VERSION } from "../kernel";
 import { DEEPSEEK_MODELS } from "@/lib/ai/config";
 
-export const STUDIO_PROMPT_VERSION = "studio-prompts-1.1.0";
+export const STUDIO_PROMPT_VERSION = "studio-prompts-1.2.0";
 export const STUDIO_CONTRACT = "1";
 
 export function studioEnabled(): boolean {

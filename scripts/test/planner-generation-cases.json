@@ -1,0 +1,56 @@
+[
+  {
+    "id": "kenya-kcse-biology",
+    "area": "Secondary school, national board outside the UK and US (Kenya, KNEC)",
+    "title": "KCSE Biology Paper 1 mock",
+    "preset": "exam",
+    "dueInDays": 35,
+    "minutesPerDay": 120,
+    "level": "Kenya KCSE, Form 4",
+    "weak": "genetics, ecology"
+  },
+  {
+    "id": "moratuwa-signals",
+    "area": "Lesser-known university course (Sri Lanka)",
+    "title": "EN2063 Signals and Systems, University of Moratuwa, whole module",
+    "preset": "course",
+    "dueInDays": 84,
+    "minutesPerDay": 90,
+    "level": "Second-year electronic and telecommunication engineering"
+  },
+  {
+    "id": "ap-us-history",
+    "area": "American high school, a whole year to the exam",
+    "title": "AP US History exam",
+    "preset": "course",
+    "due": "2027-05-07",
+    "minutesPerDay": 60,
+    "target": "5"
+  },
+  {
+    "id": "edexcel-a-level-economics",
+    "area": "A Levels, a board other than Cambridge",
+    "title": "Edexcel A Level Economics A Paper 2: The national and global economy",
+    "preset": "exam",
+    "dueInDays": 42,
+    "weak": "exchange rates, fiscal policy",
+    "target": "A"
+  },
+  {
+    "id": "spanish-skill",
+    "area": "Adult skill with no deadline",
+    "title": "Conversational Spanish from scratch",
+    "preset": "skill",
+    "daysPerWeek": 4,
+    "sessionMinutes": 30,
+    "level": "Complete beginner",
+    "target": "Hold a 10-minute conversation"
+  },
+  {
+    "id": "auto-mastery",
+    "area": "Auto: the planner chooses",
+    "title": "Get really good at integration by parts and substitution",
+    "preset": "auto",
+    "dueInDays": 14
+  }
+]

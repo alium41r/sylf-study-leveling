@@ -9,15 +9,23 @@
 //
 // Sessions have deterministic keys (`<goal>.rev.u3`), so re-compiling after the student rates a topic or unticks one updates the same sessions,
 // keeps their quests and blocks where they are, and never touches work already studied. Pure, no I/O, no Intl: identical on the server and the device.
-import { addDays, diffDays, formatMinutes, round5, weekdayOf } from "./dates";
+import { addDays, diffDays, formatMinutes, round5, weekdayOf, weekStart } from "./dates";
 import { normalizeSizes } from "./operations";
 import {
-  type Confidence, type ItemDetails, type ItemKind, type KGoal, type Load, type Method, type PlanningSnapshot, type Source, type StudyRole, type Syllabus,
-  type SyllabusPaper, type SyllabusUnit, type WorkItem, type WorkModel,
+  type Confidence, type ItemDetails, type ItemKind, type KGoal, type Load, type Method, type PlanPreset, type PlanningSnapshot, type Source, type StudyRole,
+  type Syllabus, type SyllabusPaper, type SyllabusUnit, type WorkItem, type WorkModel,
 } from "./contracts";
 
 export interface PathSummary {
+  preset?: PlanPreset;
   topics: number;
+  /** Timed checkpoints and milestone checks. */
+  checkpoints?: number;
+  /** The first and last day the path uses. */
+  from?: string | null;
+  /** The plan has a date of its own. */
+  dated?: boolean;
+  to?: string | null;
   revise: number;
   practise: number;
   mixed: number;
@@ -48,6 +56,12 @@ interface Planned {
 
 const ROLE_SHAPE: Record<StudyRole, { kind: ItemKind; method: Method; load: Load }> = {
   revise: { kind: "learn", method: "worked_examples", load: 3 },
+  learn: { kind: "learn", method: "learn", load: 3 },
+  recall: { kind: "review", method: "retrieval", load: 2 },
+  checkpoint: { kind: "practice", method: "timed_paper", load: 3 },
+  lesson: { kind: "learn", method: "learn", load: 2 },
+  milestone: { kind: "review", method: "retrieval", load: 2 },
+  read: { kind: "learn", method: "reading", load: 1 },
   practise: { kind: "practice", method: "problem_solving", load: 3 },
   mixed: { kind: "review", method: "retrieval", load: 2 },
   paper: { kind: "practice", method: "timed_paper", load: 3 },
@@ -59,7 +73,10 @@ const ROLE_SHAPE: Record<StudyRole, { kind: ItemKind; method: Method; load: Load
 /** The paper assumed when the syllabus does not say: an hour of timed questions. */
 export const PRACTICE_PAPER: SyllabusPaper = { label: "Practice paper", minutes: 60, marks: null };
 
-const KEY_ROLE: Record<StudyRole, string> = { revise: "rev", practise: "prac", mixed: "mix", paper: "paper", corrections: "fix", weak: "weak", final: "final" };
+const KEY_ROLE: Record<StudyRole, string> = {
+  revise: "rev", practise: "prac", mixed: "mix", paper: "paper", corrections: "fix", weak: "weak", final: "final",
+  learn: "learn", recall: "recall", checkpoint: "check", lesson: "lesson", milestone: "mile", read: "read",
+};
 
 /** Prefix shared by every session compiled for a goal. */
 export const pathPrefix = (goalKey: string) => `${goalKey}.`;
@@ -90,13 +107,14 @@ function practiceMinutes(unit: SyllabusUnit, confidence: Confidence | null): num
 }
 
 /** The study days from today to the day before the exam: not rest days, not days off, and not today when the day is nearly over. */
-export function studyDays(snapshot: PlanningSnapshot, model: WorkModel, until: string): { dates: string[]; capacity: number[] } {
+export function studyDays(snapshot: PlanningSnapshot, model: WorkModel, until: string, options: { from?: string | null; minutesPerDay?: number | null } = {}): { dates: string[]; capacity: number[] } {
   const restWeekdays = new Set(snapshot.days.filter((d) => d.rest === "fixed").map((d) => d.weekday));
   const off = new Set(model.constraints.flatMap((c) => (c.kind === "day_off" ? c.dates : [])));
   const settings = snapshot.settings;
   const dates: string[] = [];
   const capacity: number[] = [];
-  for (let date = snapshot.today; date <= until; date = addDays(date, 1)) {
+  const start = options.from && options.from > snapshot.today ? options.from : snapshot.today;
+  for (let date = start; date <= until && dates.length < 400; date = addDays(date, 1)) {
     if (off.has(date)) continue;
     const day = snapshot.days.find((d) => d.date === date);
     let free: number;
@@ -111,8 +129,8 @@ export function studyDays(snapshot: PlanningSnapshot, model: WorkModel, until: s
       if (restWeekdays.has(weekdayOf(date))) continue;
       free = settings.dayEnd - settings.dayStart;
     }
-    const cap = Math.min(settings.dailyCap, Math.round(free * 0.7));
-    if (cap < 30) continue;
+    const cap = Math.min(settings.dailyCap, Math.round(free * 0.7), options.minutesPerDay && options.minutesPerDay >= 15 ? options.minutesPerDay : Infinity);
+    if (cap < Math.min(30, options.minutesPerDay ?? 30)) continue;
     dates.push(date);
     capacity.push(cap);
   }
@@ -126,7 +144,7 @@ function minutesPerMark(paper: SyllabusPaper): string | null {
 }
 
 /** The aim, key points and method of a planned session. */
-function detailsFor(p: Planned, syllabus: Syllabus, weakUnits: SyllabusUnit[]): ItemDetails {
+function detailsFor(p: Planned, syllabus: Syllabus, weakUnits: SyllabusUnit[], preset: PlanPreset): ItemDetails {
   const paper = p.paper ?? syllabus.papers[0] ?? PRACTICE_PAPER;
   const paperName = paper === PRACTICE_PAPER || paper.label === PRACTICE_PAPER.label ? "the exam" : paper.label;
   const units = p.units.map((u) => u.key);
@@ -143,9 +161,65 @@ function detailsFor(p: Planned, syllabus: Syllabus, weakUnits: SyllabusUnit[]): 
           : "For each key point, rework one example from your notes or textbook, then cover the answer and do it again from memory. Write down any formula you had to look up.",
       };
     }
+    case "learn":
+      return {
+        role: p.role, units,
+        aim: `Understand ${unit.title} well enough to explain it and do the standard questions.`,
+        points: unit.points.slice(0, 7),
+        how: "Work through the lesson or chapter, write each key point in your own words, then do two examples yourself without looking.",
+      };
+    case "lesson":
+      return {
+        role: p.role, units,
+        aim: `Learn how ${unit.title} works.`,
+        points: unit.points.slice(0, 7),
+        how: "Watch or read one good explanation, try each point slowly, and note what felt hard for the next session.",
+      };
+    case "milestone":
+      return {
+        role: p.role, units,
+        aim: `Show you can do ${unit.title} without help.`,
+        points: unit.points.slice(0, 5),
+        how: "Try each point cold. If one isn't solid yet, the next session repeats it before moving on.",
+      };
+    case "read":
+      return {
+        role: p.role, units,
+        aim: `Read ${unit.title} and come away with its main ideas.`,
+        points: unit.points.length ? unit.points.slice(0, 6) : ["Note the key ideas as you go", "Mark anything you want to come back to"],
+        how: "Read actively, then close the book and write three sentences from memory.",
+      };
+    case "recall":
+      return {
+        role: p.role, units,
+        aim: `Pull ${unitList(p.units, 80)} back from memory after a gap.`,
+        points: p.units.flatMap((u) => u.points.slice(0, 2).map((point) => (p.units.length > 1 ? `${u.title}: ${point}` : point))).slice(0, 9),
+        how: preset === "reading" ? "Without the book, write a short summary of each part, then check it and fill the gaps." : "Without notes, write what you remember and do one question on each. Check, then fix only the gaps.",
+      };
+    case "checkpoint": {
+      const mastery = preset === "mastery";
+      return {
+        role: p.role, units,
+        aim: mastery ? `Prove you've mastered ${unitList(p.units, 80)} on unseen questions.` : `Test yourself on ${unitList(p.units, 80)} under timed conditions.`,
+        points: ["Unseen, mixed questions", "No notes, timed", "Mark it honestly", "Note the weakest topic for your next review"],
+        how: `${formatMinutes(p.minutes)} without notes. Mark it straight after and write down what to fix.`,
+      };
+    }
     case "practise": {
       const pace = paper ? minutesPerMark(paper) : null;
       const extra = (p.repeat ?? 0) > 0;
+      if (preset === "skill") return {
+        role: p.role, units,
+        aim: `Build ${unit.title} through deliberate practice.`,
+        points: unit.points.slice(0, 6),
+        how: "Warm up for five minutes, then practise one key point at a time, slowly before fast.",
+      };
+      if (preset === "course" || preset === "mastery") return {
+        role: p.role, units,
+        aim: extra ? `Make ${unit.title} reliable: fresh questions after a gap.` : `Get confident with ${unit.title} questions.`,
+        points: unit.points.slice(0, 7),
+        how: `Do ${extra ? "three or four" : "five to eight"} questions on ${unit.title} from your textbook or past papers. Mark them and note what went wrong.`,
+      };
       return {
         role: p.role, units,
         aim: extra ? `Make ${unit.title} reliable: fresh questions after a gap.` : `Pick up every method mark on ${unit.title} questions.`,
@@ -193,19 +267,29 @@ function detailsFor(p: Planned, syllabus: Syllabus, weakUnits: SyllabusUnit[]): 
   }
 }
 
-function titleFor(p: Planned, syllabus: Syllabus): string {
+function titleFor(p: Planned, syllabus: Syllabus, preset: PlanPreset): string {
   const unit = p.units[0];
   const paper = p.paper ?? syllabus.papers[0] ?? PRACTICE_PAPER;
   const repeat = p.repeat ?? 0;
   switch (p.role) {
     case "revise": return clip(`${unit.title} ${unit.confidence === "strong" ? "quick check" : "revision"}`, 60);
-    case "practise": return clip(`${unit.title} ${repeat ? "extra practice" : "past paper practice"}`, 60);
+    case "learn": return clip(`${unit.title} study`, 60);
+    case "lesson": return clip(`${unit.title} lesson`, 60);
+    case "milestone": return clip(`${unit.title} milestone check`, 60);
+    case "read": return clip(/^(chapter|part|section|book|act|unit)\b/i.test(unit.title) ? `Read ${unit.title}` : `Read: ${unit.title}`, 60);
+    case "recall": return p.units.length === 1 ? clip(`${unit.title} recall check`, 60) : repeat ? `Recall check ${repeat + 1}` : clip(`Recall check: ${unitList(p.units)}`, 60);
+    case "checkpoint": return preset === "mastery" ? "Mastery test" : clip(`Checkpoint test: ${unitList(p.units)}`, 60);
+    case "practise":
+      if (preset === "skill") return clip(`${unit.title} practice${repeat ? ` ${repeat + 1}` : ""}`, 60);
+      if (preset === "course" || preset === "mastery") return clip(`${unit.title} ${repeat ? "extra practice" : "practice questions"}`, 60);
+      return clip(`${unit.title} ${repeat ? "extra practice" : "past paper practice"}`, 60);
     case "mixed": return clip(`Mixed review: ${unitList(p.units)}`, 60);
     case "paper": return paper?.label === PRACTICE_PAPER.label ? `Timed practice paper${repeat ? ` ${repeat + 1}` : ""}` : clip(`${paper ? `${paper.label} ` : ""}timed past paper${repeat ? ` ${repeat + 1}` : ""}`.replace(/^t/, "T"), 60);
     case "corrections": return repeat ? `Past paper ${repeat + 1} corrections` : "Past paper corrections";
     case "weak": return "Weak topics revision";
     case "final": return quantitative(syllabus) ? "Formula sheet and final review" : "Key facts and final review";
   }
+  return p.title;
 }
 
 /** Subjects where a formula sheet is the right last-day tool. */
@@ -222,6 +306,263 @@ const NOTE: Partial<Record<StudyRole, string>> = {
  * Exported for tests and for the device's preview of a rating change.
  */
 export function layoutPath(syllabus: Syllabus, days: { dates: string[]; capacity: number[] }, prefix: string): { planned: Planned[]; compressed: boolean } {
+  return layoutExam(syllabus, days, prefix);
+}
+
+type Days = { dates: string[]; capacity: number[] };
+const keyFor = (prefix: string) => (role: StudyRole, id: string | number) => `${prefix}${KEY_ROLE[role]}.${id}`;
+
+/** Each unit's share of `L` days in proportion to its size, in order. */
+function proportionalSpans(sizes: number[], L: number): [number, number][] {
+  const total = Math.max(1, sizes.reduce((s, m) => s + m, 0));
+  let cumulative = 0;
+  return sizes.map((size) => {
+    const from = Math.min(L - 1, Math.floor((cumulative / total) * L));
+    cumulative += size;
+    const to = Math.max(from, Math.min(L - 1, Math.ceil((cumulative / total) * L) - 1));
+    return [from, to];
+  });
+}
+
+/** How many past papers fit before the exam: more time buys more, up to six over a long course. */
+const papersFor = (N: number) => (N >= 60 ? Math.min(6, Math.floor(N / 15)) : N >= 24 ? 3 : N >= 12 ? 2 : N >= 5 ? 1 : 0);
+
+/** Fewer papers when the last days cannot hold them: each paper and its corrections, plus the weak-topics session, within 85% of those days. */
+function fitPapers(days: Days, papers: SyllabusPaper[], count: number, before: number): number {
+  let k = count;
+  while (k > 1) {
+    const cap = days.capacity.slice(Math.max(0, before - Math.max(2 * k, Math.floor(before / 3))), before).reduce((sum, c) => sum + c, 0);
+    let need = 60;
+    for (let i = 0; i < k; i++) { const paper = papers[i % papers.length]; need += Math.min(180, round5(paper.minutes + 10)) + Math.max(40, Math.min(75, round5(paper.minutes * 0.5))); }
+    if (need <= cap * 0.85) break;
+    k--;
+  }
+  return k;
+}
+
+/**
+ * Study days the end of a plan needs: two a paper, and more when a daily limit means those days cannot also hold what spills into them (the
+ * weak-topics session, the last mixed review, extra practice for weak topics). Never more than a third of the time; plans without a tight limit
+ * keep two a paper.
+ */
+function tailDaysFor(days: Days, papers: SyllabusPaper[], count: number, before: number, weak: number): number {
+  let need = 60 + 60 + weak * 50;
+  for (let i = 0; i < count; i++) { const paper = papers[i % papers.length]; need += Math.min(180, round5(paper.minutes + 10)) + Math.max(40, Math.min(75, round5(paper.minutes * 0.5))); }
+  let tail = count * 2;
+  while (tail < Math.floor(before / 3) && days.capacity.slice(Math.max(0, before - tail), before).reduce((sum, c) => sum + c, 0) * 0.85 < need) tail++;
+  return tail;
+}
+
+/** Papers, corrections, weak topics and the final review in the last `2 × papers + 1` study days. */
+function examTail(planned: Planned[], units: SyllabusUnit[], papers: SyllabusPaper[], paperCount: number, L: number, before: number, finalDay: number, key: ReturnType<typeof keyFor>) {
+  const weakUnits = units.filter((u) => u.confidence === "weak");
+  for (let k = 0; k < paperCount; k++) {
+    const day = L + k * 2;
+    const paper = papers[k % papers.length];
+    const paperKey = key("paper", k + 1);
+    planned.push({ key: paperKey, role: "paper", units, title: "", minutes: Math.min(180, round5(paper.minutes + 10)), from: day, to: Math.min(before - 1, day + 1), after: [], paper, repeat: k });
+    const fix = key("corrections", k + 1);
+    planned.push({ key: fix, role: "corrections", units, title: "", minutes: Math.max(40, Math.min(75, round5(paper.minutes * 0.5))), from: Math.min(before - 1, day + 1), to: Math.min(before - 1, day + 2), after: [paperKey], paper, repeat: k });
+    // Weak topics may also use the light final day: targeted practice, nothing new.
+    if (k === 0) planned.push({ key: key("weak", 1), role: "weak", units: weakUnits, title: "", minutes: 60, from: Math.min(before - 1, day + 1), to: Math.min(finalDay >= 0 ? finalDay : before - 1, day + 3), after: [fix] });
+  }
+  if (finalDay >= 0) planned.push({ key: key("final", "1"), role: "final", units, title: "", minutes: 45, from: finalDay, to: finalDay, after: [] });
+}
+
+/**
+ * A whole course or subject over weeks or months, learnt for the first time: each topic studied then practised in order, every three topics
+ * recalled two days later and again about ten days later, a timed checkpoint every six topics, and, when the course ends in an exam, the exam tail.
+ */
+function layoutCourse(syllabus: Syllabus, days: Days, prefix: string, exam: boolean): { planned: Planned[]; compressed: boolean } {
+  const units = syllabus.units.filter((u) => u.included);
+  const N = days.dates.length;
+  const planned: Planned[] = [];
+  if (!units.length || !N) return { planned, compressed: false };
+  const key = keyFor(prefix);
+  const papers = syllabus.papers.length ? syllabus.papers : [PRACTICE_PAPER];
+  const finalDay = N >= 2 ? N - 1 : -1;
+  const before = finalDay >= 0 ? finalDay : N;
+  const paperCount = exam ? fitPapers(days, papers, papersFor(N), before) : 0;
+  const L = Math.max(1, Math.min(before, before - (paperCount ? tailDaysFor(days, papers, paperCount, before, units.filter((u) => u.confidence === "weak").length) : 0)));
+  let learn = units.map((u) => round5(revisionMinutes(u, u.confidence) + (u.confidence === "strong" ? 0 : 10)));
+  let practise = units.map((u) => practiceMinutes(u, u.confidence));
+  const capacity = days.capacity.slice(0, L).reduce((s, c) => s + c, 0) * 0.75;
+  const groups = Math.ceil(units.length / 3);
+  const needed = learn.reduce((s, m) => s + m, 0) + practise.reduce((s, m) => s + m, 0) + groups * 75;
+  let compressed = false;
+  if (needed > capacity) {
+    compressed = true;
+    const factor = Math.max(0.5, capacity / needed);
+    learn = learn.map((m) => Math.max(25, round5(m * factor)));
+    practise = practise.map((m) => Math.max(25, round5(m * factor)));
+  }
+  const spans = proportionalSpans(units.map((_, i) => learn[i] + practise[i]), L);
+  units.forEach((unit, i) => {
+    const [from, to] = spans[i];
+    const slack = Math.min(L - 1, to + 1);
+    const study = key("learn", unit.key);
+    planned.push({ key: study, role: "learn", units: [unit], title: "", minutes: learn[i], from, to: slack, after: [] });
+    planned.push({ key: key("practise", unit.key), role: "practise", units: [unit], title: "", minutes: practise[i], from, to: slack, after: [study] });
+  });
+  for (let g = 0; g < groups; g++) {
+    const group = units.slice(g * 3, g * 3 + 3);
+    const end = Math.max(...group.map((u) => spans[units.indexOf(u)][1]));
+    const first = end + 2;
+    if (first <= before - 1) planned.push({ key: key("mixed", g + 1), role: "mixed", units: group, title: "", minutes: 45, from: first, to: Math.min(before - 1, first + 2), after: group.map((u) => key("practise", u.key)) });
+    // A second, wider gap for courses long enough to have one: the spacing that turns learning into memory.
+    const second = end + 10;
+    if (N >= 28 && second <= before - 1) planned.push({ key: key("recall", g + 1), role: "recall", units: group, title: "", minutes: 30, from: second, to: Math.min(before - 1, second + 3), after: first <= before - 1 ? [key("mixed", g + 1)] : group.map((u) => key("practise", u.key)) });
+    if ((g + 1) % 2 === 0 || g === groups - 1) {
+      const covered = units.slice(Math.max(0, (g - 1) * 3), g * 3 + 3);
+      const day = end + 3;
+      if (units.length >= 4 && day <= before - 1 && (g + 1) % 2 === 0) planned.push({ key: key("checkpoint", Math.ceil((g + 1) / 2)), role: "checkpoint", units: covered, title: "", minutes: 45, from: day, to: Math.min(before - 1, day + 2), after: covered.map((u) => key("practise", u.key)) });
+    }
+  }
+  for (const unit of units) {
+    if (unit.confidence !== "weak") continue;
+    const from = spans[units.indexOf(unit)][1] + 2;
+    if (from > before - 1) continue;
+    planned.push({ key: key("practise", `${unit.key}.2`), role: "practise", units: [unit], title: "", minutes: practiceMinutes(unit, "okay"), from, to: Math.min(before - 1, from + 3), after: [key("practise", unit.key)], repeat: 1 });
+  }
+  if (exam) examTail(planned, units, papers, paperCount, L, before, finalDay, key);
+  else if (finalDay >= 0) planned.push({ key: key("recall", "final"), role: "recall", units, title: "", minutes: 45, from: finalDay, to: finalDay, after: [] });
+  return { planned, compressed };
+}
+
+/**
+ * One chapter or topic, mastered: each subtopic studied and practised in the first half of the time, then recall checks on everything at
+ * widening gaps (one, three, seven and fourteen days), and a mastery test on unseen questions at the end.
+ */
+function layoutMastery(syllabus: Syllabus, days: Days, prefix: string): { planned: Planned[]; compressed: boolean } {
+  const units = syllabus.units.filter((u) => u.included);
+  const N = days.dates.length;
+  const planned: Planned[] = [];
+  if (!units.length || !N) return { planned, compressed: false };
+  const key = keyFor(prefix);
+  const last = N - 1;
+  let learn = units.map((u) => round5(revisionMinutes(u, u.confidence) + 10));
+  let practise = units.map((u) => practiceMinutes(u, u.confidence));
+  const needed = learn.reduce((s, m) => s + m, 0) + practise.reduce((s, m) => s + m, 0);
+  const room = (n: number) => days.capacity.slice(0, n).reduce((sum, c) => sum + c, 0) * 0.75;
+  // Learning takes the first 45% of the time, up to 70% when there is a lot to learn; beyond that, sessions get shorter.
+  let L = Math.max(1, Math.min(last, Math.ceil(N * 0.45)));
+  while (L < Math.min(last, Math.ceil(N * 0.7)) && needed > room(L)) L++;
+  let compressed = false;
+  if (needed > room(L)) {
+    compressed = true;
+    const factor = Math.max(0.5, room(L) / needed);
+    learn = learn.map((m) => Math.max(25, round5(m * factor)));
+    practise = practise.map((m) => Math.max(20, round5(m * factor)));
+  }
+  const spans = proportionalSpans(units.map((_, i) => learn[i] + practise[i]), L);
+  units.forEach((unit, i) => {
+    const [from, to] = spans[i];
+    const study = key("learn", unit.key);
+    planned.push({ key: study, role: "learn", units: [unit], title: "", minutes: learn[i], from, to: Math.min(L - 1, to + 1), after: [] });
+    planned.push({ key: key("practise", unit.key), role: "practise", units: [unit], title: "", minutes: practise[i], from, to: Math.min(L - 1, to + 1), after: [study] });
+  });
+  const end = Math.max(...spans.map(([, to]) => to));
+  let n = 0;
+  let previous: string[] = units.map((u) => key("practise", u.key));
+  for (const gap of [1, 3, 7, 14]) {
+    const day = end + gap;
+    if (day >= last) break;
+    const recall = key("recall", ++n);
+    planned.push({ key: recall, role: "recall", units, title: "", minutes: 30, from: day, to: Math.min(last - 1, day + 1), after: previous, repeat: n - 1 });
+    previous = [recall];
+  }
+  if (N >= 2) planned.push({ key: key("checkpoint", "final"), role: "checkpoint", units, title: "", minutes: Math.min(75, 30 + units.length * 5), from: last, to: last, after: previous });
+  return { planned, compressed };
+}
+
+/**
+ * The study days a regular practice falls on: `perWeek` of each calendar week's study days, spread out, and a fair share of a partial first or
+ * last week.
+ */
+function practiceDays(days: Days, perWeek: number): number[] {
+  const weeks = new Map<string, number[]>();
+  days.dates.forEach((date, i) => { const w = weekStart(date); weeks.set(w, [...(weeks.get(w) ?? []), i]); });
+  const first = days.dates[0];
+  const last = days.dates[days.dates.length - 1];
+  const out: number[] = [];
+  for (const [week, list] of weeks) {
+    const from = week > first ? week : first;
+    const to = addDays(week, 6) < last ? addDays(week, 6) : last;
+    const span = Math.max(1, Math.min(7, diffDays(to, from) + 1));
+    const k = Math.min(list.length, perWeek, Math.max(1, Math.round((perWeek * span) / 7)));
+    for (let j = 0; j < k; j++) out.push(list[Math.floor((j * list.length) / k)]);
+  }
+  return out;
+}
+
+/**
+ * A skill with no exam: stages in order, each a lesson, practice sessions and a milestone check, on about `daysPerWeek` days a week at
+ * `sessionMinutes` a session. Without a date the plan runs as long as the stages need.
+ */
+function layoutSkill(syllabus: Syllabus, days: Days, prefix: string, perWeek: number, session: number): { planned: Planned[]; compressed: boolean } {
+  const units = syllabus.units.filter((u) => u.included);
+  const planned: Planned[] = [];
+  if (!units.length || !days.dates.length) return { planned, compressed: false };
+  const key = keyFor(prefix);
+  const slots = practiceDays(days, perWeek);
+  const usual = slots.length;
+  const sequence: Omit<Planned, "from" | "to">[] = [];
+  for (const unit of units) {
+    const reps = unit.confidence === "strong" ? 1 : unit.weight + (unit.confidence === "weak" ? 2 : 1);
+    sequence.push({ key: key("lesson", unit.key), role: "lesson", units: [unit], title: "", minutes: session, after: [] });
+    for (let r = 0; r < reps; r++) sequence.push({ key: key("practise", r ? `${unit.key}.${r + 1}` : unit.key), role: "practise", units: [unit], title: "", minutes: session, after: [], repeat: r });
+    sequence.push({ key: key("milestone", unit.key), role: "milestone", units: [unit], title: "", minutes: session, after: [] });
+  }
+  // When the date does not leave a slot for every session: drop extra practice, then milestone checks except the last, then use every study day,
+  // then two sessions a day. Every stage keeps its lesson and at least one practice session.
+  let compressed = false;
+  while (sequence.length > slots.length && sequence.some((p) => p.role === "practise" && (p.repeat ?? 0) > 0)) {
+    const at = sequence.map((p, i) => ({ p, i })).filter(({ p }) => p.role === "practise" && (p.repeat ?? 0) > 0).sort((a, b) => (b.p.repeat ?? 0) - (a.p.repeat ?? 0) || b.i - a.i)[0].i;
+    sequence.splice(at, 1);
+    compressed = true;
+  }
+  if (sequence.length > slots.length) {
+    const lastMilestone = sequence.map((p) => p.role).lastIndexOf("milestone");
+    for (let i = sequence.length - 1; i >= 0 && sequence.length > slots.length; i--) if (sequence[i].role === "milestone" && i !== lastMilestone) sequence.splice(i, 1);
+  }
+  if (sequence.length > slots.length) slots.splice(0, slots.length, ...days.dates.map((_, i) => i));
+  if (sequence.length > slots.length) slots.splice(0, slots.length, ...days.dates.flatMap((_, i) => [i, i]));
+  sequence.slice(0, Math.max(1, slots.length)).forEach((p, i) => {
+    const from = slots[Math.min(i, slots.length - 1)];
+    const following = slots.slice(i + 1).find((x) => x > from);
+    const to = Math.min(days.dates.length - 1, following != null ? Math.max(from, following - 1) : from + 1);
+    planned.push({ ...p, from, to, after: i > 0 ? [sequence[i - 1].key] : [] });
+  });
+  return { planned, compressed: compressed || sequence.length > usual };
+}
+
+/** A book or reading list: each part read in order at a steady pace, a written recap every three parts, and a final recap. */
+function layoutReading(syllabus: Syllabus, days: Days, prefix: string): { planned: Planned[]; compressed: boolean } {
+  const units = syllabus.units.filter((u) => u.included);
+  const N = days.dates.length;
+  const planned: Planned[] = [];
+  if (!units.length || !N) return { planned, compressed: false };
+  const key = keyFor(prefix);
+  const L = Math.max(1, N >= 4 ? N - 1 : N);
+  const minutes = units.map((u) => round5(30 + u.weight * 10));
+  const spans = proportionalSpans(minutes, L);
+  let previous: string | null = null;
+  units.forEach((unit, i) => {
+    const [from, to] = spans[i];
+    const read = key("read", unit.key);
+    planned.push({ key: read, role: "read", units: [unit], title: "", minutes: minutes[i], from, to: Math.min(L - 1, to + 1), after: previous ? [previous] : [] });
+    previous = read;
+    if ((i + 1) % 3 === 0 && i < units.length - 1) {
+      const group = units.slice(i - 2, i + 1);
+      planned.push({ key: key("recall", (i + 1) / 3), role: "recall", units: group, title: "", minutes: 20, from: Math.min(L - 1, to + 1), to: Math.min(L - 1, to + 3), after: [read] });
+    }
+  });
+  if (N >= 4) planned.push({ key: key("recall", "final"), role: "recall", units, title: "", minutes: 30, from: N - 1, to: N - 1, after: previous ? [previous] : [] });
+  return { planned, compressed: false };
+}
+
+/** The exam path: revise and practise each topic, mixed reviews, timed papers with corrections, the final review. */
+function layoutExam(syllabus: Syllabus, days: { dates: string[]; capacity: number[] }, prefix: string): { planned: Planned[]; compressed: boolean } {
   const units = syllabus.units.filter((u) => u.included);
   const N = days.dates.length;
   const planned: Planned[] = [];
@@ -235,8 +576,8 @@ export function layoutPath(syllabus: Syllabus, days: { dates: string[]; capacity
   const finalDay = N >= 2 ? last : -1;
   const before = finalDay >= 0 ? finalDay : N;
   // Past papers: each takes a day, followed by a corrections day. More time buys more papers.
-  const paperCount = !papers.length ? 0 : N >= 24 ? 3 : N >= 12 ? 2 : N >= 5 ? 1 : 0;
-  const paperDays = paperCount * 2;
+  const paperCount = !papers.length ? 0 : fitPapers(days, papers, papersFor(N), N >= 2 ? N - 1 : N);
+  const paperDays = paperCount ? tailDaysFor(days, papers, paperCount, before, units.filter((u) => u.confidence === "weak").length) : 0;
   const learnDays = Math.max(1, before - paperDays);
   const L = Math.min(learnDays, before > 0 ? before : 1);
 
@@ -295,20 +636,8 @@ export function layoutPath(syllabus: Syllabus, days: { dates: string[]; capacity
     planned.push({ key: key("practise", `${unit.key}.2`), role: "practise", units: [unit], title: "", minutes: practiceMinutes(unit, "okay"), from, to: Math.min(before - 1, from + 3), after: [key("practise", unit.key)], repeat: 1 });
   }
 
-  // Past papers, each followed by its corrections. After the first, the weak topics it exposed.
-  const weakUnits = units.filter((u) => u.confidence === "weak");
-  for (let k = 0; k < paperCount; k++) {
-    const day = L + k * 2;
-    const paper = papers[k % papers.length];
-    const paperKey = key("paper", k + 1);
-    planned.push({ key: paperKey, role: "paper", units, title: "", minutes: Math.min(180, round5(paper.minutes + 10)), from: day, to: Math.min(before - 1, day + 1), after: [], paper, repeat: k });
-    const fix = key("corrections", k + 1);
-    planned.push({ key: fix, role: "corrections", units, title: "", minutes: Math.max(40, Math.min(75, round5(paper.minutes * 0.5))), from: Math.min(before - 1, day + 1), to: Math.min(before - 1, day + 2), after: [paperKey], paper, repeat: k });
-    if (k === 0) planned.push({ key: key("weak", 1), role: "weak", units: weakUnits, title: "", minutes: 60, from: Math.min(before - 1, day + 1), to: Math.min(before - 1, day + 3), after: [fix] });
-  }
-
-  if (finalDay >= 0) planned.push({ key: key("final", "1"), role: "final", units, title: "", minutes: 45, from: finalDay, to: finalDay, after: [] });
-  for (const p of planned) p.title = titleFor(p, syllabus);
+  // Past papers, each followed by its corrections. After the first, the weak topics it exposed. Then the final review.
+  examTail(planned, units, papers, paperCount, L, before, finalDay, keyFor(prefix));
   return { planned, compressed };
 }
 
@@ -319,13 +648,38 @@ export function layoutPath(syllabus: Syllabus, days: { dates: string[]; capacity
 export function compileStudyPath(model: WorkModel, goalKey: string, snapshot: PlanningSnapshot, source: Source = "template"): { model: WorkModel; summary: PathSummary } {
   const next: WorkModel = JSON.parse(JSON.stringify(model));
   const goal = next.goals.find((g) => g.key === goalKey);
-  const empty: PathSummary = { topics: 0, revise: 0, practise: 0, mixed: 0, papers: 0, sessions: 0, minutes: 0, days: 0, compressed: false };
+  const empty: PathSummary = { checkpoints: 0, from: null, to: null, topics: 0, revise: 0, practise: 0, mixed: 0, papers: 0, sessions: 0, minutes: 0, days: 0, compressed: false };
   if (!goal?.syllabus) return { model: next, summary: empty };
   const syllabus = goal.syllabus;
-  const until = goal.due ? addDays(goal.due, -1) : addDays(snapshot.today, 27);
-  const days = studyDays(snapshot, next, until);
+  const preset = presetOf(goal);
+  const pace = goal.pace ?? {};
+  const start = pace.start && pace.start > snapshot.today ? pace.start : snapshot.today;
+  const perWeek = Math.max(1, Math.min(7, Math.round(pace.daysPerWeek ?? 4)));
+  const session = Math.max(15, Math.min(120, round5(pace.sessionMinutes ?? 30)));
+  const included = syllabus.units.filter((u) => u.included);
+  // Without a date, each kind of plan runs as long as its content needs: a course about four days a topic, a skill as many weeks as its sessions.
+  const open = (): string => {
+    switch (preset) {
+      case "course": return addDays(start, Math.min(364, Math.max(27, included.length * 4 + 13)));
+      case "skill": {
+        const sessions = included.reduce((n, u) => n + 2 + (u.confidence === "strong" ? 1 : u.weight + (u.confidence === "weak" ? 2 : 1)), 0);
+        return addDays(start, Math.min(364, (Math.ceil(sessions / perWeek) + 1) * 7 + 3));
+      }
+      case "reading": return addDays(start, Math.min(364, Math.max(6, Math.ceil(included.length * 1.6) + 2)));
+      case "mastery": return addDays(start, 20);
+      default: return addDays(start, 27);
+    }
+  };
+  const until = goal.due ? addDays(goal.due, -1) : open();
+  const days = studyDays(snapshot, next, until, { from: start, minutesPerDay: preset === "skill" ? null : pace.minutesPerDay ?? null });
   const prefix = pathPrefix(goal.key);
-  const { planned, compressed } = layoutPath(syllabus, days, prefix);
+  const exam = Boolean(goal.due) && (goal.type === "exam" || syllabus.papers.length > 0);
+  const { planned, compressed } = preset === "course" ? layoutCourse(syllabus, days, prefix, exam)
+    : preset === "mastery" ? layoutMastery(syllabus, days, prefix)
+    : preset === "skill" ? layoutSkill(syllabus, days, prefix, perWeek, session)
+    : preset === "reading" ? layoutReading(syllabus, days, prefix)
+    : layoutExam(syllabus, days, prefix);
+  for (const p of planned) p.title = titleFor(p, syllabus, preset);
   const weakUnits = syllabus.units.filter((u) => u.included && u.confidence === "weak");
   const existing = new Map(next.items.map((i) => [i.key, i]));
   const wanted = new Set(planned.map((p) => p.key));
@@ -341,15 +695,25 @@ export function compileStudyPath(model: WorkModel, goalKey: string, snapshot: Pl
   });
   for (const item of next.items) item.after = item.after.filter((k) => next.items.some((i) => i.key === k && i.status !== "dropped") || wanted.has(k));
 
+  // Under the student's minutes a day, no session is longer than the day allows (a full paper sets that limit itself).
+  const perDay = preset !== "skill" && pace.minutesPerDay && pace.minutesPerDay >= 15 ? round5(pace.minutesPerDay) : null;
+  // A paper takes its real length when the day allows it, rather than a few minutes more that would make the limit awkward to fill.
+  const sitting = (p: Planned) => (perDay && p.role === "paper" && p.paper && perDay >= p.paper.minutes ? Math.min(p.minutes, perDay) : p.minutes);
+  const dayLimit = perDay ? Math.max(perDay, ...planned.filter((p) => p.role === "paper").map(sitting)) : null;
   let first = 0;
   for (const p of planned) {
     const shape = ROLE_SHAPE[p.role];
-    const minutes = p.minutes;
-    const sizes = normalizeSizes([minutes, round5(minutes * 1.25)], p.role === "paper" ? [minutes, minutes, minutes] : [Math.min(minutes, 30), minutes, Math.max(minutes, 60)]);
+    // Under a daily limit, sessions take a whole, half or third of the day's allowance, so days pack without leftover crumbs.
+    const fits = dayLimit ? [...new Set([dayLimit, dayLimit / 2, dayLimit / 3, dayLimit / 4].map((x) => Math.floor(x / 5) * 5))].filter((x) => x >= 20) : [];
+    // The largest fitting size that does not grow the session; never below the smallest.
+    const minutes = !dayLimit ? p.minutes : p.role === "paper" ? sitting(p) : (fits.filter((x) => x <= p.minutes).sort((a, b) => b - a)[0] ?? fits[fits.length - 1] ?? Math.min(p.minutes, dayLimit));
+    const whole = p.role === "paper" || Boolean(dayLimit);
+    const sizes = normalizeSizes([minutes, round5(minutes * 1.25)], whole ? [minutes, minutes, minutes] : [Math.min(minutes, 30), minutes, Math.max(minutes, 60)]);
     const earliest = dateAt(p.from);
     let due = dateAt(p.to);
     if (goal.due && due >= goal.due) due = addDays(goal.due, -1) >= snapshot.today ? addDays(goal.due, -1) : goal.due;
-    const details = detailsFor(p, syllabus, weakUnits);
+    if (due < earliest) due = earliest;
+    const details = detailsFor(p, syllabus, weakUnits, preset);
     const topics = [...new Set(p.units.map((u) => u.topic).filter((t): t is number => t != null))].slice(0, 8);
     const before = existing.get(p.key);
     const firstStep = first < 2 && !before ? firstStepFor(p) : before?.firstStep ?? null;
@@ -367,6 +731,13 @@ export function compileStudyPath(model: WorkModel, goalKey: string, snapshot: Pl
       ? { earliest: fresh.earliest, due: fresh.due, after: fresh.after, details: fresh.details, subject: fresh.subject }
       : { ...fresh, questId: before.questId, done: before.done, status: before.status === "dropped" ? "open" : before.status, firstStep: before.firstStep ?? fresh.firstStep });
   }
+  // "Hours a day" for this plan is a hard daily limit on its sessions, never lower than its longest single sitting (a full paper).
+  const capKey = `cap:${goal.key}`;
+  next.constraints = next.constraints.filter((c) => c.key !== capKey);
+  if (dayLimit) {
+    const minutes = dayLimit;
+    next.constraints.push({ key: capKey, kind: "goal_cap", goal: goal.key, minutes, hard: true, weight: 3, provenance: "student", label: `At most ${formatMinutes(minutes)} a day for ${clip(goal.title, 40)}` });
+  }
   // Keep the order of the goal's sessions as the path lays them out, so lists read top to bottom.
   const order = new Map(planned.map((p, i) => [p.key, i]));
   const own = next.items.filter((i) => order.has(i.key)).sort((a, b) => order.get(a.key)! - order.get(b.key)!);
@@ -378,8 +749,10 @@ export function compileStudyPath(model: WorkModel, goalKey: string, snapshot: Pl
   return {
     model: next,
     summary: {
-      topics: syllabus.units.filter((u) => u.included).length, revise: count("revise"), practise: count("practise", true), mixed: count("mixed"), papers: count("paper", true),
+      preset, topics: included.length, revise: count("revise") + count("learn") + count("lesson") + count("read"), practise: count("practise", true), mixed: count("mixed") + count("recall", true),
+      papers: count("paper", true), checkpoints: count("checkpoint") + count("milestone"),
       sessions: planned.length, minutes: planned.reduce((s, p) => s + p.minutes, 0), days: days.dates.length, compressed,
+      dated: Boolean(goal.due), from: planned.length ? dateAt(Math.min(...planned.map((p) => p.from))) : null, to: planned.length ? dateAt(Math.max(...planned.map((p) => p.to))) : null,
     },
   };
 }
@@ -389,15 +762,72 @@ function firstStepFor(p: Planned): string | null {
   switch (p.role) {
     case "revise": return `Open your notes on ${unit.title} and redo one example for the first key point without looking.`;
     case "practise": return `Find the ${unit.title} questions in two recent past papers and set a timer.`;
+    case "learn": return `Open the ${unit.title} chapter and write its first key point in your own words.`;
+    case "lesson": return `Find one good explanation of ${unit.title} and try the first point slowly.`;
+    case "read": return `Open ${unit.title} and note the first key idea.`;
     default: return null;
   }
 }
+
+/** The preset a goal plans with: its own, or what its type implies for goals made before presets. */
+export function presetOf(goal: Pick<KGoal, "preset" | "type">): PlanPreset {
+  if (goal.preset) return goal.preset;
+  switch (goal.type) {
+    case "skill": return "skill";
+    case "reading": return "reading";
+    case "essay": case "project": case "problem_set": return "assignment";
+    default: return "exam";
+  }
+}
+
+const PRESET_WORDS: [RegExp, PlanPreset][] = [
+  [/\b(essay|report|dissertation|thesis|coursework|assignment|project|presentation|portfolio|lab report|problem set|homework)\b/i, "assignment"],
+  [/\b(read|reading list|book|novel|chapters? \d+ ?(?:-|to) ?\d+ of)\b/i, "reading"],
+  [/\b(exam|exams|midterm|mid-term|mid term|finals?|mock|test|quiz|boards?|paper \d|sat|act|ap\b|gcse|igcse|a-?levels?|o-?levels?|certification|certificate exam|licen[cs]e exam)\b/i, "exam"],
+  [/\b(whole|entire|full|complete) (course|syllabus|subject|module|curriculum|year)\b|\b(course|module|semester|term|curriculum|syllabus)\b/i, "course"],
+  [/\b(chapter|topic|unit|master|mastering|understand|get good at)\b/i, "mastery"],
+  [/\b(learn|learning|skill|practi[cs]e|language|instrument|guitar|piano|coding|programming|drawing|speaking|fluency|habit)\b/i, "skill"],
+];
+
+/** Auto without the model: the first preset whose words the request uses, or a course when it names a date far away. */
+export function inferPreset(text: string, due: string | null, today: string): PlanPreset {
+  const found = PRESET_WORDS.find(([re]) => re.test(text))?.[1];
+  if (found) return found;
+  if (due && diffDays(due, today) > 45) return "course";
+  return due ? "exam" : "skill";
+}
+
+const PRESET_SHAPE: Record<PlanPreset, string> = {
+  exam: "revise and practise each topic, mixed reviews, timed papers, light final day",
+  course: "study and practise each topic, spaced reviews, checkpoint tests",
+  mastery: "study each part, recall checks at widening gaps, mastery test",
+  skill: "lessons, practice and a milestone for each stage",
+  assignment: "research, outline, draft, revise, check",
+  reading: "read in order with written recaps",
+};
+
+/** One short line on how the path works, from the compiler's counts. */
+export function describePath(summary: PathSummary, syllabus: Pick<Syllabus, "papers">, preset: PlanPreset = summary.preset ?? "exam"): string {
+  const n = summary.topics;
+  const plural = (k: number, word: string) => `${k} ${word}${k === 1 ? "" : "s"}`;
+  switch (preset) {
+    case "course": return `${plural(n, "topic")} in order, ${plural(summary.mixed, "review")}${summary.checkpoints ? `, ${plural(summary.checkpoints, "checkpoint test")}` : ""}${summary.papers ? `, ${plural(summary.papers, "timed paper")}` : ""}.${summary.compressed ? " Time is tight, so sessions are short." : ""}`;
+    case "mastery": return `${plural(n, "part")}, ${plural(summary.mixed, "recall check")} at widening gaps, then a mastery test.${summary.compressed ? " Time is tight, so sessions are short." : ""}`;
+    case "skill": return `${plural(n, "stage")}, each with a lesson, practice and a milestone check.${summary.compressed && summary.dated ? " Fewer practice sessions fit before your date." : ""}`;
+    case "reading": return `${plural(n, "part")} at a steady pace, with written recaps.`;
+    default: {
+      const paper = syllabus.papers[0]?.label ?? "past paper";
+      return `${plural(n, "topic")} revised and practised in order, ${plural(summary.mixed, "mixed review")}${summary.papers ? `, ${summary.papers} timed ${paper}${summary.papers === 1 ? "" : "s"}` : ""}, light final day.${summary.compressed ? " Time is tight, so sessions are short." : ""}`;
+    }
+  }
+}
+export const presetShape = (preset: PlanPreset) => PRESET_SHAPE[preset];
 
 /** A quest's description: the aim, the key points and how to study. */
 export function questDescription(item: Pick<WorkItem, "details" | "note" | "firstStep">): string | null {
   const d = item.details;
   if (!d) return [item.note, item.firstStep ? `First step: ${item.firstStep}` : null].filter(Boolean).join("\n") || null;
-  const heading = d.role === "revise" ? "Key points" : d.role === "practise" ? "Check you can" : d.role === "mixed" || d.role === "weak" ? "Cover" : "Checklist";
+  const heading = d.role === "revise" || d.role === "learn" || d.role === "lesson" || d.role === "read" ? "Key points" : d.role === "practise" || d.role === "milestone" ? "Check you can" : d.role === "mixed" || d.role === "weak" || d.role === "recall" ? "Cover" : "Checklist";
   return [d.aim, d.points.length ? `${heading}:\n${d.points.map((p) => `• ${p}`).join("\n")}` : null, d.how ? `How: ${d.how}` : null, item.firstStep ? `First step: ${item.firstStep}` : null]
     .filter(Boolean).join("\n\n").slice(0, 2000);
 }
@@ -423,13 +853,38 @@ export function editSyllabus(model: WorkModel, goalKey: string, changes: { units
   return next;
 }
 
-/** Normalizes a syllabus from any source: clean titles, three to seven points, bounded weights, unique keys, at most 24 units. */
-export function normalizeSyllabus(raw: { source: Syllabus["source"]; ref?: string | null; name: string; papers?: Partial<SyllabusPaper>[]; units: (Partial<SyllabusUnit> & { title: string })[]; checked?: boolean }): Syllabus {
+/** A topic name that fits in `max` characters without breaking a word: "The balance of payments and exchange rates" → "Balance of payments and exchange rates". */
+export function shortTitle(text: string, max = 40): string {
+  let t = text.trim();
+  if (t.length <= max) return t;
+  t = t.replace(/^(the|an|a)\s+/i, "");
+  t = t.charAt(0).toUpperCase() + t.slice(1);
+  if (t.length <= max) return t;
+  const head = t.split(/\s*[:(–—]\s*/)[0];
+  if (head.length >= 4 && head.length <= max) return head;
+  let cut = t.slice(0, max + 1).replace(/\s+\S*$/, "");
+  cut = cut.replace(/(?:[\s,;&]+(?:and|or|of|the|to|for|in|on|with|&))+$/i, "").replace(/[\s,;:&-]+$/, "");
+  return cut.length >= 4 ? cut : clip(t, max);
+}
+
+/** A paper's short name for titles: "Paper 2" from "Paper 2: The national and global economy", "Section I, Part A" from its full heading. */
+export function paperLabel(raw: string): string {
+  const text = cleanTitle(raw);
+  if (!text) return "Past paper";
+  const head = text.split(/\s*[:–—(]\s*/)[0].trim();
+  if (head.length >= 3 && head.length <= 24) return head;
+  const named = /\b(paper|section|component|unit|part)\s*([0-9]+[a-z]?|[ivx]+)\b/i.exec(text);
+  if (named) return `${named[1][0].toUpperCase()}${named[1].slice(1).toLowerCase()} ${named[2]}`;
+  return clip(text, 24);
+}
+
+/** Normalizes a syllabus from any source: clean titles, three to seven points, bounded weights, unique keys, at most 40 units. */
+export function normalizeSyllabus(raw: { source: Syllabus["source"]; ref?: string | null; name: string; papers?: Partial<SyllabusPaper>[]; units: (Partial<SyllabusUnit> & { title: string })[]; checked?: boolean; sources?: { title: string; url: string }[]; researched?: boolean }): Syllabus {
   const level = (v: unknown, fallback: 1 | 2 | 3): 1 | 2 | 3 => (v === 1 || v === 2 || v === 3 ? v : typeof v === "number" ? (Math.max(1, Math.min(3, Math.round(v))) as 1 | 2 | 3) : fallback);
   const seen = new Set<string>();
   const units: SyllabusUnit[] = [];
   for (const unit of raw.units) {
-    const title = clip(cleanTitle(String(unit.title ?? "")).replace(/^\d+(\.\d+)*\s*[:.)-]?\s*/, ""), 40);
+    const title = shortTitle(cleanTitle(String(unit.title ?? "")).replace(/^\d+(\.\d+)*\s*[:.)-]?\s*/, ""), 40);
     if (!title || seen.has(title.toLowerCase())) continue;
     seen.add(title.toLowerCase());
     units.push({
@@ -439,13 +894,14 @@ export function normalizeSyllabus(raw: { source: Syllabus["source"]; ref?: strin
       confidence: unit.confidence === "weak" || unit.confidence === "okay" || unit.confidence === "strong" ? unit.confidence : null,
       included: unit.included !== false, topic: typeof unit.topic === "number" ? unit.topic : null,
     });
-    if (units.length >= 24) break;
+    if (units.length >= 40) break;
   }
   const papers = (raw.papers ?? [])
-    .map((p) => ({ label: clip(cleanTitle(String(p.label ?? "")) || "Past paper", 30), minutes: Math.max(20, Math.min(240, round5(Number(p.minutes) || 0))), marks: typeof p.marks === "number" && p.marks > 0 ? Math.round(p.marks) : null }))
+    .map((p) => ({ label: paperLabel(String(p.label ?? "")), minutes: Math.max(20, Math.min(240, round5(Number(p.minutes) || 0))), marks: typeof p.marks === "number" && p.marks > 0 ? Math.round(p.marks) : null }))
     .filter((p) => p.minutes >= 20)
     .slice(0, 4);
-  return { source: raw.source, ref: raw.ref ?? null, name: clip(cleanTitle(raw.name) || "Syllabus", 120), papers, units, checked: raw.checked === true };
+  const sources = (raw.sources ?? []).filter((x) => /^https?:\/\//.test(x.url)).slice(0, 6).map((x) => ({ title: clip(cleanTitle(x.title) || x.url, 120), url: x.url.slice(0, 500) }));
+  return { source: raw.source, ref: raw.ref ?? null, name: clip(cleanTitle(raw.name) || "Syllabus", 120), papers, units, checked: raw.checked === true, ...(sources.length ? { sources } : {}), ...(raw.researched ? { researched: true } : {}) };
 }
 
 /**
@@ -457,7 +913,7 @@ export function parseTopicList(text: string | null | undefined): { title: string
   const range = /\bchapters?\s*(\d{1,2})\s*(?:-|–|to|through)\s*(\d{1,2})\b/i.exec(text);
   if (range) {
     const a = Number(range[1]); const b = Number(range[2]);
-    if (b >= a && b - a < 24) return Array.from({ length: b - a + 1 }, (_, i) => ({ title: `Chapter ${a + i}`, points: [] }));
+    if (b >= a && b - a < 40) return Array.from({ length: b - a + 1 }, (_, i) => ({ title: `Chapter ${a + i}`, points: [] }));
   }
   const labelled = /\b(?:topics?|chapters?|units?)\s*(?:are|include|covered)?\s*[:\-–]\s*([^\n]+)/i.exec(text);
   const split = (line: string) => {
@@ -466,33 +922,53 @@ export function parseTopicList(text: string | null | undefined): { title: string
   };
   if (labelled) {
     const parts = labelled[1].split(/\s*(?:,|;|\band\b)\s*/i).map((p) => p.trim()).filter((p) => p.length >= 2 && p.length <= 60);
-    if (parts.length >= 2) return parts.slice(0, 24).map((p) => ({ title: clip(cleanTitle(p), 40), points: [] }));
+    if (parts.length >= 2) return parts.slice(0, 40).map((p) => ({ title: clip(cleanTitle(p), 40), points: [] }));
   }
   const lines = text.split(/\n+/).map((l) => l.trim()).filter(Boolean);
   const listy = lines.filter((l) => /^[-*•]|^\d+[.)]\s/.test(l) || (l.length <= 70 && !/[.?!]$/.test(l) && l.split(/\s+/).length <= 10));
-  if (lines.length >= 2 && listy.length >= Math.max(2, Math.ceil(lines.length * 0.7))) return listy.slice(0, 24).map(split).filter((u) => u.title.length >= 2);
+  if (lines.length >= 2 && listy.length >= Math.max(2, Math.ceil(lines.length * 0.7))) return listy.slice(0, 40).map(split).filter((u) => u.title.length >= 2);
   return [];
 }
 
-export interface GuidePhase { key: "learn" | "papers" | "final"; title: string; from: string | null; to: string | null; sessions: number }
+export interface GuidePhase { key: string; title: string; from: string | null; to: string | null; sessions: number }
 
-/** The plan in phases with real dates from the solved blocks, for "how this plan works". */
-export function pathPhases(model: WorkModel, goal: KGoal, blocks: readonly { item: string; date: string; state: string }[]): GuidePhase[] {
+/** The plan in phases with real dates: from placed blocks, and for work beyond the detailed horizon from its windows. */
+export function pathPhases(model: WorkModel, goal: KGoal, blocks: readonly { item: string; date: string; state: string }[], today?: string): GuidePhase[] {
   const items = model.items.filter((i) => i.goal === goal.key && i.details && i.status !== "dropped");
   const live = blocks.filter((b) => b.state !== "skipped");
-  const range = (roles: StudyRole[]) => {
-    const own = items.filter((i) => roles.includes(i.details!.role));
-    const dates = live.filter((b) => own.some((i) => i.key === b.item)).map((b) => b.date).sort();
+  const range = (own: WorkItem[]) => {
+    const keys = new Set(own.map((i) => i.key));
+    const placed = live.filter((b) => keys.has(b.item)).map((b) => b.date);
+    const unplaced = own.filter((i) => !placed.length || !live.some((b) => b.item === i.key));
+    const dates = [...placed, ...unplaced.flatMap((i) => [i.earliest ?? today ?? null, i.due].filter((d): d is string => Boolean(d)))].sort();
     return { from: dates[0] ?? null, to: dates[dates.length - 1] ?? null, sessions: own.length };
   };
-  const topics = goal.syllabus?.units.filter((u) => u.included).length ?? 0;
-  const learn = range(["revise", "practise", "mixed"]);
-  const papers = range(["paper", "corrections", "weak"]);
-  const final = range(["final"]);
+  const by = (roles: StudyRole[]) => items.filter((i) => roles.includes(i.details!.role));
+  const n = goal.syllabus?.units.filter((u) => u.included).length ?? 0;
   const out: GuidePhase[] = [];
-  if (learn.sessions) out.push({ key: "learn", title: `Revise and practise ${topics} topic${topics === 1 ? "" : "s"}, with mixed reviews`, ...learn });
-  if (papers.sessions) out.push({ key: "papers", title: "Timed past papers, corrections and weak topics", ...papers });
-  if (final.sessions) out.push({ key: "final", title: "Formula sheet and light review", ...final });
+  const push = (key: string, title: string, own: WorkItem[]) => { if (own.length) out.push({ key, title, ...range(own) }); };
+  switch (presetOf(goal)) {
+    case "skill":
+      for (const unit of goal.syllabus?.units.filter((u) => u.included) ?? []) push(unit.key, unit.title, items.filter((i) => i.details!.units.includes(unit.key)));
+      break;
+    case "reading":
+      push("read", `Read ${n} part${n === 1 ? "" : "s"}`, by(["read", "recall"]));
+      break;
+    case "mastery":
+      push("learn", `Study ${n} part${n === 1 ? "" : "s"}`, by(["learn", "practise"]));
+      push("recall", "Recall checks", by(["recall"]));
+      push("test", "Mastery test", by(["checkpoint"]));
+      break;
+    case "course":
+      push("learn", `Learn ${n} topic${n === 1 ? "" : "s"}`, by(["learn", "practise", "mixed", "recall", "checkpoint"]).filter((i) => !i.key.endsWith(".recall.final")));
+      push("papers", "Exam practice", by(["paper", "corrections", "weak"]));
+      push("final", "Final review", [...by(["final"]), ...items.filter((i) => i.key.endsWith(".recall.final"))]);
+      break;
+    default:
+      push("learn", `Revise ${n} topic${n === 1 ? "" : "s"}`, by(["revise", "practise", "mixed"]));
+      push("papers", "Timed papers", by(["paper", "corrections", "weak"]));
+      push("final", "Final review", by(["final"]));
+  }
   return out;
 }
 
@@ -550,4 +1026,12 @@ export function parseTopicCommand(text: string, model: WorkModel): TopicCommand 
     return null;
   }
   return null;
+}
+
+/** Marks the topics a learner named as weak ("integration, trig and vectors"), one name at a time, so one unknown name never blocks the rest. */
+export function markWeak(syllabus: Syllabus, text: string | null | undefined): Syllabus {
+  if (!text?.trim()) return syllabus;
+  const names = text.toLowerCase().split(/\s*(?:,|;|\n|&|\band\b|\/)\s*/).map((n) => n.trim()).filter((n) => n.length >= 3);
+  const weak = new Set(names.flatMap((name) => namedUnits(name, syllabus.units).map((u) => u.key)));
+  return weak.size ? { ...syllabus, units: syllabus.units.map((u) => (weak.has(u.key) ? { ...u, confidence: "weak" as const } : u)) } : syllabus;
 }

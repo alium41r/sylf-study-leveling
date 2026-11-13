@@ -125,6 +125,11 @@ function constraintSpec(raw: Record<string, unknown>, refs: RefMap): ConstraintS
       if (s === undefined) return "subject_cap subject is unknown";
       return { kind, subject: s, minutes: clampInt(raw.minutes, 0, 600, 120) };
     }
+    case "goal_cap": {
+      const goal = typeof raw.goal === "string" ? refs.goals[raw.goal] ?? raw.goal : null;
+      if (!goal) return "goal_cap needs a goal";
+      return { kind, goal, minutes: clampInt(raw.minutes, 15, 960, 120) };
+    }
     case "day_off": {
       const dates = Array.isArray(raw.dates) ? raw.dates.filter(isDateKey) : [];
       return dates.length ? { kind, dates } : "day_off needs dates";
@@ -377,6 +382,7 @@ export function describeConstraint(spec: ConstraintSpec, subjectName?: (id: numb
     case "preferred_window": return `${name(spec.subject)} ${hhmm(spec.start)}–${hhmm(spec.end)}${dayList(spec.days)}${spec.until ? ` until ${spec.until}` : ""}`;
     case "study_window": return `Study between ${hhmm(spec.start)} and ${hhmm(spec.end)}${dayList(spec.days)}`;
     case "subject_cap": return `At most ${spec.minutes} min of ${name(spec.subject)} a day`;
+    case "goal_cap": return `At most ${spec.minutes} min a day for this plan`;
     case "day_off": return spec.dates.length === 1 ? `Day off ${spec.dates[0]}` : `Days off ${spec.dates.join(", ")}`;
     case "subject_weight": return `${name(spec.subject)} matters ${spec.weight === 3 ? "most" : spec.weight === 2 ? "more" : "less"}`;
     case "exam_buffer": return `Keep ${spec.days} day${spec.days === 1 ? "" : "s"} before exams light`;

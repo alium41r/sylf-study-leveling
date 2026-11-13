@@ -11,7 +11,10 @@ export const maxDuration = 120;
 const key = z.string().regex(/^[A-Za-z0-9_:.-]{8,120}$/);
 const workflow = z.discriminatedUnion("workflow", [
   z.object({ workflow: z.literal("command"), key, text: z.string().min(2).max(600) }),
-  z.object({ workflow: z.literal("add_goal"), key, title: z.string().min(1).max(200).optional(), type: z.string().max(20).optional(), due: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(), subjectId: z.number().int().positive().nullable().optional(), priority: z.number().int().min(1).max(3).optional(), notes: z.string().max(6000).optional(), goalKey: z.string().max(80).optional() }),
+  z.object({ workflow: z.literal("add_goal"), key, title: z.string().min(1).max(200).optional(), type: z.string().max(20).optional(), due: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(), subjectId: z.number().int().positive().nullable().optional(), priority: z.number().int().min(1).max(3).optional(), notes: z.string().max(6000).optional(), goalKey: z.string().max(80).optional(),
+    preset: z.enum(["auto", "exam", "course", "mastery", "skill", "assignment", "reading"]).optional(), minutesPerDay: z.number().int().min(15).max(720).nullable().optional(),
+    daysPerWeek: z.number().int().min(1).max(7).nullable().optional(), sessionMinutes: z.number().int().min(10).max(180).nullable().optional(), start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+    level: z.string().max(200).nullable().optional(), weak: z.string().max(400).nullable().optional(), target: z.string().max(80).nullable().optional(), topics: z.string().max(4000).nullable().optional() }),
   z.object({ workflow: z.literal("answer"), key, question: z.string().max(80), answer: z.string().min(1).max(2000) }),
   z.object({ workflow: z.literal("brief") }),
   z.object({ workflow: z.literal("question"), text: z.string().min(2).max(400) }),

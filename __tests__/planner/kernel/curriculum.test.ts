@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  addDays, compileStudyPath, diffDays, editSyllabus, normalizeSyllabus, parseTopicCommand, parseTopicList, pathPhases, questDescription, seededRandom, solve, verify,
+  addDays, compileStudyPath, describePath, diffDays, editSyllabus, inferPreset, normalizeSyllabus, paperLabel, parseTopicCommand, shortTitle, parseTopicList, pathPhases, questDescription, seededRandom, solve, verify,
   type Syllabus, type WorkModel,
 } from "@/lib/planner/kernel";
 import { catalogSyllabus, linkTopics, matchSyllabi } from "@/lib/planner/catalog/syllabi";
@@ -201,5 +201,149 @@ describe("topic commands", () => {
     expect(parseTopicCommand("I'm weak at organic chemistry", exam())).toBeNull();
     expect(parseTopicCommand("move maths to evenings", exam())).toBeNull();
     expect(parseTopicCommand("I'm weak at integration", modelWith(p1()).goals.length ? { ...modelWith(p1()), goals: [] } : exam())).toBeNull();
+  });
+});
+
+describe("presets", () => {
+  const units = (n: number) => Array.from({ length: n }, (_, i) => ({ title: `Topic ${i + 1}`, points: ["one", "two", "three"], weight: ((i % 3) + 1) as 1 }));
+  const plan = (preset: import("@/lib/planner/kernel").PlanPreset, n: number, due: string | null, extra: Partial<import("@/lib/planner/kernel").KGoal> = {}, days = 28) => {
+    const snap = snapshot({ today: TODAY, nowMinute: 9 * 60 }, days, [0]);
+    const syllabus = normalizeSyllabus({ source: "model", name: "Course", units: units(n), papers: extra.type === "exam" ? [{ label: "Paper 1", minutes: 90, marks: 60 }] : [] });
+    const m: WorkModel = { goals: [goal("g1", { title: "Plan", type: "general", due, syllabus, preset, ...extra })], items: [], practices: [], constraints: [], assumptions: [], questions: [] };
+    const { model, summary } = compileStudyPath(m, "g1", snap);
+    const input = { snapshot: snap, model, blocks: [] };
+    const result = solve(input);
+    return { snap, model, summary, result, check: verify(input, result) };
+  };
+
+  it("spreads a whole course over months, with spaced reviews, checkpoints and the exam at the end", () => {
+    const { model, result, check, summary } = plan("course", 30, addDays(TODAY, 150), { type: "exam" });
+    expect(check.pass).toBe(true);
+    expect(result.unplaced).toEqual([]);
+    expect(result.weekBudgets.length).toBeGreaterThan(20);
+    expect(summary.to! >= addDays(TODAY, 140)).toBe(true);
+    const titles = model.items.map((i) => i.title);
+    expect(titles).toContain("Topic 1 study");
+    expect(titles).toContain("Topic 30 practice questions");
+    expect(titles.some((t) => t.startsWith("Checkpoint test:"))).toBe(true);
+    expect(titles.filter((t) => t.startsWith("Paper 1 timed past paper")).length).toBeGreaterThanOrEqual(4);
+    // The second review of a group comes well after the first.
+    const first = model.items.find((i) => i.key === "g1.mix.1")!; const second = model.items.find((i) => i.key === "g1.recall.1")!;
+    expect(diffDays(second.earliest!, first.earliest!)).toBeGreaterThanOrEqual(7);
+  });
+
+  it("masters a topic with recall checks at widening gaps and a final test", () => {
+    const { model, check } = plan("mastery", 4, addDays(TODAY, 21));
+    expect(check.pass).toBe(true);
+    const recalls = model.items.filter((i) => i.details?.role === "recall").map((i) => i.earliest!);
+    expect(recalls.length).toBeGreaterThanOrEqual(3);
+    for (let k = 2; k < recalls.length; k++) expect(diffDays(recalls[k], recalls[k - 1])).toBeGreaterThanOrEqual(diffDays(recalls[k - 1], recalls[k - 2]));
+    expect(model.items.at(-1)?.title).toBe("Mastery test");
+  });
+
+  it("paces a skill with no deadline at the student's days a week and session length", () => {
+    const { model, result, check } = plan("skill", 6, null, { type: "skill", pace: { daysPerWeek: 3, sessionMinutes: 40 } });
+    expect(check.pass).toBe(true);
+    expect(model.items.every((i) => i.est[0] === 40)).toBe(true);
+    expect(model.items.map((i) => i.title).slice(0, 3)).toEqual(["Topic 1 lesson", "Topic 1 practice", "Topic 1 practice 2"]);
+    expect(model.items.some((i) => i.title === "Topic 6 milestone check")).toBe(true);
+    const dates = [...new Set(result.blocks.map((b) => b.date))].sort();
+    expect(dates.length).toBe(result.blocks.length);
+    for (let k = 3; k < dates.length; k++) expect(diffDays(dates[k], dates[k - 3])).toBeGreaterThanOrEqual(6);
+  });
+
+  it("reads a book in order with recaps", () => {
+    const { model, check } = plan("reading", 12, "2027-01-01", { type: "reading" });
+    expect(check.pass).toBe(true);
+    expect(model.items[0].title).toBe("Read: Topic 1");
+    expect(model.items.filter((i) => i.details?.role === "recall").length).toBe(4);
+  });
+
+  it("keeps a plan within the student's minutes a day", () => {
+    const { model, result, check } = plan("exam", 8, "2026-12-01", { type: "exam", pace: { minutesPerDay: 90 } });
+    expect(check.pass).toBe(true);
+    // The 90-minute paper fits the 90-minute day exactly, so the limit holds on every day.
+    expect(model.constraints.find((c) => c.kind === "goal_cap")).toMatchObject({ goal: "g1", minutes: 90 });
+    expect(result.unplaced).toEqual([]);
+    const perDay = new Map<string, number>();
+    for (const b of result.blocks) perDay.set(b.date, (perDay.get(b.date) ?? 0) + b.end - b.start);
+    for (const minutes of perDay.values()) expect(minutes).toBeLessThanOrEqual(90);
+  });
+
+  it("fits fewer timed papers when the last days cannot hold them under the daily limit", () => {
+    const syllabus = p1();
+    const snap = world();
+    const m: WorkModel = { goals: [goal("g1", { title: "Maths", type: "exam", due: EXAM, priority: 3, syllabus, preset: "exam", pace: { minutesPerDay: 120 } })], items: [], practices: [], constraints: [], assumptions: [], questions: [] };
+    const { model } = compileStudyPath(m, "g1", snap);
+    const input = { snapshot: snap, model, blocks: [] };
+    const result = solve(input);
+    expect(verify(input, result).pass).toBe(true);
+    expect(result.unplaced).toEqual([]);
+    expect(model.items.filter((i) => i.details?.role === "paper").length).toBe(1);
+  });
+
+  it("compresses a mastery plan with many parts instead of leaving work unplaced", () => {
+    const { result, check } = plan("mastery", 11, addDays(TODAY, 14), { pace: { minutesPerDay: 90 } }, 15);
+    expect(check.pass).toBe(true);
+    expect(result.unplaced).toEqual([]);
+  });
+
+  it("keeps every session within a tight daily limit over a long course, with several papers", () => {
+    const { model, result, check } = plan("course", 12, addDays(TODAY, 175), { type: "exam", pace: { minutesPerDay: 60 } });
+    expect(check.pass).toBe(true);
+    expect(result.unplaced).toEqual([]);
+    expect(model.items.every((i) => i.est[0] <= 100)).toBe(true);
+    expect(model.items.filter((i) => i.details?.role === "paper").length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("gives an open-ended skill every session it needs, without claiming a date", () => {
+    const { summary } = plan("skill", 7, null, { type: "skill", pace: { daysPerWeek: 4, sessionMinutes: 30 } });
+    expect(summary.compressed).toBe(false);
+    expect(describePath(summary, { papers: [] }, "skill")).not.toMatch(/date/);
+  });
+
+  it("shortens long topic names at a word, never mid-word", () => {
+    expect(shortTitle("The balance of payments and exchange rates")).toBe("Balance of payments and exchange rates");
+    expect(shortTitle("Macroeconomic objectives and policy conflicts")).toBe("Macroeconomic objectives and policy");
+    expect(shortTitle("Public expenditure, taxation and the national debt")).toBe("Public expenditure, taxation");
+    expect(shortTitle("Quadratics")).toBe("Quadratics");
+  });
+
+  it("shortens paper names for session titles", () => {
+    expect(paperLabel("Paper 2: The national and global economy")).toBe("Paper 2");
+    expect(paperLabel("Section I, Part A: Multiple Choice")).toBe("Section I, Part A");
+    expect(paperLabel("231/1 Biology Theory Paper 1")).toBe("Paper 1");
+  });
+
+  it("picks a preset from the request when the model is not there to", () => {
+    expect(inferPreset("Maths mid term paper 1", "2026-12-01", TODAY)).toBe("exam");
+    expect(inferPreset("Whole course: MECH 2210 Thermodynamics", null, TODAY)).toBe("course");
+    expect(inferPreset("Learn conversational Spanish", null, TODAY)).toBe("skill");
+    expect(inferPreset("History essay on the Cold War", "2026-11-30", TODAY)).toBe("assignment");
+    expect(inferPreset("Read Crime and Punishment", null, TODAY)).toBe("reading");
+    expect(inferPreset("Master chapter 4: electrochemistry", null, TODAY)).toBe("mastery");
+  });
+});
+
+describe("presets over random instances", () => {
+  it("never fails a hard check, whatever the preset, pace or window", () => {
+    const runs = Number(process.env.KERNEL_PROPERTY_RUNS ?? 120);
+    const presets = ["exam", "course", "mastery", "skill", "reading"] as const;
+    for (let seed = 1; seed <= runs; seed++) {
+      const random = seededRandom(seed * 7919);
+      const int = (lo: number, hi: number) => lo + Math.floor(random() * (hi - lo + 1));
+      const preset = presets[int(0, presets.length - 1)];
+      const units = Array.from({ length: int(1, preset === "course" ? 40 : 12) }, (_, i) => ({ title: `Unit ${i + 1}`, points: ["a"], weight: int(1, 3) as 1, difficulty: int(1, 3) as 1, confidence: (["weak", "okay", "strong", null] as const)[int(0, 3)] }));
+      const syllabus = normalizeSyllabus({ source: "model", name: "X", units, papers: random() < 0.5 ? [{ label: "Paper 1", minutes: int(6, 30) * 5, marks: 50 }] : [] });
+      const days = int(8, 28);
+      const snap = snapshot({ today: TODAY, nowMinute: int(7, 20) * 60 }, days, random() < 0.5 ? [0] : []);
+      snap.settings.dailyCap = int(60, 300);
+      const due = random() < 0.3 ? null : addDays(TODAY, int(1, preset === "course" ? 200 : days + 10));
+      const pace = random() < 0.5 ? { minutesPerDay: int(3, 24) * 5, daysPerWeek: int(1, 7), sessionMinutes: int(3, 12) * 5, start: random() < 0.2 ? addDays(TODAY, int(1, 5)) : null } : null;
+      const m: WorkModel = { goals: [goal("g1", { title: "X", type: random() < 0.5 ? "exam" : "general", due, priority: 2, syllabus, preset, pace })], items: [], practices: [], constraints: [], assumptions: [], questions: [] };
+      const { model } = compileStudyPath(m, "g1", snap);
+      const input = { snapshot: snap, model, blocks: [] };
+      expect(verify(input, solve(input)).failures, `seed ${seed} ${preset}`).toEqual([]);
+    }
   });
 });

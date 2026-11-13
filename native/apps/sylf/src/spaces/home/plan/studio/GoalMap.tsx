@@ -9,7 +9,7 @@ import { ESTIMATE, RELATIVE, dayLabel, formatMinutes, goalProgress, sessionLabel
 import { SyllabusGoal } from "./StudyGuide";
 import type { Studio } from "./useStudio";
 
-export function GoalMap({ state, studio, model, blocks, onSelectItem, onSelectBlock }: { state: StudioState; studio: Studio; model: planning.WorkModel; blocks: planning.Block[]; onSelectItem: (item: string) => void; onSelectBlock: (block: string) => void }) {
+export function GoalMap({ state, studio, model, blocks, budgets, onSelectItem, onSelectBlock }: { state: StudioState; studio: Studio; model: planning.WorkModel; blocks: planning.Block[]; budgets: planning.WeekBudget[]; onSelectItem: (item: string) => void; onSelectBlock: (block: string) => void }) {
   const { color, space, shape } = useTheme();
   const streaming = new Set(studio.activity?.running ? studio.activity.items.map((i) => i.key) : []);
   const committedKeys = new Set(state.model.items.map((i) => i.key));
@@ -18,11 +18,10 @@ export function GoalMap({ state, studio, model, blocks, onSelectItem, onSelectBl
   const nextOf = (item: string) => state.plan.blocks.filter((b) => b.item === item && (b.state === "committed" || b.state === "proposed")).sort((a, b) => a.date.localeCompare(b.date) || a.start - b.start)[0];
   return (
     <Stack gap="md" testID="studio-goals">
-      <Text variant="subheading" role="heading" aria-level={3}>Goals</Text>
-      {!goals.length ? <Text tone="soft">No goals yet. Add one, or tell the planner what's coming up.</Text> : null}
+      {!goals.length ? <Text tone="soft">No plans yet.</Text> : null}
       {goals.map((goal) => {
         // An exam planned from its syllabus gets the full study guide: phases, topics with key points, and the plan day by day.
-        if (goal.syllabus) return <SyllabusGoal key={goal.key} state={state} studio={studio} model={model} goal={goal} blocks={blocks} onSelectBlock={onSelectBlock} />;
+        if (goal.syllabus) return <SyllabusGoal key={goal.key} state={state} studio={studio} model={model} goal={goal} blocks={blocks} budgets={budgets} onSelectBlock={onSelectBlock} />;
         const items = model.items.filter((i) => i.goal === goal.key && i.status !== "dropped");
         const progress = goalProgress(model, state.snapshot, goal.key);
         const r = risk(goal.key);

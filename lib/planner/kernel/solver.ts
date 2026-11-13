@@ -17,7 +17,8 @@ import {
 } from "./contracts";
 
 const UNIT = 5;
-const MAX_WEEKS = 26;
+/** Weeks beyond the detailed horizon that hold budgets: a year, so a whole course can be planned to its end. */
+const MAX_WEEKS = 52;
 /** The gap kept between any two sessions; sessions of 45 minutes or more get the student's full break. */
 const MIN_GAP = 5;
 
@@ -114,6 +115,20 @@ export function hashString(text: string): number {
   let hash = 0x811c9dc5;
   for (let i = 0; i < text.length; i++) { hash ^= text.charCodeAt(i); hash = Math.imul(hash, 0x01000193) >>> 0; }
   return hash >>> 0;
+}
+
+/**
+ * Daily cap groups: a goal's own limit ("an hour and a half a day for this plan") for its sessions, and a subject's limit for every other session of
+ * that subject. Each item counts against at most one group, so the flow stays a single path per item.
+ */
+export function capGroups(constraints: readonly Constraint[]): { caps: Map<string, number>; groupOf: (item: Pick<WorkItem, "goal" | "subject">) => string | null } {
+  const caps = new Map<string, number>();
+  for (const c of constraints) {
+    const key = c.kind === "goal_cap" ? `g:${c.goal}` : c.kind === "subject_cap" ? `s:${c.subject}` : null;
+    if (key) caps.set(key, Math.min(caps.get(key) ?? Infinity, (c as { minutes: number }).minutes));
+  }
+  const groupOf = (item: Pick<WorkItem, "goal" | "subject">) => (item.goal && caps.has(`g:${item.goal}`) ? `g:${item.goal}` : item.subject != null && caps.has(`s:${item.subject}`) ? `s:${item.subject}` : null);
+  return { caps, groupOf };
 }
 
 const matchesDay = (days: number[] | undefined, weekday: number) => !days || !days.length || days.includes(weekday);
@@ -267,9 +282,8 @@ function allocate(ctx: Ctx, demands: Demand[], capacity: { cap: number; comforta
   const H = ctx.horizon.length;
   const nItems = demands.length;
   // Node layout: 0 source, 1 sink, items, pace nodes, days, weeks, subject-day nodes.
-  const subjectCaps = new Map<number, number>();
-  for (const c of ctx.constraints) if (c.kind === "subject_cap") subjectCaps.set(c.subject, Math.min(subjectCaps.get(c.subject) ?? Infinity, c.minutes));
-  const capped = [...subjectCaps.keys()].sort((a, b) => a - b);
+  const { caps: groupCaps, groupOf } = capGroups(ctx.constraints);
+  const capped = [...groupCaps.keys()].sort();
   const itemBase = 2;
   const paceBase = itemBase + nItems;
   const dayBase = paceBase + nItems;
@@ -305,8 +319,9 @@ function allocate(ctx: Ctx, demands: Demand[], capacity: { cap: number; comforta
         if (day > dueIdx - tail) cost += 3;
       }
       // Stability: leaving a day the item already had costs more than any urgency gain from moving it, and most within the next 48 hours.
-      const subjectIdx = d.item.subject != null ? capped.indexOf(d.item.subject) : -1;
-      const target = subjectIdx >= 0 ? sdBase + subjectIdx * H + day : dayBase + day;
+      const group = groupOf(d.item);
+      const groupIdx = group ? capped.indexOf(group) : -1;
+      const target = groupIdx >= 0 ? sdBase + groupIdx * H + day : dayBase + day;
       if (prev && prev.size) {
         // Stability: the minutes the item already had on this day are the cheapest to keep; anything else costs more than any urgency gain from
         // moving, and most within the next 48 hours.
@@ -324,8 +339,8 @@ function allocate(ctx: Ctx, demands: Demand[], capacity: { cap: number; comforta
       });
     }
   });
-  capped.forEach((subject, si) => {
-    for (let day = 0; day < H; day++) graph.addEdge(sdBase + si * H + day, dayBase + day, Math.max(0, Math.floor(((subjectCaps.get(subject) ?? 0) - (fixedSubject.get(`${subject}|${day}`) ?? 0)) / UNIT)), 0);
+  capped.forEach((group, gi) => {
+    for (let day = 0; day < H; day++) graph.addEdge(sdBase + gi * H + day, dayBase + day, Math.max(0, Math.floor(((groupCaps.get(group) ?? 0) - (fixedSubject.get(`${group}|${day}`) ?? 0)) / UNIT)), 0);
   });
   for (let day = 0; day < H; day++) {
     const comfortable = Math.floor(capacity[day].comfortable / UNIT);
@@ -361,17 +376,16 @@ function allocate(ctx: Ctx, demands: Demand[], capacity: { cap: number; comforta
 function consolidate(alloc: Allocation, demands: Demand[], capacity: { cap: number; max?: number }[], constraints: readonly Constraint[] = [], fixedSubject: Map<string, number> = new Map()) {
   const used = new Array<number>(capacity.length).fill(0);
   for (const days of alloc.days.values()) for (const [day, minutes] of days) used[day] += minutes;
-  // Subject caps hold through consolidation too.
-  const subjectCaps = new Map<number, number>();
-  for (const c of constraints) if (c.kind === "subject_cap") subjectCaps.set(c.subject, Math.min(subjectCaps.get(c.subject) ?? Infinity, c.minutes));
+  // Cap groups (a goal's or a subject's daily limit) hold through consolidation too.
+  const { caps: groupCaps, groupOf } = capGroups(constraints);
   const subjectUse = new Map<string, number>(fixedSubject);
-  const subjectOf = new Map(demands.map((d) => [d.item.key, d.item.subject]));
-  for (const [key, days] of alloc.days) { const subject = subjectOf.get(key); if (subject != null && subjectCaps.has(subject)) for (const [day, m] of days) subjectUse.set(`${subject}|${day}`, (subjectUse.get(`${subject}|${day}`) ?? 0) + m); }
-  const subjectRoom = (subject: number | null, day: number, minutes: number) => subject == null || !subjectCaps.has(subject) || (subjectUse.get(`${subject}|${day}`) ?? 0) + minutes <= subjectCaps.get(subject)!;
-  const moveSubject = (subject: number | null, from: number, to: number, minutes: number) => {
-    if (subject == null || !subjectCaps.has(subject)) return;
-    subjectUse.set(`${subject}|${from}`, (subjectUse.get(`${subject}|${from}`) ?? 0) - minutes);
-    subjectUse.set(`${subject}|${to}`, (subjectUse.get(`${subject}|${to}`) ?? 0) + minutes);
+  const subjectOf = new Map(demands.map((d) => [d.item.key, groupOf(d.item)]));
+  for (const [key, days] of alloc.days) { const group = subjectOf.get(key); if (group) for (const [day, m] of days) subjectUse.set(`${group}|${day}`, (subjectUse.get(`${group}|${day}`) ?? 0) + m); }
+  const subjectRoom = (group: string | null, day: number, minutes: number) => !group || (subjectUse.get(`${group}|${day}`) ?? 0) + minutes <= groupCaps.get(group)!;
+  const moveSubject = (group: string | null, from: number, to: number, minutes: number) => {
+    if (!group) return;
+    subjectUse.set(`${group}|${from}`, (subjectUse.get(`${group}|${from}`) ?? 0) - minutes);
+    subjectUse.set(`${group}|${to}`, (subjectUse.get(`${group}|${to}`) ?? 0) + minutes);
   };
   for (const d of demands) {
     const days = alloc.days.get(d.item.key);
@@ -380,12 +394,15 @@ function consolidate(alloc: Allocation, demands: Demand[], capacity: { cap: numb
     for (const [day] of [...days.entries()].sort((a, b) => a[1] - b[1] || a[0] - b[0])) {
       const minutes = days.get(day);
       if (minutes === undefined || minutes >= min) continue;
-      const subject = d.item.subject;
+      const subject = groupOf(d.item);
       const other = [...days.entries()].filter(([o, m]) => o !== day && m >= min && capacity[o].cap - used[o] >= minutes && subjectRoom(subject, o, minutes)).sort((a, b) => Math.abs(a[0] - day) - Math.abs(b[0] - day) || a[0] - b[0])[0];
       if (other) { days.delete(day); used[day] -= minutes; days.set(other[0], other[1] + minutes); used[other[0]] += minutes; moveSubject(subject, day, other[0], minutes); continue; }
       // A leftover may stretch an existing sitting of the same item a little past the comfortable load, never past the student's hard cap.
       const stretch = [...days.entries()].filter(([o, m]) => o !== day && m >= min && (capacity[o].max ?? capacity[o].cap) - used[o] >= minutes && subjectRoom(subject, o, minutes)).sort((a, b) => Math.abs(a[0] - day) - Math.abs(b[0] - day) || a[0] - b[0])[0];
       if (stretch) { days.delete(day); used[day] -= minutes; days.set(stretch[0], stretch[1] + minutes); used[stretch[0]] += minutes; moveSubject(subject, day, stretch[0], minutes); continue; }
+      // Two short pieces of one item that together make a full sitting are joined on the day that has room.
+      const completing = [...days.entries()].filter(([o, m]) => o !== day && m < min && m + minutes >= min && capacity[o].cap - used[o] >= minutes && subjectRoom(subject, o, minutes)).sort((a, b) => b[1] - a[1] || a[0] - b[0])[0];
+      if (completing) { days.delete(day); used[day] -= minutes; days.set(completing[0], completing[1] + minutes); used[completing[0]] += minutes; moveSubject(subject, day, completing[0], minutes); continue; }
       // A crumb of a larger item is not a session: it waits for room rather than appearing as a ten-minute block.
       if (minutes < 15 && d.remaining >= min) { days.delete(day); used[day] -= minutes; moveSubject(subject, day, day, 0); alloc.overflow.set(d.item.key, (alloc.overflow.get(d.item.key) ?? 0) + minutes); continue; }
       // Nowhere to fold it: a short finishing sitting is better than losing the minutes, unless another short piece can absorb it.
@@ -414,7 +431,20 @@ function placeDay(ctx: Ctx, day: SnapshotDay, dayIdx: number, demandsByKey: Map<
       pieces.push({ item: demand.item, demand, minutes: size, start: -1, end: -1, index: k });
     }
   }
-  pieces.sort((a, b) => b.item.load - a.item.load || (a.demand.due ?? "9999").localeCompare(b.demand.due ?? "9999") || b.minutes - a.minutes || (a.item.key < b.item.key ? -1 : a.item.key > b.item.key ? 1 : a.index - b.index));
+  // Predecessors are placed before what depends on them on the same day: placed later, a predecessor would have to fit before a session that
+  // already took the day's first free time, and could be left out of a day with room to spare.
+  const onDay = new Set(pieces.map((p) => p.item.key));
+  const depthOf = new Map<string, number>();
+  const depth = (key: string, seen: Set<string> = new Set()): number => {
+    if (depthOf.has(key)) return depthOf.get(key)!;
+    if (seen.has(key)) return 0;
+    seen.add(key);
+    const item = demandsByKey.get(key)?.item;
+    const d = item ? Math.max(0, ...item.after.filter((k) => onDay.has(k)).map((k) => depth(k, seen) + 1)) : 0;
+    depthOf.set(key, d);
+    return d;
+  };
+  pieces.sort((a, b) => depth(a.item.key) - depth(b.item.key) || b.item.load - a.item.load || (a.demand.due ?? "9999").localeCompare(b.demand.due ?? "9999") || b.minutes - a.minutes || (a.item.key < b.item.key ? -1 : a.item.key > b.item.key ? 1 : a.index - b.index));
   const preferred = ctx.constraints.filter((c): c is Constraint & { kind: "preferred_window" } => c.kind === "preferred_window" && matchesDay(c.days, day.weekday) && (!c.until || day.date <= c.until));
   const previousStart = new Map<string, number[]>();
   for (const block of previousOnDay) previousStart.set(block.item, [...(previousStart.get(block.item) ?? []), block.start]);
@@ -579,8 +609,7 @@ function keepValidBlocks(ctx: Ctx, blocks: readonly Block[], itemByKey: Map<stri
     const base = item.done >= p50 && item.questId ? Math.max(item.chunk[0], round5(p50 * 0.25)) : p50 - item.done;
     return Math.max(0, base - (reserved.get(item.key) ?? 0));
   };
-  const subjectCaps = new Map<number, number>();
-  for (const c of ctx.constraints) if (c.kind === "subject_cap") subjectCaps.set(c.subject, Math.min(subjectCaps.get(c.subject) ?? Infinity, c.minutes));
+  const { caps: groupCaps, groupOf } = capGroups(ctx.constraints);
   const kept = new Set<string>();
   const used = new Map<string, number>();
   const dayUse = new Map<string, number>();
@@ -603,8 +632,9 @@ function keepValidBlocks(ctx: Ctx, blocks: readonly Block[], itemByKey: Map<stri
     const { hardCap } = dayCaps(ctx, day);
     const fixedDay = fixed.filter((b) => b.date === day.date && b.state !== "missed" && b.state !== "skipped").reduce((sum, b) => sum + blockMinutes(b), 0) + (day.date === snapshot.today ? snapshot.studiedToday : 0) + (day.otherWork ?? 0);
     if ((dayUse.get(day.date) ?? 0) + minutes + fixedDay > Math.max(hardCap, fixedDay)) { reject(); continue; }
-    const subjectKey = `${item.subject}|${day.date}`;
-    if (item.subject != null && subjectCaps.has(item.subject) && (subjectUse.get(subjectKey) ?? 0) + minutes > subjectCaps.get(item.subject)!) { reject(); continue; }
+    const group = groupOf(item);
+    const subjectKey = `${group}|${day.date}`;
+    if (group && (subjectUse.get(subjectKey) ?? 0) + minutes > groupCaps.get(group)!) { reject(); continue; }
     kept.add(block.id);
     used.set(item.key, (used.get(item.key) ?? 0) + minutes);
     dayUse.set(day.date, (dayUse.get(day.date) ?? 0) + minutes);
@@ -709,12 +739,13 @@ function solveOnce(input: SolveInput): SolveResult {
   for (const block of movable) { const idx = ctx.dayIndex.get(block.date); if (idx == null) continue; const days = previous.get(block.item) ?? new Map<number, number>(); days.set(idx, (days.get(idx) ?? 0) + blockMinutes(block)); previous.set(block.item, days); }
 
   const demands = buildDemand(ctx, items, fixed);
-  // Minutes of each subject already fixed on a day count against that subject's daily cap.
+  // Minutes already fixed on a day count against their cap group's daily limit.
   const fixedSubject = new Map<string, number>();
+  const { groupOf: fixedGroupOf } = capGroups(ctx.constraints);
   for (const block of fixed) {
     if (block.state === "missed" || block.state === "skipped") continue;
-    const idx = ctx.dayIndex.get(block.date); const subject = itemByKey.get(block.item)?.subject;
-    if (idx != null && subject != null) fixedSubject.set(`${subject}|${idx}`, (fixedSubject.get(`${subject}|${idx}`) ?? 0) + blockMinutes(block));
+    const idx = ctx.dayIndex.get(block.date); const item = itemByKey.get(block.item); const group = item ? fixedGroupOf(item) : null;
+    if (idx != null && group) fixedSubject.set(`${group}|${idx}`, (fixedSubject.get(`${group}|${idx}`) ?? 0) + blockMinutes(block));
   }
   // Residual work must finish before any successor that stays in place.
   if (kept.size) {

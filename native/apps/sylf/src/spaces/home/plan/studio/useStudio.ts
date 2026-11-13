@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppState } from "react-native";
 import { useNotice } from "@sylf/design-system";
 import { planning } from "@sylf/shared";
-import type { BackendError, BlockEdit, StudioEvent, StudioProposal, StudioState, StudioWorkflow, SyllabusEdit } from "@sylf/backend";
+import type { BackendError, BlockEdit, PlanRequest, StudioEvent, StudioProposal, StudioState, StudioWorkflow, SyllabusEdit } from "@sylf/backend";
 import { useLiveBackend } from "../studioShell";
 import { describeFailureText } from "../studioShell";
 import { refreshPlan } from "../usePlan";
@@ -129,6 +129,7 @@ export function useStudio() {
         case "strategy": record.strategy.push(event.text); break;
         case "item": record.items.push(event.item); break;
         case "unit": if (!record.units.some((u) => u.title === event.unit.title)) record.units.push(event.unit); break;
+        case "units_reset": record.units = []; break;
         case "syllabus": record.syllabus = { name: event.name, source: event.source }; break;
         case "preview": record.preview = { blocks: event.blocks, summary: event.summary, unplaced: event.unplaced }; break;
         case "text": record.text += event.delta; break;
@@ -159,7 +160,7 @@ export function useStudio() {
   }, [reads]);
 
   const command = useCallback((text: string) => run({ workflow: "command", key: keyFor(`command:${text}`), text }, `command:${text}`), [run, keyFor]);
-  const addGoal = useCallback((input: { title?: string; type?: string; due?: string | null; subjectId?: number | null; notes?: string; goalKey?: string }) => run({ workflow: "add_goal", key: keyFor(`goal:${input.goalKey ?? input.title}`), ...input }, `goal:${input.goalKey ?? input.title}`), [run, keyFor]);
+  const addGoal = useCallback((input: { title?: string; type?: string; due?: string | null; subjectId?: number | null; notes?: string; goalKey?: string } & PlanRequest) => run({ workflow: "add_goal", key: keyFor(`goal:${input.goalKey ?? input.title}`), ...input }, `goal:${input.goalKey ?? input.title}`), [run, keyFor]);
   const answer = useCallback((question: string, reply: string) => run({ workflow: "answer", key: keyFor(`answer:${question}:${reply}`), question, answer: reply }, `answer:${question}:${reply}`), [run, keyFor]);
   const ask = useCallback((text: string) => run({ workflow: "question", text }, "question"), [run]);
   const brief = useCallback(() => run({ workflow: "brief" }, "brief"), [run]);

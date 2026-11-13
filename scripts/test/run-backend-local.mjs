@@ -6,6 +6,7 @@
  *   ... node scripts/test/run-backend-local.mjs --native-checks [--electron] [--build]  Sylf Native's client against this server: the device client's integration suite, and with --electron the real Electron window. Build `native/` first for that (`npm run build:web`)
  *   ... node scripts/test/run-backend-local.mjs --journey [--build] [--out <dir>]       the whole student journey in real Electron, as two processes on one profile, so a restart is a real restart. Build `native/` first
  *   ... node scripts/test/run-backend-local.mjs --studio [--with-deepseek] [--dev]      the Planning Studio in real Electron (sign-up, plan, accept, edit, undo, screenshots). Build `native/` first.
+ *   ... node scripts/test/run-backend-local.mjs --generations --dev --with-deepseek    real plan generations for scripts/test/planner-generation-cases.json, written as generations.json and .md
  *       --with-deepseek is the one deliberate exception to blanking: it passes DEEPSEEK_API_KEY (from the environment or .env) so the Studio's
  *       model path runs for real. It spends a few tenths of a cent; leave it off to exercise the template path only.
  * Without --dev it needs a build (`--build`). Redis, Supabase storage, Realtime, email and AI providers are off, and those paths use their fallbacks.
@@ -88,6 +89,67 @@ async function studioCheck() {
   if (!report.studio) report.failed = true;
 }
 
+/** Real plan generations for the cases in planner-generation-cases.json: each goes through the Studio's stream as a new student would send it. */
+async function generations() {
+  mkdirSync(out, { recursive: true });
+  for (const path of ["/api/planner/studio", "/api/planner/studio/stream"]) await fetch(`${base}${path}`, path.endsWith("stream") ? { method: "POST", body: "{}" } : {}).catch(() => undefined);
+  const jar = cookieJar();
+  const tag = Date.now().toString(36);
+  const registered = await jar.call("/api/auth/register", { method: "POST", body: { email: `gen_${tag}@local.test`, password: `Gen-${tag}-Password1!`, name: "Generations", username: `gen_${tag}`, timezone: "UTC" } });
+  if (registered.status !== 201) throw new Error(`Could not register (${registered.status}).`);
+  const cases = JSON.parse(readFileSync(join(root, "scripts/test/planner-generation-cases.json"), "utf8"));
+  const today = (await jar.call("/api/planner/studio")).json?.snapshot?.today;
+  const plusDays = (date, days) => { const d = new Date(`${date}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + days); return d.toISOString().slice(0, 10); };
+  const results = [];
+  for (const [index, c] of cases.entries()) {
+    const due = c.dueInDays != null ? plusDays(today, c.dueInDays) : c.due ?? null;
+    const body = { workflow: "add_goal", key: `gen-${tag}-${index}`, title: c.title, preset: c.preset, due, minutesPerDay: c.minutesPerDay ?? null, daysPerWeek: c.daysPerWeek ?? null, sessionMinutes: c.sessionMinutes ?? null, level: c.level ?? null, weak: c.weak ?? null, target: c.target ?? null, topics: c.topics ?? null, ...(c.notes ? { notes: c.notes } : {}) };
+    const started = Date.now();
+    const response = await fetch(`${base}/api/planner/studio/stream`, { method: "POST", headers: { cookie: jar.cookie, "content-type": "application/json", accept: "application/x-ndjson" }, body: JSON.stringify(body) });
+    const events = (await response.text()).split("\n").filter(Boolean).map((line) => { try { return JSON.parse(line); } catch { return null; } }).filter(Boolean);
+    const seconds = Math.round((Date.now() - started) / 100) / 10;
+    const state = (await jar.call("/api/planner/studio")).json;
+    const proposal = state?.proposal;
+    const goal = proposal?.model?.goals?.find((g) => g.title === c.title.slice(0, 60) || g.title.startsWith(c.title.slice(0, 40)));
+    const items = (proposal?.model?.items ?? []).filter((i) => i.goal === goal?.key && i.status !== "dropped");
+    const blocks = (proposal?.result?.blocks ?? []).filter((b) => items.some((i) => i.key === b.item));
+    const budgets = (proposal?.result?.weekBudgets ?? []).filter((b) => items.some((i) => i.key === b.item));
+    results.push({
+      ...c, due, seconds, status: response.status, error: events.find((e) => e.type === "error")?.message ?? null,
+      stages: events.filter((e) => e.type === "stage").map((e) => e.text), strategy: proposal?.strategy ?? null,
+      preset: goal?.preset ?? null, type: goal?.type ?? null, questions: proposal?.model?.questions?.map((q) => q.text) ?? [],
+      syllabus: goal?.syllabus ? { source: goal.syllabus.source, researched: goal.syllabus.researched ?? false, sources: goal.syllabus.sources ?? [], name: goal.syllabus.name, papers: goal.syllabus.papers, units: goal.syllabus.units.map((u) => ({ title: u.title, points: u.points, weight: u.weight, difficulty: u.difficulty, confidence: u.confidence })) } : null,
+      constraints: (proposal?.model?.constraints ?? []).filter((x) => x.kind === "goal_cap"),
+      verification: proposal ? { pass: proposal.verification.pass, quality: proposal.verification.quality, critics: proposal.verification.critics?.map((x) => `${x.code} ${x.score}: ${x.note}`) } : null,
+      trace: proposal?.trace ?? null,
+      plan: { items: items.length, placed: blocks.length, laterWeeks: new Set(budgets.map((b) => b.week)).size, unplaced: (proposal?.result?.unplaced ?? []).filter((u) => items.some((i) => i.key === u.item)).length, first: blocks.map((b) => b.date).sort()[0] ?? null, last: [...items.map((i) => i.due).filter(Boolean), ...blocks.map((b) => b.date)].sort().at(-1) ?? null },
+      sessions: items.map((i) => ({ title: i.title, role: i.details?.role ?? i.method, minutes: i.est?.[0], window: `${i.earliest ?? today} → ${i.due ?? "open"}`, placed: blocks.filter((b) => b.item === i.key).map((b) => b.date).sort()[0] ?? null, aim: i.details?.aim ?? i.note ?? null, points: i.details?.points?.slice(0, 3) ?? [] })),
+    });
+    console.log(`Generation ${index + 1}/${cases.length}: ${c.id} · ${response.status} · ${seconds} s · ${goal?.preset ?? "no goal"} · ${items.length} sessions`);
+    if (proposal?.id) await jar.call("/api/planner/studio", { method: "POST", body: { action: "discard", proposalId: proposal.id } });
+  }
+  report.generations = results.map((r) => ({ id: r.id, status: r.status, seconds: r.seconds, preset: r.preset, sessions: r.plan.items, pass: r.verification?.pass ?? false }));
+  writeFileSync(join(out, "generations.json"), JSON.stringify({ today, results }, null, 1) + "\n");
+  const md = [`# Plan generations (${today})`, "", "Produced by `run-backend-local.mjs --generations --dev --with-deepseek` from `scripts/test/planner-generation-cases.json`. Each is the proposal a new student would review; nothing was accepted.", ""];
+  for (const [i, r] of results.entries()) {
+    md.push(`## ${i + 1}. ${r.title}`, "", `*${r.area}.* Asked as **${cases[i].preset}**, planned as **${r.preset ?? "none"}** (${r.type ?? "?"}) in ${r.seconds} s; ${r.trace?.tokens?.calls ?? 0} model call(s).`, "");
+    if (r.error) md.push(`Error: ${r.error}`, "");
+    if (r.questions.length) md.push(`Questions: ${r.questions.join(" ")}`, "");
+    if (r.syllabus) {
+      md.push(`- Outline from **${r.syllabus.source}**${r.syllabus.researched ? `, researched against ${r.syllabus.sources.map((x) => { try { return new URL(x.url).hostname; } catch { return x.url; } }).join(", ")}` : ""}: ${r.syllabus.name}${r.syllabus.papers.length ? ` · ${r.syllabus.papers.map((p) => `${p.label} ${p.minutes} min${p.marks ? `, ${p.marks} marks` : ""}`).join("; ")}` : ""}`);
+      md.push(`- ${r.syllabus.units.length} units: ${r.syllabus.units.map((u) => `${u.title}${u.confidence ? ` (${u.confidence})` : ""}`).join(" · ")}`);
+    }
+    md.push(`- Plan: ${r.plan.items} sessions, ${r.plan.placed} placed in the calendar from ${r.plan.first ?? "—"}, ${r.plan.laterWeeks} later week(s) budgeted, ${r.plan.unplaced} unplaced, last ${r.plan.last ?? "—"}; checks ${r.verification?.pass ? "passed" : "FAILED"}, quality ${r.verification?.quality ?? "—"}${r.constraints.length ? `; daily cap ${r.constraints[0].minutes} min` : ""}.`);
+    if (r.strategy) md.push(`- Strategy: ${r.strategy}`);
+    md.push("", "| Session | Kind | Min | Window | First placed |", "| --- | --- | --- | --- | --- |");
+    for (const x of r.sessions) md.push(`| ${x.title} | ${x.role} | ${x.minutes} | ${x.window} | ${x.placed ?? "later"} |`);
+    const sample = r.sessions.find((x) => x.points.length);
+    if (sample) md.push("", `Sample description, "${sample.title}": ${sample.aim} Key points: ${sample.points.join("; ")}.`);
+    md.push("");
+  }
+  writeFileSync(join(out, "generations.md"), md.join("\n"));
+}
+
 function journey() {
   mkdirSync(out, { recursive: true });
   const profile = mkdtempSync(join(tmpdir(), "sylf-journey-"));
@@ -152,7 +214,7 @@ try {
   server.stdout.on("data", keep); server.stderr.on("data", keep);
   await ready();
   if (has("--serve")) { console.log(`Serving ${base} on a disposable database. Ctrl-C stops both.`); await new Promise(() => {}); }
-  if (has("--live")) live(); else if (has("--journey")) journey(); else if (has("--studio")) await studioCheck(); else if (has("--native-checks")) await nativeChecks(); else await smoke();
+  if (has("--live")) live(); else if (has("--journey")) journey(); else if (has("--studio")) await studioCheck(); else if (has("--generations")) await generations(); else if (has("--native-checks")) await nativeChecks(); else await smoke();
   report.serverErrors = logs.join("").split("\n").filter(line => /error/i.test(line)).map(line => backend.redact(line).slice(0, 200)).slice(0, 30);
   if (report.failed) exit = 1;
 } catch (error) {
@@ -161,6 +223,6 @@ try {
   stop();
   report.finishedAt = new Date().toISOString();
   mkdirSync(out, { recursive: true });
-  writeFileSync(join(out, has("--journey") ? "journey-server.json" : has("--native-checks") ? "native-checks.json" : "http-smoke.json"), JSON.stringify(report, null, 1) + "\n");
+  writeFileSync(join(out, has("--journey") ? "journey-server.json" : has("--native-checks") ? "native-checks.json" : has("--generations") ? "generations-server.json" : "http-smoke.json"), JSON.stringify(report, null, 1) + "\n");
   process.exitCode = exit;
 }

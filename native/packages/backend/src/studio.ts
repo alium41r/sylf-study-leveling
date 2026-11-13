@@ -74,12 +74,20 @@ export type StudioEvent =
   | { type: "item"; goal: string | null; item: planning.WorkItem }
   | { type: "syllabus"; goal: string; name: string; source: planning.Syllabus["source"]; units: number }
   | { type: "unit"; goal: string; unit: planning.SyllabusUnit }
+  | { type: "units_reset"; goal: string }
   | { type: "preview"; blocks: Block[]; summary: string; unplaced: number }
   | { type: "text"; delta: string }
   | { type: "proposal"; proposal: StudioProposal }
   | { type: "notice"; text: string }
   | { type: "error"; status: number; code: string; message: string }
   | { type: "done"; result: unknown };
+
+/** What the composer adds to a new plan: its shape, the learner's pace and what they know about it. Every field is optional. */
+export interface PlanRequest {
+  preset?: planning.PlanPreset | "auto";
+  minutesPerDay?: number | null; daysPerWeek?: number | null; sessionMinutes?: number | null; start?: string | null;
+  level?: string | null; weak?: string | null; target?: string | null; topics?: string | null;
+}
 
 /** A change to a goal's topic list: ratings, ticks, added topics, or the list confirmed. */
 export interface SyllabusEdit {
@@ -92,7 +100,7 @@ export interface SyllabusEdit {
 export type BlockEdit = { kind: "move"; block: string; date: string; start: number } | { kind: "pin" | "unpin" | "skip" | "restore"; block: string };
 export type StudioWorkflow =
   | { workflow: "command"; key: string; text: string }
-  | { workflow: "add_goal"; key: string; title?: string; type?: string; due?: string | null; subjectId?: number | null; priority?: number; notes?: string; goalKey?: string }
+  | { workflow: "add_goal"; key: string; title?: string; type?: string; due?: string | null; subjectId?: number | null; priority?: number; notes?: string; goalKey?: string } & PlanRequest
   | { workflow: "answer"; key: string; question: string; answer: string }
   | { workflow: "brief" }
   | { workflow: "question"; text: string }

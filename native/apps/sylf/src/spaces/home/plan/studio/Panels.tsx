@@ -2,36 +2,13 @@
 // device before anything is saved, planning settings and the version history with undo.
 import { useState } from "react";
 import { View } from "react-native";
-import { Badge, Button, Callout, Chip, Disclosure, ListRow, Meter, Plane, Segmented, Sheet, Slider, Stack, Text, Toggle, useTheme } from "@sylf/design-system";
+import { Badge, Button, Callout, Chip, Disclosure, ListRow, Plane, Segmented, Select, Sheet, Slider, Stack, Text, Toggle, useTheme } from "@sylf/design-system";
+import { SheetScroll } from "./CommandBar";
 import type { planning } from "@sylf/shared";
 import type { StudioState } from "@sylf/backend";
-import { clockLabel, dayLabel, formatMinutes, RELATIVE } from "./format";
+import { clockLabel, dayLabel, formatMinutes } from "./format";
 import type { LocalPreview, Studio } from "./useStudio";
 
-export function HealthStrip({ state, onOpenSettings }: { state: StudioState; onOpenSettings: () => void }) {
-  const { space } = useTheme();
-  const health = state.plan.health;
-  const risk = health.atRisk[0];
-  const exam = health.nextExam;
-  const over = health.plannedMinutes > health.sustainableMinutes * 1.05 && health.sustainableMinutes > 0;
-  return (
-    <Plane level="raised" radius="lg" pad="md" testID="studio-health">
-      <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: space.lg }}>
-        <View style={{ flexGrow: 1, flexBasis: 220, gap: 4 }}>
-          <Text variant="label" tone="soft">Next 7 days</Text>
-          <Text variant="subheading">{`${formatMinutes(health.plannedMinutes)} planned of ${formatMinutes(health.sustainableMinutes)} you usually sustain`}</Text>
-          <Meter value={health.plannedMinutes} max={Math.max(health.sustainableMinutes, health.plannedMinutes, 1)} label="Planned against sustainable" tone={over ? "caution" : "accent"} />
-        </View>
-        <View style={{ flexGrow: 1, flexBasis: 200, gap: 6 }}>
-          {risk ? <Badge tone="critical" label={`${risk.title} at risk · due ${dayLabel(risk.due)}${risk.short ? ` · ${formatMinutes(risk.short)} short` : ""}`} /> : <Badge tone="positive" label="Every deadline fits" />}
-          {exam ? <Badge tone="accent" label={`${exam.title} · ${RELATIVE(exam.due, state.snapshot.today)}`} /> : null}
-          <Text variant="caption" tone="soft">{`Plan quality ${state.plan.quality} · ${state.facts.commitments} commitments read${state.facts.calendarComplete ? "" : " · calendar partly read"}`}</Text>
-        </View>
-        <Button title="Settings" icon="sliders" size="small" variant="ghost" onPress={onOpenSettings} testID="studio-settings-open" />
-      </View>
-    </Plane>
-  );
-}
 
 export function SignalCards({ state, studio }: { state: StudioState; studio: Studio }) {
   const { space } = useTheme();
@@ -104,37 +81,37 @@ export function PreviewBar({ preview, studio }: { preview: LocalPreview; studio:
 
 const AUTONOMY: { value: planning.Autonomy; label: string; detail: string }[] = [
   { value: "ASK", label: "Ask me", detail: "Every change waits for you." },
-  { value: "SMART", label: "Smart", detail: "Small same-day shifts happen by themselves; the rest waits for you." },
-  { value: "AUTOPILOT", label: "Autopilot", detail: "Repairs that remove nothing happen by themselves, and are logged." },
+  { value: "SMART", label: "Smart", detail: "Small shifts apply themselves." },
+  { value: "AUTOPILOT", label: "Autopilot", detail: "Repairs apply themselves." },
 ];
 const HOURS = Array.from({ length: 19 }, (_, i) => i + 5);
 
 export function SettingsSheet({ open, onClose, state, studio }: { open: boolean; onClose: () => void; state: StudioState; studio: Studio }) {
   const { space: gap } = useTheme();
   const [draft, setDraft] = useState<planning.StudioSettings>(state.settings);
-  const hour = (m: number) => Math.round(m / 60);
+  const hour = (m: number) => String(Math.round(m / 60));
+  const clock = (h: number) => `${String(h).padStart(2, "0")}:00`;
   return (
     <Sheet open={open} onClose={onClose} title="Planning settings" footer={<Button title={studio.busy === "settings" ? "Saving" : "Save"} variant="emphasis" disabled={studio.busy !== null} onPress={() => void studio.saveSettings({ autonomy: draft.autonomy, dayStart: draft.dayStart, dayEnd: draft.dayEnd, dailyCap: draft.dailyCap, dayOnly: draft.dayOnly, breakMinutes: draft.breakMinutes }).then(onClose)} testID="studio-settings-save" />}>
-      <Stack gap="lg" testID="studio-settings">
-        <Stack gap="xs">
-          <Text variant="subheading">When the plan changes</Text>
-          <Segmented<planning.Autonomy> label="Autonomy" value={draft.autonomy} options={AUTONOMY.map(({ value, label }) => ({ value, label }))} onChange={(autonomy) => setDraft({ ...draft, autonomy })} />
-          <Text variant="small" tone="soft">{AUTONOMY.find((a) => a.value === draft.autonomy)?.detail}</Text>
-        </Stack>
-        <Stack gap="xs">
-          <Text variant="subheading">Study day</Text>
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: gap.xs }}>
-            {HOURS.filter((h) => h <= 12).map((h) => <Chip key={`s${h}`} label={`From ${String(h).padStart(2, "0")}:00`} selected={hour(draft.dayStart) === h} radio onPress={() => setDraft({ ...draft, dayStart: h * 60 })} />)}
+      <SheetScroll>
+        <Stack gap="lg" testID="studio-settings">
+          <Stack gap="xs">
+            <Text variant="label" tone="soft">When the plan changes</Text>
+            <Segmented<planning.Autonomy> label="Autonomy" fit value={draft.autonomy} options={AUTONOMY.map(({ value, label }) => ({ value, label }))} onChange={(autonomy) => setDraft({ ...draft, autonomy })} />
+            <Text variant="small" tone="soft">{AUTONOMY.find((a) => a.value === draft.autonomy)?.detail}</Text>
+          </Stack>
+          <View style={{ flexDirection: "row", gap: gap.sm }}>
+            <View style={{ flex: 1, minWidth: 0 }}><Select label="Day starts" value={hour(draft.dayStart)} options={HOURS.filter((h) => h <= 12).map((h) => ({ value: String(h), label: clock(h) }))} onChange={(h) => setDraft({ ...draft, dayStart: Number(h) * 60 })} /></View>
+            <View style={{ flex: 1, minWidth: 0 }}><Select label="Day ends" value={hour(draft.dayEnd)} options={HOURS.filter((h) => h >= 16).map((h) => ({ value: String(h), label: clock(h) }))} onChange={(h) => setDraft({ ...draft, dayEnd: Number(h) * 60 })} /></View>
           </View>
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: gap.xs }}>
-            {HOURS.filter((h) => h >= 16).map((h) => <Chip key={`e${h}`} label={`Until ${String(h).padStart(2, "0")}:00`} selected={hour(draft.dayEnd) === h} radio onPress={() => setDraft({ ...draft, dayEnd: h * 60 })} />)}
+          <Slider label="Most study a day" value={draft.dailyCap} min={60} max={600} step={15} format={formatMinutes} onChange={(dailyCap) => setDraft({ ...draft, dailyCap })} />
+          <Slider label="Break between sessions" value={draft.breakMinutes} min={0} max={30} step={5} format={(v) => `${v} min`} onChange={(breakMinutes) => setDraft({ ...draft, breakMinutes })} />
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: gap.sm }}>
+            <Text variant="small" style={{ flex: 1 }}>Days only, no times</Text>
+            <Toggle label="Days only, no times" value={draft.dayOnly} onChange={(dayOnly) => setDraft({ ...draft, dayOnly })} />
           </View>
         </Stack>
-        <Slider label="Most study a day" value={draft.dailyCap} min={60} max={600} step={15} format={formatMinutes} onChange={(dailyCap) => setDraft({ ...draft, dailyCap })} />
-        <Slider label="Break between sessions" value={draft.breakMinutes} min={0} max={30} step={5} format={(v) => `${v} min`} onChange={(breakMinutes) => setDraft({ ...draft, breakMinutes })} />
-        <Toggle label="Plan by day only" hint="Hide times and show each day's work as a list." value={draft.dayOnly} onChange={(dayOnly) => setDraft({ ...draft, dayOnly })} />
-        <Text variant="small" tone="soft">{`You usually sustain about ${formatMinutes(state.snapshot.calibration.capacity)} a day${state.snapshot.calibration.samples ? `, from ${state.snapshot.calibration.samples} recent sessions` : ""}.`}</Text>
-      </Stack>
+      </SheetScroll>
     </Sheet>
   );
 }

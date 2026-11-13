@@ -3,12 +3,13 @@
 // Every number on screen comes from the solver; the model's words appear only as short decision notes.
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import { Button, Callout, EmptyState, Placeholder, Plane, Segmented, Sheet, Stack, Text, useTheme, useWindowClass } from "@sylf/design-system";
+import { Button, Callout, EmptyState, IconButton, Placeholder, Plane, Segmented, Sheet, Stack, Text, useTheme, useWindowClass } from "@sylf/design-system";
+import type { planning } from "@sylf/shared";
 import { useLiveBackend } from "../studioShell";
-import { CommandBar, AddGoalSheet, GoalComposer } from "./CommandBar";
+import { CommandBar, AddGoalSheet, GoalComposer, SheetScroll } from "./CommandBar";
 import { GoalMap } from "./GoalMap";
 import { Inspector } from "./Inspector";
-import { HealthStrip, HistoryPanel, PreviewBar, SettingsSheet, SignalCards, WhatIfPanel } from "./Panels";
+import { HistoryPanel, PreviewBar, SettingsSheet, SignalCards, WhatIfPanel } from "./Panels";
 import { ProposalReview } from "./Review";
 import { TermView, WeekGrid, type Zoom } from "./Timeline";
 import { TodayAgenda } from "./TodayAgenda";
@@ -75,7 +76,8 @@ export function StudioView() {
     if (zoom !== "term") { const at = state.snapshot.days.findIndex((d) => d.date === b.date); if (at >= 0) { setPage(Math.floor(at / 7)); setDayIndex(at); } }
   };
   const focusItem = (item: string) => { const b = blocks.find((x) => x.item === item && (x.state === "committed" || x.state === "proposed")); if (b) focusBlock(b.id); };
-  const goalMap = <GoalMap state={state} studio={studio} model={shownModel} blocks={blocks} onSelectItem={focusItem} onSelectBlock={focusBlock} />;
+  const budgets = ((preview?.result.weekBudgets ?? (proposal && view?.source !== "plan" ? proposal.result.weekBudgets : state.plan.weekBudgets)) ?? []) as planning.WeekBudget[];
+  const goalMap = <GoalMap state={state} studio={studio} model={shownModel} blocks={blocks} budgets={budgets} onSelectItem={focusItem} onSelectBlock={focusBlock} />;
   const side = selected ? <Inspector state={state} studio={studio} blockId={selected} onClose={() => { setSelected(null); studio.clearPreview(); }} /> : goalMap;
   // With nothing planned yet, the composer is the page, as on the web planner.
   const empty = !shownModel.goals.some((g) => g.status === "active") && !proposal && !studio.activity;
@@ -84,18 +86,17 @@ export function StudioView() {
   return (
     <Stack gap="lg" testID="studio-view">
       {compact ? <TodayAgenda state={state} studio={studio} onSelect={setSelected} /> : null}
-      <HealthStrip state={state} onOpenSettings={() => setSettings(true)} />
       {empty ? (
         <Plane level="raised" radius="lg" pad="lg" testID="studio-hero" style={{ gap: space.md }}>
-          <Stack gap="xs">
-            <Text variant="title" role="heading" aria-level={2}>Plan an exam</Text>
-            <Text tone="soft">Say what's coming up. The planner maps every topic and its key points, tells you what to study and when, and fits it around your calendar.</Text>
-          </Stack>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
+            <Text variant="title" role="heading" aria-level={2} style={{ flex: 1 }}>New plan</Text>
+            <IconButton icon="sliders" label="Planning settings" onPress={() => setSettings(true)} testID="studio-settings-open" />
+          </View>
           <GoalComposer state={state} studio={studio} inline />
         </Plane>
       ) : compact
-        ? <Button title="Tell the planner" icon="sylvie" variant="solid" onPress={() => setCommandSheet(true)} testID="studio-command-open" />
-        : <CommandBar state={state} studio={studio} onAddGoal={() => setAddGoal(true)} />}
+        ? <View style={{ flexDirection: "row", gap: space.sm, alignItems: "center" }}><View style={{ flex: 1 }}><Button title="Tell the planner" icon="sylvie" variant="solid" onPress={() => setCommandSheet(true)} testID="studio-command-open" /></View><IconButton icon="sliders" label="Planning settings" onPress={() => setSettings(true)} testID="studio-settings-open" /></View>
+        : <CommandBar state={state} studio={studio} onAddGoal={() => setAddGoal(true)} onOpenSettings={() => setSettings(true)} />}
       {compact && studio.activity ? <Text variant="small" tone="soft">{studio.activity.stages.at(-1)?.text ?? (studio.activity.running ? "Planning" : "")}</Text> : null}
       {preview ? <PreviewBar preview={preview} studio={studio} /> : null}
       {proposal && !preview ? <ProposalReview proposal={proposal} state={state} studio={studio} /> : null}
@@ -110,8 +111,8 @@ export function StudioView() {
       )}
       <WhatIfPanel state={state} studio={studio} />
       <HistoryPanel state={state} studio={studio} />
-      {compact ? <Button title="New goal" icon="plus" variant="ghost" onPress={() => setAddGoal(true)} /> : null}
-      <Sheet open={commandSheet} onClose={() => setCommandSheet(false)} title="Tell the planner"><CommandBar state={state} studio={studio} onAddGoal={() => { setCommandSheet(false); setAddGoal(true); }} compact /></Sheet>
+      {compact ? <Button title="New plan" icon="plus" variant="ghost" onPress={() => setAddGoal(true)} /> : null}
+      <Sheet open={commandSheet} onClose={() => setCommandSheet(false)} title="Tell the planner"><SheetScroll><CommandBar state={state} studio={studio} onAddGoal={() => { setCommandSheet(false); setAddGoal(true); }} compact /></SheetScroll></Sheet>
       <AddGoalSheet open={addGoal} onClose={() => setAddGoal(false)} state={state} studio={studio} />
       <SettingsSheet open={settings} onClose={() => setSettings(false)} state={state} studio={studio} />
     </Stack>

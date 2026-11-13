@@ -104,13 +104,20 @@ async function run(window, out) {
   // The Studio opens empty on the composer, as the web planner does.
   check("the Planner is Plan's first view", await toPlanner());
   check("the composer is the empty page", await until(tid("studio-composer")));
-  check("the health strip is there", await has(tid("studio-health")));
+  check("presets are offered, Auto first", await has('[role=radiogroup][aria-label="Kind of plan"]'));
+  check("settings are one tap away", await has(tid("studio-settings-open")));
+  check("the old seven-day box is gone", !(await has(tid("studio-health"))));
   await shot("01-empty");
 
   // A new exam, in the student's own words: the syllabus is found, topics stream in, the study path is built and fitted, then the proposal.
   await type(tid("studio-goal-title"), "Maths mid term Complete Paper 1 CAIE A levels");
   const due = new Date(Date.now() + 18 * 86_400_000).toISOString().slice(0, 10);
   await type(tid("studio-goal-due"), due);
+  // Two of the composer's prompts: hours a day, and a weak spot.
+  await clickOn(`${tid("studio-composer-prompts")} [aria-label="Hours a day"]`);
+  await clickOn('[role=radiogroup][aria-label="Hours a day"] [aria-label="2 h"]');
+  await clickOn(`${tid("studio-composer-prompts")} [aria-label="Weak spots"]`);
+  await type(tid("studio-field-weak"), "integration");
   await sleep(200);
   await shot("02-new-goal");
   const asked = Date.now();
@@ -132,7 +139,11 @@ async function run(window, out) {
   check("the proposal passed every check", before?.proposal?.verification?.pass === true);
   check("the syllabus came from Sylf's checked list", exam?.syllabus?.ref === "caie-9709-p1");
   check("every topic has revision and practice", ["Quadratics revision", "Integration past paper practice", "Paper 1 timed past paper", "Formula sheet and final review"].every((title) => proposed?.items?.some((/** @type {any} */ i) => i.title === title)));
+  facts.perDay = Object.entries((before?.proposal?.result?.blocks ?? []).reduce((/** @type {Record<string, number>} */ m, /** @type {any} */ b) => { m[b.date] = (m[b.date] ?? 0) + b.end - b.start; return m; }, {})).sort();
   check("every session is placed in the calendar", (before?.proposal?.result?.unplaced ?? []).length === 0 && (before?.proposal?.result?.weekBudgets ?? []).length === 0);
+  check("hours a day became the plan's own daily cap", proposed?.constraints?.some((/** @type {any} */ c) => c.kind === "goal_cap" && c.minutes === 120));
+  check("the weak spot was marked and practised again", exam?.syllabus?.units?.find((/** @type {any} */ u) => u.title === "Integration")?.confidence === "weak" && proposed?.items?.some((/** @type {any} */ i) => i.title === "Integration extra practice"));
+  check("Auto chose the exam preset", exam?.preset === "exam");
   check("nothing is added before acceptance", ((await api("/api/quests?all=true&limit=100")).json?.quests ?? []).length === 0);
 
   // Accept: quests appear with their aims and key points, and the study guide sits beside the calendar.
@@ -154,7 +165,7 @@ async function run(window, out) {
   await clickOn(`${tid("studio-guide-topics")} [aria-label^="Trigonometry"]`).catch(() => undefined);
   await sleep(400);
   await shot("05b-topics");
-  await clickOn(`${tid(`studio-guide-${goalKey}`)} [role=radio][aria-label="Day by day"], ${tid(`studio-guide-${goalKey}`)} [aria-label="Day by day"]`).catch(() => undefined);
+  await clickOn(`${tid(`studio-guide-${goalKey}`)} [role=radio][aria-label="Days"], ${tid(`studio-guide-${goalKey}`)} [aria-label="Days"]`).catch(() => undefined);
   check("the day-by-day tab lists the sessions", await until(tid("studio-guide-days"), 4000));
   await shot("05c-days");
 
@@ -208,7 +219,7 @@ async function run(window, out) {
   await sleep(2000);
   const undone = await studio();
   facts.afterUndo = { version: undone?.version, constraints: undone?.model?.constraints?.length };
-  check("undo is a new version without the rule", undone?.version === versionBeforeUndo + 1 && undone?.model?.constraints?.length === 0);
+  check("undo is a new version without the rule", undone?.version === versionBeforeUndo + 1 && !undone?.model?.constraints?.some((/** @type {any} */ c) => c.kind === "daily_cap"));
 
   // What-if previews on the device.
   await clickOn('[aria-label="What if…"], [role=button][aria-label*="What if"]').catch(() => undefined);
@@ -222,6 +233,9 @@ async function run(window, out) {
   await shot("10-term");
   await clickOn(tid("studio-settings-open"));
   check("planning settings open", await until(tid("studio-settings")));
+  await sleep(500);
+  facts.settingsBox = await js(`(() => { const e = document.querySelector('[data-testid="studio-settings"]'); const r = e?.getBoundingClientRect(); return r ? { right: Math.round(r.right), width: Math.round(r.width), window: window.innerWidth, overflow: [...e.querySelectorAll('*')].some((n) => n.getBoundingClientRect().right > r.right + 1) } : null; })()`);
+  check("the settings sheet fits its width", facts.settingsBox && facts.settingsBox.right <= facts.settingsBox.window && !facts.settingsBox.overflow);
   await shot("11-settings");
 
   // With AI available, an exam Sylf's catalog does not hold is mapped by the model: its topics stream in, then the compiled path is proposed.
@@ -240,7 +254,7 @@ async function run(window, out) {
     facts.mapSeconds = Math.round((Date.now() - m0) / 100) / 10;
     const mapped = await studio();
     const physics = mapped?.proposal?.model?.goals?.find((/** @type {any} */ g) => /chemistry/i.test(g.title));
-    facts.mapped = { trace: mapped?.proposal?.trace, pass: mapped?.proposal?.verification?.pass, source: physics?.syllabus?.source, name: physics?.syllabus?.name, papers: physics?.syllabus?.papers, units: physics?.syllabus?.units?.map((/** @type {any} */ u) => `${u.title}: ${u.points.slice(0, 2).join("; ")}`), titles: mapped?.proposal?.model?.items?.filter((/** @type {any} */ i) => i.goal === physics?.key).map((/** @type {any} */ i) => i.title) };
+    facts.mapped = { trace: mapped?.proposal?.trace, pass: mapped?.proposal?.verification?.pass, source: physics?.syllabus?.source, researched: physics?.syllabus?.researched ?? false, sources: physics?.syllabus?.sources ?? [], preset: physics?.preset, name: physics?.syllabus?.name, papers: physics?.syllabus?.papers, units: physics?.syllabus?.units?.map((/** @type {any} */ u) => `${u.title}: ${u.points.slice(0, 2).join("; ")}`), titles: mapped?.proposal?.model?.items?.filter((/** @type {any} */ i) => i.goal === physics?.key).map((/** @type {any} */ i) => i.title) };
     check("the model mapped the chemistry syllabus", physics?.syllabus?.source === "model" && (physics?.syllabus?.units?.length ?? 0) >= 4);
     await shot("12b-ai-syllabus-proposal");
     await clickOn(tid("studio-discard")).catch(() => undefined);

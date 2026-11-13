@@ -1,7 +1,8 @@
 // Cross-engine parity suite: hashes of shared Sylf computations that must be identical on V8 (Node and
 // Electron/Chromium) and Hermes (Android/iOS). Values were first measured on all three engines in Phase 2;
 // Phase 3 corrected the progression case (Phase 2 omitted getLevelProgress's level argument) and re-verified it.
-// planning.solve was measured on V8 (Node 22) on 13 November 2026; its Hermes and Chromium values are checked by the on-device parity run.
+// planning.solve was measured on V8 (Node 22) on 13 November 2026 and re-measured the same day after the solver began placing a day's
+// predecessors first (solver-1.1.0); its Hermes and Chromium values are checked by the on-device parity run.
 import * as Y from "yjs";
 import { appearance, calculator, inkGeometry, planning, progression, timer, TimezoneService } from "./index";
 
@@ -13,7 +14,7 @@ export const PARITY_EXPECTED = {
   "timer.snapshot": "4379c662",
   "ink.geometry": "a127da69",
   "yjs.roundTrip": "ok",
-  "planning.solve": "3bb0f5f5",
+  "planning.solve": "e7880522",
 } as const;
 
 export type ParityName = keyof typeof PARITY_EXPECTED;

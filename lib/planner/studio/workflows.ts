@@ -7,12 +7,14 @@ import { createHash } from "node:crypto";
 import { withAiRequest } from "@/lib/ai/telemetry-runtime";
 import { releaseQuota, reserveQuota } from "@/lib/ai/usage-limiter";
 import {
-  applyOperations, autoApplies, calibrationNote, classifyChange, compileStudyPath, dayLabel, diffPlans, editSyllabus, formatMinutes, inferGoalType, isDateKey, isFixed,
-  normalizeSizes, normalizeSyllabus, parseCommand, parseTopicCommand, parseTopicList, propose, scaffold, signals as computeSignals,
-  type Block, type Confidence, type GoalType, type Op, type PathSummary, type PlanCandidate, type Signal, type Syllabus, type SyllabusUnit, type WhatIf, type WorkItem, type WorkModel,
+  PLAN_PRESETS, applyOperations, autoApplies, calibrationNote, classifyChange, compileStudyPath, dayLabel, describePath, diffDays, diffPlans, editSyllabus, formatMinutes,
+  inferGoalType, inferPreset, isDateKey, isFixed, markWeak, normalizeSizes, normalizeSyllabus, parseCommand, parseTopicCommand, parseTopicList, propose, scaffold,
+  signals as computeSignals,
+  type Block, type Confidence, type GoalType, type KGoal, type Op, type Pace, type PlanCandidate, type PlanPreset, type Signal, type Syllabus, type SyllabusUnit, type WhatIf, type WorkItem, type WorkModel,
 } from "../kernel";
 import { catalogSyllabus, linkTopics, matchSyllabi } from "../catalog/syllabi";
 import { compileContext, type CompiledContext } from "./snapshot";
+import { findSources, researchAvailable, sourcesForPrompt } from "./research";
 import { CRITIQUE_TOOL, DECOMPOSE_TOOL, INTENT_TOOL, SYLLABUS_SYSTEM, SYLLABUS_TOOL, TIER0, ANSWER_SYSTEM, BRIEF_SYSTEM, EXPLAIN_SYSTEM, briefFacts, syllabusRequest, userMessage, wrapData } from "./prompts";
 import { GatewayError, callText, callTool, type WireMessage } from "./gateway";
 import { StudioError, commitDirect, history, openProposal, persistProposal, persistTransitions, setBlockState, type CommitOutcome, type ProposalView } from "./store";
@@ -25,6 +27,7 @@ export type StudioEvent =
   | { type: "item"; goal: string | null; item: WorkItem }
   | { type: "syllabus"; goal: string; name: string; source: Syllabus["source"]; units: number }
   | { type: "unit"; goal: string; unit: SyllabusUnit }
+  | { type: "units_reset"; goal: string }
   | { type: "preview"; blocks: Block[]; summary: string; unplaced: number }
   | { type: "text"; delta: string }
   | { type: "proposal"; proposal: ProposalView }
@@ -146,9 +149,10 @@ function schedulePreview(w: Working) {
 }
 
 /** Breaks one goal into work: streamed from the model, or from the strategy library when the model is unavailable. */
-async function decompose(w: Working, goalKey: string, ai: boolean, notes: string | null, signal?: AbortSignal): Promise<void> {
-  const goal = w.model.goals.find((g) => g.key === goalKey);
-  if (!goal) return;
+async function decompose(w: Working, goalKey: string, ai: boolean, notes: string | null, signal?: AbortSignal, extra: PlanInput = {}): Promise<void> {
+  const found = w.model.goals.find((g) => g.key === goalKey);
+  if (!found) return;
+  let goal: KGoal = found;
   const goalRef = w.refs.goalOf.get(goalKey)!;
   const subjectRef = goal.subject != null ? w.refs.subjectOf.get(goal.subject) ?? null : null;
   const topics = w.ctx.snapshot.topics.filter((t) => t.subject === goal.subject);
@@ -161,10 +165,19 @@ async function decompose(w: Working, goalKey: string, ai: boolean, notes: string
     w.notes.push(`${goal.title} starts from a study template. Ask for changes in your own words.`);
     schedulePreview(w);
   };
-  // Exams, and anything the student gave a topic list for, are planned from a syllabus: the topics first, then a compiled study path.
-  if (goal.type === "exam" || goal.syllabus || parseTopicList(notes).length >= 2) {
-    if (await planFromSyllabus(w, goalKey, ai, notes, signal)) return;
-    if (goal.type === "exam") return;
+  // Exams, courses, topics, skills and books are planned from an outline: its parts first, then a path compiled for the preset. Assignments, and
+  // skills or books the planner could not outline, are broken down the ordinary way.
+  const requested = extra.preset ?? goal.preset ?? null;
+  if (goal.syllabus || (requested && requested !== "assignment") || goal.type === "exam" || ((goal.type === "skill" || goal.type === "reading") && ai) || parseTopicList(extra.topics || notes).length >= 2) {
+    const outcome = await planFromOutline(w, goalKey, ai, notes, signal, extra);
+    goal = w.model.goals.find((g) => g.key === goalKey)!;
+    if (outcome.planned) return;
+    if (outcome.preset === "exam" || outcome.preset === "course" || outcome.preset === "mastery") return;
+    if (outcome.preset === "assignment") {
+      const fresh = goal;
+      fresh.preset = "assignment";
+      if (fresh.type === "general" || fresh.type === "exam") fresh.type = ((): GoalType => { const t = inferGoalType(fresh.title); return t === "essay" || t === "project" || t === "problem_set" ? t : "project"; })();
+    }
   }
   if (!ai) { template(); return; }
 
@@ -240,22 +253,18 @@ async function decompose(w: Working, goalKey: string, ai: boolean, notes: string
   }
 }
 
-const SOURCE_LABEL: Record<Syllabus["source"], string> = { catalog: "Sylf's syllabus list", model: "the AI's knowledge of the course", student: "your topic list", subject: "your syllabus in Sylf" };
-
-/** "Revise 8 topics in syllabus order…": how the path works, from the compiler's counts. */
-export function pathStrategy(summary: PathSummary, syllabus: Syllabus): string {
-  const paper = syllabus.papers[0]?.label ?? "past paper";
-  const parts = [`Revise ${summary.topics} topic${summary.topics === 1 ? "" : "s"} in syllabus order, each followed by past paper practice`];
-  if (summary.mixed) parts.push(`with ${summary.mixed} mixed review${summary.mixed === 1 ? "" : "s"} so earlier topics stay fresh`);
-  const tail = summary.papers ? `Then ${summary.papers} timed ${paper}${summary.papers === 1 ? "" : "s"} at full length, each with corrections, and a light review the day before.` : "Then a light review the day before.";
-  return `${parts.join(", ")}. ${tail}${summary.compressed ? " Time is short, so sessions are shorter than ideal." : ""}`;
-}
+const SOURCE_LABEL: Record<Syllabus["source"], string> = { catalog: "Sylf's syllabus list", model: "the AI", student: "your list", subject: "your Sylf syllabus" };
 
 /** Topic text the student typed, keeping line breaks so one topic a line stays a list. */
 const notesText = (text: unknown, max = 2000) => (typeof text === "string" ? text.replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim().slice(0, max) : "");
 
-/** Asks the model for a goal's syllabus map, streaming topics as they arrive. Returns null when it cannot. */
-async function mapSyllabus(w: Working, goalKey: string, input: { notes: string | null; typed: { title: string; points: string[] }[] }, signal?: AbortSignal): Promise<{ syllabus: Syllabus; scope: string | null; question: { text: string; options: string[] } | null } | null> {
+/** What the composer can tell the planner beyond a title and a date. */
+export interface PlanInput { preset?: PlanPreset | "auto" | null; level?: string | null; weak?: string | null; target?: string | null; topics?: string | null }
+
+interface Mapped { syllabus: Syllabus; preset: PlanPreset; scope: string | null; question: { text: string; options: string[] } | null; confidence: "high" | "medium" | "low"; research: string | null }
+
+/** Asks the model for a plan's outline, streaming units as they arrive. Returns null when it cannot. */
+async function mapOutline(w: Working, goalKey: string, input: { notes: string | null; typed: { title: string; points: string[] }[]; preset: PlanPreset | "auto"; level: string | null; target: string | null; sources?: string | null }, signal?: AbortSignal): Promise<Mapped | null> {
   const goal = w.model.goals.find((g) => g.key === goalKey)!;
   const subject = w.ctx.snapshot.subjects.find((s) => s.id === goal.subject) ?? null;
   const nodes = w.ctx.snapshot.topics.filter((t) => t.subject === goal.subject).map((t) => ({ ref: w.refs.topicOf.get(t.id)!, title: t.title }));
@@ -263,12 +272,11 @@ async function mapSyllabus(w: Working, goalKey: string, input: { notes: string |
   const toUnit = (raw: Record<string, unknown>): SyllabusUnit | null => {
     const title = typeof raw.title === "string" ? raw.title : "";
     if (!title.trim()) return null;
-    const unit = normalizeSyllabus({ source: "model", name: "", units: [{ title, points: Array.isArray(raw.points) ? raw.points.filter((p): p is string => typeof p === "string") : [], weight: raw.weight as 1, difficulty: raw.difficulty as 1, topic: typeof raw.topic === "string" ? w.refs.topics[raw.topic] ?? null : null }] }).units[0];
-    return unit ?? null;
+    return normalizeSyllabus({ source: "model", name: "", units: [{ title, points: Array.isArray(raw.points) ? raw.points.filter((p): p is string => typeof p === "string") : [], weight: raw.weight as 1, difficulty: raw.difficulty as 1, topic: typeof raw.topic === "string" ? w.refs.topics[raw.topic] ?? null : null }] }).units[0] ?? null;
   };
-  const result = await callTool<{ name?: string; papers?: { label?: string; minutes?: number; marks?: number }[]; units?: Record<string, unknown>[]; scope?: string; question?: string; options?: string[] }>({
+  const result = await callTool<{ preset?: string; confidence?: string; research?: string; name?: string; papers?: { label?: string; minutes?: number; marks?: number }[]; units?: Record<string, unknown>[]; scope?: string; question?: string; options?: string[] }>({
     userId: w.ctx.userId, profile: "syllabus.map", tool: SYLLABUS_TOOL, signal,
-    messages: [{ role: "system", content: SYLLABUS_SYSTEM }, { role: "user", content: syllabusRequest({ title: goal.title, due: goal.due, subject, notes: input.typed.length ? null : input.notes, topics: input.typed.map((t) => (t.points.length ? `${t.title}: ${t.points.join("; ")}` : t.title)), nodes }) }],
+    messages: [{ role: "system", content: SYLLABUS_SYSTEM }, { role: "user", content: syllabusRequest({ title: goal.title, due: goal.due, preset: input.preset, subject, notes: input.typed.length ? null : input.notes, topics: input.typed.map((t) => (t.points.length ? `${t.title}: ${t.points.join("; ")}` : t.title)), nodes, level: input.level, target: input.target, sources: input.sources ?? null }) }],
     stream: { field: "units", onElement: (value) => {
       const unit = toUnit(value as Record<string, unknown>);
       if (!unit || streamed.some((u) => u.title.toLowerCase() === unit.title.toLowerCase())) return;
@@ -279,81 +287,109 @@ async function mapSyllabus(w: Working, goalKey: string, input: { notes: string |
   });
   track(w, result);
   const args = result.args;
+  const preset = (PLAN_PRESETS as readonly string[]).includes(args.preset ?? "") ? (args.preset as PlanPreset) : input.preset === "auto" ? inferPreset(goal.title, goal.due, w.ctx.snapshot.today) : input.preset;
   const units = (args.units ?? []).map((raw) => toUnit(raw)).filter((u): u is SyllabusUnit => Boolean(u));
-  if (!units.length) return null;
+  const confidence = args.confidence === "high" || args.confidence === "low" ? args.confidence : "medium";
+  const research = args.research?.trim() || null;
+  if (!units.length && preset !== "assignment") return research ? { syllabus: normalizeSyllabus({ source: "model", name: goal.title, units: [] }), preset, scope: null, question: null, confidence: "low", research } : null;
   const syllabus = normalizeSyllabus({
     source: input.typed.length ? "student" : "model", name: args.name?.trim() || goal.title, units,
     papers: (args.papers ?? []).filter((p) => (p.minutes ?? 0) >= 20).map((p) => ({ label: p.label ?? "Past paper", minutes: p.minutes ?? 0, marks: p.marks && p.marks > 0 ? p.marks : null })),
   });
-  // A student's own list keeps their order and names; the model only adds key points.
+  // A learner's own list keeps their order and names; the model only adds key points.
   if (input.typed.length) syllabus.units = syllabus.units.map((u, i) => ({ ...u, title: input.typed[i]?.title ?? u.title, points: input.typed[i]?.points.length ? input.typed[i].points : u.points }));
-  return { syllabus, scope: args.scope?.trim() || null, question: args.question?.trim() ? { text: args.question.trim(), options: (args.options ?? []).slice(0, 4) } : null };
+  return { syllabus, preset, scope: args.scope?.trim() || null, question: args.question?.trim() ? { text: args.question.trim(), options: (args.options ?? []).slice(0, 4) } : null, confidence, research };
 }
 
+const STAGE_TEXT: Record<PlanPreset | "auto", string> = { exam: "Finding the syllabus", course: "Mapping the course", mastery: "Breaking down the topic", skill: "Mapping the skill", reading: "Finding the chapters", assignment: "Reading the brief", auto: "Working out the plan" };
+const TYPE_FOR: Record<PlanPreset, GoalType | null> = { exam: "exam", course: null, mastery: "general", skill: "skill", reading: "reading", assignment: null };
+
 /**
- * Plans an exam from its syllabus. The topic list comes from Sylf's checked catalog when the request names a paper it knows, from the student's own
- * list when they typed one, and from the model otherwise; the study path is compiled from it deterministically. Returns false when no topic list
- * could be found, after asking the student for one.
+ * Plans a goal from its outline: the topics (or stages, or chapters) first, then a compiled path shaped by the preset. The outline comes from Sylf's
+ * checked catalog when the request names a paper it holds, from the learner's own list, from the model (which, when it is not sure of the course,
+ * names a search: the server searches, reads a few pages and the model maps again from them), or from the learner's Sylf syllabus. Returns whether a
+ * path was compiled, and the preset it settled on: an assignment, or a skill or book with no outline, goes back to the ordinary breakdown.
  */
-async function planFromSyllabus(w: Working, goalKey: string, ai: boolean, notes: string | null, signal?: AbortSignal): Promise<boolean> {
-  const goal = w.model.goals.find((g) => g.key === goalKey);
-  if (!goal) return false;
+async function planFromOutline(w: Working, goalKey: string, ai: boolean, notes: string | null, signal?: AbortSignal, extra: PlanInput = {}): Promise<{ planned: boolean; preset: PlanPreset }> {
+  // `apply` replaces the work model with a fresh copy, so the goal is looked up again after every operation rather than held.
+  const current = () => w.model.goals.find((g) => g.key === goalKey)!;
+  const goal = current();
   const goalRef = w.refs.goalOf.get(goalKey)!;
   const subject = w.ctx.snapshot.subjects.find((s) => s.id === goal.subject) ?? null;
   const nodes = w.ctx.snapshot.topics.filter((t) => t.subject === goal.subject).map((t) => ({ id: t.id, title: t.title }));
+  const today = w.ctx.snapshot.today;
+  let preset: PlanPreset | "auto" = extra.preset ?? goal.preset ?? (goal.type === "exam" ? "exam" : goal.type === "skill" ? "skill" : goal.type === "reading" ? "reading" : "auto");
   let syllabus: Syllabus | null = goal.syllabus ?? null;
   let scope: string | null = null;
   if (!syllabus) {
-    w.emit({ type: "stage", stage: "syllabus", text: "Finding the syllabus" });
-    const typed = parseTopicList(notes);
-    const catalog = typed.length >= 2 ? null : catalogSyllabus(matchSyllabi(`${goal.title} ${notes ?? ""}`, subject));
-    if (catalog) syllabus = catalog;
-    else if (ai) {
-      const mapped = await mapSyllabus(w, goalKey, { notes, typed }, signal).catch((error) => {
-        if (signal?.aborted) throw error;
-        w.errors.push(error instanceof Error ? error.message : String(error));
-        return null;
-      });
+    w.emit({ type: "stage", stage: "syllabus", text: STAGE_TEXT[preset] });
+    const typed = parseTopicList(extra.topics || notes);
+    const catalogText = `${goal.title} ${extra.level ?? ""} ${notes ?? ""}`;
+    const catalog = typed.length < 2 && (preset === "exam" || preset === "course" || preset === "auto") ? catalogSyllabus(matchSyllabi(catalogText, subject)) : null;
+    if (catalog) {
+      syllabus = catalog;
+      if (preset === "auto") preset = goal.due && diffDays(goal.due, today) > 60 ? "course" : "exam";
+    } else if (ai) {
+      const asked = { notes: [notes, extra.topics].filter(Boolean).join("\n") || null, typed, preset, level: extra.level ?? null, target: extra.target ?? goal.target ?? null };
+      const fail = (error: unknown) => { if (signal?.aborted) throw error; w.errors.push(error instanceof Error ? error.message : String(error)); return null; };
+      let mapped = await mapOutline(w, goalKey, asked, signal).catch(fail);
+      // Not sure of this course: look it up and map again from what was found. Optional, and only when a search provider is configured.
+      if (mapped && mapped.confidence !== "high" && mapped.research && mapped.preset !== "assignment" && researchAvailable()) {
+        w.emit({ type: "stage", stage: "research", text: "Looking up the syllabus" });
+        const sources = await findSources(mapped.research, signal);
+        w.emit({ type: "stage", stage: "research", text: sources.length ? `Read ${sources.length} source${sources.length === 1 ? "" : "s"}` : "Nothing useful found; using what the planner knows" });
+        if (sources.length) {
+          w.emit({ type: "units_reset", goal: goalKey });
+          const again = await mapOutline(w, goalKey, { ...asked, preset: mapped.preset, sources: sourcesForPrompt(sources) }, signal).catch(fail);
+          if (again?.syllabus.units.length) mapped = { ...again, syllabus: { ...again.syllabus, researched: true, sources: sources.slice(0, 6).map((x) => ({ title: x.title, url: x.url })) } };
+        }
+      }
       if (mapped) {
-        syllabus = mapped.syllabus;
-        scope = mapped.scope;
+        preset = mapped.preset;
+        if (preset === "assignment") return { planned: false, preset };
+        if (mapped.syllabus.units.length) { syllabus = mapped.syllabus; scope = mapped.scope; }
         if (mapped.question && !w.model.questions.length) apply(w, [{ op: "ask", id: `${goalRef}.q1`, text: mapped.question.text, options: mapped.question.options, affects: [goalRef] }], "model");
       }
     }
     if (!syllabus && typed.length >= 2) syllabus = normalizeSyllabus({ source: "student", name: goal.title, units: typed, papers: [] });
-    // The student's own syllabus for the subject, in its order, leaving out what they have mastered.
-    if (!syllabus) {
+    if (preset === "auto") preset = inferPreset(`${goal.title} ${notes ?? ""}`, goal.due, today);
+    // The learner's own syllabus for the subject, in its order, leaving out what they have mastered.
+    if (!syllabus && (preset === "exam" || preset === "course" || preset === "mastery")) {
       const own = w.ctx.snapshot.topics.filter((t) => t.subject === goal.subject && !t.mastered).sort((a, b) => a.ref.localeCompare(b.ref, undefined, { numeric: true }));
-      if (own.length >= 2) syllabus = normalizeSyllabus({ source: "subject", name: `${subject?.name ?? goal.title}: your syllabus in Sylf`, papers: [], units: own.slice(0, 12).map((t) => ({ title: t.title, points: [], difficulty: (t.difficulty >= 4 ? 3 : t.difficulty <= 2 ? 1 : 2) as 1 | 2 | 3, confidence: t.progress >= 70 ? "strong" : null, topic: t.id })) });
+      if (own.length >= 2) syllabus = normalizeSyllabus({ source: "subject", name: `${subject?.name ?? goal.title}: your syllabus in Sylf`, papers: [], units: own.slice(0, 40).map((t) => ({ title: t.title, points: [], difficulty: (t.difficulty >= 4 ? 3 : t.difficulty <= 2 ? 1 : 2) as 1 | 2 | 3, confidence: t.progress >= 70 ? "strong" : null, topic: t.id })) });
     }
     if (!syllabus) {
-      // Without a topic list there is nothing worth scheduling: ask for one rather than invent "study blocks".
-      apply(w, [{ op: "ask", id: `${goalRef}.topics`, text: `Which topics does ${goal.title} cover? List them, one a line.`.slice(0, 160), options: [], affects: [goalRef] }], "system");
-      goal.draft = true;
-      w.notes.push(`Tell the planner which topics ${goal.title} covers and it builds the whole plan around them.`);
-      w.emit({ type: "notice", text: ai ? `The planner couldn't work out the topics for “${goal.title}”. List them and it plans the rest.` : `List the topics for “${goal.title}” and the planner builds the plan around them.` });
-      return false;
+      // A skill, a book or an assignment without an outline is broken down the ordinary way. An exam or course without topics asks for them.
+      if (preset === "skill" || preset === "reading" || preset === "assignment") return { planned: false, preset };
+      const ask = preset === "mastery" ? `Which parts of ${goal.title} do you need? One a line.` : `Which topics does ${goal.title} cover? List them, one a line.`;
+      apply(w, [{ op: "ask", id: `${goalRef}.topics`, text: ask.slice(0, 160), options: [], affects: [goalRef] }], "system");
+      current().draft = true;
+      w.emit({ type: "notice", text: "List the topics and the planner builds the rest." });
+      return { planned: false, preset };
     }
-    syllabus = linkTopics(syllabus, nodes);
-    goal.syllabus = syllabus;
+    syllabus = markWeak(linkTopics(syllabus, nodes), extra.weak);
+    current().syllabus = syllabus;
     if (syllabus.source !== "model") for (const unit of syllabus.units) w.emit({ type: "unit", goal: goalKey, unit });
     w.emit({ type: "syllabus", goal: goalKey, name: syllabus.name, source: syllabus.source, units: syllabus.units.length });
-    w.emit({ type: "stage", stage: "syllabus", text: `Mapped ${syllabus.units.length} topics from ${SOURCE_LABEL[syllabus.source]}` });
+    w.emit({ type: "stage", stage: "syllabus", text: `${syllabus.units.length} ${preset === "skill" ? "stages" : preset === "reading" ? "parts" : "topics"} from ${SOURCE_LABEL[syllabus.source]}${syllabus.researched ? ", checked against sources" : ""}` });
     const paper = syllabus.papers[0];
-    apply(w, [{ op: "note_assumption", id: `${goalRef}.scope`, text: (scope ?? `Covers all ${syllabus.units.length} topics${paper ? ` of ${paper.label}` : ""}. Untick any your exam leaves out.`).slice(0, 160), affects: [goalRef], confidence: syllabus.source === "catalog" ? 0.8 : 0.6 }], "system");
-  }
-  w.emit({ type: "stage", stage: "path", text: "Building your study path" });
-  const compiled = compileStudyPath(w.model, goalKey, w.ctx.snapshot, syllabus.source === "model" ? "model" : "template");
+    apply(w, [{ op: "note_assumption", id: `${goalRef}.scope`, text: (scope ?? `Covers all ${syllabus.units.length} ${preset === "skill" ? "stages" : "topics"}${paper ? ` of ${paper.label}` : ""}.`).slice(0, 160), affects: [goalRef], confidence: syllabus.source === "catalog" ? 0.8 : 0.6 }], "system");
+  } else if (extra.weak) current().syllabus = markWeak(syllabus, extra.weak);
+  if (preset === "auto") preset = inferPreset(`${goal.title} ${notes ?? ""}`, goal.due, today);
+  const target = current();
+  target.preset = preset;
+  const type = TYPE_FOR[preset] ?? (target.due && (target.syllabus?.papers.length || inferGoalType(target.title) === "exam") ? "exam" : "general");
+  if (target.type !== type && preset !== "assignment") target.type = type;
+  w.emit({ type: "stage", stage: "path", text: "Building your plan" });
+  const compiled = compileStudyPath(w.model, goalKey, w.ctx.snapshot, target.syllabus!.source === "model" ? "model" : "template");
   w.model = compiled.model;
-  const own = w.model.items.filter((i) => i.goal === goalKey && i.details && i.status === "open");
-  for (const item of own) w.emit({ type: "item", goal: goalKey, item });
-  const s = compiled.summary;
-  w.emit({ type: "stage", stage: "path", text: `Study path: ${s.topics} topics, ${s.mixed} mixed review${s.mixed === 1 ? "" : "s"}, ${s.papers} timed paper${s.papers === 1 ? "" : "s"}` });
-  const strategy = pathStrategy(s, syllabus);
+  for (const item of w.model.items.filter((i) => i.goal === goalKey && i.details && i.status === "open")) w.emit({ type: "item", goal: goalKey, item });
+  const strategy = describePath(compiled.summary, current().syllabus!, preset);
+  w.emit({ type: "stage", stage: "path", text: `${compiled.summary.sessions} sessions${compiled.summary.to ? ` to ${dayLabel(compiled.summary.to)}` : ""}` });
   w.strategy.push(strategy);
   w.emit({ type: "strategy", goal: goalKey, text: strategy });
   schedulePreview(w);
-  return true;
+  return { planned: true, preset };
 }
 
 /** The goals of a run that were planned from a syllabus, which the semantic critic leaves alone: the compiler already guarantees their structure. */
@@ -479,7 +515,27 @@ export async function runCommand(userId: number, input: { key: string; text: str
 }
 
 /** Add a goal from structured input (Home, the goal map, term setup), or plan an existing goal that has no work yet. */
-export async function runAddGoal(userId: number, input: { key: string; title?: string; type?: string; due?: string | null; subjectId?: number | null; priority?: number; notes?: string; goalKey?: string }, emit: Emit, signal?: AbortSignal): Promise<ProposalView | null> {
+export interface AddGoalInput {
+  key: string; title?: string; type?: string; due?: string | null; subjectId?: number | null; priority?: number; notes?: string; goalKey?: string;
+  /** How to shape the plan; `auto` lets the planner choose. */
+  preset?: PlanPreset | "auto";
+  minutesPerDay?: number | null; daysPerWeek?: number | null; sessionMinutes?: number | null; start?: string | null;
+  /** Board, institution, course code or level, in the learner's words. */
+  level?: string | null;
+  /** Topics the learner finds hard, which get more time. */
+  weak?: string | null;
+  target?: string | null;
+  /** The topic list, one a line. */
+  topics?: string | null;
+}
+
+const PRESET_NAME: Record<PlanPreset, string> = { exam: "Exam", course: "Course", mastery: "Mastery", skill: "Skill", assignment: "Assignment", reading: "Reading" };
+const PRESET_TYPE: Record<PlanPreset, (title: string) => GoalType> = {
+  exam: () => "exam", course: (t) => (inferGoalType(t) === "exam" ? "exam" : "general"), mastery: () => "general", skill: () => "skill", reading: () => "reading",
+  assignment: (t) => { const type = inferGoalType(t); return type === "essay" || type === "project" || type === "problem_set" ? type : "project"; },
+};
+
+export async function runAddGoal(userId: number, input: AddGoalInput, emit: Emit, signal?: AbortSignal): Promise<ProposalView | null> {
   const started = Date.now();
   emit({ type: "stage", stage: "read", text: "Reading your week" });
   const ctx = await compileContext(userId);
@@ -493,19 +549,28 @@ export async function runAddGoal(userId: number, input: { key: string; title?: s
     const due = input.due && isDateKey(input.due) ? input.due : null;
     if (due && due < ctx.snapshot.today) throw new StudioError(400, "PAST_DATE", "Choose a deadline from today on.");
     const subject = input.subjectId != null ? w.refs.subjectOf.get(input.subjectId) ?? null : null;
-    const type: GoalType = (input.type && ["exam", "essay", "project", "problem_set", "reading", "skill", "general"].includes(input.type) ? input.type : inferGoalType(title)) as GoalType;
+    const preset = input.preset && input.preset !== "auto" ? input.preset : null;
+    const type: GoalType = preset ? PRESET_TYPE[preset](`${title} ${input.notes ?? ""}`) : (input.type && ["exam", "essay", "project", "problem_set", "reading", "skill", "general"].includes(input.type) ? input.type : inferGoalType(title)) as GoalType;
     ops.push({ op: "add_goal", id: "G_new1", title, type, due, priority: input.priority ?? (type === "exam" ? 3 : 2), subject });
     const applied = apply(w, ops, "student");
     if (applied.errors.length) throw new StudioError(422, "INVALID_GOAL", applied.errors[0].message);
     goalKey = w.refs.goals.G_new1;
+    const created = w.model.goals.find((g) => g.key === goalKey)!;
+    if (preset) created.preset = preset;
+    const n = (v: unknown, lo: number, hi: number) => (typeof v === "number" && Number.isFinite(v) ? Math.max(lo, Math.min(hi, Math.round(v))) : null);
+    const start = input.start && isDateKey(input.start) && input.start > ctx.snapshot.today ? input.start : null;
+    const pace: Pace = { minutesPerDay: n(input.minutesPerDay, 15, 720), daysPerWeek: n(input.daysPerWeek, 1, 7), sessionMinutes: n(input.sessionMinutes, 10, 180), start };
+    if (Object.values(pace).some((v) => v != null)) created.pace = pace;
+    if (input.target?.trim()) created.target = input.target.trim().slice(0, 80);
   } else if (!w.model.goals.some((g) => g.key === goalKey && g.status === "active")) throw new StudioError(404, "NOT_FOUND", "That goal isn't in your plan.");
   const goal = w.model.goals.find((g) => g.key === goalKey)!;
-  w.interpretation = `New ${goal.type === "problem_set" ? "problem set" : goal.type} · ${goal.title}${goal.due ? ` · ${dayLabel(goal.due)}` : ""}`;
+  w.interpretation = `${goal.preset ? PRESET_NAME[goal.preset] : input.preset === "auto" ? "Auto" : `New ${goal.type === "problem_set" ? "problem set" : goal.type}`} · ${goal.title}${goal.due ? ` · ${dayLabel(goal.due)}` : ""}`;
   emit({ type: "interpretation", text: w.interpretation, fast: true });
   await widen(w, [goal.due]);
+  const extra: PlanInput = { preset: input.preset ?? goal.preset ?? null, level: notesText(input.level, 200) || null, weak: notesText(input.weak, 400) || null, target: goal.target ?? null, topics: notesText(input.topics, 4000) || null };
   return withModel(userId, "add_goal", async (ai) => {
-    emit({ type: "stage", stage: "decompose", text: goal.type === "exam" ? `Planning ${goal.title}` : `Breaking down ${goal.title}` });
-    await decompose(w, goalKey!, ai, notesText(input.notes) || null, signal);
+    emit({ type: "stage", stage: "decompose", text: `Planning ${goal.title}` });
+    await decompose(w, goalKey!, ai, notesText(input.notes) || null, signal, extra);
     const meta = { key: input.key, workflow: "add_goal", request: { title: input.title ?? goal.title, due: goal.due, type: goal.type }, ops, started };
     const proposal = await finish(w, { ...meta, source: ai ? "MODEL" : "STUDENT" });
     return ai && fromSyllabus(w, [goalKey!]).length ? improve(w, [goalKey!], proposal, meta, signal) : proposal;

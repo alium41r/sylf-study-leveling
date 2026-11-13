@@ -68,6 +68,20 @@ describe.skipIf(!database)("Planning Studio on PostgreSQL", () => {
     expect(await prisma.quest.count({ where: { userId } })).toBe(0);
   });
 
+  it("keeps the preset, pace and weak spots a student chose in the stored proposal", async () => {
+    const email = `studio-preset-${randomUUID()}@example.test`;
+    const other = (await prisma.user.create({ data: { email, username: email.split("@")[0].slice(0, 30), timezone: "UTC", restDays: [0], dailyGoalMinutes: 120 } as never })).id;
+    const proposal = await runAddGoal(other, { key: key(), title: "Maths mid term Complete Paper 1 CAIE A levels", preset: "auto", due: addDays(today(), 18), minutesPerDay: 120, weak: "integration" }, noop);
+    const goal = proposal!.model.goals[0];
+    expect(goal).toMatchObject({ preset: "exam", type: "exam", pace: { minutesPerDay: 120 } });
+    expect(goal.syllabus?.units.find((u) => u.title === "Integration")?.confidence).toBe("weak");
+    expect(proposal!.model.constraints.find((c) => c.kind === "goal_cap")).toMatchObject({ goal: goal.key, minutes: 120 });
+    expect(proposal!.result.unplaced).toEqual([]);
+    const course = await runAddGoal(other, { key: key(), title: "Organic chemistry, whole course", preset: "course", due: addDays(today(), 120), topics: "Alkanes\nAlkenes\nHalogenoalkanes\nAlcohols\nCarbonyls\nCarboxylic acids" }, noop);
+    expect(course!.model.goals.find((g) => g.title.startsWith("Organic"))).toMatchObject({ preset: "course" });
+    expect(course!.result.weekBudgets.length).toBeGreaterThan(0);
+  });
+
   it("asks for the topics, rather than inventing study blocks, when an exam has no syllabus", async () => {
     const email = `studio-topics-${randomUUID()}@example.test`;
     const other = (await prisma.user.create({ data: { email, username: email.split("@")[0].slice(0, 30), timezone: "UTC", restDays: [0], dailyGoalMinutes: 120 } as never })).id;

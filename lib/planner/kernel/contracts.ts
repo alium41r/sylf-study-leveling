@@ -2,11 +2,11 @@
 // solver writes. Pure types and constants, shared by the server and Sylf Native through @sylf/shared. Every value is plain JSON so a plan version can
 // store it unchanged and a device can re-solve from exactly what the server saw.
 
-export const KERNEL_VERSION = "kernel-1.1.0";
-export const SOLVER_VERSION = "solver-1.0.0";
+export const KERNEL_VERSION = "kernel-1.2.0";
+export const SOLVER_VERSION = "solver-1.1.0";
 export const STRATEGY_VERSION = "strategy-1.1.0";
 /** The study-path compiler that turns a syllabus into sessions (curriculum.ts). */
-export const PATH_VERSION = "path-1.0.0";
+export const PATH_VERSION = "path-2.0.0";
 
 export type DateKey = string;
 export type ItemKind = "learn" | "practice" | "review" | "produce" | "admin";
@@ -39,6 +39,22 @@ export interface KGoal {
   source: Source;
   /** What the goal covers, topic by topic. Exams planned from a syllabus carry one; its sessions are compiled from it (curriculum.ts). */
   syllabus?: Syllabus | null;
+  /** How the plan is shaped (curriculum.ts). Absent on goals made before presets, which plan as their type implies. */
+  preset?: PlanPreset | null;
+  /** The student's own pacing: minutes a day, or days a week and minutes a session for open-ended practice, and a start date. */
+  pace?: Pace | null;
+  /** What the student is aiming for, in their words: "A*", "hold a 10-minute conversation". Shown, and given to the model. */
+  target?: string | null;
+}
+
+/** How a plan is shaped. `auto` is a request, never stored: the model (or a keyword rule) picks one of the others. */
+export type PlanPreset = "exam" | "course" | "mastery" | "skill" | "assignment" | "reading";
+export const PLAN_PRESETS: readonly PlanPreset[] = ["exam", "course", "mastery", "skill", "assignment", "reading"];
+export interface Pace {
+  minutesPerDay?: number | null;
+  daysPerWeek?: number | null;
+  sessionMinutes?: number | null;
+  start?: DateKey | null;
 }
 
 /** How sure the student is of a topic. Weak topics get more time and an extra practice session; strong ones a short check. */
@@ -79,6 +95,8 @@ export interface Syllabus {
    * is the student's own syllabus nodes for the goal's subject in Sylf.
    */
   source: "catalog" | "model" | "student" | "subject";
+  /** True when the model's list was checked against searched sources. */
+  researched?: boolean;
   /** Catalog id, e.g. `caie-9709-p1`. */
   ref: string | null;
   /** "Cambridge International AS & A Level Mathematics (9709), Paper 1: Pure Mathematics 1". */
@@ -87,11 +105,13 @@ export interface Syllabus {
   units: SyllabusUnit[];
   /** The student has checked the topic list against what their exam covers. */
   checked: boolean;
+  /** Pages the topic list was checked against when the model was not sure of the course. URLs come only from the search provider. */
+  sources?: { title: string; url: string }[];
 }
 
 /** The part a session plays in a study path. */
-export type StudyRole = "revise" | "practise" | "mixed" | "paper" | "corrections" | "weak" | "final";
-export const STUDY_ROLES: readonly StudyRole[] = ["revise", "practise", "mixed", "paper", "corrections", "weak", "final"];
+export type StudyRole = "revise" | "learn" | "practise" | "mixed" | "recall" | "checkpoint" | "paper" | "corrections" | "weak" | "final" | "lesson" | "milestone" | "read";
+export const STUDY_ROLES: readonly StudyRole[] = ["revise", "learn", "practise", "mixed", "recall", "checkpoint", "paper", "corrections", "weak", "final", "lesson", "milestone", "read"];
 
 /** What a session is for, shown on the session and written into its quest. */
 export interface ItemDetails {
@@ -160,6 +180,8 @@ export type ConstraintSpec =
   | { kind: "preferred_window"; start: number; end: number; subject?: number | null; days?: number[]; until?: DateKey | null }
   | { kind: "study_window"; start: number; end: number; days?: number[] }
   | { kind: "subject_cap"; subject: number; minutes: number }
+  /** The most minutes a day one goal's sessions may take, from the student's "hours a day" for that plan. Takes precedence over a subject cap. */
+  | { kind: "goal_cap"; goal: string; minutes: number }
   | { kind: "day_off"; dates: DateKey[] }
   | { kind: "subject_weight"; subject: number; weight: number }
   | { kind: "exam_buffer"; days: number }
@@ -167,7 +189,7 @@ export type ConstraintSpec =
   | { kind: "extra_time"; date: DateKey; start: number; end: number };
 export type Constraint = ConstraintBase & ConstraintSpec;
 export type ConstraintKind = ConstraintSpec["kind"];
-export const CONSTRAINT_KINDS: readonly ConstraintKind[] = ["daily_cap", "no_study_window", "preferred_window", "study_window", "subject_cap", "day_off", "subject_weight", "exam_buffer", "extra_time"];
+export const CONSTRAINT_KINDS: readonly ConstraintKind[] = ["daily_cap", "no_study_window", "preferred_window", "study_window", "subject_cap", "goal_cap", "day_off", "subject_weight", "exam_buffer", "extra_time"];
 
 export interface Assumption { key: string; text: string; affects: string[]; confidence: number; ask: boolean }
 export interface Question { key: string; text: string; options: string[]; affects: string[] }

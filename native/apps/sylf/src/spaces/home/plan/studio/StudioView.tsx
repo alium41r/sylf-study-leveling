@@ -3,9 +3,9 @@
 // Every number on screen comes from the solver; the model's words appear only as short decision notes.
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import { Button, Callout, EmptyState, Placeholder, Segmented, Sheet, Stack, Text, useTheme, useWindowClass } from "@sylf/design-system";
+import { Button, Callout, EmptyState, Placeholder, Plane, Segmented, Sheet, Stack, Text, useTheme, useWindowClass } from "@sylf/design-system";
 import { useLiveBackend } from "../studioShell";
-import { CommandBar, AddGoalSheet } from "./CommandBar";
+import { CommandBar, AddGoalSheet, GoalComposer } from "./CommandBar";
 import { GoalMap } from "./GoalMap";
 import { Inspector } from "./Inspector";
 import { HealthStrip, HistoryPanel, PreviewBar, SettingsSheet, SignalCards, WhatIfPanel } from "./Panels";
@@ -67,13 +67,33 @@ export function StudioView() {
             onDrag={(id, date, start) => studio.previewMove(id, date, start)} onDrop={(id, date, start) => { const p = studio.previewMove(id, date, start); if (p?.pass) void studio.commitMove(id, date, start); }} onDragCancel={studio.clearPreview} dropLabel={preview?.kind === "move" ? preview.label : null} />}
     </Stack>
   );
-  const side = selected ? <Inspector state={state} studio={studio} blockId={selected} onClose={() => { setSelected(null); studio.clearPreview(); }} /> : <GoalMap state={state} studio={studio} model={shownModel} onSelectItem={(item) => { const b = blocks.find((x) => x.item === item && (x.state === "committed" || x.state === "proposed")); if (b) { setSelected(b.id); if (zoom !== "term") { const at = state.snapshot.days.findIndex((d) => d.date === b.date); if (at >= 0) { setPage(Math.floor(at / 7)); setDayIndex(at); } } } }} />;
+  // Selecting a session from the guide opens it in the inspector and turns the timeline to its day.
+  const focusBlock = (id: string) => {
+    const b = blocks.find((x) => x.id === id);
+    if (!b) return;
+    setSelected(b.id);
+    if (zoom !== "term") { const at = state.snapshot.days.findIndex((d) => d.date === b.date); if (at >= 0) { setPage(Math.floor(at / 7)); setDayIndex(at); } }
+  };
+  const focusItem = (item: string) => { const b = blocks.find((x) => x.item === item && (x.state === "committed" || x.state === "proposed")); if (b) focusBlock(b.id); };
+  const goalMap = <GoalMap state={state} studio={studio} model={shownModel} blocks={blocks} onSelectItem={focusItem} onSelectBlock={focusBlock} />;
+  const side = selected ? <Inspector state={state} studio={studio} blockId={selected} onClose={() => { setSelected(null); studio.clearPreview(); }} /> : goalMap;
+  // With nothing planned yet, the composer is the page, as on the web planner.
+  const empty = !shownModel.goals.some((g) => g.status === "active") && !proposal && !studio.activity;
+  const guideWide = shownModel.goals.some((g) => g.status === "active" && g.syllabus);
 
   return (
     <Stack gap="lg" testID="studio-view">
       {compact ? <TodayAgenda state={state} studio={studio} onSelect={setSelected} /> : null}
       <HealthStrip state={state} onOpenSettings={() => setSettings(true)} />
-      {compact
+      {empty ? (
+        <Plane level="raised" radius="lg" pad="lg" testID="studio-hero" style={{ gap: space.md }}>
+          <Stack gap="xs">
+            <Text variant="title" role="heading" aria-level={2}>Plan an exam</Text>
+            <Text tone="soft">Say what's coming up. The planner maps every topic and its key points, tells you what to study and when, and fits it around your calendar.</Text>
+          </Stack>
+          <GoalComposer state={state} studio={studio} inline />
+        </Plane>
+      ) : compact
         ? <Button title="Tell the planner" icon="sylvie" variant="solid" onPress={() => setCommandSheet(true)} testID="studio-command-open" />
         : <CommandBar state={state} studio={studio} onAddGoal={() => setAddGoal(true)} />}
       {compact && studio.activity ? <Text variant="small" tone="soft">{studio.activity.stages.at(-1)?.text ?? (studio.activity.running ? "Planning" : "")}</Text> : null}
@@ -81,11 +101,11 @@ export function StudioView() {
       {proposal && !preview ? <ProposalReview proposal={proposal} state={state} studio={studio} /> : null}
       <SignalCards state={state} studio={studio} />
       {compact ? (
-        <Stack gap="lg">{timeline}{selected ? side : <GoalMap state={state} studio={studio} model={shownModel} onSelectItem={() => undefined} />}</Stack>
+        <Stack gap="lg">{selected ? side : goalMap}{timeline}</Stack>
       ) : (
         <View style={{ flexDirection: "row", gap: space.lg, alignItems: "flex-start", flexWrap: size === "medium" ? "wrap" : "nowrap" }}>
           <View style={{ flexGrow: 1, flexBasis: 520, minWidth: 0 }}>{timeline}</View>
-          <View style={{ flexGrow: size === "medium" ? 1 : 0, flexBasis: 320, width: size === "medium" ? undefined : 340, minWidth: 0 }}>{side}</View>
+          <View style={{ flexGrow: size === "medium" ? 1 : 0, flexBasis: guideWide ? 380 : 320, width: size === "medium" ? undefined : guideWide ? 400 : 340, minWidth: 0 }}>{side}</View>
         </View>
       )}
       <WhatIfPanel state={state} studio={studio} />

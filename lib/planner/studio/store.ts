@@ -11,12 +11,20 @@ import { calculateQuestRewards, calculateRecommendedDifficulty } from "@/lib/dif
 import { calculateSemanticScopeWeight } from "@/lib/ai/scope-evaluator";
 import { GOAL_COLOR_TOKENS } from "@/lib/goal-theme";
 import {
-  addDays, calibratedEstimate, checkPlacement, diffDays, diffPlans, expandPractices, isFixed, propose,
-  type Block, type PlanCandidate, type PlanDiff, type SolveResult, type StudioSettings, type Verification, type WorkModel,
+  addDays, calibratedEstimate, checkPlacement, diffDays, diffPlans, expandPractices, isFixed, propose, questDescription,
+  type Block, type KGoal, type PlanCandidate, type PlanDiff, type SolveResult, type StudioSettings, type Verification, type WorkModel,
 } from "../kernel";
 import { compileContext, normalizeModel, type CompiledContext } from "./snapshot";
 import { localInstant } from "./time";
 import { studioVersions } from "./config";
+
+/** A Sylf goal's description: what it covers when it was planned from a syllabus. */
+export function goalDescription(goal: Pick<KGoal, "draft" | "syllabus">): string {
+  const syllabus = goal.syllabus;
+  if (!syllabus) return goal.draft ? "Planned with Sylf's Planning Studio from assumptions you can change." : "Planned with Sylf's Planning Studio.";
+  const topics = syllabus.units.filter((u) => u.included).map((u) => u.title);
+  return [syllabus.name, topics.length ? `Topics: ${topics.join(", ")}.` : null, "Planned with Sylf's Planning Studio."].filter(Boolean).join("\n").slice(0, 1000);
+}
 
 export class StudioError extends Error {
   constructor(readonly status: number, readonly code: string, message: string, readonly detail?: unknown) { super(message); }
@@ -119,7 +127,7 @@ async function project(tx: Prisma.TransactionClient, ctx: CompiledContext, model
     if (goal.status !== "active" || goal.ref != null) continue;
     if (!model.items.some((i) => i.goal === goal.key) && !model.practices.some((p) => p.goal === goal.key)) continue;
     const weeks = goal.due ? Math.max(1, Math.min(52, Math.ceil((diffDays(goal.due, today) + 1) / 7))) : 4;
-    const created = await tx.goal.create({ data: { userId, title: goal.title.slice(0, 200), targetWeeks: weeks, targetDate: goal.due ? new Date(`${goal.due}T00:00:00.000Z`) : null, color: GOAL_COLOR_TOKENS[index % GOAL_COLOR_TOKENS.length], description: goal.draft ? "Planned with Sylf's Planning Studio from assumptions you can change." : "Planned with Sylf's Planning Studio." } });
+    const created = await tx.goal.create({ data: { userId, title: goal.title.slice(0, 200), targetWeeks: weeks, targetDate: goal.due ? new Date(`${goal.due}T00:00:00.000Z`) : null, color: GOAL_COLOR_TOKENS[index % GOAL_COLOR_TOKENS.length], description: goalDescription(goal) } });
     goal.ref = created.id;
     stats.goalsCreated++;
   }
@@ -158,7 +166,7 @@ async function project(tx: Prisma.TransactionClient, ctx: CompiledContext, model
     const rewards = calculateQuestRewards(minutes, difficulty);
     const subjectId = item.subject != null && subjects.has(item.subject) ? item.subject : null;
     const node = item.topics.map((t) => topics.get(t)).find((t) => t && t.subject === subjectId);
-    const description = [item.note, item.firstStep ? `First step: ${item.firstStep}` : null].filter(Boolean).join("\n") || null;
+    const description = questDescription(item);
     if (quest && open(quest)) {
       if (notStarted(quest)) {
         await tx.quest.update({ where: { id: quest.id }, data: { title: item.title, description, requiredMinutes: minutes, targetMinutes: minutes, difficulty, xpReward: rewards.xp, sylphReward: rewards.sylph, scheduledFor: next.date, subjectId, subjectNodeId: node?.id ?? null, goalId: goal?.ref ?? null } });

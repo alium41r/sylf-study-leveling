@@ -2,7 +2,7 @@
 // the decision notes, assumptions as tags, at most two questions as tappable answers, and the individual changes before and after.
 import { useState } from "react";
 import { View } from "react-native";
-import { Badge, Button, Chip, Disclosure, Plane, Stack, Text, useTheme } from "@sylf/design-system";
+import { Badge, Button, Chip, Disclosure, Plane, Stack, Text, TextField, useTheme } from "@sylf/design-system";
 import type { StudioProposal, StudioState } from "@sylf/backend";
 import type { planning } from "@sylf/shared";
 import { clockLabel, dayLabel, formatMinutes } from "./format";
@@ -18,7 +18,10 @@ export function ProposalReview({ proposal, state, studio }: { proposal: StudioPr
   const shown = all ? changes : changes.slice(0, 6);
   const shortages = proposal.result.shortages;
   const questions = proposal.model.questions ?? [];
-  const assumptions = proposal.model.assumptions.filter((a) => !state.model.assumptions.some((b) => b.key === a.key)).slice(0, 4);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  // A syllabus goal's scope is checked in its topic list, not as an assumption chip.
+  const syllabusGoals = new Set(proposal.model.goals.filter((g) => g.syllabus).map((g) => g.key));
+  const assumptions = proposal.model.assumptions.filter((a) => !state.model.assumptions.some((b) => b.key === a.key) && !a.affects.some((k) => syllabusGoals.has(k))).slice(0, 4);
   const busy = studio.busy !== null;
   return (
     <Plane level="raised" radius="lg" pad="md" testID="studio-review" style={{ gap: space.md, borderWidth: 1.5, borderColor: color.accent.line }}>
@@ -36,7 +39,12 @@ export function ProposalReview({ proposal, state, studio }: { proposal: StudioPr
           {questions.map((q) => (
             <View key={q.key} style={{ gap: space.xs }}>
               <Text variant="subheading">{q.text}</Text>
-              <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xs }}>{q.options.map((option) => <Chip key={option} label={option} onPress={() => void studio.answer(q.key, option)} />)}</View>
+              {q.options.length ? <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xs }}>{q.options.map((option) => <Chip key={option} label={option} onPress={() => void studio.answer(q.key, option)} />)}</View> : (
+                <View style={{ gap: space.xs }}>
+                  <TextField label="Your answer" hideLabel multiline placeholder={"Quadratics\nFunctions\nTrigonometry"} value={answers[q.key] ?? ""} onChangeText={(text) => setAnswers({ ...answers, [q.key]: text })} testID={`studio-answer-${q.key}`} />
+                  <Button title="Plan with these" icon="arrowRight" variant="solid" size="small" disabled={(answers[q.key] ?? "").trim().length < 2 || busy || studio.activity?.running === true} onPress={() => void studio.answer(q.key, (answers[q.key] ?? "").trim())} />
+                </View>
+              )}
             </View>
           ))}
         </Stack>

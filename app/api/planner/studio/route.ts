@@ -2,7 +2,7 @@
 // signed-in student's own plan, and carries an idempotency key where it writes.
 import { z } from "zod";
 import { readStudioBody, studioRoute } from "@/lib/planner/studio/http";
-import { loadState, runDirect, runExplain, runWhatIf, type BlockEdit } from "@/lib/planner/studio/workflows";
+import { loadState, runDirect, runExplain, runSyllabusEdit, runWhatIf, type BlockEdit } from "@/lib/planner/studio/workflows";
 import { StudioError, acceptProposal, discardProposal, undoLatest, updateSettings } from "@/lib/planner/studio/store";
 import { studioReadiness } from "@/lib/planner/studio/config";
 
@@ -28,6 +28,14 @@ const settings = z.object({
   transitionBuffer: z.number().int().min(0).max(45).optional(), dayOnly: z.boolean().optional(), horizonDays: z.number().int().min(7).max(21).optional(), autonomy: z.enum(["ASK", "SMART", "AUTOPILOT"]).optional(),
 }).strict();
 
+const unitKey = z.string().regex(/^u\d{1,3}$/);
+const syllabus = z.object({
+  action: z.literal("syllabus"), key, goal: z.string().min(1).max(80),
+  units: z.array(z.object({ key: unitKey, confidence: z.enum(["weak", "okay", "strong"]).nullable().optional(), included: z.boolean().optional() }).strict()).max(40).optional(),
+  add: z.array(z.object({ title: z.string().min(2).max(60), points: z.array(z.string().min(1).max(120)).max(7).optional() }).strict()).max(12).optional(),
+  checked: z.boolean().optional(),
+}).strict();
+
 const action = z.discriminatedUnion("action", [
   z.object({ action: z.literal("open") }),
   z.object({ action: z.literal("accept"), proposalId: id, key }),
@@ -37,6 +45,7 @@ const action = z.discriminatedUnion("action", [
   z.object({ action: z.literal("whatif"), key, whatIf }),
   z.object({ action: z.literal("settings"), settings }),
   z.object({ action: z.literal("explain"), block: z.string().min(1).max(80) }),
+  syllabus,
 ]);
 
 export function GET(req: Request) {
@@ -61,6 +70,7 @@ export function POST(req: Request) {
       case "whatif": { const proposal = await runWhatIf(userId, { key: body.key, whatIf: body.whatIf }, () => undefined); return { proposal, state: await loadState(userId, { sync: false }) }; }
       case "settings": await updateSettings(userId, body.settings); return { state: await loadState(userId, { sync: true }) };
       case "explain": return runExplain(userId, { block: body.block, phrase: false }, () => undefined);
+      case "syllabus": { const proposal = await runSyllabusEdit(userId, body); return { proposal, state: await loadState(userId, { sync: false }) }; }
     }
     throw new StudioError(400, "UNKNOWN_ACTION", "Unknown action.");
   });

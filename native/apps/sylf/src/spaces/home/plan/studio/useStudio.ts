@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppState } from "react-native";
 import { useNotice } from "@sylf/design-system";
 import { planning } from "@sylf/shared";
-import type { BackendError, BlockEdit, StudioEvent, StudioProposal, StudioState, StudioWorkflow } from "@sylf/backend";
+import type { BackendError, BlockEdit, StudioEvent, StudioProposal, StudioState, StudioWorkflow, SyllabusEdit } from "@sylf/backend";
 import { useLiveBackend } from "../studioShell";
 import { describeFailureText } from "../studioShell";
 import { refreshPlan } from "../usePlan";
@@ -18,6 +18,9 @@ export interface Activity {
   interpretation: string | null;
   strategy: string[];
   items: planning.WorkItem[];
+  /** Topics as the syllabus is mapped, and where the list came from. */
+  units: planning.SyllabusUnit[];
+  syllabus: { name: string; source: planning.Syllabus["source"] } | null;
   preview: { blocks: Block[]; summary: string; unplaced: number } | null;
   notices: string[];
   text: string;
@@ -114,17 +117,19 @@ export function useStudio() {
     stream.current?.abort();
     const controller = new AbortController();
     stream.current = controller;
-    const record: Activity = { workflow: workflow.workflow, stages: [], interpretation: null, strategy: [], items: [], preview: null, notices: [], text: "", running: true, error: null, startedAt: Date.now() };
+    const record: Activity = { workflow: workflow.workflow, stages: [], interpretation: null, strategy: [], items: [], units: [], syllabus: null, preview: null, notices: [], text: "", running: true, error: null, startedAt: Date.now() };
     setActivity({ ...record });
     setPreview(null);
     let proposal: StudioProposal | null = null;
-    const update = () => { if (alive.current) setActivity({ ...record, stages: [...record.stages], items: [...record.items], strategy: [...record.strategy], notices: [...record.notices] }); };
+    const update = () => { if (alive.current) setActivity({ ...record, stages: [...record.stages], items: [...record.items], units: [...record.units], strategy: [...record.strategy], notices: [...record.notices] }); };
     const onEvent = (event: StudioEvent) => {
       switch (event.type) {
         case "stage": { const last = record.stages[record.stages.length - 1]; if (last?.stage === event.stage) last.text = event.text; else record.stages.push({ stage: event.stage, text: event.text }); break; }
         case "interpretation": record.interpretation = event.text; break;
         case "strategy": record.strategy.push(event.text); break;
         case "item": record.items.push(event.item); break;
+        case "unit": if (!record.units.some((u) => u.title === event.unit.title)) record.units.push(event.unit); break;
+        case "syllabus": record.syllabus = { name: event.name, source: event.source }; break;
         case "preview": record.preview = { blocks: event.blocks, summary: event.summary, unplaced: event.unplaced }; break;
         case "text": record.text += event.delta; break;
         case "notice": record.notices.push(event.text); break;
@@ -219,6 +224,13 @@ export function useStudio() {
     if (value) { setState(value.state); setPreview(null); }
   }, [write, reads]);
 
+  /** Rates, ticks or adds topics. The plan is rebuilt on the server without the model and comes back as a proposal to review. */
+  const editSyllabus = useCallback(async (edit: SyllabusEdit) => {
+    const value = await write(`syllabus:${JSON.stringify(edit)}`, (key) => reads!.syllabus(key, edit));
+    if (value) { setState(value.state); setPreview(null); setActivity(null); }
+    return Boolean(value);
+  }, [write, reads]);
+
   const saveSettings = useCallback(async (patch: Partial<planning.StudioSettings>) => {
     if (!reads) return;
     setBusy("settings");
@@ -242,7 +254,7 @@ export function useStudio() {
   return {
     state, failure, offline, busy, activity, preview, view, reads,
     open, command, addGoal, answer, ask, brief, cancelRun, dismissActivity, accept, discard, undo, direct, previewMove, commitMove,
-    previewWhatIf, keepWhatIf, clearPreview: () => setPreview(null), saveSettings, explain, explainSentence,
+    previewWhatIf, keepWhatIf, clearPreview: () => setPreview(null), saveSettings, explain, explainSentence, editSyllabus,
   };
 }
 export type Studio = ReturnType<typeof useStudio>;

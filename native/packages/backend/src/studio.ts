@@ -72,12 +72,22 @@ export type StudioEvent =
   | { type: "interpretation"; text: string; fast: boolean }
   | { type: "strategy"; goal: string; text: string }
   | { type: "item"; goal: string | null; item: planning.WorkItem }
+  | { type: "syllabus"; goal: string; name: string; source: planning.Syllabus["source"]; units: number }
+  | { type: "unit"; goal: string; unit: planning.SyllabusUnit }
   | { type: "preview"; blocks: Block[]; summary: string; unplaced: number }
   | { type: "text"; delta: string }
   | { type: "proposal"; proposal: StudioProposal }
   | { type: "notice"; text: string }
   | { type: "error"; status: number; code: string; message: string }
   | { type: "done"; result: unknown };
+
+/** A change to a goal's topic list: ratings, ticks, added topics, or the list confirmed. */
+export interface SyllabusEdit {
+  goal: string;
+  units?: { key: string; confidence?: planning.Confidence | null; included?: boolean }[];
+  add?: { title: string; points?: string[] }[];
+  checked?: boolean;
+}
 
 export type BlockEdit = { kind: "move"; block: string; date: string; start: number } | { kind: "pin" | "unpin" | "skip" | "restore"; block: string };
 export type StudioWorkflow =
@@ -138,6 +148,11 @@ export function createStudioReads(client: BackendClient) {
     },
     whatIf: async (key: string, whatIf: planning.WhatIf) => {
       const value = withState.parse(await post({ action: "whatif", key, whatIf })) as { state: unknown; proposal: StudioProposal | null };
+      return { state: stateOf(value.state), proposal: value.proposal };
+    },
+    /** Rates, ticks or adds topics; the study path is re-compiled on the server and comes back as a proposal. */
+    syllabus: async (key: string, edit: SyllabusEdit) => {
+      const value = withState.parse(await post({ action: "syllabus", key, ...edit })) as { state: unknown; proposal: StudioProposal | null };
       return { state: stateOf(value.state), proposal: value.proposal };
     },
     settings: async (settings: Partial<planning.StudioSettings>) => stateOf((withState.parse(await post({ action: "settings", settings })) as { state: unknown }).state),

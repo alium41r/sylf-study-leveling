@@ -1,9 +1,9 @@
 // Planning Studio switches and versions. The Studio is a strangler beside the existing planner: it is on by default in development and off in
 // production until `SYLF_PLANNING_STUDIO=on`, which is also the switch that needs the 20261113100000_planning_kernel migration applied first.
-import { KERNEL_VERSION, SOLVER_VERSION, STRATEGY_VERSION } from "../kernel";
+import { KERNEL_VERSION, PATH_VERSION, SOLVER_VERSION, STRATEGY_VERSION } from "../kernel";
 import { DEEPSEEK_MODELS } from "@/lib/ai/config";
 
-export const STUDIO_PROMPT_VERSION = "studio-prompts-1.0.0";
+export const STUDIO_PROMPT_VERSION = "studio-prompts-1.1.0";
 export const STUDIO_CONTRACT = "1";
 
 export function studioEnabled(): boolean {
@@ -29,5 +29,5 @@ export function studioReadiness(): StudioReadiness {
 
 /** Recorded on every plan version, so any plan can be reproduced. */
 export const studioVersions = (servedModel?: string | null) => ({
-  kernel: KERNEL_VERSION, solver: SOLVER_VERSION, strategy: STRATEGY_VERSION, prompts: STUDIO_PROMPT_VERSION, model: servedModel ?? DEEPSEEK_MODELS.planner,
+  kernel: KERNEL_VERSION, solver: SOLVER_VERSION, strategy: STRATEGY_VERSION, path: PATH_VERSION, prompts: STUDIO_PROMPT_VERSION, model: servedModel ?? DEEPSEEK_MODELS.planner,
 });

@@ -7,7 +7,7 @@ import { Badge, Button, Chip, IconButton, Plane, Stack, Text, useTheme } from "@
 import type { StudioState } from "@sylf/backend";
 import type { planning } from "@sylf/shared";
 import { useHomeNavigation, useStudySession } from "../studioShell";
-import { ESTIMATE, blockMinutes, clockLabel, dayLabel, formatMinutes, itemOf, methodLabel, subjectColour } from "./format";
+import { ESTIMATE, blockMinutes, clockLabel, dayLabel, formatMinutes, itemOf, sessionLabel, subjectColour } from "./format";
 import type { Studio } from "./useStudio";
 
 export function Inspector({ state, studio, blockId, onClose }: { state: StudioState; studio: Studio; blockId: string; onClose: () => void }) {
@@ -48,9 +48,21 @@ export function Inspector({ state, studio, blockId, onClose }: { state: StudioSt
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xs }}>
         {block.pinned ? <Badge label="Pinned" /> : null}
         {block.state === "done" ? <Badge tone="positive" label="Done" /> : block.state === "missed" ? <Badge tone="caution" label="Missed" /> : block.state === "skipped" ? <Badge label="Skipped" /> : block.state === "proposed" ? <Badge tone="accent" label="Proposed" /> : null}
-        {item ? <Badge label={methodLabel(item.method)} /> : null}
+        {item ? <Badge label={sessionLabel(item)} /> : null}
         {item ? <Badge label={`Estimate ${ESTIMATE(item, state.snapshot)}`} /> : null}
       </View>
+      {item?.details ? (
+        <Stack gap="sm" testID="studio-details">
+          <Text variant="subheading">{item.details.aim}</Text>
+          {item.details.points.length ? (
+            <Stack gap="xs">
+              <Text variant="label" tone="soft">{item.details.role === "revise" ? "Key points" : item.details.role === "practise" ? "Check you can" : item.details.role === "mixed" || item.details.role === "weak" ? "Cover" : "Checklist"}</Text>
+              {item.details.points.map((point, i) => <View key={i} style={{ flexDirection: "row", gap: 6 }}><Text variant="small" tone="accent">•</Text><Text variant="small" style={{ flex: 1 }}>{point}</Text></View>)}
+            </Stack>
+          ) : null}
+          {item.details.how ? <Stack gap="xs"><Text variant="label" tone="soft">How</Text><Text variant="small">{item.details.how}</Text></Stack> : null}
+        </Stack>
+      ) : null}
       {reasons.length ? (
         <Stack gap="xs" testID="studio-why">
           <Text variant="label" tone="soft">Why it's here</Text>
@@ -59,7 +71,7 @@ export function Inspector({ state, studio, blockId, onClose }: { state: StudioSt
         </Stack>
       ) : null}
       {item?.firstStep ? <Stack gap="xs"><Text variant="label" tone="soft">First step</Text><Text variant="small">{item.firstStep}</Text></Stack> : null}
-      {item?.note ? <Text variant="small" tone="soft">{item.note}</Text> : null}
+      {item?.note && !item.details ? <Text variant="small" tone="soft">{item.note}</Text> : null}
       {item && state.calibrationNotes[item.key] ? <Text variant="small" tone="soft">{state.calibrationNotes[item.key]}</Text> : null}
       {item && item.done > 0 ? <Text variant="caption" tone="soft">{`${formatMinutes(item.done)} studied so far.`}</Text> : null}
 

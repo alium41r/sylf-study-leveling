@@ -12,7 +12,7 @@ const key = z.string().regex(/^[A-Za-z0-9_:.-]{8,120}$/);
 const workflow = z.discriminatedUnion("workflow", [
   z.object({ workflow: z.literal("command"), key, text: z.string().min(2).max(600) }),
   z.object({ workflow: z.literal("add_goal"), key, title: z.string().min(1).max(200).optional(), type: z.string().max(20).optional(), due: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(), subjectId: z.number().int().positive().nullable().optional(), priority: z.number().int().min(1).max(3).optional(), notes: z.string().max(6000).optional(), goalKey: z.string().max(80).optional() }),
-  z.object({ workflow: z.literal("answer"), key, question: z.string().max(80), answer: z.string().min(1).max(300) }),
+  z.object({ workflow: z.literal("answer"), key, question: z.string().max(80), answer: z.string().min(1).max(2000) }),
   z.object({ workflow: z.literal("brief") }),
   z.object({ workflow: z.literal("question"), text: z.string().min(2).max(400) }),
   z.object({ workflow: z.literal("explain"), block: z.string().min(1).max(80) }),

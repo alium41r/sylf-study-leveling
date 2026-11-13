@@ -5,10 +5,11 @@ import { View } from "react-native";
 import { Badge, Button, Disclosure, Icon, Plane, Press, Progress, Stack, Text, useTheme, withAlpha } from "@sylf/design-system";
 import type { StudioState } from "@sylf/backend";
 import type { planning } from "@sylf/shared";
-import { ESTIMATE, RELATIVE, dayLabel, formatMinutes, goalProgress, methodLabel, subjectColour } from "./format";
+import { ESTIMATE, RELATIVE, dayLabel, formatMinutes, goalProgress, sessionLabel, subjectColour } from "./format";
+import { SyllabusGoal } from "./StudyGuide";
 import type { Studio } from "./useStudio";
 
-export function GoalMap({ state, studio, model, onSelectItem }: { state: StudioState; studio: Studio; model: planning.WorkModel; onSelectItem: (item: string) => void }) {
+export function GoalMap({ state, studio, model, blocks, onSelectItem, onSelectBlock }: { state: StudioState; studio: Studio; model: planning.WorkModel; blocks: planning.Block[]; onSelectItem: (item: string) => void; onSelectBlock: (block: string) => void }) {
   const { color, space, shape } = useTheme();
   const streaming = new Set(studio.activity?.running ? studio.activity.items.map((i) => i.key) : []);
   const committedKeys = new Set(state.model.items.map((i) => i.key));
@@ -20,6 +21,8 @@ export function GoalMap({ state, studio, model, onSelectItem }: { state: StudioS
       <Text variant="subheading" role="heading" aria-level={3}>Goals</Text>
       {!goals.length ? <Text tone="soft">No goals yet. Add one, or tell the planner what's coming up.</Text> : null}
       {goals.map((goal) => {
+        // An exam planned from its syllabus gets the full study guide: phases, topics with key points, and the plan day by day.
+        if (goal.syllabus) return <SyllabusGoal key={goal.key} state={state} studio={studio} model={model} goal={goal} blocks={blocks} onSelectBlock={onSelectBlock} />;
         const items = model.items.filter((i) => i.goal === goal.key && i.status !== "dropped");
         const progress = goalProgress(model, state.snapshot, goal.key);
         const r = risk(goal.key);
@@ -29,6 +32,7 @@ export function GoalMap({ state, studio, model, onSelectItem }: { state: StudioS
             <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm, flexWrap: "wrap" }}>
               <Text variant="subheading" style={{ flexShrink: 1 }}>{goal.title}</Text>
               {goal.draft ? <Badge label="Draft" /> : null}
+              {!items.length && model.questions.some((q) => q.affects.includes(goal.key)) ? <Badge tone="accent" label="Needs topics" /> : null}
               {r ? <Badge tone="critical" label={r.kind === "shortage" ? "Short of time" : "Tight"} /> : null}
             </View>
             <Text variant="caption" tone="soft">{[goal.type === "problem_set" ? "Problem set" : goal.type[0].toUpperCase() + goal.type.slice(1), goal.due ? `due ${dayLabel(goal.due)} (${RELATIVE(goal.due, state.snapshot.today)})` : "no deadline", progress.total ? `${formatMinutes(progress.done)} of ${formatMinutes(progress.total)}` : null].filter(Boolean).join(" · ")}</Text>
@@ -42,12 +46,12 @@ export function GoalMap({ state, studio, model, onSelectItem }: { state: StudioS
                     const next = nextOf(item.key);
                     const fresh = streaming.has(item.key) || !committedKeys.has(item.key);
                     return (
-                      <Press key={item.key} label={`${item.title}. ${methodLabel(item.method)}, ${ESTIMATE(item, state.snapshot)}${next ? `, next ${dayLabel(next.date)}` : ""}`} onPress={() => onSelectItem(item.key)} radius={shape.radius.sm}
+                      <Press key={item.key} label={`${item.title}. ${sessionLabel(item)}, ${ESTIMATE(item, state.snapshot)}${next ? `, next ${dayLabel(next.date)}` : ""}`} onPress={() => onSelectItem(item.key)} radius={shape.radius.sm}
                         bodyStyle={{ flexDirection: "row", alignItems: "center", gap: space.sm, paddingVertical: 6, paddingHorizontal: 6, borderRadius: shape.radius.sm, backgroundColor: fresh ? withAlpha(color.accent.fill, 0.1) : undefined }}>
                         {item.status === "done" ? <Icon name="check" size={14} color={color.positive.ink} /> : <View style={{ width: 8, height: 8, borderRadius: 4, borderWidth: 1.5, borderColor: colour }} />}
                         <View style={{ flex: 1, minWidth: 0 }}>
                           <Text variant="caption" numberOfLines={2} tone={item.status === "done" ? "soft" : "ink"}>{item.title}</Text>
-                          <Text variant="micro" tone="soft" numberOfLines={1}>{[methodLabel(item.method), ESTIMATE(item, state.snapshot), next ? `next ${dayLabel(next.date)}` : item.status === "open" ? "not scheduled yet" : null, fresh ? "new" : null].filter(Boolean).join(" · ")}</Text>
+                          <Text variant="micro" tone="soft" numberOfLines={1}>{[sessionLabel(item), ESTIMATE(item, state.snapshot), next ? `next ${dayLabel(next.date)}` : item.status === "open" ? "not scheduled yet" : null, fresh ? "new" : null].filter(Boolean).join(" · ")}</Text>
                         </View>
                       </Press>
                     );
@@ -55,7 +59,7 @@ export function GoalMap({ state, studio, model, onSelectItem }: { state: StudioS
                 </View>
               </Disclosure>
             )}
-            {items.length ? <View style={{ flexDirection: "row", gap: space.xs, flexWrap: "wrap" }}><Button title="Drop goal" size="small" variant="quiet" disabled={studio.activity?.running === true} onPress={() => void studio.command(`drop ${goal.title}`)} /></View> : null}
+            {items.length ? <View style={{ flexDirection: "row", gap: space.xs, flexWrap: "wrap" }}>{goal.type === "exam" ? <Button title="Re-plan topic by topic" size="small" variant="solid" icon="planner" disabled={studio.activity?.running === true} onPress={() => void studio.addGoal({ goalKey: goal.key })} testID={`studio-replan-${goal.key}`} /> : null}<Button title="Drop goal" size="small" variant="quiet" disabled={studio.activity?.running === true} onPress={() => void studio.command(`drop ${goal.title}`)} /></View> : null}
           </Plane>
         );
       })}

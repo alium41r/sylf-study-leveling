@@ -97,3 +97,58 @@ export const RELATIVE = (date: string, today: string) => {
   const delta = diffDays(date, today);
   return delta === 0 ? "today" : delta === 1 ? "tomorrow" : delta > 1 && delta < 7 ? `in ${delta} days` : dayLabel(date);
 };
+
+const ROLE_WORDS: Record<planning.StudyRole, string> = {
+  revise: "Revision", practise: "Past paper practice", mixed: "Mixed review", paper: "Timed paper", corrections: "Corrections", weak: "Weak topics", final: "Final review",
+};
+/** What a session is, in the words a student uses: "Revision", "Timed paper"; the study method for work that was not compiled from a syllabus. */
+export const sessionLabel = (item: Pick<planning.WorkItem, "method" | "details">) => (item.details ? ROLE_WORDS[item.details.role] : methodLabel(item.method));
+
+export const CONFIDENCE_WORDS: Record<planning.Confidence, string> = { weak: "Weak", okay: "Okay", strong: "Strong" };
+export const SOURCE_WORDS: Record<planning.Syllabus["source"], string> = {
+  catalog: "Topics from Sylf's checked syllabus list",
+  model: "Topics from the AI's knowledge of the course. Check them against your syllabus",
+  student: "Topics from your list",
+  subject: "Topics from your syllabus in Sylf",
+};
+
+/** Where a topic stands: revised, practised, or when its next session is. */
+export function unitStatus(model: Model, goal: string, unit: string, blocks: readonly Block[]): { revised: boolean; practised: boolean; next: string | null; sessions: number } {
+  const items = model.items.filter((i) => i.goal === goal && i.status !== "dropped" && i.details?.units.includes(unit) && (i.details.role === "revise" || i.details.role === "practise"));
+  const done = (role: planning.StudyRole) => items.some((i) => i.details!.role === role && i.status === "done");
+  const keys = new Set(items.map((i) => i.key));
+  const next = blocks.filter((b) => keys.has(b.item) && live(b)).map((b) => b.date).sort()[0] ?? null;
+  return { revised: done("revise"), practised: done("practise"), next, sessions: items.length };
+}
+
+/** A goal's sessions day by day, from the blocks shown, in time order. */
+export function agendaFor(model: Model, goal: string, blocks: readonly Block[]): { date: string; blocks: Block[] }[] {
+  const own = new Set(model.items.filter((i) => i.goal === goal).map((i) => i.key));
+  const byDate = new Map<string, Block[]>();
+  for (const block of blocks) {
+    if (!own.has(block.item) || block.state === "skipped") continue;
+    byDate.set(block.date, [...(byDate.get(block.date) ?? []), block]);
+  }
+  return [...byDate.entries()].sort(([a], [b]) => (a < b ? -1 : 1)).map(([date, list]) => ({ date, blocks: list.sort((a, b) => a.start - b.start) }));
+}
+
+/** "Fri 13 Nov – Thu 26 Nov", or one day. */
+export const dateSpan = (from: string | null, to: string | null) => (!from ? "not scheduled yet" : !to || to === from ? dayLabel(from) : `${dayLabel(from)} – ${dayLabel(to)}`);
+
+const SHORT_ROLE: Record<planning.StudyRole, string> = { revise: "Revision", practise: "Past papers", mixed: "Mixed review", paper: "Timed paper", corrections: "Corrections", weak: "Weak topics", final: "Final review" };
+/**
+ * A block's label for a narrow column: the topic on the first line and what kind of session on the second ("Functions" / "Past papers"), so a
+ * week beside the study guide never breaks a word in half. Work that was not compiled from a syllabus keeps its title.
+ */
+export function compactLabel(item: planning.WorkItem | null): { title: string; sub: string | null } {
+  if (!item) return { title: "Study", sub: null };
+  const d = item.details;
+  if (!d) return { title: item.title, sub: null };
+  switch (d.role) {
+    case "revise": return { title: item.title.replace(/\s+(revision|quick check)$/i, ""), sub: /quick check$/i.test(item.title) ? "Quick check" : SHORT_ROLE.revise };
+    case "practise": return { title: item.title.replace(/\s+(past paper practice|extra practice)$/i, ""), sub: /extra practice$/i.test(item.title) ? "Extra practice" : SHORT_ROLE.practise };
+    case "mixed": return { title: SHORT_ROLE.mixed, sub: `${d.units.length} topic${d.units.length === 1 ? "" : "s"}` };
+    case "paper": return { title: SHORT_ROLE.paper, sub: item.title.replace(/\s*timed past paper.*$/i, "") || null };
+    default: return { title: SHORT_ROLE[d.role], sub: null };
+  }
+}

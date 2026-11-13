@@ -101,24 +101,24 @@ async function run(window, out) {
   const readiness = (await api("/api/planner/studio?readiness=1")).json?.readiness;
   facts.readiness = readiness;
 
-  // The Studio opens empty and says what to do.
+  // The Studio opens empty on the composer, as the web planner does.
   check("the Planner is Plan's first view", await toPlanner());
-  check("the command bar is there", await until(tid("studio-command-input")));
+  check("the composer is the empty page", await until(tid("studio-composer")));
   check("the health strip is there", await has(tid("studio-health")));
   await shot("01-empty");
 
-  // A new exam: the sheet, the breakdown streaming in, then the proposal.
-  await clickOn(tid("studio-add-goal"));
-  check("the new-goal sheet opens", await until(tid("studio-goal-sheet")));
-  await type(tid("studio-goal-title"), "Organic chemistry midterm");
-  const due = new Date(Date.now() + 12 * 86_400_000).toISOString().slice(0, 10);
+  // A new exam, in the student's own words: the syllabus is found, topics stream in, the study path is built and fitted, then the proposal.
+  await type(tid("studio-goal-title"), "Maths mid term Complete Paper 1 CAIE A levels");
+  const due = new Date(Date.now() + 18 * 86_400_000).toISOString().slice(0, 10);
   await type(tid("studio-goal-due"), due);
   await sleep(200);
   await shot("02-new-goal");
   const asked = Date.now();
   await clickOn(tid("studio-goal-submit"));
   const sawActivity = await until(tid("studio-activity"), 15000);
-  check("the activity line reports progress", sawActivity);
+  check("the activity card reports progress", sawActivity);
+  check("the stage rail shows the planning stages", await until(tid("studio-stage-rail"), 15000));
+  check("the topics stream in", await until(tid("studio-activity-units"), 20000));
   if (sawActivity) await shot("03-planning");
   check("a proposal arrives for review", await until(tid("studio-review"), 90000));
   facts.goalSeconds = Math.round((Date.now() - asked) / 100) / 10;
@@ -126,29 +126,62 @@ async function run(window, out) {
   await sleep(500);
   await shot("04-proposal");
   const before = await studio();
-  facts.proposal = { trace: before?.proposal?.trace, critics: before?.proposal?.verification?.critics?.map((/** @type {any} */ c) => `${c.code} ${c.score}: ${c.note}`), workflow: before?.proposal?.workflow, source: before?.proposal?.source, pass: before?.proposal?.verification?.pass, quality: before?.proposal?.verification?.quality, blocks: before?.proposal?.result?.blocks?.length, items: before?.proposal?.model?.items?.length, interpretation: before?.proposal?.interpretation, strategy: before?.proposal?.strategy };
+  const proposed = before?.proposal?.model;
+  const exam = proposed?.goals?.[0];
+  facts.proposal = { trace: before?.proposal?.trace, critics: before?.proposal?.verification?.critics?.map((/** @type {any} */ c) => `${c.code} ${c.score}: ${c.note}`), workflow: before?.proposal?.workflow, source: before?.proposal?.source, pass: before?.proposal?.verification?.pass, quality: before?.proposal?.verification?.quality, blocks: before?.proposal?.result?.blocks?.length, unplaced: before?.proposal?.result?.unplaced, items: proposed?.items?.length, interpretation: before?.proposal?.interpretation, strategy: before?.proposal?.strategy, syllabus: exam?.syllabus ? { source: exam.syllabus.source, ref: exam.syllabus.ref, units: exam.syllabus.units.map((/** @type {any} */ u) => u.title) } : null, titles: proposed?.items?.map((/** @type {any} */ i) => i.title) };
   check("the proposal passed every check", before?.proposal?.verification?.pass === true);
+  check("the syllabus came from Sylf's checked list", exam?.syllabus?.ref === "caie-9709-p1");
+  check("every topic has revision and practice", ["Quadratics revision", "Integration past paper practice", "Paper 1 timed past paper", "Formula sheet and final review"].every((title) => proposed?.items?.some((/** @type {any} */ i) => i.title === title)));
+  check("every session is placed in the calendar", (before?.proposal?.result?.unplaced ?? []).length === 0 && (before?.proposal?.result?.weekBudgets ?? []).length === 0);
   check("nothing is added before acceptance", ((await api("/api/quests?all=true&limit=100")).json?.quests ?? []).length === 0);
 
-  // Accept: quests appear, the timeline shows committed sessions.
+  // Accept: quests appear with their aims and key points, and the study guide sits beside the calendar.
   await clickOn(tid("studio-accept"));
   check("the review closes on accept", await gone(tid("studio-review"), 20000));
   await sleep(800);
   const after = await studio();
   const quests = (await api("/api/quests?all=true&limit=100")).json?.quests ?? [];
-  facts.committed = { version: after?.version, blocks: after?.blocks?.length, quests: quests.length, firstQuest: quests[0] ? { title: quests[0].title, scheduledFor: quests[0].scheduledFor, requiredMinutes: quests[0].requiredMinutes } : null };
+  const quadratics = quests.find((/** @type {any} */ q) => q.title === "Quadratics revision");
+  facts.committed = { version: after?.version, blocks: after?.blocks?.length, quests: quests.length, titles: quests.map((/** @type {any} */ q) => `${q.scheduledFor} ${q.title}`), quadratics: quadratics ? { scheduledFor: quadratics.scheduledFor, requiredMinutes: quadratics.requiredMinutes, description: quadratics.description } : null };
   check("the plan is version 1", after?.version === 1);
-  check("quests were created from the plan", quests.length > 0);
+  check("a quest for every session", quests.length === proposed?.items?.length);
+  check("quest descriptions carry the aim and key points", typeof quadratics?.description === "string" && quadratics.description.includes("Key points:") && quadratics.description.includes("discriminant"));
+  const goalKey = after?.model?.goals?.[0]?.key;
+  check("the study guide is beside the calendar", await until(tid(`studio-guide-${goalKey}`), 6000));
   await shot("05-plan-week");
+  await clickOn(`${tid(`studio-guide-${goalKey}`)} [role=radio][aria-label^="Topics"], ${tid(`studio-guide-${goalKey}`)} [aria-label^="Topics"]`).catch(() => undefined);
+  check("the topics tab lists the syllabus", await until(tid("studio-guide-topics"), 4000));
+  await clickOn(`${tid("studio-guide-topics")} [aria-label^="Trigonometry"]`).catch(() => undefined);
+  await sleep(400);
+  await shot("05b-topics");
+  await clickOn(`${tid(`studio-guide-${goalKey}`)} [role=radio][aria-label="Day by day"], ${tid(`studio-guide-${goalKey}`)} [aria-label="Day by day"]`).catch(() => undefined);
+  check("the day-by-day tab lists the sessions", await until(tid("studio-guide-days"), 4000));
+  await shot("05c-days");
 
-  // Why is this here? Open the first committed session.
+  // The session: its aim, key points and method, and why it is where it is.
   const first = after?.blocks?.filter((/** @type {any} */ b) => b.state === "committed").sort((/** @type {any} */ a, /** @type {any} */ b) => a.date.localeCompare(b.date) || a.start - b.start)[0];
   if (first) {
     if (!(await has(tid(`studio-block-${first.id}`)))) await clickOn('[aria-label="Next week"]').catch(() => undefined);
     await clickOn(tid(`studio-block-${first.id}`)).catch(() => undefined);
-    check("the inspector explains the session", await until(tid("studio-why"), 6000));
+    check("the inspector shows the session's aim and key points", await until(tid("studio-details"), 6000));
+    check("the inspector explains the session", await has(tid("studio-why")));
     await shot("06-inspector");
+    await clickOn('[aria-label="Close details"]').catch(() => undefined);
   }
+
+  // A topic rated weak rebuilds the plan without the model, as a proposal; accepting keeps every existing session's quest.
+  const rated = await api("/api/planner/studio", { json: { action: "syllabus", key: `syllabus-${tag}`, goal: goalKey, units: [{ key: "u5", confidence: "weak" }, { key: "u1", confidence: "strong" }] } });
+  const ratedModel = rated.json?.proposal?.model;
+  facts.rated = { status: rated.status, summary: rated.json?.proposal?.summary, extra: ratedModel?.items?.find((/** @type {any} */ i) => i.key.endsWith(".prac.u5.2"))?.title, quick: ratedModel?.items?.find((/** @type {any} */ i) => i.key.endsWith(".rev.u1"))?.title };
+  check("rating a topic proposes a rebuilt plan", rated.status === 200 && rated.json?.proposal?.verification?.pass === true && facts.rated.extra === "Trigonometry extra practice" && facts.rated.quick === "Quadratics quick check");
+  await toPlanner();
+  check("the rebuilt plan is up for review", await until(tid("studio-review"), 8000));
+  await shot("06b-rated-proposal");
+  await clickOn(tid("studio-accept"));
+  await gone(tid("studio-review"), 20000);
+  const questsAfter = (await api("/api/quests?all=true&limit=100")).json?.quests ?? [];
+  check("existing quests kept their identity", quests.every((/** @type {any} */ q) => questsAfter.some((/** @type {any} */ r) => r.id === q.id)));
+  facts.afterRating = { quests: questsAfter.length, version: (await studio())?.version };
 
   // Edit by command: the fast path answers at once, with no model.
   await type(tid("studio-command-input"), "max 2 hours a day on weekdays");
@@ -164,6 +197,7 @@ async function run(window, out) {
   await clickOn(tid("studio-accept"));
   await gone(tid("studio-review"), 20000);
   facts.afterCommand = (await studio())?.version;
+  const versionBeforeUndo = facts.afterCommand;
 
   // Undo restores the version before: from the notice that follows every change, or from the history.
   if (await until('[aria-label="Undo"]', 5000)) { await shot("08b-undo-notice"); await clickOn('[aria-label="Undo"]'); }
@@ -174,7 +208,7 @@ async function run(window, out) {
   await sleep(2000);
   const undone = await studio();
   facts.afterUndo = { version: undone?.version, constraints: undone?.model?.constraints?.length };
-  check("undo is a new version without the rule", undone?.version === 3 && undone?.model?.constraints?.length === 0);
+  check("undo is a new version without the rule", undone?.version === versionBeforeUndo + 1 && undone?.model?.constraints?.length === 0);
 
   // What-if previews on the device.
   await clickOn('[aria-label="What if…"], [role=button][aria-label*="What if"]').catch(() => undefined);
@@ -190,9 +224,29 @@ async function run(window, out) {
   check("planning settings open", await until(tid("studio-settings")));
   await shot("11-settings");
 
-  // With AI available, a command the fast path cannot parse goes to the model.
+  // With AI available, an exam Sylf's catalog does not hold is mapped by the model: its topics stream in, then the compiled path is proposed.
   if (process.env.SYLF_STUDIO_AI === "1" && readiness?.ai) {
     await toPlanner();
+    await clickOn(tid("studio-add-goal"));
+    check("the new-plan sheet opens", await until(tid("studio-goal-sheet")));
+    await type(tid("studio-goal-title"), "CAIE A level Chemistry Paper 2 mock");
+    await type(tid("studio-goal-due"), new Date(Date.now() + 15 * 86_400_000).toISOString().slice(0, 10));
+    const m0 = Date.now();
+    await clickOn(tid("studio-goal-submit"));
+    const units = await until(tid("studio-activity-units"), 40000);
+    facts.mapFirstTopicSeconds = units ? Math.round((Date.now() - m0) / 100) / 10 : null;
+    if (units) await shot("12a-ai-syllabus-streaming");
+    check("the model's syllabus arrives as a proposal", await until(tid("studio-review"), 90000));
+    facts.mapSeconds = Math.round((Date.now() - m0) / 100) / 10;
+    const mapped = await studio();
+    const physics = mapped?.proposal?.model?.goals?.find((/** @type {any} */ g) => /chemistry/i.test(g.title));
+    facts.mapped = { trace: mapped?.proposal?.trace, pass: mapped?.proposal?.verification?.pass, source: physics?.syllabus?.source, name: physics?.syllabus?.name, papers: physics?.syllabus?.papers, units: physics?.syllabus?.units?.map((/** @type {any} */ u) => `${u.title}: ${u.points.slice(0, 2).join("; ")}`), titles: mapped?.proposal?.model?.items?.filter((/** @type {any} */ i) => i.goal === physics?.key).map((/** @type {any} */ i) => i.title) };
+    check("the model mapped the chemistry syllabus", physics?.syllabus?.source === "model" && (physics?.syllabus?.units?.length ?? 0) >= 4);
+    await shot("12b-ai-syllabus-proposal");
+    await clickOn(tid("studio-discard")).catch(() => undefined);
+    await gone(tid("studio-review"), 10000);
+
+    // A command the fast path cannot parse goes to the model.
     await type(tid("studio-command-input"), "I also have a physics problem set on rotational dynamics due next Friday, and I'm weak on torque");
     const t0 = Date.now();
     await clickOn(tid("studio-command-send"));

@@ -2,9 +2,11 @@
 // solver writes. Pure types and constants, shared by the server and Sylf Native through @sylf/shared. Every value is plain JSON so a plan version can
 // store it unchanged and a device can re-solve from exactly what the server saw.
 
-export const KERNEL_VERSION = "kernel-1.0.0";
+export const KERNEL_VERSION = "kernel-1.1.0";
 export const SOLVER_VERSION = "solver-1.0.0";
-export const STRATEGY_VERSION = "strategy-1.0.0";
+export const STRATEGY_VERSION = "strategy-1.1.0";
+/** The study-path compiler that turns a syllabus into sessions (curriculum.ts). */
+export const PATH_VERSION = "path-1.0.0";
 
 export type DateKey = string;
 export type ItemKind = "learn" | "practice" | "review" | "produce" | "admin";
@@ -35,6 +37,73 @@ export interface KGoal {
   /** Built on assumptions the student has not confirmed. */
   draft: boolean;
   source: Source;
+  /** What the goal covers, topic by topic. Exams planned from a syllabus carry one; its sessions are compiled from it (curriculum.ts). */
+  syllabus?: Syllabus | null;
+}
+
+/** How sure the student is of a topic. Weak topics get more time and an extra practice session; strong ones a short check. */
+export type Confidence = "weak" | "okay" | "strong";
+export const CONFIDENCES: readonly Confidence[] = ["weak", "okay", "strong"];
+
+/** One topic of a syllabus: a chapter-sized unit with the key points a student must be able to do. */
+export interface SyllabusUnit {
+  /** Stable within the goal: `u1`, `u2`… */
+  key: string;
+  /** A plain syllabus name, at most 40 characters: "Quadratics", "Circular measure". */
+  title: string;
+  /** Three to seven key points, each a short phrase a student can check themselves against. */
+  points: string[];
+  /** Share of the paper: 1 small, 2 typical, 3 large. */
+  weight: 1 | 2 | 3;
+  /** 1 straightforward, 2 typical, 3 hard. */
+  difficulty: 1 | 2 | 3;
+  /** The student's own rating, or null when they have not said. */
+  confidence: Confidence | null;
+  /** False when the student says the exam leaves it out. */
+  included: boolean;
+  /** `SubjectNode.id` when the topic matches one of the student's syllabus nodes. */
+  topic: number | null;
+}
+
+export interface SyllabusPaper {
+  /** "Paper 1". */
+  label: string;
+  /** Exam length in minutes, so a timed paper is practised at the real length. */
+  minutes: number;
+  marks: number | null;
+}
+
+export interface Syllabus {
+  /**
+   * Where the topic list came from. `catalog` is Sylf's checked list; `model` is the AI's knowledge; `student` is what the student typed; `subject`
+   * is the student's own syllabus nodes for the goal's subject in Sylf.
+   */
+  source: "catalog" | "model" | "student" | "subject";
+  /** Catalog id, e.g. `caie-9709-p1`. */
+  ref: string | null;
+  /** "Cambridge International AS & A Level Mathematics (9709), Paper 1: Pure Mathematics 1". */
+  name: string;
+  papers: SyllabusPaper[];
+  units: SyllabusUnit[];
+  /** The student has checked the topic list against what their exam covers. */
+  checked: boolean;
+}
+
+/** The part a session plays in a study path. */
+export type StudyRole = "revise" | "practise" | "mixed" | "paper" | "corrections" | "weak" | "final";
+export const STUDY_ROLES: readonly StudyRole[] = ["revise", "practise", "mixed", "paper", "corrections", "weak", "final"];
+
+/** What a session is for, shown on the session and written into its quest. */
+export interface ItemDetails {
+  role: StudyRole;
+  /** Syllabus unit keys this session covers. */
+  units: string[];
+  /** The aim in one sentence: what the student can do at the end. */
+  aim: string;
+  /** Key points to cover or check. */
+  points: string[];
+  /** How to spend the session, in one or two sentences. */
+  how: string;
 }
 
 export interface WorkItem {
@@ -65,6 +134,8 @@ export interface WorkItem {
   firstStep: string | null;
   /** One short decision note from the planner. Never chain of thought. */
   note: string | null;
+  /** The aim, key points and method of a session compiled from a syllabus. */
+  details?: ItemDetails | null;
 }
 
 /** A recurring cadence such as "Spanish, 20 minutes on weekdays". It expands into one item per matching day. */
@@ -141,7 +212,7 @@ export interface SnapshotDay {
   /** Minutes of other quests already on this day (work Sylf knows about but the plan does not own). They count against the day's capacity. */
   otherWork?: number;
 }
-export interface SnapshotSubject { id: number; name: string; color: string; code: string }
+export interface SnapshotSubject { id: number; name: string; color: string; code: string; board?: string; level?: string }
 export interface SnapshotTopic { id: number; subject: number; ref: string; title: string; progress: number; mastered: boolean; difficulty: number }
 
 export interface Calibration {

@@ -8,7 +8,7 @@ import { getApplicationPool } from "@/lib/prisma";
 import { readPlanningCalendar } from "@/lib/calendar/planning";
 import { TimezoneService } from "@/lib/timezone-service";
 import {
-  DEFAULT_SETTINGS, addDays, calibrate, dateRange, emptyWorkModel, inferGoalType, markMissed, weekdayOf,
+  DEFAULT_SETTINGS, addDays, calibrate, dateRange, diffDays, emptyWorkModel, inferGoalType, markMissed, weekdayOf,
   type Block, type BlockState, type Busy, type BusyKind, type KGoal, type PlanningSnapshot, type RefMap, type SessionSample, type SnapshotDay,
   type SnapshotSubject, type SnapshotTopic, type StudioSettings, type WorkModel,
 } from "../kernel";
@@ -96,20 +96,33 @@ async function readCalendar(userId: number, start: string, end: string, timezone
   }
 }
 
-export async function compileContext(userId: number, now = new Date()): Promise<CompiledContext> {
+/** The detailed horizon reaches an exam up to four weeks away, so its whole study path lands in the calendar rather than in weekly budgets. */
+export const EXAM_HORIZON_DAYS = 28;
+
+/** Days the detailed horizon needs to cover every active exam within reach, counting the exam day. */
+export function horizonFor(base: number, today: string, models: WorkModel[], until: string | null = null): number {
+  const dues = models.flatMap((m) => m.goals.filter((g) => g.status === "active" && g.type === "exam" && g.due && g.due >= today).map((g) => g.due!));
+  if (until && until >= today) dues.push(until);
+  const reach = dues.map((d) => diffDays(d, today) + 1).filter((n) => n <= EXAM_HORIZON_DAYS);
+  return Math.max(7, Math.min(21, base), ...reach);
+}
+
+export async function compileContext(userId: number, now = new Date(), options: { until?: string | null } = {}): Promise<CompiledContext> {
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { timezone: true, restDays: true, dailyGoalMinutes: true } });
   const timezone = TimezoneService.validateTimezone(user.timezone) ? user.timezone : "UTC";
   const space = await loadSpace(userId, user.dailyGoalMinutes);
   const local = localParts(timezone, now);
   const today = local.date;
-  const horizon = Math.max(7, Math.min(21, space.settings.horizonDays));
+  // An open proposal's exams count too, so a proposal is always shown and re-checked over the days it was planned on.
+  const pending = await prisma.planVersion.findFirst({ where: { spaceId: space.id, state: "PROPOSED" }, select: { workModel: true } });
+  const horizon = horizonFor(space.settings.horizonDays, today, [space.workModel, ...(pending ? [normalizeModel(pending.workModel)] : [])], options.until ?? null);
   const end = addDays(today, horizon);
   const historyStart = addDays(today, -28);
 
   const [floating, calendar, subjects, sylfGoals, plannerGoals, links, otherQuests, sessions, blockRows] = await Promise.all([
     prisma.floatingRestDay.findMany({ where: { userId, dateKey: { gte: today, lt: end } }, select: { dateKey: true } }),
     readCalendar(userId, today, end, timezone, now),
-    prisma.subject.findMany({ where: { userId, archivedAt: null }, select: { id: true, name: true, color: true, code: true, nodes: { select: { id: true, nodeId: true, title: true, progress: true, isMastered: true, difficulty: true }, orderBy: { nodeId: "asc" }, take: 60 } }, orderBy: { id: "asc" }, take: 30 }),
+    prisma.subject.findMany({ where: { userId, archivedAt: null }, select: { id: true, name: true, color: true, code: true, examBoard: true, level: true, nodes: { select: { id: true, nodeId: true, title: true, progress: true, isMastered: true, difficulty: true }, orderBy: { nodeId: "asc" }, take: 60 } }, orderBy: { id: "asc" }, take: 30 }),
     prisma.goal.findMany({ where: { userId, status: "ACTIVE" }, select: { id: true, title: true, targetDate: true }, orderBy: { id: "asc" }, take: 50 }),
     prisma.plannerPlan.findMany({ where: { userId, goalId: { not: null } }, select: { goalId: true } }),
     prisma.planItemQuest.findMany({ where: { spaceId: space.id }, select: { itemKey: true, questId: true, quest: { select: { id: true, status: true, elapsedSeconds: true, scheduledFor: true, requiredMinutes: true, completedAt: true, _count: { select: { sessions: true } } } } } }),
@@ -118,7 +131,7 @@ export async function compileContext(userId: number, now = new Date()): Promise<
     prisma.planBlock.findMany({ where: { spaceId: space.id, removedVersion: null, localDate: { gte: addDays(today, -7) } }, orderBy: [{ localDate: "asc" }, { startMinute: "asc" }] }),
   ]);
 
-  const snapshotSubjects: SnapshotSubject[] = subjects.map((s) => ({ id: s.id, name: s.name, color: s.color, code: s.code }));
+  const snapshotSubjects: SnapshotSubject[] = subjects.map((s) => ({ id: s.id, name: s.name, color: s.color, code: s.code, board: s.examBoard, level: s.level }));
   const topics: SnapshotTopic[] = subjects.flatMap((s) => s.nodes.map((n) => ({ id: n.id, subject: s.id, ref: n.nodeId, title: n.title, progress: Math.round(n.progress), mastered: n.isMastered, difficulty: n.difficulty })));
 
   // Availability.

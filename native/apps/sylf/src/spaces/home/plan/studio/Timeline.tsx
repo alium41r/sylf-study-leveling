@@ -5,7 +5,7 @@ import { memo, useMemo, useRef, useState } from "react";
 import { PanResponder, ScrollView, View, type LayoutChangeEvent } from "react-native";
 import { Icon, Press, Text, useTheme, withAlpha } from "@sylf/design-system";
 import type { planning } from "@sylf/shared";
-import { addDays, blockMinutes, clockLabel, dayLabel, daySummary, formatMinutes, hourRange, itemOf, live, snapMinute, subjectColour, titleOf, weekdayOf } from "./format";
+import { addDays, blockMinutes, clockLabel, compactLabel, dayLabel, daySummary, formatMinutes, hourRange, itemOf, live, snapMinute, subjectColour, titleOf, weekdayOf } from "./format";
 
 type Block = planning.Block;
 export type Zoom = "day" | "week" | "term";
@@ -36,7 +36,7 @@ function Hatch({ height, color }: { height: number; color: string }) {
   );
 }
 
-const BlockBody = memo(function BlockBody({ block, title, colour, height, selected, proposal, onPress, grip }: { block: Block; title: string; colour: string; height: number; selected: boolean; proposal: boolean; onPress: () => void; grip: React.ReactNode }) {
+const BlockBody = memo(function BlockBody({ block, title, compact, colour, height, selected, proposal, onPress, grip }: { block: Block; title: string; compact: { title: string; sub: string | null } | null; colour: string; height: number; selected: boolean; proposal: boolean; onPress: () => void; grip: React.ReactNode }) {
   const { color, shape } = useTheme();
   const done = block.state === "done";
   const missed = block.state === "missed";
@@ -50,9 +50,9 @@ const BlockBody = memo(function BlockBody({ block, title, colour, height, select
         <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
           {done ? <Icon name="check" size={12} color={color.positive.ink} /> : null}
           {block.pinned ? <Icon name="pin" size={11} color={color.inkSoft} /> : null}
-          <Text variant="caption" numberOfLines={height > 40 ? 2 : 1} style={{ flex: 1, textDecorationLine: skipped ? "line-through" : undefined }}>{title}</Text>
+          <Text variant="caption" numberOfLines={compact ? 1 : height > 40 ? 2 : 1} style={{ flex: 1, textDecorationLine: skipped ? "line-through" : undefined }}>{compact?.title ?? title}</Text>
         </View>
-        {height > 34 ? <Text variant="micro" tone="soft" numberOfLines={1}>{`${clockLabel(block.start)}–${clockLabel(block.end)}`}</Text> : null}
+        {height > 34 ? <Text variant="micro" tone="soft" numberOfLines={1}>{compact ? compact.sub ?? clockLabel(block.start) : `${clockLabel(block.start)}–${clockLabel(block.end)}`}</Text> : null}
         {missed && height > 30 ? <Text variant="micro" tone="caution" numberOfLines={1}>Missed · find time</Text> : null}
       </View>
       {grip}
@@ -94,6 +94,8 @@ export function WeekGrid({ snapshot, model, blocks, committed, days, zoom, dayOn
   const range = hourRange(snapshot, blocks, days);
   const hours = Array.from({ length: range[1] - range[0] }, (_, i) => range[0] + i);
   const columnWidth = days.length ? Math.max(0, (width - LABEL_W) / days.length) : 0;
+  // Beside the study guide a week's columns are narrow: blocks then show the topic and the kind of session rather than a broken title.
+  const narrow = zoom === "week" && columnWidth > 0 && columnWidth < 130;
   const committedIds = new Set(committed.filter(live).map((b) => `${b.id}|${b.date}|${b.start}`));
   const deadlines = (date: string) => model.goals.filter((g) => g.status === "active" && g.due === date);
   const onLayout = (event: LayoutChangeEvent) => setWidth(event.nativeEvent.layout.width);
@@ -149,7 +151,7 @@ export function WeekGrid({ snapshot, model, blocks, committed, days, zoom, dayOn
                 const colour = subjectColour(snapshot, itemOf(model, block.item)?.subject);
                 const proposal = block.state === "proposed" || (live(block) && !committedIds.has(`${block.id}|${block.date}|${block.start}`));
                 const draggable = block.state === "committed" && !proposal && (block.date > snapshot.today || block.start > snapshot.nowMinute);
-                const body = (grip: React.ReactNode) => <BlockBody block={block} title={titleOf(model, block.item)} colour={colour} height={height} selected={selected === block.id} proposal={proposal} onPress={() => onSelect(block.id)} grip={grip} />;
+                const body = (grip: React.ReactNode) => <BlockBody block={block} title={titleOf(model, block.item)} compact={narrow ? compactLabel(itemOf(model, block.item)) : null} colour={colour} height={height} selected={selected === block.id} proposal={proposal} onPress={() => onSelect(block.id)} grip={grip} />;
                 if (!draggable) return <View key={block.id} style={{ position: "absolute", top: top(block.start) + 1, left: 2, right: 2 }}>{body(null)}</View>;
                 return (
                   <DraggableBlock key={block.id} block={block} days={days} columnWidth={columnWidth} pxPerMinute={pxPerMinute} range={range}

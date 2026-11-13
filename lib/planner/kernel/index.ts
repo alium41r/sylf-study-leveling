@@ -10,5 +10,6 @@ export * from "./verify";
 export * from "./diff";
 export * from "./commands";
 export * from "./adapt";
+export * from "./curriculum";
 export * from "./stream-json";
 export { MinCostFlow } from "./flow";

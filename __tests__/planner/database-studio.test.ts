@@ -21,7 +21,7 @@ vi.mock("@/lib/prisma", async () => {
 import { prisma } from "@/lib/prisma";
 import { compileContext } from "@/lib/planner/studio/snapshot";
 import { acceptProposal, commitDirect, undoLatest } from "@/lib/planner/studio/store";
-import { loadState, runAddGoal, runCommand, runDirect } from "@/lib/planner/studio/workflows";
+import { loadState, runAddGoal, runAnswer, runCommand, runDirect } from "@/lib/planner/studio/workflows";
 import { repairBeforeDeadline } from "@/lib/planner/studio/events";
 import { localParts } from "@/lib/planner/studio/time";
 import { addDays, propose } from "@/lib/planner/kernel";
@@ -54,7 +54,7 @@ describe.skipIf(!database)("Planning Studio on PostgreSQL", () => {
     return proposal!;
   }
 
-  it("creates a space on first open and proposes a verified, template-built plan for a new exam", async () => {
+  it("creates a space on first open and proposes a verified plan for a new exam from the student's own syllabus", async () => {
     const state = await loadState(userId);
     expect(state.version).toBe(0);
     expect(state.readiness.enabled).toBe(true);
@@ -62,8 +62,22 @@ describe.skipIf(!database)("Planning Studio on PostgreSQL", () => {
     expect(proposal.state).toBe("PROPOSED");
     expect(proposal.verification.pass).toBe(true);
     expect(proposal.diff.counts.added).toBeGreaterThan(3);
+    expect(proposal.model.goals[0].syllabus).toMatchObject({ source: "subject", units: [{ title: "Reaction mechanisms" }, { title: "Stereochemistry" }, { title: "Spectroscopy" }] });
+    expect(proposal.model.items.map((i) => i.title)).toEqual(expect.arrayContaining(["Reaction mechanisms revision", "Spectroscopy past paper practice", "Timed practice paper"]));
     expect(proposal.model.items.some((i) => i.method === "retrieval")).toBe(true);
     expect(await prisma.quest.count({ where: { userId } })).toBe(0);
+  });
+
+  it("asks for the topics, rather than inventing study blocks, when an exam has no syllabus", async () => {
+    const email = `studio-topics-${randomUUID()}@example.test`;
+    const other = (await prisma.user.create({ data: { email, username: email.split("@")[0].slice(0, 30), timezone: "UTC", restDays: [0], dailyGoalMinutes: 120 } as never })).id;
+    const proposal = await runAddGoal(other, { key: key(), title: "History midterm", type: "exam", due: addDays(today(), 9) }, noop);
+    expect(proposal!.model.items).toEqual([]);
+    expect(proposal!.model.questions[0].text).toMatch(/Which topics does History midterm cover/);
+    const answered = await runAnswer(other, { key: key(), question: proposal!.model.questions[0].key, answer: "The Cold War\nDecolonisation\nThe United Nations" }, noop);
+    expect(answered!.model.goals[0].syllabus).toMatchObject({ source: "student", units: [{ title: "The Cold War" }, { title: "Decolonisation" }, { title: "The United Nations" }] });
+    expect(answered!.model.items.map((i) => i.title)).toContain("Decolonisation revision");
+    expect(answered!.verification.pass).toBe(true);
   });
 
   it("commits once: quests, goal, blocks and links appear, and a replayed key changes nothing", async () => {

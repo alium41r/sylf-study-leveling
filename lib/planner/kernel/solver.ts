@@ -250,8 +250,10 @@ function buildDemand(ctx: Ctx, items: WorkItem[], fixed: readonly Block[]): Dema
     const slope = 1 + priority + (item.subject != null ? (weights.get(item.subject) ?? 2) - 2 : 0) * 2 + (due ? Math.min(12, Math.floor(40 / Math.max(2, window))) : 0);
     const forbidden = new Set<number>();
     // No new topics in the final 24 hours before an exam, and an optional wider light buffer.
-    if (goal?.type === "exam" && due && (item.kind === "learn" || item.method === "learn" || item.method === "worked_examples")) {
-      for (let k = 0; k <= Math.max(1, examBuffer); k++) { const idx = diffDays(addDays(due, -k), snapshot.today); if (idx >= 0) forbidden.add(idx); }
+    // Measured from the exam itself: an item's own earlier deadline is a pacing window, not an exam.
+    const examDay = goal?.type === "exam" ? goal.due ?? due : null;
+    if (examDay && (item.kind === "learn" || item.method === "learn" || item.method === "worked_examples")) {
+      for (let k = 0; k <= Math.max(1, examBuffer); k++) { const idx = diffDays(addDays(examDay, -k), snapshot.today); if (idx >= 0) forbidden.add(idx); }
     }
     out.push({ item, virtual: item.key.includes("@"), remaining, target: p50, earliest, latest, due, priority, slope: Math.max(1, slope), goal, forbidden });
   }

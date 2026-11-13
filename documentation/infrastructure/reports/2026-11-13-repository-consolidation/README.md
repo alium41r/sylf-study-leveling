@@ -67,13 +67,13 @@ The root `.env` points at the hosted database. Run root Vitest with `DATABASE_UR
 | `consolidation/2026-11-13` | same | The branch the consolidation was built on. |
 | `phase-14-pen-settings` | `e3bfc8c` | Latest Native, now committed; an ancestor of `main`. |
 | `phase-14`, `expansion-part-3`, `expansion-part-2`, `sylf_performance_*`, `week5-multi-agent`, `internship-final` | older | All ancestors of `main`; fully merged, kept until the owner agrees to delete them. |
-| `origin/main` | `f5a900b` | **Not updated**: pushing waits for the owner. |
+| `origin/main`, `origin/phase-14-pen-settings` | baseline, `e3bfc8c` | Pushed with the owner's approval on 13 November (fast-forwards from `f5a900b` and `f627f76`). |
 
 The main checkout `~/Desktop/sylf` is on `main`, clean. `~/Desktop/sylf-pen-settings` is on `phase-14-pen-settings`, clean. The Antigravity worktrees and `~/Desktop/sylf-expansion-part-3`, `~/Desktop/sylf-phase-14` were left in place; the two Antigravity worktrees whose work is now in `main` still show it as uncommitted there. Removing these worktrees and the merged branches is a separate step that needs the owner's approval.
 
 ## 6. Remaining issues
 
-1. Push `main` (and the new Native commit) to `origin` — owner's call.
+1. Done: `main` and `phase-14-pen-settings` pushed to `origin`. `consolidation/2026-11-13` and `refs/backup/*` stay local.
 2. Remove the stale worktrees and merged local branches once approved.
 3. Tablet verification of the 10–13 November Native work.
 4. Pre-existing lint debt in `lib/ai/providers/deepseek.ts`.

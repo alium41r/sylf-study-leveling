@@ -61,20 +61,21 @@ The root `.env` points at the hosted database. Run root Vitest with `DATABASE_UR
 
 ## 5. Branch and worktree structure afterwards
 
-| Ref | Commit | Meaning |
-| --- | --- | --- |
-| `main` (local) | consolidation tip | **The baseline.** Branch from here. |
-| `consolidation/2026-11-13` | same | The branch the consolidation was built on. |
-| `phase-14-pen-settings` | `e3bfc8c` | Latest Native, now committed; an ancestor of `main`. |
-| `phase-14`, `expansion-part-3`, `expansion-part-2`, `sylf_performance_*`, `week5-multi-agent`, `internship-final` | older | All ancestors of `main`; fully merged, kept until the owner agrees to delete them. |
-| `origin/main`, `origin/phase-14-pen-settings` | baseline, `e3bfc8c` | Pushed with the owner's approval on 13 November (fast-forwards from `f5a900b` and `f627f76`). |
+After the owner approved clean-up on 13 November, only two worktrees and two local branches remain:
 
-The main checkout `~/Desktop/sylf` is on `main`, clean. `~/Desktop/sylf-pen-settings` is on `phase-14-pen-settings`, clean. The Antigravity worktrees and `~/Desktop/sylf-expansion-part-3`, `~/Desktop/sylf-phase-14` were left in place; the two Antigravity worktrees whose work is now in `main` still show it as uncommitted there. Removing these worktrees and the merged branches is a separate step that needs the owner's approval.
+| Worktree | Branch | Purpose |
+| --- | --- | --- |
+| `~/Desktop/sylf` | `main` | **The baseline.** Branch from here; pushed to `origin/main`. |
+| `~/Desktop/sylf-pen-settings` | `native-device` (created from `main`) | Kept only because it holds the one current Android prebuild (`native/apps/sylf/android`, 1.1 GB, with the audio and notification modules the main checkout's 1 November prebuild lacks). Use it for tablet/Electron device work; bring it up to date with `git merge --ff-only main` first. |
+
+Removed (all clean or verified identical to their backup refs first): the seven Antigravity worktrees under `~/.gemini/antigravity/worktrees/sylf/`, `~/Desktop/sylf-expansion-part-3` and `~/Desktop/sylf-phase-14`. Deleted local branches, all fully merged into `main` (`git branch -d`): `phase-14-pen-settings`, `phase-14`, `expansion-part-2`, `expansion-part-3`, `sylf_performance_phase_2`, `sylf_performance_optimization_modernization`, `week5-multi-agent`, `internship-final`, `consolidation/2026-11-13` and the six Antigravity branches. Two ignored files that existed only in removed worktrees were saved to the backup folder's `ignored-extras/`: `expansion-part-3`'s `native/apps/sylf/.env.local` (one API origin) and `sylf-phase-14`'s Android build logs.
+
+Left on purpose: the remote branches `origin/expansion-part-2`, `origin/expansion-part-3`, `origin/phase-14` and `origin/phase-14-pen-settings` (all contained in `main`; deleting them on GitHub is the owner's call), `refs/backup/2026-11-13/*`, the backup folder and the stash.
 
 ## 6. Remaining issues
 
 1. Done: `main` and `phase-14-pen-settings` pushed to `origin`. `consolidation/2026-11-13` and `refs/backup/*` stay local.
-2. Remove the stale worktrees and merged local branches once approved.
+2. Done: stale worktrees and merged local branches removed (section 5). The four merged remote branches remain.
 3. Tablet verification of the 10–13 November Native work.
 4. Pre-existing lint debt in `lib/ai/providers/deepseek.ts`.
 5. The `notes/ink` sustained-revision test is close to its 60 s limit under full-suite load on this machine.

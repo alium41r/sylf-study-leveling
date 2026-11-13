@@ -2,7 +2,7 @@
 // signed-in student's own plan, and carries an idempotency key where it writes.
 import { z } from "zod";
 import { readStudioBody, studioRoute } from "@/lib/planner/studio/http";
-import { loadState, runDirect, runExplain, runSyllabusEdit, runWhatIf, type BlockEdit } from "@/lib/planner/studio/workflows";
+import { loadState, runDirect, runExplain, runFeedback, runSyllabusEdit, runWhatIf, type BlockEdit } from "@/lib/planner/studio/workflows";
 import { StudioError, acceptProposal, discardProposal, undoLatest, updateSettings } from "@/lib/planner/studio/store";
 import { studioReadiness } from "@/lib/planner/studio/config";
 
@@ -46,6 +46,7 @@ const action = z.discriminatedUnion("action", [
   z.object({ action: z.literal("settings"), settings }),
   z.object({ action: z.literal("explain"), block: z.string().min(1).max(80) }),
   syllabus,
+  z.object({ action: z.literal("feedback"), goal: z.string().min(1).max(80), verdict: z.enum(["accurate", "dismissed"]) }).strict(),
 ]);
 
 export function GET(req: Request) {
@@ -70,6 +71,7 @@ export function POST(req: Request) {
       case "whatif": { const proposal = await runWhatIf(userId, { key: body.key, whatIf: body.whatIf }, () => undefined); return { proposal, state: await loadState(userId, { sync: false }) }; }
       case "settings": await updateSettings(userId, body.settings); return { state: await loadState(userId, { sync: true }) };
       case "explain": return runExplain(userId, { block: body.block, phrase: false }, () => undefined);
+      case "feedback": await runFeedback(userId, body); return { state: await loadState(userId, { sync: false }) };
       case "syllabus": { const proposal = await runSyllabusEdit(userId, body); return { proposal, state: await loadState(userId, { sync: false }) }; }
     }
     throw new StudioError(400, "UNKNOWN_ACTION", "Unknown action.");

@@ -1,7 +1,7 @@
 /** Disposable PostgreSQL verification for the Planning Studio. Never reads a hosted database URL.
  * Usage: node scripts/test/test-planning-studio-postgres.mjs [path-filter] (Docker Desktop required).
- * Builds today's schema without the Studio's four tables from the Prisma schema, installs the Supabase roles the migrations grant against, then
- * applies prisma/migrations/20261113100000_planning_kernel unchanged, so its constraints, partial index, ownership triggers and RLS are the ones
+ * Builds today's schema without the Studio's six tables from the Prisma schema, installs the Supabase roles the migrations grant against, then
+ * applies prisma/migrations/20261113100000_planning_kernel and 20261113200000_syllabus_library unchanged, so its constraints, partial index, ownership triggers and RLS are the ones
  * under test. Existing planner guard migrations are not replayed here; the Studio writes only quests that no other planner links.
  */
 import { execFileSync } from "node:child_process";
@@ -25,8 +25,8 @@ try {
   const url = connection.toString();
   run("docker", ["exec", container, "sh", "-c", "for i in $(seq 1 30); do pg_isready -U postgres -d sylf_planner_studio_test >/dev/null 2>&1 && exit 0; sleep 1; done; exit 1"]);
   const schema = readFileSync(join(root, "prisma/schema.prisma"), "utf8")
-    .replace(/\n(?:\/\/[^\n]*\n)*model (?:PlanningSpace|PlanVersion|PlanBlock|PlanItemQuest) \{[\s\S]*?\n\}\n/g, "\n")
-    .replace(/^\s*(?:planningSpace|planVersions|planBlocks|planItemQuests|planItem)\s+Plan[A-Za-z]*(?:\[\]|\?)?.*\n/gm, "");
+    .replace(/\n(?:\/\/[^\n]*\n)*model (?:PlanningSpace|PlanVersion|PlanBlock|PlanItemQuest|SyllabusOutline|PlanFeedback) \{[\s\S]*?\n\}\n/g, "\n")
+    .replace(/^\s*(?:planningSpace|planVersions|planBlocks|planItemQuests|planItem|planFeedback)\s+Plan[A-Za-z]*(?:\[\]|\?)?.*\n/gm, "");
   writeFileSync(join(temp, "before.prisma"), schema);
   const migrations = join(temp, "migrations"); mkdirSync(migrations);
   const stage = (name, sql) => { const dir = join(migrations, name); mkdirSync(dir); writeFileSync(join(dir, "migration.sql"), sql); };
@@ -43,6 +43,7 @@ CREATE PUBLICATION supabase_realtime;
   const baseline = run(prisma, ["migrate", "diff", "--from-empty", "--to-schema", join(temp, "before.prisma"), "--script"]) + "\n" + generated + "\n";
   stage("00000000000000_audited_schema", bootstrap + baseline);
   stage("20261113100000_planning_kernel", readFileSync(join(root, "prisma/migrations/20261113100000_planning_kernel/migration.sql"), "utf8"));
+  stage("20261113200000_syllabus_library", readFileSync(join(root, "prisma/migrations/20261113200000_syllabus_library/migration.sql"), "utf8"));
   copyFileSync(join(root, "prisma/migrations/migration_lock.toml"), join(migrations, "migration_lock.toml"));
   const config = join(temp, "prisma.config.ts");
   writeFileSync(config, `export default ${JSON.stringify({ schema: join(root, "prisma/schema.prisma"), migrations: { path: migrations }, datasource: { url } })};`);

@@ -228,6 +228,7 @@ model User {
   plannerIntakeSessions PlannerIntakeSession[]
   planningSpace         PlanningSpace?
   planVersions          PlanVersion[]
+  planFeedback          PlanFeedback[]
   planBlocks            PlanBlock[]
   planItemQuests        PlanItemQuest[]
 
@@ -737,6 +738,51 @@ model PlanItemQuest {
   quest          Quest?        @relation(fields: [questId], references: [id], onDelete: SetNull)
 
   @@unique([spaceId, itemKey])
+}
+
+/// A syllabus every student shares: what a named exam or course covers, researched and double-checked the first time anyone plans it, then
+/// reused as it is. No personal data: the outline is the syllabus's content. Sylf's hand-checked catalog (lib/planner/catalog) is not stored here.
+model SyllabusOutline {
+  id            String         @id @default(uuid()) @db.Uuid
+  /// Normalised identity, e.g. `knec|kcse|biology|231/1|p1` (lib/planner/studio/outlines.ts).
+  key           String         @unique
+  /// The same syllabus described without its code, so requests that name the code and requests that do not find one entry.
+  altKey        String?        @unique
+  name          String
+  preset        String
+  /// The normalised kernel Syllabus: units with key points, papers, edition.
+  outline       Json
+  /// Pages it was checked against: [{ title, url }].
+  sources       Json
+  /// The syllabus edition the sources describe, e.g. "2025–2027", when known.
+  edition       String?
+  /// CHECKED: researched and double-checked against sources. UNVERIFIED: no usable sources were found.
+  trust         String         @default("UNVERIFIED")
+  version       Int            @default(1)
+  confirmations Int            @default(0)
+  reports       Int            @default(0)
+  checkedAt     DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  feedback      PlanFeedback[]
+}
+
+/// A student's answer to "Is this plan right?" for one plan of one goal. A re-check starts a new round, which can be answered again.
+model PlanFeedback {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    Int
+  goalKey   String
+  round     Int              @default(0)
+  outlineId String?          @db.Uuid
+  /// ACCURATE | INACCURATE | DISMISSED
+  verdict   String
+  note      String?
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  outline   SyllabusOutline? @relation(fields: [outlineId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, goalKey, round])
+  @@index([outlineId])
 }
 
 model StudySession {

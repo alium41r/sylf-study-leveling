@@ -7,15 +7,16 @@ import { createHash } from "node:crypto";
 import { withAiRequest } from "@/lib/ai/telemetry-runtime";
 import { releaseQuota, reserveQuota } from "@/lib/ai/usage-limiter";
 import {
-  PLAN_PRESETS, applyOperations, autoApplies, calibrationNote, classifyChange, compileStudyPath, dayLabel, describePath, diffDays, diffPlans, editSyllabus, formatMinutes,
-  inferGoalType, inferPreset, isDateKey, isFixed, markWeak, normalizeSizes, normalizeSyllabus, parseCommand, parseTopicCommand, parseTopicList, propose, scaffold,
+  PLAN_PRESETS, applyCorrections, applyOperations, autoApplies, boundCorrections, calibrationNote, codeIn, outlineKeys, classifyChange, compileStudyPath, dayLabel, describePath, diffDays, diffPlans, editSyllabus, formatMinutes,
+  inferGoalType, inferPreset, isDateKey, isFixed, markWeak, presetOf, normalizeSizes, normalizeSyllabus, parseCommand, parseTopicCommand, parseTopicList, propose, scaffold,
   signals as computeSignals,
-  type Block, type Confidence, type GoalType, type KGoal, type Op, type Pace, type PlanCandidate, type PlanPreset, type Signal, type Syllabus, type SyllabusUnit, type WhatIf, type WorkItem, type WorkModel,
+  type Block, type Confidence, type GoalType, type KGoal, type Op, type OutlineCorrections, type Pace, type SyllabusIdentity, type PlanCandidate, type PlanPreset, type Signal, type Syllabus, type SyllabusUnit, type WhatIf, type WorkItem, type WorkModel,
 } from "../kernel";
 import { catalogSyllabus, linkTopics, matchSyllabi } from "../catalog/syllabi";
 import { compileContext, type CompiledContext } from "./snapshot";
-import { findSources, researchAvailable, sourcesForPrompt } from "./research";
-import { CRITIQUE_TOOL, DECOMPOSE_TOOL, INTENT_TOOL, SYLLABUS_SYSTEM, SYLLABUS_TOOL, TIER0, ANSWER_SYSTEM, BRIEF_SYSTEM, EXPLAIN_SYSTEM, briefFacts, syllabusRequest, userMessage, wrapData } from "./prompts";
+import { findSources, researchAvailable, sourcesForPrompt, syllabusQueries } from "./research";
+import { feedbackFor, findOutline, recordFeedback, reviseOutline, saveOutline } from "./outlines";
+import { CRITIQUE_TOOL, DECOMPOSE_TOOL, IDENTIFY_SYSTEM, IDENTIFY_TOOL, INTENT_TOOL, SYLLABUS_SYSTEM, SYLLABUS_TOOL, TIER0, VERIFY_SYSTEM, VERIFY_TOOL, verifyRequest, ANSWER_SYSTEM, BRIEF_SYSTEM, EXPLAIN_SYSTEM, briefFacts, syllabusRequest, userMessage, wrapData } from "./prompts";
 import { GatewayError, callText, callTool, type WireMessage } from "./gateway";
 import { StudioError, commitDirect, history, openProposal, persistProposal, persistTransitions, setBlockState, type CommitOutcome, type ProposalView } from "./store";
 import { studioReadiness } from "./config";
@@ -255,6 +256,69 @@ async function decompose(w: Working, goalKey: string, ai: boolean, notes: string
 
 const SOURCE_LABEL: Record<Syllabus["source"], string> = { catalog: "Sylf's syllabus list", model: "the AI", student: "your list", subject: "your Sylf syllabus" };
 
+/** Which syllabus a request names, in one short call: what decides whether the shared library and careful research apply. */
+async function identify(w: Working, goalKey: string, input: { notes: string | null; level: string | null }, signal?: AbortSignal): Promise<{ named: boolean; preset: PlanPreset; identity: SyllabusIdentity } | null> {
+  const goal = w.model.goals.find((g) => g.key === goalKey)!;
+  const subject = w.ctx.snapshot.subjects.find((x) => x.id === goal.subject) ?? null;
+  const user = [`Plan: ${wrapData(goal.title)}`, input.level ? `Board, institution or level: ${wrapData(input.level)}` : "", subject ? `Subject in Sylf: ${subject.name}${subject.code && subject.code !== "GENERAL" ? ` (${subject.code})` : ""}${subject.board ? `, ${subject.board}` : ""}${subject.level ? `, ${subject.level}` : ""}` : "", input.notes ? `Notes:\n${wrapData(input.notes.slice(0, 1200))}` : ""].filter(Boolean).join("\n");
+  const result = await callTool<{ named?: boolean; preset?: string; board?: string; qualification?: string; subject?: string; code?: string; component?: string; edition?: string }>({ userId: w.ctx.userId, profile: "syllabus.identify", tool: IDENTIFY_TOOL, signal, messages: [{ role: "system", content: IDENTIFY_SYSTEM }, { role: "user", content: user }] });
+  track(w, result);
+  const a = result.args;
+  const text = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim().slice(0, 80) : null);
+  // A code the model mentioned elsewhere (in the title or the edition) but left out of its field still identifies the syllabus.
+  const code = text(a.code) ?? codeIn(`${goal.title} ${a.edition ?? ""} ${input.level ?? ""}`);
+  return { named: a.named === true, preset: (PLAN_PRESETS as readonly string[]).includes(a.preset ?? "") ? (a.preset as PlanPreset) : "exam", identity: { board: text(a.board), qualification: text(a.qualification), subject: text(a.subject), code, component: text(a.component), edition: text(a.edition) } };
+}
+
+/** The double-check: an independent reading of an outline against sources (and a learner's report), as corrections. */
+async function verifyOutline(w: Working, syllabus: Syllabus, sources: string | null, report: string | null, signal?: AbortSignal): Promise<OutlineCorrections & { verdict: "ok" | "revise"; notes: string | null }> {
+  const result = await callTool<{ verdict?: string; edition?: string; missing?: { title?: string; points?: string[]; after?: string }[]; remove?: string[]; rename?: { from?: string; to?: string }[]; papers?: { label?: string; minutes?: number; marks?: number }[]; notes?: string }>({
+    userId: w.ctx.userId, profile: "syllabus.verify", tool: VERIFY_TOOL, signal,
+    messages: [{ role: "system", content: VERIFY_SYSTEM }, { role: "user", content: verifyRequest({ name: syllabus.name, edition: syllabus.identity?.edition ?? null, units: syllabus.units.filter((u) => u.included), papers: syllabus.papers, sources, report }) }],
+  });
+  track(w, result);
+  const a = result.args;
+  const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
+  return {
+    verdict: a.verdict === "revise" ? "revise" : "ok", notes: str(a.notes) || null, edition: str(a.edition) || null,
+    add: (a.missing ?? []).filter((m) => str(m.title)).slice(0, 12).map((m) => ({ title: str(m.title), points: (m.points ?? []).filter((p): p is string => typeof p === "string"), after: str(m.after) || null })),
+    remove: (a.remove ?? []).filter((t): t is string => typeof t === "string" && t.trim().length > 0).slice(0, 12),
+    rename: (a.rename ?? []).filter((r) => str(r.from) && str(r.to)).slice(0, 12).map((r) => ({ from: str(r.from), to: str(r.to) })),
+    papers: (a.papers ?? []).filter((p) => (p.minutes ?? 0) >= 20).slice(0, 4).map((p) => ({ label: str(p.label) || "Past paper", minutes: p.minutes ?? 0, marks: p.marks && p.marks > 0 ? p.marks : null })),
+  };
+}
+
+/**
+ * A syllabus nobody has planned before, looked at with care: several searches for its official document and current edition, a map from what was
+ * read, then an independent double-check against the same sources whose corrections are applied. Slower and more thorough than everyday planning,
+ * and it runs once per syllabus: everyone after reuses the result.
+ */
+async function carefulOutline(w: Working, goalKey: string, asked: { notes: string | null; typed: { title: string; points: string[] }[]; preset: PlanPreset | "auto"; level: string | null; target: string | null }, identity: SyllabusIdentity, signal?: AbortSignal): Promise<Mapped | null> {
+  const goal = w.model.goals.find((g) => g.key === goalKey)!;
+  w.emit({ type: "stage", stage: "research", text: "Researching this syllabus for the first time" });
+  const sources = researchAvailable() ? await findSources(syllabusQueries(identity, goal.title, Number(w.ctx.snapshot.today.slice(0, 4))), signal, { pages: 5, seconds: 30 }) : [];
+  w.emit({ type: "stage", stage: "research", text: sources.length ? `Read ${sources.length} source${sources.length === 1 ? "" : "s"}` : "No sources found; using what the planner knows" });
+  const text = sources.length ? sourcesForPrompt(sources) : null;
+  const mapped = await mapOutline(w, goalKey, { ...asked, sources: text }, signal);
+  if (!mapped?.syllabus.units.length) return mapped;
+  w.emit({ type: "stage", stage: "check", text: "Double-checking the topics" });
+  const check = await verifyOutline(w, { ...mapped.syllabus, identity }, text, null, signal).catch(() => null);
+  let syllabus: Syllabus = { ...mapped.syllabus, identity, researched: sources.length > 0, sources: sources.slice(0, 6).map((x) => ({ title: x.title, url: x.url })) };
+  if (check) {
+    const before = JSON.stringify(syllabus.units.map((u) => u.title));
+    const bounded = boundCorrections(syllabus, check);
+    Object.assign(check, bounded);
+    syllabus = applyCorrections(syllabus, bounded);
+    if (JSON.stringify(syllabus.units.map((u) => u.title)) !== before) {
+      w.emit({ type: "units_reset", goal: goalKey });
+      for (const unit of syllabus.units) w.emit({ type: "unit", goal: goalKey, unit });
+    }
+    const fixes = check.add.length + check.remove.length + check.rename.length + (check.papers?.length ? 1 : 0);
+    w.emit({ type: "stage", stage: "check", text: fixes ? `Double-check made ${fixes} correction${fixes === 1 ? "" : "s"}` : "Double-check agreed" });
+  }
+  return { ...mapped, syllabus, preset: mapped.preset };
+}
+
 /** Topic text the student typed, keeping line breaks so one topic a line stays a list. */
 const notesText = (text: unknown, max = 2000) => (typeof text === "string" ? text.replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim().slice(0, max) : "");
 
@@ -332,9 +396,30 @@ async function planFromOutline(w: Working, goalKey: string, ai: boolean, notes: 
     } else if (ai) {
       const asked = { notes: [notes, extra.topics].filter(Boolean).join("\n") || null, typed, preset, level: extra.level ?? null, target: extra.target ?? goal.target ?? null };
       const fail = (error: unknown) => { if (signal?.aborted) throw error; w.errors.push(error instanceof Error ? error.message : String(error)); return null; };
-      let mapped = await mapOutline(w, goalKey, asked, signal).catch(fail);
+      // A named official syllabus goes through the shared library: reused as it is when someone has planned it before, otherwise researched,
+      // mapped and double-checked with care, then saved for everyone after.
+      let mapped: Mapped | null = null;
+      if (typed.length < 2 && (preset === "exam" || preset === "course" || preset === "auto")) {
+        const named = await identify(w, goalKey, asked, signal).catch(fail);
+        const keys = named?.named ? outlineKeys(named.identity) : [];
+        if (named && preset === "auto" && (named.preset === "exam" || named.preset === "course")) preset = named.preset;
+        if (keys.length && named) {
+          const entry = await findOutline(keys).catch(fail);
+          if (entry) {
+            w.emit({ type: "stage", stage: "syllabus", text: "Found in Sylf's syllabus library" });
+            mapped = { syllabus: entry.syllabus, preset: preset === "auto" ? entry.preset : preset, scope: null, question: null, confidence: "high", research: null };
+          } else {
+            mapped = await carefulOutline(w, goalKey, { ...asked, preset }, named.identity, signal).catch(fail);
+            if (mapped) {
+              const saved = await saveOutline(keys, mapped.syllabus, mapped.preset).catch(fail);
+              if (saved) mapped = { ...mapped, syllabus: { ...mapped.syllabus, library: saved.syllabus.library ?? null } };
+            }
+          }
+        }
+      }
+      if (!mapped) mapped = await mapOutline(w, goalKey, asked, signal).catch(fail);
       // Not sure of this course: look it up and map again from what was found. Optional, and only when a search provider is configured.
-      if (mapped && mapped.confidence !== "high" && mapped.research && mapped.preset !== "assignment" && researchAvailable()) {
+      if (mapped && !mapped.syllabus.library && mapped.confidence !== "high" && mapped.research && mapped.preset !== "assignment" && researchAvailable()) {
         w.emit({ type: "stage", stage: "research", text: "Looking up the syllabus" });
         const sources = await findSources(mapped.research, signal);
         w.emit({ type: "stage", stage: "research", text: sources.length ? `Read ${sources.length} source${sources.length === 1 ? "" : "s"}` : "Nothing useful found; using what the planner knows" });
@@ -369,9 +454,10 @@ async function planFromOutline(w: Working, goalKey: string, ai: boolean, notes: 
     }
     syllabus = markWeak(linkTopics(syllabus, nodes), extra.weak);
     current().syllabus = syllabus;
-    if (syllabus.source !== "model") for (const unit of syllabus.units) w.emit({ type: "unit", goal: goalKey, unit });
+    if (syllabus.source !== "model" || syllabus.library?.reused) for (const unit of syllabus.units) w.emit({ type: "unit", goal: goalKey, unit });
     w.emit({ type: "syllabus", goal: goalKey, name: syllabus.name, source: syllabus.source, units: syllabus.units.length });
-    w.emit({ type: "stage", stage: "syllabus", text: `${syllabus.units.length} ${preset === "skill" ? "stages" : preset === "reading" ? "parts" : "topics"} from ${SOURCE_LABEL[syllabus.source]}${syllabus.researched ? ", checked against sources" : ""}` });
+    const from = syllabus.library?.reused ? "Sylf's syllabus library" : syllabus.library ? "research, double-checked" : SOURCE_LABEL[syllabus.source];
+    w.emit({ type: "stage", stage: "syllabus", text: `${syllabus.units.length} ${preset === "skill" ? "stages" : preset === "reading" ? "parts" : "topics"} from ${from}${!syllabus.library && syllabus.researched ? ", checked against sources" : ""}` });
     const paper = syllabus.papers[0];
     apply(w, [{ op: "note_assumption", id: `${goalRef}.scope`, text: (scope ?? `Covers all ${syllabus.units.length} ${preset === "skill" ? "stages" : "topics"}${paper ? ` of ${paper.label}` : ""}.`).slice(0, 160), affects: [goalRef], confidence: syllabus.source === "catalog" ? 0.8 : 0.6 }], "system");
   } else if (extra.weak) current().syllabus = markWeak(syllabus, extra.weak);
@@ -631,6 +717,76 @@ export async function runSyllabusEdit(userId: number, input: { key: string; goal
   return finish(w, { key: input.key, workflow: "syllabus", request: { goal: input.goal, units: input.units ?? [], add: input.add ?? [], checked: input.checked ?? null }, ops: [], source: "STUDENT", started });
 }
 
+/**
+ * "Is this plan right?" answered "no": the syllabus is researched again, mapped again with the student's report in hand, double-checked against
+ * the sources, and the plan rebuilt from it as a proposal. Ratings and ticks on topics that stay are kept. A correction to a shared library entry,
+ * confirmed by sources, becomes its next version; Sylf's hand-checked catalog is never changed here.
+ */
+export async function runRecheck(userId: number, input: { key: string; goal: string; note?: string | null }, emit: Emit, signal?: AbortSignal): Promise<ProposalView | null> {
+  const started = Date.now();
+  const ctx = await compileContext(userId);
+  const pending = await openProposal(ctx.space.id);
+  const base: WorkModel = pending?.model.goals.some((g) => g.key === input.goal && g.syllabus) ? pending.model : ctx.model;
+  const original = base.goals.find((g) => g.key === input.goal && g.status === "active");
+  if (!original?.syllabus) throw new StudioError(404, "NOT_FOUND", "That plan has no syllabus to check.");
+  const note = notesText(input.note, 600) || null;
+  const round = original.review?.round ?? 0;
+  await recordFeedback(userId, { goalKey: original.key, round, outlineId: original.syllabus.library?.id ?? null, verdict: "INACCURATE", note });
+  const w = newWorking(ctx, emit, input.key);
+  w.model = JSON.parse(JSON.stringify(base));
+  w.interpretation = "Re-checking the plan";
+  emit({ type: "interpretation", text: w.interpretation, fast: false });
+  return withModel(userId, "recheck", async (ai) => {
+    if (!ai) throw new StudioError(503, "AI_UNAVAILABLE", "Re-checking needs the AI planner, which isn't available right now.");
+    const goal = () => w.model.goals.find((g) => g.key === original.key)!;
+    const old = goal().syllabus!;
+    const preset = presetOf(goal());
+    const identity: SyllabusIdentity = old.identity ?? { board: null, qualification: null, subject: null, code: null, component: null, edition: null };
+    emit({ type: "stage", stage: "research", text: "Re-checking the syllabus" });
+    const sources = researchAvailable() ? await findSources(syllabusQueries(identity, goal().title, Number(ctx.snapshot.today.slice(0, 4))), signal, { pages: 5, seconds: 30 }) : [];
+    emit({ type: "stage", stage: "research", text: sources.length ? `Read ${sources.length} source${sources.length === 1 ? "" : "s"}` : "No sources found; checking against what the planner knows" });
+    const text = sources.length ? sourcesForPrompt(sources) : null;
+    // Map again, told that the last outline was reported wrong, then double-check the new one against the sources and the report.
+    const report = `The previous outline for this plan was reported as inaccurate by the learner${note ? `: "${note}"` : "."} Previous topics: ${old.units.map((u) => u.title).join("; ")}.`;
+    const mapped = await mapOutline(w, original.key, { notes: report, typed: [], preset, level: [identity.board, identity.qualification, identity.code].filter(Boolean).join(" ") || null, target: goal().target ?? null, sources: text }, signal).catch(() => null);
+    let fresh: Syllabus = mapped?.syllabus.units.length ? { ...mapped.syllabus, identity, ref: old.ref } : { ...old };
+    emit({ type: "stage", stage: "check", text: "Double-checking the topics" });
+    const check = await verifyOutline(w, fresh, text, note ?? "", signal).catch(() => null);
+    if (check) fresh = applyCorrections(fresh, boundCorrections(fresh, check));
+    // Keep the student's own ratings and ticks on every topic that stays, by name.
+    const prior = new Map(old.units.map((u) => [u.title.toLowerCase(), u]));
+    fresh = { ...fresh, source: old.source === "catalog" ? "model" : fresh.source, checked: false, researched: sources.length > 0 || old.researched, sources: sources.length ? sources.slice(0, 6).map((x) => ({ title: x.title, url: x.url })) : old.sources, library: old.library ?? null,
+      units: fresh.units.map((u) => { const was = prior.get(u.title.toLowerCase()); return was ? { ...u, confidence: was.confidence, included: was.included, topic: was.topic } : u; }) };
+    fresh = linkTopics(fresh, ctx.snapshot.topics.filter((t) => t.subject === goal().subject).map((t) => ({ id: t.id, title: t.title })));
+    emit({ type: "units_reset", goal: original.key });
+    for (const unit of fresh.units) emit({ type: "unit", goal: original.key, unit });
+    const changed = fresh.units.length !== old.units.length || fresh.units.some((u, i) => u.title !== old.units[i]?.title) || JSON.stringify(fresh.papers) !== JSON.stringify(old.papers);
+    // Only a real correction, confirmed against sources, becomes the shared entry's next version.
+    if (old.library?.id && sources.length && changed) {
+      const revised = await reviseOutline(old.library.id, fresh).catch(() => null);
+      if (revised) fresh = { ...fresh, library: { ...old.library, version: revised.version, trust: "CHECKED", reused: false } };
+    }
+    const target = goal();
+    target.syllabus = fresh;
+    target.review = { round: round + 1 };
+    emit({ type: "stage", stage: "path", text: "Rebuilding the plan" });
+    const compiled = compileStudyPath(w.model, original.key, ctx.snapshot, "model");
+    w.model = compiled.model;
+    w.notes.push(changed ? `Re-checked ${sources.length ? `against ${sources.length} source${sources.length === 1 ? "" : "s"}` : "by the planner"}: ${check?.notes ?? "the topics were corrected"}` : `Re-checked ${sources.length ? `against ${sources.length} source${sources.length === 1 ? "" : "s"}` : "by the planner"}: the topics look right${check?.notes ? `. ${check.notes}` : ""}`);
+    w.strategy.push(describePath(compiled.summary, fresh, preset));
+    return finish(w, { key: input.key, workflow: "recheck", request: { goal: original.key, note }, ops: [], source: "MODEL", started });
+  });
+}
+
+/** "Is this plan right?" answered "yes", or closed: recorded for this plan round; the plan does not change. */
+export async function runFeedback(userId: number, input: { goal: string; verdict: "accurate" | "dismissed" }): Promise<void> {
+  const ctx = await compileContext(userId);
+  const pending = await openProposal(ctx.space.id);
+  const goal = (pending?.model.goals ?? []).find((g) => g.key === input.goal) ?? ctx.model.goals.find((g) => g.key === input.goal);
+  if (!goal) throw new StudioError(404, "NOT_FOUND", "That plan isn't in your planner.");
+  await recordFeedback(userId, { goalKey: goal.key, round: goal.review?.round ?? 0, outlineId: goal.syllabus?.library?.id ?? null, verdict: input.verdict === "accurate" ? "ACCURATE" : "DISMISSED" });
+}
+
 /** What-ifs become real changes only when the student keeps them. */
 export async function runWhatIf(userId: number, input: { key: string; whatIf: WhatIf }, emit: Emit): Promise<ProposalView | null> {
   const started = Date.now();
@@ -725,6 +881,8 @@ export interface StudioState {
   facts: CompiledContext["facts"];
   calibrationNotes: Record<string, string>;
   repaired: { summary: string } | null;
+  /** The student's latest answer to "Is this plan right?" for each goal, with its plan round. */
+  feedback: Record<string, { round: number; verdict: string }>;
 }
 
 export async function loadState(userId: number, options: { sync: boolean } = { sync: true }): Promise<StudioState> {
@@ -742,6 +900,7 @@ export async function loadState(userId: number, options: { sync: boolean } = { s
     plan: { ...plan, quality: candidate.verification.quality, critics: candidate.verification.critics }, proposal,
     signals: computeSignals(ctx.snapshot, ctx.model, candidate.result, ctx.lastStudied, ctx.blocks), history: await history(userId), lockedGoals: ctx.lockedGoals,
     facts: ctx.facts, calibrationNotes, repaired: applied && !applied.replayed && applied.proposal.diff.changes.length ? { summary: applied.proposal.summary } : null,
+    feedback: await feedbackFor(userId).catch(() => ({})),
   };
 }
 

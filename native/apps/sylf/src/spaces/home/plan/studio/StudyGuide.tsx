@@ -3,10 +3,10 @@
 // the plan is rebuilt on the server, without the model, and comes back as a proposal. Dates come from the solver; topics from the outline.
 import { useMemo, useState } from "react";
 import { View } from "react-native";
-import { Badge, Button, Checkbox, Chip, Disclosure, Icon, Plane, Press, Progress, Segmented, Stack, Text, TextField, useTheme, withAlpha } from "@sylf/design-system";
+import { Badge, Button, Checkbox, Chip, Disclosure, Icon, IconButton, Plane, Press, Progress, Segmented, Stack, Text, TextField, useTheme, withAlpha } from "@sylf/design-system";
 import type { StudioState } from "@sylf/backend";
 import { planning } from "@sylf/shared";
-import { CONFIDENCE_WORDS, PRESET_WORDS, RELATIVE, SOURCE_WORDS, agendaFor, blockMinutes, clockLabel, dateSpan, dayLabel, formatMinutes, goalProgress, live, sessionLabel, subjectColour, titleOf, unitStatus } from "./format";
+import { CONFIDENCE_WORDS, PRESET_WORDS, RELATIVE, agendaFor, sourceWords, blockMinutes, clockLabel, dateSpan, dayLabel, formatMinutes, goalProgress, live, sessionLabel, subjectColour, titleOf, unitStatus } from "./format";
 import type { Studio } from "./useStudio";
 
 type Tab = "plan" | "topics" | "days";
@@ -59,6 +59,8 @@ export function SyllabusGoal({ state, studio, model, goal, blocks, budgets, onSe
         <Text variant="micro" tone="faint">{`${progress.finished}/${progress.items} done · ${formatMinutes(progress.total)}`}</Text>
       </Stack>
 
+      <PlanCheck state={state} studio={studio} goal={goal} />
+
       {next ? (
         <Press label={`Next: ${titleOf(model, next.item)}, ${dayLabel(next.date)} ${clockLabel(next.start)}`} onPress={() => onSelectBlock(next.id)} radius={shape.radius.md} testID="studio-guide-next"
           bodyStyle={{ flexDirection: "row", alignItems: "center", gap: space.sm, padding: space.sm, borderRadius: shape.radius.md, backgroundColor: withAlpha(color.accent.fill, 0.1) }}>
@@ -95,7 +97,7 @@ export function SyllabusGoal({ state, studio, model, goal, blocks, budgets, onSe
 
       {tab === "topics" ? (
         <Stack gap="sm" testID="studio-guide-topics">
-          <Text variant="micro" tone="faint">{SOURCE_WORDS[syllabus.source]}</Text>
+          <Text variant="micro" tone="faint">{sourceWords(syllabus)}</Text>
           <View style={{ gap: 2 }}>
             {syllabus.units.map((unit) => {
               const change = pending[unit.key] ?? {};
@@ -167,5 +169,43 @@ export function SyllabusGoal({ state, studio, model, goal, blocks, budgets, onSe
         <Button title="Drop" size="small" variant="quiet" disabled={busy} onPress={() => void studio.command(`drop ${goal.title}`)} />
       </View>
     </Plane>
+  );
+}
+
+/**
+ * "Is this plan right?", once per plan round, small and closeable. Yes records it and changes nothing. No (with an optional note) researches and
+ * double-checks the syllabus again and proposes an improved plan; that new plan gets its own round, so it can be judged too.
+ */
+function PlanCheck({ state, studio, goal }: { state: StudioState; studio: Studio; goal: planning.KGoal }) {
+  const { color, space } = useTheme();
+  const [off, setOff] = useState(false);
+  const [note, setNote] = useState("");
+  const [closed, setClosed] = useState<number | null>(null);
+  const round = goal.review?.round ?? 0;
+  const answered = state.feedback?.[goal.key];
+  const running = studio.activity?.running === true;
+  if ((answered && answered.round >= round) || closed === round || running) return null;
+  const close = (verdict: "accurate" | "dismissed") => { setClosed(round); setOff(false); void studio.feedback(goal.key, verdict); };
+  return (
+    <View testID="studio-plan-check" style={{ gap: space.sm, padding: space.sm, borderRadius: 12, borderWidth: 1, borderColor: color.accent.line, backgroundColor: withAlpha(color.accent.fill, 0.06) }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm }}>
+        <Text variant="small" style={{ flex: 1 }}>{round ? "Is the re-checked plan right?" : "Is this plan right?"}</Text>
+        <IconButton icon="close" label="Close" onPress={() => close("dismissed")} testID="studio-plan-check-close" />
+      </View>
+      {off ? (
+        <Stack gap="sm">
+          <TextField label="What's off? (optional)" hideLabel multiline placeholder="What's off? (optional)" value={note} onChangeText={setNote} testID="studio-plan-check-note" />
+          <View style={{ flexDirection: "row", gap: space.sm, flexWrap: "wrap" }}>
+            <Button title="Re-check" icon="reset" variant="emphasis" size="small" disabled={studio.busy !== null} onPress={() => { setClosed(round); void studio.recheck(goal.key, note.trim() || null); setOff(false); setNote(""); }} testID="studio-plan-check-recheck" />
+            <Button title="Cancel" size="small" variant="quiet" onPress={() => setOff(false)} />
+          </View>
+        </Stack>
+      ) : (
+        <View style={{ flexDirection: "row", gap: space.sm, flexWrap: "wrap" }}>
+          <Button title="Looks good" icon="check" size="small" variant="solid" onPress={() => close("accurate")} testID="studio-plan-check-good" />
+          <Button title="Something's off" size="small" variant="ghost" onPress={() => setOff(true)} testID="studio-plan-check-off" />
+        </View>
+      )}
+    </View>
   );
 }

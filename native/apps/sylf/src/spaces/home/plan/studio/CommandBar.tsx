@@ -1,9 +1,9 @@
 // The command bar: natural language with suggestion chips and a live interpretation chip that shows what will run before anything does. Common phrasings
 // are understood on the device by the kernel's fast path; anything else goes to the planner. Questions are answered from the plan's facts. Below it,
 // the activity line reports real stages with real counts while a workflow runs.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
-import { Activity as Spinner, Badge, Button, Chip, Icon, IconButton, Plane, Select, Sheet, Stack, Text, TextField, useTheme } from "@sylf/design-system";
+import { Activity as Spinner, Badge, Button, Chip, Icon, IconButton, Plane, Popover, Press, Select, Sheet, Stack, Text, TextField, useTheme, type ViewHandle } from "@sylf/design-system";
 import { planning } from "@sylf/shared";
 import type { StudioState } from "@sylf/backend";
 import { addDays, dayLabel, ESTIMATE, isQuestion, PRESET_WORDS, sessionLabel } from "./format";
@@ -192,9 +192,7 @@ export function GoalComposer({ state, studio, onDone, inline }: { state: StudioS
   const hint = (field: Field) => FIELD_HINT[field]?.[preset] ?? FIELD_HINT[field]?.default ?? "";
   return (
     <Stack gap="md" testID={inline ? "studio-composer" : "studio-goal-sheet"}>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xs }} role="radiogroup" aria-label="Kind of plan">
-        {PRESET_ORDER.map((p) => <Chip key={p} label={PRESET_WORDS[p].label} icon={PRESET_WORDS[p].icon as never} radio selected={preset === p} onPress={() => { setPreset(p); setOpen((o) => o.filter((f) => FIELDS[p].includes(f) || f === "subject")); }} />)}
-      </View>
+      <PresetPicker value={preset} onChange={(p) => { setPreset(p); setOpen((o) => o.filter((f) => FIELDS[p].includes(f) || f === "subject")); }} />
       <TextField label="What are you planning?" hideLabel placeholder={PLACEHOLDER[preset]} value={title} onChangeText={setTitle} onSubmitEditing={submit} testID="studio-goal-title" />
       <Stack gap="xs">
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xs, alignItems: "center" }}>
@@ -229,6 +227,57 @@ export function GoalComposer({ state, studio, onDone, inline }: { state: StudioS
         <Button title={running ? "Planning…" : "Plan it"} variant="emphasis" icon="arrowRight" disabled={!ready} onPress={submit} testID="studio-goal-submit" />
       </View>
     </Stack>
+  );
+}
+
+/** The kind of plan, as a picker: the chosen preset shows on its own, and opening it lists every preset as a large row with what it does. */
+function PresetPicker({ value, onChange }: { value: PresetChoice; onChange: (preset: PresetChoice) => void }) {
+  const { color, space, shape } = useTheme();
+  const [open, setOpen] = useState(false);
+  const anchor = useRef<ViewHandle>(null);
+  const current = PRESET_WORDS[value];
+  return (
+    <>
+      <View ref={anchor} collapsable={false} style={{ alignSelf: "flex-start", width: "100%", maxWidth: 380 }}>
+        <Press role="button" label={`Kind of plan: ${current.label}`} expanded={open} onPress={() => setOpen(true)} radius={shape.radius.md} testID="studio-preset"
+          bodyStyle={{ flexDirection: "row", alignItems: "center", gap: space.md, paddingVertical: space.sm, paddingHorizontal: space.sm, borderRadius: shape.radius.md, borderWidth: 1, borderColor: color.line, backgroundColor: color.sunken }}>
+          <PresetIcon name={current.icon} selected />
+          <View style={{ flex: 1, minWidth: 0, gap: 1 }}>
+            <Text variant="subheading" numberOfLines={1}>{current.label}</Text>
+            <Text variant="micro" tone="soft" numberOfLines={1}>{current.detail}</Text>
+          </View>
+          <Icon name={open ? "chevronUp" : "chevronDown"} size={16} color={color.inkSoft} />
+        </Press>
+      </View>
+      <Popover open={open} anchor={anchor} onClose={() => setOpen(false)} label="Kind of plan" width={380}>
+        <View style={{ padding: space.xs, gap: 2 }} role="radiogroup" aria-label="Kind of plan">
+          {PRESET_ORDER.map((p) => {
+            const words = PRESET_WORDS[p];
+            const on = p === value;
+            return (
+              <Press key={p} role="radio" checked={on} label={`${words.label}. ${words.detail}`} onPress={() => { onChange(p); setOpen(false); }} radius={shape.radius.md} testID={`studio-preset-${p}`}
+                bodyStyle={{ flexDirection: "row", alignItems: "center", gap: space.md, paddingVertical: space.sm + 2, paddingHorizontal: space.sm, borderRadius: shape.radius.md, backgroundColor: on ? color.accent.wash : undefined }}>
+                <PresetIcon name={words.icon} selected={on} />
+                <View style={{ flex: 1, minWidth: 0, gap: 1 }}>
+                  <Text variant="small" style={{ fontWeight: "600" }} tone={on ? "accent" : "ink"}>{words.label}</Text>
+                  <Text variant="micro" tone="soft" numberOfLines={2}>{words.detail}</Text>
+                </View>
+                {on ? <Icon name="check" size={16} color={color.accent.ink} /> : null}
+              </Press>
+            );
+          })}
+        </View>
+      </Popover>
+    </>
+  );
+}
+
+function PresetIcon({ name, selected }: { name: string; selected?: boolean }) {
+  const { color, shape } = useTheme();
+  return (
+    <View style={{ width: 38, height: 38, borderRadius: shape.radius.sm, alignItems: "center", justifyContent: "center", backgroundColor: selected ? color.accent.fill : color.plane, borderWidth: selected ? 0 : 1, borderColor: color.line }}>
+      <Icon name={name as never} size={18} color={selected ? color.accent.on : color.inkSoft} />
+    </View>
   );
 }
 

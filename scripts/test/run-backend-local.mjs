@@ -7,6 +7,7 @@
  *   ... node scripts/test/run-backend-local.mjs --journey [--build] [--out <dir>]       the whole student journey in real Electron, as two processes on one profile, so a restart is a real restart. Build `native/` first
  *   ... node scripts/test/run-backend-local.mjs --studio [--with-deepseek] [--dev]      the Planning Studio in real Electron (sign-up, plan, accept, edit, undo, screenshots). Build `native/` first.
  *   ... node scripts/test/run-backend-local.mjs --generations --dev --with-deepseek    real plan generations for scripts/test/planner-generation-cases.json, written as generations.json and .md
+ *       (SYLF_GENERATION_CASES=id,id runs only those cases)
  *       --with-deepseek is the one deliberate exception to blanking: it passes DEEPSEEK_API_KEY (from the environment or .env) so the Studio's
  *       model path runs for real. It spends a few tenths of a cent; leave it off to exercise the template path only.
  * Without --dev it needs a build (`--build`). Redis, Supabase storage, Realtime, email and AI providers are off, and those paths use their fallbacks.
@@ -97,7 +98,8 @@ async function generations() {
   const tag = Date.now().toString(36);
   const registered = await jar.call("/api/auth/register", { method: "POST", body: { email: `gen_${tag}@local.test`, password: `Gen-${tag}-Password1!`, name: "Generations", username: `gen_${tag}`, timezone: "UTC" } });
   if (registered.status !== 201) throw new Error(`Could not register (${registered.status}).`);
-  const cases = JSON.parse(readFileSync(join(root, "scripts/test/planner-generation-cases.json"), "utf8"));
+  const only = (process.env.SYLF_GENERATION_CASES ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+  const cases = JSON.parse(readFileSync(join(root, "scripts/test/planner-generation-cases.json"), "utf8")).filter((c) => !only.length || only.includes(c.id));
   const today = (await jar.call("/api/planner/studio")).json?.snapshot?.today;
   const plusDays = (date, days) => { const d = new Date(`${date}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + days); return d.toISOString().slice(0, 10); };
   const results = [];

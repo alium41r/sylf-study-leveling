@@ -1,0 +1,557 @@
+{
+ "passed": true,
+ "checks": {
+  "the sign-in surface is first": true,
+  "Home opens after sign-up": true,
+  "the Planner is Plan's first view": true,
+  "the composer is the empty page": true,
+  "the preset picker lists every preset": true,
+  "the picker closes on choosing": true,
+  "presets are offered, Auto first": true,
+  "settings are one tap away": true,
+  "the old seven-day box is gone": true,
+  "the activity card reports progress": true,
+  "the stage rail shows the planning stages": true,
+  "the topics stream in": true,
+  "a proposal arrives for review": true,
+  "the proposal passed every check": true,
+  "the syllabus came from Sylf's checked list": true,
+  "every topic has revision and practice": true,
+  "every session is placed in the calendar": true,
+  "hours a day became the plan's own daily cap": true,
+  "the weak spot was marked and practised again": true,
+  "Auto chose the exam preset": true,
+  "nothing is added before acceptance": true,
+  "the review closes on accept": true,
+  "the plan is version 1": true,
+  "a quest for every session": true,
+  "quest descriptions carry the aim and key points": true,
+  "the study guide is beside the calendar": true,
+  "the plan asks whether it is right": true,
+  "Looks good closes the card": true,
+  "Looks good is recorded and the plan does not change": true,
+  "the topics tab lists the syllabus": true,
+  "the day-by-day tab lists the sessions": true,
+  "the inspector shows the session's aim and key points": true,
+  "the inspector explains the session": true,
+  "rating a topic proposes a rebuilt plan": true,
+  "the rebuilt plan is up for review": true,
+  "existing quests kept their identity": true,
+  "the interpretation chip shows before anything runs": true,
+  "the command becomes a proposal": true,
+  "undo is a new version without the rule": true,
+  "the term view shows weeks": true,
+  "planning settings open": true,
+  "the settings sheet fits its width": true,
+  "the new-plan sheet opens": true,
+  "the model's syllabus arrives as a proposal": true,
+  "the model mapped the chemistry syllabus": true,
+  "a new syllabus is researched, double-checked and saved to the library": true,
+  "a re-check proposes an improved plan in a new round": true,
+  "the re-check answered the student's note": true,
+  "a syllabus planned before comes from the library without research": true,
+  "the model's breakdown arrives as a proposal": true,
+  "the phone opens on today's agenda": true
+ },
+ "facts": {
+  "subject": 201,
+  "readiness": {
+   "enabled": true,
+   "ai": true,
+   "model": "deepseek-flash",
+   "reason": null
+  },
+  "goalSeconds": 0.3,
+  "proposalSummary": "23 sessions added",
+  "proposal": {
+   "trace": {
+    "ms": 56,
+    "errors": [],
+    "solver": {
+     "ms": 9,
+     "items": 23,
+     "placed": 23,
+     "iterations": 2
+    },
+    "tokens": {
+     "calls": 0,
+     "input": 0,
+     "cached": 0,
+     "output": 0,
+     "servedModel": null,
+     "firstTokenMs": []
+    }
+   },
+   "critics": [
+    "realism 100: Every day is within what you usually sustain.",
+    "exam_prep 100: Spaced retrieval and a light review before each exam.",
+    "front_loading 97: 1 item finish on the due date with no room to run long.",
+    "interleaving 100: Practice is mixed across subjects.",
+    "fragmentation 100: Sessions are a workable length.",
+    "neglect 100: Every active goal has time."
+   ],
+   "workflow": "add_goal",
+   "source": "MODEL",
+   "pass": true,
+   "quality": 100,
+   "blocks": 23,
+   "unplaced": [],
+   "items": 23,
+   "interpretation": "Auto · Maths mid term Complete Paper 1 CAIE A levels · Tue 1 Dec",
+   "strategy": "8 topics revised and practised in order, 2 mixed reviews, 1 timed Paper 1, light final day. Time is tight, so sessions are short.",
+   "syllabus": {
+    "source": "catalog",
+    "ref": "caie-9709-p1",
+    "units": [
+     "Quadratics",
+     "Functions",
+     "Coordinate geometry",
+     "Circular measure",
+     "Trigonometry",
+     "Series",
+     "Differentiation",
+     "Integration"
+    ]
+   },
+   "titles": [
+    "Quadratics revision",
+    "Quadratics past paper practice",
+    "Functions revision",
+    "Functions past paper practice",
+    "Coordinate geometry revision",
+    "Coordinate geometry past paper practice",
+    "Circular measure revision",
+    "Circular measure past paper practice",
+    "Trigonometry revision",
+    "Trigonometry past paper practice",
+    "Series revision",
+    "Series past paper practice",
+    "Differentiation revision",
+    "Differentiation past paper practice",
+    "Integration revision",
+    "Integration past paper practice",
+    "Mixed review: Quadratics, Functions and Coordinate geometry",
+    "Mixed review: Circular measure to Integration",
+    "Integration extra practice",
+    "Paper 1 timed past paper",
+    "Past paper corrections",
+    "Weak topics revision",
+    "Formula sheet and final review"
+   ]
+  },
+  "perDay": [
+   [
+    "2026-11-13",
+    40
+   ],
+   [
+    "2026-11-14",
+    110
+   ],
+   [
+    "2026-11-16",
+    80
+   ],
+   [
+    "2026-11-17",
+    60
+   ],
+   [
+    "2026-11-18",
+    80
+   ],
+   [
+    "2026-11-19",
+    120
+   ],
+   [
+    "2026-11-20",
+    80
+   ],
+   [
+    "2026-11-21",
+    120
+   ],
+   [
+    "2026-11-25",
+    120
+   ],
+   [
+    "2026-11-26",
+    100
+   ],
+   [
+    "2026-11-27",
+    120
+   ],
+   [
+    "2026-11-30",
+    40
+   ]
+  ],
+  "committed": {
+   "version": 1,
+   "blocks": 23,
+   "quests": 23,
+   "titles": [
+    "2026-11-13 Quadratics revision",
+    "2026-11-14 Quadratics past paper practice",
+    "2026-11-14 Functions revision",
+    "2026-11-14 Functions past paper practice",
+    "2026-11-16 Coordinate geometry revision",
+    "2026-11-16 Coordinate geometry past paper practice",
+    "2026-11-17 Circular measure revision",
+    "2026-11-17 Circular measure past paper practice",
+    "2026-11-18 Trigonometry revision",
+    "2026-11-18 Trigonometry past paper practice",
+    "2026-11-19 Series revision",
+    "2026-11-19 Series past paper practice",
+    "2026-11-20 Differentiation revision",
+    "2026-11-20 Differentiation past paper practice",
+    "2026-11-21 Integration revision",
+    "2026-11-21 Integration past paper practice",
+    "2026-11-19 Mixed review: Quadratics, Functions and Coordinate geometry",
+    "2026-11-26 Mixed review: Circular measure to Integration",
+    "2026-11-27 Integration extra practice",
+    "2026-11-25 Paper 1 timed past paper",
+    "2026-11-26 Past paper corrections",
+    "2026-11-27 Weak topics revision",
+    "2026-11-30 Formula sheet and final review"
+   ],
+   "quadratics": {
+    "scheduledFor": "2026-11-13",
+    "requiredMinutes": 40,
+    "description": "Be able to answer any Quadratics question on Paper 1 without notes.\n\nKey points:\n• Complete the square and read off the vertex and line of symmetry\n• Use the discriminant b² − 4ac for two, one or no real roots\n• Solve quadratic inequalities with a sketch\n• Solve a linear and a quadratic equation simultaneously\n• Solve equations that are quadratic in a function of x, e.g. in x² or √x\n• Use the discriminant for a line that is tangent to a curve\n\nHow: For each key point, rework one example from your notes or textbook, then cover the answer and do it again from memory. Write down any formula you had to look up.\n\nFirst step: Open your notes on Quadratics and redo one example for the first key point without looking."
+   }
+  },
+  "rated": {
+   "status": 200,
+   "summary": "1 session added · 3 moved",
+   "extra": "Trigonometry extra practice",
+   "quick": "Quadratics quick check"
+  },
+  "afterRating": {
+   "quests": 24,
+   "version": 2
+  },
+  "chip": "Limit · 2 h a day · weekdaysinstant, no AI needed",
+  "commandSeconds": 0.2,
+  "afterCommand": 3,
+  "afterUndo": {
+   "version": 4,
+   "constraints": 1
+  },
+  "settingsBox": {
+   "right": 1341,
+   "width": 386,
+   "window": 1366,
+   "overflow": false
+  },
+  "mapFirstTopicSeconds": 12.5,
+  "mapSeconds": 26.4,
+  "mapped": {
+   "trace": {
+    "ms": 26174,
+    "errors": [],
+    "solver": {
+     "ms": 46,
+     "items": 80,
+     "placed": 61,
+     "iterations": 4
+    },
+    "tokens": {
+     "calls": 3,
+     "input": 10507,
+     "cached": 2432,
+     "output": 3051,
+     "servedModel": "deepseek-flash",
+     "firstTokenMs": [
+      2372,
+      1724,
+      736
+     ]
+    }
+   },
+   "pass": true,
+   "source": "model",
+   "researched": true,
+   "sources": [
+    {
+     "url": "https://cambridgeinternational.org/Images/758526-chemistry-9701-march-2026-grade-threshold-table.pdf",
+     "title": "Cambridge International AS & A Level Chemistry (9701)"
+    },
+    {
+     "url": "http://fdslive.oup.com/www.oup.com/oxed/international/cambridge/CAIE_SyllabusMappingGrid_Chemistry.pdf?region=international",
+     "title": "Student Book & Cambridge syllabus matching grid"
+    },
+    {
+     "url": "https://scribd.com/document/867329298/chemistry-syllabus-16-38",
+     "title": "chemistry syllabus-16-38 - Opens in a new window Opens an external website Opens an external website in a new window"
+    },
+    {
+     "url": "https://gamatrain.com/post/56/cambridge-international-as-a-level-chemistry-9701-syllabus-content-assessment-and-routes-for-2025-2026-and-2027",
+     "title": "Cambridge International AS & A Level Chemistry 9701 Syllabus, Content , Assessment and Routes for 2025, 2026 and 2027"
+    },
+    {
+     "url": "https://examyard.com/as-level-chemistry-9701-past-papers?ey-preview=pakistan",
+     "title": "What Is 9701? The Cambridge AS Level Chemistry Syllabus Code"
+    },
+    {
+     "url": "https://clapslearn.com/blog/cambridge-caie-as-chemistry",
+     "title": "Cambridge CAIE AS Level Chemistry 9701 Preparation Tips 2026 | Claps Learn"
+    }
+   ],
+   "preset": "exam",
+   "name": "Cambridge International AS & A Level Chemistry (9701), Paper 2",
+   "papers": [
+    {
+     "label": "Paper 2",
+     "marks": 60,
+     "minutes": 75
+    }
+   ],
+   "units": [
+    "Atomic structure: Describe protons, neutrons, electrons and atomic/isotope notation; Write electron configurations using subshells and orbitals",
+    "Atoms, molecules and stoichiometry: Calculate relative atomic and molecular masses; Use the mole and Avogadro constant in calculations",
+    "Chemical bonding: Draw dot-and-cross diagrams for ionic and covalent species; Explain ionic, covalent, dative covalent and metallic bonding",
+    "States of matter: Use the ideal gas equation pV = nRT in calculations; Explain deviations of real gases from ideal behaviour",
+    "Chemical energetics: Define enthalpy changes of reaction, formation and combustion; Draw and use energy cycle (Hess's law) diagrams",
+    "Electrochemistry: Assign oxidation numbers to elements in compounds and ions; Identify oxidation and reduction in electron-transfer reactions",
+    "Equilibria: Explain dynamic equilibrium and the effect of changing conditions; Apply Le Chatelier's principle to predict shifts",
+    "Reaction kinetics: Explain rates in terms of collision theory and activation energy; Interpret rate and concentration-time graphs",
+    "Chemical periodicity: Describe trends in atomic radius, melting point and conductivity across Period 3; Explain trends in ionisation energy across Period 3",
+    "Group 2: Describe trends in atomic radius, melting point and reactivity down the group; Write equations for reactions of Group 2 metals with water, oxygen and acids",
+    "Group 17: Describe trends in physical properties of the halogens down the group; Identify halogens and halide ions using displacement and silver nitrate tests",
+    "Nitrogen and sulfur: Describe the formation and uses of ammonia; Describe the chemistry of nitrogen oxides as pollutants",
+    "Introduction to organic chemistry: Name and draw compounds using IUPAC rules; Identify functional groups and write structural, displayed and skeletal formulae",
+    "Hydrocarbons: Describe free-radical substitution of alkanes and its mechanism; Write equations for complete and incomplete combustion of alkanes",
+    "Halogen compounds: Describe nucleophilic substitution of halogenoalkanes; Compare SN1 and SN2 mechanisms and rates",
+    "Hydroxy compounds: Classify alcohols as primary, secondary or tertiary; Describe oxidation of alcohols and the reagents used",
+    "Carbonyl compounds: Describe preparation of aldehydes and ketones; Use Tollens' and Fehling's reagents to distinguish aldehydes and ketones",
+    "Carboxylic acids and derivatives: Describe properties and acid strength of carboxylic acids; Write equations for esterification and ester hydrolysis",
+    "Nitrogen compounds: Describe preparation and basicity of primary amines; Describe formation of nitriles and hydroxynitriles",
+    "Polymerisation: Describe addition polymerisation from alkenes; Draw repeat units from monomers and vice versa",
+    "Organic synthesis: Design multi-step routes between given functional groups; Select reagents and conditions for each synthetic step",
+    "Analytical techniques: Identify functional groups from infrared absorptions; Interpret mass spectra to find Mr and fragmentation patterns"
+   ],
+   "titles": [
+    "Atomic structure revision",
+    "Atomic structure past paper practice",
+    "Atoms, molecules and stoichiometry revision",
+    "Atoms, molecules and stoichiometry past paper practice",
+    "Chemical bonding revision",
+    "Chemical bonding past paper practice",
+    "States of matter revision",
+    "States of matter past paper practice",
+    "Chemical energetics revision",
+    "Chemical energetics past paper practice",
+    "Electrochemistry revision",
+    "Electrochemistry past paper practice",
+    "Equilibria revision",
+    "Equilibria past paper practice",
+    "Reaction kinetics revision",
+    "Reaction kinetics past paper practice",
+    "Chemical periodicity revision",
+    "Chemical periodicity past paper practice",
+    "Group 2 revision",
+    "Group 2 past paper practice",
+    "Group 17 revision",
+    "Group 17 past paper practice",
+    "Nitrogen and sulfur revision",
+    "Nitrogen and sulfur past paper practice",
+    "Introduction to organic chemistry revision",
+    "Introduction to organic chemistry past paper practice",
+    "Hydrocarbons revision",
+    "Hydrocarbons past paper practice",
+    "Halogen compounds revision",
+    "Halogen compounds past paper practice",
+    "Hydroxy compounds revision",
+    "Hydroxy compounds past paper practice",
+    "Carbonyl compounds revision",
+    "Carbonyl compounds past paper practice",
+    "Carboxylic acids and derivatives revision",
+    "Carboxylic acids and derivatives past paper practice",
+    "Nitrogen compounds revision",
+    "Nitrogen compounds past paper practice",
+    "Polymerisation revision",
+    "Polymerisation past paper practice",
+    "Organic synthesis revision",
+    "Organic synthesis past paper practice",
+    "Analytical techniques revision",
+    "Analytical techniques past paper practice",
+    "Mixed review: Atomic structure to Chemical bonding",
+    "Mixed review: States of matter to Electrochemistry",
+    "Mixed review: Equilibria to Chemical periodicity",
+    "Mixed review: Group 2, Group 17 and Nitrogen and sulfur",
+    "Mixed review: 3 topics",
+    "Mixed review: 3 topics",
+    "Mixed review: Nitrogen compounds to Analytical techniques",
+    "Paper 2 timed past paper",
+    "Past paper corrections",
+    "Weak topics revision",
+    "Paper 2 timed past paper 2",
+    "Past paper 2 corrections",
+    "Formula sheet and final review"
+   ],
+   "library": {
+    "id": "a96c0bef-bf28-4468-8add-9c1b1cfa2c85",
+    "trust": "CHECKED",
+    "reused": false,
+    "version": 1
+   },
+   "identity": {
+    "code": "9701",
+    "board": "Cambridge International",
+    "edition": "2025–2027 (latest syllabus; also 2026 exam series)",
+    "subject": "Chemistry",
+    "component": "Paper 2",
+    "qualification": "A Level"
+   }
+  },
+  "recheck": {
+   "seconds": 20.6,
+   "workflow": "recheck",
+   "trace": {
+    "ms": 18919,
+    "errors": [],
+    "solver": {
+     "ms": 51,
+     "items": 28,
+     "placed": 59,
+     "iterations": 4
+    },
+    "tokens": {
+     "calls": 2,
+     "input": 10079,
+     "cached": 1920,
+     "output": 2233,
+     "servedModel": "deepseek-flash",
+     "firstTokenMs": [
+      1455,
+      1022
+     ]
+    }
+   },
+   "notes": [
+    "Re-checked against 8 sources: Checked AS topics 1–22 against the 2025–2027 syllabus: nitrogen compounds, polymerisation and organic synthesis are present (topics 19–21), so the learner's note is mistaken; Paper 2 timing and marks are already correct."
+   ],
+   "round": 1,
+   "library": {
+    "id": "a96c0bef-bf28-4468-8add-9c1b1cfa2c85",
+    "trust": "CHECKED",
+    "reused": false,
+    "version": 2
+   },
+   "units": [
+    "Atomic structure",
+    "Atoms, molecules and stoichiometry",
+    "Chemical bonding",
+    "States of matter",
+    "Chemical energetics",
+    "Electrochemistry",
+    "Equilibria",
+    "Reaction kinetics",
+    "The Periodic Table: chemical periodicity",
+    "Group 2",
+    "Group 17",
+    "Nitrogen and sulfur",
+    "Introduction to organic chemistry",
+    "Hydrocarbons",
+    "Halogen compounds",
+    "Hydroxy compounds",
+    "Carbonyl compounds",
+    "Carboxylic acids and derivatives",
+    "Nitrogen compounds",
+    "Polymerisation",
+    "Organic synthesis",
+    "Analytical techniques"
+   ]
+  },
+  "reuse": {
+   "stages": [
+    "Reading your week",
+    "Reading your week · 0 commitments",
+    "Planning Cambridge International AS Level Chemistry 9701 paper 2",
+    "Finding the syllabus",
+    "Found in Sylf's syllabus library",
+    "22 topics from Sylf's syllabus library",
+    "Building your plan",
+    "57 sessions to Wed 2 Dec",
+    "Fitting 81 pieces of work into your free time",
+    "608 checks passed"
+   ],
+   "trace": {
+    "ms": 1356,
+    "errors": [],
+    "solver": {
+     "ms": 49,
+     "items": 24,
+     "placed": 61,
+     "iterations": 2
+    },
+    "tokens": {
+     "calls": 1,
+     "input": 706,
+     "cached": 512,
+     "output": 151,
+     "servedModel": "deepseek-flash",
+     "firstTokenMs": [
+      855
+     ]
+    }
+   },
+   "library": {
+    "id": "a96c0bef-bf28-4468-8add-9c1b1cfa2c85",
+    "trust": "CHECKED",
+    "reused": true,
+    "version": 2
+   },
+   "units": 22
+  },
+  "aiFirstItemSeconds": 6.1,
+  "aiSeconds": 6.1,
+  "ai": {
+   "trace": {
+    "ms": 5946,
+    "errors": [
+     "No usable items."
+    ],
+    "solver": {
+     "ms": 5,
+     "items": 25,
+     "placed": 25,
+     "iterations": 2
+    },
+    "tokens": {
+     "calls": 1,
+     "input": 3703,
+     "cached": 3456,
+     "output": 1251,
+     "servedModel": "deepseek-flash",
+     "firstTokenMs": [
+      1015
+     ]
+    }
+   },
+   "critics": [
+    "realism 100: Every day is within what you usually sustain.",
+    "exam_prep 100: Spaced retrieval and a light review before each exam.",
+    "front_loading 95: 2 items finish on the due date with no room to run long.",
+    "interleaving 100: Practice is mixed across subjects.",
+    "fragmentation 100: Sessions are a workable length.",
+    "neglect 100: Every active goal has time."
+   ],
+   "notes": [
+    "Physics problem set on rotational dynamics starts from a study template. Ask for changes in your own words."
+   ],
+   "source": "MODEL",
+   "workflow": "add_goal",
+   "items": [],
+   "strategy": "An early first attempt on the whole set to find what is hard, a targeted torque and moment-of-inertia fix, then a second pass and a check before Friday.",
+   "pass": true,
+   "quality": 99,
+   "interpretation": "New problem set · Physics problem set on rotational dynamics · Fri 20 Nov"
+  }
+ },
+ "consoleErrors": []
+}

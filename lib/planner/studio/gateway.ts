@@ -11,12 +11,14 @@ import type { LLMUsage } from "@/lib/ai/providers/types";
 import { aiSignal, observeAiDispatch } from "@/lib/ai/telemetry-runtime";
 import { StreamingArrayParser } from "../kernel";
 
-export type ProfileName = "intent.parse" | "goal.decompose" | "syllabus.map" | "plan.critique" | "copy.brief" | "copy.explain" | "assistant.answer";
+export type ProfileName = "intent.parse" | "goal.decompose" | "syllabus.map" | "syllabus.identify" | "syllabus.verify" | "plan.critique" | "copy.brief" | "copy.explain" | "assistant.answer";
 interface Profile { maxTokens: number; deadlineMs: number; hedgeMs: number | null; thinking: "disabled" | "enabled"; effort?: "low" | "high" }
 export const PROFILES: Record<ProfileName, Profile> = {
   "intent.parse": { maxTokens: 700, deadlineMs: 15_000, hedgeMs: 2_500, thinking: "disabled" },
   "goal.decompose": { maxTokens: 2_600, deadlineMs: 40_000, hedgeMs: 2_500, thinking: "disabled" },
   "syllabus.map": { maxTokens: 2_400, deadlineMs: 40_000, hedgeMs: 2_500, thinking: "disabled" },
+  "syllabus.identify": { maxTokens: 300, deadlineMs: 15_000, hedgeMs: 2_500, thinking: "disabled" },
+  "syllabus.verify": { maxTokens: 2_000, deadlineMs: 45_000, hedgeMs: null, thinking: "disabled" },
   "plan.critique": { maxTokens: 1_000, deadlineMs: 20_000, hedgeMs: null, thinking: "disabled" },
   "copy.brief": { maxTokens: 220, deadlineMs: 10_000, hedgeMs: 2_500, thinking: "disabled" },
   "copy.explain": { maxTokens: 160, deadlineMs: 8_000, hedgeMs: 2_500, thinking: "disabled" },

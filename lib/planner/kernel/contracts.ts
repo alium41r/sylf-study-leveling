@@ -45,6 +45,19 @@ export interface KGoal {
   pace?: Pace | null;
   /** What the student is aiming for, in their words: "A*", "hold a 10-minute conversation". Shown, and given to the model. */
   target?: string | null;
+  /** Which plan the student is asked "Is this plan right?" about: a re-check starts a new round. */
+  review?: { round: number } | null;
+}
+
+/** Which official syllabus an outline is: what makes two students' requests the same syllabus. */
+export interface SyllabusIdentity {
+  board: string | null;
+  qualification: string | null;
+  subject: string | null;
+  code: string | null;
+  component: string | null;
+  /** The edition the outline follows, e.g. "2025–2027". */
+  edition: string | null;
 }
 
 /** How a plan is shaped. `auto` is a request, never stored: the model (or a keyword rule) picks one of the others. */
@@ -107,6 +120,10 @@ export interface Syllabus {
   checked: boolean;
   /** Pages the topic list was checked against when the model was not sure of the course. URLs come only from the search provider. */
   sources?: { title: string; url: string }[];
+  /** Which syllabus this is, when it is a named one. */
+  identity?: SyllabusIdentity | null;
+  /** The shared library entry it came from or was saved as. */
+  library?: { id: string; version: number; trust: "CHECKED" | "UNVERIFIED"; reused: boolean } | null;
 }
 
 /** The part a session plays in a study path. */

@@ -21,10 +21,11 @@ vi.mock("@/lib/prisma", async () => {
 import { prisma } from "@/lib/prisma";
 import { compileContext } from "@/lib/planner/studio/snapshot";
 import { acceptProposal, commitDirect, undoLatest } from "@/lib/planner/studio/store";
-import { loadState, runAddGoal, runAnswer, runCommand, runDirect } from "@/lib/planner/studio/workflows";
+import { loadState, runAddGoal, runAnswer, runCommand, runDirect, runFeedback } from "@/lib/planner/studio/workflows";
+import { feedbackFor, findOutline, recordFeedback, reviseOutline, saveOutline } from "@/lib/planner/studio/outlines";
 import { repairBeforeDeadline } from "@/lib/planner/studio/events";
 import { localParts } from "@/lib/planner/studio/time";
-import { addDays, propose } from "@/lib/planner/kernel";
+import { addDays, normalizeSyllabus, propose } from "@/lib/planner/kernel";
 
 const key = () => `t${randomUUID().replace(/-/g, "").slice(0, 20)}`;
 const noop = () => undefined;
@@ -184,6 +185,43 @@ describe.skipIf(!database)("Planning Studio on PostgreSQL", () => {
     const quest = await prisma.quest.findUniqueOrThrow({ where: { id: first.questId! } });
     expect(quest.scheduledFor >= addDays(first.localDate, 1)).toBe(true);
     expect(quest.status).toBe("ACTIVE");
+  });
+
+  it("shares a checked syllabus through the library without anyone's personal data, once per syllabus", async () => {
+    const key = `test|${randomUUID()}|p1`;
+    const syllabus = normalizeSyllabus({ source: "model", name: "KCSE Biology Paper 1", units: [{ title: "Genetics", points: ["Monohybrid crosses"], confidence: "weak", topic: 42 }, { title: "Ecology", points: ["Food webs"] }], papers: [{ label: "Paper 1", minutes: 120, marks: 80 }], sources: [{ title: "KNEC syllabus", url: "https://example.ac.ke/biology.pdf" }], researched: true });
+    syllabus.identity = { board: "KNEC", qualification: "KCSE", subject: "Biology", code: "231/1", component: "Paper 1", edition: "2025" };
+    const saved = await saveOutline(key, syllabus, "exam");
+    expect(saved).toMatchObject({ trust: "CHECKED", version: 1 });
+    expect(saved.syllabus.library).toMatchObject({ reused: false, trust: "CHECKED" });
+    const found = await findOutline(key);
+    expect(found?.syllabus.units.map((u) => [u.title, u.confidence, u.topic])).toEqual([["Genetics", null, null], ["Ecology", null, null]]);
+    expect(found?.syllabus.library).toMatchObject({ id: saved.id, reused: true });
+    expect(found?.syllabus.identity?.edition).toBe("2025");
+    // A second save of the same syllabus (two students at once) keeps the first.
+    const again = await saveOutline(key, { ...syllabus, name: "Other" }, "exam");
+    expect(again.id).toBe(saved.id);
+    expect((await findOutline(key))?.syllabus.name).toBe("KCSE Biology Paper 1");
+    const revised = await reviseOutline(saved.id, { ...syllabus, units: [...syllabus.units, { ...syllabus.units[0], key: "u3", title: "Evolution" }] });
+    expect(revised.version).toBe(2);
+    const row = await prisma.syllabusOutline.findUniqueOrThrow({ where: { id: saved.id } });
+    expect(row).toMatchObject({ version: 2, reports: 1 });
+    expect(JSON.stringify(row.outline)).not.toContain("42");
+  });
+
+  it("records one answer per plan round, counts a confirmation once, and shows it in the state", async () => {
+    const proposal = await planExam(9);
+    const goal = proposal.model.goals.find((g) => g.title === "Chem midterm")!;
+    await acceptProposal(userId, proposal.id, key());
+    const key2 = `test|${randomUUID()}|p2`;
+    const entry = await saveOutline(key2, normalizeSyllabus({ source: "model", name: "X", units: [{ title: "A", points: [] }], sources: [{ title: "s", url: "https://example.edu/s" }] }), "exam");
+    await recordFeedback(userId, { goalKey: goal.key, round: 0, outlineId: entry.id, verdict: "ACCURATE" });
+    await recordFeedback(userId, { goalKey: goal.key, round: 0, outlineId: entry.id, verdict: "ACCURATE" });
+    expect((await prisma.syllabusOutline.findUniqueOrThrow({ where: { id: entry.id } })).confirmations).toBe(1);
+    expect((await feedbackFor(userId))[goal.key]).toEqual({ round: 0, verdict: "ACCURATE" });
+    await runFeedback(userId, { goal: goal.key, verdict: "dismissed" });
+    expect((await loadState(userId, { sync: false })).feedback[goal.key]).toEqual({ round: 0, verdict: "DISMISSED" });
+    await expect(prisma.planFeedback.create({ data: { userId, goalKey: goal.key, round: 0, verdict: "MAYBE" } })).rejects.toThrow();
   });
 
   it("enforces ownership and immutable history in the database", async () => {

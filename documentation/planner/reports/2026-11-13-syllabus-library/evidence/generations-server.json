@@ -1,0 +1,70 @@
+{
+ "schemaVersion": 1,
+ "startedAt": "2026-11-13T16:11:15.926Z",
+ "steps": [],
+ "schema": {
+  "migrations": 85,
+  "recovered": 11,
+  "unresolved": 0
+ },
+ "generations": [
+  {
+   "id": "kenya-kcse-biology",
+   "status": 200,
+   "seconds": 21.3,
+   "preset": "exam",
+   "sessions": 45,
+   "pass": true
+  },
+  {
+   "id": "kenya-kcse-biology-again",
+   "status": 200,
+   "seconds": 2,
+   "preset": "exam",
+   "sessions": 43,
+   "pass": true
+  },
+  {
+   "id": "moratuwa-signals",
+   "status": 200,
+   "seconds": 23.9,
+   "preset": "course",
+   "sessions": 32,
+   "pass": true
+  },
+  {
+   "id": "ap-us-history",
+   "status": 200,
+   "seconds": 15.3,
+   "preset": "course",
+   "sessions": 52,
+   "pass": true
+  },
+  {
+   "id": "edexcel-a-level-economics",
+   "status": 200,
+   "seconds": 17.8,
+   "preset": "exam",
+   "sessions": 32,
+   "pass": true
+  },
+  {
+   "id": "spanish-skill",
+   "status": 200,
+   "seconds": 5.8,
+   "preset": "skill",
+   "sessions": 43,
+   "pass": true
+  },
+  {
+   "id": "auto-mastery",
+   "status": 200,
+   "seconds": 5.8,
+   "preset": "mastery",
+   "sessions": 19,
+   "pass": true
+  }
+ ],
+ "serverErrors": [],
+ "finishedAt": "2026-11-13T16:12:54.902Z"
+}

@@ -10,6 +10,13 @@
     "weak": "genetics, ecology"
   },
   {
+    "id": "kenya-kcse-biology-again",
+    "area": "The same syllabus asked for again in other words: expected from the shared library, no research",
+    "title": "Kenya KCSE Biology 231/1 Paper 1 exam",
+    "preset": "exam",
+    "dueInDays": 30
+  },
+  {
     "id": "moratuwa-signals",
     "area": "Lesser-known university course (Sri Lanka)",
     "title": "EN2063 Signals and Systems, University of Moratuwa, whole module",

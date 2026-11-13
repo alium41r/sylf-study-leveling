@@ -13,7 +13,7 @@ import { addDays, diffDays, formatMinutes, round5, weekdayOf, weekStart } from "
 import { normalizeSizes } from "./operations";
 import {
   type Confidence, type ItemDetails, type ItemKind, type KGoal, type Load, type Method, type PlanPreset, type PlanningSnapshot, type Source, type StudyRole,
-  type Syllabus, type SyllabusPaper, type SyllabusUnit, type WorkItem, type WorkModel,
+  type Syllabus, type SyllabusIdentity, type SyllabusPaper, type SyllabusUnit, type WorkItem, type WorkModel,
 } from "./contracts";
 
 export interface PathSummary {
@@ -83,7 +83,8 @@ export const pathPrefix = (goalKey: string) => `${goalKey}.`;
 export const isPathItem = (item: Pick<WorkItem, "key" | "details">, goalKey: string) => Boolean(item.details) && item.key.startsWith(pathPrefix(goalKey));
 
 const clip = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text);
-const cleanTitle = (text: string) => text.replace(/\s+/g, " ").trim();
+/** Collapses whitespace and decodes the HTML entities that web pages leave in text the model read. */
+const cleanTitle = (text: string) => text.replace(/&amp;/gi, "&").replace(/&quot;/gi, '"').replace(/&#0?39;|&apos;/gi, "'").replace(/&lt;/gi, "<").replace(/&gt;/gi, ">").replace(/&nbsp;/gi, " ").replace(/\s+/g, " ").trim();
 
 /** "Quadratics, Functions and Coordinate geometry", shortened to "Quadratics to Coordinate geometry" when long. */
 export function unitList(units: Pick<SyllabusUnit, "title">[], max = 46): string {
@@ -862,8 +863,11 @@ export function shortTitle(text: string, max = 40): string {
   if (t.length <= max) return t;
   const head = t.split(/\s*[:(–—]\s*/)[0];
   if (head.length >= 4 && head.length <= max) return head;
+  // "Terms of trade and international competitiveness" → "Terms of trade": the first half of an "and" when it says enough on its own.
+  const first = t.split(/\s+and\s+/i)[0];
+  if (first !== t && first.length >= 12 && first.length <= max && !/,/.test(first)) return first;
   let cut = t.slice(0, max + 1).replace(/\s+\S*$/, "");
-  cut = cut.replace(/(?:[\s,;&]+(?:and|or|of|the|to|for|in|on|with|&))+$/i, "").replace(/[\s,;:&-]+$/, "");
+  cut = cut.replace(/(?:[\s,;&]+(?:and|or|of|the|to|for|in|on|with|between|within|about|among|from|by|at|as|into|&))+$/i, "").replace(/[\s,;:&-]+$/, "");
   return cut.length >= 4 ? cut : clip(t, max);
 }
 
@@ -1034,4 +1038,100 @@ export function markWeak(syllabus: Syllabus, text: string | null | undefined): S
   const names = text.toLowerCase().split(/\s*(?:,|;|\n|&|\band\b|\/)\s*/).map((n) => n.trim()).filter((n) => n.length >= 3);
   const weak = new Set(names.flatMap((name) => namedUnits(name, syllabus.units).map((u) => u.key)));
   return weak.size ? { ...syllabus, units: syllabus.units.map((u) => (weak.has(u.key) ? { ...u, confidence: "weak" as const } : u)) } : syllabus;
+}
+
+
+const BOARDS: [RegExp, string][] = [
+  [/\b(caie|cie|cambridge(?: assessment)?(?: international)?)\b/, "caie"], [/\b(pearson\s+)?edexcel\b|\bpearson\b/, "edexcel"], [/\baqa\b/, "aqa"], [/\bocr\b/, "ocr"],
+  [/\bwjec\b|\beduqas\b/, "wjec"], [/\b(ib|ibo|international baccalaureate)\b/, "ib"], [/\b(college board|ap\b)/, "collegeboard"], [/\b(knec|kcse)\b/, "knec"],
+  [/\bwaec\b/, "waec"], [/\bcbse\b/, "cbse"], [/\b(cisce|icse|isc)\b/, "cisce"], [/\bfbise\b/, "fbise"], [/\bsqa\b/, "sqa"],
+];
+const slug = (text: string | null | undefined) => (text ?? "").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/&/g, " and ").replace(/[^a-z0-9/.]+/g, " ").trim().replace(/\s+/g, " ");
+
+/**
+ * The shared library key for a named syllabus: board, then the syllabus code when there is one (else qualification and subject), then the paper.
+ * Synonyms collapse ("Cambridge International" and "CAIE" are one board; "Paper 2" and "P2" are one paper), so two students asking for the same
+ * syllabus in different words share one entry. Returns null when the identity is too vague to share: no board and no code.
+ */
+export function outlineKey(identity: SyllabusIdentity | null | undefined): string | null {
+  if (!identity) return null;
+  const raw = slug(identity.board);
+  const board = BOARDS.find(([re]) => re.test(raw))?.[1] ?? raw.replace(/\s+/g, "-");
+  const code = slug(identity.code).replace(/\s+/g, "");
+  const subject = slug(identity.subject).replace(/\b(and|the|of)\b/g, "").replace(/\s+/g, " ").trim();
+  let qualification = slug(identity.qualification).replace(/\b(as and a|as a|a and as)\b/g, "a").replace(/\blevels?\b/g, "level").replace(/\s+/g, " ").trim();
+  // Cambridge's AS and A Level share one syllabus per subject; other boards' AS and A Level are separate qualifications and stay apart.
+  if (board === "caie" && /^(as|a2|a)\s*level$/.test(qualification)) qualification = "a level";
+  const paper = /\b(?:paper|component|p|unit)\s*([0-9]+[a-z]?|[ivx]+)\b/.exec(slug(identity.component))?.[1] ?? slug(identity.component).replace(/\s+/g, "-");
+  if (!board && !code) return null;
+  if (!code && !subject) return null;
+  const parts = [board || "any", code || `${qualification || "any"}|${subject}`, paper ? `p${paper.replace(/^p/, "")}` : "all"];
+  return parts.join("|").slice(0, 240);
+}
+
+/**
+ * Every key a syllabus can be found under: by code when it has one, and by board, qualification, subject and paper, so a request that names the
+ * code and one that does not still meet. The first is the one it is saved under.
+ */
+export function outlineKeys(identity: SyllabusIdentity | null | undefined): string[] {
+  const primary = outlineKey(identity);
+  if (!primary || !identity) return [];
+  const described = identity.code && identity.subject ? outlineKey({ ...identity, code: null }) : null;
+  return [...new Set([primary, described].filter((k): k is string => Boolean(k)))];
+}
+
+/** A checker's corrections to an outline: topics to add (after a named topic or at the end), to remove, to rename, and corrected papers. */
+export interface OutlineCorrections {
+  add: { title: string; points: string[]; after: string | null }[];
+  remove: string[];
+  rename: { from: string; to: string }[];
+  papers: { label: string; minutes: number; marks: number | null }[] | null;
+  edition: string | null;
+}
+
+/**
+ * Bounds a double-check before it is applied. A checker that reads the same sources as the mapper and still wants to add more than about a third
+ * of the outline is disagreeing about granularity (subtopics as topics), not finding missing content, so its additions are set aside; likewise a
+ * removal of most of the outline. A paper list is taken when the outline had none, or when it corrects the same papers rather than splitting them.
+ */
+export function boundCorrections(syllabus: Syllabus, corrections: OutlineCorrections): OutlineCorrections {
+  const n = syllabus.units.filter((u) => u.included).length;
+  return {
+    ...corrections,
+    add: corrections.add.length > Math.max(3, Math.ceil(n * 0.3)) ? [] : corrections.add,
+    remove: corrections.remove.length > Math.max(2, Math.ceil(n * 0.4)) ? [] : corrections.remove,
+    papers: !corrections.papers?.length ? null : !syllabus.papers.length || corrections.papers.length === syllabus.papers.length ? corrections.papers : null,
+  };
+}
+
+/** Applies corrections to a syllabus, keeping the student's ratings and ticks on every topic that stays, and renumbering keys only for new ones. */
+export function applyCorrections(syllabus: Syllabus, corrections: OutlineCorrections): Syllabus {
+  const same = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
+  const removed = new Set(corrections.remove.map((t) => t.trim().toLowerCase()));
+  let units = syllabus.units.filter((u) => !removed.has(u.title.toLowerCase()));
+  units = units.map((u) => { const r = corrections.rename.find((x) => same(x.from, u.title)); return r ? { ...u, title: shortTitle(cleanTitle(r.to), 40) } : u; });
+  let n = syllabus.units.reduce((max, u) => Math.max(max, Number(u.key.replace(/\D/g, "")) || 0), 0);
+  // An addition that restates a topic already there ("Period 7" beside "Period 7: 1890–1945", "Excretion in plants" beside "Excretion") is a
+  // subtopic or a duplicate, not a missing topic.
+  const head = (t: string) => t.toLowerCase().split(/\s*[:(–—]\s*/)[0].trim();
+  const restates = (title: string) => units.some((u) => same(u.title, title) || head(u.title) === head(title) || title.toLowerCase().startsWith(u.title.toLowerCase()) || u.title.toLowerCase().startsWith(title.toLowerCase()));
+  for (const add of corrections.add) {
+    const title = shortTitle(cleanTitle(add.title), 40);
+    if (!title || restates(title)) continue;
+    const unit: SyllabusUnit = { key: `u${++n}`, title, points: add.points.map((p) => clip(cleanTitle(p), 90)).filter(Boolean).slice(0, 7), weight: 2, difficulty: 2, confidence: null, included: true, topic: null };
+    const at = add.after ? units.findIndex((u) => same(u.title, add.after!)) : -1;
+    units = at >= 0 ? [...units.slice(0, at + 1), unit, ...units.slice(at + 1)] : [...units, unit];
+  }
+  const papers = corrections.papers?.length ? normalizeSyllabus({ source: syllabus.source, name: syllabus.name, units: [], papers: corrections.papers }).papers : syllabus.papers;
+  return { ...syllabus, units: units.slice(0, 40), papers, identity: syllabus.identity ? { ...syllabus.identity, edition: corrections.edition ?? syllabus.identity.edition } : syllabus.identity };
+}
+
+/** A syllabus code named in free text, when the model left it out: "9701", "231/1", "9EC0". Years are never codes. */
+export function codeIn(text: string | null | undefined): string | null {
+  for (const match of (text ?? "").matchAll(/\b(\d{3,4}\/\d|\d[A-Z]{2}\d|\d{4})\b/g)) {
+    const code = match[1];
+    if (/^(19|20)\d{2}$/.test(code)) continue;
+    return code;
+  }
+  return null;
 }

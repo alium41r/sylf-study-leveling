@@ -104,7 +104,12 @@ async function run(window, out) {
   // The Studio opens empty on the composer, as the web planner does.
   check("the Planner is Plan's first view", await toPlanner());
   check("the composer is the empty page", await until(tid("studio-composer")));
-  check("presets are offered, Auto first", await has('[role=radiogroup][aria-label="Kind of plan"]'));
+  await clickOn(tid("studio-preset"));
+  check("the preset picker lists every preset", await until(tid("studio-preset-reading"), 4000) && await has(tid("studio-preset-course")));
+  await shot("01b-preset-picker");
+  await clickOn(tid("studio-preset-auto"));
+  check("the picker closes on choosing", await gone(tid("studio-preset-reading"), 4000));
+  check("presets are offered, Auto first", (await textOf(tid("studio-preset")))?.startsWith("Auto") === true);
   check("settings are one tap away", await has(tid("studio-settings-open")));
   check("the old seven-day box is gone", !(await has(tid("studio-health"))));
   await shot("01-empty");
@@ -159,6 +164,14 @@ async function run(window, out) {
   check("quest descriptions carry the aim and key points", typeof quadratics?.description === "string" && quadratics.description.includes("Key points:") && quadratics.description.includes("discriminant"));
   const goalKey = after?.model?.goals?.[0]?.key;
   check("the study guide is beside the calendar", await until(tid(`studio-guide-${goalKey}`), 6000));
+  check("the plan asks whether it is right", await until(`${tid(`studio-guide-${goalKey}`)} ${tid("studio-plan-check")}`, 4000));
+  await shot("05a-plan-check");
+  const versionBeforeCheck = (await studio())?.version;
+  await clickOn(`${tid(`studio-guide-${goalKey}`)} ${tid("studio-plan-check-good")}`);
+  check("Looks good closes the card", await gone(`${tid(`studio-guide-${goalKey}`)} ${tid("studio-plan-check")}`, 4000));
+  await sleep(800);
+  const afterGood = await studio();
+  check("Looks good is recorded and the plan does not change", afterGood?.feedback?.[goalKey]?.verdict === "ACCURATE" && afterGood?.version === versionBeforeCheck);
   await shot("05-plan-week");
   await clickOn(`${tid(`studio-guide-${goalKey}`)} [role=radio][aria-label^="Topics"], ${tid(`studio-guide-${goalKey}`)} [aria-label^="Topics"]`).catch(() => undefined);
   check("the topics tab lists the syllabus", await until(tid("studio-guide-topics"), 4000));
@@ -256,9 +269,40 @@ async function run(window, out) {
     const physics = mapped?.proposal?.model?.goals?.find((/** @type {any} */ g) => /chemistry/i.test(g.title));
     facts.mapped = { trace: mapped?.proposal?.trace, pass: mapped?.proposal?.verification?.pass, source: physics?.syllabus?.source, researched: physics?.syllabus?.researched ?? false, sources: physics?.syllabus?.sources ?? [], preset: physics?.preset, name: physics?.syllabus?.name, papers: physics?.syllabus?.papers, units: physics?.syllabus?.units?.map((/** @type {any} */ u) => `${u.title}: ${u.points.slice(0, 2).join("; ")}`), titles: mapped?.proposal?.model?.items?.filter((/** @type {any} */ i) => i.goal === physics?.key).map((/** @type {any} */ i) => i.title) };
     check("the model mapped the chemistry syllabus", physics?.syllabus?.source === "model" && (physics?.syllabus?.units?.length ?? 0) >= 4);
+    facts.mapped.library = physics?.syllabus?.library ?? null;
+    facts.mapped.identity = physics?.syllabus?.identity ?? null;
+    check("a new syllabus is researched, double-checked and saved to the library", physics?.syllabus?.library?.reused === false && physics?.syllabus?.researched === true);
     await shot("12b-ai-syllabus-proposal");
+
+    // "Something's off": the syllabus is researched and double-checked again with the note, and an improved plan is proposed.
+    const chemGuide = tid(`studio-guide-${physics?.key}`);
+    await clickOn(`${chemGuide} ${tid("studio-plan-check-off")}`).catch(() => undefined);
+    await type(`${chemGuide} ${tid("studio-plan-check-note")}`, "It's missing nitrogen compounds, polymerisation and organic synthesis.");
+    await shot("12c-plan-check-note");
+    const r0 = Date.now();
+    await clickOn(`${chemGuide} ${tid("studio-plan-check-recheck")}`);
+    await until(tid("studio-activity"), 10000);
+    await sleep(1500);
+    await until(tid("studio-review"), 120000);
+    await gone('[data-testid="studio-activity"] [aria-label="Planning"]', 120000).catch(() => undefined);
+    await sleep(1500);
+    const rechecked = await studio();
+    const chem2 = rechecked?.proposal?.model?.goals?.find((/** @type {any} */ g) => g.key === physics?.key);
+    facts.recheck = { seconds: Math.round((Date.now() - r0) / 100) / 10, workflow: rechecked?.proposal?.workflow, trace: rechecked?.proposal?.trace, notes: rechecked?.proposal?.notes, round: chem2?.review?.round, library: chem2?.syllabus?.library, units: chem2?.syllabus?.units?.map((/** @type {any} */ u) => u.title) };
+    check("a re-check proposes an improved plan in a new round", rechecked?.proposal?.workflow === "recheck" && chem2?.review?.round === 1 && rechecked?.proposal?.verification?.pass === true);
+    check("the re-check answered the student's note", (chem2?.syllabus?.units ?? []).some((/** @type {any} */ u) => /nitrogen|amine/i.test(u.title)) && (chem2?.syllabus?.units ?? []).some((/** @type {any} */ u) => /polymer/i.test(u.title)));
+    await shot("12d-rechecked-proposal");
     await clickOn(tid("studio-discard")).catch(() => undefined);
     await gone(tid("studio-review"), 10000);
+
+    // The same syllabus asked for in other words comes from the library: no research, one short identification call.
+    const reused = await js(`(async () => { const r = await fetch("/api/planner/studio/stream", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/x-ndjson" }, body: JSON.stringify({ workflow: "add_goal", key: "reuse-${tag}", title: "Cambridge International AS Level Chemistry 9701 paper 2", preset: "exam", due: "${new Date(Date.now() + 20 * 86_400_000).toISOString().slice(0, 10)}" }) }); return (await r.text()).split("\\n").filter(Boolean).map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean); })()`);
+    const stages = (reused ?? []).filter((/** @type {any} */ e) => e.type === "stage").map((/** @type {any} */ e) => e.text);
+    const library = await studio();
+    const chem3 = library?.proposal?.model?.goals?.find((/** @type {any} */ g) => /9701/.test(g.title));
+    facts.reuse = { stages, trace: library?.proposal?.trace, library: chem3?.syllabus?.library, units: chem3?.syllabus?.units?.length };
+    check("a syllabus planned before comes from the library without research", chem3?.syllabus?.library?.reused === true && !stages.some((/** @type {string} */ t) => /Researching|Looking up/.test(t)) && (library?.proposal?.trace?.tokens?.calls ?? 9) <= 1);
+    if (library?.proposal?.id) await api("/api/planner/studio", { json: { action: "discard", proposalId: library.proposal.id } });
 
     // A command the fast path cannot parse goes to the model.
     await type(tid("studio-command-input"), "I also have a physics problem set on rotational dynamics due next Friday, and I'm weak on torque");

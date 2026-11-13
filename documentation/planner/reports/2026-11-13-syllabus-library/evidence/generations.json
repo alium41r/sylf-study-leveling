@@ -1,0 +1,5252 @@
+{
+ "today": "2026-11-13",
+ "results": [
+  {
+   "id": "kenya-kcse-biology",
+   "area": "Secondary school, national board outside the UK and US (Kenya, KNEC)",
+   "title": "KCSE Biology Paper 1 mock",
+   "preset": "exam",
+   "dueInDays": 35,
+   "minutesPerDay": 120,
+   "level": "Kenya KCSE, Form 4",
+   "weak": "genetics, ecology",
+   "due": "2026-12-18",
+   "seconds": 21.3,
+   "status": 200,
+   "error": null,
+   "stages": [
+    "Reading your week",
+    "Reading your week · 0 commitments",
+    "Planning KCSE Biology Paper 1 mock",
+    "Finding the syllabus",
+    "Researching this syllabus for the first time",
+    "Read 8 sources",
+    "Double-checking the topics",
+    "Double-check made 4 corrections",
+    "15 topics from research, double-checked",
+    "Building your plan",
+    "45 sessions to Thu 17 Dec",
+    "Fitting 45 pieces of work into your free time",
+    "239 checks passed"
+   ],
+   "strategy": "15 topics revised and practised in order, 5 mixed reviews, 3 timed Paper 1s, light final day. Time is tight, so sessions are short.",
+   "type": "exam",
+   "questions": [],
+   "syllabus": {
+    "source": "model",
+    "researched": true,
+    "sources": [
+     {
+      "url": "https://knecnotes.co.ke/wp-content/uploads/2025/02/BIO-MS-2.pdf",
+      "title": "MARKING SCHEME"
+     },
+     {
+      "url": "https://educationnewshub.co.ke/knec-biology-syllabus/?amp=1",
+      "title": "Knec Biology Syllabus"
+     },
+     {
+      "url": "https://teacher.co.ke/wp-content/uploads/bsk-pdf-manager/2019/01/BIOLOGY-SYLLABUS-1.docx",
+      "title": "KENYA CERTIFICATE OF SECONDARY EDUCATION"
+     },
+     {
+      "url": "https://newsblaze.co.ke/kicd-biology-syllabus-pdf",
+      "title": "kicd Biology syllabus pdf - Newsblaze.co.ke - kicd Biology syllabus pdf"
+     },
+     {
+      "url": "https://advance-africa.com/Biology-Syllabus.html",
+      "title": "KNEC KCSE Biology Syllabus 2024 | Syllabus - High School Biology KCSE"
+     },
+     {
+      "url": "https://kcserevision.com/free-kcse-syllabus",
+      "title": "FREE KCSE SYLLABUS"
+     }
+    ],
+    "name": "KCSE Biology Paper 1 (231/1)",
+    "papers": [
+     {
+      "label": "Paper 1",
+      "marks": 80,
+      "minutes": 120
+     }
+    ],
+    "units": [
+     {
+      "title": "Introduction to Biology",
+      "points": [
+       "Define biology and list its main branches",
+       "State characteristics of living organisms",
+       "Compare plants and animals",
+       "Explain the importance of biology"
+      ],
+      "weight": 1,
+      "difficulty": 1,
+      "confidence": null
+     },
+     {
+      "title": "Classification",
+      "points": [
+       "Name the five kingdoms and give examples",
+       "State the major taxonomic units and their order",
+       "Apply binomial nomenclature rules",
+       "Construct and use dichotomous keys",
+       "Identify features of Arthropoda and Chordata classes"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Classification II",
+      "points": [
+       "State general principles of classification",
+       "State general characteristics of the five kingdoms",
+       "Outline main characteristics of major divisions of Plantae and of Arthropoda and Chordata…",
+       "Describe classes of spermatophyta",
+       "Construct and use simple dichotomous keys"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "The Cell",
+      "points": [
+       "Identify parts of the light microscope and their functions",
+       "Calculate magnification and estimate cell size",
+       "Relate cell organelles to their functions",
+       "Compare plant and animal cells",
+       "Describe cell specialisation, tissues and organs"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Cell specialization, tissues, organs",
+      "points": [
+       "Describe cell specialization",
+       "State the differences between cells, tissues, organs and organ systems",
+       "Give examples of tissues, organs and organ systems"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Cell Physiology",
+      "points": [
+       "Explain diffusion, osmosis and active transport",
+       "Describe water relations in plant cells",
+       "Predict results of experiments on osmosis",
+       "Relate surface area to volume to exchange",
+       "Interpret plasmolysis and haemolysis observations"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Nutrition in Plants",
+      "points": [
+       "Describe the process of photosynthesis",
+       "Identify factors affecting photosynthesis",
+       "Explain the role of chlorophyll and light",
+       "Describe mineral salt uptake and deficiency symptoms",
+       "Interpret starch and light experiment results"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Nutrition in Animals",
+      "points": [
+       "Describe dentition of carnivore, herbivore and omnivore",
+       "Explain digestion in the human alimentary canal",
+       "State roles of enzymes and digestive secretions",
+       "Explain the role of vitamins and mineral salts",
+       "Outline causes and treatment of dental diseases"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Transport in Plants and Animals",
+      "points": [
+       "Explain absorption of water and mineral salts by roots",
+       "Describe transpiration and factors affecting it",
+       "Relate leaf and stem structure to transport",
+       "Describe blood circulation and the mammalian heart",
+       "Explain blood groups and immunity basics"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Gaseous Exchange and Respiration",
+      "points": [
+       "Describe gaseous exchange in plants",
+       "Compare gaseous exchange in mammals and fish",
+       "Explain aerobic and anaerobic respiration",
+       "Interpret breathing rate and experiment data",
+       "State adaptations of respiratory surfaces"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Excretion and Homeostasis",
+      "points": [
+       "Describe structure and function of the kidney and nephron",
+       "Explain osmoregulation and urine formation",
+       "Describe skin structure and temperature regulation",
+       "Outline excretion in plants",
+       "Interpret kidney failure and dialysis questions"
+      ],
+      "weight": 2,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Excretion and homeostasis in plants",
+      "points": [
+       "Outline excretion and homeostasis in unicellular organisms",
+       "Describe excretion and homeostasis in plants",
+       "Describe excretion in mammals",
+       "Relate kidney and skin structure to their functions"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Reproduction",
+      "points": [
+       "Describe flower structure and parts of the seed",
+       "Explain pollination, fertilisation and fruit formation",
+       "Compare reproduction in mammals and plants",
+       "Describe the menstrual cycle and hormones",
+       "Outline asexual reproduction methods in plants"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Genetics and Variation",
+      "points": [
+       "Define terms: gene, allele, genotype, phenotype",
+       "Use monohybrid crosses and Punnett squares",
+       "Explain sex determination and inheritance of traits",
+       "Distinguish continuous from discontinuous variation",
+       "Discuss causes and importance of variation"
+      ],
+      "weight": 2,
+      "difficulty": 3,
+      "confidence": "weak"
+     },
+     {
+      "title": "Evolution and Ecology",
+      "points": [
+       "Outline evidence for evolution",
+       "Explain natural selection and adaptation",
+       "Describe food chains, webs and trophic levels",
+       "Explain energy flow and nutrient cycles",
+       "Describe factors affecting populations in habitats"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": "weak"
+     }
+    ]
+   },
+   "constraints": [
+    {
+     "key": "cap:g_fe9ca98166ce",
+     "goal": "g_fe9ca98166ce",
+     "hard": true,
+     "kind": "goal_cap",
+     "label": "At most 2 h a day for KCSE Biology Paper 1 mock",
+     "weight": 3,
+     "minutes": 120,
+     "provenance": "student"
+    }
+   ],
+   "verification": {
+    "pass": true,
+    "quality": 97,
+    "critics": [
+     "realism 100: Every day is within what you usually sustain.",
+     "exam_prep 90: no light review on Thu 17 Dec",
+     "front_loading 100: Deadline work finishes with room to spare.",
+     "interleaving 100: Practice is mixed across subjects.",
+     "fragmentation 88: 4 sessions are much shorter than ideal.",
+     "neglect 100: Every active goal has time."
+    ]
+   },
+   "trace": {
+    "ms": 21201,
+    "errors": [],
+    "solver": {
+     "ms": 31,
+     "items": 25,
+     "placed": 24,
+     "iterations": 2
+    },
+    "tokens": {
+     "calls": 3,
+     "input": 7970,
+     "cached": 4608,
+     "output": 1714,
+     "servedModel": "deepseek-flash",
+     "firstTokenMs": [
+      1533,
+      1914,
+      1205
+     ]
+    }
+   },
+   "plan": {
+    "items": 45,
+    "placed": 24,
+    "laterWeeks": 4,
+    "unplaced": 0,
+    "first": "2026-11-13",
+    "last": "2026-12-17"
+   },
+   "sessions": [
+    {
+     "title": "Introduction to Biology revision",
+     "role": "revise",
+     "minutes": 40,
+     "window": "2026-11-13 → 2026-11-14",
+     "placed": "2026-11-13",
+     "aim": "Be able to answer any Introduction to Biology question on Paper 1 without notes.",
+     "points": [
+      "Define biology and list its main branches",
+      "State characteristics of living organisms",
+      "Compare plants and animals"
+     ]
+    },
+    {
+     "title": "Introduction to Biology past paper practice",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-11-13 → 2026-11-14",
+     "placed": "2026-11-13",
+     "aim": "Pick up every method mark on Introduction to Biology questions.",
+     "points": [
+      "Define biology and list its main branches",
+      "State characteristics of living organisms",
+      "Compare plants and animals"
+     ]
+    },
+    {
+     "title": "Classification revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-13 → 2026-11-17",
+     "placed": "2026-11-13",
+     "aim": "Be able to answer any Classification question on Paper 1 without notes.",
+     "points": [
+      "Name the five kingdoms and give examples",
+      "State the major taxonomic units and their order",
+      "Apply binomial nomenclature rules"
+     ]
+    },
+    {
+     "title": "Classification past paper practice",
+     "role": "practise",
+     "minutes": 40,
+     "window": "2026-11-13 → 2026-11-17",
+     "placed": "2026-11-14",
+     "aim": "Pick up every method mark on Classification questions.",
+     "points": [
+      "Name the five kingdoms and give examples",
+      "State the major taxonomic units and their order",
+      "Apply binomial nomenclature rules"
+     ]
+    },
+    {
+     "title": "Classification II revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-16 → 2026-11-18",
+     "placed": "2026-11-16",
+     "aim": "Be able to answer any Classification II question on Paper 1 without notes.",
+     "points": [
+      "State general principles of classification",
+      "State general characteristics of the five kingdoms",
+      "Outline main characteristics of major divisions of Plantae and of Arthropoda and Chordata…"
+     ]
+    },
+    {
+     "title": "Classification II past paper practice",
+     "role": "practise",
+     "minutes": 40,
+     "window": "2026-11-16 → 2026-11-18",
+     "placed": "2026-11-16",
+     "aim": "Pick up every method mark on Classification II questions.",
+     "points": [
+      "State general principles of classification",
+      "State general characteristics of the five kingdoms",
+      "Outline main characteristics of major divisions of Plantae and of Arthropoda and Chordata…"
+     ]
+    },
+    {
+     "title": "The Cell revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-17 → 2026-11-20",
+     "placed": "2026-11-17",
+     "aim": "Be able to answer any The Cell question on Paper 1 without notes.",
+     "points": [
+      "Identify parts of the light microscope and their functions",
+      "Calculate magnification and estimate cell size",
+      "Relate cell organelles to their functions"
+     ]
+    },
+    {
+     "title": "The Cell past paper practice",
+     "role": "practise",
+     "minutes": 40,
+     "window": "2026-11-17 → 2026-11-20",
+     "placed": "2026-11-17",
+     "aim": "Pick up every method mark on The Cell questions.",
+     "points": [
+      "Identify parts of the light microscope and their functions",
+      "Calculate magnification and estimate cell size",
+      "Relate cell organelles to their functions"
+     ]
+    },
+    {
+     "title": "Cell specialization, tissues, organs revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-19 → 2026-11-21",
+     "placed": "2026-11-19",
+     "aim": "Be able to answer any Cell specialization, tissues, organs question on Paper 1 without notes.",
+     "points": [
+      "Describe cell specialization",
+      "State the differences between cells, tissues, organs and organ systems",
+      "Give examples of tissues, organs and organ systems"
+     ]
+    },
+    {
+     "title": "Cell specialization, tissues, organs past paper practice",
+     "role": "practise",
+     "minutes": 40,
+     "window": "2026-11-19 → 2026-11-21",
+     "placed": "2026-11-20",
+     "aim": "Pick up every method mark on Cell specialization, tissues, organs questions.",
+     "points": [
+      "Describe cell specialization",
+      "State the differences between cells, tissues, organs and organ systems",
+      "Give examples of tissues, organs and organ systems"
+     ]
+    },
+    {
+     "title": "Cell Physiology revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-20 → 2026-11-23",
+     "placed": "2026-11-20",
+     "aim": "Be able to answer any Cell Physiology question on Paper 1 without notes.",
+     "points": [
+      "Explain diffusion, osmosis and active transport",
+      "Describe water relations in plant cells",
+      "Predict results of experiments on osmosis"
+     ]
+    },
+    {
+     "title": "Cell Physiology past paper practice",
+     "role": "practise",
+     "minutes": 40,
+     "window": "2026-11-20 → 2026-11-23",
+     "placed": "2026-11-20",
+     "aim": "Pick up every method mark on Cell Physiology questions.",
+     "points": [
+      "Explain diffusion, osmosis and active transport",
+      "Describe water relations in plant cells",
+      "Predict results of experiments on osmosis"
+     ]
+    },
+    {
+     "title": "Nutrition in Plants revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-21 → 2026-11-25",
+     "placed": "2026-11-21",
+     "aim": "Be able to answer any Nutrition in Plants question on Paper 1 without notes.",
+     "points": [
+      "Describe the process of photosynthesis",
+      "Identify factors affecting photosynthesis",
+      "Explain the role of chlorophyll and light"
+     ]
+    },
+    {
+     "title": "Nutrition in Plants past paper practice",
+     "role": "practise",
+     "minutes": 40,
+     "window": "2026-11-21 → 2026-11-25",
+     "placed": "2026-11-21",
+     "aim": "Pick up every method mark on Nutrition in Plants questions.",
+     "points": [
+      "Describe the process of photosynthesis",
+      "Identify factors affecting photosynthesis",
+      "Explain the role of chlorophyll and light"
+     ]
+    },
+    {
+     "title": "Nutrition in Animals revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-24 → 2026-11-26",
+     "placed": "2026-11-24",
+     "aim": "Be able to answer any Nutrition in Animals question on Paper 1 without notes.",
+     "points": [
+      "Describe dentition of carnivore, herbivore and omnivore",
+      "Explain digestion in the human alimentary canal",
+      "State roles of enzymes and digestive secretions"
+     ]
+    },
+    {
+     "title": "Nutrition in Animals past paper practice",
+     "role": "practise",
+     "minutes": 40,
+     "window": "2026-11-24 → 2026-11-26",
+     "placed": "2026-11-25",
+     "aim": "Pick up every method mark on Nutrition in Animals questions.",
+     "points": [
+      "Describe dentition of carnivore, herbivore and omnivore",
+      "Explain digestion in the human alimentary canal",
+      "State roles of enzymes and digestive secretions"
+     ]
+    },
+    {
+     "title": "Transport in Plants and Animals revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-25 → 2026-11-27",
+     "placed": "2026-11-25",
+     "aim": "Be able to answer any Transport in Plants and Animals question on Paper 1 without notes.",
+     "points": [
+      "Explain absorption of water and mineral salts by roots",
+      "Describe transpiration and factors affecting it",
+      "Relate leaf and stem structure to transport"
+     ]
+    },
+    {
+     "title": "Transport in Plants and Animals past paper practice",
+     "role": "practise",
+     "minutes": 40,
+     "window": "2026-11-25 → 2026-11-27",
+     "placed": "2026-11-26",
+     "aim": "Pick up every method mark on Transport in Plants and Animals questions.",
+     "points": [
+      "Explain absorption of water and mineral salts by roots",
+      "Describe transpiration and factors affecting it",
+      "Relate leaf and stem structure to transport"
+     ]
+    },
+    {
+     "title": "Gaseous Exchange and Respiration revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-26 → 2026-11-30",
+     "placed": "2026-11-26",
+     "aim": "Be able to answer any Gaseous Exchange and Respiration question on Paper 1 without notes.",
+     "points": [
+      "Describe gaseous exchange in plants",
+      "Compare gaseous exchange in mammals and fish",
+      "Explain aerobic and anaerobic respiration"
+     ]
+    },
+    {
+     "title": "Gaseous Exchange and Respiration past paper practice",
+     "role": "practise",
+     "minutes": 40,
+     "window": "2026-11-26 → 2026-11-30",
+     "placed": "2026-11-26",
+     "aim": "Pick up every method mark on Gaseous Exchange and Respiration questions.",
+     "points": [
+      "Describe gaseous exchange in plants",
+      "Compare gaseous exchange in mammals and fish",
+      "Explain aerobic and anaerobic respiration"
+     ]
+    },
+    {
+     "title": "Excretion and Homeostasis revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-28 → 2026-12-01",
+     "placed": null,
+     "aim": "Be able to answer any Excretion and Homeostasis question on Paper 1 without notes.",
+     "points": [
+      "Describe structure and function of the kidney and nephron",
+      "Explain osmoregulation and urine formation",
+      "Describe skin structure and temperature regulation"
+     ]
+    },
+    {
+     "title": "Excretion and Homeostasis past paper practice",
+     "role": "practise",
+     "minutes": 40,
+     "window": "2026-11-28 → 2026-12-01",
+     "placed": null,
+     "aim": "Pick up every method mark on Excretion and Homeostasis questions.",
+     "points": [
+      "Describe structure and function of the kidney and nephron",
+      "Explain osmoregulation and urine formation",
+      "Describe skin structure and temperature regulation"
+     ]
+    },
+    {
+     "title": "Excretion and homeostasis in plants revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-30 → 2026-12-02",
+     "placed": null,
+     "aim": "Be able to answer any Excretion and homeostasis in plants question on Paper 1 without notes.",
+     "points": [
+      "Outline excretion and homeostasis in unicellular organisms",
+      "Describe excretion and homeostasis in plants",
+      "Describe excretion in mammals"
+     ]
+    },
+    {
+     "title": "Excretion and homeostasis in plants past paper practice",
+     "role": "practise",
+     "minutes": 40,
+     "window": "2026-11-30 → 2026-12-02",
+     "placed": null,
+     "aim": "Pick up every method mark on Excretion and homeostasis in plants questions.",
+     "points": [
+      "Outline excretion and homeostasis in unicellular organisms",
+      "Describe excretion and homeostasis in plants",
+      "Describe excretion in mammals"
+     ]
+    },
+    {
+     "title": "Reproduction revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-12-01 → 2026-12-04",
+     "placed": null,
+     "aim": "Be able to answer any Reproduction question on Paper 1 without notes.",
+     "points": [
+      "Describe flower structure and parts of the seed",
+      "Explain pollination, fertilisation and fruit formation",
+      "Compare reproduction in mammals and plants"
+     ]
+    },
+    {
+     "title": "Reproduction past paper practice",
+     "role": "practise",
+     "minutes": 40,
+     "window": "2026-12-01 → 2026-12-04",
+     "placed": null,
+     "aim": "Pick up every method mark on Reproduction questions.",
+     "points": [
+      "Describe flower structure and parts of the seed",
+      "Explain pollination, fertilisation and fruit formation",
+      "Compare reproduction in mammals and plants"
+     ]
+    },
+    {
+     "title": "Genetics and Variation revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-12-03 → 2026-12-07",
+     "placed": null,
+     "aim": "Be able to answer any Genetics and Variation question on Paper 1 without notes.",
+     "points": [
+      "Define terms: gene, allele, genotype, phenotype",
+      "Use monohybrid crosses and Punnett squares",
+      "Explain sex determination and inheritance of traits"
+     ]
+    },
+    {
+     "title": "Genetics and Variation past paper practice",
+     "role": "practise",
+     "minutes": 60,
+     "window": "2026-12-03 → 2026-12-07",
+     "placed": null,
+     "aim": "Pick up every method mark on Genetics and Variation questions.",
+     "points": [
+      "Define terms: gene, allele, genotype, phenotype",
+      "Use monohybrid crosses and Punnett squares",
+      "Explain sex determination and inheritance of traits"
+     ]
+    },
+    {
+     "title": "Evolution and Ecology revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-12-05 → 2026-12-07",
+     "placed": null,
+     "aim": "Be able to answer any Evolution and Ecology question on Paper 1 without notes.",
+     "points": [
+      "Outline evidence for evolution",
+      "Explain natural selection and adaptation",
+      "Describe food chains, webs and trophic levels"
+     ]
+    },
+    {
+     "title": "Evolution and Ecology past paper practice",
+     "role": "practise",
+     "minutes": 60,
+     "window": "2026-12-05 → 2026-12-07",
+     "placed": null,
+     "aim": "Pick up every method mark on Evolution and Ecology questions.",
+     "points": [
+      "Outline evidence for evolution",
+      "Explain natural selection and adaptation",
+      "Describe food chains, webs and trophic levels"
+     ]
+    },
+    {
+     "title": "Mixed review: Introduction to Biology to Classification II",
+     "role": "mixed",
+     "minutes": 40,
+     "window": "2026-11-19 → 2026-11-21",
+     "placed": "2026-11-19",
+     "aim": "Recall Introduction to Biology, Classification and Classification II after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Introduction to Biology: Define biology and list its main branches",
+      "Introduction to Biology: State characteristics of living organisms",
+      "Classification: Name the five kingdoms and give examples"
+     ]
+    },
+    {
+     "title": "Mixed review: The Cell to Cell Physiology",
+     "role": "mixed",
+     "minutes": 40,
+     "window": "2026-11-24 → 2026-11-26",
+     "placed": "2026-11-24",
+     "aim": "Recall The Cell, Cell specialization, tissues, organs and Cell Physiology after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "The Cell: Identify parts of the light microscope and their functions",
+      "The Cell: Calculate magnification and estimate cell size",
+      "Cell specialization, tissues, organs: Describe cell specialization"
+     ]
+    },
+    {
+     "title": "Mixed review: 3 topics",
+     "role": "mixed",
+     "minutes": 40,
+     "window": "2026-11-28 → 2026-12-01",
+     "placed": null,
+     "aim": "Recall Nutrition in Plants, Nutrition in Animals and Transport in Plants and Animals after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Nutrition in Plants: Describe the process of photosynthesis",
+      "Nutrition in Plants: Identify factors affecting photosynthesis",
+      "Nutrition in Animals: Describe dentition of carnivore, herbivore and omnivore"
+     ]
+    },
+    {
+     "title": "Mixed review: 3 topics",
+     "role": "mixed",
+     "minutes": 40,
+     "window": "2026-12-03 → 2026-12-05",
+     "placed": null,
+     "aim": "Recall Gaseous Exchange and Respiration to Excretion and homeostasis in plants after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Gaseous Exchange and Respiration: Describe gaseous exchange in plants",
+      "Gaseous Exchange and Respiration: Compare gaseous exchange in mammals and fish",
+      "Excretion and Homeostasis: Describe structure and function of the kidney and nephron"
+     ]
+    },
+    {
+     "title": "Mixed review: Reproduction to Evolution and Ecology",
+     "role": "mixed",
+     "minutes": 40,
+     "window": "2026-12-09 → 2026-12-11",
+     "placed": null,
+     "aim": "Recall Reproduction, Genetics and Variation and Evolution and Ecology after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Reproduction: Describe flower structure and parts of the seed",
+      "Reproduction: Explain pollination, fertilisation and fruit formation",
+      "Genetics and Variation: Define terms: gene, allele, genotype, phenotype"
+     ]
+    },
+    {
+     "title": "Genetics and Variation extra practice",
+     "role": "practise",
+     "minutes": 40,
+     "window": "2026-12-08 → 2026-12-11",
+     "placed": null,
+     "aim": "Make Genetics and Variation reliable: fresh questions after a gap.",
+     "points": [
+      "Define terms: gene, allele, genotype, phenotype",
+      "Use monohybrid crosses and Punnett squares",
+      "Explain sex determination and inheritance of traits"
+     ]
+    },
+    {
+     "title": "Evolution and Ecology extra practice",
+     "role": "practise",
+     "minutes": 40,
+     "window": "2026-12-09 → 2026-12-12",
+     "placed": null,
+     "aim": "Make Evolution and Ecology reliable: fresh questions after a gap.",
+     "points": [
+      "Outline evidence for evolution",
+      "Explain natural selection and adaptation",
+      "Describe food chains, webs and trophic levels"
+     ]
+    },
+    {
+     "title": "Paper 1 timed past paper",
+     "role": "paper",
+     "minutes": 120,
+     "window": "2026-12-08 → 2026-12-09",
+     "placed": null,
+     "aim": "Sit a full Paper 1 in exam conditions: 2 h, 80 marks.",
+     "points": [
+      "Use a past paper you haven't seen before",
+      "Time it strictly and put your notes away",
+      "Show full working so you keep method marks"
+     ]
+    },
+    {
+     "title": "Past paper corrections",
+     "role": "corrections",
+     "minutes": 60,
+     "window": "2026-12-09 → 2026-12-10",
+     "placed": null,
+     "aim": "Turn every lost mark into a method you now know.",
+     "points": [
+      "Mark the paper with the official mark scheme",
+      "Redo every wrong question without looking at the answer",
+      "Write each mistake and its fix in your error log"
+     ]
+    },
+    {
+     "title": "Weak topics revision",
+     "role": "weak",
+     "minutes": 60,
+     "window": "2026-12-09 → 2026-12-11",
+     "placed": null,
+     "aim": "Close the gaps in Genetics and Variation and Evolution and Ecology.",
+     "points": [
+      "Genetics and Variation: Define terms: gene, allele, genotype, phenotype",
+      "Genetics and Variation: Use monohybrid crosses and Punnett squares",
+      "Evolution and Ecology: Outline evidence for evolution"
+     ]
+    },
+    {
+     "title": "Paper 1 timed past paper 2",
+     "role": "paper",
+     "minutes": 120,
+     "window": "2026-12-10 → 2026-12-11",
+     "placed": null,
+     "aim": "Sit a full Paper 1 in exam conditions: 2 h, 80 marks.",
+     "points": [
+      "Use a past paper you haven't seen before",
+      "Time it strictly and put your notes away",
+      "Show full working so you keep method marks"
+     ]
+    },
+    {
+     "title": "Past paper 2 corrections",
+     "role": "corrections",
+     "minutes": 60,
+     "window": "2026-12-11 → 2026-12-12",
+     "placed": null,
+     "aim": "Turn every lost mark into a method you now know.",
+     "points": [
+      "Mark the paper with the official mark scheme",
+      "Redo every wrong question without looking at the answer",
+      "Write each mistake and its fix in your error log"
+     ]
+    },
+    {
+     "title": "Paper 1 timed past paper 3",
+     "role": "paper",
+     "minutes": 120,
+     "window": "2026-12-12 → 2026-12-14",
+     "placed": null,
+     "aim": "Sit a full Paper 1 in exam conditions: 2 h, 80 marks.",
+     "points": [
+      "Use a past paper you haven't seen before",
+      "Time it strictly and put your notes away",
+      "Show full working so you keep method marks"
+     ]
+    },
+    {
+     "title": "Past paper 3 corrections",
+     "role": "corrections",
+     "minutes": 60,
+     "window": "2026-12-14 → 2026-12-15",
+     "placed": null,
+     "aim": "Turn every lost mark into a method you now know.",
+     "points": [
+      "Mark the paper with the official mark scheme",
+      "Redo every wrong question without looking at the answer",
+      "Write each mistake and its fix in your error log"
+     ]
+    },
+    {
+     "title": "Key facts and final review",
+     "role": "final",
+     "minutes": 40,
+     "window": "2026-12-17 → 2026-12-17",
+     "placed": null,
+     "aim": "Go into the exam calm, with every formula and method fresh.",
+     "points": [
+      "Write a one-page sheet of key facts, definitions and common mistakes",
+      "Read through your error log",
+      "Do a few quick questions you know you can do"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kenya-kcse-biology-again",
+   "area": "The same syllabus asked for again in other words: expected from the shared library, no research",
+   "title": "Kenya KCSE Biology 231/1 Paper 1 exam",
+   "preset": "exam",
+   "dueInDays": 30,
+   "due": "2026-12-13",
+   "seconds": 2,
+   "status": 200,
+   "error": null,
+   "stages": [
+    "Reading your week",
+    "Reading your week · 0 commitments",
+    "Planning Kenya KCSE Biology 231/1 Paper 1 exam",
+    "Finding the syllabus",
+    "Found in Sylf's syllabus library",
+    "15 topics from Sylf's syllabus library",
+    "Building your plan",
+    "43 sessions to Sat 12 Dec",
+    "Fitting 43 pieces of work into your free time",
+    "213 checks passed"
+   ],
+   "strategy": "15 topics revised and practised in order, 5 mixed reviews, 3 timed Paper 1s, light final day.",
+   "type": "exam",
+   "questions": [],
+   "syllabus": {
+    "source": "model",
+    "researched": true,
+    "sources": [
+     {
+      "url": "https://knecnotes.co.ke/wp-content/uploads/2025/02/BIO-MS-2.pdf",
+      "title": "MARKING SCHEME"
+     },
+     {
+      "url": "https://educationnewshub.co.ke/knec-biology-syllabus/?amp=1",
+      "title": "Knec Biology Syllabus"
+     },
+     {
+      "url": "https://teacher.co.ke/wp-content/uploads/bsk-pdf-manager/2019/01/BIOLOGY-SYLLABUS-1.docx",
+      "title": "KENYA CERTIFICATE OF SECONDARY EDUCATION"
+     },
+     {
+      "url": "https://newsblaze.co.ke/kicd-biology-syllabus-pdf",
+      "title": "kicd Biology syllabus pdf - Newsblaze.co.ke - kicd Biology syllabus pdf"
+     },
+     {
+      "url": "https://advance-africa.com/Biology-Syllabus.html",
+      "title": "KNEC KCSE Biology Syllabus 2024 | Syllabus - High School Biology KCSE"
+     },
+     {
+      "url": "https://kcserevision.com/free-kcse-syllabus",
+      "title": "FREE KCSE SYLLABUS"
+     }
+    ],
+    "name": "KCSE Biology Paper 1 (231/1)",
+    "papers": [
+     {
+      "label": "Paper 1",
+      "marks": 80,
+      "minutes": 120
+     }
+    ],
+    "units": [
+     {
+      "title": "Introduction to Biology",
+      "points": [
+       "Define biology and list its main branches",
+       "State characteristics of living organisms",
+       "Compare plants and animals",
+       "Explain the importance of biology"
+      ],
+      "weight": 1,
+      "difficulty": 1,
+      "confidence": null
+     },
+     {
+      "title": "Classification",
+      "points": [
+       "Name the five kingdoms and give examples",
+       "State the major taxonomic units and their order",
+       "Apply binomial nomenclature rules",
+       "Construct and use dichotomous keys",
+       "Identify features of Arthropoda and Chordata classes"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Classification II",
+      "points": [
+       "State general principles of classification",
+       "State general characteristics of the five kingdoms",
+       "Outline main characteristics of major divisions of Plantae and of Arthropoda and Chordata…",
+       "Describe classes of spermatophyta",
+       "Construct and use simple dichotomous keys"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "The Cell",
+      "points": [
+       "Identify parts of the light microscope and their functions",
+       "Calculate magnification and estimate cell size",
+       "Relate cell organelles to their functions",
+       "Compare plant and animal cells",
+       "Describe cell specialisation, tissues and organs"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Cell specialization, tissues, organs",
+      "points": [
+       "Describe cell specialization",
+       "State the differences between cells, tissues, organs and organ systems",
+       "Give examples of tissues, organs and organ systems"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Cell Physiology",
+      "points": [
+       "Explain diffusion, osmosis and active transport",
+       "Describe water relations in plant cells",
+       "Predict results of experiments on osmosis",
+       "Relate surface area to volume to exchange",
+       "Interpret plasmolysis and haemolysis observations"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Nutrition in Plants",
+      "points": [
+       "Describe the process of photosynthesis",
+       "Identify factors affecting photosynthesis",
+       "Explain the role of chlorophyll and light",
+       "Describe mineral salt uptake and deficiency symptoms",
+       "Interpret starch and light experiment results"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Nutrition in Animals",
+      "points": [
+       "Describe dentition of carnivore, herbivore and omnivore",
+       "Explain digestion in the human alimentary canal",
+       "State roles of enzymes and digestive secretions",
+       "Explain the role of vitamins and mineral salts",
+       "Outline causes and treatment of dental diseases"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Transport in Plants and Animals",
+      "points": [
+       "Explain absorption of water and mineral salts by roots",
+       "Describe transpiration and factors affecting it",
+       "Relate leaf and stem structure to transport",
+       "Describe blood circulation and the mammalian heart",
+       "Explain blood groups and immunity basics"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Gaseous Exchange and Respiration",
+      "points": [
+       "Describe gaseous exchange in plants",
+       "Compare gaseous exchange in mammals and fish",
+       "Explain aerobic and anaerobic respiration",
+       "Interpret breathing rate and experiment data",
+       "State adaptations of respiratory surfaces"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Excretion and Homeostasis",
+      "points": [
+       "Describe structure and function of the kidney and nephron",
+       "Explain osmoregulation and urine formation",
+       "Describe skin structure and temperature regulation",
+       "Outline excretion in plants",
+       "Interpret kidney failure and dialysis questions"
+      ],
+      "weight": 2,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Excretion and homeostasis in plants",
+      "points": [
+       "Outline excretion and homeostasis in unicellular organisms",
+       "Describe excretion and homeostasis in plants",
+       "Describe excretion in mammals",
+       "Relate kidney and skin structure to their functions"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Reproduction",
+      "points": [
+       "Describe flower structure and parts of the seed",
+       "Explain pollination, fertilisation and fruit formation",
+       "Compare reproduction in mammals and plants",
+       "Describe the menstrual cycle and hormones",
+       "Outline asexual reproduction methods in plants"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Genetics and Variation",
+      "points": [
+       "Define terms: gene, allele, genotype, phenotype",
+       "Use monohybrid crosses and Punnett squares",
+       "Explain sex determination and inheritance of traits",
+       "Distinguish continuous from discontinuous variation",
+       "Discuss causes and importance of variation"
+      ],
+      "weight": 2,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Evolution and Ecology",
+      "points": [
+       "Outline evidence for evolution",
+       "Explain natural selection and adaptation",
+       "Describe food chains, webs and trophic levels",
+       "Explain energy flow and nutrient cycles",
+       "Describe factors affecting populations in habitats"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     }
+    ]
+   },
+   "constraints": [],
+   "verification": {
+    "pass": true,
+    "quality": 98,
+    "critics": [
+     "realism 100: Every day is within what you usually sustain.",
+     "exam_prep 90: no light review on Sat 12 Dec",
+     "front_loading 100: Deadline work finishes with room to spare.",
+     "interleaving 100: Practice is mixed across subjects.",
+     "fragmentation 100: Sessions are a workable length.",
+     "neglect 100: Every active goal has time."
+    ]
+   },
+   "trace": {
+    "ms": 1973,
+    "errors": [],
+    "solver": {
+     "ms": 22,
+     "items": 43,
+     "placed": 22,
+     "iterations": 2
+    },
+    "tokens": {
+     "calls": 1,
+     "input": 708,
+     "cached": 512,
+     "output": 152,
+     "servedModel": "deepseek-flash",
+     "firstTokenMs": [
+      1562
+     ]
+    }
+   },
+   "plan": {
+    "items": 43,
+    "placed": 22,
+    "laterWeeks": 3,
+    "unplaced": 0,
+    "first": "2026-11-13",
+    "last": "2026-12-12"
+   },
+   "sessions": [
+    {
+     "title": "Introduction to Biology revision",
+     "role": "revise",
+     "minutes": 45,
+     "window": "2026-11-13 → 2026-11-14",
+     "placed": "2026-11-13",
+     "aim": "Be able to answer any Introduction to Biology question on Paper 1 without notes.",
+     "points": [
+      "Define biology and list its main branches",
+      "State characteristics of living organisms",
+      "Compare plants and animals"
+     ]
+    },
+    {
+     "title": "Introduction to Biology past paper practice",
+     "role": "practise",
+     "minutes": 35,
+     "window": "2026-11-13 → 2026-11-14",
+     "placed": "2026-11-13",
+     "aim": "Pick up every method mark on Introduction to Biology questions.",
+     "points": [
+      "Define biology and list its main branches",
+      "State characteristics of living organisms",
+      "Compare plants and animals"
+     ]
+    },
+    {
+     "title": "Classification revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-13 → 2026-11-17",
+     "placed": "2026-11-13",
+     "aim": "Be able to answer any Classification question on Paper 1 without notes.",
+     "points": [
+      "Name the five kingdoms and give examples",
+      "State the major taxonomic units and their order",
+      "Apply binomial nomenclature rules"
+     ]
+    },
+    {
+     "title": "Classification past paper practice",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-11-13 → 2026-11-17",
+     "placed": "2026-11-13",
+     "aim": "Pick up every method mark on Classification questions.",
+     "points": [
+      "Name the five kingdoms and give examples",
+      "State the major taxonomic units and their order",
+      "Apply binomial nomenclature rules"
+     ]
+    },
+    {
+     "title": "Classification II revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-16 → 2026-11-18",
+     "placed": "2026-11-16",
+     "aim": "Be able to answer any Classification II question on Paper 1 without notes.",
+     "points": [
+      "State general principles of classification",
+      "State general characteristics of the five kingdoms",
+      "Outline main characteristics of major divisions of Plantae and of Arthropoda and Chordata…"
+     ]
+    },
+    {
+     "title": "Classification II past paper practice",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-11-16 → 2026-11-18",
+     "placed": "2026-11-16",
+     "aim": "Pick up every method mark on Classification II questions.",
+     "points": [
+      "State general principles of classification",
+      "State general characteristics of the five kingdoms",
+      "Outline main characteristics of major divisions of Plantae and of Arthropoda and Chordata…"
+     ]
+    },
+    {
+     "title": "The Cell revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-17 → 2026-11-19",
+     "placed": "2026-11-17",
+     "aim": "Be able to answer any The Cell question on Paper 1 without notes.",
+     "points": [
+      "Identify parts of the light microscope and their functions",
+      "Calculate magnification and estimate cell size",
+      "Relate cell organelles to their functions"
+     ]
+    },
+    {
+     "title": "The Cell past paper practice",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-11-17 → 2026-11-19",
+     "placed": "2026-11-17",
+     "aim": "Pick up every method mark on The Cell questions.",
+     "points": [
+      "Identify parts of the light microscope and their functions",
+      "Calculate magnification and estimate cell size",
+      "Relate cell organelles to their functions"
+     ]
+    },
+    {
+     "title": "Cell specialization, tissues, organs revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-18 → 2026-11-21",
+     "placed": "2026-11-18",
+     "aim": "Be able to answer any Cell specialization, tissues, organs question on Paper 1 without notes.",
+     "points": [
+      "Describe cell specialization",
+      "State the differences between cells, tissues, organs and organ systems",
+      "Give examples of tissues, organs and organ systems"
+     ]
+    },
+    {
+     "title": "Cell specialization, tissues, organs past paper practice",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-11-18 → 2026-11-21",
+     "placed": "2026-11-18",
+     "aim": "Pick up every method mark on Cell specialization, tissues, organs questions.",
+     "points": [
+      "Describe cell specialization",
+      "State the differences between cells, tissues, organs and organ systems",
+      "Give examples of tissues, organs and organ systems"
+     ]
+    },
+    {
+     "title": "Cell Physiology revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-20 → 2026-11-23",
+     "placed": "2026-11-20",
+     "aim": "Be able to answer any Cell Physiology question on Paper 1 without notes.",
+     "points": [
+      "Explain diffusion, osmosis and active transport",
+      "Describe water relations in plant cells",
+      "Predict results of experiments on osmosis"
+     ]
+    },
+    {
+     "title": "Cell Physiology past paper practice",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-11-20 → 2026-11-23",
+     "placed": "2026-11-20",
+     "aim": "Pick up every method mark on Cell Physiology questions.",
+     "points": [
+      "Explain diffusion, osmosis and active transport",
+      "Describe water relations in plant cells",
+      "Predict results of experiments on osmosis"
+     ]
+    },
+    {
+     "title": "Nutrition in Plants revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-21 → 2026-11-24",
+     "placed": "2026-11-21",
+     "aim": "Be able to answer any Nutrition in Plants question on Paper 1 without notes.",
+     "points": [
+      "Describe the process of photosynthesis",
+      "Identify factors affecting photosynthesis",
+      "Explain the role of chlorophyll and light"
+     ]
+    },
+    {
+     "title": "Nutrition in Plants past paper practice",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-11-21 → 2026-11-24",
+     "placed": "2026-11-21",
+     "aim": "Pick up every method mark on Nutrition in Plants questions.",
+     "points": [
+      "Describe the process of photosynthesis",
+      "Identify factors affecting photosynthesis",
+      "Explain the role of chlorophyll and light"
+     ]
+    },
+    {
+     "title": "Nutrition in Animals revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-23 → 2026-11-25",
+     "placed": "2026-11-23",
+     "aim": "Be able to answer any Nutrition in Animals question on Paper 1 without notes.",
+     "points": [
+      "Describe dentition of carnivore, herbivore and omnivore",
+      "Explain digestion in the human alimentary canal",
+      "State roles of enzymes and digestive secretions"
+     ]
+    },
+    {
+     "title": "Nutrition in Animals past paper practice",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-11-23 → 2026-11-25",
+     "placed": "2026-11-23",
+     "aim": "Pick up every method mark on Nutrition in Animals questions.",
+     "points": [
+      "Describe dentition of carnivore, herbivore and omnivore",
+      "Explain digestion in the human alimentary canal",
+      "State roles of enzymes and digestive secretions"
+     ]
+    },
+    {
+     "title": "Transport in Plants and Animals revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-24 → 2026-11-27",
+     "placed": "2026-11-24",
+     "aim": "Be able to answer any Transport in Plants and Animals question on Paper 1 without notes.",
+     "points": [
+      "Explain absorption of water and mineral salts by roots",
+      "Describe transpiration and factors affecting it",
+      "Relate leaf and stem structure to transport"
+     ]
+    },
+    {
+     "title": "Transport in Plants and Animals past paper practice",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-11-24 → 2026-11-27",
+     "placed": "2026-11-24",
+     "aim": "Pick up every method mark on Transport in Plants and Animals questions.",
+     "points": [
+      "Explain absorption of water and mineral salts by roots",
+      "Describe transpiration and factors affecting it",
+      "Relate leaf and stem structure to transport"
+     ]
+    },
+    {
+     "title": "Gaseous Exchange and Respiration revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-26 → 2026-11-28",
+     "placed": "2026-11-26",
+     "aim": "Be able to answer any Gaseous Exchange and Respiration question on Paper 1 without notes.",
+     "points": [
+      "Describe gaseous exchange in plants",
+      "Compare gaseous exchange in mammals and fish",
+      "Explain aerobic and anaerobic respiration"
+     ]
+    },
+    {
+     "title": "Gaseous Exchange and Respiration past paper practice",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-11-26 → 2026-11-28",
+     "placed": "2026-11-26",
+     "aim": "Pick up every method mark on Gaseous Exchange and Respiration questions.",
+     "points": [
+      "Describe gaseous exchange in plants",
+      "Compare gaseous exchange in mammals and fish",
+      "Explain aerobic and anaerobic respiration"
+     ]
+    },
+    {
+     "title": "Excretion and Homeostasis revision",
+     "role": "revise",
+     "minutes": 65,
+     "window": "2026-11-27 → 2026-11-30",
+     "placed": null,
+     "aim": "Be able to answer any Excretion and Homeostasis question on Paper 1 without notes.",
+     "points": [
+      "Describe structure and function of the kidney and nephron",
+      "Explain osmoregulation and urine formation",
+      "Describe skin structure and temperature regulation"
+     ]
+    },
+    {
+     "title": "Excretion and Homeostasis past paper practice",
+     "role": "practise",
+     "minutes": 55,
+     "window": "2026-11-27 → 2026-11-30",
+     "placed": null,
+     "aim": "Pick up every method mark on Excretion and Homeostasis questions.",
+     "points": [
+      "Describe structure and function of the kidney and nephron",
+      "Explain osmoregulation and urine formation",
+      "Describe skin structure and temperature regulation"
+     ]
+    },
+    {
+     "title": "Excretion and homeostasis in plants revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-28 → 2026-12-02",
+     "placed": null,
+     "aim": "Be able to answer any Excretion and homeostasis in plants question on Paper 1 without notes.",
+     "points": [
+      "Outline excretion and homeostasis in unicellular organisms",
+      "Describe excretion and homeostasis in plants",
+      "Describe excretion in mammals"
+     ]
+    },
+    {
+     "title": "Excretion and homeostasis in plants past paper practice",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-11-28 → 2026-12-02",
+     "placed": null,
+     "aim": "Pick up every method mark on Excretion and homeostasis in plants questions.",
+     "points": [
+      "Outline excretion and homeostasis in unicellular organisms",
+      "Describe excretion and homeostasis in plants",
+      "Describe excretion in mammals"
+     ]
+    },
+    {
+     "title": "Reproduction revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-12-01 → 2026-12-03",
+     "placed": null,
+     "aim": "Be able to answer any Reproduction question on Paper 1 without notes.",
+     "points": [
+      "Describe flower structure and parts of the seed",
+      "Explain pollination, fertilisation and fruit formation",
+      "Compare reproduction in mammals and plants"
+     ]
+    },
+    {
+     "title": "Reproduction past paper practice",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-12-01 → 2026-12-03",
+     "placed": null,
+     "aim": "Pick up every method mark on Reproduction questions.",
+     "points": [
+      "Describe flower structure and parts of the seed",
+      "Explain pollination, fertilisation and fruit formation",
+      "Compare reproduction in mammals and plants"
+     ]
+    },
+    {
+     "title": "Genetics and Variation revision",
+     "role": "revise",
+     "minutes": 65,
+     "window": "2026-12-02 → 2026-12-04",
+     "placed": null,
+     "aim": "Be able to answer any Genetics and Variation question on Paper 1 without notes.",
+     "points": [
+      "Define terms: gene, allele, genotype, phenotype",
+      "Use monohybrid crosses and Punnett squares",
+      "Explain sex determination and inheritance of traits"
+     ]
+    },
+    {
+     "title": "Genetics and Variation past paper practice",
+     "role": "practise",
+     "minutes": 55,
+     "window": "2026-12-02 → 2026-12-04",
+     "placed": null,
+     "aim": "Pick up every method mark on Genetics and Variation questions.",
+     "points": [
+      "Define terms: gene, allele, genotype, phenotype",
+      "Use monohybrid crosses and Punnett squares",
+      "Explain sex determination and inheritance of traits"
+     ]
+    },
+    {
+     "title": "Evolution and Ecology revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-12-03 → 2026-12-04",
+     "placed": null,
+     "aim": "Be able to answer any Evolution and Ecology question on Paper 1 without notes.",
+     "points": [
+      "Outline evidence for evolution",
+      "Explain natural selection and adaptation",
+      "Describe food chains, webs and trophic levels"
+     ]
+    },
+    {
+     "title": "Evolution and Ecology past paper practice",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-12-03 → 2026-12-04",
+     "placed": null,
+     "aim": "Pick up every method mark on Evolution and Ecology questions.",
+     "points": [
+      "Outline evidence for evolution",
+      "Explain natural selection and adaptation",
+      "Describe food chains, webs and trophic levels"
+     ]
+    },
+    {
+     "title": "Mixed review: Introduction to Biology to Classification II",
+     "role": "mixed",
+     "minutes": 45,
+     "window": "2026-11-19 → 2026-11-21",
+     "placed": "2026-11-19",
+     "aim": "Recall Introduction to Biology, Classification and Classification II after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Introduction to Biology: Define biology and list its main branches",
+      "Introduction to Biology: State characteristics of living organisms",
+      "Classification: Name the five kingdoms and give examples"
+     ]
+    },
+    {
+     "title": "Mixed review: The Cell to Cell Physiology",
+     "role": "mixed",
+     "minutes": 45,
+     "window": "2026-11-24 → 2026-11-26",
+     "placed": "2026-11-24",
+     "aim": "Recall The Cell, Cell specialization, tissues, organs and Cell Physiology after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "The Cell: Identify parts of the light microscope and their functions",
+      "The Cell: Calculate magnification and estimate cell size",
+      "Cell specialization, tissues, organs: Describe cell specialization"
+     ]
+    },
+    {
+     "title": "Mixed review: 3 topics",
+     "role": "mixed",
+     "minutes": 45,
+     "window": "2026-11-28 → 2026-12-01",
+     "placed": null,
+     "aim": "Recall Nutrition in Plants, Nutrition in Animals and Transport in Plants and Animals after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Nutrition in Plants: Describe the process of photosynthesis",
+      "Nutrition in Plants: Identify factors affecting photosynthesis",
+      "Nutrition in Animals: Describe dentition of carnivore, herbivore and omnivore"
+     ]
+    },
+    {
+     "title": "Mixed review: 3 topics",
+     "role": "mixed",
+     "minutes": 45,
+     "window": "2026-12-03 → 2026-12-05",
+     "placed": null,
+     "aim": "Recall Gaseous Exchange and Respiration to Excretion and homeostasis in plants after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Gaseous Exchange and Respiration: Describe gaseous exchange in plants",
+      "Gaseous Exchange and Respiration: Compare gaseous exchange in mammals and fish",
+      "Excretion and Homeostasis: Describe structure and function of the kidney and nephron"
+     ]
+    },
+    {
+     "title": "Mixed review: Reproduction to Evolution and Ecology",
+     "role": "mixed",
+     "minutes": 45,
+     "window": "2026-12-07 → 2026-12-09",
+     "placed": null,
+     "aim": "Recall Reproduction, Genetics and Variation and Evolution and Ecology after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Reproduction: Describe flower structure and parts of the seed",
+      "Reproduction: Explain pollination, fertilisation and fruit formation",
+      "Genetics and Variation: Define terms: gene, allele, genotype, phenotype"
+     ]
+    },
+    {
+     "title": "Paper 1 timed past paper",
+     "role": "paper",
+     "minutes": 130,
+     "window": "2026-12-05 → 2026-12-07",
+     "placed": null,
+     "aim": "Sit a full Paper 1 in exam conditions: 2 h, 80 marks.",
+     "points": [
+      "Use a past paper you haven't seen before",
+      "Time it strictly and put your notes away",
+      "Show full working so you keep method marks"
+     ]
+    },
+    {
+     "title": "Past paper corrections",
+     "role": "corrections",
+     "minutes": 60,
+     "window": "2026-12-07 → 2026-12-08",
+     "placed": null,
+     "aim": "Turn every lost mark into a method you now know.",
+     "points": [
+      "Mark the paper with the official mark scheme",
+      "Redo every wrong question without looking at the answer",
+      "Write each mistake and its fix in your error log"
+     ]
+    },
+    {
+     "title": "Weak topics revision",
+     "role": "weak",
+     "minutes": 60,
+     "window": "2026-12-07 → 2026-12-09",
+     "placed": null,
+     "aim": "Close the gaps in the topics that lost you the most marks.",
+     "points": [
+      "The two topics that lost the most marks in your past paper",
+      "Your error log entries that came up more than once"
+     ]
+    },
+    {
+     "title": "Paper 1 timed past paper 2",
+     "role": "paper",
+     "minutes": 130,
+     "window": "2026-12-08 → 2026-12-09",
+     "placed": null,
+     "aim": "Sit a full Paper 1 in exam conditions: 2 h, 80 marks.",
+     "points": [
+      "Use a past paper you haven't seen before",
+      "Time it strictly and put your notes away",
+      "Show full working so you keep method marks"
+     ]
+    },
+    {
+     "title": "Past paper 2 corrections",
+     "role": "corrections",
+     "minutes": 60,
+     "window": "2026-12-09 → 2026-12-10",
+     "placed": null,
+     "aim": "Turn every lost mark into a method you now know.",
+     "points": [
+      "Mark the paper with the official mark scheme",
+      "Redo every wrong question without looking at the answer",
+      "Write each mistake and its fix in your error log"
+     ]
+    },
+    {
+     "title": "Paper 1 timed past paper 3",
+     "role": "paper",
+     "minutes": 130,
+     "window": "2026-12-10 → 2026-12-11",
+     "placed": null,
+     "aim": "Sit a full Paper 1 in exam conditions: 2 h, 80 marks.",
+     "points": [
+      "Use a past paper you haven't seen before",
+      "Time it strictly and put your notes away",
+      "Show full working so you keep method marks"
+     ]
+    },
+    {
+     "title": "Past paper 3 corrections",
+     "role": "corrections",
+     "minutes": 60,
+     "window": "2026-12-11 → 2026-12-11",
+     "placed": null,
+     "aim": "Turn every lost mark into a method you now know.",
+     "points": [
+      "Mark the paper with the official mark scheme",
+      "Redo every wrong question without looking at the answer",
+      "Write each mistake and its fix in your error log"
+     ]
+    },
+    {
+     "title": "Key facts and final review",
+     "role": "final",
+     "minutes": 45,
+     "window": "2026-12-12 → 2026-12-12",
+     "placed": null,
+     "aim": "Go into the exam calm, with every formula and method fresh.",
+     "points": [
+      "Write a one-page sheet of key facts, definitions and common mistakes",
+      "Read through your error log",
+      "Do a few quick questions you know you can do"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "moratuwa-signals",
+   "area": "Lesser-known university course (Sri Lanka)",
+   "title": "EN2063 Signals and Systems, University of Moratuwa, whole module",
+   "preset": "course",
+   "dueInDays": 84,
+   "minutesPerDay": 90,
+   "level": "Second-year electronic and telecommunication engineering",
+   "due": "2027-02-05",
+   "seconds": 23.9,
+   "status": 200,
+   "error": null,
+   "stages": [
+    "Reading your week",
+    "Reading your week · 0 commitments",
+    "Planning EN2063 Signals and Systems, University of Moratuwa, whole mo",
+    "Mapping the course",
+    "Researching this syllabus for the first time",
+    "Read 8 sources",
+    "Double-checking the topics",
+    "Double-check agreed",
+    "12 topics from research, double-checked",
+    "Building your plan",
+    "32 sessions to Thu 4 Feb",
+    "Fitting 32 pieces of work into your free time",
+    "80 checks passed"
+   ],
+   "strategy": "12 topics in order, 7 reviews, 1 checkpoint test.",
+   "type": "general",
+   "questions": [],
+   "syllabus": {
+    "source": "model",
+    "researched": true,
+    "sources": [
+     {
+      "url": "https://tkmce.ac.in/uploads/syllabus/3745_Syllabus_EEE_2023_S3-S8.pdf",
+      "title": "<table><tr><td rowspan=\"2\">PATTERN 1</td><td>Marks: (2x10 =20 marks)</td><td>Each question carries 8 marks"
+     },
+     {
+      "url": "https://heritageit.edu/PDF/BTech_ECE_Syllabus_June2019.pdf",
+      "title": "1.1. Classification of Signals: Discrete and continuous signal, Periodic aperiodic, even – odd, energy and power signals, determ..."
+     },
+     {
+      "url": "https://eng.jfn.ac.lk/wp-content/uploads/curriculum/Syllabi_Special_Computer_Full_17E_and_above.pdf",
+      "title": "<table><tr><td>4. Discrete Fourier Transform and Discrete Time Fourier Transform<br>Discrete Fourier Transform and Discrete Time..."
+     },
+     {
+      "url": "https://neu.edu.tr/wp-content/uploads/2015/11/MODULE-HANDBOOK-BSc.pdf",
+      "title": "6  Solve problems, find solutions of the systems in time domain, z-domain and frequency domain"
+     },
+     {
+      "url": "https://bauet.ac.bd/wp-content/uploads/sites/9/2023/05/Syllabus-ICE-BAUET-3E-2022-09-26-UGC-exclude-top-page_2.pdf",
+      "title": "| W10 | L28  | Fourier Transform of standard signals    | 1,2    |"
+     },
+     {
+      "url": "https://sitttrkerala.ac.in/index.php?r=training%2Flearning-resources%2Flink&id=176",
+      "title": "<table><tr><td>CO2</td><td colspan=\"3\">Classify and compare continuous time and discrete time systems</td></tr><tr><td>M2.01</td..."
+     }
+    ],
+    "name": "EN2063 Signals and Systems (UoM)",
+    "papers": [],
+    "units": [
+     {
+      "title": "Signal classification",
+      "points": [
+       "Distinguish continuous-time and discrete-time signals",
+       "Classify as periodic/aperiodic, even/odd, energy/power",
+       "Compute period, energy and average power of a signal",
+       "Test even/odd symmetry algebraically and graphically"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Elementary signals",
+      "points": [
+       "Sketch and express unit step, impulse, ramp and parabolic signals",
+       "Relate unit impulse to unit step by differentiation and integration",
+       "Use sifting property of the impulse in integrals",
+       "Recognise signum, rectangular, triangular and sinc functions",
+       "Express rectangular pulses as superpositions of steps"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Signal operations",
+      "points": [
+       "Time-shift, time-reverse and scale (including order of operations)",
+       "Add, multiply and combine signals graphically",
+       "Sample a continuous signal and relate it to its discrete version",
+       "Apply operations to build composite waveforms from elementary signals"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Systems and properties",
+      "points": [
+       "Classify systems as continuous/discrete, linear/nonlinear",
+       "Test time-invariance, causality, memory and invertibility",
+       "Test BIBO stability from the impulse response",
+       "Identify static vs dynamic and stable vs unstable systems"
+      ],
+      "weight": 2,
+      "difficulty": 1,
+      "confidence": null
+     },
+     {
+      "title": "LTI systems and convolution",
+      "points": [
+       "Find impulse response of systems described by equations or block diagrams",
+       "Compute continuous-time convolution integrals with graphs",
+       "Compute discrete-time convolution sums and tabulate results",
+       "Use convolution properties: commutativity, associativity, distribution",
+       "Convolve with shifted impulses using the sifting property"
+      ],
+      "weight": 3,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "LCCDE and system response",
+      "points": [
+       "Model systems with linear constant-coefficient difference/differential equations",
+       "Find zero-input (natural) and zero-state (forced) responses",
+       "Compute step and impulse responses of first and second order systems",
+       "Use block diagrams of adders, multipliers and delay/integrator elements"
+      ],
+      "weight": 2,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Fourier series",
+      "points": [
+       "Represent periodic signals by trigonometric and exponential Fourier series",
+       "Compute Fourier coefficients for standard waveforms",
+       "Apply Dirichlet conditions and symmetry to simplify coefficients",
+       "Relate series coefficients to power (Parseval) and line spectra"
+      ],
+      "weight": 3,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Fourier transform",
+      "points": [
+       "Derive the Fourier transform from the Fourier integral",
+       "Find transforms of standard signals: pulse, exponential, impulse, sinusoid",
+       "Apply linearity, time-shift, frequency-shift and scaling properties",
+       "Use duality, differentiation and convolution/multiplication theorems",
+       "Compute inverse transforms by partial fractions"
+      ],
+      "weight": 3,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Frequency response and filtering",
+      "points": [
+       "Relate impulse response and frequency response of an LTI system",
+       "Determine magnitude and phase response; plot Bode-style sketches",
+       "Compute output spectrum as product of input spectrum and H(jω)",
+       "Describe ideal low-pass, high-pass and band-pass filters",
+       "State conditions for distortionless transmission"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Sampling and reconstruction",
+      "points": [
+       "State and apply the Nyquist sampling theorem",
+       "Sketch spectra of sampled signals and identify aliasing",
+       "Reconstruct a bandlimited signal from its samples",
+       "Explain zero-order hold and ideal interpolation"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Laplace transform and CT systems",
+      "points": [
+       "Find Laplace transforms and inverse transforms via partial fractions",
+       "Determine region of convergence and relate it to causality",
+       "Solve differential equations and initial-value problems by Laplace methods",
+       "Use the s-domain transfer function and assess stability from poles"
+      ],
+      "weight": 3,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Z-transform and DT systems",
+      "points": [
+       "Find Z-transforms of standard sequences and their ROCs",
+       "Apply shift, scaling and convolution properties of the Z-transform",
+       "Invert via partial fractions and long division",
+       "Solve difference equations with the Z-transform",
+       "Relate pole positions to stability and causality; map s-plane to z-plane"
+      ],
+      "weight": 3,
+      "difficulty": 3,
+      "confidence": null
+     }
+    ]
+   },
+   "constraints": [
+    {
+     "key": "cap:g_bff0834dbf56",
+     "goal": "g_bff0834dbf56",
+     "hard": true,
+     "kind": "goal_cap",
+     "label": "At most 1 h 30 m a day for EN2063 Signals and Systems, University…",
+     "weight": 3,
+     "minutes": 90,
+     "provenance": "student"
+    }
+   ],
+   "verification": {
+    "pass": true,
+    "quality": 100,
+    "critics": [
+     "realism 100: Every day is within what you usually sustain.",
+     "exam_prep 100: No exams in view.",
+     "front_loading 100: Deadline work finishes with room to spare.",
+     "interleaving 100: Practice is mixed across subjects.",
+     "fragmentation 100: Sessions are a workable length.",
+     "neglect 100: Every active goal has time."
+    ]
+   },
+   "trace": {
+    "ms": 23912,
+    "errors": [],
+    "solver": {
+     "ms": 18,
+     "items": 32,
+     "placed": 6,
+     "iterations": 2
+    },
+    "tokens": {
+     "calls": 3,
+     "input": 6190,
+     "cached": 3712,
+     "output": 1548,
+     "servedModel": "deepseek-flash",
+     "firstTokenMs": [
+      981,
+      2210,
+      912
+     ]
+    }
+   },
+   "plan": {
+    "items": 32,
+    "placed": 6,
+    "laterWeeks": 10,
+    "unplaced": 0,
+    "first": "2026-11-13",
+    "last": "2027-02-04"
+   },
+   "sessions": [
+    {
+     "title": "Signal classification study",
+     "role": "learn",
+     "minutes": 45,
+     "window": "2026-11-13 → 2026-11-20",
+     "placed": "2026-11-13",
+     "aim": "Understand Signal classification well enough to explain it and do the standard questions.",
+     "points": [
+      "Distinguish continuous-time and discrete-time signals",
+      "Classify as periodic/aperiodic, even/odd, energy/power",
+      "Compute period, energy and average power of a signal"
+     ]
+    },
+    {
+     "title": "Signal classification practice questions",
+     "role": "practise",
+     "minutes": 45,
+     "window": "2026-11-13 → 2026-11-20",
+     "placed": "2026-11-13",
+     "aim": "Get confident with Signal classification questions.",
+     "points": [
+      "Distinguish continuous-time and discrete-time signals",
+      "Classify as periodic/aperiodic, even/odd, energy/power",
+      "Compute period, energy and average power of a signal"
+     ]
+    },
+    {
+     "title": "Elementary signals study",
+     "role": "learn",
+     "minutes": 45,
+     "window": "2026-11-19 → 2026-11-26",
+     "placed": "2026-11-19",
+     "aim": "Understand Elementary signals well enough to explain it and do the standard questions.",
+     "points": [
+      "Sketch and express unit step, impulse, ramp and parabolic signals",
+      "Relate unit impulse to unit step by differentiation and integration",
+      "Use sifting property of the impulse in integrals"
+     ]
+    },
+    {
+     "title": "Elementary signals practice questions",
+     "role": "practise",
+     "minutes": 45,
+     "window": "2026-11-19 → 2026-11-26",
+     "placed": "2026-11-19",
+     "aim": "Get confident with Elementary signals questions.",
+     "points": [
+      "Sketch and express unit step, impulse, ramp and parabolic signals",
+      "Relate unit impulse to unit step by differentiation and integration",
+      "Use sifting property of the impulse in integrals"
+     ]
+    },
+    {
+     "title": "Signal operations study",
+     "role": "learn",
+     "minutes": 45,
+     "window": "2026-11-25 → 2026-12-03",
+     "placed": "2026-11-25",
+     "aim": "Understand Signal operations well enough to explain it and do the standard questions.",
+     "points": [
+      "Time-shift, time-reverse and scale (including order of operations)",
+      "Add, multiply and combine signals graphically",
+      "Sample a continuous signal and relate it to its discrete version"
+     ]
+    },
+    {
+     "title": "Signal operations practice questions",
+     "role": "practise",
+     "minutes": 45,
+     "window": "2026-11-25 → 2026-12-03",
+     "placed": "2026-11-25",
+     "aim": "Get confident with Signal operations questions.",
+     "points": [
+      "Time-shift, time-reverse and scale (including order of operations)",
+      "Add, multiply and combine signals graphically",
+      "Sample a continuous signal and relate it to its discrete version"
+     ]
+    },
+    {
+     "title": "Systems and properties study",
+     "role": "learn",
+     "minutes": 45,
+     "window": "2026-12-02 → 2026-12-09",
+     "placed": null,
+     "aim": "Understand Systems and properties well enough to explain it and do the standard questions.",
+     "points": [
+      "Classify systems as continuous/discrete, linear/nonlinear",
+      "Test time-invariance, causality, memory and invertibility",
+      "Test BIBO stability from the impulse response"
+     ]
+    },
+    {
+     "title": "Systems and properties practice questions",
+     "role": "practise",
+     "minutes": 45,
+     "window": "2026-12-02 → 2026-12-09",
+     "placed": null,
+     "aim": "Get confident with Systems and properties questions.",
+     "points": [
+      "Classify systems as continuous/discrete, linear/nonlinear",
+      "Test time-invariance, causality, memory and invertibility",
+      "Test BIBO stability from the impulse response"
+     ]
+    },
+    {
+     "title": "LTI systems and convolution study",
+     "role": "learn",
+     "minutes": 45,
+     "window": "2026-12-08 → 2026-12-16",
+     "placed": null,
+     "aim": "Understand LTI systems and convolution well enough to explain it and do the standard questions.",
+     "points": [
+      "Find impulse response of systems described by equations or block diagrams",
+      "Compute continuous-time convolution integrals with graphs",
+      "Compute discrete-time convolution sums and tabulate results"
+     ]
+    },
+    {
+     "title": "LTI systems and convolution practice questions",
+     "role": "practise",
+     "minutes": 45,
+     "window": "2026-12-08 → 2026-12-16",
+     "placed": null,
+     "aim": "Get confident with LTI systems and convolution questions.",
+     "points": [
+      "Find impulse response of systems described by equations or block diagrams",
+      "Compute continuous-time convolution integrals with graphs",
+      "Compute discrete-time convolution sums and tabulate results"
+     ]
+    },
+    {
+     "title": "LCCDE and system response study",
+     "role": "learn",
+     "minutes": 45,
+     "window": "2026-12-15 → 2026-12-23",
+     "placed": null,
+     "aim": "Understand LCCDE and system response well enough to explain it and do the standard questions.",
+     "points": [
+      "Model systems with linear constant-coefficient difference/differential equations",
+      "Find zero-input (natural) and zero-state (forced) responses",
+      "Compute step and impulse responses of first and second order systems"
+     ]
+    },
+    {
+     "title": "LCCDE and system response practice questions",
+     "role": "practise",
+     "minutes": 45,
+     "window": "2026-12-15 → 2026-12-23",
+     "placed": null,
+     "aim": "Get confident with LCCDE and system response questions.",
+     "points": [
+      "Model systems with linear constant-coefficient difference/differential equations",
+      "Find zero-input (natural) and zero-state (forced) responses",
+      "Compute step and impulse responses of first and second order systems"
+     ]
+    },
+    {
+     "title": "Fourier series study",
+     "role": "learn",
+     "minutes": 45,
+     "window": "2026-12-22 → 2026-12-30",
+     "placed": null,
+     "aim": "Understand Fourier series well enough to explain it and do the standard questions.",
+     "points": [
+      "Represent periodic signals by trigonometric and exponential Fourier series",
+      "Compute Fourier coefficients for standard waveforms",
+      "Apply Dirichlet conditions and symmetry to simplify coefficients"
+     ]
+    },
+    {
+     "title": "Fourier series practice questions",
+     "role": "practise",
+     "minutes": 45,
+     "window": "2026-12-22 → 2026-12-30",
+     "placed": null,
+     "aim": "Get confident with Fourier series questions.",
+     "points": [
+      "Represent periodic signals by trigonometric and exponential Fourier series",
+      "Compute Fourier coefficients for standard waveforms",
+      "Apply Dirichlet conditions and symmetry to simplify coefficients"
+     ]
+    },
+    {
+     "title": "Fourier transform study",
+     "role": "learn",
+     "minutes": 45,
+     "window": "2026-12-29 → 2027-01-07",
+     "placed": null,
+     "aim": "Understand Fourier transform well enough to explain it and do the standard questions.",
+     "points": [
+      "Derive the Fourier transform from the Fourier integral",
+      "Find transforms of standard signals: pulse, exponential, impulse, sinusoid",
+      "Apply linearity, time-shift, frequency-shift and scaling properties"
+     ]
+    },
+    {
+     "title": "Fourier transform practice questions",
+     "role": "practise",
+     "minutes": 45,
+     "window": "2026-12-29 → 2027-01-07",
+     "placed": null,
+     "aim": "Get confident with Fourier transform questions.",
+     "points": [
+      "Derive the Fourier transform from the Fourier integral",
+      "Find transforms of standard signals: pulse, exponential, impulse, sinusoid",
+      "Apply linearity, time-shift, frequency-shift and scaling properties"
+     ]
+    },
+    {
+     "title": "Frequency response and filtering study",
+     "role": "learn",
+     "minutes": 45,
+     "window": "2027-01-06 → 2027-01-14",
+     "placed": null,
+     "aim": "Understand Frequency response and filtering well enough to explain it and do the standard questions.",
+     "points": [
+      "Relate impulse response and frequency response of an LTI system",
+      "Determine magnitude and phase response; plot Bode-style sketches",
+      "Compute output spectrum as product of input spectrum and H(jω)"
+     ]
+    },
+    {
+     "title": "Frequency response and filtering practice questions",
+     "role": "practise",
+     "minutes": 45,
+     "window": "2027-01-06 → 2027-01-14",
+     "placed": null,
+     "aim": "Get confident with Frequency response and filtering questions.",
+     "points": [
+      "Relate impulse response and frequency response of an LTI system",
+      "Determine magnitude and phase response; plot Bode-style sketches",
+      "Compute output spectrum as product of input spectrum and H(jω)"
+     ]
+    },
+    {
+     "title": "Sampling and reconstruction study",
+     "role": "learn",
+     "minutes": 45,
+     "window": "2027-01-13 → 2027-01-20",
+     "placed": null,
+     "aim": "Understand Sampling and reconstruction well enough to explain it and do the standard questions.",
+     "points": [
+      "State and apply the Nyquist sampling theorem",
+      "Sketch spectra of sampled signals and identify aliasing",
+      "Reconstruct a bandlimited signal from its samples"
+     ]
+    },
+    {
+     "title": "Sampling and reconstruction practice questions",
+     "role": "practise",
+     "minutes": 45,
+     "window": "2027-01-13 → 2027-01-20",
+     "placed": null,
+     "aim": "Get confident with Sampling and reconstruction questions.",
+     "points": [
+      "State and apply the Nyquist sampling theorem",
+      "Sketch spectra of sampled signals and identify aliasing",
+      "Reconstruct a bandlimited signal from its samples"
+     ]
+    },
+    {
+     "title": "Laplace transform and CT systems study",
+     "role": "learn",
+     "minutes": 45,
+     "window": "2027-01-19 → 2027-01-28",
+     "placed": null,
+     "aim": "Understand Laplace transform and CT systems well enough to explain it and do the standard questions.",
+     "points": [
+      "Find Laplace transforms and inverse transforms via partial fractions",
+      "Determine region of convergence and relate it to causality",
+      "Solve differential equations and initial-value problems by Laplace methods"
+     ]
+    },
+    {
+     "title": "Laplace transform and CT systems practice questions",
+     "role": "practise",
+     "minutes": 45,
+     "window": "2027-01-19 → 2027-01-28",
+     "placed": null,
+     "aim": "Get confident with Laplace transform and CT systems questions.",
+     "points": [
+      "Find Laplace transforms and inverse transforms via partial fractions",
+      "Determine region of convergence and relate it to causality",
+      "Solve differential equations and initial-value problems by Laplace methods"
+     ]
+    },
+    {
+     "title": "Z-transform and DT systems study",
+     "role": "learn",
+     "minutes": 45,
+     "window": "2027-01-27 → 2027-02-03",
+     "placed": null,
+     "aim": "Understand Z-transform and DT systems well enough to explain it and do the standard questions.",
+     "points": [
+      "Find Z-transforms of standard sequences and their ROCs",
+      "Apply shift, scaling and convolution properties of the Z-transform",
+      "Invert via partial fractions and long division"
+     ]
+    },
+    {
+     "title": "Z-transform and DT systems practice questions",
+     "role": "practise",
+     "minutes": 45,
+     "window": "2027-01-27 → 2027-02-03",
+     "placed": null,
+     "aim": "Get confident with Z-transform and DT systems questions.",
+     "points": [
+      "Find Z-transforms of standard sequences and their ROCs",
+      "Apply shift, scaling and convolution properties of the Z-transform",
+      "Invert via partial fractions and long division"
+     ]
+    },
+    {
+     "title": "Mixed review: Signal classification to Signal operations",
+     "role": "mixed",
+     "minutes": 45,
+     "window": "2026-12-04 → 2026-12-07",
+     "placed": null,
+     "aim": "Recall Signal classification, Elementary signals and Signal operations after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Signal classification: Distinguish continuous-time and discrete-time signals",
+      "Signal classification: Classify as periodic/aperiodic, even/odd, energy/power",
+      "Elementary signals: Sketch and express unit step, impulse, ramp and parabolic signals"
+     ]
+    },
+    {
+     "title": "Recall check: Signal classification to Signal operations",
+     "role": "recall",
+     "minutes": 30,
+     "window": "2026-12-14 → 2026-12-17",
+     "placed": null,
+     "aim": "Pull Signal classification, Elementary signals and Signal operations back from memory after a gap.",
+     "points": [
+      "Signal classification: Distinguish continuous-time and discrete-time signals",
+      "Signal classification: Classify as periodic/aperiodic, even/odd, energy/power",
+      "Elementary signals: Sketch and express unit step, impulse, ramp and parabolic signals"
+     ]
+    },
+    {
+     "title": "Mixed review: 3 topics",
+     "role": "mixed",
+     "minutes": 45,
+     "window": "2026-12-24 → 2026-12-26",
+     "placed": null,
+     "aim": "Recall Systems and properties to LCCDE and system response after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Systems and properties: Classify systems as continuous/discrete, linear/nonlinear",
+      "Systems and properties: Test time-invariance, causality, memory and invertibility",
+      "LTI systems and convolution: Find impulse response of systems described by equations or block diagrams"
+     ]
+    },
+    {
+     "title": "Recall check: 3 topics",
+     "role": "recall",
+     "minutes": 30,
+     "window": "2027-01-02 → 2027-01-06",
+     "placed": null,
+     "aim": "Pull Systems and properties to LCCDE and system response back from memory after a gap.",
+     "points": [
+      "Systems and properties: Classify systems as continuous/discrete, linear/nonlinear",
+      "Systems and properties: Test time-invariance, causality, memory and invertibility",
+      "LTI systems and convolution: Find impulse response of systems described by equations or block diagrams"
+     ]
+    },
+    {
+     "title": "Checkpoint test: 6 topics",
+     "role": "checkpoint",
+     "minutes": 45,
+     "window": "2026-12-25 → 2026-12-28",
+     "placed": null,
+     "aim": "Test yourself on Signal classification to LCCDE and system response under timed conditions.",
+     "points": [
+      "Unseen, mixed questions",
+      "No notes, timed",
+      "Mark it honestly"
+     ]
+    },
+    {
+     "title": "Mixed review: 3 topics",
+     "role": "mixed",
+     "minutes": 45,
+     "window": "2027-01-15 → 2027-01-18",
+     "placed": null,
+     "aim": "Recall Fourier series, Fourier transform and Frequency response and filtering after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Fourier series: Represent periodic signals by trigonometric and exponential Fourier series",
+      "Fourier series: Compute Fourier coefficients for standard waveforms",
+      "Fourier transform: Derive the Fourier transform from the Fourier integral"
+     ]
+    },
+    {
+     "title": "Recall check: 3 topics",
+     "role": "recall",
+     "minutes": 30,
+     "window": "2027-01-25 → 2027-01-28",
+     "placed": null,
+     "aim": "Pull Fourier series, Fourier transform and Frequency response and filtering back from memory after a gap.",
+     "points": [
+      "Fourier series: Represent periodic signals by trigonometric and exponential Fourier series",
+      "Fourier series: Compute Fourier coefficients for standard waveforms",
+      "Fourier transform: Derive the Fourier transform from the Fourier integral"
+     ]
+    },
+    {
+     "title": "Recall check: 12 topics",
+     "role": "recall",
+     "minutes": 45,
+     "window": "2027-02-04 → 2027-02-04",
+     "placed": null,
+     "aim": "Pull Signal classification to Z-transform and DT systems back from memory after a gap.",
+     "points": [
+      "Signal classification: Distinguish continuous-time and discrete-time signals",
+      "Signal classification: Classify as periodic/aperiodic, even/odd, energy/power",
+      "Elementary signals: Sketch and express unit step, impulse, ramp and parabolic signals"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ap-us-history",
+   "area": "American high school, a whole year to the exam",
+   "title": "AP US History exam",
+   "preset": "course",
+   "due": "2027-05-07",
+   "minutesPerDay": 60,
+   "target": "5",
+   "seconds": 15.3,
+   "status": 200,
+   "error": null,
+   "stages": [
+    "Reading your week",
+    "Reading your week · 0 commitments",
+    "Planning AP US History exam",
+    "Mapping the course",
+    "Researching this syllabus for the first time",
+    "Read 8 sources",
+    "Double-checking the topics",
+    "Double-check made 3 corrections",
+    "13 topics from research, double-checked",
+    "Building your plan",
+    "52 sessions to Thu 6 May",
+    "Fitting 52 pieces of work into your free time",
+    "86 checks passed"
+   ],
+   "strategy": "13 topics in order, 10 reviews, 2 checkpoint tests, 6 timed papers.",
+   "type": "exam",
+   "questions": [],
+   "syllabus": {
+    "source": "model",
+    "researched": true,
+    "sources": [
+     {
+      "url": "https://apcentral.collegeboard.org/media/pdf/ap-us-history-course-and-exam-description.pdf?SFMC_cid=EM1029827-&rid=47066265",
+      "title": "CollegeBoard"
+     },
+     {
+      "url": "https://apstudents.collegeboard.org/courses/ap-united-states-history?ushist",
+      "title": "AP United States History"
+     },
+     {
+      "url": "https://sjisd.wednet.edu/site/handlers/filedownload.ashx?moduleinstanceid=4125&dataid=6933&FileName=APUSHSYLLABUS.pdf",
+      "title": "AP UNITED STATES HISTORY SYLLABUS"
+     },
+     {
+      "url": "https://acenet.edu/National-Guide/Pages/Course.aspx?cid=0bed899e-7180-ed11-81ad-00224805f697&oid=e7089b28-9016-e811-810f-5065f38bf0e1",
+      "title": "AP U.S. History - AP U"
+     },
+     {
+      "url": "https://hollandcsd.org/cms/lib/NY19000531/Centricity/Domain/126/APUSH%20new%20Syllabus.pdf",
+      "title": "AP US History Syllabus"
+     },
+     {
+      "url": "https://fortcherry.org/Downloads/AP_US_History_Syllabus.pdf",
+      "title": "AP® U.S. History: Sample Syllabus 3"
+     }
+    ],
+    "name": "AP U.S. History (College Board)",
+    "papers": [
+     {
+      "label": "Section I MCQs",
+      "marks": 55,
+      "minutes": 55
+     },
+     {
+      "label": "Section II FRQs",
+      "marks": 55,
+      "minutes": 55
+     }
+    ],
+    "units": [
+     {
+      "title": "Period 1: 1491–1607",
+      "points": [
+       "Describe Native American societies' diversity before European contact",
+       "Explain motives and technologies driving European exploration",
+       "Trace the Columbian Exchange's effects on Europe, Africa, Americas",
+       "Explain how encomienda and caste shaped Spanish colonial labor",
+       "Compare Spanish, French and Dutch interactions with Native peoples"
+      ],
+      "weight": 1,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Period 2: 1607–1754",
+      "points": [
+       "Compare Chesapeake, New England, middle and Spanish colonial development",
+       "Explain how labour systems moved from indentured servitude to racial slavery",
+       "Analyse transatlantic trade, mercantilism and colonial economy",
+       "Describe Native–European conflicts such as Metacom's and Pueblo revolts",
+       "Explain how Anglicisation shaped colonial society and politics by 1754"
+      ],
+      "weight": 1,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Period 3: 1754–1800",
+      "points": [
+       "Explain how the Seven Years' War reshaped British colonial policy",
+       "Analyse the ideological and economic causes of the Revolution",
+       "Compare the Articles of Confederation with the Constitution",
+       "Explain the ratification debate and the Bill of Rights",
+       "Describe the Federalist era, party formation and early foreign policy"
+      ],
+      "weight": 2,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Period 4: 1800–1848",
+      "points": [
+       "Trace the rise of the first and second party systems",
+       "Explain market revolution changes in transport, industry and agriculture",
+       "Analyse Marshall Court and states' rights debates over federal power",
+       "Describe the Second Great Awakening and reform movements",
+       "Explain the experiences of enslaved and free African Americans in this era"
+      ],
+      "weight": 2,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Period 5: 1844–1877",
+      "points": [
+       "Explain Manifest Destiny and the Mexican–American War's territorial gains",
+       "Compare the Compromise of 1850, Kansas–Nebraska Act and Dred Scott case",
+       "Explain how the 1860 election led to Southern secession",
+       "Analyse the Civil War's turning points and home-front changes",
+       "Evaluate Reconstruction amendments, Radical Reconstruction and its collapse"
+      ],
+      "weight": 2,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Period 5: Reconstruction (continued)",
+      "points": [
+       "Explain the constitutional amendments that ended slavery and redefined citizenship and vo…",
+       "Describe federal Reconstruction policies and their contested enforcement",
+       "Analyse African Americans' political participation and its rollback",
+       "Explain the Compromise of 1877 and Reconstruction's end"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Period 6: 1865–1898",
+      "points": [
+       "Explain westward settlement, the Homestead Act and Indian Wars",
+       "Describe the 'New South' and sharecropping's limits on Black autonomy",
+       "Analyse industrial capitalism, trusts, railroads and labour conflict",
+       "Explain new immigration patterns and urbanisation",
+       "Compare Populist, agrarian and social reform responses to inequality"
+      ],
+      "weight": 2,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Period 7: 1890–1945",
+      "points": [
+       "Compare arguments for and against US imperialism",
+       "Explain Progressive reform at municipal, state and national levels",
+       "Analyse US neutrality and entry into World War I and its aftermath",
+       "Explain 1920s consumer culture, mass media and cultural conflict",
+       "Evaluate the Great Depression's causes and New Deal responses",
+       "Assess US entry into World War II and its mobilisation and diplomacy"
+      ],
+      "weight": 2,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Period 7",
+      "points": [
+       "Explain the causes and effects of the Great Depression",
+       "Analyse the New Deal's response and its critics",
+       "Explain US neutrality and entry into World War II",
+       "Assess the war's impact on the home front and postwar diplomacy"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Period 8: 1945–1980",
+      "points": [
+       "Explain containment, Cold War alliances and the Red Scare",
+       "Analyse postwar economic growth, suburbs and conformity",
+       "Evaluate the African American civil rights movement's strategies and victories",
+       "Explain the Vietnam War's escalation, opposition and legacy",
+       "Compare Great Society programmes and liberal-conservative debates",
+       "Describe 1960s youth culture, women's and other rights movements"
+      ],
+      "weight": 2,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Period 9: 1980 to the present",
+      "points": [
+       "Explain Reagan's conservatism and shifts in economic policy",
+       "Describe the Cold War's end and post-Cold War US foreign policy",
+       "Analyse technology, globalisation and inequality in the new economy",
+       "Explain post-1980 migration and demographic change",
+       "Describe debates over terrorism, civil liberties and 21st-century challenges"
+      ],
+      "weight": 1,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Exam skills: MCQ and SAQ",
+      "points": [
+       "Apply the seven themes and reasoning skills to stimulus-based MCQs",
+       "Analyse maps, charts, images and primary texts under time pressure",
+       "Write SAQs that answer both parts with specific evidence",
+       "Explain causation, comparison and continuity versus change"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Exam skills: DBQ and LEQ",
+      "points": [
+       "Write a defensible thesis taking a clear position",
+       "Contextualise and group documents to support an argument",
+       "Source documents by point of view, purpose, situation and audience",
+       "Use targeted outside evidence beyond the documents",
+       "Plan and write a five-paragraph essay in 40 minutes"
+      ],
+      "weight": 2,
+      "difficulty": 3,
+      "confidence": null
+     }
+    ]
+   },
+   "constraints": [
+    {
+     "key": "cap:g_5f9ce89bac0b",
+     "goal": "g_5f9ce89bac0b",
+     "hard": true,
+     "kind": "goal_cap",
+     "label": "At most 1 h a day for AP US History exam",
+     "weight": 3,
+     "minutes": 60,
+     "provenance": "student"
+    }
+   ],
+   "verification": {
+    "pass": true,
+    "quality": 88,
+    "critics": [
+     "realism 100: Every day is within what you usually sustain.",
+     "exam_prep 50: fewer than two spaced retrieval sessions; no light review on Thu 6 May",
+     "front_loading 100: Deadline work finishes with room to spare.",
+     "interleaving 100: Practice is mixed across subjects.",
+     "fragmentation 100: Sessions are a workable length.",
+     "neglect 100: Every active goal has time."
+    ]
+   },
+   "trace": {
+    "ms": 15278,
+    "errors": [],
+    "solver": {
+     "ms": 28,
+     "items": 52,
+     "placed": 4,
+     "iterations": 2
+    },
+    "tokens": {
+     "calls": 3,
+     "input": 7466,
+     "cached": 4224,
+     "output": 1954,
+     "servedModel": "deepseek-flash",
+     "firstTokenMs": [
+      706,
+      1313,
+      1180
+     ]
+    }
+   },
+   "plan": {
+    "items": 52,
+    "placed": 4,
+    "laterWeeks": 17,
+    "unplaced": 0,
+    "first": "2026-11-13",
+    "last": "2027-05-06"
+   },
+   "sessions": [
+    {
+     "title": "Period 1: 1491–1607 study",
+     "role": "learn",
+     "minutes": 60,
+     "window": "2026-11-13 → 2026-11-24",
+     "placed": "2026-11-13",
+     "aim": "Understand Period 1: 1491–1607 well enough to explain it and do the standard questions.",
+     "points": [
+      "Describe Native American societies' diversity before European contact",
+      "Explain motives and technologies driving European exploration",
+      "Trace the Columbian Exchange's effects on Europe, Africa, Americas"
+     ]
+    },
+    {
+     "title": "Period 1: 1491–1607 practice questions",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-11-13 → 2026-11-24",
+     "placed": "2026-11-14",
+     "aim": "Get confident with Period 1: 1491–1607 questions.",
+     "points": [
+      "Describe Native American societies' diversity before European contact",
+      "Explain motives and technologies driving European exploration",
+      "Trace the Columbian Exchange's effects on Europe, Africa, Americas"
+     ]
+    },
+    {
+     "title": "Period 2: 1607–1754 study",
+     "role": "learn",
+     "minutes": 60,
+     "window": "2026-11-23 → 2026-12-04",
+     "placed": "2026-11-23",
+     "aim": "Understand Period 2: 1607–1754 well enough to explain it and do the standard questions.",
+     "points": [
+      "Compare Chesapeake, New England, middle and Spanish colonial development",
+      "Explain how labour systems moved from indentured servitude to racial slavery",
+      "Analyse transatlantic trade, mercantilism and colonial economy"
+     ]
+    },
+    {
+     "title": "Period 2: 1607–1754 practice questions",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-11-23 → 2026-12-04",
+     "placed": "2026-11-24",
+     "aim": "Get confident with Period 2: 1607–1754 questions.",
+     "points": [
+      "Compare Chesapeake, New England, middle and Spanish colonial development",
+      "Explain how labour systems moved from indentured servitude to racial slavery",
+      "Analyse transatlantic trade, mercantilism and colonial economy"
+     ]
+    },
+    {
+     "title": "Period 3: 1754–1800 study",
+     "role": "learn",
+     "minutes": 60,
+     "window": "2026-12-03 → 2026-12-17",
+     "placed": null,
+     "aim": "Understand Period 3: 1754–1800 well enough to explain it and do the standard questions.",
+     "points": [
+      "Explain how the Seven Years' War reshaped British colonial policy",
+      "Analyse the ideological and economic causes of the Revolution",
+      "Compare the Articles of Confederation with the Constitution"
+     ]
+    },
+    {
+     "title": "Period 3: 1754–1800 practice questions",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-12-03 → 2026-12-17",
+     "placed": null,
+     "aim": "Get confident with Period 3: 1754–1800 questions.",
+     "points": [
+      "Explain how the Seven Years' War reshaped British colonial policy",
+      "Analyse the ideological and economic causes of the Revolution",
+      "Compare the Articles of Confederation with the Constitution"
+     ]
+    },
+    {
+     "title": "Period 4: 1800–1848 study",
+     "role": "learn",
+     "minutes": 60,
+     "window": "2026-12-16 → 2026-12-30",
+     "placed": null,
+     "aim": "Understand Period 4: 1800–1848 well enough to explain it and do the standard questions.",
+     "points": [
+      "Trace the rise of the first and second party systems",
+      "Explain market revolution changes in transport, industry and agriculture",
+      "Analyse Marshall Court and states' rights debates over federal power"
+     ]
+    },
+    {
+     "title": "Period 4: 1800–1848 practice questions",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-12-16 → 2026-12-30",
+     "placed": null,
+     "aim": "Get confident with Period 4: 1800–1848 questions.",
+     "points": [
+      "Trace the rise of the first and second party systems",
+      "Explain market revolution changes in transport, industry and agriculture",
+      "Analyse Marshall Court and states' rights debates over federal power"
+     ]
+    },
+    {
+     "title": "Period 5: 1844–1877 study",
+     "role": "learn",
+     "minutes": 60,
+     "window": "2026-12-29 → 2027-01-12",
+     "placed": null,
+     "aim": "Understand Period 5: 1844–1877 well enough to explain it and do the standard questions.",
+     "points": [
+      "Explain Manifest Destiny and the Mexican–American War's territorial gains",
+      "Compare the Compromise of 1850, Kansas–Nebraska Act and Dred Scott case",
+      "Explain how the 1860 election led to Southern secession"
+     ]
+    },
+    {
+     "title": "Period 5: 1844–1877 practice questions",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-12-29 → 2027-01-12",
+     "placed": null,
+     "aim": "Get confident with Period 5: 1844–1877 questions.",
+     "points": [
+      "Explain Manifest Destiny and the Mexican–American War's territorial gains",
+      "Compare the Compromise of 1850, Kansas–Nebraska Act and Dred Scott case",
+      "Explain how the 1860 election led to Southern secession"
+     ]
+    },
+    {
+     "title": "Period 5: Reconstruction (continued) study",
+     "role": "learn",
+     "minutes": 60,
+     "window": "2027-01-11 → 2027-01-23",
+     "placed": null,
+     "aim": "Understand Period 5: Reconstruction (continued) well enough to explain it and do the standard questions.",
+     "points": [
+      "Explain the constitutional amendments that ended slavery and redefined citizenship and vo…",
+      "Describe federal Reconstruction policies and their contested enforcement",
+      "Analyse African Americans' political participation and its rollback"
+     ]
+    },
+    {
+     "title": "Period 5: Reconstruction (continued) practice questions",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-01-11 → 2027-01-23",
+     "placed": null,
+     "aim": "Get confident with Period 5: Reconstruction (continued) questions.",
+     "points": [
+      "Explain the constitutional amendments that ended slavery and redefined citizenship and vo…",
+      "Describe federal Reconstruction policies and their contested enforcement",
+      "Analyse African Americans' political participation and its rollback"
+     ]
+    },
+    {
+     "title": "Period 6: 1865–1898 study",
+     "role": "learn",
+     "minutes": 60,
+     "window": "2027-01-22 → 2027-02-05",
+     "placed": null,
+     "aim": "Understand Period 6: 1865–1898 well enough to explain it and do the standard questions.",
+     "points": [
+      "Explain westward settlement, the Homestead Act and Indian Wars",
+      "Describe the 'New South' and sharecropping's limits on Black autonomy",
+      "Analyse industrial capitalism, trusts, railroads and labour conflict"
+     ]
+    },
+    {
+     "title": "Period 6: 1865–1898 practice questions",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-01-22 → 2027-02-05",
+     "placed": null,
+     "aim": "Get confident with Period 6: 1865–1898 questions.",
+     "points": [
+      "Explain westward settlement, the Homestead Act and Indian Wars",
+      "Describe the 'New South' and sharecropping's limits on Black autonomy",
+      "Analyse industrial capitalism, trusts, railroads and labour conflict"
+     ]
+    },
+    {
+     "title": "Period 7: 1890–1945 study",
+     "role": "learn",
+     "minutes": 60,
+     "window": "2027-02-04 → 2027-02-18",
+     "placed": null,
+     "aim": "Understand Period 7: 1890–1945 well enough to explain it and do the standard questions.",
+     "points": [
+      "Compare arguments for and against US imperialism",
+      "Explain Progressive reform at municipal, state and national levels",
+      "Analyse US neutrality and entry into World War I and its aftermath"
+     ]
+    },
+    {
+     "title": "Period 7: 1890–1945 practice questions",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-02-04 → 2027-02-18",
+     "placed": null,
+     "aim": "Get confident with Period 7: 1890–1945 questions.",
+     "points": [
+      "Compare arguments for and against US imperialism",
+      "Explain Progressive reform at municipal, state and national levels",
+      "Analyse US neutrality and entry into World War I and its aftermath"
+     ]
+    },
+    {
+     "title": "Period 7 study",
+     "role": "learn",
+     "minutes": 60,
+     "window": "2027-02-17 → 2027-03-03",
+     "placed": null,
+     "aim": "Understand Period 7 well enough to explain it and do the standard questions.",
+     "points": [
+      "Explain the causes and effects of the Great Depression",
+      "Analyse the New Deal's response and its critics",
+      "Explain US neutrality and entry into World War II"
+     ]
+    },
+    {
+     "title": "Period 7 practice questions",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-02-17 → 2027-03-03",
+     "placed": null,
+     "aim": "Get confident with Period 7 questions.",
+     "points": [
+      "Explain the causes and effects of the Great Depression",
+      "Analyse the New Deal's response and its critics",
+      "Explain US neutrality and entry into World War II"
+     ]
+    },
+    {
+     "title": "Period 8: 1945–1980 study",
+     "role": "learn",
+     "minutes": 60,
+     "window": "2027-03-02 → 2027-03-16",
+     "placed": null,
+     "aim": "Understand Period 8: 1945–1980 well enough to explain it and do the standard questions.",
+     "points": [
+      "Explain containment, Cold War alliances and the Red Scare",
+      "Analyse postwar economic growth, suburbs and conformity",
+      "Evaluate the African American civil rights movement's strategies and victories"
+     ]
+    },
+    {
+     "title": "Period 8: 1945–1980 practice questions",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-03-02 → 2027-03-16",
+     "placed": null,
+     "aim": "Get confident with Period 8: 1945–1980 questions.",
+     "points": [
+      "Explain containment, Cold War alliances and the Red Scare",
+      "Analyse postwar economic growth, suburbs and conformity",
+      "Evaluate the African American civil rights movement's strategies and victories"
+     ]
+    },
+    {
+     "title": "Period 9: 1980 to the present study",
+     "role": "learn",
+     "minutes": 60,
+     "window": "2027-03-15 → 2027-03-25",
+     "placed": null,
+     "aim": "Understand Period 9: 1980 to the present well enough to explain it and do the standard questions.",
+     "points": [
+      "Explain Reagan's conservatism and shifts in economic policy",
+      "Describe the Cold War's end and post-Cold War US foreign policy",
+      "Analyse technology, globalisation and inequality in the new economy"
+     ]
+    },
+    {
+     "title": "Period 9: 1980 to the present practice questions",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-03-15 → 2027-03-25",
+     "placed": null,
+     "aim": "Get confident with Period 9: 1980 to the present questions.",
+     "points": [
+      "Explain Reagan's conservatism and shifts in economic policy",
+      "Describe the Cold War's end and post-Cold War US foreign policy",
+      "Analyse technology, globalisation and inequality in the new economy"
+     ]
+    },
+    {
+     "title": "Exam skills: MCQ and SAQ study",
+     "role": "learn",
+     "minutes": 60,
+     "window": "2027-03-24 → 2027-04-06",
+     "placed": null,
+     "aim": "Understand Exam skills: MCQ and SAQ well enough to explain it and do the standard questions.",
+     "points": [
+      "Apply the seven themes and reasoning skills to stimulus-based MCQs",
+      "Analyse maps, charts, images and primary texts under time pressure",
+      "Write SAQs that answer both parts with specific evidence"
+     ]
+    },
+    {
+     "title": "Exam skills: MCQ and SAQ practice questions",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-03-24 → 2027-04-06",
+     "placed": null,
+     "aim": "Get confident with Exam skills: MCQ and SAQ questions.",
+     "points": [
+      "Apply the seven themes and reasoning skills to stimulus-based MCQs",
+      "Analyse maps, charts, images and primary texts under time pressure",
+      "Write SAQs that answer both parts with specific evidence"
+     ]
+    },
+    {
+     "title": "Exam skills: DBQ and LEQ study",
+     "role": "learn",
+     "minutes": 60,
+     "window": "2027-04-05 → 2027-04-17",
+     "placed": null,
+     "aim": "Understand Exam skills: DBQ and LEQ well enough to explain it and do the standard questions.",
+     "points": [
+      "Write a defensible thesis taking a clear position",
+      "Contextualise and group documents to support an argument",
+      "Source documents by point of view, purpose, situation and audience"
+     ]
+    },
+    {
+     "title": "Exam skills: DBQ and LEQ practice questions",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-04-05 → 2027-04-17",
+     "placed": null,
+     "aim": "Get confident with Exam skills: DBQ and LEQ questions.",
+     "points": [
+      "Write a defensible thesis taking a clear position",
+      "Contextualise and group documents to support an argument",
+      "Source documents by point of view, purpose, situation and audience"
+     ]
+    },
+    {
+     "title": "Mixed review: Period 1: 1491–1607 to Period 3: 1754–1800",
+     "role": "mixed",
+     "minutes": 30,
+     "window": "2026-12-18 → 2026-12-21",
+     "placed": null,
+     "aim": "Recall Period 1: 1491–1607, Period 2: 1607–1754 and Period 3: 1754–1800 after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Period 1: 1491–1607: Describe Native American societies' diversity before European contact",
+      "Period 1: 1491–1607: Explain motives and technologies driving European exploration",
+      "Period 2: 1607–1754: Compare Chesapeake, New England, middle and Spanish colonial development"
+     ]
+    },
+    {
+     "title": "Recall check: Period 1: 1491–1607 to Period 3: 1754–1800",
+     "role": "recall",
+     "minutes": 30,
+     "window": "2026-12-28 → 2026-12-31",
+     "placed": null,
+     "aim": "Pull Period 1: 1491–1607, Period 2: 1607–1754 and Period 3: 1754–1800 back from memory after a gap.",
+     "points": [
+      "Period 1: 1491–1607: Describe Native American societies' diversity before European contact",
+      "Period 1: 1491–1607: Explain motives and technologies driving European exploration",
+      "Period 2: 1607–1754: Compare Chesapeake, New England, middle and Spanish colonial development"
+     ]
+    },
+    {
+     "title": "Mixed review: 3 topics",
+     "role": "mixed",
+     "minutes": 30,
+     "window": "2027-01-25 → 2027-01-27",
+     "placed": null,
+     "aim": "Recall Period 4: 1800–1848 to Period 5: Reconstruction (continued) after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Period 4: 1800–1848: Trace the rise of the first and second party systems",
+      "Period 4: 1800–1848: Explain market revolution changes in transport, industry and agriculture",
+      "Period 5: 1844–1877: Explain Manifest Destiny and the Mexican–American War's territorial gains"
+     ]
+    },
+    {
+     "title": "Recall check: 3 topics",
+     "role": "recall",
+     "minutes": 30,
+     "window": "2027-02-03 → 2027-02-06",
+     "placed": null,
+     "aim": "Pull Period 4: 1800–1848 to Period 5: Reconstruction (continued) back from memory after a gap.",
+     "points": [
+      "Period 4: 1800–1848: Trace the rise of the first and second party systems",
+      "Period 4: 1800–1848: Explain market revolution changes in transport, industry and agriculture",
+      "Period 5: 1844–1877: Explain Manifest Destiny and the Mexican–American War's territorial gains"
+     ]
+    },
+    {
+     "title": "Checkpoint test: 6 topics",
+     "role": "checkpoint",
+     "minutes": 30,
+     "window": "2027-01-26 → 2027-01-28",
+     "placed": null,
+     "aim": "Test yourself on Period 1: 1491–1607 to Period 5: Reconstruction (continued) under timed conditions.",
+     "points": [
+      "Unseen, mixed questions",
+      "No notes, timed",
+      "Mark it honestly"
+     ]
+    },
+    {
+     "title": "Mixed review: Period 6: 1865–1898 to Period 7",
+     "role": "mixed",
+     "minutes": 30,
+     "window": "2027-03-04 → 2027-03-06",
+     "placed": null,
+     "aim": "Recall Period 6: 1865–1898, Period 7: 1890–1945 and Period 7 after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Period 6: 1865–1898: Explain westward settlement, the Homestead Act and Indian Wars",
+      "Period 6: 1865–1898: Describe the 'New South' and sharecropping's limits on Black autonomy",
+      "Period 7: 1890–1945: Compare arguments for and against US imperialism"
+     ]
+    },
+    {
+     "title": "Recall check: Period 6: 1865–1898 to Period 7",
+     "role": "recall",
+     "minutes": 30,
+     "window": "2027-03-13 → 2027-03-17",
+     "placed": null,
+     "aim": "Pull Period 6: 1865–1898, Period 7: 1890–1945 and Period 7 back from memory after a gap.",
+     "points": [
+      "Period 6: 1865–1898: Explain westward settlement, the Homestead Act and Indian Wars",
+      "Period 6: 1865–1898: Describe the 'New South' and sharecropping's limits on Black autonomy",
+      "Period 7: 1890–1945: Compare arguments for and against US imperialism"
+     ]
+    },
+    {
+     "title": "Mixed review: 3 topics",
+     "role": "mixed",
+     "minutes": 30,
+     "window": "2027-04-07 → 2027-04-09",
+     "placed": null,
+     "aim": "Recall Period 8: 1945–1980, Period 9: 1980 to the present and Exam skills: MCQ and SAQ after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Period 8: 1945–1980: Explain containment, Cold War alliances and the Red Scare",
+      "Period 8: 1945–1980: Analyse postwar economic growth, suburbs and conformity",
+      "Period 9: 1980 to the present: Explain Reagan's conservatism and shifts in economic policy"
+     ]
+    },
+    {
+     "title": "Recall check: 3 topics",
+     "role": "recall",
+     "minutes": 30,
+     "window": "2027-04-16 → 2027-04-20",
+     "placed": null,
+     "aim": "Pull Period 8: 1945–1980, Period 9: 1980 to the present and Exam skills: MCQ and SAQ back from memory after a gap.",
+     "points": [
+      "Period 8: 1945–1980: Explain containment, Cold War alliances and the Red Scare",
+      "Period 8: 1945–1980: Analyse postwar economic growth, suburbs and conformity",
+      "Period 9: 1980 to the present: Explain Reagan's conservatism and shifts in economic policy"
+     ]
+    },
+    {
+     "title": "Checkpoint test: 6 topics",
+     "role": "checkpoint",
+     "minutes": 30,
+     "window": "2027-04-08 → 2027-04-10",
+     "placed": null,
+     "aim": "Test yourself on Period 6: 1865–1898 to Exam skills: MCQ and SAQ under timed conditions.",
+     "points": [
+      "Unseen, mixed questions",
+      "No notes, timed",
+      "Mark it honestly"
+     ]
+    },
+    {
+     "title": "Mixed review: Exam skills: DBQ and LEQ",
+     "role": "mixed",
+     "minutes": 30,
+     "window": "2027-04-20 → 2027-04-22",
+     "placed": null,
+     "aim": "Recall Exam skills: DBQ and LEQ after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Exam skills: DBQ and LEQ: Write a defensible thesis taking a clear position",
+      "Exam skills: DBQ and LEQ: Contextualise and group documents to support an argument"
+     ]
+    },
+    {
+     "title": "Exam skills: DBQ and LEQ recall check",
+     "role": "recall",
+     "minutes": 30,
+     "window": "2027-04-29 → 2027-05-03",
+     "placed": null,
+     "aim": "Pull Exam skills: DBQ and LEQ back from memory after a gap.",
+     "points": [
+      "Write a defensible thesis taking a clear position",
+      "Contextualise and group documents to support an argument"
+     ]
+    },
+    {
+     "title": "Section I MCQs timed past paper",
+     "role": "paper",
+     "minutes": 60,
+     "window": "2027-04-19 → 2027-04-20",
+     "placed": null,
+     "aim": "Sit a full Section I MCQs in exam conditions: 55 m, 55 marks.",
+     "points": [
+      "Use a past paper you haven't seen before",
+      "Time it strictly and put your notes away",
+      "Show full working so you keep method marks"
+     ]
+    },
+    {
+     "title": "Past paper corrections",
+     "role": "corrections",
+     "minutes": 30,
+     "window": "2027-04-20 → 2027-04-21",
+     "placed": null,
+     "aim": "Turn every lost mark into a method you now know.",
+     "points": [
+      "Mark the paper with the official mark scheme",
+      "Redo every wrong question without looking at the answer",
+      "Write each mistake and its fix in your error log"
+     ]
+    },
+    {
+     "title": "Weak topics revision",
+     "role": "weak",
+     "minutes": 60,
+     "window": "2027-04-20 → 2027-04-22",
+     "placed": null,
+     "aim": "Close the gaps in the topics that lost you the most marks.",
+     "points": [
+      "The two topics that lost the most marks in your past paper",
+      "Your error log entries that came up more than once"
+     ]
+    },
+    {
+     "title": "Section II FRQs timed past paper 2",
+     "role": "paper",
+     "minutes": 60,
+     "window": "2027-04-21 → 2027-04-22",
+     "placed": null,
+     "aim": "Sit a full Section II FRQs in exam conditions: 55 m, 55 marks.",
+     "points": [
+      "Use a past paper you haven't seen before",
+      "Time it strictly and put your notes away",
+      "Show full working so you keep method marks"
+     ]
+    },
+    {
+     "title": "Past paper 2 corrections",
+     "role": "corrections",
+     "minutes": 30,
+     "window": "2027-04-22 → 2027-04-23",
+     "placed": null,
+     "aim": "Turn every lost mark into a method you now know.",
+     "points": [
+      "Mark the paper with the official mark scheme",
+      "Redo every wrong question without looking at the answer",
+      "Write each mistake and its fix in your error log"
+     ]
+    },
+    {
+     "title": "Section I MCQs timed past paper 3",
+     "role": "paper",
+     "minutes": 60,
+     "window": "2027-04-23 → 2027-04-24",
+     "placed": null,
+     "aim": "Sit a full Section I MCQs in exam conditions: 55 m, 55 marks.",
+     "points": [
+      "Use a past paper you haven't seen before",
+      "Time it strictly and put your notes away",
+      "Show full working so you keep method marks"
+     ]
+    },
+    {
+     "title": "Past paper 3 corrections",
+     "role": "corrections",
+     "minutes": 30,
+     "window": "2027-04-24 → 2027-04-26",
+     "placed": null,
+     "aim": "Turn every lost mark into a method you now know.",
+     "points": [
+      "Mark the paper with the official mark scheme",
+      "Redo every wrong question without looking at the answer",
+      "Write each mistake and its fix in your error log"
+     ]
+    },
+    {
+     "title": "Section II FRQs timed past paper 4",
+     "role": "paper",
+     "minutes": 60,
+     "window": "2027-04-26 → 2027-04-27",
+     "placed": null,
+     "aim": "Sit a full Section II FRQs in exam conditions: 55 m, 55 marks.",
+     "points": [
+      "Use a past paper you haven't seen before",
+      "Time it strictly and put your notes away",
+      "Show full working so you keep method marks"
+     ]
+    },
+    {
+     "title": "Past paper 4 corrections",
+     "role": "corrections",
+     "minutes": 30,
+     "window": "2027-04-27 → 2027-04-28",
+     "placed": null,
+     "aim": "Turn every lost mark into a method you now know.",
+     "points": [
+      "Mark the paper with the official mark scheme",
+      "Redo every wrong question without looking at the answer",
+      "Write each mistake and its fix in your error log"
+     ]
+    },
+    {
+     "title": "Section I MCQs timed past paper 5",
+     "role": "paper",
+     "minutes": 60,
+     "window": "2027-04-28 → 2027-04-29",
+     "placed": null,
+     "aim": "Sit a full Section I MCQs in exam conditions: 55 m, 55 marks.",
+     "points": [
+      "Use a past paper you haven't seen before",
+      "Time it strictly and put your notes away",
+      "Show full working so you keep method marks"
+     ]
+    },
+    {
+     "title": "Past paper 5 corrections",
+     "role": "corrections",
+     "minutes": 30,
+     "window": "2027-04-29 → 2027-04-30",
+     "placed": null,
+     "aim": "Turn every lost mark into a method you now know.",
+     "points": [
+      "Mark the paper with the official mark scheme",
+      "Redo every wrong question without looking at the answer",
+      "Write each mistake and its fix in your error log"
+     ]
+    },
+    {
+     "title": "Section II FRQs timed past paper 6",
+     "role": "paper",
+     "minutes": 60,
+     "window": "2027-04-30 → 2027-05-01",
+     "placed": null,
+     "aim": "Sit a full Section II FRQs in exam conditions: 55 m, 55 marks.",
+     "points": [
+      "Use a past paper you haven't seen before",
+      "Time it strictly and put your notes away",
+      "Show full working so you keep method marks"
+     ]
+    },
+    {
+     "title": "Past paper 6 corrections",
+     "role": "corrections",
+     "minutes": 30,
+     "window": "2027-05-01 → 2027-05-03",
+     "placed": null,
+     "aim": "Turn every lost mark into a method you now know.",
+     "points": [
+      "Mark the paper with the official mark scheme",
+      "Redo every wrong question without looking at the answer",
+      "Write each mistake and its fix in your error log"
+     ]
+    },
+    {
+     "title": "Key facts and final review",
+     "role": "final",
+     "minutes": 30,
+     "window": "2027-05-06 → 2027-05-06",
+     "placed": null,
+     "aim": "Go into the exam calm, with every formula and method fresh.",
+     "points": [
+      "Write a one-page sheet of key facts, definitions and common mistakes",
+      "Read through your error log",
+      "Do a few quick questions you know you can do"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "edexcel-a-level-economics",
+   "area": "A Levels, a board other than Cambridge",
+   "title": "Edexcel A Level Economics A Paper 2: The national and global economy",
+   "preset": "exam",
+   "dueInDays": 42,
+   "weak": "exchange rates, fiscal policy",
+   "target": "A",
+   "due": "2026-12-25",
+   "seconds": 17.8,
+   "status": 200,
+   "error": null,
+   "stages": [
+    "Reading your week",
+    "Reading your week · 0 commitments",
+    "Planning Edexcel A Level Economics A Paper 2: The national and global",
+    "Finding the syllabus",
+    "Researching this syllabus for the first time",
+    "Read 8 sources",
+    "Double-checking the topics",
+    "Double-check made 1 correction",
+    "10 topics from research, double-checked",
+    "Building your plan",
+    "32 sessions to Thu 24 Dec",
+    "Fitting 32 pieces of work into your free time",
+    "117 checks passed"
+   ],
+   "strategy": "10 topics revised and practised in order, 3 mixed reviews, 3 timed Paper 2s, light final day.",
+   "type": "exam",
+   "questions": [],
+   "syllabus": {
+    "source": "model",
+    "researched": true,
+    "sources": [
+     {
+      "url": "https://qualifications.pearson.com/content/dam/pdf/A%20Level/Economics/2015/teaching-and-learning-materials/getting-started-guide-new.pdf",
+      "title": "AS and A Level Economics A"
+     },
+     {
+      "url": "https://nationalcareers.service.gov.uk/find-a-course/details?courseId=8a91f0aa-a396-40e6-8dab-bfa24e3d32dc&runId=070fa10c-5f89-4ebb-b813-d626a78285f6&searchTerm=Level%203%20business%20administration&town=&learningMethod=&courseType=&sectors=&courseHours=&courseStudyTime=&startDate=&distance=&filtera=False&page=1678&orderByValue=Relevance&coordinates=&campaignCode=&qualificationLevels=&D=0",
+      "title": "Details | Find a Course"
+     },
+     {
+      "url": "https://cognito.org/specifications/alevel/economics/edexcela",
+      "title": "Edexcel A A-Level Economics A (9EC0) Specification"
+     },
+     {
+      "url": "https://duckduckgo.com/?q=edexcel+economics+a+exam+specification&ia=web",
+      "title": "edexcel economics a exam specification at DuckDuckGo - - Find official Edexcel Economics exam specifications and matching study resources from all major exam boards"
+     },
+     {
+      "url": "https://learndirect.com/category/alevel-courses/resources/edexcel-economics-a-level-spec",
+      "title": "Edexcel A-Level Economics Specification Guide"
+     },
+     {
+      "url": "https://bwsgirls.org/wp-content/uploads/2025/05/Economics-Bridging-Courses-2025.pdf",
+      "title": "Edexcel A Level EconomicsCourse Introduction and Summer Work2025"
+     }
+    ],
+    "name": "Edexcel A Level Economics A (9EC0), Paper 2",
+    "papers": [
+     {
+      "label": "Paper 2",
+      "marks": 100,
+      "minutes": 120
+     }
+    ],
+    "units": [
+     {
+      "title": "Measures of economic performance",
+      "points": [
+       "Calculate and interpret GDP, real GDP and GDP per capita",
+       "Distinguish GDP from GNI and explain the limitations of GDP",
+       "Measure inflation with CPI and RPI and explain their uses",
+       "Distinguish unemployment measures: claimant count vs ILO/LFS",
+       "Interpret the current account of the balance of payments",
+       "Explain index numbers and use them in data interpretation"
+      ],
+      "weight": 3,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Aggregate demand",
+      "points": [
+       "Define AD and explain its components (C + I + G + X − M)",
+       "Explain the downward slope of the AD curve",
+       "Analyse the determinants of consumption and the APC/APS",
+       "Explain investment and the accelerator effect",
+       "Distinguish injections and withdrawals",
+       "Show shifts in AD on a diagram and analyse their effects"
+      ],
+      "weight": 3,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Aggregate supply",
+      "points": [
+       "Explain the shape of the short-run AS curve",
+       "Show the effect of a change in costs on short-run AS",
+       "Distinguish short-run from long-run AS",
+       "Illustrate the Keynesian long-run AS curve and its stages",
+       "Explain factors shifting long-run AS (quantity and quality of inputs)",
+       "Use AD/AS diagrams to show macroeconomic equilibrium"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "National income",
+      "points": [
+       "Explain the circular flow of income",
+       "Distinguish equilibrium and full-employment level of output",
+       "Show equilibrium with injections and withdrawals",
+       "Calculate and explain the multiplier",
+       "Use the multiplier formula and apply it to a change in injections",
+       "Explain the significance of the multiplier for policy"
+      ],
+      "weight": 2,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Economic growth",
+      "points": [
+       "Distinguish actual and potential growth and their causes",
+       "Show growth on a PPF and AD/AS diagram",
+       "Explain output gaps: positive and negative",
+       "Describe the trade (business) cycle and its phases",
+       "Explain benefits and costs of economic growth",
+       "Evaluate whether growth is always desirable"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Macroeconomic objectives and policy",
+      "points": [
+       "Explain objectives: growth, inflation target, employment, BoP, redistribution",
+       "Explain demand-side policies: fiscal and monetary",
+       "Analyse fiscal policy and automatic stabilisers",
+       "Explain monetary policy tools and transmission mechanism",
+       "Explain supply-side policies: market-based and interventionist",
+       "Evaluate conflicts and trade-offs between objectives and policies"
+      ],
+      "weight": 3,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Globalisation, trade and trading blocs",
+      "points": [
+       "Explain causes and consequences of globalisation",
+       "Explain specialisation, comparative and absolute advantage",
+       "Analyse patterns and changes in trade",
+       "Calculate and interpret terms of trade",
+       "Explain trading blocs and the role of the WTO",
+       "Explain methods and effects of protectionism"
+      ],
+      "weight": 3,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Balance of payments and exchange rates",
+      "points": [
+       "Explain the components of the current and financial accounts",
+       "Analyse causes of current account deficits and surpluses",
+       "Explain fixed, floating and managed exchange rate systems",
+       "Analyse factors influencing exchange rates (e.g. interest rates)",
+       "Explain depreciation/appreciation and their effects on trade",
+       "Explain international competitiveness and its determinants"
+      ],
+      "weight": 3,
+      "difficulty": 2,
+      "confidence": "weak"
+     },
+     {
+      "title": "Poverty, inequality and development",
+      "points": [
+       "Distinguish absolute and relative poverty and their causes",
+       "Explain measures of income and wealth inequality (e.g. Lorenz curve, Gini)",
+       "Evaluate measures of development (HDI, GNI per capita, MPI)",
+       "Explain factors influencing growth and development",
+       "Evaluate strategies to promote growth and development (aid, trade, FDI)",
+       "Relate development strategies to government policy choices"
+      ],
+      "weight": 3,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Financial sector and public finance",
+      "points": [
+       "Explain the role of financial markets and key institutions",
+       "Explain market failure in the financial sector",
+       "Explain the role and tools of central banks, including QE",
+       "Explain the role and effects of public expenditure",
+       "Analyse taxation: types, incidence and effects",
+       "Explain public sector finances: budget deficits, debt and the fiscal rules"
+      ],
+      "weight": 3,
+      "difficulty": 3,
+      "confidence": null
+     }
+    ]
+   },
+   "constraints": [],
+   "verification": {
+    "pass": true,
+    "quality": 88,
+    "critics": [
+     "realism 100: Every day is within what you usually sustain.",
+     "exam_prep 50: fewer than two spaced retrieval sessions; no light review on Thu 24 Dec",
+     "front_loading 100: Deadline work finishes with room to spare.",
+     "interleaving 100: Practice is mixed across subjects.",
+     "fragmentation 100: Sessions are a workable length.",
+     "neglect 100: Every active goal has time."
+    ]
+   },
+   "trace": {
+    "ms": 17783,
+    "errors": [],
+    "solver": {
+     "ms": 23,
+     "items": 32,
+     "placed": 11,
+     "iterations": 2
+    },
+    "tokens": {
+     "calls": 3,
+     "input": 12304,
+     "cached": 2432,
+     "output": 2349,
+     "servedModel": "deepseek-flash",
+     "firstTokenMs": [
+      1031,
+      1063,
+      1385
+     ]
+    }
+   },
+   "plan": {
+    "items": 32,
+    "placed": 11,
+    "laterWeeks": 5,
+    "unplaced": 0,
+    "first": "2026-11-13",
+    "last": "2026-12-24"
+   },
+   "sessions": [
+    {
+     "title": "Measures of economic performance revision",
+     "role": "revise",
+     "minutes": 70,
+     "window": "2026-11-13 → 2026-11-17",
+     "placed": "2026-11-13",
+     "aim": "Be able to answer any Measures of economic performance question on Paper 2 without notes.",
+     "points": [
+      "Calculate and interpret GDP, real GDP and GDP per capita",
+      "Distinguish GDP from GNI and explain the limitations of GDP",
+      "Measure inflation with CPI and RPI and explain their uses"
+     ]
+    },
+    {
+     "title": "Measures of economic performance past paper practice",
+     "role": "practise",
+     "minutes": 60,
+     "window": "2026-11-13 → 2026-11-17",
+     "placed": "2026-11-13",
+     "aim": "Pick up every method mark on Measures of economic performance questions.",
+     "points": [
+      "Calculate and interpret GDP, real GDP and GDP per capita",
+      "Distinguish GDP from GNI and explain the limitations of GDP",
+      "Measure inflation with CPI and RPI and explain their uses"
+     ]
+    },
+    {
+     "title": "Aggregate demand revision",
+     "role": "revise",
+     "minutes": 70,
+     "window": "2026-11-16 → 2026-11-20",
+     "placed": "2026-11-16",
+     "aim": "Be able to answer any Aggregate demand question on Paper 2 without notes.",
+     "points": [
+      "Define AD and explain its components (C + I + G + X − M)",
+      "Explain the downward slope of the AD curve",
+      "Analyse the determinants of consumption and the APC/APS"
+     ]
+    },
+    {
+     "title": "Aggregate demand past paper practice",
+     "role": "practise",
+     "minutes": 60,
+     "window": "2026-11-16 → 2026-11-20",
+     "placed": "2026-11-16",
+     "aim": "Pick up every method mark on Aggregate demand questions.",
+     "points": [
+      "Define AD and explain its components (C + I + G + X − M)",
+      "Explain the downward slope of the AD curve",
+      "Analyse the determinants of consumption and the APC/APS"
+     ]
+    },
+    {
+     "title": "Aggregate supply revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-19 → 2026-11-24",
+     "placed": "2026-11-19",
+     "aim": "Be able to answer any Aggregate supply question on Paper 2 without notes.",
+     "points": [
+      "Explain the shape of the short-run AS curve",
+      "Show the effect of a change in costs on short-run AS",
+      "Distinguish short-run from long-run AS"
+     ]
+    },
+    {
+     "title": "Aggregate supply past paper practice",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-11-19 → 2026-11-24",
+     "placed": "2026-11-19",
+     "aim": "Pick up every method mark on Aggregate supply questions.",
+     "points": [
+      "Explain the shape of the short-run AS curve",
+      "Show the effect of a change in costs on short-run AS",
+      "Distinguish short-run from long-run AS"
+     ]
+    },
+    {
+     "title": "National income revision",
+     "role": "revise",
+     "minutes": 65,
+     "window": "2026-11-23 → 2026-11-26",
+     "placed": "2026-11-23",
+     "aim": "Be able to answer any National income question on Paper 2 without notes.",
+     "points": [
+      "Explain the circular flow of income",
+      "Distinguish equilibrium and full-employment level of output",
+      "Show equilibrium with injections and withdrawals"
+     ]
+    },
+    {
+     "title": "National income past paper practice",
+     "role": "practise",
+     "minutes": 55,
+     "window": "2026-11-23 → 2026-11-26",
+     "placed": "2026-11-23",
+     "aim": "Pick up every method mark on National income questions.",
+     "points": [
+      "Explain the circular flow of income",
+      "Distinguish equilibrium and full-employment level of output",
+      "Show equilibrium with injections and withdrawals"
+     ]
+    },
+    {
+     "title": "Economic growth revision",
+     "role": "revise",
+     "minutes": 60,
+     "window": "2026-11-25 → 2026-11-28",
+     "placed": "2026-11-25",
+     "aim": "Be able to answer any Economic growth question on Paper 2 without notes.",
+     "points": [
+      "Distinguish actual and potential growth and their causes",
+      "Show growth on a PPF and AD/AS diagram",
+      "Explain output gaps: positive and negative"
+     ]
+    },
+    {
+     "title": "Economic growth past paper practice",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-11-25 → 2026-11-28",
+     "placed": "2026-11-25",
+     "aim": "Pick up every method mark on Economic growth questions.",
+     "points": [
+      "Distinguish actual and potential growth and their causes",
+      "Show growth on a PPF and AD/AS diagram",
+      "Explain output gaps: positive and negative"
+     ]
+    },
+    {
+     "title": "Macroeconomic objectives and policy revision",
+     "role": "revise",
+     "minutes": 75,
+     "window": "2026-11-27 → 2026-12-03",
+     "placed": null,
+     "aim": "Be able to answer any Macroeconomic objectives and policy question on Paper 2 without notes.",
+     "points": [
+      "Explain objectives: growth, inflation target, employment, BoP, redistribution",
+      "Explain demand-side policies: fiscal and monetary",
+      "Analyse fiscal policy and automatic stabilisers"
+     ]
+    },
+    {
+     "title": "Macroeconomic objectives and policy past paper practice",
+     "role": "practise",
+     "minutes": 65,
+     "window": "2026-11-27 → 2026-12-03",
+     "placed": null,
+     "aim": "Pick up every method mark on Macroeconomic objectives and policy questions.",
+     "points": [
+      "Explain objectives: growth, inflation target, employment, BoP, redistribution",
+      "Explain demand-side policies: fiscal and monetary",
+      "Analyse fiscal policy and automatic stabilisers"
+     ]
+    },
+    {
+     "title": "Globalisation, trade and trading blocs revision",
+     "role": "revise",
+     "minutes": 75,
+     "window": "2026-12-02 → 2026-12-07",
+     "placed": null,
+     "aim": "Be able to answer any Globalisation, trade and trading blocs question on Paper 2 without notes.",
+     "points": [
+      "Explain causes and consequences of globalisation",
+      "Explain specialisation, comparative and absolute advantage",
+      "Analyse patterns and changes in trade"
+     ]
+    },
+    {
+     "title": "Globalisation, trade and trading blocs past paper practice",
+     "role": "practise",
+     "minutes": 65,
+     "window": "2026-12-02 → 2026-12-07",
+     "placed": null,
+     "aim": "Pick up every method mark on Globalisation, trade and trading blocs questions.",
+     "points": [
+      "Explain causes and consequences of globalisation",
+      "Explain specialisation, comparative and absolute advantage",
+      "Analyse patterns and changes in trade"
+     ]
+    },
+    {
+     "title": "Balance of payments and exchange rates revision",
+     "role": "revise",
+     "minutes": 100,
+     "window": "2026-12-05 → 2026-12-10",
+     "placed": null,
+     "aim": "Be able to answer any Balance of payments and exchange rates question on Paper 2 without notes.",
+     "points": [
+      "Explain the components of the current and financial accounts",
+      "Analyse causes of current account deficits and surpluses",
+      "Explain fixed, floating and managed exchange rate systems"
+     ]
+    },
+    {
+     "title": "Balance of payments and exchange rates past paper practice",
+     "role": "practise",
+     "minutes": 80,
+     "window": "2026-12-05 → 2026-12-10",
+     "placed": null,
+     "aim": "Pick up every method mark on Balance of payments and exchange rates questions.",
+     "points": [
+      "Explain the components of the current and financial accounts",
+      "Analyse causes of current account deficits and surpluses",
+      "Explain fixed, floating and managed exchange rate systems"
+     ]
+    },
+    {
+     "title": "Poverty, inequality and development revision",
+     "role": "revise",
+     "minutes": 75,
+     "window": "2026-12-09 → 2026-12-14",
+     "placed": null,
+     "aim": "Be able to answer any Poverty, inequality and development question on Paper 2 without notes.",
+     "points": [
+      "Distinguish absolute and relative poverty and their causes",
+      "Explain measures of income and wealth inequality (e.g. Lorenz curve, Gini)",
+      "Evaluate measures of development (HDI, GNI per capita, MPI)"
+     ]
+    },
+    {
+     "title": "Poverty, inequality and development past paper practice",
+     "role": "practise",
+     "minutes": 65,
+     "window": "2026-12-09 → 2026-12-14",
+     "placed": null,
+     "aim": "Pick up every method mark on Poverty, inequality and development questions.",
+     "points": [
+      "Distinguish absolute and relative poverty and their causes",
+      "Explain measures of income and wealth inequality (e.g. Lorenz curve, Gini)",
+      "Evaluate measures of development (HDI, GNI per capita, MPI)"
+     ]
+    },
+    {
+     "title": "Financial sector and public finance revision",
+     "role": "revise",
+     "minutes": 75,
+     "window": "2026-12-12 → 2026-12-16",
+     "placed": null,
+     "aim": "Be able to answer any Financial sector and public finance question on Paper 2 without notes.",
+     "points": [
+      "Explain the role of financial markets and key institutions",
+      "Explain market failure in the financial sector",
+      "Explain the role and tools of central banks, including QE"
+     ]
+    },
+    {
+     "title": "Financial sector and public finance past paper practice",
+     "role": "practise",
+     "minutes": 65,
+     "window": "2026-12-12 → 2026-12-16",
+     "placed": null,
+     "aim": "Pick up every method mark on Financial sector and public finance questions.",
+     "points": [
+      "Explain the role of financial markets and key institutions",
+      "Explain market failure in the financial sector",
+      "Explain the role and tools of central banks, including QE"
+     ]
+    },
+    {
+     "title": "Mixed review: 3 topics",
+     "role": "mixed",
+     "minutes": 45,
+     "window": "2026-11-25 → 2026-11-27",
+     "placed": "2026-11-25",
+     "aim": "Recall Measures of economic performance, Aggregate demand and Aggregate supply after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Measures of economic performance: Calculate and interpret GDP, real GDP and GDP per capita",
+      "Measures of economic performance: Distinguish GDP from GNI and explain the limitations of GDP",
+      "Aggregate demand: Define AD and explain its components (C + I + G + X − M)"
+     ]
+    },
+    {
+     "title": "Mixed review: 3 topics",
+     "role": "mixed",
+     "minutes": 45,
+     "window": "2026-12-04 → 2026-12-07",
+     "placed": null,
+     "aim": "Recall National income, Economic growth and Macroeconomic objectives and policy after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "National income: Explain the circular flow of income",
+      "National income: Distinguish equilibrium and full-employment level of output",
+      "Economic growth: Distinguish actual and potential growth and their causes"
+     ]
+    },
+    {
+     "title": "Mixed review: 4 topics",
+     "role": "mixed",
+     "minutes": 60,
+     "window": "2026-12-18 → 2026-12-21",
+     "placed": null,
+     "aim": "Recall Globalisation, trade and trading blocs to Financial sector and public finance after a gap, mixed together the way the exam mixes them.",
+     "points": [
+      "Globalisation, trade and trading blocs: Explain causes and consequences of globalisation",
+      "Globalisation, trade and trading blocs: Explain specialisation, comparative and absolute advantage",
+      "Balance of payments and exchange rates: Explain the components of the current and financial accounts"
+     ]
+    },
+    {
+     "title": "Balance of payments and exchange rates extra practice",
+     "role": "practise",
+     "minutes": 60,
+     "window": "2026-12-11 → 2026-12-15",
+     "placed": null,
+     "aim": "Make Balance of payments and exchange rates reliable: fresh questions after a gap.",
+     "points": [
+      "Explain the components of the current and financial accounts",
+      "Analyse causes of current account deficits and surpluses",
+      "Explain fixed, floating and managed exchange rate systems"
+     ]
+    },
+    {
+     "title": "Paper 2 timed past paper",
+     "role": "paper",
+     "minutes": 130,
+     "window": "2026-12-17 → 2026-12-18",
+     "placed": null,
+     "aim": "Sit a full Paper 2 in exam conditions: 2 h, 100 marks.",
+     "points": [
+      "Use a past paper you haven't seen before",
+      "Time it strictly and put your notes away",
+      "Show full working so you keep method marks"
+     ]
+    },
+    {
+     "title": "Past paper corrections",
+     "role": "corrections",
+     "minutes": 60,
+     "window": "2026-12-18 → 2026-12-19",
+     "placed": null,
+     "aim": "Turn every lost mark into a method you now know.",
+     "points": [
+      "Mark the paper with the official mark scheme",
+      "Redo every wrong question without looking at the answer",
+      "Write each mistake and its fix in your error log"
+     ]
+    },
+    {
+     "title": "Weak topics revision",
+     "role": "weak",
+     "minutes": 60,
+     "window": "2026-12-18 → 2026-12-21",
+     "placed": null,
+     "aim": "Close the gaps in Balance of payments and exchange rates.",
+     "points": [
+      "Balance of payments and exchange rates: Explain the components of the current and financial accounts",
+      "Balance of payments and exchange rates: Analyse causes of current account deficits and surpluses"
+     ]
+    },
+    {
+     "title": "Paper 2 timed past paper 2",
+     "role": "paper",
+     "minutes": 130,
+     "window": "2026-12-19 → 2026-12-21",
+     "placed": null,
+     "aim": "Sit a full Paper 2 in exam conditions: 2 h, 100 marks.",
+     "points": [
+      "Use a past paper you haven't seen before",
+      "Time it strictly and put your notes away",
+      "Show full working so you keep method marks"
+     ]
+    },
+    {
+     "title": "Past paper 2 corrections",
+     "role": "corrections",
+     "minutes": 60,
+     "window": "2026-12-21 → 2026-12-22",
+     "placed": null,
+     "aim": "Turn every lost mark into a method you now know.",
+     "points": [
+      "Mark the paper with the official mark scheme",
+      "Redo every wrong question without looking at the answer",
+      "Write each mistake and its fix in your error log"
+     ]
+    },
+    {
+     "title": "Paper 2 timed past paper 3",
+     "role": "paper",
+     "minutes": 130,
+     "window": "2026-12-22 → 2026-12-23",
+     "placed": null,
+     "aim": "Sit a full Paper 2 in exam conditions: 2 h, 100 marks.",
+     "points": [
+      "Use a past paper you haven't seen before",
+      "Time it strictly and put your notes away",
+      "Show full working so you keep method marks"
+     ]
+    },
+    {
+     "title": "Past paper 3 corrections",
+     "role": "corrections",
+     "minutes": 60,
+     "window": "2026-12-23 → 2026-12-23",
+     "placed": null,
+     "aim": "Turn every lost mark into a method you now know.",
+     "points": [
+      "Mark the paper with the official mark scheme",
+      "Redo every wrong question without looking at the answer",
+      "Write each mistake and its fix in your error log"
+     ]
+    },
+    {
+     "title": "Formula sheet and final review",
+     "role": "final",
+     "minutes": 45,
+     "window": "2026-12-24 → 2026-12-24",
+     "placed": null,
+     "aim": "Go into the exam calm, with every formula and method fresh.",
+     "points": [
+      "Write a one-page sheet of key formulas and common mistakes",
+      "Read through your error log",
+      "Do a few quick questions you know you can do"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "spanish-skill",
+   "area": "Adult skill with no deadline",
+   "title": "Conversational Spanish from scratch",
+   "preset": "skill",
+   "daysPerWeek": 4,
+   "sessionMinutes": 30,
+   "level": "Complete beginner",
+   "target": "Hold a 10-minute conversation",
+   "due": null,
+   "seconds": 5.8,
+   "status": 200,
+   "error": null,
+   "stages": [
+    "Reading your week",
+    "Reading your week · 0 commitments",
+    "Planning Conversational Spanish from scratch",
+    "Mapping the skill",
+    "8 stages from the AI",
+    "Building your plan",
+    "43 sessions to Mon 25 Jan",
+    "Fitting 43 pieces of work into your free time",
+    "114 checks passed"
+   ],
+   "strategy": "8 stages, each with a lesson, practice and a milestone check.",
+   "type": "skill",
+   "questions": [],
+   "syllabus": {
+    "source": "model",
+    "researched": false,
+    "sources": [],
+    "name": "Conversational Spanish from scratch",
+    "papers": [],
+    "units": [
+     {
+      "title": "Sounds and greeting",
+      "points": [
+       "Pronounce the five pure vowels consistently",
+       "Greet and say goodbye at the right time of day",
+       "Introduce yourself: name, origin, where you live",
+       "Ask the same questions back to someone else",
+       "Use tú and usted in the right situation"
+      ],
+      "weight": 2,
+      "difficulty": 1,
+      "confidence": null
+     },
+     {
+      "title": "Survival phrases and numbers",
+      "points": [
+       "Say please, thank you, sorry and excuse me",
+       "Ask someone to repeat or speak more slowly",
+       "Count 0–100 and use numbers for prices and times",
+       "Ask how to say something and use no lo entiendo",
+       "Use basic question words: qué, quién, dónde, cuándo, cómo"
+      ],
+      "weight": 2,
+      "difficulty": 1,
+      "confidence": null
+     },
+     {
+      "title": "Present tense of key verbs",
+      "points": [
+       "Conjugate regular -ar, -er, -ir verbs in the present",
+       "Use ser and estar for identity versus state",
+       "Use tener for age, hunger and possession",
+       "Use hay to say what there is and isn't",
+       "Form yes/no questions and negatives"
+      ],
+      "weight": 3,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Talking about your life",
+      "points": [
+       "Describe family, work and studies",
+       "Talk about daily routine using reflexive verbs",
+       "State likes and dislikes with me gusta / me gustan",
+       "Give simple reasons with porque",
+       "Ask a partner about their life and follow up"
+      ],
+      "weight": 3,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Getting around and ordering",
+      "points": [
+       "Order food and drink and ask for the bill",
+       "Ask for directions and understand the answer",
+       "Buy a ticket and ask about times",
+       "Handle price, quantity and simple money talk",
+       "Use polite requests with quisiera and me puede dar"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Talking about the past and plans",
+      "points": [
+       "Use the pretérito perfecto for recent experiences",
+       "Talk about weekends and holidays in the past",
+       "Express future plans with ir a + infinitive",
+       "Use markers like ayer, esta semana, el próximo año",
+       "Tell a short story with then, after, finally"
+      ],
+      "weight": 2,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "Everyday small talk",
+      "points": [
+       "Comment on weather, health and mood",
+       "Give opinions with creo que and en mi opinión",
+       "Agree, disagree and show surprise politely",
+       "Ask follow-up questions to keep talk going",
+       "Use fillers to buy thinking time naturally"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Hold a 10-minute conversation",
+      "points": [
+       "Open, sustain and close a conversation without English",
+       "Ask for clarification without switching languages",
+       "Link ideas with pero, aunque, entonces, además",
+       "Repair a breakdown: paraphrase, gesture, circumlocute",
+       "Practise a rehearsed conversation with a partner or tutor"
+      ],
+      "weight": 3,
+      "difficulty": 3,
+      "confidence": null
+     }
+    ]
+   },
+   "constraints": [],
+   "verification": {
+    "pass": true,
+    "quality": 93,
+    "critics": [
+     "realism 100: Every day is within what you usually sustain.",
+     "exam_prep 100: No exams in view.",
+     "front_loading 60: 6 items finish on the due date with no room to run long.",
+     "interleaving 100: Practice is mixed across subjects.",
+     "fragmentation 100: Sessions are a workable length.",
+     "neglect 100: Every active goal has time."
+    ]
+   },
+   "trace": {
+    "ms": 5719,
+    "errors": [],
+    "solver": {
+     "ms": 16,
+     "items": 43,
+     "placed": 9,
+     "iterations": 2
+    },
+    "tokens": {
+     "calls": 1,
+     "input": 1436,
+     "cached": 1280,
+     "output": 888,
+     "servedModel": "deepseek-flash",
+     "firstTokenMs": [
+      1196
+     ]
+    }
+   },
+   "plan": {
+    "items": 43,
+    "placed": 9,
+    "laterWeeks": 10,
+    "unplaced": 0,
+    "first": "2026-11-13",
+    "last": "2027-01-25"
+   },
+   "sessions": [
+    {
+     "title": "Sounds and greeting lesson",
+     "role": "lesson",
+     "minutes": 30,
+     "window": "2026-11-13 → 2026-11-13",
+     "placed": "2026-11-13",
+     "aim": "Learn how Sounds and greeting works.",
+     "points": [
+      "Pronounce the five pure vowels consistently",
+      "Greet and say goodbye at the right time of day",
+      "Introduce yourself: name, origin, where you live"
+     ]
+    },
+    {
+     "title": "Sounds and greeting practice",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-11-14 → 2026-11-14",
+     "placed": "2026-11-14",
+     "aim": "Build Sounds and greeting through deliberate practice.",
+     "points": [
+      "Pronounce the five pure vowels consistently",
+      "Greet and say goodbye at the right time of day",
+      "Introduce yourself: name, origin, where you live"
+     ]
+    },
+    {
+     "title": "Sounds and greeting practice 2",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-11-16 → 2026-11-16",
+     "placed": "2026-11-16",
+     "aim": "Build Sounds and greeting through deliberate practice.",
+     "points": [
+      "Pronounce the five pure vowels consistently",
+      "Greet and say goodbye at the right time of day",
+      "Introduce yourself: name, origin, where you live"
+     ]
+    },
+    {
+     "title": "Sounds and greeting practice 3",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-11-17 → 2026-11-18",
+     "placed": "2026-11-17",
+     "aim": "Build Sounds and greeting through deliberate practice.",
+     "points": [
+      "Pronounce the five pure vowels consistently",
+      "Greet and say goodbye at the right time of day",
+      "Introduce yourself: name, origin, where you live"
+     ]
+    },
+    {
+     "title": "Sounds and greeting milestone check",
+     "role": "milestone",
+     "minutes": 30,
+     "window": "2026-11-19 → 2026-11-19",
+     "placed": "2026-11-19",
+     "aim": "Show you can do Sounds and greeting without help.",
+     "points": [
+      "Pronounce the five pure vowels consistently",
+      "Greet and say goodbye at the right time of day",
+      "Introduce yourself: name, origin, where you live"
+     ]
+    },
+    {
+     "title": "Survival phrases and numbers lesson",
+     "role": "lesson",
+     "minutes": 30,
+     "window": "2026-11-20 → 2026-11-21",
+     "placed": "2026-11-20",
+     "aim": "Learn how Survival phrases and numbers works.",
+     "points": [
+      "Say please, thank you, sorry and excuse me",
+      "Ask someone to repeat or speak more slowly",
+      "Count 0–100 and use numbers for prices and times"
+     ]
+    },
+    {
+     "title": "Survival phrases and numbers practice",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-11-23 → 2026-11-23",
+     "placed": "2026-11-23",
+     "aim": "Build Survival phrases and numbers through deliberate practice.",
+     "points": [
+      "Say please, thank you, sorry and excuse me",
+      "Ask someone to repeat or speak more slowly",
+      "Count 0–100 and use numbers for prices and times"
+     ]
+    },
+    {
+     "title": "Survival phrases and numbers practice 2",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-11-24 → 2026-11-25",
+     "placed": "2026-11-24",
+     "aim": "Build Survival phrases and numbers through deliberate practice.",
+     "points": [
+      "Say please, thank you, sorry and excuse me",
+      "Ask someone to repeat or speak more slowly",
+      "Count 0–100 and use numbers for prices and times"
+     ]
+    },
+    {
+     "title": "Survival phrases and numbers practice 3",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-11-26 → 2026-11-26",
+     "placed": "2026-11-26",
+     "aim": "Build Survival phrases and numbers through deliberate practice.",
+     "points": [
+      "Say please, thank you, sorry and excuse me",
+      "Ask someone to repeat or speak more slowly",
+      "Count 0–100 and use numbers for prices and times"
+     ]
+    },
+    {
+     "title": "Survival phrases and numbers milestone check",
+     "role": "milestone",
+     "minutes": 30,
+     "window": "2026-11-27 → 2026-11-28",
+     "placed": null,
+     "aim": "Show you can do Survival phrases and numbers without help.",
+     "points": [
+      "Say please, thank you, sorry and excuse me",
+      "Ask someone to repeat or speak more slowly",
+      "Count 0–100 and use numbers for prices and times"
+     ]
+    },
+    {
+     "title": "Present tense of key verbs lesson",
+     "role": "lesson",
+     "minutes": 30,
+     "window": "2026-11-30 → 2026-11-30",
+     "placed": null,
+     "aim": "Learn how Present tense of key verbs works.",
+     "points": [
+      "Conjugate regular -ar, -er, -ir verbs in the present",
+      "Use ser and estar for identity versus state",
+      "Use tener for age, hunger and possession"
+     ]
+    },
+    {
+     "title": "Present tense of key verbs practice",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-12-01 → 2026-12-02",
+     "placed": null,
+     "aim": "Build Present tense of key verbs through deliberate practice.",
+     "points": [
+      "Conjugate regular -ar, -er, -ir verbs in the present",
+      "Use ser and estar for identity versus state",
+      "Use tener for age, hunger and possession"
+     ]
+    },
+    {
+     "title": "Present tense of key verbs practice 2",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-12-03 → 2026-12-03",
+     "placed": null,
+     "aim": "Build Present tense of key verbs through deliberate practice.",
+     "points": [
+      "Conjugate regular -ar, -er, -ir verbs in the present",
+      "Use ser and estar for identity versus state",
+      "Use tener for age, hunger and possession"
+     ]
+    },
+    {
+     "title": "Present tense of key verbs practice 3",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-12-04 → 2026-12-05",
+     "placed": null,
+     "aim": "Build Present tense of key verbs through deliberate practice.",
+     "points": [
+      "Conjugate regular -ar, -er, -ir verbs in the present",
+      "Use ser and estar for identity versus state",
+      "Use tener for age, hunger and possession"
+     ]
+    },
+    {
+     "title": "Present tense of key verbs practice 4",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-12-07 → 2026-12-07",
+     "placed": null,
+     "aim": "Build Present tense of key verbs through deliberate practice.",
+     "points": [
+      "Conjugate regular -ar, -er, -ir verbs in the present",
+      "Use ser and estar for identity versus state",
+      "Use tener for age, hunger and possession"
+     ]
+    },
+    {
+     "title": "Present tense of key verbs milestone check",
+     "role": "milestone",
+     "minutes": 30,
+     "window": "2026-12-08 → 2026-12-09",
+     "placed": null,
+     "aim": "Show you can do Present tense of key verbs without help.",
+     "points": [
+      "Conjugate regular -ar, -er, -ir verbs in the present",
+      "Use ser and estar for identity versus state",
+      "Use tener for age, hunger and possession"
+     ]
+    },
+    {
+     "title": "Talking about your life lesson",
+     "role": "lesson",
+     "minutes": 30,
+     "window": "2026-12-10 → 2026-12-10",
+     "placed": null,
+     "aim": "Learn how Talking about your life works.",
+     "points": [
+      "Describe family, work and studies",
+      "Talk about daily routine using reflexive verbs",
+      "State likes and dislikes with me gusta / me gustan"
+     ]
+    },
+    {
+     "title": "Talking about your life practice",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-12-11 → 2026-12-12",
+     "placed": null,
+     "aim": "Build Talking about your life through deliberate practice.",
+     "points": [
+      "Describe family, work and studies",
+      "Talk about daily routine using reflexive verbs",
+      "State likes and dislikes with me gusta / me gustan"
+     ]
+    },
+    {
+     "title": "Talking about your life practice 2",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-12-14 → 2026-12-14",
+     "placed": null,
+     "aim": "Build Talking about your life through deliberate practice.",
+     "points": [
+      "Describe family, work and studies",
+      "Talk about daily routine using reflexive verbs",
+      "State likes and dislikes with me gusta / me gustan"
+     ]
+    },
+    {
+     "title": "Talking about your life practice 3",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-12-15 → 2026-12-16",
+     "placed": null,
+     "aim": "Build Talking about your life through deliberate practice.",
+     "points": [
+      "Describe family, work and studies",
+      "Talk about daily routine using reflexive verbs",
+      "State likes and dislikes with me gusta / me gustan"
+     ]
+    },
+    {
+     "title": "Talking about your life practice 4",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-12-17 → 2026-12-17",
+     "placed": null,
+     "aim": "Build Talking about your life through deliberate practice.",
+     "points": [
+      "Describe family, work and studies",
+      "Talk about daily routine using reflexive verbs",
+      "State likes and dislikes with me gusta / me gustan"
+     ]
+    },
+    {
+     "title": "Talking about your life milestone check",
+     "role": "milestone",
+     "minutes": 30,
+     "window": "2026-12-18 → 2026-12-19",
+     "placed": null,
+     "aim": "Show you can do Talking about your life without help.",
+     "points": [
+      "Describe family, work and studies",
+      "Talk about daily routine using reflexive verbs",
+      "State likes and dislikes with me gusta / me gustan"
+     ]
+    },
+    {
+     "title": "Getting around and ordering lesson",
+     "role": "lesson",
+     "minutes": 30,
+     "window": "2026-12-21 → 2026-12-21",
+     "placed": null,
+     "aim": "Learn how Getting around and ordering works.",
+     "points": [
+      "Order food and drink and ask for the bill",
+      "Ask for directions and understand the answer",
+      "Buy a ticket and ask about times"
+     ]
+    },
+    {
+     "title": "Getting around and ordering practice",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-12-22 → 2026-12-23",
+     "placed": null,
+     "aim": "Build Getting around and ordering through deliberate practice.",
+     "points": [
+      "Order food and drink and ask for the bill",
+      "Ask for directions and understand the answer",
+      "Buy a ticket and ask about times"
+     ]
+    },
+    {
+     "title": "Getting around and ordering practice 2",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-12-24 → 2026-12-24",
+     "placed": null,
+     "aim": "Build Getting around and ordering through deliberate practice.",
+     "points": [
+      "Order food and drink and ask for the bill",
+      "Ask for directions and understand the answer",
+      "Buy a ticket and ask about times"
+     ]
+    },
+    {
+     "title": "Getting around and ordering practice 3",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-12-25 → 2026-12-26",
+     "placed": null,
+     "aim": "Build Getting around and ordering through deliberate practice.",
+     "points": [
+      "Order food and drink and ask for the bill",
+      "Ask for directions and understand the answer",
+      "Buy a ticket and ask about times"
+     ]
+    },
+    {
+     "title": "Getting around and ordering milestone check",
+     "role": "milestone",
+     "minutes": 30,
+     "window": "2026-12-28 → 2026-12-28",
+     "placed": null,
+     "aim": "Show you can do Getting around and ordering without help.",
+     "points": [
+      "Order food and drink and ask for the bill",
+      "Ask for directions and understand the answer",
+      "Buy a ticket and ask about times"
+     ]
+    },
+    {
+     "title": "Talking about the past and plans lesson",
+     "role": "lesson",
+     "minutes": 30,
+     "window": "2026-12-29 → 2026-12-30",
+     "placed": null,
+     "aim": "Learn how Talking about the past and plans works.",
+     "points": [
+      "Use the pretérito perfecto for recent experiences",
+      "Talk about weekends and holidays in the past",
+      "Express future plans with ir a + infinitive"
+     ]
+    },
+    {
+     "title": "Talking about the past and plans practice",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2026-12-31 → 2026-12-31",
+     "placed": null,
+     "aim": "Build Talking about the past and plans through deliberate practice.",
+     "points": [
+      "Use the pretérito perfecto for recent experiences",
+      "Talk about weekends and holidays in the past",
+      "Express future plans with ir a + infinitive"
+     ]
+    },
+    {
+     "title": "Talking about the past and plans practice 2",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-01-01 → 2027-01-02",
+     "placed": null,
+     "aim": "Build Talking about the past and plans through deliberate practice.",
+     "points": [
+      "Use the pretérito perfecto for recent experiences",
+      "Talk about weekends and holidays in the past",
+      "Express future plans with ir a + infinitive"
+     ]
+    },
+    {
+     "title": "Talking about the past and plans practice 3",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-01-04 → 2027-01-04",
+     "placed": null,
+     "aim": "Build Talking about the past and plans through deliberate practice.",
+     "points": [
+      "Use the pretérito perfecto for recent experiences",
+      "Talk about weekends and holidays in the past",
+      "Express future plans with ir a + infinitive"
+     ]
+    },
+    {
+     "title": "Talking about the past and plans milestone check",
+     "role": "milestone",
+     "minutes": 30,
+     "window": "2027-01-05 → 2027-01-06",
+     "placed": null,
+     "aim": "Show you can do Talking about the past and plans without help.",
+     "points": [
+      "Use the pretérito perfecto for recent experiences",
+      "Talk about weekends and holidays in the past",
+      "Express future plans with ir a + infinitive"
+     ]
+    },
+    {
+     "title": "Everyday small talk lesson",
+     "role": "lesson",
+     "minutes": 30,
+     "window": "2027-01-07 → 2027-01-07",
+     "placed": null,
+     "aim": "Learn how Everyday small talk works.",
+     "points": [
+      "Comment on weather, health and mood",
+      "Give opinions with creo que and en mi opinión",
+      "Agree, disagree and show surprise politely"
+     ]
+    },
+    {
+     "title": "Everyday small talk practice",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-01-08 → 2027-01-09",
+     "placed": null,
+     "aim": "Build Everyday small talk through deliberate practice.",
+     "points": [
+      "Comment on weather, health and mood",
+      "Give opinions with creo que and en mi opinión",
+      "Agree, disagree and show surprise politely"
+     ]
+    },
+    {
+     "title": "Everyday small talk practice 2",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-01-11 → 2027-01-11",
+     "placed": null,
+     "aim": "Build Everyday small talk through deliberate practice.",
+     "points": [
+      "Comment on weather, health and mood",
+      "Give opinions with creo que and en mi opinión",
+      "Agree, disagree and show surprise politely"
+     ]
+    },
+    {
+     "title": "Everyday small talk practice 3",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-01-12 → 2027-01-13",
+     "placed": null,
+     "aim": "Build Everyday small talk through deliberate practice.",
+     "points": [
+      "Comment on weather, health and mood",
+      "Give opinions with creo que and en mi opinión",
+      "Agree, disagree and show surprise politely"
+     ]
+    },
+    {
+     "title": "Everyday small talk milestone check",
+     "role": "milestone",
+     "minutes": 30,
+     "window": "2027-01-14 → 2027-01-14",
+     "placed": null,
+     "aim": "Show you can do Everyday small talk without help.",
+     "points": [
+      "Comment on weather, health and mood",
+      "Give opinions with creo que and en mi opinión",
+      "Agree, disagree and show surprise politely"
+     ]
+    },
+    {
+     "title": "Hold a 10-minute conversation lesson",
+     "role": "lesson",
+     "minutes": 30,
+     "window": "2027-01-15 → 2027-01-16",
+     "placed": null,
+     "aim": "Learn how Hold a 10-minute conversation works.",
+     "points": [
+      "Open, sustain and close a conversation without English",
+      "Ask for clarification without switching languages",
+      "Link ideas with pero, aunque, entonces, además"
+     ]
+    },
+    {
+     "title": "Hold a 10-minute conversation practice",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-01-18 → 2027-01-18",
+     "placed": null,
+     "aim": "Build Hold a 10-minute conversation through deliberate practice.",
+     "points": [
+      "Open, sustain and close a conversation without English",
+      "Ask for clarification without switching languages",
+      "Link ideas with pero, aunque, entonces, además"
+     ]
+    },
+    {
+     "title": "Hold a 10-minute conversation practice 2",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-01-19 → 2027-01-20",
+     "placed": null,
+     "aim": "Build Hold a 10-minute conversation through deliberate practice.",
+     "points": [
+      "Open, sustain and close a conversation without English",
+      "Ask for clarification without switching languages",
+      "Link ideas with pero, aunque, entonces, además"
+     ]
+    },
+    {
+     "title": "Hold a 10-minute conversation practice 3",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-01-21 → 2027-01-21",
+     "placed": null,
+     "aim": "Build Hold a 10-minute conversation through deliberate practice.",
+     "points": [
+      "Open, sustain and close a conversation without English",
+      "Ask for clarification without switching languages",
+      "Link ideas with pero, aunque, entonces, además"
+     ]
+    },
+    {
+     "title": "Hold a 10-minute conversation practice 4",
+     "role": "practise",
+     "minutes": 30,
+     "window": "2027-01-22 → 2027-01-23",
+     "placed": null,
+     "aim": "Build Hold a 10-minute conversation through deliberate practice.",
+     "points": [
+      "Open, sustain and close a conversation without English",
+      "Ask for clarification without switching languages",
+      "Link ideas with pero, aunque, entonces, además"
+     ]
+    },
+    {
+     "title": "Hold a 10-minute conversation milestone check",
+     "role": "milestone",
+     "minutes": 30,
+     "window": "2027-01-25 → 2027-01-25",
+     "placed": null,
+     "aim": "Show you can do Hold a 10-minute conversation without help.",
+     "points": [
+      "Open, sustain and close a conversation without English",
+      "Ask for clarification without switching languages",
+      "Link ideas with pero, aunque, entonces, además"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "auto-mastery",
+   "area": "Auto: the planner chooses",
+   "title": "Get really good at integration by parts and substitution",
+   "preset": "mastery",
+   "dueInDays": 14,
+   "due": "2026-11-27",
+   "seconds": 5.8,
+   "status": 200,
+   "error": null,
+   "stages": [
+    "Reading your week",
+    "Reading your week · 0 commitments",
+    "Planning Get really good at integration by parts and substitution",
+    "Working out the plan",
+    "8 topics from the AI",
+    "Building your plan",
+    "19 sessions to Thu 26 Nov",
+    "Fitting 19 pieces of work into your free time",
+    "170 checks passed"
+   ],
+   "strategy": "8 parts, 2 recall checks at widening gaps, then a mastery test.",
+   "type": "general",
+   "questions": [],
+   "syllabus": {
+    "source": "model",
+    "researched": false,
+    "sources": [],
+    "name": "Integration by parts and substitution",
+    "papers": [],
+    "units": [
+     {
+      "title": "Recognising antiderivatives",
+      "points": [
+       "Recall standard integrals: powers, e^x, sin, cos, 1/x, 1/(1+x^2)",
+       "Rewrite integrands into standard form (split fractions, complete the square)",
+       "Use linearity to split sums and pull out constant factors"
+      ],
+      "weight": 2,
+      "difficulty": 1,
+      "confidence": null
+     },
+     {
+      "title": "Substitution: choosing u",
+      "points": [
+       "Spot an inner function whose derivative is present",
+       "Choose u = g(x) and compute du = g'(x) dx",
+       "Handle constant factors that appear or go missing"
+      ],
+      "weight": 3,
+      "difficulty": 1,
+      "confidence": null
+     },
+     {
+      "title": "Substitution in definite integrals",
+      "points": [
+       "Change the limits to u-values when substituting",
+       "Evaluate without converting back to x",
+       "Check sign and orientation of limits after substitution"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Trigonometric substitutions",
+      "points": [
+       "Integrate products such as sin^m x cos^n x using odd-power substitution",
+       "Turn even powers into double angles with cos2x identities",
+       "Use tan x = sin x / cos x substitutions where useful"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Integration by parts",
+      "points": [
+       "Apply ∫u dv = uv − ∫v du correctly",
+       "Choose u by LIATE (log, inverse trig, algebraic, trig, exponential)",
+       "Integrate ∫x^n e^{ax}, ∫x^n sin ax, ∫x^n cos ax"
+      ],
+      "weight": 3,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Repeated and cyclic integration by parts",
+      "points": [
+       "Apply parts twice for ∫x^2 e^x style integrands",
+       "Handle cyclic integrals like ∫e^x sin x by solving for I",
+       "Use reduction-style reasoning to lower a power step by step"
+      ],
+      "weight": 2,
+      "difficulty": 3,
+      "confidence": null
+     },
+     {
+      "title": "ln x, inverse trig and hidden products",
+      "points": [
+       "Integrate ln x by taking u = ln x, dv = dx",
+       "Integrate arctan x and arcsin x by parts",
+       "Spot hidden products such as ∫x ln x or ∫x arctan x"
+      ],
+      "weight": 2,
+      "difficulty": 2,
+      "confidence": null
+     },
+     {
+      "title": "Choosing between substitution and parts",
+      "points": [
+       "Decide by structure: composition suggests substitution, product suggests parts",
+       "Combine parts with a substitution in multi-step integrals",
+       "Use parts to prove substitution-like results such as ∫ln x dx"
+      ],
+      "weight": 3,
+      "difficulty": 3,
+      "confidence": null
+     }
+    ]
+   },
+   "constraints": [],
+   "verification": {
+    "pass": true,
+    "quality": 94,
+    "critics": [
+     "realism 82: 1 day above what you usually sustain.",
+     "exam_prep 100: No exams in view.",
+     "front_loading 91: 3 items finish on the due date with no room to run long.",
+     "interleaving 100: Practice is mixed across subjects.",
+     "fragmentation 100: Sessions are a workable length.",
+     "neglect 100: Every active goal has time."
+    ]
+   },
+   "trace": {
+    "ms": 5725,
+    "errors": [],
+    "solver": {
+     "ms": 11,
+     "items": 19,
+     "placed": 19,
+     "iterations": 1
+    },
+    "tokens": {
+     "calls": 2,
+     "input": 2118,
+     "cached": 1792,
+     "output": 938,
+     "servedModel": "deepseek-flash",
+     "firstTokenMs": [
+      796,
+      900
+     ]
+    }
+   },
+   "plan": {
+    "items": 19,
+    "placed": 19,
+    "laterWeeks": 0,
+    "unplaced": 0,
+    "first": "2026-11-13",
+    "last": "2026-11-26"
+   },
+   "sessions": [
+    {
+     "title": "Recognising antiderivatives study",
+     "role": "learn",
+     "minutes": 65,
+     "window": "2026-11-13 → 2026-11-14",
+     "placed": "2026-11-13",
+     "aim": "Understand Recognising antiderivatives well enough to explain it and do the standard questions.",
+     "points": [
+      "Recall standard integrals: powers, e^x, sin, cos, 1/x, 1/(1+x^2)",
+      "Rewrite integrands into standard form (split fractions, complete the square)",
+      "Use linearity to split sums and pull out constant factors"
+     ]
+    },
+    {
+     "title": "Recognising antiderivatives practice questions",
+     "role": "practise",
+     "minutes": 45,
+     "window": "2026-11-13 → 2026-11-14",
+     "placed": "2026-11-13",
+     "aim": "Get confident with Recognising antiderivatives questions.",
+     "points": [
+      "Recall standard integrals: powers, e^x, sin, cos, 1/x, 1/(1+x^2)",
+      "Rewrite integrands into standard form (split fractions, complete the square)",
+      "Use linearity to split sums and pull out constant factors"
+     ]
+    },
+    {
+     "title": "Substitution: choosing u study",
+     "role": "learn",
+     "minutes": 75,
+     "window": "2026-11-13 → 2026-11-16",
+     "placed": "2026-11-13",
+     "aim": "Understand Substitution: choosing u well enough to explain it and do the standard questions.",
+     "points": [
+      "Spot an inner function whose derivative is present",
+      "Choose u = g(x) and compute du = g'(x) dx",
+      "Handle constant factors that appear or go missing"
+     ]
+    },
+    {
+     "title": "Substitution: choosing u practice questions",
+     "role": "practise",
+     "minutes": 55,
+     "window": "2026-11-13 → 2026-11-16",
+     "placed": "2026-11-14",
+     "aim": "Get confident with Substitution: choosing u questions.",
+     "points": [
+      "Spot an inner function whose derivative is present",
+      "Choose u = g(x) and compute du = g'(x) dx",
+      "Handle constant factors that appear or go missing"
+     ]
+    },
+    {
+     "title": "Substitution in definite integrals study",
+     "role": "learn",
+     "minutes": 70,
+     "window": "2026-11-14 → 2026-11-17",
+     "placed": "2026-11-14",
+     "aim": "Understand Substitution in definite integrals well enough to explain it and do the standard questions.",
+     "points": [
+      "Change the limits to u-values when substituting",
+      "Evaluate without converting back to x",
+      "Check sign and orientation of limits after substitution"
+     ]
+    },
+    {
+     "title": "Substitution in definite integrals practice questions",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-11-14 → 2026-11-17",
+     "placed": "2026-11-14",
+     "aim": "Get confident with Substitution in definite integrals questions.",
+     "points": [
+      "Change the limits to u-values when substituting",
+      "Evaluate without converting back to x",
+      "Check sign and orientation of limits after substitution"
+     ]
+    },
+    {
+     "title": "Trigonometric substitutions study",
+     "role": "learn",
+     "minutes": 70,
+     "window": "2026-11-16 → 2026-11-17",
+     "placed": "2026-11-16",
+     "aim": "Understand Trigonometric substitutions well enough to explain it and do the standard questions.",
+     "points": [
+      "Integrate products such as sin^m x cos^n x using odd-power substitution",
+      "Turn even powers into double angles with cos2x identities",
+      "Use tan x = sin x / cos x substitutions where useful"
+     ]
+    },
+    {
+     "title": "Trigonometric substitutions practice questions",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-11-16 → 2026-11-17",
+     "placed": "2026-11-16",
+     "aim": "Get confident with Trigonometric substitutions questions.",
+     "points": [
+      "Integrate products such as sin^m x cos^n x using odd-power substitution",
+      "Turn even powers into double angles with cos2x identities",
+      "Use tan x = sin x / cos x substitutions where useful"
+     ]
+    },
+    {
+     "title": "Integration by parts study",
+     "role": "learn",
+     "minutes": 80,
+     "window": "2026-11-16 → 2026-11-18",
+     "placed": "2026-11-16",
+     "aim": "Understand Integration by parts well enough to explain it and do the standard questions.",
+     "points": [
+      "Apply ∫u dv = uv − ∫v du correctly",
+      "Choose u by LIATE (log, inverse trig, algebraic, trig, exponential)",
+      "Integrate ∫x^n e^{ax}, ∫x^n sin ax, ∫x^n cos ax"
+     ]
+    },
+    {
+     "title": "Integration by parts practice questions",
+     "role": "practise",
+     "minutes": 60,
+     "window": "2026-11-16 → 2026-11-18",
+     "placed": "2026-11-17",
+     "aim": "Get confident with Integration by parts questions.",
+     "points": [
+      "Apply ∫u dv = uv − ∫v du correctly",
+      "Choose u by LIATE (log, inverse trig, algebraic, trig, exponential)",
+      "Integrate ∫x^n e^{ax}, ∫x^n sin ax, ∫x^n cos ax"
+     ]
+    },
+    {
+     "title": "Repeated and cyclic integration by parts study",
+     "role": "learn",
+     "minutes": 75,
+     "window": "2026-11-17 → 2026-11-19",
+     "placed": "2026-11-17",
+     "aim": "Understand Repeated and cyclic integration by parts well enough to explain it and do the standard questions.",
+     "points": [
+      "Apply parts twice for ∫x^2 e^x style integrands",
+      "Handle cyclic integrals like ∫e^x sin x by solving for I",
+      "Use reduction-style reasoning to lower a power step by step"
+     ]
+    },
+    {
+     "title": "Repeated and cyclic integration by parts practice questions",
+     "role": "practise",
+     "minutes": 55,
+     "window": "2026-11-17 → 2026-11-19",
+     "placed": "2026-11-17",
+     "aim": "Get confident with Repeated and cyclic integration by parts questions.",
+     "points": [
+      "Apply parts twice for ∫x^2 e^x style integrands",
+      "Handle cyclic integrals like ∫e^x sin x by solving for I",
+      "Use reduction-style reasoning to lower a power step by step"
+     ]
+    },
+    {
+     "title": "ln x, inverse trig and hidden products study",
+     "role": "learn",
+     "minutes": 70,
+     "window": "2026-11-18 → 2026-11-19",
+     "placed": "2026-11-18",
+     "aim": "Understand ln x, inverse trig and hidden products well enough to explain it and do the standard questions.",
+     "points": [
+      "Integrate ln x by taking u = ln x, dv = dx",
+      "Integrate arctan x and arcsin x by parts",
+      "Spot hidden products such as ∫x ln x or ∫x arctan x"
+     ]
+    },
+    {
+     "title": "ln x, inverse trig and hidden products practice questions",
+     "role": "practise",
+     "minutes": 50,
+     "window": "2026-11-18 → 2026-11-19",
+     "placed": "2026-11-18",
+     "aim": "Get confident with ln x, inverse trig and hidden products questions.",
+     "points": [
+      "Integrate ln x by taking u = ln x, dv = dx",
+      "Integrate arctan x and arcsin x by parts",
+      "Spot hidden products such as ∫x ln x or ∫x arctan x"
+     ]
+    },
+    {
+     "title": "Choosing between substitution and parts study",
+     "role": "learn",
+     "minutes": 85,
+     "window": "2026-11-19 → 2026-11-19",
+     "placed": "2026-11-19",
+     "aim": "Understand Choosing between substitution and parts well enough to explain it and do the standard questions.",
+     "points": [
+      "Decide by structure: composition suggests substitution, product suggests parts",
+      "Combine parts with a substitution in multi-step integrals",
+      "Use parts to prove substitution-like results such as ∫ln x dx"
+     ]
+    },
+    {
+     "title": "Choosing between substitution and parts practice questions",
+     "role": "practise",
+     "minutes": 65,
+     "window": "2026-11-19 → 2026-11-19",
+     "placed": "2026-11-19",
+     "aim": "Get confident with Choosing between substitution and parts questions.",
+     "points": [
+      "Decide by structure: composition suggests substitution, product suggests parts",
+      "Combine parts with a substitution in multi-step integrals",
+      "Use parts to prove substitution-like results such as ∫ln x dx"
+     ]
+    },
+    {
+     "title": "Recall check: 8 topics",
+     "role": "recall",
+     "minutes": 30,
+     "window": "2026-11-20 → 2026-11-21",
+     "placed": "2026-11-20",
+     "aim": "Pull Recognising antiderivatives to Choosing between substitution and parts back from memory after a gap.",
+     "points": [
+      "Recognising antiderivatives: Recall standard integrals: powers, e^x, sin, cos, 1/x, 1/(1+x^2)",
+      "Recognising antiderivatives: Rewrite integrands into standard form (split fractions, complete the square)",
+      "Substitution: choosing u: Spot an inner function whose derivative is present"
+     ]
+    },
+    {
+     "title": "Recall check 2",
+     "role": "recall",
+     "minutes": 30,
+     "window": "2026-11-23 → 2026-11-24",
+     "placed": "2026-11-23",
+     "aim": "Pull Recognising antiderivatives to Choosing between substitution and parts back from memory after a gap.",
+     "points": [
+      "Recognising antiderivatives: Recall standard integrals: powers, e^x, sin, cos, 1/x, 1/(1+x^2)",
+      "Recognising antiderivatives: Rewrite integrands into standard form (split fractions, complete the square)",
+      "Substitution: choosing u: Spot an inner function whose derivative is present"
+     ]
+    },
+    {
+     "title": "Mastery test",
+     "role": "checkpoint",
+     "minutes": 70,
+     "window": "2026-11-26 → 2026-11-26",
+     "placed": "2026-11-26",
+     "aim": "Prove you've mastered Recognising antiderivatives to Choosing between substitution and parts on unseen questions.",
+     "points": [
+      "Unseen, mixed questions",
+      "No notes, timed",
+      "Mark it honestly"
+     ]
+    }
+   ]
+  }
+ ]
+}

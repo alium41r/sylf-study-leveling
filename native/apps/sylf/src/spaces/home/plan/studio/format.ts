@@ -113,15 +113,22 @@ export const SOURCE_WORDS: Record<planning.Syllabus["source"], string> = {
   subject: "From your Sylf syllabus",
 };
 
-export const PRESET_WORDS: Record<planning.PlanPreset | "auto", { label: string; icon: string; due: string }> = {
-  auto: { label: "Auto", icon: "auto", due: "Date" },
-  exam: { label: "Exam", icon: "paper", due: "Exam date" },
-  course: { label: "Whole course", icon: "layers", due: "Finish by" },
-  mastery: { label: "Topic mastery", icon: "focus", due: "Finish by" },
-  skill: { label: "Skill", icon: "progress", due: "Target date" },
-  assignment: { label: "Assignment", icon: "notes", due: "Due" },
-  reading: { label: "Reading", icon: "resources", due: "Finish by" },
+export const PRESET_WORDS: Record<planning.PlanPreset | "auto", { label: string; icon: string; due: string; detail: string }> = {
+  auto: { label: "Auto", icon: "auto", due: "Date", detail: "The planner picks the best shape" },
+  exam: { label: "Exam", icon: "paper", due: "Exam date", detail: "Revise every topic, past papers, a light final day" },
+  course: { label: "Whole course", icon: "layers", due: "Finish by", detail: "Learn a full syllabus over weeks or months" },
+  mastery: { label: "Topic mastery", icon: "focus", due: "Finish by", detail: "Learn one chapter or topic deeply" },
+  skill: { label: "Skill", icon: "progress", due: "Target date", detail: "Practise a skill, with or without a deadline" },
+  assignment: { label: "Assignment", icon: "notes", due: "Due", detail: "Essay, report, project or problem set" },
+  reading: { label: "Reading", icon: "resources", due: "Finish by", detail: "A book or reading list, part by part" },
 };
+
+/** Where a plan's topics came from, in a few words. */
+export function sourceWords(syllabus: planning.Syllabus): string {
+  if (syllabus.library?.reused) return syllabus.library.trust === "CHECKED" ? "From Sylf's syllabus library · checked" : "From Sylf's syllabus library";
+  if (syllabus.library) return syllabus.library.trust === "CHECKED" ? "Researched and double-checked" : "From the AI · no sources found";
+  return SOURCE_WORDS[syllabus.source];
+}
 
 /** Where a topic stands: revised, practised, or when its next session is. */
 export function unitStatus(model: Model, goal: string, unit: string, blocks: readonly Block[]): { revised: boolean; practised: boolean; next: string | null; sessions: number } {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  addDays, compileStudyPath, describePath, diffDays, editSyllabus, inferPreset, normalizeSyllabus, paperLabel, parseTopicCommand, shortTitle, parseTopicList, pathPhases, questDescription, seededRandom, solve, verify,
+  addDays, applyCorrections, boundCorrections, codeIn, compileStudyPath, describePath, diffDays, outlineKey, outlineKeys, editSyllabus, inferPreset, normalizeSyllabus, paperLabel, parseTopicCommand, shortTitle, parseTopicList, pathPhases, questDescription, seededRandom, solve, verify,
   type Syllabus, type WorkModel,
 } from "@/lib/planner/kernel";
 import { catalogSyllabus, linkTopics, matchSyllabi } from "@/lib/planner/catalog/syllabi";
@@ -304,9 +304,12 @@ describe("presets", () => {
 
   it("shortens long topic names at a word, never mid-word", () => {
     expect(shortTitle("The balance of payments and exchange rates")).toBe("Balance of payments and exchange rates");
-    expect(shortTitle("Macroeconomic objectives and policy conflicts")).toBe("Macroeconomic objectives and policy");
+    expect(shortTitle("Macroeconomic objectives and policy conflicts")).toBe("Macroeconomic objectives");
+    expect(shortTitle("Terms of trade and international competitiveness")).toBe("Terms of trade");
+    expect(shortTitle("Conflicts and trade-offs between macroeconomic objectives")).toBe("Conflicts and trade-offs");
     expect(shortTitle("Public expenditure, taxation and the national debt")).toBe("Public expenditure, taxation");
     expect(shortTitle("Quadratics")).toBe("Quadratics");
+    expect(normalizeSyllabus({ source: "model", name: "X", units: [{ title: "DBQ &amp; historical skills", points: ["Source &quot;HIPP&quot; analysis"] }] }).units[0]).toMatchObject({ title: "DBQ & historical skills", points: ['Source "HIPP" analysis'] });
   });
 
   it("shortens paper names for session titles", () => {
@@ -345,5 +348,63 @@ describe("presets over random instances", () => {
       const input = { snapshot: snap, model, blocks: [] };
       expect(verify(input, solve(input)).failures, `seed ${seed} ${preset}`).toEqual([]);
     }
+  });
+});
+
+describe("syllabus library keys and corrections", () => {
+  const id = (over: Partial<import("@/lib/planner/kernel").SyllabusIdentity>) => ({ board: null, qualification: null, subject: null, code: null, component: null, edition: null, ...over });
+  it("gives one key to the same syllabus asked for in different words", () => {
+    const a = outlineKey(id({ board: "Cambridge International", qualification: "AS & A Level", subject: "Chemistry", code: "9701", component: "Paper 2" }));
+    const b = outlineKey(id({ board: "CAIE", qualification: "A Level", subject: "chemistry", code: "9701", component: "P2" }));
+    expect(a).toBe("caie|9701|p2");
+    expect(b).toBe(a);
+    expect(outlineKey(id({ board: "KNEC", qualification: "KCSE", subject: "Biology", code: "231/1", component: "Paper 1" }))).toBe(outlineKey(id({ board: "KCSE", subject: "Biology", code: "231/1", component: "paper 1" })));
+    expect(outlineKey(id({ board: "College Board", qualification: "AP", subject: "US History" }))).toBe("collegeboard|ap|us history|all");
+  });
+  it("also keys a coded syllabus by its description, so requests with and without the code meet", () => {
+    const keys = outlineKeys(id({ board: "CAIE", qualification: "A Level", subject: "Chemistry", code: "9701", component: "Paper 2" }));
+    expect(keys).toEqual(["caie|9701|p2", "caie|a level|chemistry|p2"]);
+    expect(outlineKeys(id({ board: "Cambridge International", qualification: "A Level", subject: "Chemistry", component: "Paper 2" }))).toEqual(["caie|a level|chemistry|p2"]);
+  });
+  it("treats Cambridge AS and A Level as one syllabus, but not other boards'", () => {
+    expect(outlineKey(id({ board: "CAIE", qualification: "AS Level", subject: "Chemistry", component: "Paper 2" }))).toBe(outlineKey(id({ board: "Cambridge International", qualification: "A Level", subject: "Chemistry", component: "Paper 2" })));
+    expect(outlineKey(id({ board: "Edexcel", qualification: "AS Level", subject: "Economics", component: "Paper 2" }))).not.toBe(outlineKey(id({ board: "Edexcel", qualification: "A Level", subject: "Economics", component: "Paper 2" })));
+  });
+  it("finds a syllabus code in free text, never a year", () => {
+    expect(codeIn("2025–2027 (Cambridge International AS & A Level Chemistry 9701)")).toBe("9701");
+    expect(codeIn("KCSE Biology 231/1 Paper 1")).toBe("231/1");
+    expect(codeIn("Edexcel 9EC0 Paper 2")).toBe("9EC0");
+    expect(codeIn("Exam in 2026")).toBeNull();
+  });
+  it("does not key a request too vague to share", () => {
+    expect(outlineKey(id({ subject: "Chemistry" }))).toBeNull();
+    expect(outlineKey(id({ board: "My school" }))).toBeNull();
+    expect(outlineKey(null)).toBeNull();
+  });
+  it("sets aside a double-check that turns subtopics into topics or splits papers", () => {
+    const base = normalizeSyllabus({ source: "model", name: "AP", units: Array.from({ length: 9 }, (_, i) => ({ title: `Period ${i + 1}`, points: [] })), papers: [{ label: "Section I", minutes: 95, marks: null }, { label: "Section II", minutes: 100, marks: null }] });
+    const flood = { add: Array.from({ length: 6 }, (_, i) => ({ title: `Key concept ${i}`, points: [], after: "Period 1" })), remove: [], rename: [], papers: [{ label: "Section I", minutes: 55, marks: 40 }, { label: "Section II", minutes: 40, marks: 12 }, { label: "Section II", minutes: 60, marks: 7 }], edition: null };
+    const bounded = boundCorrections(base, flood);
+    expect(bounded.add).toEqual([]);
+    expect(bounded.papers).toBeNull();
+    const fair = boundCorrections(base, { ...flood, add: flood.add.slice(0, 2), papers: [{ label: "Section I", minutes: 95, marks: 55 }, { label: "Section II", minutes: 100, marks: 13 }] });
+    expect(fair.add).toHaveLength(2);
+    expect(fair.papers).toHaveLength(2);
+  });
+  it("drops additions that restate a topic already there", () => {
+    const base = normalizeSyllabus({ source: "model", name: "AP", units: [{ title: "Period 7: 1890–1945", points: [] }, { title: "Excretion and homeostasis", points: [] }] });
+    const fixed = applyCorrections(base, { add: [{ title: "Period 7", points: [], after: null }, { title: "Excretion and homeostasis in plants", points: [], after: null }, { title: "Ecology", points: [], after: null }], remove: [], rename: [], papers: null, edition: null });
+    expect(fixed.units.map((u) => u.title)).toEqual(["Period 7: 1890–1945", "Excretion and homeostasis", "Ecology"]);
+  });
+  it("applies a double-check's corrections and keeps the student's ratings", () => {
+    const base = normalizeSyllabus({ source: "model", name: "Chem", units: [{ title: "Atomic structure", points: ["a"] }, { title: "Hydrocarbons", points: ["b"] }, { title: "Practical skills", points: ["c"] }], papers: [{ label: "Paper 2", minutes: 75, marks: 50 }] });
+    base.units[1].confidence = "weak";
+    base.identity = { board: "CAIE", qualification: null, subject: "Chemistry", code: "9701", component: "Paper 2", edition: null };
+    const fixed = applyCorrections(base, { add: [{ title: "Halogen compounds", points: ["x"], after: "Hydrocarbons" }, { title: "Polymerisation", points: [], after: null }], remove: ["Practical skills"], rename: [{ from: "Atomic structure", to: "Atomic Structure (AS)" }], papers: [{ label: "Paper 2", minutes: 75, marks: 60 }], edition: "2025–2027" });
+    expect(fixed.units.map((u) => u.title)).toEqual(["Atomic Structure (AS)", "Hydrocarbons", "Halogen compounds", "Polymerisation"]);
+    expect(fixed.units[1].confidence).toBe("weak");
+    expect(new Set(fixed.units.map((u) => u.key)).size).toBe(4);
+    expect(fixed.papers[0].marks).toBe(60);
+    expect(fixed.identity?.edition).toBe("2025–2027");
   });
 });

@@ -161,6 +161,13 @@ export function useStudio() {
 
   const command = useCallback((text: string) => run({ workflow: "command", key: keyFor(`command:${text}`), text }, `command:${text}`), [run, keyFor]);
   const addGoal = useCallback((input: { title?: string; type?: string; due?: string | null; subjectId?: number | null; notes?: string; goalKey?: string } & PlanRequest) => run({ workflow: "add_goal", key: keyFor(`goal:${input.goalKey ?? input.title}`), ...input }, `goal:${input.goalKey ?? input.title}`), [run, keyFor]);
+  /** "No, it's off": the syllabus is researched and double-checked again with the note, and an improved plan comes back for review. */
+  const recheck = useCallback((goal: string, note: string | null) => run({ workflow: "recheck", key: keyFor(`recheck:${goal}:${note ?? ""}`), goal, note }, `recheck:${goal}:${note ?? ""}`), [run, keyFor]);
+  /** "Looks good", or closing the card: recorded, and the plan stays as it is. */
+  const feedback = useCallback(async (goal: string, verdict: "accurate" | "dismissed") => {
+    if (!reads) return;
+    try { setState(await reads.feedback(goal, verdict)); if (verdict === "accurate") notice("Thanks. The plan stays as it is."); } catch (error) { notice(describeFailureText(error), { tone: "caution" }); }
+  }, [reads, notice]);
   const answer = useCallback((question: string, reply: string) => run({ workflow: "answer", key: keyFor(`answer:${question}:${reply}`), question, answer: reply }, `answer:${question}:${reply}`), [run, keyFor]);
   const ask = useCallback((text: string) => run({ workflow: "question", text }, "question"), [run]);
   const brief = useCallback(() => run({ workflow: "brief" }, "brief"), [run]);
@@ -255,7 +262,7 @@ export function useStudio() {
   return {
     state, failure, offline, busy, activity, preview, view, reads,
     open, command, addGoal, answer, ask, brief, cancelRun, dismissActivity, accept, discard, undo, direct, previewMove, commitMove,
-    previewWhatIf, keepWhatIf, clearPreview: () => setPreview(null), saveSettings, explain, explainSentence, editSyllabus,
+    previewWhatIf, keepWhatIf, clearPreview: () => setPreview(null), saveSettings, explain, explainSentence, editSyllabus, recheck, feedback,
   };
 }
 export type Studio = ReturnType<typeof useStudio>;

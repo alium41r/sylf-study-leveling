@@ -65,6 +65,8 @@ export interface StudioState {
   facts: { commitments: number; quests: number; sessions: number; calendarComplete: boolean };
   calibrationNotes: Record<string, string>;
   repaired: { summary: string } | null;
+  /** The latest answer to "Is this plan right?" per goal, with its plan round. Absent from servers that predate it. */
+  feedback?: Record<string, { round: number; verdict: string }>;
 }
 
 export type StudioEvent =
@@ -102,6 +104,7 @@ export type StudioWorkflow =
   | { workflow: "command"; key: string; text: string }
   | { workflow: "add_goal"; key: string; title?: string; type?: string; due?: string | null; subjectId?: number | null; priority?: number; notes?: string; goalKey?: string } & PlanRequest
   | { workflow: "answer"; key: string; question: string; answer: string }
+  | { workflow: "recheck"; key: string; goal: string; note?: string | null }
   | { workflow: "brief" }
   | { workflow: "question"; text: string }
   | { workflow: "explain"; block: string };
@@ -163,6 +166,8 @@ export function createStudioReads(client: BackendClient) {
       const value = withState.parse(await post({ action: "syllabus", key, ...edit })) as { state: unknown; proposal: StudioProposal | null };
       return { state: stateOf(value.state), proposal: value.proposal };
     },
+    /** "Is this plan right?": yes, or closed. A "no" is the `recheck` workflow, which streams. */
+    feedback: async (goal: string, verdict: "accurate" | "dismissed") => stateOf((withState.parse(await post({ action: "feedback", goal, verdict })) as { state: unknown }).state),
     settings: async (settings: Partial<planning.StudioSettings>) => stateOf((withState.parse(await post({ action: "settings", settings })) as { state: unknown }).state),
     explain: async (block: string) => (await post({ action: "explain", block })) as { reasons: planning.Reason[]; sentence: string | null; calibration: string | null },
     /** Runs a workflow and hands over its events as they arrive. Resolves with the final result; a failure arrives as an `error` event and a rejection. */

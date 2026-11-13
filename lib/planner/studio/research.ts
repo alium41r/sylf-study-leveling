@@ -29,17 +29,20 @@ function score(result: SearchResult): number {
 }
 
 /**
- * Searches once and reads up to three pages. Bounded to about twenty seconds and 18,000 characters of text, and never throws: no sources is an
- * answer the caller handles by keeping the model's own list.
+ * Searches (one query, or several pooled for a careful first look) and reads the best few pages. Bounded in time and in text, and never throws:
+ * no sources is an answer the caller handles by keeping the model's own list.
  */
-export async function findSources(query: string, signal?: AbortSignal): Promise<FoundSource[]> {
+export async function findSources(query: string | string[], signal?: AbortSignal, options: { pages?: number; seconds?: number } = {}): Promise<FoundSource[]> {
   const provider = selectSearchProvider(process.env, { preferDeepSeek: true });
-  const q = query.replace(/\s+/g, " ").trim().slice(0, 120);
-  if (!provider || q.length < 4) return [];
-  const deadline = AbortSignal.timeout(20_000);
+  const queries = (Array.isArray(query) ? query : [query]).map((q) => q.replace(/\s+/g, " ").trim().slice(0, 120)).filter((q) => q.length >= 4).slice(0, 4);
+  if (!provider || !queries.length) return [];
+  const deadline = AbortSignal.timeout((options.seconds ?? 20) * 1000);
   const bounded = signal ? AbortSignal.any([signal, deadline]) : deadline;
-  let results: SearchResult[];
-  try { results = await provider.search({ query: q, limit: 8, signal: bounded }); } catch { return []; }
+  // Several queries widen the net for a syllabus nobody has planned before; their results are pooled, best first.
+  const settled = await Promise.all(queries.map((q) => provider.search({ query: q, limit: 8, signal: bounded }).catch(() => [] as SearchResult[])));
+  const results = settled.flat();
+  if (!results.length) return [];
+  const pages = Math.max(1, Math.min(5, options.pages ?? 3));
   const seen = new Set<string>();
   const ranked = [...results].sort((a, b) => score(b) - score(a)).filter((r) => {
     let host = "";
@@ -48,7 +51,7 @@ export async function findSources(query: string, signal?: AbortSignal): Promise<
     seen.add(host);
     return score(r) > -50;
   });
-  const read = await Promise.all(ranked.slice(0, 3).map(async (r) => {
+  const read = await Promise.all(ranked.slice(0, pages).map(async (r) => {
     try {
       const page = await fetchSource(r.url, { signal: bounded, extractText: true });
       const text = page.text.replace(/\s+/g, " ").trim();
@@ -57,11 +60,21 @@ export async function findSources(query: string, signal?: AbortSignal): Promise<
       return { title: r.title, url: r.url, text: r.snippet ?? "" };
     }
   }));
-  const rest = ranked.slice(3, 6).filter((r) => r.snippet).map((r) => ({ title: r.title, url: r.url, text: r.snippet! }));
+  const rest = ranked.slice(pages, pages + 3).filter((r) => r.snippet).map((r) => ({ title: r.title, url: r.url, text: r.snippet! }));
   return [...read, ...rest].filter((s) => s.text.trim().length > 40);
 }
 
 /** Sources as the model reads them: numbered, titled, and inside the data tags the prompt treats as untrusted. */
 export function sourcesForPrompt(sources: FoundSource[]): string {
   return sources.map((s, i) => `[S${i + 1}] ${s.title.slice(0, 120)} (${(() => { try { return new URL(s.url).hostname; } catch { return "web"; } })()})\n${s.text}`).join("\n\n").slice(0, 11_500);
+}
+
+/** Queries for a careful first look at a named syllabus: its official document, its current edition, and the paper's content. */
+export function syllabusQueries(identity: { board: string | null; qualification: string | null; subject: string | null; code: string | null; component: string | null; edition: string | null }, title: string, year: number): string[] {
+  const base = [identity.board, identity.qualification, identity.subject, identity.code].filter(Boolean).join(" ") || title;
+  return [
+    `${base} syllabus ${year}`,
+    `${base} ${identity.component ?? ""} specification topics`.replace(/\s+/g, " "),
+    identity.edition ? `${base} syllabus ${identity.edition}` : `${base} latest syllabus pdf`,
+  ];
 }

@@ -2,7 +2,7 @@
 // items as they are written, solver previews as blocks settle, and finally the verified proposal. Drags, what-ifs and repairs never come here.
 import { z } from "zod";
 import { eventStream, readStudioBody } from "@/lib/planner/studio/http";
-import { runAddGoal, runAnswer, runBrief, runCommand, runExplain, runQuestion } from "@/lib/planner/studio/workflows";
+import { runAddGoal, runAnswer, runBrief, runCommand, runExplain, runQuestion, runRecheck } from "@/lib/planner/studio/workflows";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -16,6 +16,7 @@ const workflow = z.discriminatedUnion("workflow", [
     daysPerWeek: z.number().int().min(1).max(7).nullable().optional(), sessionMinutes: z.number().int().min(10).max(180).nullable().optional(), start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
     level: z.string().max(200).nullable().optional(), weak: z.string().max(400).nullable().optional(), target: z.string().max(80).nullable().optional(), topics: z.string().max(4000).nullable().optional() }),
   z.object({ workflow: z.literal("answer"), key, question: z.string().max(80), answer: z.string().min(1).max(2000) }),
+  z.object({ workflow: z.literal("recheck"), key, goal: z.string().min(1).max(80), note: z.string().max(600).nullable().optional() }),
   z.object({ workflow: z.literal("brief") }),
   z.object({ workflow: z.literal("question"), text: z.string().min(2).max(400) }),
   z.object({ workflow: z.literal("explain"), block: z.string().min(1).max(80) }),
@@ -30,6 +31,7 @@ export async function POST(req: Request) {
       case "command": return runCommand(userId, { key: body.key, text: body.text }, emit, signal);
       case "add_goal": return runAddGoal(userId, body, emit, signal);
       case "answer": return runAnswer(userId, body, emit, signal);
+      case "recheck": return runRecheck(userId, body, emit, signal);
       case "brief": return { text: await runBrief(userId, emit, signal) };
       case "question": return { text: await runQuestion(userId, { text: body.text }, emit, signal) };
       case "explain": return runExplain(userId, { block: body.block, phrase: true }, emit, signal);

@@ -59,9 +59,14 @@ const clampInt = (value: unknown, min: number, max: number, fallback: number) =>
   return Math.max(min, Math.min(max, n));
 };
 const clean = (value: unknown, max: number) => (typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, max) : "");
+/** A title within 60 characters, shortened at a natural break (a colon, dash, comma or word) rather than cut with an ellipsis. */
 const title60 = (value: unknown) => {
   const text = clean(value, 200);
-  return text.length > 60 ? `${text.slice(0, 59).trimEnd()}…` : text;
+  if (text.length <= 60) return text;
+  const head = text.slice(0, 61);
+  const brk = Math.max(head.lastIndexOf(": "), head.lastIndexOf(" – "), head.lastIndexOf(" - "), head.lastIndexOf(", "), head.lastIndexOf(" ("));
+  const cut = brk >= 25 ? head.slice(0, brk) : head.replace(/\s+\S*$/, "");
+  return cut.replace(/(?:[\s,;&]+(?:and|or|of|the|to|for|in|on|with|from|by|at|as|a|an|&))+$/i, "").replace(/[\s,;:&-]+$/, "") || text.slice(0, 60);
 };
 
 /** Normalizes estimate and chunk ranges so the solver never sees an impossible item. */

@@ -2,11 +2,11 @@
 // solver writes. Pure types and constants, shared by the server and Sylf Native through @sylf/shared. Every value is plain JSON so a plan version can
 // store it unchanged and a device can re-solve from exactly what the server saw.
 
-export const KERNEL_VERSION = "kernel-1.2.0";
-export const SOLVER_VERSION = "solver-1.1.0";
+export const KERNEL_VERSION = "kernel-1.3.0";
+export const SOLVER_VERSION = "solver-1.2.0";
 export const STRATEGY_VERSION = "strategy-1.1.0";
 /** The study-path compiler that turns a syllabus into sessions (curriculum.ts). */
-export const PATH_VERSION = "path-2.0.0";
+export const PATH_VERSION = "path-2.1.0";
 
 export type DateKey = string;
 export type ItemKind = "learn" | "practice" | "review" | "produce" | "admin";

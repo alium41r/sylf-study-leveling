@@ -7,8 +7,8 @@ import { createHash } from "node:crypto";
 import { withAiRequest } from "@/lib/ai/telemetry-runtime";
 import { releaseQuota, reserveQuota } from "@/lib/ai/usage-limiter";
 import {
-  PLAN_PRESETS, applyCorrections, applyOperations, autoApplies, boundCorrections, calibrationNote, codeIn, outlineKeys, classifyChange, compileStudyPath, dayLabel, describePath, diffDays, diffPlans, editSyllabus, formatMinutes,
-  inferGoalType, inferPreset, isDateKey, isFixed, markWeak, presetOf, normalizeSizes, normalizeSyllabus, parseCommand, parseTopicCommand, parseTopicList, propose, scaffold,
+  PLAN_PRESETS, applyCorrections, applyOperations, autoApplies, boundCorrections, uncoveredUnits, calibrationNote, codeIn, outlineKeys, classifyChange, compileStudyPath, dayLabel, describePath, diffDays, diffPlans, editSyllabus, formatMinutes,
+  coverFocus, dropCoursework, inferGoalType, inferPreset, isDateKey, isFixed, markWeak, namedFocus, paceWork, presetOf, normalizeSizes, normalizeSyllabus, parseCommand, parseTopicCommand, parseTopicList, propose, scaffold,
   signals as computeSignals,
   type Block, type Confidence, type GoalType, type KGoal, type Op, type OutlineCorrections, type Pace, type SyllabusIdentity, type PlanCandidate, type PlanPreset, type Signal, type Syllabus, type SyllabusUnit, type WhatIf, type WorkItem, type WorkModel,
 } from "../kernel";
@@ -80,14 +80,15 @@ function toOp(raw: Record<string, unknown>): Op | null {
 }
 
 /** A decomposed item from the model to an add_item operation, with ids made unique per goal so parallel breakdowns cannot collide. */
-function itemOp(raw: Record<string, unknown>, goalRef: string, prefix: string, known: (ref: string) => boolean): Op | null {
+function itemOp(raw: Record<string, unknown>, goalRef: string, prefix: string, known: (ref: string) => boolean, topicKnown: (ref: string) => boolean = () => true): Op | null {
   const id = typeof raw.id === "string" && raw.id.trim() ? `${prefix}${raw.id.trim()}` : null;
   if (!id) return null;
   const s = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : null);
   const after = (Array.isArray(raw.after) ? raw.after : []).filter((a): a is string => typeof a === "string" && a.trim().length > 0).map((a) => (known(a) ? a : `${prefix}${a}`));
   const nums = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is number => typeof x === "number") : null);
   return {
-    op: "add_item", id, goal: goalRef, title: s(raw.title) ?? "", kind: s(raw.kind), method: s(raw.method), topics: (Array.isArray(raw.topics) ? raw.topics : []).filter((t): t is string => typeof t === "string" && t.length > 0),
+    // A topic named in words rather than by a snapshot ref is dropped, not a reason to lose the whole item.
+    op: "add_item", id, goal: goalRef, title: s(raw.title) ?? "", kind: s(raw.kind), method: s(raw.method), topics: (Array.isArray(raw.topics) ? raw.topics : []).filter((t): t is string => typeof t === "string" && t.length > 0 && topicKnown(t)),
     est: nums(raw.est), chunk: nums(raw.chunk), earliest: s(raw.earliest), due: s(raw.due), after, load: typeof raw.load === "number" ? raw.load : null, note: s(raw.note), first_step: s(raw.first_step),
   };
 }
@@ -184,6 +185,7 @@ async function decompose(w: Working, goalKey: string, ai: boolean, notes: string
 
   const prefix = `${goalRef}.`;
   const known = (ref: string) => Boolean(w.refs.items[ref]);
+  const topicKnown = (ref: string) => w.refs.topics[ref] !== undefined;
   const request = [
     `Break down goal ${goalRef} "${goal.title}" (${goal.type}${goal.due ? `, due ${goal.due}` : ", no deadline"}${subjectRef ? `, subject ${subjectRef}` : ""}).`,
     topics.length ? `Use topics from ${subjectRef} where they fit; weakest first.` : "There are no syllabus topics for this goal; name the work concretely.",
@@ -198,7 +200,7 @@ async function decompose(w: Working, goalKey: string, ai: boolean, notes: string
     const result = await callTool<{ strategy?: string; items?: Record<string, unknown>[]; assumptions?: string[]; question?: string; options?: string[] }>({
       userId: w.ctx.userId, profile: "goal.decompose", messages, tool: DECOMPOSE_TOOL, signal,
       stream: { field: "items", onElement: (value) => {
-        const op = itemOp(value as Record<string, unknown>, goalRef, prefix, known);
+        const op = itemOp(value as Record<string, unknown>, goalRef, prefix, known, topicKnown);
         if (!op) return;
         const applied = apply(w, [op], "model");
         if (applied.errors.length) { rejected.push(`${(value as { id?: string }).id}: ${applied.errors[0].message}`); return; }
@@ -212,12 +214,22 @@ async function decompose(w: Working, goalKey: string, ai: boolean, notes: string
     track(w, result);
     const args = result.args;
     if (args.strategy) { w.strategy.push(args.strategy.slice(0, 200)); w.emit({ type: "strategy", goal: goalKey, text: args.strategy.slice(0, 200) }); }
-    // Items the stream parser missed (rare: invalid JSON fragments) are applied from the final document.
-    for (const raw of args.items ?? []) {
-      const id = typeof raw.id === "string" ? `${prefix}${raw.id}` : null;
-      if (!id || w.refs.items[id] || rejected.some((r) => r.startsWith(`${raw.id}:`))) continue;
-      const op = itemOp(raw, goalRef, prefix, known);
-      if (op) { const applied = apply(w, [op], "model"); if (!applied.errors.length) streamed++; }
+    // Items the stream parser missed (rare: invalid JSON fragments), and items rejected only because they named one that had not streamed yet,
+    // are applied from the final document, in its order.
+    for (let pass = 0; pass < 2; pass++) {
+      for (const raw of args.items ?? []) {
+        const id = typeof raw.id === "string" ? `${prefix}${raw.id}` : null;
+        if (!id || w.refs.items[id]) continue;
+        const op = itemOp(raw, goalRef, prefix, known, topicKnown);
+        if (!op) continue;
+        const applied = apply(w, [op], "model");
+        if (applied.errors.length) continue;
+        streamed++;
+        const index = rejected.findIndex((r) => r.startsWith(`${raw.id}:`));
+        if (index >= 0) rejected.splice(index, 1);
+        const item = w.model.items.find((i) => i.key === applied.applied[0]?.key);
+        if (item) w.emit({ type: "item", goal: goalKey, item });
+      }
     }
     const extra: Op[] = [];
     (args.assumptions ?? []).slice(0, 3).forEach((text, i) => { if (text?.trim()) extra.push({ op: "note_assumption", id: `${goalRef}.a${i + 1}`, text, affects: [goalRef] }); });
@@ -232,14 +244,14 @@ async function decompose(w: Working, goalKey: string, ai: boolean, notes: string
       if (retry) {
         track(w, retry);
         for (const raw of retry.args.items ?? []) {
-          const op = itemOp(raw, goalRef, prefix, known);
+          const op = itemOp(raw, goalRef, prefix, known, topicKnown);
           if (!op || w.refs.items[(op as { id: string }).id]) continue;
           const applied = apply(w, [op], "model");
           if (!applied.errors.length) { streamed++; const item = w.model.items.find((i) => i.key === applied.applied[0]?.key); if (item) w.emit({ type: "item", goal: goalKey, item }); }
         }
       }
     }
-    if (!streamed) throw new GatewayError("invalid", "No usable items.");
+    if (!streamed) throw new GatewayError("invalid", `No usable items.${rejected.length ? ` ${rejected.slice(0, 3).join("; ").slice(0, 300)}` : ""}`);
     // Drop dangling dependencies to rejected items, then let the solver see the finished breakdown.
     const keys = new Set(w.model.items.map((i) => i.key));
     for (const item of w.model.items) item.after = item.after.filter((a) => keys.has(a));
@@ -252,6 +264,9 @@ async function decompose(w: Working, goalKey: string, ai: boolean, notes: string
       template();
     }
   }
+  // An assignment's work is spread over the time to its date rather than packed into the first free days, from the model or the template.
+  const paced = w.model.goals.find((g) => g.key === goalKey);
+  if (paced?.due && (paced.preset === "assignment" || paced.type === "essay" || paced.type === "project" || paced.type === "problem_set")) w.model = paceWork(w.model, goalKey, w.ctx.snapshot);
 }
 
 const SOURCE_LABEL: Record<Syllabus["source"], string> = { catalog: "Sylf's syllabus list", model: "the AI", student: "your list", subject: "your Sylf syllabus" };
@@ -271,16 +286,17 @@ async function identify(w: Working, goalKey: string, input: { notes: string | nu
 }
 
 /** The double-check: an independent reading of an outline against sources (and a learner's report), as corrections. */
-async function verifyOutline(w: Working, syllabus: Syllabus, sources: string | null, report: string | null, signal?: AbortSignal): Promise<OutlineCorrections & { verdict: "ok" | "revise"; notes: string | null }> {
-  const result = await callTool<{ verdict?: string; edition?: string; missing?: { title?: string; points?: string[]; after?: string }[]; remove?: string[]; rename?: { from?: string; to?: string }[]; papers?: { label?: string; minutes?: number; marks?: number }[]; notes?: string }>({
+async function verifyOutline(w: Working, syllabus: Syllabus, sources: string | null, report: string | null, signal?: AbortSignal, uncovered?: string[]): Promise<OutlineCorrections & { verdict: "ok" | "revise"; notes: string | null; official: string[] }> {
+  const result = await callTool<{ official?: string[]; verdict?: string; edition?: string; missing?: { title?: string; points?: string[]; after?: string }[]; remove?: string[]; rename?: { from?: string; to?: string }[]; papers?: { label?: string; minutes?: number; marks?: number }[]; notes?: string }>({
     userId: w.ctx.userId, profile: "syllabus.verify", tool: VERIFY_TOOL, signal,
-    messages: [{ role: "system", content: VERIFY_SYSTEM }, { role: "user", content: verifyRequest({ name: syllabus.name, edition: syllabus.identity?.edition ?? null, units: syllabus.units.filter((u) => u.included), papers: syllabus.papers, sources, report }) }],
+    messages: [{ role: "system", content: VERIFY_SYSTEM }, { role: "user", content: verifyRequest({ name: syllabus.name, edition: syllabus.identity?.edition ?? null, units: syllabus.units.filter((u) => u.included), papers: syllabus.papers, sources, report, uncovered }) }],
   });
   track(w, result);
   const a = result.args;
   const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
   return {
     verdict: a.verdict === "revise" ? "revise" : "ok", notes: str(a.notes) || null, edition: str(a.edition) || null,
+    official: (a.official ?? []).filter((t): t is string => typeof t === "string" && t.trim().length > 0).map((t) => t.trim().slice(0, 120)).slice(0, 60),
     add: (a.missing ?? []).filter((m) => str(m.title)).slice(0, 12).map((m) => ({ title: str(m.title), points: (m.points ?? []).filter((p): p is string => typeof p === "string"), after: str(m.after) || null })),
     remove: (a.remove ?? []).filter((t): t is string => typeof t === "string" && t.trim().length > 0).slice(0, 12),
     rename: (a.rename ?? []).filter((r) => str(r.from) && str(r.to)).slice(0, 12).map((r) => ({ from: str(r.from), to: str(r.to) })),
@@ -293,6 +309,38 @@ async function verifyOutline(w: Working, syllabus: Syllabus, sources: string | n
  * read, then an independent double-check against the same sources whose corrections are applied. Slower and more thorough than everyday planning,
  * and it runs once per syllabus: everyone after reuses the result.
  */
+/**
+ * The double-check of a mapped outline against its sources: an independent reading as bounded corrections, then the checker's list of the
+ * official units compared with the outline, and one focused second look at any official unit still uncovered (added when really missing).
+ */
+async function doubleCheck(w: Working, goalKey: string, mapped: Syllabus, text: string | null, signal?: AbortSignal): Promise<Syllabus> {
+  w.emit({ type: "stage", stage: "check", text: "Double-checking the topics" });
+  const check = await verifyOutline(w, mapped, text, null, signal).catch(() => null);
+  let syllabus = mapped;
+  if (!check) return syllabus;
+  const before = JSON.stringify(syllabus.units.map((u) => u.title));
+  const bounded = boundCorrections(syllabus, check);
+  Object.assign(check, bounded);
+  syllabus = applyCorrections(syllabus, bounded);
+  const uncovered = check.official.length ? uncoveredUnits(syllabus, check.official) : [];
+  if (uncovered.length) {
+    w.emit({ type: "stage", stage: "check", text: `Checking ${uncovered.length} more official topic${uncovered.length === 1 ? "" : "s"}` });
+    const second = await verifyOutline(w, syllabus, text, null, signal, uncovered).catch(() => null);
+    if (second) {
+      const extra = boundCorrections(syllabus, { add: second.add, remove: [], rename: [], papers: null, edition: null });
+      check.add.push(...extra.add);
+      syllabus = applyCorrections(syllabus, { ...extra, edition: null });
+    }
+  }
+  if (JSON.stringify(syllabus.units.map((u) => u.title)) !== before) {
+    w.emit({ type: "units_reset", goal: goalKey });
+    for (const unit of syllabus.units) w.emit({ type: "unit", goal: goalKey, unit });
+  }
+  const fixes = check.add.length + check.remove.length + check.rename.length + (check.papers?.length ? 1 : 0);
+  w.emit({ type: "stage", stage: "check", text: fixes ? `Double-check made ${fixes} correction${fixes === 1 ? "" : "s"}` : "Double-check agreed" });
+  return syllabus;
+}
+
 async function carefulOutline(w: Working, goalKey: string, asked: { notes: string | null; typed: { title: string; points: string[] }[]; preset: PlanPreset | "auto"; level: string | null; target: string | null }, identity: SyllabusIdentity, signal?: AbortSignal): Promise<Mapped | null> {
   const goal = w.model.goals.find((g) => g.key === goalKey)!;
   w.emit({ type: "stage", stage: "research", text: "Researching this syllabus for the first time" });
@@ -301,22 +349,8 @@ async function carefulOutline(w: Working, goalKey: string, asked: { notes: strin
   const text = sources.length ? sourcesForPrompt(sources) : null;
   const mapped = await mapOutline(w, goalKey, { ...asked, sources: text }, signal);
   if (!mapped?.syllabus.units.length) return mapped;
-  w.emit({ type: "stage", stage: "check", text: "Double-checking the topics" });
-  const check = await verifyOutline(w, { ...mapped.syllabus, identity }, text, null, signal).catch(() => null);
-  let syllabus: Syllabus = { ...mapped.syllabus, identity, researched: sources.length > 0, sources: sources.slice(0, 6).map((x) => ({ title: x.title, url: x.url })) };
-  if (check) {
-    const before = JSON.stringify(syllabus.units.map((u) => u.title));
-    const bounded = boundCorrections(syllabus, check);
-    Object.assign(check, bounded);
-    syllabus = applyCorrections(syllabus, bounded);
-    if (JSON.stringify(syllabus.units.map((u) => u.title)) !== before) {
-      w.emit({ type: "units_reset", goal: goalKey });
-      for (const unit of syllabus.units) w.emit({ type: "unit", goal: goalKey, unit });
-    }
-    const fixes = check.add.length + check.remove.length + check.rename.length + (check.papers?.length ? 1 : 0);
-    w.emit({ type: "stage", stage: "check", text: fixes ? `Double-check made ${fixes} correction${fixes === 1 ? "" : "s"}` : "Double-check agreed" });
-  }
-  return { ...mapped, syllabus, preset: mapped.preset };
+  const syllabus = await doubleCheck(w, goalKey, { ...dropCoursework(mapped.syllabus), identity, researched: sources.length > 0, sources: sources.slice(0, 6).map((x) => ({ title: x.title, url: x.url })) }, text, signal);
+  return { ...mapped, syllabus: dropCoursework(syllabus), preset: mapped.preset };
 }
 
 /** Topic text the student typed, keeping line breaks so one topic a line stays a list. */
@@ -418,6 +452,8 @@ async function planFromOutline(w: Working, goalKey: string, ai: boolean, notes: 
         }
       }
       if (!mapped) mapped = await mapOutline(w, goalKey, asked, signal).catch(fail);
+      // A book outlined in a handful of parts rather than its chapters is looked up: its table of contents is worth one search.
+      if (mapped && mapped.preset === "reading" && !typed.length && mapped.syllabus.units.length < 10) mapped = { ...mapped, confidence: "low", research: mapped.research ?? `${goal.title.replace(/^read\s+/i, "")} table of contents chapters`.slice(0, 120) };
       // Not sure of this course: look it up and map again from what was found. Optional, and only when a search provider is configured.
       if (mapped && !mapped.syllabus.library && mapped.confidence !== "high" && mapped.research && mapped.preset !== "assignment" && researchAvailable()) {
         w.emit({ type: "stage", stage: "research", text: "Looking up the syllabus" });
@@ -425,13 +461,21 @@ async function planFromOutline(w: Working, goalKey: string, ai: boolean, notes: 
         w.emit({ type: "stage", stage: "research", text: sources.length ? `Read ${sources.length} source${sources.length === 1 ? "" : "s"}` : "Nothing useful found; using what the planner knows" });
         if (sources.length) {
           w.emit({ type: "units_reset", goal: goalKey });
-          const again = await mapOutline(w, goalKey, { ...asked, preset: mapped.preset, sources: sourcesForPrompt(sources) }, signal).catch(fail);
-          if (again?.syllabus.units.length) mapped = { ...again, syllabus: { ...again.syllabus, researched: true, sources: sources.slice(0, 6).map((x) => ({ title: x.title, url: x.url })) } };
+          const text = sourcesForPrompt(sources);
+          const again = await mapOutline(w, goalKey, { ...asked, preset: mapped.preset, sources: text }, signal).catch(fail);
+          // A researched outline is double-checked against the same sources, as a library entry is.
+          if (again?.syllabus.units.length) {
+            const researched: Syllabus = { ...again.syllabus, researched: true, sources: sources.slice(0, 6).map((x) => ({ title: x.title, url: x.url })) };
+            // Only a course or exam has an official syllabus to check against, and a student's own topic list is never changed.
+            const checkable = (again.preset === "exam" || again.preset === "course") && researched.source === "model";
+            mapped = { ...again, syllabus: checkable ? await doubleCheck(w, goalKey, researched, text, signal).catch(() => researched) : researched };
+          }
         }
       }
       if (mapped) {
         preset = mapped.preset;
         if (preset === "assignment") return { planned: false, preset };
+        if (mapped.syllabus.source === "model") mapped = { ...mapped, syllabus: dropCoursework(mapped.syllabus) };
         if (mapped.syllabus.units.length) { syllabus = mapped.syllabus; scope = mapped.scope; }
         if (mapped.question && !w.model.questions.length) apply(w, [{ op: "ask", id: `${goalRef}.q1`, text: mapped.question.text, options: mapped.question.options, affects: [goalRef] }], "model");
       }
@@ -452,7 +496,10 @@ async function planFromOutline(w: Working, goalKey: string, ai: boolean, notes: 
       w.emit({ type: "notice", text: "List the topics and the planner builds the rest." });
       return { planned: false, preset };
     }
-    syllabus = markWeak(linkTopics(syllabus, nodes), extra.weak);
+    // Whatever the learner singled out ("especially Bayes") is covered, and counts as a weak spot.
+    const focusText = `${goal.title}${notes ? `. ${notes}` : ""}`;
+    if (syllabus.source !== "catalog" && syllabus.source !== "student") syllabus = coverFocus(syllabus, focusText);
+    syllabus = markWeak(linkTopics(syllabus, nodes), [extra.weak, namedFocus(focusText).join(", ")].filter(Boolean).join(", ") || null);
     current().syllabus = syllabus;
     if (syllabus.source !== "model" || syllabus.library?.reused) for (const unit of syllabus.units) w.emit({ type: "unit", goal: goalKey, unit });
     w.emit({ type: "syllabus", goal: goalKey, name: syllabus.name, source: syllabus.source, units: syllabus.units.length });

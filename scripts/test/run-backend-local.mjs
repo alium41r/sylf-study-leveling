@@ -7,7 +7,8 @@
  *   ... node scripts/test/run-backend-local.mjs --journey [--build] [--out <dir>]       the whole student journey in real Electron, as two processes on one profile, so a restart is a real restart. Build `native/` first
  *   ... node scripts/test/run-backend-local.mjs --studio [--with-deepseek] [--dev]      the Planning Studio in real Electron (sign-up, plan, accept, edit, undo, screenshots). Build `native/` first.
  *   ... node scripts/test/run-backend-local.mjs --generations --dev --with-deepseek    real plan generations for scripts/test/planner-generation-cases.json, written as generations.json and .md
- *       (SYLF_GENERATION_CASES=id,id runs only those cases)
+ *       (SYLF_GENERATION_CASES=id,id runs only those cases; SYLF_GENERATION_FILE=<cases.json> reads another bank, such as
+ *       scripts/test/planner-quality-cases.json, whose `expect` blocks are scored by lib/plan-quality.mjs into quality.json and quality.md)
  *       --with-deepseek is the one deliberate exception to blanking: it passes DEEPSEEK_API_KEY (from the environment or .env) so the Studio's
  *       model path runs for real. It spends a few tenths of a cent; leave it off to exercise the template path only.
  * Without --dev it needs a build (`--build`). Redis, Supabase storage, Realtime, email and AI providers are off, and those paths use their fallbacks.
@@ -17,6 +18,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { backendEnvironment, buildSchemaFromMigrations, root, startDisposablePostgres } from "./lib/disposable-backend.mjs";
+import { scorePlan } from "./lib/plan-quality.mjs";
 
 const args = process.argv.slice(2);
 const has = name => args.includes(name);
@@ -99,13 +101,16 @@ async function generations() {
   const registered = await jar.call("/api/auth/register", { method: "POST", body: { email: `gen_${tag}@local.test`, password: `Gen-${tag}-Password1!`, name: "Generations", username: `gen_${tag}`, timezone: "UTC" } });
   if (registered.status !== 201) throw new Error(`Could not register (${registered.status}).`);
   const only = (process.env.SYLF_GENERATION_CASES ?? "").split(",").map((x) => x.trim()).filter(Boolean);
-  const cases = JSON.parse(readFileSync(join(root, "scripts/test/planner-generation-cases.json"), "utf8")).filter((c) => !only.length || only.includes(c.id));
+  const file = process.env.SYLF_GENERATION_FILE || "scripts/test/planner-generation-cases.json";
+  const cases = JSON.parse(readFileSync(join(root, file), "utf8")).filter((c) => !only.length || only.includes(c.id));
+  const quality = [];
   const today = (await jar.call("/api/planner/studio")).json?.snapshot?.today;
   const plusDays = (date, days) => { const d = new Date(`${date}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + days); return d.toISOString().slice(0, 10); };
   const results = [];
   for (const [index, c] of cases.entries()) {
     const due = c.dueInDays != null ? plusDays(today, c.dueInDays) : c.due ?? null;
-    const body = { workflow: "add_goal", key: `gen-${tag}-${index}`, title: c.title, preset: c.preset, due, minutesPerDay: c.minutesPerDay ?? null, daysPerWeek: c.daysPerWeek ?? null, sessionMinutes: c.sessionMinutes ?? null, level: c.level ?? null, weak: c.weak ?? null, target: c.target ?? null, topics: c.topics ?? null, ...(c.notes ? { notes: c.notes } : {}) };
+    const start = c.startInDays != null ? plusDays(today, c.startInDays) : null;
+    const body = { workflow: "add_goal", key: `gen-${tag}-${index}`, title: c.title, preset: c.preset, due, start, minutesPerDay: c.minutesPerDay ?? null, daysPerWeek: c.daysPerWeek ?? null, sessionMinutes: c.sessionMinutes ?? null, level: c.level ?? null, weak: c.weak ?? null, target: c.target ?? null, topics: c.topics ?? null, ...(c.notes ? { notes: c.notes } : {}) };
     const started = Date.now();
     const response = await fetch(`${base}/api/planner/studio/stream`, { method: "POST", headers: { cookie: jar.cookie, "content-type": "application/json", accept: "application/x-ndjson" }, body: JSON.stringify(body) });
     const events = (await response.text()).split("\n").filter(Boolean).map((line) => { try { return JSON.parse(line); } catch { return null; } }).filter(Boolean);
@@ -127,7 +132,15 @@ async function generations() {
       plan: { items: items.length, placed: blocks.length, laterWeeks: new Set(budgets.map((b) => b.week)).size, unplaced: (proposal?.result?.unplaced ?? []).filter((u) => items.some((i) => i.key === u.item)).length, first: blocks.map((b) => b.date).sort()[0] ?? null, last: [...items.map((i) => i.due).filter(Boolean), ...blocks.map((b) => b.date)].sort().at(-1) ?? null },
       sessions: items.map((i) => ({ title: i.title, role: i.details?.role ?? i.method, minutes: i.est?.[0], window: `${i.earliest ?? today} → ${i.due ?? "open"}`, placed: blocks.filter((b) => b.item === i.key).map((b) => b.date).sort()[0] ?? null, aim: i.details?.aim ?? i.note ?? null, points: i.details?.points?.slice(0, 3) ?? [] })),
     });
-    console.log(`Generation ${index + 1}/${cases.length}: ${c.id} · ${response.status} · ${seconds} s · ${goal?.preset ?? "no goal"} · ${items.length} sessions`);
+    const error = events.find((e) => e.type === "error")?.message ?? null;
+    const scored = scorePlan({ c, today, due, proposal, goal, seconds, error });
+    quality.push({ id: c.id, area: c.area, title: c.title, asked: c, due, seconds, calls: proposal?.trace?.tokens?.calls ?? 0, stages: events.filter((e) => e.type === "stage").map((e) => e.text), score: scored.score, failed: scored.failed, checks: scored.checks,
+      preset: goal?.preset ?? null, strategy: proposal?.strategy ?? null, questions: proposal?.model?.questions?.map((q) => q.text) ?? [],
+      syllabus: goal?.syllabus ? { source: goal.syllabus.source, researched: goal.syllabus.researched ?? false, library: goal.syllabus.library ?? null, identity: goal.syllabus.identity ?? null, sources: (goal.syllabus.sources ?? []).map((x) => x.url), name: goal.syllabus.name, papers: goal.syllabus.papers, units: goal.syllabus.units.map((u) => ({ key: u.key, title: u.title, points: u.points, weight: u.weight, difficulty: u.difficulty, confidence: u.confidence, paper: u.paper ?? null })) } : null,
+      cap: (proposal?.model?.constraints ?? []).find((x) => x.kind === "goal_cap" && x.goal === goal?.key)?.minutes ?? null,
+      critics: proposal?.verification?.critics?.map((x) => `${x.code} ${x.score}: ${x.note}`) ?? [],
+      sessions: items.map((i) => ({ key: i.key, title: i.title, role: i.details?.role ?? i.method, minutes: i.est?.[0], earliest: i.earliest ?? null, due: i.due ?? null, after: i.after ?? [], blocks: blocks.filter((b) => b.item === i.key).map((b) => `${b.date} ${String(Math.floor(b.start / 60)).padStart(2, "0")}:${String(b.start % 60).padStart(2, "0")}–${b.end - b.start}m`).sort(), weeks: budgets.filter((b) => b.item === i.key).map((b) => `${b.week}:${b.minutes}m`), aim: i.details?.aim ?? i.note ?? null, points: i.details?.points ?? [], how: i.details?.how ?? null })) });
+    console.log(`Generation ${index + 1}/${cases.length}: ${c.id} · ${response.status} · ${seconds} s · ${goal?.preset ?? "no goal"} · ${items.length} sessions · score ${scored.score}${scored.failed.length ? ` · failed: ${scored.failed.map((f) => f.id).join(", ")}` : ""}`);
     if (proposal?.id) await jar.call("/api/planner/studio", { method: "POST", body: { action: "discard", proposalId: proposal.id } });
   }
   report.generations = results.map((r) => ({ id: r.id, status: r.status, seconds: r.seconds, preset: r.preset, sessions: r.plan.items, pass: r.verification?.pass ?? false }));
@@ -150,6 +163,36 @@ async function generations() {
     md.push("");
   }
   writeFileSync(join(out, "generations.md"), md.join("\n"));
+  if (cases.some((c) => c.expect)) writeQuality(out, today, file, quality);
+}
+
+/** The scorecard beside generations.md: each plan's automatic score and failed checks, then every session in date order, for the human review. */
+function writeQuality(dir, today, file, quality) {
+  report.quality = quality.map((q) => ({ id: q.id, score: q.score, failed: q.failed.map((f) => f.id) }));
+  writeFileSync(join(dir, "quality.json"), JSON.stringify({ today, file, quality }, null, 1) + "\n");
+  const mean = Math.round(quality.reduce((s, q) => s + q.score, 0) / Math.max(1, quality.length));
+  const md = [`# Plan quality (${today})`, "", `Automatic scores from \`scripts/test/lib/plan-quality.mjs\` for \`${file}\`; mean **${mean}**. Each plan's sessions follow in date order for the manual review.`, "", "| Case | Preset | Score | Seconds | Calls | Failed checks |", "| --- | --- | --- | --- | --- | --- |"];
+  for (const q of quality) md.push(`| ${q.id} | ${q.preset ?? "—"} | ${q.score} | ${q.seconds} | ${q.calls} | ${q.failed.map((f) => f.id).join(", ") || "—"} |`);
+  for (const q of quality) {
+    md.push("", `## ${q.id}: ${q.title}`, "", `*${q.area}.* Score **${q.score}**, planned as **${q.preset ?? "none"}**, due ${q.due ?? "none"}, ${q.seconds} s, ${q.calls} call(s). Stages: ${q.stages.join(" → ") || "—"}.`);
+    for (const f of q.failed) md.push(`- ✗ **${f.id}**: ${f.detail}`);
+    if (q.questions.length) md.push(`- Questions: ${q.questions.join(" ")}`);
+    if (q.strategy) md.push(`- Strategy: ${q.strategy}`);
+    if (q.critics.length) md.push(`- Critics: ${q.critics.join("; ")}`);
+    if (q.cap) md.push(`- Daily cap: ${q.cap} min`);
+    if (q.syllabus) {
+      const s = q.syllabus;
+      md.push(`- Syllabus **${s.name}** from ${s.source}${s.researched ? " (researched)" : ""}${s.library ? `, library ${s.library.reused ? "reused" : "new"} v${s.library.version} ${s.library.trust}` : ""}${s.identity ? `; identity ${[s.identity.board, s.identity.qualification, s.identity.subject, s.identity.code, s.identity.component].filter(Boolean).join(" / ")}` : ""}`);
+      if (s.papers?.length) md.push(`- Papers: ${s.papers.map((p) => `${p.label} ${p.minutes} min${p.marks ? `, ${p.marks} marks` : ""}`).join("; ")}`);
+      if (s.sources.length) md.push(`- Sources: ${s.sources.join(", ")}`);
+      md.push("", "Topics:", "");
+      for (const u of s.units) md.push(`${s.units.indexOf(u) + 1}. **${u.title}**${u.confidence ? ` (${u.confidence})` : ""} w${u.weight ?? "?"} d${u.difficulty ?? "?"}: ${(u.points ?? []).join("; ")}`);
+    }
+    md.push("", "| First block | Session | Role | Min | Blocks / weeks | Aim |", "| --- | --- | --- | --- | --- | --- |");
+    const ordered = [...q.sessions].sort((a, b) => (a.blocks[0] ?? a.weeks[0] ?? "9999").localeCompare(b.blocks[0] ?? b.weeks[0] ?? "9999"));
+    for (const x of ordered) md.push(`| ${x.blocks[0]?.slice(0, 10) ?? (x.weeks[0] ? `week ${x.weeks[0]}` : "—")} | ${x.title} | ${x.role} | ${x.minutes} | ${x.blocks.length ? x.blocks.join(", ") : x.weeks.join(", ")} | ${(x.aim ?? "").replace(/\|/g, "/")} ${x.points.length ? `· ${x.points.join("; ").replace(/\|/g, "/")}` : ""} |`);
+  }
+  writeFileSync(join(dir, "quality.md"), md.join("\n") + "\n");
 }
 
 function journey() {

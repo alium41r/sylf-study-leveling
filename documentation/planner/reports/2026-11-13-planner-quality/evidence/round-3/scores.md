@@ -1,0 +1,45 @@
+# round-3 scorecard
+
+Automatic scores from `scripts/test/lib/plan-quality.mjs`; the full session lists of this intermediate round were not kept (see the report for what was found and fixed).
+
+| Case | Preset | Score | Seconds | Calls | Sessions | Topics | Failed checks |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| aqa-gcse-biology-p1 | exam | 98 | 25.7 | 3 | 38 | 13 | topic count: 13 topics, expected 3–12 |
+| ib-maths-aa-hl-course | course | 97 | 28.3 | 3 | 128 | 25 | session titles clean: Cut or dirty titles: Mixed review: Maclaurin series and convergence and divergence |
+| jee-main-physics | exam | 100 | 24.1 | 3 | 120 | 19 | — |
+| aws-saa-c03 | exam | 94 | 20 | 3 | 45 | 17 | nothing unplaced: 7 session(s) unplaced: Mixed review: 3 topics (45 min); Database design and performance past paper practice (45 min); Detection, logging and compliance past pap |
+| usmle-step1 | exam | 100 | 36.1 | 3 | 173 | 20 | — |
+| sapiens-reading | reading | 97 | 4.1 | 1 | 14 | 4 | topic count: 4 topics, expected 12–25 |
+| guitar-skill | skill | 100 | 6.4 | 1 | 48 | 9 | — |
+| dissertation-lit-review | assignment | 100 | 11.3 | 1 | 12 | — | — |
+| quiz-tomorrow | exam | 100 | 25.8 | 3 | 4 | 5 | — |
+| typed-topics-future-start | course | 100 | 21.6 | 2 | 42 | 8 | — |
+| auto-vague-probability | mastery | 94 | 14.8 | 3 | 12 | 5 | covers /bayes/: No topic covers /bayes/ |
+| bac-philosophie | exam | 100 | 21.7 | 3 | 38 | 13 | — |
+| fbise-hssc2-physics | exam | 100 | 23.3 | 3 | 95 | 13 | — |
+| cfa-level-1 | exam | 100 | 15 | 3 | 110 | 10 | — |
+| gre-quant | exam | 97 | 16.9 | 3 | 57 | 21 | topic count: 21 topics, expected 4–14 |
+| thinking-fast-slow | reading | 94 | 16.4 | 1 | 54 | 40 | nothing unplaced: 37 session(s) unplaced: Read: Answering an Easier Question (30 min); Read: Law of Small Numbers (30 min); Read: Anchors (30 min); Read: The Science of Availabil |
+| calc-midterm-tomorrow | exam | 100 | 19.3 | 3 | 4 | 10 | — |
+| marketing-report | assignment | 100 | 11.3 | 1 | 11 | — | — |
+| python-skill | skill | 100 | 6.3 | 1 | 47 | 9 | — |
+
+Topics per plan:
+
+- **aqa-gcse-biology-p1**: Cell structure and microscopy · Cell division and stem cells · Transport in cells · Culturing microorganisms · Principles of organisation and digestive system · The heart and blood vessels · Blood, health and disease · Plant organs and transport · Communicable diseases · Human defence, vaccination and drugs · Monoclonal antibodies and plant disease · Photosynthesis and limiting factors · Respiration and metabolism
+- **ib-maths-aa-hl-course**: Sequences and series · Exponents and logarithms · Proof and mathematical induction · Binomial theorem · Partial fractions and systems of equations · Permutations and combinations · Complex numbers · Functions and graphs · Quadratics and polynomials · Rational functions and asymptotes · Modulus function · Exponential and logarithmic functions · Trigonometric equations and functions · Further trigonometric identities · Vectors and geometry · Statistics and data analysis · Probability · Distributions · Limits, continuity and differentiability · Differentiation · Implicit differentiation · Applications of differentiation · Integration · Differential equations and series · Maclaurin series and convergence and divergence
+- **jee-main-physics**: Units and Measurements · Kinematics · Laws of Motion · Work, Energy and Power · Rotational Motion · Gravitation · Properties of Solids and Liquids · Thermodynamics · Kinetic Theory of Gases · Oscillations and Waves · Electrostatics · Current Electricity · Magnetic Effects of Current and Magnetism · Electromagnetic Induction · Electromagnetic Waves · Optics · Dual Nature of Matter and Radiation · Atoms and Nuclei · Electronic Devices
+- **aws-saa-c03**: IAM identities and policies · Network security in a VPC · Encryption, keys and secrets · Detection, logging and compliance · High availability and fault tolerance · Loose coupling and messaging · Disaster recovery · Storage choice and sizing · Compute performance options · Database design and performance · Content delivery and global networking · API and integration performance · Compute cost optimization · Storage and data transfer cost · Cost-aware architecture decisions · Identity governance with AWS Organizations · Edge protection with AWS WAF and Shield
+- **usmle-step1**: General principles · General principles: cell biology and histology · General principles: human development · General principles: genetics · General principles: pharmacology principles · Immune system: pathology and disorders · Blood and lymphoreticular system · Cardiovascular system · Respiratory system · Renal and urinary system · Gastrointestinal system · Endocrine system · Reproductive system · Nervous system and special senses · Behavioral health · Musculoskeletal and connective tissue · Skin and subcutaneous tissue · Multisystem processes and disorders · Biostatistics · Communication and interpersonal skills / ethics
+- **sapiens-reading**: The Cognitive Revolution · The Agricultural Revolution · The Unification of Humankind · The Scientific Revolution
+- **guitar-skill**: Holding and tuning the guitar · Clean single notes and fretting · First open chords: Em, A, D · Core open chords: G, C, E, Am · More open chords: Dm, A7, Em7, F · Rhythm and strumming patterns · Changing chords in time · Playing with a song · Play your first full song
+- **quiz-tomorrow**: Acids and bases: definitions and properties · Strong and weak acids and bases · The pH scale and pH calculations · Indicators and pH measurement · Neutralisation and salt solutions
+- **typed-topics-future-start**: Structure and bonding · Alkanes and conformations · Stereochemistry · Nucleophilic substitution · Elimination reactions · Alkenes and alkynes · Alcohols and ethers · Spectroscopy
+- **auto-vague-probability**: Set notation and Venn diagrams · Tree diagrams and two-way tables · Conditional probability and the formula · Independence and conditional probability · Reverse conditionals and harder problems
+- **bac-philosophie**: La raison et le réel · La conscience et l'inconscient · La perception · Autrui · Le langage · La liberté · L'existence et le temps · La morale · L'État et la société · La justice et le droit · La religion · La technique et l'art · Auteurs du programme
+- **fbise-hssc2-physics**: Electrostatics · Electrostatic Potential Energy, Electron Volt · Current Electricity · Electromagnetism · Electromagnetic Induction · Alternating Current · Physics of Solids · Semiconductor Devices: Diodes and Transistors · Electronics · Dawn of Modern Physics · Relativity and Basic Forces of Nature · Atomic Spectra · Nuclear Physics
+- **cfa-level-1**: Ethical and Professional Standards · Quantitative Methods · Economics · Financial Statement Analysis · Corporate Issuers · Equity Investments · Fixed Income · Derivatives · Alternative Investments · Portfolio Management
+- **gre-quant**: Integers and number properties · Fractions, decimals and real numbers · Exponents and roots · Ratio, proportion and percent · Algebraic expressions and rules of exponents · Linear equations and inequalities · Quadratic equations and functions · Functions and their graphs · Coordinate geometry · Lines and angles · Triangles · Quadrilaterals and polygons · Circles · Three-dimensional figures · Presenting and interpreting data · Numerical methods for data · Counting methods · Probability · Distributions and random variables · Quantitative Comparison technique · Numeric entry and multiple-answer formats
+- **thinking-fast-slow**: Introduction · The Characters of the Story · Attention and Effort · The Lazy Controller · The Associative Machine · Cognitive Ease · Norms, Surprises, and Causes · A Machine for Jumping to Conclusions · How Judgements Happen · Answering an Easier Question · Law of Small Numbers · Anchors · The Science of Availability · Availability, Emotion, and Risk · Tom W's Specialty · Linda: Less is More · Causes Trump Statistics · Regression to the Mean · Taming Intuitive Predictions · The Illusion of Understanding · The Illusion of Validity · Intuitions vs. Formulas · Expert Intuition: When Can We Trust It? · The Outside View · The Engine of Capitalism · Bernoulli's Errors · Prospect Theory · The Endowment Effect · Bad Events · The Fourfold Pattern · Rare Events · Risk Policies · Keeping Score · Frames and Reality · Two Selves · Life as a Story · Experienced Well-Being · Thinking About Life · Conclusions · Appendix A: Judgement under Uncertainty
+- **calc-midterm-tomorrow**: Limits of functions · Calculating limits · Continuity · Limits involving infinity · Derivatives and rates of change · The derivative as a function · Differentiation rules · Derivatives of trigonometric functions · The chain rule and implicit differentiation · Derivatives of exponential
+- **python-skill**: Set up Python and run your first script · Python basics you will reuse · Read a CSV into a DataFrame · Select and filter rows and columns · Clean messy data · Summarise and group data · Combine datasets · Chart your results · Clean and chart a real CSV on your own

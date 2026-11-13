@@ -121,14 +121,62 @@ export function hashString(text: string): number {
  * Daily cap groups: a goal's own limit ("an hour and a half a day for this plan") for its sessions, and a subject's limit for every other session of
  * that subject. Each item counts against at most one group, so the flow stays a single path per item.
  */
-export function capGroups(constraints: readonly Constraint[]): { caps: Map<string, number>; groupOf: (item: Pick<WorkItem, "goal" | "subject">) => string | null } {
+export function capGroups(constraints: readonly Constraint[]): { caps: Map<string, number>; groupOf: (item: Pick<WorkItem, "goal" | "subject">) => string | null; soloOf: (item: Pick<WorkItem, "goal" | "subject" | "chunk">) => boolean } {
   const caps = new Map<string, number>();
   for (const c of constraints) {
     const key = c.kind === "goal_cap" ? `g:${c.goal}` : c.kind === "subject_cap" ? `s:${c.subject}` : null;
     if (key) caps.set(key, Math.min(caps.get(key) ?? Infinity, (c as { minutes: number }).minutes));
   }
   const groupOf = (item: Pick<WorkItem, "goal" | "subject">) => (item.goal && caps.has(`g:${item.goal}`) ? `g:${item.goal}` : item.subject != null && caps.has(`s:${item.subject}`) ? `s:${item.subject}` : null);
-  return { caps, groupOf };
+  // A single sitting longer than its group's daily limit (a full timed paper under "an hour a day") is allowed, and takes that day to itself:
+  // nothing else of the group is placed on the day it is sat.
+  const soloOf = (item: Pick<WorkItem, "goal" | "subject" | "chunk">) => { const group = groupOf(item); return group != null && item.chunk[0] > caps.get(group)!; };
+  return { caps, groupOf, soloOf };
+}
+
+/**
+ * After allocation: on a day a solo sitting is allocated, the rest of its cap group moves to the nearest other day of its window with room in the
+ * group and the day, or waits (overflow). Two solo sittings of one group never share a day either.
+ */
+function separateSolo(alloc: Allocation, demands: Demand[], capacity: { cap: number }[], constraints: readonly Constraint[], fixedSubject: Map<string, number>) {
+  const { caps, groupOf, soloOf } = capGroups(constraints);
+  if (!caps.size) return;
+  const byKey = new Map(demands.map((d) => [d.item.key, d]));
+  const used = new Array<number>(capacity.length).fill(0);
+  const groupUse = new Map<string, number>(fixedSubject);
+  for (const [key, days] of alloc.days) {
+    const d = byKey.get(key); const group = d ? groupOf(d.item) : null;
+    for (const [day, m] of days) { used[day] += m; if (group) groupUse.set(`${group}|${day}`, (groupUse.get(`${group}|${day}`) ?? 0) + m); }
+  }
+  const soloDay = new Map<string, string>();
+  for (const [key, days] of alloc.days) {
+    const d = byKey.get(key);
+    if (!d || !soloOf(d.item)) continue;
+    const group = groupOf(d.item)!;
+    for (const day of [...days.keys()].sort((a, b) => a - b)) if (!soloDay.has(`${group}|${day}`)) soloDay.set(`${group}|${day}`, key);
+  }
+  if (!soloDay.size) return;
+  const move = (key: string, d: Demand, group: string, day: number, minutes: number, solo: boolean) => {
+    const days = alloc.days.get(key)!;
+    const limit = caps.get(group)!;
+    const target = [...Array(Math.max(0, Math.min(capacity.length - 1, d.latest) - d.earliest + 1)).keys()].map((k) => d.earliest + k)
+      .filter((t) => t !== day && !d.forbidden.has(t) && capacity[t].cap - used[t] >= minutes && !soloDay.has(`${group}|${t}`) && (solo ? (groupUse.get(`${group}|${t}`) ?? 0) === 0 : (groupUse.get(`${group}|${t}`) ?? 0) + minutes <= limit))
+      .sort((a, b) => Math.abs(a - day) - Math.abs(b - day) || a - b)[0];
+    days.delete(day); used[day] -= minutes; groupUse.set(`${group}|${day}`, (groupUse.get(`${group}|${day}`) ?? 0) - minutes);
+    if (target == null) { alloc.overflow.set(key, (alloc.overflow.get(key) ?? 0) + minutes); if (!days.size) alloc.days.delete(key); return; }
+    days.set(target, (days.get(target) ?? 0) + minutes); used[target] += minutes; groupUse.set(`${group}|${target}`, (groupUse.get(`${group}|${target}`) ?? 0) + minutes);
+    if (solo) soloDay.set(`${group}|${target}`, key);
+  };
+  for (const [slot, owner] of [...soloDay]) {
+    const [group, dayText] = [slot.slice(0, slot.lastIndexOf("|")), slot.slice(slot.lastIndexOf("|") + 1)];
+    const day = Number(dayText);
+    for (const [key, days] of [...alloc.days]) {
+      if (key === owner || !days.has(day)) continue;
+      const d = byKey.get(key);
+      if (!d || groupOf(d.item) !== group) continue;
+      move(key, d, group, day, days.get(day)!, soloOf(d.item));
+    }
+  }
 }
 
 const matchesDay = (days: number[] | undefined, weekday: number) => !days || !days.length || days.includes(weekday);
@@ -268,7 +316,8 @@ function buildDemand(ctx: Ctx, items: WorkItem[], fixed: readonly Block[]): Dema
     // Measured from the exam itself: an item's own earlier deadline is a pacing window, not an exam.
     const examDay = goal?.type === "exam" ? goal.due ?? due : null;
     if (examDay && (item.kind === "learn" || item.method === "learn" || item.method === "worked_examples")) {
-      for (let k = 0; k <= Math.max(1, examBuffer); k++) { const idx = diffDays(addDays(examDay, -k), snapshot.today); if (idx >= 0) forbidden.add(idx); }
+      // Today always stays open: an exam tomorrow still gets this evening's revision.
+      for (let k = 0; k <= Math.max(1, examBuffer); k++) { const idx = diffDays(addDays(examDay, -k), snapshot.today); if (idx > 0 || (idx === 0 && k === 0)) forbidden.add(idx); }
     }
     out.push({ item, virtual: item.key.includes("@"), remaining, target: p50, earliest, latest, due, priority, slope: Math.max(1, slope), goal, forbidden });
   }
@@ -278,18 +327,20 @@ function buildDemand(ctx: Ctx, items: WorkItem[], fixed: readonly Block[]): Dema
 
 interface Allocation { days: Map<string, Map<number, number>>; weeks: Map<string, Map<string, number>>; overflow: Map<string, number> }
 
-function allocate(ctx: Ctx, demands: Demand[], capacity: { cap: number; comfortable: number }[], previous: Map<string, Map<number, number>>, weekCaps: { week: string; cap: number; offset: number }[], keptMinutes: Map<string, number> = new Map(), fixedSubject: Map<string, number> = new Map()): Allocation {
+function allocate(ctx: Ctx, demands: Demand[], capacity: { cap: number; comfortable: number }[], previous: Map<string, Map<number, number>>, weekCaps: { week: string; cap: number; offset: number; days?: number }[], keptMinutes: Map<string, number> = new Map(), fixedSubject: Map<string, number> = new Map()): Allocation {
   const H = ctx.horizon.length;
   const nItems = demands.length;
-  // Node layout: 0 source, 1 sink, items, pace nodes, days, weeks, subject-day nodes.
-  const { caps: groupCaps, groupOf } = capGroups(ctx.constraints);
+  // Node layout: 0 source, 1 sink, items, pace nodes, days, weeks, subject-day nodes, subject-week nodes.
+  const { caps: groupCaps, groupOf, soloOf } = capGroups(ctx.constraints);
   const capped = [...groupCaps.keys()].sort();
   const itemBase = 2;
   const paceBase = itemBase + nItems;
   const dayBase = paceBase + nItems;
   const weekBase = dayBase + H;
   const sdBase = weekBase + weekCaps.length;
-  const nodes = sdBase + capped.length * H;
+  // A cap group's daily limit holds in the weeks beyond the detailed horizon too: at most its limit on each of the week's study days.
+  const swBase = sdBase + capped.length * H;
+  const nodes = swBase + capped.length * weekCaps.length;
   const graph = new MinCostFlow(nodes);
   const S = 0; const T = 1;
   const edges: { demand: number; day: number; edge: number }[] = [];
@@ -319,7 +370,7 @@ function allocate(ctx: Ctx, demands: Demand[], capacity: { cap: number; comforta
         if (day > dueIdx - tail) cost += 3;
       }
       // Stability: leaving a day the item already had costs more than any urgency gain from moving it, and most within the next 48 hours.
-      const group = groupOf(d.item);
+      const group = soloOf(d.item) ? null : groupOf(d.item);
       const groupIdx = group ? capped.indexOf(group) : -1;
       const target = groupIdx >= 0 ? sdBase + groupIdx * H + day : dayBase + day;
       if (prev && prev.size) {
@@ -332,15 +383,18 @@ function allocate(ctx: Ctx, demands: Demand[], capacity: { cap: number; comforta
       } else edges.push({ demand: i, day, edge: graph.addEdge(paceBase + i, target, perDay, cost) });
     }
     if ((dueIdx == null || dueIdx >= H) && !d.capped) {
+      const weekGroup = soloOf(d.item) ? null : groupOf(d.item);
+      const gi = weekGroup ? capped.indexOf(weekGroup) : -1;
       weekCaps.forEach((w, wi) => {
         if (d.due && w.week > d.due) return;
         if (diffDays(addDays(w.week, 6), ctx.snapshot.today) < d.earliest) return;
-        weekEdges.push({ demand: i, week: wi, edge: graph.addEdge(itemBase + i, weekBase + wi, units, d.slope * (H + 3 + w.offset)) });
+        weekEdges.push({ demand: i, week: wi, edge: graph.addEdge(itemBase + i, gi >= 0 ? swBase + gi * weekCaps.length + wi : weekBase + wi, units, d.slope * (H + 3 + w.offset)) });
       });
     }
   });
   capped.forEach((group, gi) => {
     for (let day = 0; day < H; day++) graph.addEdge(sdBase + gi * H + day, dayBase + day, Math.max(0, Math.floor(((groupCaps.get(group) ?? 0) - (fixedSubject.get(`${group}|${day}`) ?? 0)) / UNIT)), 0);
+    weekCaps.forEach((w, wi) => graph.addEdge(swBase + gi * weekCaps.length + wi, weekBase + wi, Math.floor(((groupCaps.get(group) ?? 0) * (w.days ?? 7)) / UNIT), 0));
   });
   for (let day = 0; day < H; day++) {
     const comfortable = Math.floor(capacity[day].comfortable / UNIT);
@@ -374,14 +428,25 @@ function allocate(ctx: Ctx, demands: Demand[], capacity: { cap: number; comforta
 
 /** Folds allocations smaller than an item's minimum sitting into another day, or rounds them up when there is room, or releases them. */
 function consolidate(alloc: Allocation, demands: Demand[], capacity: { cap: number; max?: number }[], constraints: readonly Constraint[] = [], fixedSubject: Map<string, number> = new Map()) {
+  separateSolo(alloc, demands, capacity, constraints, fixedSubject);
   const used = new Array<number>(capacity.length).fill(0);
   for (const days of alloc.days.values()) for (const [day, minutes] of days) used[day] += minutes;
-  // Cap groups (a goal's or a subject's daily limit) hold through consolidation too.
-  const { caps: groupCaps, groupOf } = capGroups(constraints);
+  // Cap groups (a goal's or a subject's daily limit) hold through consolidation too. A solo sitting's day stays its own.
+  const { caps: groupCaps, groupOf, soloOf } = capGroups(constraints);
   const subjectUse = new Map<string, number>(fixedSubject);
   const subjectOf = new Map(demands.map((d) => [d.item.key, groupOf(d.item)]));
-  for (const [key, days] of alloc.days) { const group = subjectOf.get(key); if (group) for (const [day, m] of days) subjectUse.set(`${group}|${day}`, (subjectUse.get(`${group}|${day}`) ?? 0) + m); }
-  const subjectRoom = (group: string | null, day: number, minutes: number) => !group || (subjectUse.get(`${group}|${day}`) ?? 0) + minutes <= groupCaps.get(group)!;
+  const soloItems = new Set(demands.filter((d) => soloOf(d.item)).map((d) => d.item.key));
+  const soloDays = new Set<string>();
+  for (const [key, days] of alloc.days) {
+    const group = subjectOf.get(key);
+    if (group) for (const [day, m] of days) { subjectUse.set(`${group}|${day}`, (subjectUse.get(`${group}|${day}`) ?? 0) + m); if (soloItems.has(key)) soloDays.add(`${group}|${day}`); }
+  }
+  let current = "";
+  const subjectRoom = (group: string | null, day: number, minutes: number) => {
+    if (!group) return true;
+    if (soloItems.has(current)) { const own = alloc.days.get(current)?.get(day) ?? 0; return (subjectUse.get(`${group}|${day}`) ?? 0) - own === 0; }
+    return !soloDays.has(`${group}|${day}`) && (subjectUse.get(`${group}|${day}`) ?? 0) + minutes <= groupCaps.get(group)!;
+  };
   const moveSubject = (group: string | null, from: number, to: number, minutes: number) => {
     if (!group) return;
     subjectUse.set(`${group}|${from}`, (subjectUse.get(`${group}|${from}`) ?? 0) - minutes);
@@ -390,6 +455,7 @@ function consolidate(alloc: Allocation, demands: Demand[], capacity: { cap: numb
   for (const d of demands) {
     const days = alloc.days.get(d.item.key);
     if (!days) continue;
+    current = d.item.key;
     const min = d.item.chunk[0];
     for (const [day] of [...days.entries()].sort((a, b) => a[1] - b[1] || a[0] - b[0])) {
       const minutes = days.get(day);
@@ -609,7 +675,8 @@ function keepValidBlocks(ctx: Ctx, blocks: readonly Block[], itemByKey: Map<stri
     const base = item.done >= p50 && item.questId ? Math.max(item.chunk[0], round5(p50 * 0.25)) : p50 - item.done;
     return Math.max(0, base - (reserved.get(item.key) ?? 0));
   };
-  const { caps: groupCaps, groupOf } = capGroups(ctx.constraints);
+  const { caps: groupCaps, groupOf, soloOf } = capGroups(ctx.constraints);
+  const soloKept = new Set<string>();
   const kept = new Set<string>();
   const used = new Map<string, number>();
   const dayUse = new Map<string, number>();
@@ -634,7 +701,8 @@ function keepValidBlocks(ctx: Ctx, blocks: readonly Block[], itemByKey: Map<stri
     if ((dayUse.get(day.date) ?? 0) + minutes + fixedDay > Math.max(hardCap, fixedDay)) { reject(); continue; }
     const group = groupOf(item);
     const subjectKey = `${group}|${day.date}`;
-    if (group && (subjectUse.get(subjectKey) ?? 0) + minutes > groupCaps.get(group)!) { reject(); continue; }
+    if (group && (soloOf(item) ? (subjectUse.get(subjectKey) ?? 0) > 0 : soloKept.has(subjectKey) || (subjectUse.get(subjectKey) ?? 0) + minutes > groupCaps.get(group)!)) { reject(); continue; }
+    if (group && soloOf(item)) soloKept.add(subjectKey);
     kept.add(block.id);
     used.set(item.key, (used.get(item.key) ?? 0) + minutes);
     dayUse.set(day.date, (dayUse.get(day.date) ?? 0) + minutes);
@@ -709,13 +777,19 @@ function solveOnce(input: SolveInput): SolveResult {
   const fixed = given.filter((b) => isFixed(b, snapshot));
   const movable = given.filter((b) => !isFixed(b, snapshot) && (b.state === "committed" || b.state === "proposed"));
 
-  // Capacity per day.
+  // Capacity per day. A plan's own "minutes a day", when the student gave it, is what they say they can sustain for that plan: it lifts the
+  // calibrated comfort level (never the hard daily cap), so six hours a day for a licensing exam is planned as six hours, not as a new user's average.
+  const { soloOf: soloItem } = capGroups(ctx.constraints);
+  const longestSolo = Math.max(0, ...items.filter((i) => i.status === "open" && soloItem(i)).map((i) => i.chunk[0]));
+  const asked = Math.max(0, ...ctx.constraints.filter((c): c is Constraint & { kind: "goal_cap" } => c.kind === "goal_cap" && c.provenance === "student").map((c) => c.minutes));
   const capacity = snapshot.days.map((day) => {
     if (isDayOff(ctx, day)) return { cap: 0, comfortable: 0, free: 0, hardCap: 0, sustainable: 0, max: 0 };
     const free = freeIntervals(ctx, day, fixed).reduce((sum, [a, b]) => sum + (b - a >= 15 ? b - a : 0), 0);
     const fixedMinutes = fixed.filter((b) => b.date === day.date && b.state !== "missed" && b.state !== "skipped").reduce((s, b) => s + blockMinutes(b), 0) + (day.date === snapshot.today ? snapshot.studiedToday : 0) + (day.otherWork ?? 0);
-    const { hardCap, sustainable } = dayCaps(ctx, day);
-    const ceiling = Math.min(hardCap, round5(sustainable * 1.15 + 15));
+    const { hardCap, sustainable: calibrated } = dayCaps(ctx, day);
+    const sustainable = Math.max(calibrated, Math.min(hardCap, asked));
+    // A day can always hold one full paper (a solo sitting), within the hard cap.
+    const ceiling = Math.min(hardCap, Math.max(round5(sustainable * 1.15 + 15), longestSolo));
     const cap = Math.max(0, Math.min(free, ceiling - fixedMinutes));
     const comfortable = Math.max(0, Math.min(cap, round5(sustainable * 0.85) - fixedMinutes));
     // `max` is the most the day could hold under the student's own hard cap: room to fold a small leftover into a session rather than strand it.
@@ -726,13 +800,13 @@ function solveOnce(input: SolveInput): SolveResult {
   const restWeekdays = new Set(snapshot.days.filter((d) => d.rest === "fixed").map((d) => d.weekday));
   const lastDue = [...model.goals.map((g) => g.due), ...items.map((i) => i.due)].filter((d): d is string => Boolean(d)).sort().at(-1);
   const horizonEnd = addDays(snapshot.today, H);
-  const weekCaps: { week: string; cap: number; offset: number }[] = [];
+  const weekCaps: { week: string; cap: number; offset: number; days: number }[] = [];
   if (lastDue && lastDue >= horizonEnd) {
-    const daily = Math.min(snapshot.settings.dailyCap, snapshot.calibration.capacity);
+    const daily = Math.min(snapshot.settings.dailyCap, Math.max(snapshot.calibration.capacity, asked));
     for (let w = 0, cursor = weekStart(horizonEnd); cursor <= lastDue && w < MAX_WEEKS; w++, cursor = addDays(cursor, 7)) {
-      let cap = 0;
-      for (let k = 0; k < 7; k++) { const date = addDays(cursor, k); if (date >= horizonEnd && !restWeekdays.has(weekdayOf(date))) cap += daily; }
-      weekCaps.push({ week: cursor, cap: round5(cap * 0.85), offset: w * 7 });
+      let cap = 0; let days = 0;
+      for (let k = 0; k < 7; k++) { const date = addDays(cursor, k); if (date >= horizonEnd && !restWeekdays.has(weekdayOf(date))) { cap += daily; days++; } }
+      weekCaps.push({ week: cursor, cap: round5(cap * 0.85), offset: w * 7, days });
     }
   }
   const previous = new Map<string, Map<number, number>>();
@@ -794,7 +868,8 @@ function solveOnce(input: SolveInput): SolveResult {
       let changed = false;
       const lastDay = new Map<string, number>();
       for (const [key, days] of alloc.days) lastDay.set(key, Math.max(...days.keys()));
-      for (const [key, weeks] of alloc.weeks) if (weeks.size) lastDay.set(key, H + 7);
+      // Work budgeted beyond the horizon ends in its latest week: a successor may share that week but never come in an earlier one.
+      for (const [key, weeks] of alloc.weeks) if (weeks.size) lastDay.set(key, Math.max(H, ...[...weeks.keys()].map((week) => diffDays(week, snapshot.today))));
       for (const fixedBlock of fixed) { const idx = ctx.dayIndex.get(fixedBlock.date); if (idx != null && fixedBlock.state !== "missed" && fixedBlock.state !== "skipped") lastDay.set(fixedBlock.item, Math.max(lastDay.get(fixedBlock.item) ?? -1, idx)); }
       for (const d of demands) {
         for (const pred of d.item.after) {
@@ -875,7 +950,7 @@ function solveOnce(input: SolveInput): SolveResult {
 
   const days: DayLoad[] = snapshot.days.map((day, idx) => {
     const planned = blocks.filter((b) => b.date === day.date && b.state !== "missed" && b.state !== "skipped").reduce((s, b) => s + blockMinutes(b), 0);
-    return { date: day.date, capacity: capacity[idx].cap + fixed.filter((b) => b.date === day.date && b.state !== "missed" && b.state !== "skipped").reduce((s, b) => s + blockMinutes(b), 0), planned, sustainable: isDayOff(ctx, day) ? 0 : snapshot.calibration.capacity, free: capacity[idx].free, rest: isDayOff(ctx, day) };
+    return { date: day.date, capacity: capacity[idx].cap + fixed.filter((b) => b.date === day.date && b.state !== "missed" && b.state !== "skipped").reduce((s, b) => s + blockMinutes(b), 0), planned, sustainable: isDayOff(ctx, day) ? 0 : capacity[idx].sustainable, free: capacity[idx].free, rest: isDayOff(ctx, day) };
   });
 
   // Shortages, measured against each deadline that has unplaced work.

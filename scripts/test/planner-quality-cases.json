@@ -1,0 +1,446 @@
+[
+ {
+  "id": "aqa-gcse-biology-p1",
+  "area": "UK GCSE, one paper of a two-paper subject (AQA 8461)",
+  "title": "AQA GCSE Biology Paper 1 (8461) higher tier",
+  "preset": "exam",
+  "dueInDays": 42,
+  "minutesPerDay": 60,
+  "expect": {
+   "preset": "exam",
+   "units": [
+    3,
+    16
+   ],
+   "include": [
+    "cell biology|cell structure|cells",
+    "organisation|organ",
+    "infection|disease|pathogen",
+    "bioenergetic|photosynthesis|respiration"
+   ],
+   "exclude": [
+    "homeostasis",
+    "inheritance",
+    "evolution",
+    "ecology|ecosystem"
+   ],
+   "paper": {
+    "minutes": 105,
+    "marks": 100
+   }
+  }
+ },
+ {
+  "id": "ib-maths-aa-hl-course",
+  "area": "IB Diploma, a whole two-year course to the final exams, several papers",
+  "title": "IB Mathematics: Analysis and Approaches HL, whole course to the May exams",
+  "preset": "course",
+  "due": "2027-05-04",
+  "minutesPerDay": 60,
+  "target": "7",
+  "expect": {
+   "preset": "course",
+   "units": [
+    5,
+    40
+   ],
+   "include": [
+    "number|algebra",
+    "function",
+    "geometry|trigonometry",
+    "statistic|probability",
+    "calculus|differentiation|integration"
+   ],
+   "papersAtLeast": 2,
+   "spansToDue": true,
+   "exclude": [
+    "internal assessment|exploration"
+   ]
+  }
+ },
+ {
+  "id": "jee-main-physics",
+  "area": "Indian national entrance exam (JEE Main), heavy daily load, weak topics",
+  "title": "JEE Main Physics preparation",
+  "preset": "exam",
+  "dueInDays": 90,
+  "minutesPerDay": 180,
+  "weak": "rotational motion, electrostatics",
+  "level": "NTA JEE Main, Class 11 and 12",
+  "expect": {
+   "preset": "exam",
+   "units": [
+    10,
+    40
+   ],
+   "include": [
+    "rotation",
+    "electrostatic|electric field|electric charge",
+    "optic",
+    "thermodynamic",
+    "kinematic|motion in",
+    "magnet",
+    "semiconductor|electronic device",
+    "electromagnetic wave"
+   ],
+   "weak": [
+    "rotation",
+    "electrostatic|electric"
+   ],
+   "spansToDue": true
+  }
+ },
+ {
+  "id": "aws-saa-c03",
+  "area": "Professional certification, short weekday sessions",
+  "title": "AWS Certified Solutions Architect Associate (SAA-C03) exam",
+  "preset": "exam",
+  "dueInDays": 35,
+  "minutesPerDay": 45,
+  "expect": {
+   "preset": "exam",
+   "units": [
+    4,
+    20
+   ],
+   "include": [
+    "secur",
+    "resilien|high availab|fault",
+    "perform",
+    "cost"
+   ],
+   "paper": {
+    "minutes": 130
+   }
+  }
+ },
+ {
+  "id": "usmle-step1",
+  "area": "Medical licensing exam, a very large syllabus over four months at six hours a day",
+  "title": "USMLE Step 1 dedicated study",
+  "preset": "auto",
+  "dueInDays": 120,
+  "minutesPerDay": 360,
+  "expect": {
+   "preset": "exam|course",
+   "units": [
+    12,
+    40
+   ],
+   "include": [
+    "cardio",
+    "renal|kidney",
+    "pharmacolog|drug",
+    "microbio|immun",
+    "pathology|patho|general principles",
+    "biochem|genetic|general principles",
+    "gastro|gi\\b"
+   ],
+   "spansToDue": true
+  }
+ },
+ {
+  "id": "sapiens-reading",
+  "area": "Reading a non-fiction book in three weeks",
+  "title": "Read Sapiens: A Brief History of Humankind by Yuval Noah Harari",
+  "preset": "reading",
+  "dueInDays": 21,
+  "minutesPerDay": 40,
+  "expect": {
+   "preset": "reading",
+   "units": [
+    12,
+    25
+   ],
+   "include": [
+    "cognitive|tree of knowledge|animal of no significance",
+    "agricultur|biggest fraud",
+    "unif|money|empire|imperial",
+    "scien|ignorance|capitalis|industr"
+   ]
+  }
+ },
+ {
+  "id": "guitar-skill",
+  "area": "A practical skill with no deadline, short frequent sessions",
+  "title": "Learn guitar from zero: open chords to playing my first full song",
+  "preset": "skill",
+  "daysPerWeek": 5,
+  "sessionMinutes": 20,
+  "level": "Never played",
+  "target": "Play a full song with chord changes in time",
+  "expect": {
+   "preset": "skill",
+   "units": [
+    4,
+    12
+   ],
+   "include": [
+    "chord",
+    "strum|rhythm",
+    "song"
+   ],
+   "sessionMinutes": 20
+  }
+ },
+ {
+  "id": "dissertation-lit-review",
+  "area": "University assignment: the ordinary breakdown, not a syllabus",
+  "title": "Dissertation literature review on climate migration, 3,000 words",
+  "preset": "assignment",
+  "dueInDays": 20,
+  "notes": "Need at least 25 academic sources. Supervisor wants a thematic structure.",
+  "expect": {
+   "preset": "assignment",
+   "itemsAtLeast": 5,
+   "include": [],
+   "titlesInclude": [
+    "draft|write",
+    "revis|edit|proofread",
+    "outline|structure|plan",
+    "source|research|read"
+   ]
+  }
+ },
+ {
+  "id": "quiz-tomorrow",
+  "area": "Edge case: a quiz tomorrow on a narrow topic",
+  "title": "Chemistry quiz tomorrow on acids, bases and pH",
+  "preset": "auto",
+  "dueInDays": 1,
+  "expect": {
+   "preset": "exam|mastery",
+   "units": [
+    1,
+    8
+   ],
+   "include": [
+    "acid|base|ph"
+   ],
+   "noStudyOnDue": true
+  }
+ },
+ {
+  "id": "typed-topics-future-start",
+  "area": "Edge case: the student types the topics and starts in ten days",
+  "title": "CHEM 2410 Organic Chemistry I, whole module",
+  "preset": "course",
+  "dueInDays": 70,
+  "startInDays": 10,
+  "minutesPerDay": 90,
+  "topics": "Structure and bonding\nAlkanes and conformations\nStereochemistry\nNucleophilic substitution\nElimination reactions\nAlkenes and alkynes\nAlcohols and ethers\nSpectroscopy",
+  "expect": {
+   "preset": "course",
+   "units": [
+    8,
+    8
+   ],
+   "include": [
+    "stereochem",
+    "spectroscop",
+    "nucleophilic"
+   ],
+   "startsOnOrAfter": 10
+  }
+ },
+ {
+  "id": "auto-vague-probability",
+  "area": "Auto with a vague, personal request",
+  "title": "I keep failing probability questions, especially conditional probability and Bayes",
+  "preset": "auto",
+  "dueInDays": 10,
+  "expect": {
+   "preset": "mastery|exam",
+   "units": [
+    2,
+    10
+   ],
+   "include": [
+    "conditional",
+    "bayes"
+   ]
+  }
+ },
+ {
+  "id": "bac-philosophie",
+  "area": "A non-English national exam with essay papers (France)",
+  "title": "Baccalauréat épreuve de philosophie (terminale, voie générale)",
+  "preset": "exam",
+  "dueInDays": 60,
+  "minutesPerDay": 60,
+  "expect": {
+   "preset": "exam",
+   "units": [
+    5,
+    25
+   ],
+   "include": [
+    "libert",
+    "conscience",
+    "justice|état|etat",
+    "vérité|verite|truth"
+   ],
+   "paper": {
+    "minutes": 240
+   }
+  }
+ },
+ {
+  "id": "fbise-hssc2-physics",
+  "area": "Pakistan federal board, intermediate (HSSC-II) physics",
+  "title": "FBISE HSSC-II Physics annual exam",
+  "preset": "exam",
+  "dueInDays": 75,
+  "minutesPerDay": 120,
+  "expect": {
+   "preset": "exam",
+   "units": [
+    6,
+    25
+   ],
+   "include": [
+    "electrostatic|electric field",
+    "current electricity|current",
+    "electromagnet|magnet",
+    "electronic|semiconductor",
+    "nuclear|atomic|quantum"
+   ]
+  }
+ },
+ {
+  "id": "cfa-level-1",
+  "area": "Professional finance exam, ten official topic areas over five months",
+  "title": "CFA Level I exam",
+  "preset": "exam",
+  "dueInDays": 150,
+  "minutesPerDay": 120,
+  "expect": {
+   "preset": "exam",
+   "units": [
+    10,
+    40
+   ],
+   "include": [
+    "ethic",
+    "quantitative|time value|probabilit|regression",
+    "economic|demand|monetary",
+    "financial statement|financial reporting|balance sheet",
+    "corporate",
+    "equit",
+    "fixed income",
+    "derivative",
+    "alternative",
+    "portfolio"
+   ],
+   "spansToDue": true
+  }
+ },
+ {
+  "id": "gre-quant",
+  "area": "Standardised admissions test, one section only",
+  "title": "GRE General Test: Quantitative Reasoning section",
+  "preset": "exam",
+  "dueInDays": 42,
+  "minutesPerDay": 90,
+  "expect": {
+   "preset": "exam",
+   "units": [
+    4,
+    25
+   ],
+   "include": [
+    "integer|fraction|arithmetic|number propert",
+    "algebra|equation",
+    "geometry|triangle|circle",
+    "data|distribution|statistic"
+   ],
+   "exclude": [
+    "verbal",
+    "analytical writing|essay",
+    "technique|strategy|format"
+   ]
+  }
+ },
+ {
+  "id": "thinking-fast-slow",
+  "area": "A long non-fiction book with many chapters",
+  "title": "Read Thinking, Fast and Slow by Daniel Kahneman",
+  "preset": "reading",
+  "dueInDays": 28,
+  "minutesPerDay": 30,
+  "expect": {
+   "preset": "reading",
+   "units": [
+    5,
+    40
+   ],
+   "include": [
+    "system|two systems",
+    "heuristic|bias",
+    "overconfiden",
+    "choice|prospect",
+    "two selves|experiencing"
+   ]
+  }
+ },
+ {
+  "id": "calc-midterm-tomorrow",
+  "area": "Edge case: a midterm tomorrow morning, Auto",
+  "title": "Calculus 1 midterm tomorrow: limits and derivatives",
+  "preset": "auto",
+  "dueInDays": 1,
+  "expect": {
+   "preset": "exam|mastery",
+   "units": [
+    1,
+    15
+   ],
+   "include": [
+    "limit",
+    "derivative|differentiat"
+   ],
+   "noStudyOnDue": true
+  }
+ },
+ {
+  "id": "marketing-report",
+  "area": "University group assignment with a word count",
+  "title": "Marketing plan report for a new product, 4,000 words, group project",
+  "preset": "assignment",
+  "dueInDays": 14,
+  "notes": "Sections: situation analysis, SWOT, target market, marketing mix, budget. I write the SWOT and marketing mix sections.",
+  "expect": {
+   "preset": "assignment",
+   "itemsAtLeast": 6,
+   "titlesInclude": [
+    "swot",
+    "marketing mix|mix",
+    "draft|write",
+    "edit|revis|proofread"
+   ]
+  }
+ },
+ {
+  "id": "python-skill",
+  "area": "Practical coding skill, longer sessions, no date",
+  "title": "Learn Python for data analysis with pandas",
+  "preset": "skill",
+  "daysPerWeek": 4,
+  "sessionMinutes": 45,
+  "level": "Can code a little in Excel formulas, never used Python",
+  "target": "Clean and chart a real CSV dataset on my own",
+  "expect": {
+   "preset": "skill",
+   "units": [
+    4,
+    12
+   ],
+   "include": [
+    "pandas|dataframe",
+    "plot|chart|visuali",
+    "clean"
+   ],
+   "sessionMinutes": 45
+  }
+ }
+]

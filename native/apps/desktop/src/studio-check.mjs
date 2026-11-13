@@ -147,7 +147,7 @@ async function run(window, out) {
   facts.perDay = Object.entries((before?.proposal?.result?.blocks ?? []).reduce((/** @type {Record<string, number>} */ m, /** @type {any} */ b) => { m[b.date] = (m[b.date] ?? 0) + b.end - b.start; return m; }, {})).sort();
   check("every session is placed in the calendar", (before?.proposal?.result?.unplaced ?? []).length === 0 && (before?.proposal?.result?.weekBudgets ?? []).length === 0);
   check("hours a day became the plan's own daily cap", proposed?.constraints?.some((/** @type {any} */ c) => c.kind === "goal_cap" && c.minutes === 120));
-  check("the weak spot was marked and practised again", exam?.syllabus?.units?.find((/** @type {any} */ u) => u.title === "Integration")?.confidence === "weak" && proposed?.items?.some((/** @type {any} */ i) => i.title === "Integration extra practice"));
+  check("the weak spot was marked and practised again", exam?.syllabus?.units?.find((/** @type {any} */ u) => u.title === "Integration")?.confidence === "weak" && proposed?.items?.some((/** @type {any} */ i) => i.title === "Integration past paper practice 2"));
   check("Auto chose the exam preset", exam?.preset === "exam");
   check("nothing is added before acceptance", ((await api("/api/quests?all=true&limit=100")).json?.quests ?? []).length === 0);
 
@@ -197,7 +197,7 @@ async function run(window, out) {
   const rated = await api("/api/planner/studio", { json: { action: "syllabus", key: `syllabus-${tag}`, goal: goalKey, units: [{ key: "u5", confidence: "weak" }, { key: "u1", confidence: "strong" }] } });
   const ratedModel = rated.json?.proposal?.model;
   facts.rated = { status: rated.status, summary: rated.json?.proposal?.summary, extra: ratedModel?.items?.find((/** @type {any} */ i) => i.key.endsWith(".prac.u5.2"))?.title, quick: ratedModel?.items?.find((/** @type {any} */ i) => i.key.endsWith(".rev.u1"))?.title };
-  check("rating a topic proposes a rebuilt plan", rated.status === 200 && rated.json?.proposal?.verification?.pass === true && facts.rated.extra === "Trigonometry extra practice" && facts.rated.quick === "Quadratics quick check");
+  check("rating a topic proposes a rebuilt plan", rated.status === 200 && rated.json?.proposal?.verification?.pass === true && facts.rated.extra === "Trigonometry past paper practice 2" && facts.rated.quick === "Quadratics quick check");
   await toPlanner();
   check("the rebuilt plan is up for review", await until(tid("studio-review"), 8000));
   await shot("06b-rated-proposal");

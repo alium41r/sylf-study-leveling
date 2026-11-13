@@ -115,7 +115,7 @@ describe("study path", () => {
     const keys = new Set(first.items.map((i) => i.key));
     for (const key of keys) expect(again.items.some((i) => i.key === key)).toBe(true);
     expect(again.items.find((i) => i.key === "g1.rev.u5")).toMatchObject({ done: 25, questId: 99 });
-    expect(again.items.find((i) => i.key === "g1.prac.u5.2")?.title).toBe("Trigonometry extra practice");
+    expect(again.items.find((i) => i.key === "g1.prac.u5.2")?.title).toBe("Trigonometry past paper practice 2");
     expect(again.items.find((i) => i.key === "g1.rev.u1")?.title).toBe("Quadratics quick check");
     expect(again.items.find((i) => i.key === "g1.weak.1")?.details?.aim).toContain("Trigonometry");
   });
@@ -270,7 +270,7 @@ describe("presets", () => {
     for (const minutes of perDay.values()) expect(minutes).toBeLessThanOrEqual(90);
   });
 
-  it("fits fewer timed papers when the last days cannot hold them under the daily limit", () => {
+  it("gives each timed paper a day of its own under the daily limit, and leaves nothing unplaced", () => {
     const syllabus = p1();
     const snap = world();
     const m: WorkModel = { goals: [goal("g1", { title: "Maths", type: "exam", due: EXAM, priority: 3, syllabus, preset: "exam", pace: { minutesPerDay: 120 } })], items: [], practices: [], constraints: [], assumptions: [], questions: [] };
@@ -279,7 +279,13 @@ describe("presets", () => {
     const result = solve(input);
     expect(verify(input, result).pass).toBe(true);
     expect(result.unplaced).toEqual([]);
-    expect(model.items.filter((i) => i.details?.role === "paper").length).toBe(1);
+    const papers = model.items.filter((i) => i.details?.role === "paper");
+    expect(papers.length).toBe(2);
+    // Nothing else of the plan shares a paper's day, and every other day stays within the two hours.
+    for (const block of result.blocks.filter((b) => papers.some((p) => p.key === b.item))) expect(result.blocks.filter((b) => b.date === block.date && b.item !== block.item)).toEqual([]);
+    const perDay = new Map<string, number>();
+    for (const b of result.blocks) if (!papers.some((p) => p.key === b.item)) perDay.set(b.date, (perDay.get(b.date) ?? 0) + b.end - b.start);
+    for (const minutes of perDay.values()) expect(minutes).toBeLessThanOrEqual(120);
   });
 
   it("compresses a mastery plan with many parts instead of leaving work unplaced", () => {
@@ -387,7 +393,8 @@ describe("syllabus library keys and corrections", () => {
     const bounded = boundCorrections(base, flood);
     expect(bounded.add).toEqual([]);
     expect(bounded.papers).toBeNull();
-    const fair = boundCorrections(base, { ...flood, add: flood.add.slice(0, 2), papers: [{ label: "Section I", minutes: 95, marks: 55 }, { label: "Section II", minutes: 100, marks: 13 }] });
+    // Two whole missing topics, each with its key points, are a fair correction; one with no key points is a subtopic and is dropped.
+    const fair = boundCorrections(base, { ...flood, add: [...flood.add.slice(0, 2).map((a) => ({ ...a, points: ["One", "Two", "Three"] })), flood.add[2]], papers: [{ label: "Section I", minutes: 95, marks: 55 }, { label: "Section II", minutes: 100, marks: 13 }] });
     expect(fair.add).toHaveLength(2);
     expect(fair.papers).toHaveLength(2);
   });

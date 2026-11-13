@@ -59,11 +59,17 @@ export function verify(input: SolveInput, result: SolveResult): Verification {
     checks++;
     if (placed > 0 && placed + fixedMinutes > Math.max(cap, fixedMinutes)) failures.push({ code: "DAILY_CAP", block: null, item: null, detail: `${dayLabel(date)} plans ${placed + fixedMinutes} min against a cap of ${cap}.` });
     // Cap groups (a goal's or a subject's daily limit) count only what the solver placed.
-    const { caps: groupCaps, groupOf } = capGroups(model.constraints);
+    const { caps: groupCaps, groupOf, soloOf } = capGroups(model.constraints);
     for (const [group, minutes] of groupCaps) {
       const c = { minutes };
       checks++;
       const ofSubject = list.filter((b) => { const item = items.get(b.item); return item && groupOf(item) === group && b.state !== "done"; });
+      // A sitting longer than the limit (a full paper) may take a day, alone.
+      const solo = ofSubject.filter((b) => soloOf(items.get(b.item)!));
+      if (solo.length) {
+        if (ofSubject.some((b) => b.item !== solo[0].item)) failures.push({ code: "DAILY_CAP", block: null, item: solo[0].item, detail: `${dayLabel(date)} puts other work of one ${group.startsWith("g:") ? "plan" : "subject"} beside a sitting longer than its cap of ${c.minutes}.` });
+        continue;
+      }
       const placedSubject = ofSubject.filter((b) => !fixedIds.has(b.id)).reduce((s, b) => s + blockMinutes(b), 0);
       const fixedSubject = ofSubject.filter((b) => fixedIds.has(b.id)).reduce((s, b) => s + blockMinutes(b), 0);
       const subjectMinutes = placedSubject + fixedSubject;

@@ -17,7 +17,8 @@
     "frontend-check": "electron . --sylf-frontend-check",
     "backend-check": "electron . --sylf-backend-check",
     "journey-check": "electron . --sylf-journey-check",
-    "review-capture": "electron . --sylf-review-capture"
+    "review-capture": "electron . --sylf-review-capture",
+    "studio-check": "electron . --sylf-studio-check"
   },
   "devDependencies": {
     "electron": "45.1.0"

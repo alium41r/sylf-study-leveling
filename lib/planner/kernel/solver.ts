@@ -356,7 +356,7 @@ function allocate(ctx: Ctx, demands: Demand[], capacity: { cap: number; comforta
 }
 
 /** Folds allocations smaller than an item's minimum sitting into another day, or rounds them up when there is room, or releases them. */
-function consolidate(alloc: Allocation, demands: Demand[], capacity: { cap: number }[], constraints: readonly Constraint[] = [], fixedSubject: Map<string, number> = new Map()) {
+function consolidate(alloc: Allocation, demands: Demand[], capacity: { cap: number; max?: number }[], constraints: readonly Constraint[] = [], fixedSubject: Map<string, number> = new Map()) {
   const used = new Array<number>(capacity.length).fill(0);
   for (const days of alloc.days.values()) for (const [day, minutes] of days) used[day] += minutes;
   // Subject caps hold through consolidation too.
@@ -381,6 +381,11 @@ function consolidate(alloc: Allocation, demands: Demand[], capacity: { cap: numb
       const subject = d.item.subject;
       const other = [...days.entries()].filter(([o, m]) => o !== day && m >= min && capacity[o].cap - used[o] >= minutes && subjectRoom(subject, o, minutes)).sort((a, b) => Math.abs(a[0] - day) - Math.abs(b[0] - day) || a[0] - b[0])[0];
       if (other) { days.delete(day); used[day] -= minutes; days.set(other[0], other[1] + minutes); used[other[0]] += minutes; moveSubject(subject, day, other[0], minutes); continue; }
+      // A leftover may stretch an existing sitting of the same item a little past the comfortable load, never past the student's hard cap.
+      const stretch = [...days.entries()].filter(([o, m]) => o !== day && m >= min && (capacity[o].max ?? capacity[o].cap) - used[o] >= minutes && subjectRoom(subject, o, minutes)).sort((a, b) => Math.abs(a[0] - day) - Math.abs(b[0] - day) || a[0] - b[0])[0];
+      if (stretch) { days.delete(day); used[day] -= minutes; days.set(stretch[0], stretch[1] + minutes); used[stretch[0]] += minutes; moveSubject(subject, day, stretch[0], minutes); continue; }
+      // A crumb of a larger item is not a session: it waits for room rather than appearing as a ten-minute block.
+      if (minutes < 15 && d.remaining >= min) { days.delete(day); used[day] -= minutes; moveSubject(subject, day, day, 0); alloc.overflow.set(d.item.key, (alloc.overflow.get(d.item.key) ?? 0) + minutes); continue; }
       // Nowhere to fold it: a short finishing sitting is better than losing the minutes, unless another short piece can absorb it.
       const sibling = [...days.entries()].filter(([o]) => o !== day && capacity[o].cap - used[o] >= minutes && subjectRoom(subject, o, minutes)).sort((a, b) => b[1] - a[1] || a[0] - b[0])[0];
       if (sibling) { days.delete(day); used[day] -= minutes; days.set(sibling[0], sibling[1] + minutes); used[sibling[0]] += minutes; moveSubject(subject, day, sibling[0], minutes); }
@@ -538,7 +543,9 @@ function reasonsFor(ctx: Ctx, block: Block, demand: Demand | undefined, previous
   if (demand.virtual) reasons.push({ code: "practice", text: `Part of your ${item.title.replace(/^Practice:\s*/, "")} routine.` });
   if (due) {
     const slack = diffDays(due, block.date);
-    reasons.push({ code: "due", text: `${goal?.type === "exam" ? "Exam" : "Due"} ${dayLabel(due)} · ${slack === 0 ? "due that day" : `${slack} day${slack === 1 ? "" : "s"} of slack`}.` });
+    const slackText = slack === 0 ? "due that day" : `${slack} day${slack === 1 ? "" : "s"} of slack`;
+    if (goal?.type === "exam" && goal.due) reasons.push({ code: "due", text: `Exam ${dayLabel(goal.due)}${due !== goal.due ? ` · this part by ${dayLabel(due)}` : ""} · ${slackText}.` });
+    else reasons.push({ code: "due", text: `Due ${dayLabel(due)} · ${slackText}.` });
   }
   if (goal?.type === "exam" && due && block.date === addDays(due, -1) && (item.method === "spaced_review" || item.kind === "review")) reasons.push({ code: "review", text: "Light review the day before the exam." });
   const weekday = weekdayOf(block.date);
@@ -672,14 +679,15 @@ function solveOnce(input: SolveInput): SolveResult {
 
   // Capacity per day.
   const capacity = snapshot.days.map((day) => {
-    if (isDayOff(ctx, day)) return { cap: 0, comfortable: 0, free: 0, hardCap: 0, sustainable: 0 };
+    if (isDayOff(ctx, day)) return { cap: 0, comfortable: 0, free: 0, hardCap: 0, sustainable: 0, max: 0 };
     const free = freeIntervals(ctx, day, fixed).reduce((sum, [a, b]) => sum + (b - a >= 15 ? b - a : 0), 0);
     const fixedMinutes = fixed.filter((b) => b.date === day.date && b.state !== "missed" && b.state !== "skipped").reduce((s, b) => s + blockMinutes(b), 0) + (day.date === snapshot.today ? snapshot.studiedToday : 0) + (day.otherWork ?? 0);
     const { hardCap, sustainable } = dayCaps(ctx, day);
     const ceiling = Math.min(hardCap, round5(sustainable * 1.15 + 15));
     const cap = Math.max(0, Math.min(free, ceiling - fixedMinutes));
     const comfortable = Math.max(0, Math.min(cap, round5(sustainable * 0.85) - fixedMinutes));
-    return { cap: floor5(cap), comfortable: floor5(comfortable), free, hardCap, sustainable };
+    // `max` is the most the day could hold under the student's own hard cap: room to fold a small leftover into a session rather than strand it.
+    return { cap: floor5(cap), comfortable: floor5(comfortable), free, hardCap, sustainable, max: floor5(Math.max(0, Math.min(free, hardCap - fixedMinutes))) };
   });
 
   // Weekly budgets beyond the detailed horizon, using the student's usual rest weekdays.
@@ -826,7 +834,7 @@ function solveOnce(input: SolveInput): SolveResult {
   const reasons: Record<string, Reason[]> = {};
   // Items with nothing left to place still explain their blocks.
   const info = new Map(buildDemand(ctx, items, []).map((d) => [d.item.key, d]));
-  for (const block of blocks) reasons[block.id] = reasonsFor(ctx, block, demandsByKey.get(block.item) ?? info.get(block.item), matchedPrev.get(block.id) ?? (kept.has(block.id) ? block : undefined), blocks);
+  for (const block of blocks) reasons[block.id] = reasonsFor(ctx, block, demandsByKey.get(block.item) ?? info.get(block.item), matchedPrev.get(block.id), blocks);
 
   const weekBudgets: WeekBudget[] = [];
   for (const [item, weeks] of [...alloc.weeks.entries()].sort(([a], [b]) => (a < b ? -1 : 1))) for (const [week, minutes] of [...weeks.entries()].sort()) weekBudgets.push({ week, item, minutes });

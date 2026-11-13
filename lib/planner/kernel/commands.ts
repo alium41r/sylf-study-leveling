@@ -214,10 +214,13 @@ export function parseCommand(input: string, snapshot: Pick<PlanningSnapshot, "to
   if (drop && goal) return { ops: [{ op: "drop_goal", id: refs.goalRef(goal.key) }], interpretation: `Drop · ${goal.title}`, decompose: [], confident: true };
 
   // A new deadline: "chem midterm on 28 Nov", "essay due Friday", "prepare for the physics exam next friday".
-  const deadline = text.match(/^(?:add\s+|i have (?:a|an|my)\s+|there'?s (?:a|an)\s+|prepare for (?:the |my )?|study for (?:the |my )?|finish (?:the |my )?|write (?:the |my )?|plan (?:for )?(?:the |my )?)?(.+?)\s+(?:on|is on|due|due on|by|is|next|this)\s+(.+)$/);
+  const lead = /^(?:(?:and|also|oh|so|then|plus)\s+)*(?:i(?:'ve| have| also have|'ve also got| also need to| need to)?\s+(?:got\s+)?(?:a|an|my|another|the)?\s*|there'?s (?:also )?(?:a|an)\s+|add\s+(?:a|an|my)?\s*|prepare for (?:the |my )?|study for (?:the |my )?|finish (?:the |my )?|write (?:the |my )?|plan (?:for )?(?:the |my )?)/;
+  const stripped = text.replace(lead, "").trim();
+  // "due" and "by" name a deadline more surely than "on", which also starts a topic ("a problem set on rotational dynamics due Friday").
+  const deadline = stripped.match(/^(.+?)\s+(?:is due|due on|due|by)\s+(.+?)(?:,|\band\b|$)/) ?? stripped.match(/^(.+?)\s+(?:on|is on|is|next|this)\s+(.+?)(?:,|\band\b|$)/);
   if (deadline) {
     const due = parseDate(deadline[2], today) ?? (/(next|this)\s/.test(text) ? parseDate(text, today) : null);
-    const title = cleanTitle(input, deadline[1]);
+    const title = cleanTitle(input, deadline[1].replace(/^(?:a|an|my|the)\s+/, ""));
     const type: GoalType = inferGoalType(text);
     if (due && title.length >= 3 && type !== "general") {
       const gid = "G_new";

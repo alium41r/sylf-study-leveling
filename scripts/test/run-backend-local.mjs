@@ -5,10 +5,13 @@
  *   ... node scripts/test/run-backend-local.mjs --serve [--dev] [--port 3111]           keep serving until Ctrl-C, for a client to talk to
  *   ... node scripts/test/run-backend-local.mjs --native-checks [--electron] [--build]  Sylf Native's client against this server: the device client's integration suite, and with --electron the real Electron window. Build `native/` first for that (`npm run build:web`)
  *   ... node scripts/test/run-backend-local.mjs --journey [--build] [--out <dir>]       the whole student journey in real Electron, as two processes on one profile, so a restart is a real restart. Build `native/` first
+ *   ... node scripts/test/run-backend-local.mjs --studio [--with-deepseek] [--dev]      the Planning Studio in real Electron (sign-up, plan, accept, edit, undo, screenshots). Build `native/` first.
+ *       --with-deepseek is the one deliberate exception to blanking: it passes DEEPSEEK_API_KEY (from the environment or .env) so the Studio's
+ *       model path runs for real. It spends a few tenths of a cent; leave it off to exercise the template path only.
  * Without --dev it needs a build (`--build`). Redis, Supabase storage, Realtime, email and AI providers are off, and those paths use their fallbacks.
  */
 import { execFileSync, spawn } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { backendEnvironment, buildSchemaFromMigrations, root, startDisposablePostgres } from "./lib/disposable-backend.mjs";
@@ -76,6 +79,15 @@ function live() {
   if (!report.live) report.failed = true;
 }
 
+async function studioCheck() {
+  // Next's dev server compiles a route on its first request; warm the Studio's so the window's timeouts measure the app, not the compiler.
+  for (const path of ["/api/planner/studio", "/api/planner/studio/stream", "/api/subjects", "/api/quests?all=true&limit=1", "/api/planner/workspace", "/api/user/stats", "/api/calendar/month?year=2026&month=10"]) {
+    await fetch(`${base}${path}`, path.endsWith("stream") ? { method: "POST", body: "{}" } : {}).catch(() => undefined);
+  }
+  report.studio = nativeCheck("npm", ["--workspace", "@sylf/desktop", "run", "studio-check"], { SYLF_BACKEND_ORIGIN: base, SYLF_STUDIO_OUT: out, SYLF_STUDIO_AI: has("--with-deepseek") ? "1" : "0" }, 600_000);
+  if (!report.studio) report.failed = true;
+}
+
 function journey() {
   mkdirSync(out, { recursive: true });
   const profile = mkdtempSync(join(tmpdir(), "sylf-journey-"));
@@ -127,7 +139,8 @@ try {
   const build = await buildSchemaFromMigrations(backend.url);
   report.schema = { migrations: build.migrations.length, recovered: build.migrations.filter(entry => entry.recovered).length, unresolved: build.migrations.flatMap(entry => entry.remaining ?? []).length };
   const dev = has("--dev");
-  const environment = backendEnvironment(backend.url, { NODE_ENV: dev ? "development" : "production", NODE_OPTIONS: "--max-old-space-size=3072" });
+  const deepseek = has("--with-deepseek") ? (process.env.DEEPSEEK_API_KEY || (readFileSync(join(root, ".env"), "utf8").match(/^DEEPSEEK_API_KEY=(.*)$/m)?.[1] ?? "").replace(/^["']|["']$/g, "").trim()) : "";
+  const environment = backendEnvironment(backend.url, { NODE_ENV: dev ? "development" : "production", NODE_OPTIONS: "--max-old-space-size=3072", SYLF_PLANNING_STUDIO: "on", ...(deepseek ? { DEEPSEEK_API_KEY: deepseek } : {}) });
   if (has("--build")) {
     const started = Date.now();
     execFileSync(next, ["build"], { cwd: root, env: environment, stdio: "pipe", timeout: 590_000, maxBuffer: 256 * 1024 * 1024 });
@@ -139,7 +152,7 @@ try {
   server.stdout.on("data", keep); server.stderr.on("data", keep);
   await ready();
   if (has("--serve")) { console.log(`Serving ${base} on a disposable database. Ctrl-C stops both.`); await new Promise(() => {}); }
-  if (has("--live")) live(); else if (has("--journey")) journey(); else if (has("--native-checks")) await nativeChecks(); else await smoke();
+  if (has("--live")) live(); else if (has("--journey")) journey(); else if (has("--studio")) await studioCheck(); else if (has("--native-checks")) await nativeChecks(); else await smoke();
   report.serverErrors = logs.join("").split("\n").filter(line => /error/i.test(line)).map(line => backend.redact(line).slice(0, 200)).slice(0, 30);
   if (report.failed) exit = 1;
 } catch (error) {

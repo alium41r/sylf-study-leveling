@@ -1,6 +1,6 @@
 # Sylf Planner Blueprint — 13 November 2026
 
-Status: **proposal from a research and planning phase. Nothing here is implemented or approved.** It is a design input, not a description of current behaviour; source, tests, schema and configuration remain authoritative. Each roadmap stage needs the owner's approval before work starts.
+Status: **proposal from a research and planning phase.** Implemented the same day on branch `planner/planning-kernel`: see the [implementation report](../2026-11-13-planning-studio/README.md) and the [current contract](../../STUDIO.md), which take precedence over this design where they differ. It is a design input, not a description of current behaviour; source, tests, schema and configuration remain authoritative. Each roadmap stage needs the owner's approval before work starts.
 
 How it was produced: DeepSeek's official documentation and the planning literature were researched first, and the architecture was settled before Sylf's code was opened. The code was read afterwards only to map integration points ([§6](#6-from-plan-to-action-across-sylf)) and the migration path ([§10](#10-what-this-means-for-the-current-planner)). Latency and cost figures are targets derived from documented prices and independent speed measurements; Stage 0 measures them on Sylf's own prompts.
 

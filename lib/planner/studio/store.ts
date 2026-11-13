@@ -52,7 +52,7 @@ export interface ProposalView {
   strategy: string | null;
   notes: string[];
   model: WorkModel;
-  result: Omit<SolveResult, "demand" | "stats">;
+  result: Omit<SolveResult, "demand" | "stats" | "kept">;
   trace: Record<string, unknown>;
 }
 

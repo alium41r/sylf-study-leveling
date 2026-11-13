@@ -209,6 +209,13 @@ export async function compileContext(userId: number, now = new Date()): Promise<
   const itemStatus = new Map(model.items.map((i) => [i.key, i.status]));
   const marked = markMissed(blocks, snapshot, (item, date) => studied.has(`${item}|${date}`) || itemStatus.get(item) === "done");
   const transitions = marked.flatMap((b, i) => (b.state !== blocks[i].state ? [{ key: b.id, state: b.state }] : []));
+  // A student who moved a plan quest to a later day elsewhere in Sylf (Quests, Calendar) moved its work: the item may not start before that day.
+  for (const item of model.items) {
+    const quest = questByItem.get(item.key);
+    if (!quest || item.status !== "open" || quest.elapsedSeconds > 0 || quest.sessions > 0 || !["ACTIVE", "PENDING"].includes(quest.status) || quest.scheduledFor <= today) continue;
+    const next = marked.filter((b) => b.item === item.key && b.state === "committed" && b.date >= today).sort((a, b) => a.date.localeCompare(b.date) || a.start - b.start)[0];
+    if (next && quest.scheduledFor > next.date && (!item.due || quest.scheduledFor <= item.due)) item.earliest = item.earliest && item.earliest > quest.scheduledFor ? item.earliest : quest.scheduledFor;
+  }
 
   return {
     userId, space, snapshot, model, blocks: marked, refs: buildRefs(snapshotSubjects, topics, model), transitions, lastStudied,

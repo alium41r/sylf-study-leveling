@@ -100,6 +100,11 @@ describe("command fast path", () => {
     expect(parsed.ops[0]).toMatchObject({ op: "add_goal", type: "exam", due: "2026-11-28", subject: "S1" });
     expect(parsed.decompose).toEqual(["G_new"]);
   });
+  it("drops conversational lead-ins from a new deadline's title", () => {
+    const parsed = parseCommand("I also have a physics problem set on rotational dynamics due next Friday, and I'm weak on torque", s, m, refs)!;
+    expect(parsed.ops[0]).toMatchObject({ op: "add_goal", type: "problem_set", due: "2026-12-04", subject: "S2" });
+    expect((parsed.ops[0] as { title: string }).title).toBe("Physics problem set on rotational dynamics");
+  });
   it("leaves open-ended requests to the model", () => {
     expect(parseCommand("am I on track for finals?", s, m, refs)).toBeNull();
   });

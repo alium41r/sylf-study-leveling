@@ -229,20 +229,40 @@ async function critique(w: Working, goalKeys: string[], signal?: AbortSignal): P
   if (!goalKeys.length) return 0;
   const goals = goalKeys.map((k) => w.model.goals.find((g) => g.key === k)).filter((g): g is NonNullable<typeof g> => Boolean(g));
   const lines = goals.flatMap((g) => [`${w.refs.goalOf.get(g.key)} ${g.title} (${g.type}${g.due ? `, due ${g.due}` : ""})`, ...w.model.items.filter((i) => i.goal === g.key).map((i) => `  ${w.refs.itemOf.get(i.key)} ${i.title} · ${i.kind}/${i.method} · ${i.est[0]} min${i.topics.length ? ` · ${i.topics.map((t) => w.refs.topicOf.get(t)).join(",")}` : ""}${i.after.length ? ` · after ${i.after.map((a) => w.refs.itemOf.get(a)).join(",")}` : ""}`)]);
-  const request = `Review this breakdown. Add at most three items only for a real gap (a syllabus topic with no work, no retrieval before an exam, a missing final check). New item ids: r1, r2, r3.\n${lines.join("\n")}`;
+  const goal = goals[0];
+  const request = `Review the breakdown of ${w.refs.goalOf.get(goal.key)} only. Add at most three items, only for a real gap in THIS goal (a syllabus topic of its subject with no work, no retrieval before an exam, a missing final check). Never add work for other goals. New item ids: r1, r2, r3.\n${lines.join("\n")}`;
   const result = await callTool<{ verdict?: string; add?: Record<string, unknown>[] }>({ userId: w.ctx.userId, profile: "plan.critique", messages: [{ role: "system", content: TIER0 }, { role: "user", content: userMessage(w.ctx.snapshot, w.model, w.refs, request) }], tool: CRITIQUE_TOOL, signal }).catch(() => null);
   if (!result) return 0;
   track(w, result);
   if (result.args.verdict !== "revise") return 0;
   let added = 0;
   for (const raw of (result.args.add ?? []).slice(0, 3)) {
-    const goalRef = w.refs.goalOf.get(goals[0].key)!;
+    const goalRef = w.refs.goalOf.get(goal.key)!;
     const op = itemOp(raw, goalRef, `${goalRef}.`, (ref) => Boolean(w.refs.items[ref]));
     if (!op) continue;
+    // Additions stay inside the goal's own subject: a topic from another subject is a sign the critic wandered.
+    const topics = ((op as { topics?: string[] }).topics ?? []).map((ref) => w.refs.topics[ref]).filter((t): t is number => t != null);
+    if (topics.some((t) => w.refs.topicSubjects[t] !== goal.subject)) continue;
     const applied = apply(w, [op], "model");
     if (!applied.errors.length) { added++; const item = w.model.items.find((i) => i.key === applied.applied[0]?.key); if (item) w.emit({ type: "item", goal: item.goal, item }); }
   }
   return added;
+}
+
+/**
+ * The semantic critic, off the critical path: the student already has the proposal. If the critic finds a real gap while the proposal is still
+ * open, a revised proposal replaces it, once, with a note saying what was added.
+ */
+async function improve(w: Working, goalKeys: string[], proposal: ProposalView, meta: { key: string; workflow: string; request: Record<string, unknown>; ops: unknown[]; started: number }, signal?: AbortSignal): Promise<ProposalView> {
+  const before = new Set(w.model.items.map((i) => i.key));
+  const added = await critique(w, goalKeys, signal).catch(() => 0);
+  if (!added) return proposal;
+  const current = await openProposal(w.ctx.space.id);
+  if (!current || current.id !== proposal.id) return proposal;
+  const titles = w.model.items.filter((i) => !before.has(i.key)).map((i) => `“${i.title}”`).join(", ");
+  w.notes.push(`A review of the breakdown added ${titles}.`);
+  w.emit({ type: "stage", stage: "review", text: `Review added ${plural(added, "session")}` });
+  return finish(w, { ...meta, key: `${meta.key}.reviewed`, source: "MODEL" });
 }
 
 async function finish(w: Working, meta: { key: string; workflow: string; request: Record<string, unknown>; ops: unknown[]; source: "MODEL" | "STUDENT" | "SYSTEM"; started: number; autoCommit?: boolean }): Promise<ProposalView> {
@@ -303,9 +323,9 @@ export async function runCommand(userId: number, input: { key: string; text: str
       for (const key of goalKeys) { const g = w.model.goals.find((x) => x.key === key); if (g && g.type === "general") g.type = inferGoalType(`${g.title} ${text}`); }
       emit({ type: "stage", stage: "decompose", text: `Breaking down ${plural(goalKeys.length, "goal")}` });
       await Promise.all(goalKeys.map((key) => decompose(w, key, ai, text, signal)));
-      if (ai) await Promise.race([critique(w, goalKeys, signal), new Promise((r) => setTimeout(r, 6_000))]);
     }
-    return finish(w, { key: input.key, workflow: goalKeys.length ? "add_goal" : "command", request: { text }, ops, source: ai && !fast ? "MODEL" : "STUDENT", started });
+    const proposal = await finish(w, { key: input.key, workflow: goalKeys.length ? "add_goal" : "command", request: { text }, ops, source: ai && goalKeys.length ? "MODEL" : ai && !fast ? "MODEL" : "STUDENT", started });
+    return ai && goalKeys.length ? improve(w, goalKeys, proposal, { key: input.key, workflow: "add_goal", request: { text }, ops, started }, signal) : proposal;
   });
 }
 
@@ -336,8 +356,9 @@ export async function runAddGoal(userId: number, input: { key: string; title?: s
   return withModel(userId, "add_goal", async (ai) => {
     emit({ type: "stage", stage: "decompose", text: `Breaking down ${goal.title}` });
     await decompose(w, goalKey!, ai, requestText(input.notes, 2000) || null, signal);
-    if (ai) await Promise.race([critique(w, [goalKey!], signal), new Promise((r) => setTimeout(r, 6_000))]);
-    return finish(w, { key: input.key, workflow: "add_goal", request: { title: input.title ?? goal.title, due: goal.due, type: goal.type }, ops, source: ai ? "MODEL" : "STUDENT", started });
+    const meta = { key: input.key, workflow: "add_goal", request: { title: input.title ?? goal.title, due: goal.due, type: goal.type }, ops, started };
+    const proposal = await finish(w, { ...meta, source: ai ? "MODEL" : "STUDENT" });
+    return ai ? improve(w, [goalKey!], proposal, meta, signal) : proposal;
   });
 }
 
@@ -473,7 +494,7 @@ export async function loadState(userId: number, options: { sync: boolean } = { s
     readiness: studioReadiness(), version: ctx.space.version, settings: ctx.snapshot.settings, snapshot: ctx.snapshot, model: ctx.model, blocks: ctx.blocks,
     plan: { ...plan, quality: candidate.verification.quality, critics: candidate.verification.critics }, proposal,
     signals: computeSignals(ctx.snapshot, ctx.model, candidate.result, ctx.lastStudied, ctx.blocks), history: await history(userId), lockedGoals: ctx.lockedGoals,
-    facts: ctx.facts, calibrationNotes, repaired: applied && !applied.replayed ? { summary: applied.proposal.summary } : null,
+    facts: ctx.facts, calibrationNotes, repaired: applied && !applied.replayed && applied.proposal.diff.changes.length ? { summary: applied.proposal.summary } : null,
   };
 }
 

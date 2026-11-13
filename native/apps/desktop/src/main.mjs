@@ -9,6 +9,7 @@ import { createBackendProxy, parseBackendOrigin } from "./backend-proxy.mjs";
 import { createSessionVault } from "./session-vault.mjs";
 import { runBackendCheck, startBackendStub } from "./backend-check.mjs";
 import { runJourneyCheck } from "./journey-check.mjs";
+import { runStudioCheck } from "./studio-check.mjs";
 import { runDesignCheck } from "./design-check.mjs";
 import { runReviewCapture } from "./review-capture.mjs";
 import { runSelfTest } from "./self-test.mjs";
@@ -33,9 +34,10 @@ const FRONTEND_CHECK = process.argv.includes("--sylf-frontend-check");
 const FIXTURE_CHECK = FRONTEND_CHECK || SPACES_CHECK || HOME_CHECK || WORKSPACE_CHECK || WORLD_CHECK || SESSION_CHECK;
 const BACKEND_CHECK = process.argv.includes("--sylf-backend-check");
 const JOURNEY_CHECK = process.argv.includes("--sylf-journey-check");
+const STUDIO_CHECK = process.argv.includes("--sylf-studio-check");
 
 // Verification runs use a throwaway profile so they neither read nor overwrite the user's preferences.
-if (DESIGN_CHECK || FIXTURE_CHECK || REVIEW_CAPTURE || BACKEND_CHECK) app.setPath("userData", fs.mkdtempSync(path.join(app.getPath("temp"), "sylf-design-check-")));
+if (DESIGN_CHECK || FIXTURE_CHECK || REVIEW_CAPTURE || BACKEND_CHECK || STUDIO_CHECK) app.setPath("userData", fs.mkdtempSync(path.join(app.getPath("temp"), "sylf-design-check-")));
 // The journey's two runs share one throwaway profile, because a real restart keeps what is on disk.
 if (JOURNEY_CHECK) app.setPath("userData", process.env.SYLF_JOURNEY_PROFILE ?? fs.mkdtempSync(path.join(app.getPath("temp"), "sylf-journey-")));
 
@@ -149,6 +151,7 @@ app.whenReady().then(async () => {
     }
     if (BACKEND_CHECK && stub) { void runBackendCheck(createWindow(), { stub, backend, createBackend }); return; }
     if (JOURNEY_CHECK && stub) { void runJourneyCheck(createWindow(), { stub, backend }); return; }
+    if (STUDIO_CHECK) { void runStudioCheck(createWindow()); return; }
   }
   const window = createWindow();
   if (SELF_TEST) runSelfTest(window, { webRoot: WEB_ROOT });

@@ -116,7 +116,8 @@ export function critique(input: SolveInput, result: SolveResult): CriticScore[] 
   const out: CriticScore[] = [];
 
   // Realism: planned minutes a day against sustainable capacity.
-  const heavy = result.days.filter((d) => !d.rest && d.planned > d.sustainable * 1.15 + 5);
+  // The solver may fill a day up to sustainable × 1.15 + 15 minutes; only days beyond that are unrealistic.
+  const heavy = result.days.filter((d) => !d.rest && d.planned > Math.round((d.sustainable * 1.15 + 15) / 5) * 5);
   out.push({ code: "realism", score: Math.max(0, 100 - heavy.length * 18), note: heavy.length ? `${heavy.length} day${heavy.length === 1 ? "" : "s"} above what you usually sustain.` : "Every day is within what you usually sustain." });
 
   // Exam preparation: two retrievals per topic at least two days apart, light review the day before, no new topics in the final day.
@@ -125,12 +126,22 @@ export function critique(input: SolveInput, result: SolveResult): CriticScore[] 
     let score = 100; const notes: string[] = [];
     for (const exam of exams) {
       const own = [...items.values()].filter((i) => i.goal === exam.key);
+      // The share of the exam's topics that get two retrieval sessions at least two days apart. A broad session covers every topic it names.
       const topics = [...new Set(own.flatMap((i) => i.topics))];
-      for (const topic of topics) {
-        const dates = live.filter((b) => { const i = items.get(b.item); return i && i.goal === exam.key && i.topics.includes(topic) && SPACED_METHODS.includes(i.method); }).map((b) => b.date).sort();
-        const doneRetrievals = own.filter((i) => i.topics.includes(topic) && SPACED_METHODS.includes(i.method) && i.status === "done").length;
-        const spaced = dates.length + doneRetrievals >= 2 && (doneRetrievals > 0 || diffDays(dates[dates.length - 1], dates[0]) >= SPACING_DAYS);
-        if (!spaced && diffDays(exam.due!, snapshot.today) >= 4) { score -= 12; notes.push("a topic has fewer than two spaced retrievals"); }
+      const retrievals = own.filter((i) => SPACED_METHODS.includes(i.method) || i.method === "timed_paper");
+      if (diffDays(exam.due!, snapshot.today) >= 4) {
+        if (!topics.length) {
+          const dates = live.filter((b) => retrievals.some((i) => i.key === b.item)).map((b) => b.date).sort();
+          if (dates.length < 2 || diffDays(dates[dates.length - 1], dates[0]) < SPACING_DAYS) { score -= 40; notes.push("fewer than two spaced retrieval sessions"); }
+        } else {
+          let short = 0;
+          for (const topic of topics) {
+            const dates = live.filter((b) => { const i = items.get(b.item); return i && i.goal === exam.key && (i.topics.includes(topic) || (i.method === "timed_paper" && !i.topics.length)) && (SPACED_METHODS.includes(i.method) || i.method === "timed_paper"); }).map((b) => b.date).sort();
+            const done = own.filter((i) => i.topics.includes(topic) && SPACED_METHODS.includes(i.method) && i.status === "done").length;
+            if (!(dates.length + done >= 2 && (done > 0 || diffDays(dates[dates.length - 1], dates[0]) >= SPACING_DAYS))) short++;
+          }
+          if (short) { score -= Math.round((50 * short) / topics.length); notes.push(`${short} of ${topics.length} topics have fewer than two spaced retrievals`); }
+        }
       }
       const before = addDays(exam.due!, -1);
       if (before >= snapshot.today && !live.some((b) => b.date === before && items.get(b.item)?.goal === exam.key)) { score -= 10; notes.push(`no light review on ${dayLabel(before)}`); }

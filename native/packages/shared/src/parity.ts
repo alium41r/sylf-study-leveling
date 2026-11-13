@@ -13,7 +13,7 @@ export const PARITY_EXPECTED = {
   "timer.snapshot": "4379c662",
   "ink.geometry": "a127da69",
   "yjs.roundTrip": "ok",
-  "planning.solve": "46dd1554",
+  "planning.solve": "3bb0f5f5",
 } as const;
 
 export type ParityName = keyof typeof PARITY_EXPECTED;

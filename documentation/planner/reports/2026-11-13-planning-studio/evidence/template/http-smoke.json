@@ -1,0 +1,14 @@
+{
+ "schemaVersion": 1,
+ "startedAt": "2026-11-13T08:19:51.159Z",
+ "steps": [],
+ "schema": {
+  "migrations": 84,
+  "recovered": 11,
+  "unresolved": 0
+ },
+ "studio": false,
+ "failed": true,
+ "serverErrors": [],
+ "finishedAt": "2026-11-13T08:20:35.809Z"
+}

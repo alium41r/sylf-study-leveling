@@ -1,0 +1,152 @@
+{
+ "passed": true,
+ "checks": {
+  "the sign-in surface is first": true,
+  "Home opens after sign-up": true,
+  "the Planner is Plan's first view": true,
+  "the command bar is there": true,
+  "the health strip is there": true,
+  "the new-goal sheet opens": true,
+  "the activity line reports progress": true,
+  "a proposal arrives for review": true,
+  "the proposal passed every check": true,
+  "nothing is added before acceptance": true,
+  "the review closes on accept": true,
+  "the plan is version 1": true,
+  "quests were created from the plan": true,
+  "the inspector explains the session": true,
+  "the interpretation chip shows before anything runs": true,
+  "the command becomes a proposal": true,
+  "undo is a new version without the rule": true,
+  "the term view shows weeks": true,
+  "planning settings open": true,
+  "the model's breakdown arrives as a proposal": true,
+  "the phone opens on today's agenda": true
+ },
+ "facts": {
+  "subject": 201,
+  "readiness": {
+   "enabled": true,
+   "ai": true,
+   "model": "deepseek-flash",
+   "reason": null
+  },
+  "goalSeconds": 10.1,
+  "proposalSummary": "12 sessions added",
+  "proposal": {
+   "trace": {
+    "ms": 9943,
+    "errors": [],
+    "solver": {
+     "ms": 5,
+     "items": 12,
+     "placed": 12,
+     "iterations": 1
+    },
+    "tokens": {
+     "calls": 1,
+     "input": 2836,
+     "cached": 2688,
+     "output": 2140,
+     "servedModel": "deepseek-flash",
+     "firstTokenMs": [
+      1317
+     ]
+    }
+   },
+   "critics": [
+    "realism 100: Every day is within what you usually sustain.",
+    "exam_prep 53: 34 of 36 topics have fewer than two spaced retrievals",
+    "front_loading 90: 2 items finish on the due date with no room to run long.",
+    "interleaving 100: Practice is mixed across subjects.",
+    "fragmentation 100: Sessions are a workable length.",
+    "neglect 100: Every active goal has time."
+   ],
+   "workflow": "add_goal",
+   "source": "MODEL",
+   "pass": true,
+   "quality": 87,
+   "blocks": 12,
+   "items": 12,
+   "interpretation": "New exam · Organic chemistry midterm · Wed 25 Nov",
+   "strategy": "Diagnose weak areas first, learn the foundational nodes with checkable mastery criteria, then run two spaced retrieval rounds per block and finish with a timed paper plus error log before a light revi"
+  },
+  "committed": {
+   "version": 1,
+   "blocks": 12,
+   "quests": 12,
+   "firstQuest": {
+    "title": "Diagnostic: 20 mixed questions across functional groups, st…",
+    "scheduledFor": "2026-11-13",
+    "requiredMinutes": 45
+   }
+  },
+  "chip": "Limit · 2 h a day · weekdaysinstant, no AI needed",
+  "commandSeconds": 0.2,
+  "afterCommand": 2,
+  "afterUndo": {
+   "version": 3,
+   "constraints": 0
+  },
+  "aiFirstItemSeconds": 3.1,
+  "aiSeconds": 5.4,
+  "ai": {
+   "trace": {
+    "ms": 5201,
+    "errors": [],
+    "solver": {
+     "ms": 6,
+     "items": 18,
+     "placed": 18,
+     "iterations": 1
+    },
+    "tokens": {
+     "calls": 1,
+     "input": 3302,
+     "cached": 2560,
+     "output": 953,
+     "servedModel": "deepseek-flash",
+     "firstTokenMs": [
+      1245
+     ]
+    }
+   },
+   "critics": [
+    "realism 100: Every day is within what you usually sustain.",
+    "exam_prep 53: 34 of 36 topics have fewer than two spaced retrievals",
+    "front_loading 93: 2 items finish on the due date with no room to run long.",
+    "interleaving 100: Practice is mixed across subjects.",
+    "fragmentation 100: Sessions are a workable length.",
+    "neglect 100: Every active goal has time."
+   ],
+   "notes": [],
+   "source": "MODEL",
+   "workflow": "add_goal",
+   "items": [
+    "Diagnostic: 20 mixed questions across functional groups, st… · diagnostic · 45–60m",
+    "Learn: nomenclature, bonding and functional group identific… · learn · 60–80m",
+    "Learn + worked examples: stereochemistry and conformation · worked_examples · 60–80m",
+    "Retrieval: naming and stereochem, closed book · retrieval · 30–40m",
+    "Learn: substitution and elimination (SN1, SN2, E1, E2) · learn · 70–90m",
+    "Learn: alkenes, alkynes and aromatic substitution · learn · 70–90m",
+    "Retrieval + error log: reaction mechanism problems · retrieval · 50–65m",
+    "Learn: carbonyls and oxygen/nitrogen chemistry · learn · 60–80m",
+    "Timed past paper (full length) under exam conditions · timed_paper · 90–110m",
+    "Error log: rework every wrong past-paper question · error_log · 45–60m",
+    "Spaced retrieval: mixed weak-spot cards and mechanisms · spaced_review · 30–40m",
+    "Light review: key reagents and named-reaction sheet · spaced_review · 25–35m",
+    "Torque diagnostic: 5 torque/lever-arm problems, no notes · diagnostic · 40–55m",
+    "First attempt: full problem set, mark unsure items · problem_solving · 70–90m",
+    "Study torque + moment of inertia worked examples · worked_examples · 50–65m",
+    "Second pass: fix flagged problems after a gap · problem_solving · 60–80m",
+    "Error log: rework wrong second-pass problems · error_log · 35–45m",
+    "Final check: answers, units and write-up · final_check · 30–40m"
+   ],
+   "strategy": "An early torque-focused first pass to expose what is hard, a gap for a second pass on the hardest problems, then a final check before Friday.",
+   "pass": true,
+   "quality": 87,
+   "interpretation": "New problem set · I also have a physics problem set · Fri 20 Nov"
+  }
+ },
+ "consoleErrors": []
+}

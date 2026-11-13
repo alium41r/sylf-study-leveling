@@ -48,7 +48,7 @@ export interface StudioProposal {
   verification: { pass: boolean; quality: number; checks: number; failures: number; critics: planning.CriticScore[] };
   interpretation: string | null; strategy: string | null; notes: string[];
   model: Model;
-  result: Omit<planning.SolveResult, "demand" | "stats">;
+  result: Omit<planning.SolveResult, "demand" | "stats" | "kept">;
 }
 export interface StudioState {
   readiness: { enabled: boolean; ai: boolean; reason: string | null; model: string };
@@ -57,7 +57,7 @@ export interface StudioState {
   snapshot: Snapshot;
   model: Model;
   blocks: Block[];
-  plan: Omit<planning.SolveResult, "demand" | "stats"> & { quality: number; critics: planning.CriticScore[] };
+  plan: Omit<planning.SolveResult, "demand" | "stats" | "kept"> & { quality: number; critics: planning.CriticScore[] };
   proposal: StudioProposal | null;
   signals: planning.Signal[];
   history: { id: string; sequence: number | null; source: string; workflow: string; summary: string; at: string | null }[];

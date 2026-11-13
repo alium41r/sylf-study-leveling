@@ -1,0 +1,64 @@
+{
+ "passed": false,
+ "checks": {
+  "the sign-in surface is first": true,
+  "Home opens after sign-up": true,
+  "the Planner is Plan's first view": true,
+  "the command bar is there": true,
+  "the health strip is there": true,
+  "the new-goal sheet opens": true,
+  "the activity line reports progress": true,
+  "a proposal arrives for review": true,
+  "the proposal passed every check": true,
+  "nothing is added before acceptance": true,
+  "the review closes on accept": true,
+  "the plan is version 1": true,
+  "quests were created from the plan": true,
+  "the inspector explains the session": true,
+  "the interpretation chip shows before anything runs": true,
+  "the command becomes a proposal": true,
+  "undo is a new version without the rule": false,
+  "the term view shows weeks": true,
+  "planning settings open": true,
+  "the phone opens on today's agenda": true
+ },
+ "facts": {
+  "subject": 201,
+  "readiness": {
+   "enabled": true,
+   "ai": false,
+   "model": "deepseek-flash",
+   "reason": "AI planning is unavailable, so new goals start from study templates. Everything else works."
+  },
+  "goalSeconds": 0.3,
+  "proposalSummary": "11 sessions added",
+  "proposal": {
+   "workflow": "add_goal",
+   "source": "STUDENT",
+   "pass": true,
+   "quality": 95,
+   "blocks": 11,
+   "items": 10,
+   "interpretation": "New exam · Organic chemistry midterm · Wed 25 Nov",
+   "strategy": null
+  },
+  "committed": {
+   "version": 1,
+   "blocks": 11,
+   "quests": 10,
+   "firstQuest": {
+    "title": "Diagnostic: weak spots in Organic chemistry midterm",
+    "scheduledFor": "2026-11-13",
+    "requiredMinutes": 30
+   }
+  },
+  "chip": "Limit · 2 h a day · weekdaysinstant, no AI needed",
+  "commandSeconds": 0.2,
+  "afterCommand": 2,
+  "afterUndo": {
+   "version": 2,
+   "constraints": 1
+  }
+ },
+ "consoleErrors": []
+}

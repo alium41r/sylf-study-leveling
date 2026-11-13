@@ -128,7 +128,11 @@ export function useStudio() {
         case "preview": record.preview = { blocks: event.blocks, summary: event.summary, unplaced: event.unplaced }; break;
         case "text": record.text += event.delta; break;
         case "notice": record.notices.push(event.text); break;
-        case "proposal": proposal = event.proposal; break;
+        case "proposal":
+          proposal = event.proposal;
+          // Show it at once: anything after this (the critic's review) refines it while the student is already reading.
+          void reads.state(controller.signal).then((next) => { if (alive.current && !controller.signal.aborted) setState(next); }, () => undefined);
+          break;
         case "error": record.error = event.message; break;
       }
       update();

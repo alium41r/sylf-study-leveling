@@ -2,7 +2,9 @@
 
 Sylf Native is a planned, new tablet-first native application for iPad and Android tablets. It has desktop/laptop as an equal large-screen priority and a later, simplified phone companion. It will be developed inside this repository alongside the unchanged Next.js web app, reusing existing backend systems. It is distinct from the existing Vite/Capacitor client in [`mobile/`](../../mobile/).
 
-**Status (1 November 2026): Expansion Part 1 is complete and awaiting the owner's review. No application code changed, nothing is committed or deployed, and Part 2 needs the owner's authorization. Start with the [Part 2 handoff](handoffs/expansion-part-1.md) and the [urgent issues](reports/expansion-part-1/urgent-issues.md).** Stage 3 stays verified on the Mac and, in portrait, on the real tablet on Hermes.
+**Status (13 November 2026): the repository was consolidated into one committed baseline on `main`; see the [consolidation report](../infrastructure/reports/2026-11-13-repository-consolidation/README.md). The latest Native work (frontend refinement, Notes gallery and quality pass, Home redesign, 10–13 November) is committed and verified on the Mac, not yet on the tablet: start from the [2026-11-12 quality-pass report](reports/2026-11-12-notes-workspace-quality/README.md), the [Home redesign report](reports/2026-11-12-home-redesign/) and the end of the [tablet checklist](handoffs/tablet-checklist.md).** The status below this line is the 1 November record, kept as history.
+
+**Earlier status (1 November 2026): Expansion Part 1 is complete and awaiting the owner's review. No application code changed, nothing is committed or deployed, and Part 2 needs the owner's authorization. Start with the [Part 2 handoff](handoffs/expansion-part-1.md) and the [urgent issues](reports/expansion-part-1/urgent-issues.md).** Stage 3 stays verified on the Mac and, in portrait, on the real tablet on Hermes.
 
 | Document | Role |
 | --- | --- |

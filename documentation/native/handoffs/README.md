@@ -4,6 +4,7 @@ Each development stage ends with a self-contained handoff here, so a fresh agent
 
 | Handoff | Covers | Status |
 | --- | --- | --- |
+| [Consolidation report](../../infrastructure/reports/2026-11-13-repository-consolidation/README.md) | The 13 November baseline: where every piece of uncommitted work went, backups, verification, branch structure | Written 13 November 2026. **Start here**, then the [2026-11-12 quality-pass report](../reports/2026-11-12-notes-workspace-quality/README.md) |
 | [`stage-1.md`](stage-1.md) | Phases 1–3 and the Phase 4 requirements | Written 30 October 2026 |
 | [`phase-4.md`](phase-4.md) | Phase 4 (design system and Theme Studio), its decisions, and the Phase 5 requirements | Written 30 October 2026, at the end of Phase 4. The Stage 2 handoff (after Phase 10) will cover Phases 4–10 |
 | [`phase-5.md`](phase-5.md) | Phase 5 (global Spaces system) and the Phase 6 requirements | Written 30 October 2026 |

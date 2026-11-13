@@ -10,6 +10,12 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 <!-- END:nextjs-agent-rules -->
 
+## Git baseline
+
+- `main` is the single baseline (consolidated 13 November 2026; see the [consolidation report](documentation/infrastructure/reports/2026-11-13-repository-consolidation/README.md)). Sylf Native in `native/` is the primary client and wins over older implementations.
+- Start each task on a branch from `main`, in its own worktree when another agent may be active. Commit work before ending a session; do not leave large uncommitted trees behind, and never edit files another worktree owns.
+- Keep `refs/backup/*` refs until the owner removes them.
+
 ## Working model
 
 - Sylf is a study/progression app: Next.js 16 App Router, React 19, strict TypeScript, Tailwind CSS 4/CSS Modules, and Prisma/PostgreSQL. Use npm and `package-lock.json`; `@/` resolves to the repository root.

@@ -27,7 +27,7 @@ export async function collectTextChunks(chunks: AsyncIterable<TextChunk>, onText
 
 /** The provider reasoning channel is captured only by explicit opt-in callers,
  * never merged into answer text or default telemetry. */
-export async function collectHttpTextStream(response: Response, onText: (text: string) => void, signal?: AbortSignal,onReasoning?:(text:string)=>void) {
+export async function collectHttpTextStream(response: Response, onText: (text: string) => void, signal?: AbortSignal,onReasoning?:(text:string)=>void,idleTimeoutMs?:number) {
   let text = "", model: string | undefined, fingerprint:string|null|undefined, usage: Record<string, unknown> | undefined, finish: string | null = null, completed = false;
   let reasoning="";
   await readEventStream(response, (_event, data) => {
@@ -41,7 +41,7 @@ export async function collectHttpTextStream(response: Response, onText: (text: s
     if(onReasoning&&typeof choice?.delta?.reasoning_content==="string"){reasoning+=choice.delta.reasoning_content;onReasoning(choice.delta.reasoning_content);}
     if (typeof choice?.delta?.content === "string") { text += choice.delta.content; onText(choice.delta.content); }
     finish = choice?.finish_reason || finish;
-  }, signal);
+  }, signal, idleTimeoutMs);
   if (!completed || !finish) throw new Error("Provider stream interrupted");
-  return { model, system_fingerprint:fingerprint, usage, choices: [{ message: { content: text, tool_calls: undefined, reasoning_content:onReasoning?reasoning:undefined }, finish_reason: finish }] };
+  return { model, system_fingerprint:fingerprint, usage, choices: [{ message: { content: text, tool_calls: undefined, reasoning_content:onReasoning&&reasoning.length>0?reasoning:undefined }, finish_reason: finish }] };
 }

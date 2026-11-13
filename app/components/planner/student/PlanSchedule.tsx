@@ -1,7 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { ChevronDown, ListChecks } from "lucide-react";
-import { FocusClockIcon, SubjectGrimoireIcon } from "@/app/components/icons";
+import { ChevronDown, Clock, Layers, ListChecks } from "lucide-react";
 import type { StudentWorkspace } from "@/lib/planner/v2/client/workspace";
 import s from "./StudentPlannerWorkspace.module.css";
 
@@ -61,7 +60,7 @@ export default function PlanSchedule({
       else {
         const k =
           item.a.commitment.category === "COMMITTED"
-            ? "Not yet allocated"
+            ? "Unscheduled"
             : label(item.a.commitment.category);
         loose.set(k, [...(loose.get(k) ?? []), item]);
       }
@@ -76,7 +75,7 @@ export default function PlanSchedule({
       flexible: [...loose.entries()],
       rhythm: dated.map(([date, v]) => {
         const m = v.reduce((n, i) => n + i.minutes, 0);
-        return { date, m, h: Math.max(8, Math.round((m / max) * 48)) };
+        return { date, m, h: Math.max(6, Math.round((m / max) * 36)) };
       }),
       total:
         draft?.allocation?.committedMinutes ??
@@ -99,46 +98,42 @@ export default function PlanSchedule({
             <small>{a.purpose}</small>
           </span>
           <span className={s.time}>{hours(a.timeboxMinutes)}</span>
-          <ChevronDown size={16} />
+          <ChevronDown size={14} />
         </summary>
         <div className={s.activityBody}>
-          <p>{a.purpose}</p>
           <div>
-            <h4>What to do</h4>
+            <h4>Tasks</h4>
             <p className={s.prose}>{a.instructions}</p>
           </div>
           <div>
-            <h4>How you’ll know it’s done</h4>
+            <h4>Check</h4>
             <p>{a.completionCriterion}</p>
             {a.stoppingCondition && (
-              <p className={s.muted}>Stop when: {a.stoppingCondition}</p>
+              <p className={s.muted}>Stop: {a.stoppingCondition}</p>
             )}
           </div>
-          <div className={s.facts}>
-            {a.hardDependencies.length > 0 && (
-              <span className={s.fact}>
-                After:{" "}
-                {a.hardDependencies
-                  .map(
-                    (ref) =>
-                      blueprint.activities.find((v) => v.localId === ref)
-                        ?.title ?? ref
-                  )
-                  .join(", ")}
-              </span>
-            )}
-            {a.commitment.category === "CONTINGENT" && (
-              <span className={s.fact}>
-                Only if: {a.commitment.trigger.condition}
-              </span>
-            )}
-            {(a.resourceRefs?.length ?? 0) > 0 && (
-              <span className={s.fact}>
-                Resource references: {a.resourceRefs!.join(", ")}. Inspect
-                Research and retained translation for provenance.
-              </span>
-            )}
-          </div>
+          {(a.hardDependencies.length > 0 ||
+            a.commitment.category === "CONTINGENT") && (
+            <div className={s.facts}>
+              {a.hardDependencies.length > 0 && (
+                <span className={s.fact}>
+                  After:{" "}
+                  {a.hardDependencies
+                    .map(
+                      (ref) =>
+                        blueprint.activities.find((v) => v.localId === ref)
+                          ?.title ?? ref
+                    )
+                    .join(", ")}
+                </span>
+              )}
+              {a.commitment.category === "CONTINGENT" && (
+                <span className={s.fact}>
+                  If: {a.commitment.trigger.condition}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </details>
     );
@@ -147,24 +142,17 @@ export default function PlanSchedule({
   return (
     <>
       <div className={s.scheduleHead}>
-        <div>
-          <h3>
-            {draft?.allocation?.status === "FEASIBLE"
-              ? "Your study schedule"
-              : "Learning activities"}
-          </h3>
-          <p>
-            {total} min · {blueprint.activities.length} activities
-            {dated.length > 0 && ` · ${dated.length} study days`}
-          </p>
-        </div>
+        <p>
+          {hours(total)} · {blueprint.activities.length} sessions
+          {dated.length > 0 && ` · ${dated.length} days`}
+        </p>
         <button
           type="button"
           className={s.ghost}
           onClick={() => setMode((m) => ({ open: !m.open, n: m.n + 1 }))}
         >
-          <ListChecks size={15} />
-          {mode.open ? "Collapse all" : "Expand all"}
+          <ListChecks size={14} />
+          {mode.open ? "Collapse" : "Expand all"}
         </button>
       </div>
       {rhythm.length > 1 && (
@@ -174,7 +162,7 @@ export default function PlanSchedule({
               key={r.date}
               style={{
                 height: r.h,
-                animationDelay: `${Math.min(n, 40) * 18}ms`,
+                animationDelay: `${Math.min(n, 40) * 14}ms`,
               }}
               title={`${parts(r.date).long} · ${r.m} min`}
             />
@@ -200,10 +188,10 @@ export default function PlanSchedule({
         <section key={name} className={s.dayGroup} aria-label={name}>
           <div className={s.dayLabel}>
             <strong>
-              {name === "Not yet allocated" ? (
-                <SubjectGrimoireIcon size={20} />
+              {name === "Unscheduled" ? (
+                <Layers size={16} />
               ) : (
-                <FocusClockIcon size={20} />
+                <Clock size={16} />
               )}
             </strong>
             <span>{name}</span>

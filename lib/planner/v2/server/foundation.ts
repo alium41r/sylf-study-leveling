@@ -136,7 +136,8 @@ export class PlannerFoundationService {
             while(cursor?.kind==="CAPACITY"&&cursor.value.schemaVersion===2){if(cursor.digest===before.learning.capacity.digest){linked=true;break;}cursor=cursor.value.previous?archive.entries[cursor.value.previous.id]:undefined;}
             if(!linked)reject("INVALID_OUTPUT","Reviewed reallocation requires explicit retained Calendar ancestry.");
           }
-          const authorContinuation=before.schemaVersion!==1&&before.stage==="INCOMPLETE"&&next.schemaVersion===3&&next.stage==="REFINEMENT"&&next.workflow.authorFeedback?.source.digest===head.digest&&["STRATEGIST","TRANSLATOR"].includes(next.workflow.route??"");
+          const rejectedTranslatorContinuation=before.schemaVersion!==1&&before.stage==="TRANSLATION"&&before.learning.call?.role==="TRANSLATOR"&&next.schemaVersion===3&&next.stage==="REFINEMENT"&&!next.learning.call&&next.workflow.authorFeedback?.kind==="REJECTED"&&next.workflow.authorFeedback.source.digest===head.digest&&["STRATEGIST","TRANSLATOR"].includes(next.workflow.route??"");
+          const authorContinuation=(before.schemaVersion!==1&&before.stage==="INCOMPLETE"&&next.schemaVersion===3&&next.stage==="REFINEMENT"&&next.workflow.authorFeedback?.source.digest===head.digest&&["STRATEGIST","TRANSLATOR"].includes(next.workflow.route??""))||rejectedTranslatorContinuation;
           if (next.previous?.id !== head.id || next.previous.digest !== head.digest || before.stage !== next.stage && !allowedRoleTransition(before.stage, next.stage)&&!reviewedCalendarRefresh&&!authorContinuation) reject("INVALID_OUTPUT", "Checkpoint routing must extend the current compiler stage.");
           const oldCall = before.pendingCall, call = next.pendingCall;
           if (oldCall && oldCall.state !== "RESPONSE_SAVED" && (!call || call.callId !== oldCall.callId || call.inputDigest !== oldCall.inputDigest || call.role !== oldCall.role ||
@@ -144,7 +145,7 @@ export class PlannerFoundationService {
           if (before.schemaVersion !== 1 && before.learning.call && next.schemaVersion !== 1 && hash("learning-call", before.learning.call) !== hash("learning-call", next.learning.call)) {
             const descriptor = before.learning.call;
             const records = await rows<{ reservation: { roleCall?: { key?: string } } }>(sql, 'SELECT reservation FROM "AiUsageLog" WHERE "attemptId"=$1 AND reservation->\'roleCall\'->>\'key\'=$2', [attempt.attemptId, descriptor.key]);
-            const correctingRejected=descriptor.role==="REVIEWER"&&next.schemaVersion===3&&next.workflow.recovery!==null&&next.learning.call?.role==="REVIEWER";
+            const correctingRejected=(descriptor.role==="REVIEWER"&&next.schemaVersion===3&&next.workflow.recovery!==null&&next.learning.call?.role==="REVIEWER")||(descriptor.role==="TRANSLATOR"&&rejectedTranslatorContinuation);
             // assertReviewedArtifact has reconstructed this exact rejected STOP
             // response and its concerns. No accepted/uncertain call is waived.
             if (records.length&&!correctingRejected) {

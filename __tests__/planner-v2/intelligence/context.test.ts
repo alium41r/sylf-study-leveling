@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
 import { projectPlannerContext } from "@/lib/planner/v2/intelligence/context";
-import { relevantDependencyQuests, verifyContextCorrespondence, questDependency, type ExecutionContext, type QuestRow, type SessionRow } from "@/lib/planner/v2/server/context";
+import { relevantDependencyQuests, verifyContextCorrespondence, questDependency, overdueCompetingWork, type ExecutionContext, type QuestRow, type SessionRow } from "@/lib/planner/v2/server/context";
 import { executionFixture, intentFixture, id, digest } from "../contracts/fixtures";
 
 export function questFixture(n = 1): QuestRow {
@@ -21,6 +21,19 @@ const target = () => ({ planId: id(1), planRef: "physics", intent: intentFixture
 const window = { start: "2026-10-05", end: "2026-10-06" };
 
 describe("bounded authoritative model context", () => {
+  it("excludes terminal legacy failures but preserves failed V2 OPEN work and actual study", () => {
+    const c=contextFixture();
+    c.quests=[{...questFixture(1),plannerSpec:null,status:"FAILED"},{...questFixture(2),status:"FAILED"}];
+    c.sessions=[{questId:1,durationSeconds:600,startedAt:new Date("2026-10-05"),endedAt:c.now,executionState:"ENDED"} as SessionRow];
+    const p=projectPlannerContext(c,[{...target(),planId:id(50)}],window);
+    expect(p.view.envelope.days[0].otherCommittedMinutes).toBe(40);
+    expect(p.view.execution).toHaveLength(1);
+    expect(p.view.execution[0].source).toBe("V2_EXECUTION");
+    expect(c.quests).toHaveLength(2);
+    c.today="2026-10-06";
+    expect(overdueCompetingWork(c,new Set())).toEqual([expect.objectContaining({questId:2,canReschedule:false,remainingMinutes:30})]);
+    expect(overdueCompetingWork(c,new Set([id(1)]))).toEqual([]);
+  });
   it("projects 1500 completed activities without pinning or repeating all history, retaining the complete raw snapshot", () => {
     const c = contextFixture(); c.quests = Array.from({ length: 1500 }, (_, i) => ({ ...questFixture(i + 1), status: "COMPLETED", remainingDisposition: "COMPLETED", executionVersion: 1, elapsedSeconds: 900, completedAt: c.now }));
     const projected = projectPlannerContext(c, [target()], window);

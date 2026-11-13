@@ -2,14 +2,19 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  AlertCircle,
   ArrowLeft,
   ArrowRight,
+  Calendar,
+  Check,
   CheckCircle2,
   ChevronDown,
+  Clock,
   FileText,
+  ListTree,
   Plus,
   RefreshCw,
-  Search,
+  SlidersHorizontal,
   Square,
   Upload,
   X,
@@ -30,25 +35,15 @@ import {
 import {
   workspaceRequest,
   WorkspaceRequestError,
+  reschedulePlannerCommitment,
 } from "@/lib/planner/v2/client/transport";
 import type { PlannerCapabilities } from "@/lib/planner/transport";
 import { invalidatePlannerCommit } from "@/lib/planner/client";
-import {
-  DailyQuotaIcon,
-  DeadlineIcon,
-  FocusClockIcon,
-  ObjectiveTargetIcon,
-  QuestEmblemIcon,
-  ReviewSealIcon,
-  SubjectGrimoireIcon,
-  SylvieIcon,
-  SystemInsightsIcon,
-  SystemWarningIcon,
-} from "@/app/components/icons";
+import { ImmersiveModeButton } from "@/app/components/ImmersiveModeButton";
 import AcceptedDetailsEditor from "./AcceptedDetailsEditor";
 import PlanningActivity from "./PlanningActivity";
 import PlanSchedule from "./PlanSchedule";
-import StageRail from "./StageRail";
+import StageRail, { PLANNER_STAGES } from "./StageRail";
 import s from "./StudentPlannerWorkspace.module.css";
 
 const key = () => crypto.randomUUID();
@@ -62,13 +57,22 @@ const day = (iso: string) =>
     year: "numeric",
     timeZone: "UTC",
   });
+const shortDay = (iso: string) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
 const planState = (state: string) =>
   state === "ACTIVE"
-    ? "Active plan"
+    ? "Active"
     : state === "ARCHIVED"
       ? "Archived"
       : "Draft";
 const label = (value: string) => value.toLowerCase().replaceAll("_", " ");
+const TABS = ["Schedule", "Strategy", "Research", "Review", "Notes"] as const;
+type TabName = (typeof TABS)[number];
+
 function stageIndex(view: StudentWorkspace) {
   if (
     view.workspace.candidate?.attemptId === view.attempt?.attemptId ||
@@ -76,19 +80,82 @@ function stageIndex(view: StudentWorkspace) {
   )
     return 5;
   if (view.draft?.retainedFromEarlierAttempt) return 0;
-  const stage = view.draft?.stage;
+  const stage =
+    view.draft?.stage === "INCOMPLETE"
+      ? view.attempt?.stage
+      : (view.draft?.stage ?? view.attempt?.stage);
   return stage === "STRATEGY"
     ? 1
-    : stage === "TRANSLATION"
+    : stage === "TRANSLATION" || stage === "BLUEPRINT"
       ? 2
-      : stage === "ALLOCATION"
+      : stage === "ALLOCATION" || stage === "ALLOCATE"
         ? 3
         : stage === "REVIEW" || stage === "REFINEMENT"
           ? 4
           : 0;
 }
+
 const live = (view: StudentWorkspace | null) =>
   !!view?.attempt && ["QUEUED", "RUNNING"].includes(view.attempt.state);
+
+const OPEN_AUTHORIZE_STORAGE_KEY = "sylf:planner:open-authorize";
+
+function readOpenAuthorize(planId: string | null | undefined): boolean {
+  if (!planId || typeof window === "undefined") return false;
+  try {
+    return window.sessionStorage.getItem(OPEN_AUTHORIZE_STORAGE_KEY) === planId;
+  } catch {
+    return false;
+  }
+}
+
+function markOpenAuthorize(planId: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(OPEN_AUTHORIZE_STORAGE_KEY, planId);
+  } catch {
+    /* Ignore restricted storage environments. */
+  }
+}
+
+function clearOpenAuthorize() {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.removeItem(OPEN_AUTHORIZE_STORAGE_KEY);
+  } catch {
+    /* Ignore restricted storage environments. */
+  }
+}
+
+/** Splits plain strategy prose into headed sections and bullet rows. */
+function StrategyText({ text }: { text: string }) {
+  const blocks = text.split(/\n{2,}/).map((b) => b.split("\n").filter(Boolean));
+  return (
+    <>
+      {blocks.map((lines, i) => {
+        const [first, ...rest] = lines;
+        const heading = first && /^[A-Z0-9][A-Z0-9 &,'’/()\-–:]{3,}$/.test(first.trim());
+        const body = heading ? rest : lines;
+        const bullets = body.filter((l) => /^\s*[-•]\s/.test(l));
+        const prose = body.filter((l) => !/^\s*[-•]\s/.test(l));
+        return (
+          <section key={i} className={s.strategyBlock}>
+            {heading && <h3 className={s.strategyHeading}>{first.trim()}</h3>}
+            {prose.length > 0 && <p>{prose.join(" ")}</p>}
+            {bullets.length > 0 && (
+              <ul>
+                {bullets.map((b, j) => (
+                  <li key={j}>{b.replace(/^\s*[-•]\s/, "")}</li>
+                ))}
+              </ul>
+            )}
+          </section>
+        );
+      })}
+    </>
+  );
+}
+
 export default function StudentPlannerWorkspace({
   capabilities,
   onExit,
@@ -116,17 +183,20 @@ export default function StudentPlannerWorkspace({
     );
     return () => clearTimeout(timer);
   }, [view?.attempt?.budget.executionDeadlineAt]);
+
   const [readiness, setReadiness] = useState<StudentReadiness | null>(null),
     [loading, setLoading] = useState(true),
     [hasPending, setHasPending] = useState(false),
     [busy, setBusy] = useState(false),
     [error, setError] = useState<string | null>(null),
     [notice, setNotice] = useState<string | null>(null);
-  const [tab, setTab] = useState("Plan"),
+  const [tab, setTab] = useState<TabName>("Schedule"),
     [spendingLimitUsd, setSpendingLimitUsd] = useState(
       STUDENT_SPENDING_LIMIT_USD
     ),
-    [authorize, setAuthorize] = useState(false),
+    [authorize, setAuthorize] = useState(() =>
+      readOpenAuthorize(initialPlanId)
+    ),
     [consent, setConsent] = useState(false),
     [confirm, setConfirm] = useState<string | null>(null),
     [ack, setAck] = useState<string[]>([]),
@@ -137,11 +207,11 @@ export default function StudentPlannerWorkspace({
     [date, setDate] = useState(""),
     [notes, setNotes] = useState(""),
     [feedback, setFeedback] = useState("");
-  const [start, setStart] = useState("17:00"),
-    [end, setEnd] = useState("19:00"),
+  const [start, setStart] = useState("08:00"),
+    [end, setEnd] = useState("22:00"),
     [ceiling, setCeiling] = useState(90),
     [rest, setRest] = useState(() => plannerRestDays(capabilities.restDays)),
-    [research, setResearch] = useState(false),
+    [research, setResearch] = useState(true),
     [documents, setDocuments] = useState<
       { documentId: string; title: string }[]
     >([]);
@@ -163,6 +233,7 @@ export default function StudentPlannerWorkspace({
     requesting = useRef(false),
     mounted = useRef(true),
     selection = useRef(selected);
+
   const refresh = useCallback(async (id?: string | null) => {
     const data = await workspaceRequest<{
       plans: StudentPlan[];
@@ -181,6 +252,7 @@ export default function StudentPlannerWorkspace({
       if (mounted.current && selection.current === planId) setView(current);
     }
   }, []);
+
   useEffect(() => {
     mounted.current = true;
     void refresh(null)
@@ -190,6 +262,7 @@ export default function StudentPlannerWorkspace({
       mounted.current = false;
     };
   }, [refresh]);
+
   useEffect(() => {
     if (!selected) return;
     let active = true;
@@ -206,6 +279,7 @@ export default function StudentPlannerWorkspace({
       active = false;
     };
   }, [selected]);
+
   useEffect(() => {
     if (!selected || !live(view)) return;
     let cancelled = false;
@@ -223,7 +297,7 @@ export default function StudentPlannerWorkspace({
     };
     const timer = setInterval(() => {
       void visible();
-    }, 4000);
+    }, 3000);
     window.addEventListener("online", visible);
     document.addEventListener("visibilitychange", visible);
     return () => {
@@ -233,23 +307,40 @@ export default function StudentPlannerWorkspace({
       document.removeEventListener("visibilitychange", visible);
     };
   }, [selected, view, refresh]);
-  function choosePlan(id: string | null) {
-    if (id !== null && selection.current === id) return;
+
+  function closeAuthorize() {
+    clearOpenAuthorize();
+    setAuthorize(false);
+  }
+
+  function choosePlan(id: string | null, openAuthorize = false) {
+    if (openAuthorize && id) markOpenAuthorize(id);
+    else clearOpenAuthorize();
+    if (id !== null && selection.current === id) {
+      if (openAuthorize) {
+        setAuthorize(true);
+        setConsent(false);
+      }
+      return;
+    }
     selection.current = id;
     setSelected(id);
     onPlanSelected?.(id);
     setView(null);
     setDocuments([]);
     setAnswers({});
-    setAuthorize(false);
+    setAuthorize(openAuthorize);
+    setConsent(false);
     setConfirm(null);
     setAck([]);
     setHistory(null);
     setSelectedStrategy(null);
     setHistorical(null);
     setEditing(false);
+    setLiveStageHint(null);
     setClarifiedIntent(null);
   }
+
   async function run(action: () => Promise<void>) {
     if (requesting.current) return;
     requesting.current = true;
@@ -270,6 +361,7 @@ export default function StudentPlannerWorkspace({
       if (mounted.current) setBusy(false);
     }
   }
+
   async function mutate<T>(path: string, body: unknown): Promise<T> {
     if (pending.current)
       throw new Error(
@@ -290,6 +382,7 @@ export default function StudentPlannerWorkspace({
       throw e;
     }
   }
+
   function acceptedIntent(): CanonicalIntentV2 {
     if (minutes(end) <= minutes(start))
       throw new Error("The study window must end after it starts.");
@@ -299,6 +392,11 @@ export default function StudentPlannerWorkspace({
       .split("\n")
       .map((t) => t.trim())
       .filter(Boolean);
+    const maxBox = Math.min(180, Math.max(30, ceiling));
+    const prefBox = Math.min(
+      60,
+      Math.max(25, Math.min(maxBox, Math.round(ceiling / 2)))
+    );
     return CanonicalIntentV2Schema.parse({
       schemaVersion: 2,
       title: title.trim(),
@@ -324,7 +422,7 @@ export default function StudentPlannerWorkspace({
         ),
         restWeekdays: rest,
         blockedDates: [],
-        recoveryPercent: 10,
+        recoveryPercent: 0,
         basis: "CONFIRMED_AVAILABILITY",
         studyWindows: {
           schemaVersion: 1,
@@ -345,14 +443,15 @@ export default function StudentPlannerWorkspace({
       preferences: {
         pacing: "SPREAD",
         desiredIntensity: "MODERATE",
-        preferredTimeboxMinutes: 25,
-        maximumTimeboxMinutes: 60,
+        preferredTimeboxMinutes: prefBox,
+        maximumTimeboxMinutes: maxBox,
       },
       assumptions: [],
       unresolvedQuestions: [],
     });
   }
-  async function create() {
+
+  async function create(openAuthorize: boolean) {
     const intent = acceptedIntent(),
       result = await mutate<{ planId: string }>("/workspace", {
         action: "CREATE",
@@ -367,15 +466,14 @@ export default function StudentPlannerWorkspace({
         text: notes,
         expectedConversationVersion: 0,
       });
-    choosePlan(result.planId);
+    choosePlan(result.planId, openAuthorize);
     setNotes("");
-    setNotice(
-      "Goal saved. Add any materials, then review the AI authorization to begin."
-    );
-    await refresh(null);
+    await refresh(result.planId);
   }
+
   async function generate() {
     if (!view || !consent) return;
+    clearOpenAuthorize();
     const text = [
       view.intent.intent.outcome,
       notes ? `Student instructions: ${notes}` : "",
@@ -410,6 +508,7 @@ export default function StudentPlannerWorkspace({
     setFeedback("");
     await refresh(selected);
   }
+
   async function resume() {
     if (!view?.attempt || !view.research) return;
     await mutate("/workspace", {
@@ -438,6 +537,7 @@ export default function StudentPlannerWorkspace({
     setClarifiedIntent(null);
     await refresh(selected);
   }
+
   const canConfirm =
     !!view?.workspace.allowedActions.includes("CONFIRM") &&
     view.workspace.candidate?.attemptId === view.attempt?.attemptId &&
@@ -460,6 +560,16 @@ export default function StudentPlannerWorkspace({
     [fold, setFold] = useState<"availability" | "context" | null>(null),
     [inspector, setInspector] = useState(false),
     [outcomeOpen, setOutcomeOpen] = useState(false);
+  const [placementDates, setPlacementDates] = useState<Record<number, string>>(
+    {}
+  );
+  const [liveStageHint, setLiveStageHint] = useState<number | null>(null);
+
+  const handleActivityStep = useCallback(() => {
+    if (!selection.current || requesting.current) return;
+    void refresh(selection.current).catch(() => {});
+  }, [refresh]);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -477,9 +587,16 @@ export default function StudentPlannerWorkspace({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [authorize, confirm, inspector]);
+
   const attemptState = view?.attempt?.state;
-  const stageIdx = view ? stageIndex(view) : 0;
+  const rawStageIdx = view ? stageIndex(view) : 0;
+  const stageIdx =
+    live(view) && liveStageHint !== null
+      ? Math.max(rawStageIdx, liveStageHint)
+      : rawStageIdx;
   const settled = !!view && !live(view);
+  const showContentTabs =
+    !live(view) || !!blueprint || !!view?.draft?.strategies.length;
   const tone: "neutral" | "bad" | "good" =
     attemptState === "FAILED"
       ? "bad"
@@ -490,12 +607,12 @@ export default function StudentPlannerWorkspace({
     ? null
     : view.workspace.active
       ? displayingActive
-        ? ({ text: "Active plan", tone: "good" } as const)
+        ? ({ text: "Active", tone: "good" } as const)
         : ({
-            text: "Draft update · Active plan unchanged",
+            text: "Draft update",
             tone: "accent",
           } as const)
-      : ({ text: "Unconfirmed draft", tone: "neutral" } as const);
+      : ({ text: "Draft", tone: "neutral" } as const);
   const minutesTotal = blueprint
     ? (view?.draft?.allocation?.committedMinutes ??
       blueprint.activities.reduce((n, a) => n + a.timeboxMinutes, 0))
@@ -517,7 +634,6 @@ export default function StudentPlannerWorkspace({
     !busy &&
     !!readiness?.ready &&
     !view.usage?.uncertain &&
-    !(journeyExpired && view.attempt?.state === "NEEDS_DECISION") &&
     !["ARCHIVED", "COMPLETED"].includes(view.plan.state);
   const allDocuments = view
     ? [
@@ -527,6 +643,7 @@ export default function StudentPlannerWorkspace({
         ),
       ]
     : [];
+
   return (
     <div className={s.root}>
       <div className={s.stage}>
@@ -541,7 +658,6 @@ export default function StudentPlannerWorkspace({
           </button>
           <div className={s.brand}>
             <h1>Planner</h1>
-            <span className={s.badge}>Preview</span>
           </div>
           <button
             type="button"
@@ -553,8 +669,8 @@ export default function StudentPlannerWorkspace({
               setQuery("");
             }}
           >
-            <span>{view?.plan.title ?? "Your plans"}</span>
-            <ChevronDown size={14} />
+            <span>{view?.plan.title ?? "Plans"}</span>
+            <ChevronDown size={13} />
           </button>
           {view && (
             <button
@@ -562,7 +678,8 @@ export default function StudentPlannerWorkspace({
               className={s.ghost}
               onClick={() => setInspector(true)}
             >
-              <SystemInsightsIcon size={16} /> Details
+              <SlidersHorizontal size={14} />
+              <span className={s.topBtnLabel}>Details</span>
             </button>
           )}
           {selected && (
@@ -572,10 +689,16 @@ export default function StudentPlannerWorkspace({
               disabled={busy}
               onClick={resetIntake}
             >
-              <Plus size={16} /> New plan
+              <Plus size={14} />
+              <span className={s.topBtnLabel}>New</span>
             </button>
           )}
+          <ImmersiveModeButton
+            variant="header-pill"
+            className="hidden md:inline-flex"
+          />
         </header>
+
         {switcher && (
           <>
             <button
@@ -584,20 +707,22 @@ export default function StudentPlannerWorkspace({
               aria-label="Close plan switcher"
               onClick={() => setSwitcher(false)}
             />
-            <div className={s.pop} role="dialog" aria-label="Your plans">
+            <div className={s.pop} role="dialog" aria-label="Plans">
               <input
                 autoFocus
                 className={s.popSearch}
                 aria-label="Search plans"
-                placeholder="Search plans…"
+                placeholder="Filter plans…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
               <nav className={s.popList}>
                 {loading ? (
                   <p className={s.popEmpty} role="status">
-                    Loading saved plans…
+                    Loading…
                   </p>
+                ) : plans.length === 0 ? (
+                  <p className={s.popEmpty}>No saved plans</p>
                 ) : (
                   plans
                     .filter((p) =>
@@ -637,7 +762,7 @@ export default function StudentPlannerWorkspace({
                     })
                   }
                 >
-                  Load older plans
+                  Load more
                 </button>
               )}
               <button
@@ -646,11 +771,12 @@ export default function StudentPlannerWorkspace({
                 disabled={busy}
                 onClick={resetIntake}
               >
-                <Plus size={15} /> New plan
+                <Plus size={14} /> New plan
               </button>
             </div>
           </>
         )}
+
         {error && (
           <div className={s.banner} data-tone="bad" role="alert">
             <p>{error}</p>
@@ -664,7 +790,7 @@ export default function StudentPlannerWorkspace({
                   })
                 }
               >
-                <RefreshCw size={14} /> Refresh saved work
+                <RefreshCw size={13} /> Refresh
               </button>
               {hasPending && (
                 <button
@@ -683,7 +809,7 @@ export default function StudentPlannerWorkspace({
                       setHasPending(false);
                       if (result.planId) choosePlan(result.planId);
                       await refresh(selected);
-                      setNotice("The original action was acknowledged.");
+                      setNotice("Action acknowledged.");
                     })
                   }
                 >
@@ -695,25 +821,19 @@ export default function StudentPlannerWorkspace({
         )}
         {notice && (
           <p role="status" className={s.banner} data-tone="accent">
-            <SylvieIcon size={16} /> {notice}
+            {notice}
           </p>
         )}
+
         <div className={s.scroll}>
           {!selected ? (
             <section className={s.intake}>
               <div className={s.intakeInner}>
-                <span className={s.emblem}>
-                  <SylvieIcon size={30} />
-                </span>
-                <h2 className={s.hello}>What would you like to learn?</h2>
-                <p className={s.lede}>
-                  Describe your goal. Sylf researches, schedules and drafts a
-                  plan you review before it’s added.
-                </p>
+                <h2 className={s.hello}>Study plan</h2>
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    void run(create);
+                    void run(() => create(true));
                   }}
                   onInvalidCapture={() => {
                     if (start === "" || end === "") setFold("availability");
@@ -727,7 +847,7 @@ export default function StudentPlannerWorkspace({
                       value={title}
                       maxLength={120}
                       onChange={(e) => setTitle(e.target.value)}
-                      placeholder="Chemistry mock exam"
+                      placeholder="Subject or exam (e.g. A-Level Physics Paper 2)"
                     />
                     <textarea
                       className={s.composerGoal}
@@ -737,12 +857,12 @@ export default function StudentPlannerWorkspace({
                       maxLength={1000}
                       value={goal}
                       onChange={(e) => setGoal(e.target.value)}
-                      placeholder="What are you preparing for? What would success look like?"
+                      placeholder="Syllabus topics, paper format, weak areas, or target grade…"
                     />
                     <div className={s.composerBar}>
                       <label className={`${s.chip} ${s.dateChip}`}>
-                        <DeadlineIcon size={14} />
-                        <span>{date ? date : "Deadline"}</span>
+                        <Calendar size={13} />
+                        <span>{date ? shortDay(date) : "Deadline"}</span>
                         <input
                           type="date"
                           className={s.dateInputHidden}
@@ -753,7 +873,7 @@ export default function StudentPlannerWorkspace({
                         />
                       </label>
                       <label className={s.chip}>
-                        <DailyQuotaIcon size={14} />
+                        <Clock size={13} />
                         <select
                           aria-label="Daily study limit"
                           value={ceiling}
@@ -761,7 +881,7 @@ export default function StudentPlannerWorkspace({
                         >
                           {[30, 60, 90, 120, 180, 240, 360].map((n) => (
                             <option key={n} value={n}>
-                              {n} min / day
+                              {n}m / day
                             </option>
                           ))}
                         </select>
@@ -777,7 +897,7 @@ export default function StudentPlannerWorkspace({
                           )
                         }
                       >
-                        <FocusClockIcon size={14} /> Availability
+                        Hours
                       </button>
                       <button
                         type="button"
@@ -788,17 +908,26 @@ export default function StudentPlannerWorkspace({
                           setFold(fold === "context" ? null : "context")
                         }
                       >
-                        <SubjectGrimoireIcon size={14} /> Context
+                        <ListTree size={13} /> Topics
                       </button>
-                      <button
-                        className={`${s.primary} ${s.send}`}
-                        disabled={busy || !title.trim() || !goal.trim()}
-                        type="submit"
-                        aria-label="Save goal & continue"
-                      >
-                        <span>{busy ? "Saving…" : "Save goal"}</span>
-                        <ArrowRight size={14} />
-                      </button>
+                      <div className={s.composerActions}>
+                        <button
+                          type="button"
+                          className={s.ghost}
+                          disabled={busy || !title.trim() || !goal.trim()}
+                          onClick={() => void run(() => create(false))}
+                        >
+                          Save goal
+                        </button>
+                        <button
+                          className={`${s.primary} ${s.send}`}
+                          disabled={busy || !title.trim() || !goal.trim()}
+                          type="submit"
+                        >
+                          <span>{busy ? "Saving…" : "Continue"}</span>
+                          <ArrowRight size={13} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <div className={s.fold} data-open={fold === "availability"}>
@@ -806,7 +935,7 @@ export default function StudentPlannerWorkspace({
                       <div className={s.foldBody}>
                         <div className={s.pair}>
                           <label className={s.field}>
-                            Study window starts
+                            From
                             <input
                               type="time"
                               required
@@ -815,7 +944,7 @@ export default function StudentPlannerWorkspace({
                             />
                           </label>
                           <label className={s.field}>
-                            Ends
+                            Until
                             <input
                               type="time"
                               required
@@ -825,29 +954,24 @@ export default function StudentPlannerWorkspace({
                           </label>
                         </div>
                         <fieldset className={s.days}>
-                          <legend>Rest days</legend>
-                          {WEEKDAYS.map((day, i) => (
-                            <label key={day} className={s.day}>
+                          <legend>Rest days · {capabilities.timezone}</legend>
+                          {WEEKDAYS.map((d, i) => (
+                            <label key={d} className={s.day}>
                               <input
                                 type="checkbox"
                                 checked={rest.includes(i)}
                                 onChange={() =>
                                   setRest((old) =>
                                     old.includes(i)
-                                      ? old.filter((d) => d !== i)
+                                      ? old.filter((v) => v !== i)
                                       : [...old, i]
                                   )
                                 }
                               />
-                              <span>{day.slice(0, 3)}</span>
+                              <span>{d.slice(0, 3)}</span>
                             </label>
                           ))}
                         </fieldset>
-                        <p className={s.muted}>
-                          {capabilities.timezone} · Applies on non-rest days.
-                          Calendar commitments and a 10% recovery margin also
-                          reduce availability.
-                        </p>
                       </div>
                     </div>
                   </div>
@@ -855,41 +979,31 @@ export default function StudentPlannerWorkspace({
                     <div>
                       <div className={s.foldBody}>
                         <label className={s.field}>
-                          <span>
-                            Topics{" "}
-                            <span className={s.muted}>
-                              (one per line; optional)
-                            </span>
-                          </span>
+                          Topics (one per line)
                           <textarea
                             rows={3}
                             value={scope}
                             onChange={(e) => setScope(e.target.value)}
-                            placeholder={"Stoichiometry\nEquilibrium"}
+                            placeholder={"Kinematics\nDynamics\nSuperposition"}
                           />
                         </label>
                         <label className={s.field}>
-                          Student context &amp; instructions
+                          Notes
                           <textarea
                             maxLength={2800}
-                            rows={4}
+                            rows={3}
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
-                            placeholder="Your weaknesses, prior knowledge, resource access, exclusions or other constraints."
+                            placeholder="Weak topics, resources, or exclusions…"
                           />
                         </label>
-                        <p className={s.muted}>
-                          Starts as a general learning goal. You can accept a
-                          formal exam identity in plan details.
-                        </p>
                       </div>
                     </div>
                   </div>
-                  <p className={s.fine}>Saving your goal makes no AI calls.</p>
                 </form>
                 {plans.length > 0 && (
                   <section className={s.recent} aria-label="Saved plans">
-                    <h3>Recent plans</h3>
+                    <h3>Plans</h3>
                     <div className={s.recentRow}>
                       {plans.slice(0, 6).map((p) => (
                         <button
@@ -900,14 +1014,8 @@ export default function StudentPlannerWorkspace({
                             if (!busy) choosePlan(p.planId);
                           }}
                         >
-                          <div className={s.recentCardTop}>
-                            <SubjectGrimoireIcon
-                              size={13}
-                              className={s.recentCardIcon}
-                            />
-                            <small>{planState(p.state)}</small>
-                          </div>
                           <strong>{p.title}</strong>
+                          <small>{planState(p.state)}</small>
                         </button>
                       ))}
                     </div>
@@ -926,15 +1034,7 @@ export default function StudentPlannerWorkspace({
             </section>
           ) : !view ? (
             <div className={s.loadingStage} role="status">
-              <span className={s.loadingEmblem}>
-                <SylvieIcon size={34} />
-              </span>
-              <strong className={s.loadingTitle}>
-                Opening your saved plan
-              </strong>
-              <p className={s.loadingSub}>
-                Loading research, strategy and calendar schedule…
-              </p>
+              <strong className={s.loadingTitle}>Loading…</strong>
               <div className={s.loadingTrack} aria-hidden="true">
                 <div className={s.loadingBar} />
               </div>
@@ -945,13 +1045,21 @@ export default function StudentPlannerWorkspace({
                 <div className={s.heroTop}>
                   {planBadge && (
                     <span className={s.badge} data-tone={planBadge.tone}>
-                      {planBadge.tone === "good" && <CheckCircle2 size={12} />}
+                      {planBadge.tone === "good" && <Check size={11} />}
                       {planBadge.text}
                     </span>
                   )}
+                  <span className={s.metaInline}>
+                    {view.intent.intent.deadline.kind === "NONE"
+                      ? "No deadline"
+                      : `Due ${day(view.intent.intent.deadline.date)}`}
+                    {minutesTotal !== null &&
+                      blueprint &&
+                      ` · ${minutesTotal}m · ${blueprint.activities.length} sessions`}
+                  </span>
                   {view.workspace.active && displayingActive && (
                     <Link href="/quests" className={s.textButton}>
-                      Open study quests <ArrowRight size={14} />
+                      Quests <ArrowRight size={13} />
                     </Link>
                   )}
                 </div>
@@ -966,167 +1074,122 @@ export default function StudentPlannerWorkspace({
                     style={{ justifySelf: "start" }}
                     onClick={() => setOutcomeOpen(!outcomeOpen)}
                   >
-                    {outcomeOpen ? "Show less" : "Show more"}
+                    {outcomeOpen ? "Less" : "More"}
                   </button>
                 )}
-                <div className={s.meta}>
-                  <span className={s.metaItem}>
-                    <DeadlineIcon size={14} />
-                    {view.intent.intent.deadline.kind === "NONE"
-                      ? "No fixed deadline"
-                      : `Deadline ${day(view.intent.intent.deadline.date)}`}
-                  </span>
-                  <span className={s.metaItem}>
-                    <FocusClockIcon size={14} />
-                    {view.intent.intent.availability?.timezone ??
-                      capabilities.timezone}
-                  </span>
-                  <span className={s.metaItem}>
-                    <ObjectiveTargetIcon size={14} />
-                    {label(view.intent.intent.policy)} goal
-                  </span>
-                  {minutesTotal !== null && blueprint && (
-                    <span className={s.metaItem}>
-                      <QuestEmblemIcon size={14} />
-                      {minutesTotal} min · {blueprint.activities.length}{" "}
-                      activities
-                    </span>
-                  )}
-                </div>
               </div>
+
               {view.draft?.retainedFromEarlierAttempt && (
                 <p className={s.notice} data-tone="accent">
-                  Retained draft from the earlier linked attempt. Its research
-                  and calendar evidence are historical; the current continuation
-                  must revalidate and review any reused work.
+                  Earlier draft retained while current run completes.
                 </p>
               )}
+
               {view.attempt && (
                 <section
-                  className={s.agent}
+                  className={
+                    settled && (canConfirm || displayingActive) && attemptState === "SUCCEEDED"
+                      ? s.agentCompact
+                      : s.agent
+                  }
                   data-live={live(view)}
                   data-tone={tone}
                   aria-label="Planning progress"
                 >
-                  <div className={s.agentHead}>
-                    <span className={s.agentOrb}>
-                      {tone === "bad" ? (
-                        <SystemWarningIcon size={18} />
-                      ) : tone === "good" ? (
-                        <CheckCircle2 size={18} />
-                      ) : (
-                        <SylvieIcon size={20} />
-                      )}
-                    </span>
-                    <div className={s.agentTitle}>
-                      {live(view) ? (
-                        <>
-                          <strong role="status">
-                            {view.attempt.state === "QUEUED"
-                              ? "Waiting for the Planner worker"
-                              : `Working on ${label(view.draft?.stage ?? view.attempt.stage)}`}
-                          </strong>
-                          <span>
-                            Progress is saved. You can leave and come back.
-                          </span>
-                        </>
-                      ) : view.attempt.state === "FAILED" ? (
-                        <>
-                          <strong>
-                            Planning stopped at {label(view.attempt.stage)}
-                          </strong>
-                          <span>{view.attempt.error?.message}</span>
-                        </>
-                      ) : view.attempt.state === "CANCELLED" ? (
-                        <>
-                          <strong>Planning stopped</strong>
-                          <span>
-                            Planning was stopped. Saved artifacts and any
-                            reported usage are retained.
-                          </span>
-                        </>
-                      ) : view.attempt.state === "NEEDS_DECISION" ? (
-                        <>
-                          <strong>Waiting for you</strong>
-                          <span>Saved progress is retained.</span>
-                        </>
-                      ) : (
-                        <>
-                          <strong>Planning complete</strong>
-                          <span>
-                            Every stage below was recorded as it happened.
-                          </span>
-                        </>
-                      )}
-                    </div>
-                    {live(view) && (
-                      <button
-                        className={s.stop}
-                        disabled={busy}
-                        type="button"
-                        onClick={() =>
-                          void run(async () => {
-                            await mutate(
-                              `/${selected}/operations/${view.attempt!.attemptId}`,
-                              { schemaVersion: 2, action: "CANCEL" }
-                            );
-                            await refresh(selected);
-                          })
-                        }
-                      >
-                        <Square size={12} /> Stop
-                      </button>
-                    )}
-                  </div>
-                  <StageRail index={stageIdx} live={live(view)} tone={tone} />
-                  {view.attempt.state === "FAILED" && (
-                    <p className={s.stageNote}>
-                      Drafts are retained. Nothing was added to your plan.
-                    </p>
+                  {!(
+                    settled &&
+                    (canConfirm || displayingActive) &&
+                    attemptState === "SUCCEEDED"
+                  ) && (
+                    <>
+                      <div className={s.agentHead}>
+                        <span className={s.agentOrb} aria-hidden="true">
+                          {tone === "bad" ? (
+                            <AlertCircle size={15} />
+                          ) : tone === "good" ? (
+                            <Check size={15} strokeWidth={2.5} />
+                          ) : (
+                            <i className={s.liveDot} />
+                          )}
+                        </span>
+                        <div className={s.agentTitle}>
+                          {live(view) ? (
+                            <strong role="status">
+                              {view.attempt.state === "QUEUED"
+                                ? "Starting…"
+                                : `${PLANNER_STAGES[stageIdx]}…`}
+                            </strong>
+                          ) : view.attempt.state === "FAILED" ? (
+                            <>
+                              <strong>
+                                Stopped at{" "}
+                                {PLANNER_STAGES[stageIdx].toLowerCase()}
+                              </strong>
+                              {view.attempt.error?.message && (
+                                <span>{view.attempt.error.message}</span>
+                              )}
+                            </>
+                          ) : view.attempt.state === "CANCELLED" ? (
+                            <strong>Stopped</strong>
+                          ) : view.attempt.state === "NEEDS_DECISION" ? (
+                            <strong>
+                              {journeyExpired
+                                ? "Request expired"
+                                : "Input needed"}
+                            </strong>
+                          ) : (
+                            <strong>Complete</strong>
+                          )}
+                        </div>
+                        {live(view) && (
+                          <button
+                            className={s.stop}
+                            disabled={busy}
+                            type="button"
+                            onClick={() =>
+                              void run(async () => {
+                                await mutate(
+                                  `/${selected}/operations/${view.attempt!.attemptId}`,
+                                  { schemaVersion: 2, action: "CANCEL" }
+                                );
+                                await refresh(selected);
+                              })
+                            }
+                          >
+                            <Square size={11} /> Stop
+                          </button>
+                        )}
+                      </div>
+                      <StageRail
+                        index={stageIdx}
+                        live={live(view)}
+                        tone={tone}
+                      />
+                    </>
                   )}
                   <PlanningActivity
                     key={view.attempt.attemptId}
                     planId={view.plan.planId}
                     attemptId={view.attempt.attemptId}
                     running={live(view)}
+                    onStageHint={setLiveStageHint}
+                    onActivityStep={handleActivityStep}
                   />
                 </section>
               )}
+
               {journeyExpired && !live(view) && (
                 <div className={s.notice} data-tone="accent">
-                  <p>
-                    This planning request has expired. Your saved work and usage
-                    are retained. Start a new authorized request to plan again.
-                  </p>
-                  {view.attempt?.state === "NEEDS_DECISION" && (
-                    <button
-                      type="button"
-                      className={s.button}
-                      disabled={busy}
-                      onClick={() =>
-                        void run(async () => {
-                          await mutate(
-                            `/${selected}/operations/${view.attempt!.attemptId}`,
-                            { schemaVersion: 2, action: "CANCEL" }
-                          );
-                          await refresh(selected);
-                        })
-                      }
-                    >
-                      Close expired request
-                    </button>
-                  )}
+                  <p>This request expired. Start a new planning request.</p>
                 </div>
               )}
+
               {!journeyExpired &&
               view.research?.questions.length &&
               view.attempt?.state === "NEEDS_DECISION" ? (
                 <section className={s.ask}>
-                  <span className={s.askGlyph}>
-                    <SylvieIcon size={18} />
-                  </span>
                   <div>
-                    <h3>A few details before we continue</h3>
+                    <h3>Clarification needed</h3>
                     <form
                       onSubmit={(e) => {
                         e.preventDefault();
@@ -1151,12 +1214,6 @@ export default function StudentPlannerWorkspace({
                           />
                         </label>
                       ))}
-                      <p className={s.muted}>
-                        Answers stay linked to this request and its original
-                        resource limits and deadline. Use Plan details below to
-                        accept any changed hard facts before starting a new
-                        request.
-                      </p>
                       <button
                         type="submit"
                         className={s.primary}
@@ -1164,27 +1221,103 @@ export default function StudentPlannerWorkspace({
                         disabled={busy}
                       >
                         Send answers &amp; continue
-                        <ArrowRight size={16} />
+                        <ArrowRight size={14} />
                       </button>
                     </form>
                   </div>
                 </section>
               ) : null}
+
               {view.attempt?.state === "NEEDS_DECISION" &&
                 !view.research?.questions.length && (
                   <div className={s.notice} data-tone="accent">
-                    <strong>Your decision is needed</strong>
-                    <p>{view.attempt.question}</p>
-                    <p>
-                      Inspect the draft and Plan details. Accept any changed
-                      goal or availability there, then continue the saved
-                      journey under its original limits.
-                    </p>
+                    <strong>
+                      {view.capacityDecision?.overdue.length
+                        ? "Reschedule overdue tasks"
+                        : view.capacityDecision?.overdueResolved
+                          ? "Tasks updated"
+                          : "Decision needed"}
+                    </strong>
+                    {view.capacityDecision?.overdueResolved ? (
+                      <p>
+                        {journeyExpired
+                          ? "Start a new planning request."
+                          : "Continue saved journey."}
+                      </p>
+                    ) : view.capacityDecision?.overdue.length ? (
+                      <>
+                        {view.capacityDecision.overdue.map((task) => (
+                          <form
+                            key={task.questId}
+                            className={s.field}
+                            onSubmit={(event) => {
+                              event.preventDefault();
+                              const nextDate = placementDates[task.questId];
+                              if (nextDate)
+                                void run(async () => {
+                                  await reschedulePlannerCommitment(
+                                    task.questId,
+                                    nextDate
+                                  );
+                                  await refresh(selected);
+                                  setNotice("Task date updated.");
+                                });
+                            }}
+                          >
+                            <span>
+                              {task.title} · {task.remainingMinutes}m · due{" "}
+                              {day(task.date)}
+                            </span>
+                            {task.canReschedule ? (
+                              <>
+                                <label>
+                                  New date for {task.title}
+                                  <input
+                                    type="date"
+                                    min={view.capacityDecision!.today}
+                                    required
+                                    disabled={busy}
+                                    value={placementDates[task.questId] ?? ""}
+                                    onChange={(event) =>
+                                      setPlacementDates((dates) => ({
+                                        ...dates,
+                                        [task.questId]: event.target.value,
+                                      }))
+                                    }
+                                  />
+                                </label>
+                                <button
+                                  className={s.button}
+                                  type="submit"
+                                  disabled={busy || !placementDates[task.questId]}
+                                >
+                                  Save task date
+                                </button>
+                              </>
+                            ) : (
+                              <Link
+                                className={s.textButton}
+                                href={
+                                  task.planId
+                                    ? `/planner/${task.planId}`
+                                    : "/goals?tab=quests"
+                                }
+                              >
+                                Review this work
+                              </Link>
+                            )}
+                          </form>
+                        ))}
+                      </>
+                    ) : (
+                      <p>{view.attempt.question}</p>
+                    )}
                   </div>
                 )}
+
               {!readiness?.ready && (
                 <p className={s.notice}>
-                  {readiness?.reason ?? "Checking the Planner worker…"}{" "}
+                  {readiness?.reason ?? "Checking worker…"}{" "}
                   <button
                     type="button"
                     className={s.textButton}
@@ -1194,358 +1327,335 @@ export default function StudentPlannerWorkspace({
                   </button>
                 </p>
               )}
-              <div
-                className={s.tabs}
-                role="tablist"
-                aria-label="Plan inspection"
-              >
-                {["Plan", "Strategy", "Research", "Review", "Conversation"].map(
-                  (t) => (
-                    <button
-                      type="button"
-                      role="tab"
-                      aria-selected={tab === t}
-                      id={`planner-tab-${t}`}
-                      aria-controls="planner-panel"
-                      tabIndex={tab === t ? 0 : -1}
-                      key={t}
-                      onKeyDown={(e) => {
-                        if (["ArrowLeft", "ArrowRight"].includes(e.key)) {
-                          e.preventDefault();
-                          const all = [
-                              "Plan",
-                              "Strategy",
-                              "Research",
-                              "Review",
-                              "Conversation",
-                            ],
-                            target =
-                              all[
-                                (all.indexOf(t) +
-                                  (e.key === "ArrowRight" ? 1 : 4)) %
-                                  5
+
+              {showContentTabs && (
+                <>
+                  <div
+                    className={s.tabs}
+                    role="tablist"
+                    aria-label="Plan inspection"
+                  >
+                    {TABS.map((t) => (
+                      <button
+                        type="button"
+                        role="tab"
+                        aria-selected={tab === t}
+                        id={`planner-tab-${t}`}
+                        aria-controls="planner-panel"
+                        tabIndex={tab === t ? 0 : -1}
+                        key={t}
+                        onKeyDown={(e) => {
+                          if (["ArrowLeft", "ArrowRight"].includes(e.key)) {
+                            e.preventDefault();
+                            const target =
+                              TABS[
+                                (TABS.indexOf(t) +
+                                  (e.key === "ArrowRight" ? 1 : TABS.length - 1)) %
+                                  TABS.length
                               ];
-                          setTab(target);
-                          document
-                            .getElementById(`planner-tab-${target}`)
-                            ?.focus();
-                        }
-                      }}
-                      onClick={() => setTab(t)}
-                    >
-                      {t}
-                      {t === "Review" && currentIssues.length > 0 && (
-                        <span>{currentIssues.length}</span>
-                      )}
-                    </button>
-                  )
-                )}
-              </div>
-              <section
-                id="planner-panel"
-                role="tabpanel"
-                aria-labelledby={`planner-tab-${tab}`}
-                className={s.panel}
-                key={tab}
-              >
-                {tab === "Plan" && (
-                  <>
-                    {!blueprint ? (
-                      <div className={s.empty}>
-                        <SubjectGrimoireIcon size={28} />
-                        <h3>
-                          {live(view)
-                            ? "Your learning plan is taking shape"
-                            : "Ready when you are"}
-                        </h3>
-                        <p>
-                          {view.attempt
-                            ? "Any strategy or partial work is available in the other tabs. The activities have not been translated yet."
-                            : "Review your accepted details, then start planning. Sylf will ask before it uses any sources."}
-                        </p>
-                      </div>
-                    ) : (
+                            setTab(target);
+                            document
+                              .getElementById(`planner-tab-${target}`)
+                              ?.focus();
+                          }
+                        }}
+                        onClick={() => setTab(t)}
+                      >
+                        {t}
+                        {t === "Review" && currentIssues.length > 0 && (
+                          <span>{currentIssues.length}</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+
+                  <section
+                    id="planner-panel"
+                    role="tabpanel"
+                    aria-labelledby={`planner-tab-${tab}`}
+                    className={s.panel}
+                    key={tab}
+                  >
+                    {tab === "Schedule" && (
                       <>
-                        {view.draft?.activitiesStrategyId !==
-                          view.draft?.strategies.at(-1)?.id && (
-                          <p className={s.notice} data-tone="accent">
-                            These activities retain strategy version{" "}
-                            {view.draft?.activitiesStrategyVersion ?? "pending"}
-                            . The newest natural strategy is still awaiting
-                            faithful translation and revalidation.
-                          </p>
+                        {!blueprint ? (
+                          <div className={s.empty}>
+                            <p>
+                              {live(view)
+                                ? "Building schedule…"
+                                : "No schedule yet."}
+                            </p>
+                          </div>
+                        ) : (
+                          <>
+                            {view.draft?.activitiesStrategyId !==
+                              view.draft?.strategies.at(-1)?.id && (
+                              <p className={s.notice} data-tone="accent">
+                                These activities retain strategy version{" "}
+                                {view.draft?.activitiesStrategyVersion ?? "pending"}
+                                .
+                              </p>
+                            )}
+                            {!canConfirm &&
+                              !displayingActive &&
+                              attemptState !== "SUCCEEDED" &&
+                              view.draft?.reason && (
+                                <p className={s.notice}>{view.draft.reason}</p>
+                              )}
+                            <PlanSchedule view={view} blueprint={blueprint} />
+                          </>
                         )}
-                        {!canConfirm && !displayingActive && (
-                          <p className={s.notice}>
-                            Draft for inspection. {view.draft?.reason} Approval
-                            and currentness are required before these activities
-                            can become executable.
-                          </p>
-                        )}
-                        <PlanSchedule view={view} blueprint={blueprint} />
                       </>
                     )}
-                  </>
-                )}
-                {tab === "Strategy" &&
-                  (view.draft?.strategies.length ? (
-                    <>
-                      <label className={s.version}>
-                        Strategy version
-                        <select
-                          onChange={(e) =>
-                            void run(async () => {
-                              const selected = await workspaceRequest<{
-                                artifact: {
-                                  id: string;
-                                  value: { version: number; text: string };
-                                };
-                              }>(
-                                `/workspace?planId=${view.plan.planId}&attemptId=${view.draft!.attemptId}&artifactId=${e.target.value}`
-                              );
-                              setSelectedStrategy({
-                                id: selected.artifact.id,
-                                version: selected.artifact.value.version,
-                                text: selected.artifact.value.text,
-                              });
-                            })
-                          }
-                          value={
-                            selectedStrategy?.id ??
-                            view.draft.strategies.at(-1)!.id
-                          }
-                        >
-                          {(view.draft.history.some(
-                            (h) => h.kind === "STRATEGY"
-                          )
-                            ? view.draft.history
-                                .filter((h) => h.kind === "STRATEGY")
-                                .map((h) => ({ id: h.id, label: h.label }))
-                            : view.draft.strategies.map((v) => ({
-                                id: v.id,
-                                label: `Strategy ${v.version}`,
-                              }))
-                          ).map((v) => (
-                            <option key={v.id} value={v.id}>
-                              {v.label}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      {(selectedStrategy
-                        ? [selectedStrategy]
-                        : [...view.draft.strategies].reverse()
-                      ).map((v, i) => (
-                        <details
-                          key={v.id}
-                          id={`strategy-${v.id}`}
-                          className={s.details}
-                          open={i === 0}
-                        >
-                          <summary>
-                            Natural strategy · version {v.version}
-                          </summary>
-                          <article className={s.article}>{v.text}</article>
-                        </details>
-                      ))}
-                    </>
-                  ) : (
-                    <div className={s.empty}>
-                      <FileText size={28} />
-                      <h3>No strategy yet</h3>
-                      <p>
-                        The strategist receives the verified research and real
-                        calendar capacity before writing.
-                      </p>
-                    </div>
-                  ))}
-                {tab === "Research" &&
-                  (view.research?.summary ? (
-                    <>
-                      {Object.entries(view.research.summary).map(([k, v]) => (
-                        <section key={k} className={s.card}>
-                          <h3>{label(k)}</h3>
-                          <p className={s.prose}>{v}</p>
-                        </section>
-                      ))}
-                      <p className={s.muted}>
-                        Research summaries distinguish reported knowledge,
-                        demonstrated evidence and uncertainty. Full source,
-                        verification and capacity artifacts are available in
-                        History.
-                      </p>
-                    </>
-                  ) : (
-                    <div className={s.empty}>
-                      <Search size={28} />
-                      <p>Research context will appear here as it is saved.</p>
-                    </div>
-                  ))}
-                {tab === "Review" && (
-                  <>
-                    {view.draft?.reviews.map((r) => (
-                      <div key={r.id} className={s.verdict}>
-                        <span className={s.badge} data-tone="accent">
-                          {label(r.verdict)}
-                        </span>
-                        <p className={s.prose}>{r.explanation}</p>
-                      </div>
-                    ))}
-                    {view.draft?.issues.map((i) => (
-                      <article
-                        className={s.issue}
-                        data-severity={i.severity.toLowerCase()}
-                        key={i.issueId}
-                      >
-                        <div className={s.heroTop}>
-                          <span
-                            className={s.badge}
-                            data-tone={
-                              ["BLOCKER", "MAJOR"].includes(i.severity)
-                                ? "bad"
-                                : "warn"
-                            }
-                          >
-                            {label(i.severity)}
-                          </span>
-                          <span className={s.muted}>
-                            {label(i.disposition)} · {label(i.route)}
-                          </span>
-                        </div>
-                        <h3>{i.requirement}</h3>
-                        <p>{i.offendingContent}</p>
-                        <p className={s.muted}>{i.consequence}</p>
-                        <details>
-                          <summary>Reviewer evidence &amp; explanation</summary>
-                          <p>{i.explanation}</p>
-                          {i.grounds.map((g, n) => (
-                            <blockquote key={n}>{g.excerpt}</blockquote>
-                          ))}
-                        </details>
-                      </article>
-                    ))}
-                    {!view.draft?.reviews.length &&
-                      !view.draft?.issues.length && (
+
+                    {tab === "Strategy" &&
+                      (view.draft?.strategies.length ? (
+                        <>
+                          {view.draft.strategies.length > 1 ? (
+                            <>
+                              <label className={s.version}>
+                                Version
+                                <select
+                                  onChange={(e) =>
+                                    void run(async () => {
+                                      const res = await workspaceRequest<{
+                                        artifact: {
+                                          id: string;
+                                          value: {
+                                            version: number;
+                                            text: string;
+                                          };
+                                        };
+                                      }>(
+                                        `/workspace?planId=${view.plan.planId}&attemptId=${view.draft!.attemptId}&artifactId=${e.target.value}`
+                                      );
+                                      setSelectedStrategy({
+                                        id: res.artifact.id,
+                                        version: res.artifact.value.version,
+                                        text: res.artifact.value.text,
+                                      });
+                                    })
+                                  }
+                                  value={
+                                    selectedStrategy?.id ??
+                                    view.draft.strategies.at(-1)!.id
+                                  }
+                                >
+                                  {(view.draft.history.some(
+                                    (h) => h.kind === "STRATEGY"
+                                  )
+                                    ? view.draft.history
+                                        .filter((h) => h.kind === "STRATEGY")
+                                        .map((h) => ({
+                                          id: h.id,
+                                          label: h.label,
+                                        }))
+                                    : view.draft.strategies.map((v) => ({
+                                        id: v.id,
+                                        label: `v${v.version}`,
+                                      }))
+                                  ).map((v) => (
+                                    <option key={v.id} value={v.id}>
+                                      {v.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                              {(selectedStrategy
+                                ? [selectedStrategy]
+                                : [...view.draft.strategies].reverse()
+                              ).map((v) => (
+                                <article
+                                  key={v.id}
+                                  id={`strategy-${v.id}`}
+                                  className={s.strategySurface}
+                                >
+                                  <StrategyText text={v.text} />
+                                </article>
+                              ))}
+                            </>
+                          ) : (
+                            <article
+                              id={`strategy-${view.draft.strategies[0].id}`}
+                              className={s.strategySurface}
+                            >
+                              <StrategyText text={view.draft.strategies[0].text} />
+                            </article>
+                          )}
+                        </>
+                      ) : (
                         <div className={s.empty}>
-                          <ReviewSealIcon size={28} />
-                          <h3>Independent review comes next</h3>
-                          <p>
-                            Drafts stay visible even if review requests changes
-                            or cannot finish. A review pass is not a guarantee
-                            of educational correctness.
-                          </p>
+                          <p>No strategy yet.</p>
                         </div>
-                      )}
-                  </>
-                )}
-                {tab === "Conversation" && (
-                  <>
-                    <p className={s.muted}>
-                      Your notes and feedback are saved here. Research asks
-                      consequential questions above. Saving a note makes no AI
-                      call and changes no accepted hard facts.
-                    </p>
-                    <div className={s.messages}>
-                      {view.conversation.events.map((e) => (
-                        <article key={e.key} className={s.bubble}>
-                          <p className={s.prose}>{e.text}</p>
-                          <small>{e.response.message}</small>
-                        </article>
                       ))}
-                    </div>
-                    <form
-                      className={s.reply}
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        void run(async () => {
-                          await mutate("/workspace", {
-                            action: "NOTE",
-                            planId: selected,
-                            key: key(),
-                            text: feedback,
-                            expectedConversationVersion:
-                              view.workspace.conversationVersion,
-                          });
-                          setFeedback("");
-                          await refresh(selected);
-                        });
-                      }}
-                    >
-                      <textarea
-                        aria-label="Message or feedback"
-                        rows={3}
-                        value={feedback}
-                        maxLength={2800}
-                        onChange={(e) => setFeedback(e.target.value)}
-                        placeholder="What should Sylf understand or change?"
-                      />
-                      <div className={s.replyBar}>
-                        <details>
-                          <summary className={s.textButton}>
-                            Ask Sylf about this goal
-                          </summary>
-                          <p className={s.muted} style={{ margin: "8px 0" }}>
-                            This uses a paid AI advice turn through your
-                            existing account allowance. Advice cannot start
-                            planning, change accepted facts or add activities.
-                            Use Save feedback for a free note.
-                          </p>
-                          <button
-                            type="button"
-                            className={s.button}
-                            disabled={
-                              busy ||
-                              !feedback.trim() ||
-                              !readiness?.ready ||
-                              live(view)
-                            }
-                            onClick={() =>
-                              void run(async () => {
-                                await mutate(`/${selected}/assistant`, {
-                                  action: "TURN",
-                                  turn: {
-                                    key: key(),
-                                    text: feedback,
-                                    expectedConversationVersion:
-                                      view.workspace.conversationVersion,
-                                    readPlanIds: [selected],
-                                    mode: "ADVICE",
-                                    researchRequested: false,
-                                  },
-                                });
-                                setFeedback("");
-                                await refresh(selected);
-                              })
-                            }
+
+                    {tab === "Research" &&
+                      (view.research?.summary ? (
+                        <div className={s.card}>
+                          {Object.entries(view.research.summary)
+                            .filter(([, v]) => Boolean(v && String(v).trim()))
+                            .map(([k, v]) => (
+                              <div key={k} className={s.summaryItem}>
+                                <h3>{label(k)}</h3>
+                                <p className={s.prose}>{v}</p>
+                              </div>
+                            ))}
+                        </div>
+                      ) : (
+                        <div className={s.empty}>
+                          <p>No research summary yet.</p>
+                        </div>
+                      ))}
+
+                    {tab === "Review" && (
+                      <>
+                        {view.draft?.reviews.map((r) => (
+                          <div key={r.id} className={s.verdict}>
+                            <span className={s.badge} data-tone="accent">
+                              {label(r.verdict)}
+                            </span>
+                            <p className={s.prose}>{r.explanation}</p>
+                          </div>
+                        ))}
+                        {view.draft?.issues.map((i) => (
+                          <article
+                            className={s.issue}
+                            data-severity={i.severity.toLowerCase()}
+                            key={i.issueId}
                           >
-                            Authorize AI advice &amp; send
-                          </button>
-                        </details>
-                        <button
-                          type="submit"
-                          className={s.button}
-                          disabled={busy || !feedback.trim()}
+                            <div className={s.heroTop}>
+                              <span
+                                className={s.badge}
+                                data-tone={
+                                  ["BLOCKER", "MAJOR"].includes(i.severity)
+                                    ? "bad"
+                                    : "warn"
+                                }
+                              >
+                                {label(i.severity)}
+                              </span>
+                              <span className={s.muted}>
+                                {label(i.disposition)} · {label(i.route)}
+                              </span>
+                            </div>
+                            <h3>{i.requirement}</h3>
+                            <p>{i.offendingContent}</p>
+                            <p className={s.muted}>{i.consequence}</p>
+                            <details>
+                              <summary>Evidence</summary>
+                              <p>{i.explanation}</p>
+                              {i.grounds.map((g, n) => (
+                                <blockquote key={n}>{g.excerpt}</blockquote>
+                              ))}
+                            </details>
+                          </article>
+                        ))}
+                        {!view.draft?.reviews.length &&
+                          !view.draft?.issues.length && (
+                            <div className={s.empty}>
+                              <p>No review yet.</p>
+                            </div>
+                          )}
+                      </>
+                    )}
+
+                    {tab === "Notes" && (
+                      <>
+                        <div className={s.messages}>
+                          {view.conversation.events.map((e) => (
+                            <article key={e.key} className={s.bubble}>
+                              <p className={s.prose}>{e.text}</p>
+                              <small>{e.response.message}</small>
+                            </article>
+                          ))}
+                        </div>
+                        <form
+                          className={s.reply}
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            void run(async () => {
+                              await mutate("/workspace", {
+                                action: "NOTE",
+                                planId: selected,
+                                key: key(),
+                                text: feedback,
+                                expectedConversationVersion:
+                                  view.workspace.conversationVersion,
+                              });
+                              setFeedback("");
+                              await refresh(selected);
+                            });
+                          }}
                         >
-                          Save feedback
-                        </button>
-                      </div>
-                    </form>
-                  </>
-                )}
-              </section>
+                          <textarea
+                            aria-label="Message or feedback"
+                            rows={3}
+                            value={feedback}
+                            maxLength={2800}
+                            onChange={(e) => setFeedback(e.target.value)}
+                            placeholder="Add a note or revision instruction…"
+                          />
+                          <div className={s.replyBar}>
+                            <details>
+                              <summary className={s.textButton}>Ask AI</summary>
+                              <p className={s.muted} style={{ margin: "6px 0" }}>
+                                1 advice turn · leaves plan unchanged.
+                              </p>
+                              <button
+                                type="button"
+                                className={s.button}
+                                disabled={
+                                  busy ||
+                                  !feedback.trim() ||
+                                  !readiness?.ready ||
+                                  live(view)
+                                }
+                                onClick={() =>
+                                  void run(async () => {
+                                    await mutate(`/${selected}/assistant`, {
+                                      action: "TURN",
+                                      turn: {
+                                        key: key(),
+                                        text: feedback,
+                                        expectedConversationVersion:
+                                          view.workspace.conversationVersion,
+                                        readPlanIds: [selected],
+                                        mode: "ADVICE",
+                                        researchRequested: false,
+                                      },
+                                    });
+                                    setFeedback("");
+                                    await refresh(selected);
+                                  })
+                                }
+                              >
+                                Send question
+                              </button>
+                            </details>
+                            <button
+                              type="submit"
+                              className={s.button}
+                              disabled={busy || !feedback.trim()}
+                            >
+                              Save note
+                            </button>
+                          </div>
+                        </form>
+                      </>
+                    )}
+                  </section>
+                </>
+              )}
             </div>
           )}
         </div>
+
         {view && selected && !live(view) && (
           <footer className={s.dock} data-ready={canConfirm}>
             {canConfirm ? (
               <>
                 <div className={s.dockText}>
-                  <strong>Ready for your confirmation</strong>
-                  <p>
-                    Review the activities and changes before adding them to
-                    Sylf.
-                  </p>
+                  <strong>Ready to add</strong>
                 </div>
                 <div className={s.dockActions}>
                   <button
@@ -1557,7 +1667,7 @@ export default function StudentPlannerWorkspace({
                     }}
                   >
                     Review &amp; add plan
-                    <ArrowRight size={16} />
+                    <ArrowRight size={14} />
                   </button>
                 </div>
               </>
@@ -1566,14 +1676,9 @@ export default function StudentPlannerWorkspace({
                 <div className={s.dockText}>
                   <strong>
                     {view.workspace.active
-                      ? "Your active plan is protected"
-                      : "Your draft stays separate"}
+                      ? "In Quests"
+                      : "Draft saved"}
                   </strong>
-                  <p>
-                    {view.attempt
-                      ? "Inspect the saved work, or start a new authorized request."
-                      : "You choose when AI planning starts."}
-                  </p>
                 </div>
                 <div className={s.dockActions}>
                   {view.attempt &&
@@ -1596,13 +1701,21 @@ export default function StudentPlannerWorkspace({
                     type="button"
                     className={s.primary}
                     disabled={!canStart}
-                    onClick={() => {
-                      setAuthorize(!authorize);
-                      if (feedback.trim()) setNotes(feedback);
-                      setConsent(false);
-                    }}
+                    onClick={() =>
+                      void run(async () => {
+                        if (view.attempt?.state === "NEEDS_DECISION") {
+                          await mutate(
+                            `/${selected}/operations/${view.attempt.attemptId}`,
+                            { schemaVersion: 2, action: "CANCEL" }
+                          );
+                          await refresh(selected);
+                        }
+                        setAuthorize(!authorize);
+                        if (feedback.trim()) setNotes(feedback);
+                        setConsent(false);
+                      })
+                    }
                   >
-                    <SylvieIcon size={16} />
                     {view.attempt ? "New planning request" : "Start planning"}
                   </button>
                 </div>
@@ -1610,6 +1723,7 @@ export default function StudentPlannerWorkspace({
             )}
           </footer>
         )}
+
         {view && inspector && (
           <div
             className={`${s.overlay} ${s.drawerWrap}`}
@@ -1625,15 +1739,14 @@ export default function StudentPlannerWorkspace({
             >
               <div className={s.sheetHead}>
                 <div>
-                  <h3>Plan details</h3>
+                  <h3>Details</h3>
                   <p>
                     {view.intent.intent.availability?.timezone ??
                       capabilities.timezone}{" "}
                     ·{" "}
                     {view.intent.intent.deadline.kind === "NONE"
-                      ? "No fixed deadline"
-                      : `Deadline ${view.intent.intent.deadline.date}`}{" "}
-                    · {label(view.intent.intent.policy)} goal
+                      ? "No deadline"
+                      : day(view.intent.intent.deadline.date)}
                   </p>
                 </div>
                 <button
@@ -1642,236 +1755,205 @@ export default function StudentPlannerWorkspace({
                   aria-label="Close details"
                   onClick={() => setInspector(false)}
                 >
-                  <X size={18} />
+                  <X size={16} />
                 </button>
               </div>
               <div className={s.sheetBody}>
-                <div className={s.box}>
-                  <p>
-                    Rest days:{" "}
-                    {view.intent.intent.availability?.restWeekdays
-                      .map((i) => WEEKDAYS[i])
-                      .join(", ") || "None accepted"}
-                    . Account rest days and Calendar commitments also apply.
-                  </p>
-                  <details>
-                    <summary className={s.boxTitle}>
-                      Edit accepted details
-                    </summary>
-                    <p className={s.muted} style={{ margin: "8px 0" }}>
-                      Accept changes to your goal, deadline or study windows
-                      explicitly. During clarification these details travel with
-                      your answers; otherwise a new intent invalidates affected
-                      drafts.
-                    </p>
+                <div className={s.modalRow}>
+                  <div className={s.modalRowInline}>
+                    <span className={s.muted}>
+                      Rest:{" "}
+                      {view.intent.intent.availability?.restWeekdays
+                        .map((i) => WEEKDAYS[i].slice(0, 3))
+                        .join(", ") || "None"}
+                    </span>
                     <button
                       type="button"
                       className={s.button}
                       disabled={busy || live(view)}
                       onClick={() => setEditing(!editing)}
                     >
-                      Edit details
+                      {editing ? "Close editor" : "Edit goal & schedule"}
                     </button>
-                    {editing && (
-                      <AcceptedDetailsEditor
-                        intent={clarifiedIntent ?? view.intent.intent}
-                        busy={busy}
-                        onCancel={() => setEditing(false)}
-                        onSave={async (intent) => {
-                          if (view.attempt?.state === "NEEDS_DECISION") {
-                            setClarifiedIntent(intent);
-                            setEditing(false);
-                            setNotice(
-                              "Updated details are ready to accept together with your answers."
-                            );
-                            return;
-                          }
-                          await workspaceRequest(
-                            `/${selected}`,
-                            {
-                              schemaVersion: 2,
-                              expectedPlanningVersion:
-                                view.workspace.planningVersion,
-                              expectedIntentVersionId:
-                                view.intent.intentVersionId,
-                              intent,
-                            },
-                            undefined,
-                            "PATCH"
-                          );
+                  </div>
+                  {editing && (
+                    <AcceptedDetailsEditor
+                      intent={clarifiedIntent ?? view.intent.intent}
+                      busy={busy}
+                      onCancel={() => setEditing(false)}
+                      onSave={async (intent) => {
+                        if (
+                          view.attempt?.state === "NEEDS_DECISION" &&
+                          !journeyExpired
+                        ) {
+                          setClarifiedIntent(intent);
                           setEditing(false);
-                          await refresh(selected);
-                        }}
-                      />
-                    )}
-                  </details>
+                          setNotice("Details queued with your answers.");
+                          return;
+                        }
+                        await workspaceRequest(
+                          `/${selected}`,
+                          {
+                            schemaVersion: 2,
+                            expectedPlanningVersion:
+                              view.workspace.planningVersion,
+                            expectedIntentVersionId:
+                              view.intent.intentVersionId,
+                            intent,
+                          },
+                          undefined,
+                          "PATCH"
+                        );
+                        setEditing(false);
+                        await refresh(selected);
+                      }}
+                    />
+                  )}
                 </div>
-                <h3>History &amp; usage</h3>
-                <p className={s.muted}>
-                  Saved immutable artifacts are read-only. Currentness and
-                  permission are checked again at confirmation.
-                </p>
+
                 {view.usage && (
-                  <>
-                    <div className={s.usage}>
-                      <div>
-                        <strong>{view.usage.calls}</strong>
-                        <span>recorded calls</span>
-                      </div>
-                      <div>
+                  <div className={s.modalRow}>
+                    <div className={s.usageCompact}>
+                      <span>
                         <strong>
-                          ${view.usage.estimatedCostUsd.toFixed(6)}
-                        </strong>
-                        <span>known estimated cost</span>
-                      </div>
-                      <div>
-                        <strong>
-                          {view.usage.inputTokens.toLocaleString()}
-                        </strong>
-                        <span>input</span>
-                      </div>
-                      <div>
-                        <strong>
-                          {view.usage.outputTokens.toLocaleString()}
-                        </strong>
-                        <span>completion tokens (reasoning included)</span>
-                      </div>
+                          ${view.usage.estimatedCostUsd.toFixed(3)}
+                        </strong>{" "}
+                        spent
+                      </span>
+                      <span>·</span>
+                      <span>{view.usage.calls} calls</span>
+                      <span>·</span>
+                      <span>
+                        {(
+                          view.usage.inputTokens + view.usage.outputTokens
+                        ).toLocaleString()}{" "}
+                        tokens
+                      </span>
                     </div>
-                    <p className={s.muted}>
-                      {view.usage.reasoningTokens !== null
-                        ? `${view.usage.reasoningTokens.toLocaleString()} reasoning`
-                        : "Reasoning breakdown unavailable"}
-                      {view.usage.unknownCosts
-                        ? ` · ${view.usage.unknownCosts} records with unknown costs`
-                        : ""}
-                      .
-                      {view.usage.uncertain &&
-                        " Spending may be unsettled. Do not repeat provider requests."}
-                    </p>
-                  </>
+                    {view.usage.uncertain && (
+                      <p className={s.muted}>
+                        Spending unsettled. Wait before starting another run.
+                      </p>
+                    )}
+                  </div>
                 )}
-                {view.attemptHistory.length > 0 && (
-                  <label className={s.field}>
-                    Previous planning requests
-                    <select
-                      value={
-                        historical?.attemptId ??
-                        view.draft?.attemptId ??
-                        view.attempt?.attemptId
-                      }
-                      onChange={(e) =>
-                        void run(async () => {
-                          const attemptId = e.target.value;
-                          const response = await workspaceRequest<{
-                            history: {
-                              id: string;
-                              kind: string;
-                              label: string;
-                            }[];
-                          }>(
-                            `/workspace?planId=${selected}&attemptId=${attemptId}&history=true`
-                          );
-                          setHistorical({
-                            attemptId,
-                            history: response.history,
-                          });
-                          setHistory(null);
-                        })
-                      }
-                    >
-                      {view.attemptHistory.map((a) => (
-                        <option key={a.attemptId} value={a.attemptId}>
-                          {new Date(a.at).toLocaleString()} · {label(a.state)}
-                        </option>
+
+                {(view.attemptHistory.length > 0 ||
+                  (historical?.history ?? view.draft?.history)?.length) && (
+                  <details className={s.limitsDisclosure}>
+                    <summary>Technical log</summary>
+                    <div className={s.techStack}>
+                      {view.attemptHistory.length > 0 && (
+                        <label className={s.field}>
+                          Run
+                          <select
+                            value={
+                              historical?.attemptId ??
+                              view.draft?.attemptId ??
+                              view.attempt?.attemptId
+                            }
+                            onChange={(e) =>
+                              void run(async () => {
+                                const attemptId = e.target.value;
+                                const response = await workspaceRequest<{
+                                  history: {
+                                    id: string;
+                                    kind: string;
+                                    label: string;
+                                  }[];
+                                }>(
+                                  `/workspace?planId=${selected}&attemptId=${attemptId}&history=true`
+                                );
+                                setHistorical({
+                                  attemptId,
+                                  history: response.history,
+                                });
+                                setHistory(null);
+                              })
+                            }
+                          >
+                            {view.attemptHistory.map((a) => (
+                              <option key={a.attemptId} value={a.attemptId}>
+                                {new Date(a.at).toLocaleString()} ·{" "}
+                                {label(a.state)}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      )}
+                      {(historical?.history ?? view.draft?.history)?.map((h) => (
+                        <button
+                          type="button"
+                          key={h.id}
+                          className={s.history}
+                          onClick={() =>
+                            void run(async () =>
+                              setHistory(
+                                await workspaceRequest(
+                                  `/workspace?planId=${selected}&attemptId=${historical?.attemptId ?? view.draft?.attemptId ?? view.attempt!.attemptId}&artifactId=${h.id}`
+                                )
+                              )
+                            )
+                          }
+                        >
+                          {h.label}
+                          <ArrowRight size={13} />
+                        </button>
                       ))}
-                    </select>
-                  </label>
-                )}
-                {(historical?.history ?? view.draft?.history)?.map((h) => (
-                  <button
-                    type="button"
-                    key={h.id}
-                    className={s.history}
-                    onClick={() =>
-                      void run(async () =>
-                        setHistory(
-                          await workspaceRequest(
-                            `/workspace?planId=${selected}&attemptId=${historical?.attemptId ?? view.draft?.attemptId ?? view.attempt!.attemptId}&artifactId=${h.id}`
-                          )
-                        )
-                      )
-                    }
-                  >
-                    {h.label}
-                    <ArrowRight size={13} />
-                  </button>
-                ))}
-                {history !== null && (
-                  <details open>
-                    <summary className={s.boxTitle}>Selected artifact</summary>
-                    <pre className={s.raw}>
-                      {JSON.stringify(history, null, 2)}
-                    </pre>
+                      {history !== null && (
+                        <pre className={s.raw}>
+                          {JSON.stringify(history, null, 2)}
+                        </pre>
+                      )}
+                    </div>
                   </details>
                 )}
               </div>
-              <div className={s.sheetFoot} />
             </aside>
           </div>
         )}
+
         {view && authorize && (
           <div
             className={s.overlay}
             onMouseDown={(e) => {
-              if (e.target === e.currentTarget) setAuthorize(false);
+              if (e.target === e.currentTarget) closeAuthorize();
             }}
           >
             <section
-              className={s.sheet}
+              className={`${s.sheet} ${s.sheetCompact}`}
               role="dialog"
               aria-modal="true"
-              aria-label="AI planning authorization"
+              aria-label="Generate plan"
             >
               <div className={s.sheetHead}>
                 <div>
-                  <h3>Start this AI planning request?</h3>
-                  <p>
-                    Research, strategy, translation and independent review may
-                    make multiple paid provider calls, including substantive
-                    refinements. This preview uses DeepSeek Flash with High
-                    reasoning for strategy and review, Low for research and
-                    translation; up to 65,536 completion tokens per role call.
-                    This request has a ${spendingLimitUsd.toFixed(2)} spending
-                    ceiling.
-                  </p>
+                  <h3>Generate plan</h3>
                 </div>
                 <button
                   type="button"
                   className={s.icon}
                   aria-label="Close"
-                  onClick={() => setAuthorize(false)}
+                  onClick={closeAuthorize}
                 >
-                  <X size={18} />
+                  <X size={16} />
                 </button>
               </div>
               <div className={s.sheetBody}>
-                <div className={s.box}>
-                  <label className={s.check}>
-                    <input
-                      type="checkbox"
-                      checked={research}
-                      onChange={(e) => setResearch(e.target.checked)}
-                      disabled={live(view)}
-                    />
-                    <span>
-                      Allow web research and reading the materials I select for
-                      the next request
-                    </span>
-                  </label>
-                  {research && (
-                    <>
-                      <label className={s.upload}>
-                        <Upload size={16} /> Add PDF or text (up to 3 MB)
+                <div className={s.modalRow}>
+                  <div className={s.modalRowInline}>
+                    <label className={s.check}>
+                      <input
+                        type="checkbox"
+                        checked={research}
+                        onChange={(e) => setResearch(e.target.checked)}
+                        disabled={live(view)}
+                      />
+                      <span>Web search</span>
+                    </label>
+                    {research && (
+                      <label className={s.uploadPill}>
+                        <Upload size={13} /> Attach PDF / TXT
                         <input
                           type="file"
                           accept="application/pdf,text/plain,.pdf,.txt"
@@ -1898,6 +1980,10 @@ export default function StudentPlannerWorkspace({
                           }}
                         />
                       </label>
+                    )}
+                  </div>
+                  {research && allDocuments.length > 0 && (
+                    <div className={s.docList}>
                       {allDocuments.map((d) => (
                         <label className={s.check} key={d.documentId}>
                           <input
@@ -1916,26 +2002,30 @@ export default function StudentPlannerWorkspace({
                             }
                           />
                           <span>
-                            <FileText size={14} /> {d.title}
+                            <FileText size={12} /> {d.title}
                           </span>
                         </label>
                       ))}
-                    </>
+                    </div>
                   )}
                 </div>
-                <label className={s.field}>
-                  Instructions for this request
-                  <textarea
-                    rows={3}
-                    value={notes}
-                    maxLength={2800}
-                    onChange={(e) => setNotes(e.target.value)}
-                  />
-                </label>
-                <details className={s.box}>
-                  <summary className={s.boxTitle}>Resource safeguards</summary>
-                  <label className={s.field}>
-                    Maximum AI spend (USD)
+
+                {view.attempt !== null && (
+                  <label className={`${s.field} ${s.modalRow}`}>
+                    Changes or focus (optional)
+                    <textarea
+                      rows={2}
+                      value={notes}
+                      maxLength={2800}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="What to adjust…"
+                    />
+                  </label>
+                )}
+
+                <div className={s.modalRow}>
+                  <label className={s.spendRow}>
+                    <span>Maximum AI spend (USD)</span>
                     <input
                       type="number"
                       min="0.01"
@@ -1949,28 +2039,20 @@ export default function StudentPlannerWorkspace({
                       disabled={busy}
                     />
                   </label>
-                  <p>
-                    One financial root: up to 48 model calls, 3,000,000 input
-                    units and 700,000 completion tokens within four hours, with
-                    resources reserved for translation and review. External
-                    research has its own finite limits. These are operational
-                    ceilings, not expected usage. The dollar ceiling includes
-                    reserved model calls and research, and follows linked
-                    continuations. Account entitlements and provider billing
-                    still apply. Uncertain spending blocks further paid
-                    requests.
-                  </p>
-                </details>
-                <label className={`${s.check} ${s.consent}`}>
+                  <details className={s.limitsDisclosure}>
+                    <summary>AI settings &amp; limits</summary>
+                    <p>DeepSeek · max 48 calls · 4h window.</p>
+                  </details>
+                </div>
+
+                <label className={`${s.check} ${s.consentFlat}`}>
                   <input
                     type="checkbox"
                     checked={consent}
                     onChange={(e) => setConsent(e.target.checked)}
                   />
                   <span>
-                    I authorize this new AI request with the accepted goal,
-                    selected materials, research permission and resource
-                    safeguards shown here.
+                    I authorize DeepSeek within this spend limit.
                   </span>
                 </label>
               </div>
@@ -1978,7 +2060,7 @@ export default function StudentPlannerWorkspace({
                 <button
                   type="button"
                   className={s.ghost}
-                  onClick={() => setAuthorize(false)}
+                  onClick={closeAuthorize}
                 >
                   Cancel
                 </button>
@@ -1994,12 +2076,13 @@ export default function StudentPlannerWorkspace({
                   onClick={() => void run(generate)}
                 >
                   Authorize &amp; begin
-                  <ArrowRight size={16} />
+                  <ArrowRight size={14} />
                 </button>
               </div>
             </section>
           </div>
         )}
+
         {view &&
           confirm === view.changeSet?.changeSetId &&
           canConfirm &&
@@ -2011,19 +2094,20 @@ export default function StudentPlannerWorkspace({
               }}
             >
               <section
-                className={s.sheet}
+                className={`${s.sheet} ${s.sheetCompact}`}
                 role="dialog"
                 aria-modal="true"
                 aria-label="Confirm plan changes"
               >
                 <div className={s.sheetHead}>
                   <div>
-                    <h3>Add this reviewed plan to Sylf?</h3>
+                    <h3>Add to Quests?</h3>
                     <p>
-                      {view.changeSet.aggregate.committedTargetMinutes} study
-                      minutes. {view.changeSet.entries.length} changes. This can
-                      replace eligible unstarted work; running and protected
-                      work retain their execution guarantees.
+                      {view.changeSet.entries.length}{" "}
+                      {view.changeSet.entries.length === 1
+                        ? "session"
+                        : "sessions"}{" "}
+                      · {view.changeSet.aggregate.committedTargetMinutes}m total
                     </p>
                   </div>
                   <button
@@ -2032,29 +2116,25 @@ export default function StudentPlannerWorkspace({
                     aria-label="Close"
                     onClick={() => setConfirm(null)}
                   >
-                    <X size={18} />
+                    <X size={16} />
                   </button>
                 </div>
                 <div className={s.sheetBody}>
-                  <details className={s.box} open>
-                    <summary className={s.boxTitle}>Exact changes</summary>
+                  <details className={s.limitsDisclosure}>
+                    <summary>Preview sessions</summary>
                     <div className={s.changes}>
                       {view.changeSet.entries.map((e) => (
                         <article className={s.change} key={e.activityKey}>
-                          <strong>{e.changes.map(label).join(", ")}</strong>
-                          <p>{e.reason}</p>
-                          {e.before && (
-                            <p className={s.muted}>
-                              Before: {e.before.date} ·{" "}
-                              {e.before.remainingMinutesEstimate} minutes
-                              remaining
-                            </p>
-                          )}
+                          <strong>{e.reason || e.changes.map(label).join(", ")}</strong>
                           {e.after && (
                             <p className={s.muted}>
-                              After: {e.after.date} ·{" "}
-                              {e.after.remainingMinutesEstimate} minutes
-                              remaining ({e.after.timezone})
+                              {day(e.after.date)} ·{" "}
+                              {e.after.remainingMinutesEstimate}m
+                            </p>
+                          )}
+                          {!e.after && e.before && (
+                            <p className={s.muted}>
+                              Removed ({day(e.before.date)})
                             </p>
                           )}
                         </article>
@@ -2069,7 +2149,7 @@ export default function StudentPlannerWorkspace({
                     )
                     .map((i) => (
                       <label
-                        className={`${s.check} ${s.consent}`}
+                        className={`${s.check} ${s.consentFlat}`}
                         key={i.issueId}
                       >
                         <input
@@ -2095,7 +2175,7 @@ export default function StudentPlannerWorkspace({
                     className={s.ghost}
                     onClick={() => setConfirm(null)}
                   >
-                    Not yet
+                    Cancel
                   </button>
                   <button
                     type="button"
@@ -2121,14 +2201,12 @@ export default function StudentPlannerWorkspace({
                         setConfirm(null);
                         await refresh(selected);
                         onApplied();
-                        setNotice(
-                          "Your plan is active. Its quests are ready in Sylf."
-                        );
+                        setNotice("Plan added to Quests.");
                       })
                     }
                   >
                     Confirm &amp; add plan
-                    <CheckCircle2 size={16} />
+                    <CheckCircle2 size={14} />
                   </button>
                 </div>
               </section>

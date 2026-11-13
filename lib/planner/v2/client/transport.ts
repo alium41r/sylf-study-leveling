@@ -10,6 +10,23 @@ export class WorkspaceRequestError extends Error {
     super(message);
   }
 }
+/** Reuse the authenticated Quest mutation owner. This only places existing
+ * manual work; it does not grant Planner generation or application authority. */
+export async function reschedulePlannerCommitment(questId: number, scheduledFor: string): Promise<void> {
+  try {
+    const response = await fetchWithTimeout((input, init) => apiFetch(String(input), init), `/api/quests/${questId}`, {
+      method: "PATCH", credentials: "include", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scheduledFor }),
+    });
+    const value = await response.json();
+    if (!response.ok) throw new WorkspaceRequestError(value.error ?? "Could not reschedule this task.");
+  } catch (error) {
+    if (error instanceof WorkspaceRequestError) throw error;
+    throw new WorkspaceRequestError("Could not confirm the new date. Refresh your saved work before trying again.", true);
+  } finally {
+    for (const path of ["/api/quests", "/api/planner", "/api/calendar"]) invalidateClientCache(path);
+  }
+}
 export async function workspaceRequest<T>(
   path: string,
   body?: unknown,

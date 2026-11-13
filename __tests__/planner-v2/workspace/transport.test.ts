@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { apiFetch } from "@/lib/api-transport";
 import { clearClientCache } from "@/lib/client-data-cache";
-import { workspaceRequest, WorkspaceRequestError, streamWorkspaceActivity } from "@/lib/planner/v2/client/transport";
+import { workspaceRequest, WorkspaceRequestError, streamWorkspaceActivity, reschedulePlannerCommitment } from "@/lib/planner/v2/client/transport";
 
 vi.mock("@/lib/api-transport", async importOriginal => ({
   ...await importOriginal<typeof import("@/lib/api-transport")>(),
@@ -12,6 +12,13 @@ const response = (value: unknown, status = 200) => new Response(JSON.stringify(v
 afterEach(() => { clearClientCache(); vi.clearAllMocks(); vi.useRealTimers(); });
 
 describe("live workspace reads", () => {
+  it("reschedules only the requested date through the authenticated Quest API and preserves its rejection", async () => {
+    api.mockResolvedValueOnce(response({}));
+    await reschedulePlannerCommitment(7,"2026-11-03");
+    expect(api).toHaveBeenCalledWith("/api/quests/7",expect.objectContaining({method:"PATCH",credentials:"include",body:JSON.stringify({scheduledFor:"2026-11-03"})}));
+    api.mockResolvedValueOnce(response({error:"This is a rest day."},409));
+    await expect(reschedulePlannerCommitment(7,"2026-11-08")).rejects.toThrow("This is a rest day.");
+  });
   it("delivers SSE text before completion rather than buffering the response body",async()=>{
     let wire!:ReadableStreamDefaultController<Uint8Array>;const body=new ReadableStream<Uint8Array>({start(controller){wire=controller;}});
     api.mockResolvedValueOnce(new Response(body,{headers:{"content-type":"text/event-stream"}}));const received=vi.fn(),controller=new AbortController();let finished=false;

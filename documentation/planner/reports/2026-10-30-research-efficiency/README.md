@@ -98,7 +98,16 @@ Research protocol; an old financial root or in-flight policy is never rewritten.
 
 ## Verification
 
-Final aggregate PostgreSQL verification is in progress. The added regressions reproduce missing anchors plus an
+The missing final aggregate gate is now resolved. The isolated resumption run
+completed on 1 November and its receipt was inspected on 2 November:
+**424 V2 + 225 legacy = 649 required PostgreSQL checks passed**, with zero
+failures/required skips and unchanged source pins during execution. See the
+[full receipt](evidence/2026-11-01-resumed-full-postgres-2/postgres-harness-run.json),
+[source pins](evidence/2026-11-01-resumed-full-postgres-2/postgres-source-pins.json)
+and [resumption verification](evidence/2026-11-01-resumed-checks/verification.json).
+The earlier interrupted run and original failure receipts remain unchanged.
+
+The added regressions reproduce missing anchors plus an
 oversized extraction synopsis, assert precise repair feedback and preserved raw
 rejection, and exercise a paused synthetic DeepSeek SSE response through the real
 adapter, dispatcher, PostgreSQL preview and browser SSE transport before final
@@ -109,6 +118,28 @@ and all 225 legacy PostgreSQL tests, with no required skips or source changes
 during the run. The broader unpaid unit run passed 512 tests in 48 files.
 TypeScript, scoped ESLint, the worker build and the Next.js production build
 passed. Native/mobile builds were deliberately not rerun during the continuation.
+
+The resumption also passed 512 unit tests in 48 files and the worker build on
+Node 24.22.1. Its first typecheck found malformed generated Next development
+types; with the task-owned development processes stopped, only that generated
+directory was moved to a temporary backup, `next typegen` regenerated types,
+and the typecheck passed. No application contract was changed to hide the error.
+All 368 captured Planner frontend/native/mobile source files were unchanged.
+Subsequent unrelated committed performance work changes shared app/auth/cache
+owners and the package build command; it is preserved, and the dated full-bank
+receipt is not claimed as qualification of every later shared change.
+
+Before any live resumption, the original explicit $1.75 permission and later
+autonomous-work direction were checked in the originating chat. Whole-root
+ledger reconciliation identifies five settled Planner roots totalling
+**$0.562777500 estimated**, including the separate $0.081774804 LUMS root,
+with no unknown costs or queued/running attempts at preflight. A proposed
+**$1.18** new request keeps aggregate maximum exposure at **$1.742777500**.
+This is the remaining earlier authority, not a new allowance or invoice.
+The [preflight receipt](evidence/2026-11-01-resumed-checks/preflight.json)
+retains the bounded accounting evidence. Metadata-only provider checks passed;
+they do not establish model delivery or quality. No paid request had been
+submitted when this verification closure was recorded.
 
 ## Implementation owners
 
@@ -123,7 +154,7 @@ passed. Native/mobile builds were deliberately not rerun during the continuation
 Paths beginning `server/`, `client/` or `intelligence/` above are relative to
 `lib/planner/v2/`. The existing frontend integration was preserved on resumption.
 
-No paid call was made to implement or verify these fixes. The old failed journey
+No paid call was made to implement or verify these fixes at the preceding verification closure. A subsequent user-submitted real call and the newly diagnosed persistence correction are recorded separately in the [2 November continuation](../2026-11-02-workflow-ui/README.md). The old failed journey
 is preserved and was not rewritten or automatically retried. A real-model speed
 or success improvement is not claimed from scripted tests. Provider chunk timing
 is provider-controlled; the UI does not invent intermediate text if upstream

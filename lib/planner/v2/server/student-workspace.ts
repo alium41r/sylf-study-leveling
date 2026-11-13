@@ -2,6 +2,7 @@ import { z } from "zod";
 import { PlanChangeSetV2Schema, DurableIdV2Schema } from "../contracts";
 import {
   STUDENT_RESOURCE_PROFILE,
+  PRIOR_STUDENT_RESOURCE_PROFILE,
   LEGACY_STUDENT_RESOURCE_PROFILE,
   STUDENT_SPENDING_LIMIT_USD,
   type StudentWorkspace,
@@ -22,6 +23,7 @@ import {
 import { DocumentsSchema } from "../intelligence/schemas/documents";
 import { currentIssueHeads } from "../intelligence/foundation/validation";
 import { AI_PRICING_VERSION } from "../../../ai/config";
+import { loadExecutionContext, overdueCompetingWork } from "./context";
 
 /** Trusted, explicit preview admission. No public request supplies resources,
  * compiler identity, permissions or routing. Existing production defaults stay v1. */
@@ -31,30 +33,39 @@ export function studentResourcePolicy(maximumSpendUsd = STUDENT_SPENDING_LIMIT_U
 > {
   maximumSpendUsd = z.number().positive().max(STUDENT_SPENDING_LIMIT_USD).multipleOf(0.01).parse(maximumSpendUsd);
   const call = { calls: 1, inputUnits: 500000, completionTokens: 65536 };
-  const role = (format: "TEXT" | "JSON", held: number, effort: "LOW" | "HIGH" = "HIGH") => ({
-    format,
-    provider: "deepseek" as const,
-    model: "deepseek-flash" as const,
-    effort,
-    call: { ...call },
-    holdback: {
-      calls: held,
-      inputUnits: held * call.inputUnits,
-      completionTokens: held * call.completionTokens,
-    },
-  });
+  const role = (format: "TEXT" | "JSON", held: number, effort: "DISABLED" | "LOW" | "HIGH" = "HIGH") => {
+    const completionTokens = effort === "DISABLED" ? 8192 : call.completionTokens;
+    return {
+      format,
+      provider: "deepseek" as const,
+      model: "deepseek-flash" as const,
+      effort,
+      call: { ...call, completionTokens },
+      holdback: {
+        calls: held,
+        inputUnits: held * call.inputUnits,
+        completionTokens: held * completionTokens,
+      },
+    };
+  };
+  const isLegacy = profile === LEGACY_STUDENT_RESOURCE_PROFILE;
+  const isV2 = profile === PRIOR_STUDENT_RESOURCE_PROFILE;
   return {
     schemaVersion: 1,
-    policyId: profile === LEGACY_STUDENT_RESOURCE_PROFILE ? "59f72827-d48f-49d3-99de-4568c163313e" : "1290c270-c194-4902-8d7c-104b700b7987",
+    policyId: isLegacy
+      ? "59f72827-d48f-49d3-99de-4568c163313e"
+      : isV2
+        ? "1290c270-c194-4902-8d7c-104b700b7987"
+        : "3d84e9a2-7b16-4e2f-9a51-8f204c61d3e9",
     journeyVersion: 1,
     spending: { maximumMicros: Math.round(maximumSpendUsd * 1000000), pricingVersion: AI_PRICING_VERSION },
     processingMs: 4 * 3600000,
     root: { calls: 48, inputUnits: 3000000, completionTokens: 700000 },
     roles: {
-      RESEARCH: role("JSON", 1, profile === LEGACY_STUDENT_RESOURCE_PROFILE ? "HIGH" : "LOW"),
-      STRATEGIST: role("TEXT", 1),
-      TRANSLATOR: role("JSON", 2, profile === LEGACY_STUDENT_RESOURCE_PROFILE ? "HIGH" : "LOW"),
-      REVIEWER: role("JSON", 3),
+      RESEARCH: role("JSON", 1, isLegacy ? "HIGH" : isV2 ? "LOW" : "DISABLED"),
+      STRATEGIST: role("TEXT", 1, isLegacy || isV2 ? "HIGH" : "LOW"),
+      TRANSLATOR: role("JSON", 2, isLegacy ? "HIGH" : "LOW"),
+      REVIEWER: role("JSON", 3, isLegacy || isV2 ? "HIGH" : "DISABLED"),
     },
     researchTools: {
       researchQueries: 20,
@@ -125,7 +136,7 @@ export async function requireStudentAdmission() {
 }
 export const StudentGenerationSchema = z.strictObject({
   action: z.literal("GENERATE"),
-  profile: z.enum([STUDENT_RESOURCE_PROFILE, LEGACY_STUDENT_RESOURCE_PROFILE]),
+  profile: z.enum([STUDENT_RESOURCE_PROFILE, PRIOR_STUDENT_RESOURCE_PROFILE, LEGACY_STUDENT_RESOURCE_PROFILE]),
   consent: z.literal(true),
   spendingLimitUsd: z.number().positive().max(STUDENT_SPENDING_LIMIT_USD).multipleOf(0.01).optional(),
   request: GenerateRequestV2Schema,
@@ -172,6 +183,16 @@ export class StudentWorkspaceService {
       const retained = loaded
         ? await loadAttemptArtifacts(sql, ownerId, loaded.attempt.attemptId)
         : null;
+      let capacityDecision: StudentWorkspace["capacityDecision"] = null;
+      const capacities = retained?.compilerVersion === 2 ? Object.values(retained.archive.entries).filter(a => a.kind === "CAPACITY" && a.value.schemaVersion === 2) : [];
+      const blockedCapacity = capacities.find(a => !capacities.some(next => next.kind === "CAPACITY" && next.value.schemaVersion === 2 && next.value.previous?.id === a.id));
+      if (loaded?.attempt.state === "NEEDS_DECISION" && retained?.compilerVersion === 2 &&
+        blockedCapacity?.kind === "CAPACITY" && blockedCapacity.value.schemaVersion === 2 && blockedCapacity.value.status !== "READY") {
+        const context = await loadExecutionContext(sql, ownerId, [plan], intent.intent);
+        const overdue = overdueCompetingWork(context, new Set(loaded.attempt.targets.map(t => t.planId)));
+        capacityDecision = { today: context.today, overdue, overdueResolved: !overdue.length && blockedCapacity.value.reasons.length > 0 &&
+          blockedCapacity.value.reasons.every(reason => reason.startsWith("Reschedule unfinished work before planning:") || reason.startsWith("Overdue protected or competing work")) };
+      }
       let draft: StudentWorkspace["draft"] = null;
       let shownAttemptId = loaded?.attempt.attemptId ?? null;
       let shownPlanRef = `plan_${(loaded?.attempt.targets.findIndex((t) => t.planId === planId) ?? -1) + 1}`;
@@ -256,6 +277,7 @@ export class StudentWorkspaceService {
           (d) => ({ documentId: d.documentId, title: d.title })
         ),
         attempt: loaded?.attempt ?? null,
+        capacityDecision,
         draft,
         attemptHistory: attemptHistory.map((a) => ({
           attemptId: a.id,

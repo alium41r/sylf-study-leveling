@@ -10,6 +10,8 @@ const ref = z.strictObject({ id: DurableIdV2Schema, digest: DigestV2Schema });
 export const AuthorFeedbackSchema=z.discriminatedUnion("kind",[
   z.strictObject({kind:z.literal("INCOMPLETE"),source:ref,input:ref,responseDigest:DigestV2Schema,progressDigest:DigestV2Schema,response:NaturalTranslationResponseSchema.options[1]}),
   z.strictObject({kind:z.literal("GAPS"),source:ref,input:ref,responseDigest:DigestV2Schema,progressDigest:DigestV2Schema,translation:ref}),
+  z.strictObject({kind:z.literal("REJECTED"),source:ref,input:ref,responseDigest:DigestV2Schema,progressDigest:DigestV2Schema,
+    validation:z.record(z.string(),z.unknown()),rejectedOutput:z.record(z.string(),z.unknown())}),
 ]);
 export type AuthorFeedback=z.infer<typeof AuthorFeedbackSchema>;
 export const ReviewedResearchHandoffSchema=z.strictObject({schemaVersion:z.literal(1),assessment:ref,

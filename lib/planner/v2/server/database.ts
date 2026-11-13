@@ -1,9 +1,68 @@
 import { randomUUID, createHash } from "node:crypto";
-import { types, type Pool, type PoolClient, type QueryResultRow } from "pg";
+import { types, type Pool, type PoolClient, type QueryConfig, type QueryResult, type QueryResultRow } from "pg";
 import type { PlannerErrorV2 } from "../contracts";
 
 /** The web and worker share this repository, not a second execution engine. */
 export type Sql = Pick<PoolClient, "query">;
+
+function cachedTransactionSql(raw: PoolClient): Sql {
+  const selectCache = new Map<string, Promise<QueryResult<QueryResultRow>>>();
+  const runRaw = (
+    configOrText: string | QueryConfig,
+    values?: unknown[]
+  ): Promise<QueryResult<QueryResultRow>> =>
+    typeof configOrText === "string"
+      ? values === undefined
+        ? raw.query(configOrText)
+        : raw.query(configOrText, values)
+      : raw.query(configOrText);
+
+  return {
+    query: ((
+      first: string | QueryConfig,
+      second?: unknown[]
+    ): Promise<QueryResult<QueryResultRow>> => {
+      const text = typeof first === "string" ? first : first?.text ?? "";
+      const params = typeof first === "string" ? second : first?.values;
+      const hasCustomTypes =
+        typeof first === "object" &&
+        first !== null &&
+        "types" in first &&
+        Boolean(first.types);
+      const trimmed = text.trimStart();
+      const cacheable =
+        /^SELECT\b/i.test(trimmed) &&
+        !/\b(?:FOR\s+(?:UPDATE|NO\s+KEY\s+UPDATE|SHARE|KEY\s+SHARE)|clock_timestamp|statement_timestamp|timeofday|txid_current|pg_current_xact_id|set_config|pg_try_advisory|pg_advisory|nextval|setval)\b/i.test(
+          trimmed
+        );
+      if (!cacheable) {
+        if (
+          !/^SELECT\s+(?:clock_timestamp|statement_timestamp)\b/i.test(trimmed)
+        ) {
+          selectCache.clear();
+        }
+        return runRaw(first, second);
+      }
+      const key = `${hasCustomTypes ? "1" : "0"}\u0000${text}\u0000${JSON.stringify(params ?? [])}`;
+      const hit = selectCache.get(key);
+      if (hit) {
+        return hit.then((res) => ({
+          ...res,
+          rows: [...res.rows],
+        }));
+      }
+      const pending = runRaw(first, second).catch((err: unknown) => {
+        selectCache.delete(key);
+        throw err;
+      });
+      selectCache.set(key, pending);
+      return pending.then((res) => ({
+        ...res,
+        rows: [...res.rows],
+      }));
+    }) as unknown as Sql["query"],
+  };
+}
 export class DurablePlannerError extends Error {
   readonly detail: PlannerErrorV2;
   constructor(code: PlannerErrorV2["code"], message: string, stage: PlannerErrorV2["stage"] = "PERSISTENCE") {
@@ -75,11 +134,11 @@ export class PlannerDatabase {
     sql.on("error", disconnected);
     try {
       await sql.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
-      await sql.query("SET LOCAL TIME ZONE 'UTC'");
-      await sql.query("SET LOCAL statement_timeout = '10s'");
-      await sql.query("SET LOCAL idle_in_transaction_session_timeout = '15s'");
-      await sql.query("SELECT set_config('sylf.planner_v2_core_owner',$1,true)", [String(ownerId)]);
-      const result = await work(sql);
+      await sql.query(
+        "SELECT set_config('TimeZone','UTC',true), set_config('statement_timeout','10s',true), set_config('idle_in_transaction_session_timeout','15s',true), set_config('sylf.planner_v2_core_owner',$1,true)",
+        [String(ownerId)]
+      );
+      const result = await work(cachedTransactionSql(sql));
       if (connectionError) throw connectionError;
       await sql.query("COMMIT");
       return result;
@@ -105,13 +164,14 @@ export class PlannerDatabase {
         // Never wait inside SERIALIZABLE with a snapshot pinned before another
         // owner commits: a busy nonblocking attempt rolls back and starts fresh.
         await sql.query("BEGIN ISOLATION LEVEL SERIALIZABLE");
-        await sql.query("SET LOCAL TIME ZONE 'UTC'");
-        await sql.query("SET LOCAL statement_timeout = '10s'");
-        await sql.query("SET LOCAL idle_in_transaction_session_timeout = '15s'");
-        const locked = (await sql.query("SELECT pg_try_advisory_xact_lock(73641, $1::int) AS locked", [ownerId])).rows[0]?.locked;
+        const locked = (
+          await sql.query(
+            "SELECT set_config('TimeZone','UTC',true), set_config('statement_timeout','10s',true), set_config('idle_in_transaction_session_timeout','15s',true), pg_try_advisory_xact_lock(73641, $1::int) AS locked, set_config('sylf.planner_v2_core_owner',$1::text,true)",
+            [ownerId]
+          )
+        ).rows[0]?.locked;
         if (locked !== true) throw Object.assign(new Error("The account is busy. Please retry shortly."), { code: "55P03" });
-        await sql.query("SELECT set_config('sylf.planner_v2_core_owner',$1,true)", [String(ownerId)]);
-        const result = await work(sql);
+        const result = await work(cachedTransactionSql(sql));
         if (connectionError) throw connectionError;
         await sql.query("COMMIT");
         return result;

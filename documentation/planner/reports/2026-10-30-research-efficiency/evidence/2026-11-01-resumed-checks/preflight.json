@@ -1,0 +1,125 @@
+{
+  "checkedAt": "2026-11-01T16:15:21.006Z",
+  "timezone": "Asia/Karachi",
+  "paidCallsDuringPreflight": 0,
+  "authorization": {
+    "source": "Verified user messages in Review Planner V2 handoff, turns 01a186a4-1c6c-7f60-8799-763356e5320d and 01a188fa-b91a-7c72-a3b4-3a6514477559; resumed by current user instruction",
+    "ceilingUsd": 1.75,
+    "scope": "Manual student workflow debugging with DeepSeek and accepted goal/deadline/availability/history/research context; formal Phase C remains deferred"
+  },
+  "settledRoots": [
+    {
+      "rootRequestId": "82dbdbb3-2a48-5638-afb9-68dfb6da2ff4",
+      "feature": "planner",
+      "accountingState": "SETTLED",
+      "calls": 2,
+      "first": "2026-10-29T03:28:13.088Z",
+      "last": "2026-10-29T03:28:56.099Z",
+      "estimatedCostUsd": 0.001938012,
+      "unknownCosts": 0,
+      "input": "5761",
+      "completion": "457",
+      "reasoning": "405"
+    },
+    {
+      "rootRequestId": "4234b385-5300-593c-a61b-a6ebb0f7f792",
+      "feature": "planner",
+      "accountingState": "SETTLED",
+      "calls": 20,
+      "first": "2026-10-29T07:24:00.636Z",
+      "last": "2026-10-29T08:46:28.612Z",
+      "estimatedCostUsd": 0.138074988,
+      "unknownCosts": 0,
+      "input": "148889",
+      "completion": "82580",
+      "reasoning": "73999"
+    },
+    {
+      "rootRequestId": "c7873844-929e-54eb-a008-93c77c567f9f",
+      "feature": "planner",
+      "accountingState": "SETTLED",
+      "calls": 1,
+      "first": "2026-10-29T14:02:20.856Z",
+      "last": "2026-10-29T14:02:20.856Z",
+      "estimatedCostUsd": 0.002290812,
+      "unknownCosts": 0,
+      "input": "5745",
+      "completion": "755",
+      "reasoning": "711"
+    },
+    {
+      "rootRequestId": "eed3599f-4b2d-5fc9-a549-68767c9d01c1",
+      "feature": "planner",
+      "accountingState": "SETTLED",
+      "calls": 39,
+      "first": "2026-10-29T14:07:04.017Z",
+      "last": "2026-10-29T15:34:16.892Z",
+      "estimatedCostUsd": 0.338698884,
+      "unknownCosts": 0,
+      "input": "405231",
+      "completion": "190927",
+      "reasoning": "173826"
+    },
+    {
+      "rootRequestId": "e5fd7027-de34-52b4-ad08-e6c013292edd",
+      "feature": "planner",
+      "accountingState": "SETTLED",
+      "calls": 17,
+      "first": "2026-10-29T22:11:29.306Z",
+      "last": "2026-10-29T22:28:31.339Z",
+      "estimatedCostUsd": 0.081774804,
+      "unknownCosts": 0,
+      "input": "146795",
+      "completion": "38290",
+      "reasoning": "27195"
+    }
+  ],
+  "knownEstimatedCostUsd": 0.5627775,
+  "unknownCosts": 0,
+  "unsettledCalls": 0,
+  "queue": [],
+  "proposedNewRequestCeilingUsd": 1.18,
+  "aggregateMaximumUsd": 1.7427775,
+  "provider": {
+    "schemaVersion": 1,
+    "status": "METADATA_REACHABLE",
+    "paidCalls": 0,
+    "fixedOrigin": "https://api.deepseek.com",
+    "credentialRecorded": false,
+    "metadataRequests": [
+      {
+        "path": "/models",
+        "ok": true,
+        "status": 200
+      },
+      {
+        "path": "/user/balance",
+        "ok": true,
+        "status": 200
+      }
+    ],
+    "model": {
+      "id": "deepseek-flash",
+      "name": "DeepSeek-V4.1-Flash",
+      "contextWindow": 1048576,
+      "maxOutputTokens": 393216,
+      "effort": {
+        "supported_levels": [
+          "low",
+          "high",
+          "max"
+        ],
+        "default_level": "high"
+      }
+    },
+    "limitations": [
+      "Metadata GET success does not prove generation delivery, model quality, tool delivery or long-running streaming reliability."
+    ],
+    "checkedAt": "2026-11-01T16:16:08.399Z"
+  },
+  "balanceAvailable": true,
+  "fundingSufficientForProposedCeiling": true,
+  "officialPricingVerified": "https://api-docs.deepseek.com/quick_start/pricing/",
+  "pricingObservation": "Existing peak upper-bound model rates and 0.00075 USD successful search quote agree with current published prices. Catalog estimates are not invoices.",
+  "submitted": false
+}

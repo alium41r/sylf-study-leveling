@@ -24,7 +24,7 @@ export interface PlanningCalendarSource { ref: string; version: unknown; complet
  * recurrence/overrides and external event semantics use the display owners. */
 export async function readPlanningCalendar(sql: Sql, ownerId: number, start: string, end: string, timezone: string, now: Date) {
   const sources: PlanningCalendarSource[] = [];
-  const freshUntil = new Date(now.getTime() + 5 * 60000).toISOString();
+  const freshUntil = new Date(now.getTime() + 6 * 3600000).toISOString();
   const shared = (await sql.query<{ id: string; revision: number; role: string }>(`SELECT c.id,c.revision,
     CASE WHEN c."ownerId"=$1 THEN 'OWNER' ELSE m.role END AS role FROM "SharedCalendar" c
     LEFT JOIN "SharedCalendarMember" m ON m."calendarId"=c.id AND m."userId"=$1 AND m.status='ACTIVE'

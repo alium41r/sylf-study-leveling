@@ -54,6 +54,13 @@ async function reserve(f: Awaited<ReturnType<typeof fixture>>, role: PlannerRole
     roleCall: { schemaVersion: 1, key: randomUUID(), role, policyDigest: p.policyDigest, inputDigest: hash("input", []), promptDigest: hash("prompt", []), format: p.format, effort: p.effort, purpose: role === "RESEARCH" ? "RESEARCH" : role === "REVIEWER" ? "REVIEW" : "BLUEPRINT" } });
 }
 describe("compiler v2 role resources on genuine PostgreSQL", () => {
+  it("keeps a reserved call live so its subsequent stream is not discarded as stopped",async()=>{
+    const f=await fixture(),callId=await reserve(f),planId=f.attempt.targets[0].planId;
+    expect((await readPlannerActivity(db,f.ownerId,planId,f.attempt.attemptId)).calls).toEqual([expect.objectContaining({id:callId,state:"WORKING"})]);
+    await attempts.dispatchCall(f.token,callId,"PLANNING");
+    await retainVisibleOutput(attempts,f.token,callId,"Actual first reasoning",22,"reasoning");
+    expect((await readPlannerActivity(db,f.ownerId,planId,f.attempt.attemptId)).calls[0]).toMatchObject({state:"WORKING",reasoning:{text:"Actual first reasoning",recorded:true}});
+  });
   it("shows actual streamed strategy text under the owned fence without exposing credentials or changing accounting",async()=>{
     const f=await fixture(),planId=f.attempt.targets[0].planId,partial="Study substitution first. sk-synthetic-secret candidate_1",full=partial+"\nThen practise independently.",thinking="Check the prerequisites before ordering practice. sk-synthetic-secret";
     const result=await dispatchMeteredProvider(workerProviderMeter(attempts,f.token),{role:{role:"STRATEGIST",key:"live_strategy_fixture"},messages:[{role:"user",content:"Plan"}],systemInstruction:"Unpaid fixture",policy:{purpose:"BLUEPRINT"},outputTokens:100,validate:r=>r.text},{adapter:()=>({generateResponse:async(_messages,_system,_tools,options)=>{

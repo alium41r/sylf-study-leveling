@@ -12,7 +12,8 @@ import { loadIntent } from "./intents";
 import { loadAttempt } from "./attempts";
 import { CompleteReviewResponseSchema,ReviewedResearchHandoffSchema,AuthorFeedbackSchema,type AuthorFeedback } from "../intelligence/schemas/reviewed-learning";
 import { NaturalTranslationResponseSchema } from "../intelligence/schemas/natural-learning";
-import { dispatchMeteredProvider, workerProviderMeter, boundedRejectedOutput } from "../intelligence/provider";
+import { dispatchMeteredProvider, workerProviderMeter, boundedRejectedOutput, validationFeedback } from "../intelligence/provider";
+import { assembleNaturalTranslation } from "../intelligence/natural-learning";
 import { captureRejectedReview } from "../intelligence/quality";
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
@@ -63,6 +64,21 @@ function researchForLearning(archive:FoundationArchive,checkpoint:LearningCheckp
   const research=retainedArtifact(archive,dossier.value.research,"DOSSIER");if(research.value.schemaVersion!==2)throw new Error("FULL_RESEARCH_REQUIRED");return {...research,value:research.value};
 }
 export async function checkedAuthorFeedback(sql:Sql,attempt:PlannerAttemptV2,archive:FoundationArchive,source:LearningCheckpoint):Promise<AuthorFeedback>{
+  if(source.value.stage==="TRANSLATION"&&source.value.learning.call?.role==="TRANSLATOR"&&source.value.learning.strategy){
+    // Only a settled complete rejected receipt may request correction. Re-run
+    // admission against its frozen inputs; a failed transaction is not proof
+    // that otherwise valid education needs another paid response.
+    const actual=await readRejectedLearningResponse(sql,attempt,source.value.learning.call);
+    const strategy=retainedArtifact(archive,source.value.learning.strategy,"STRATEGY"),capacity=retainedArtifact(archive,source.value.learning.capacity,"CAPACITY");
+    if(capacity.value.schemaVersion!==2||!capacity.value.constraints||!capacity.value.facts)throw new Error("REJECTED_TRANSLATION_CAPACITY_REQUIRED");
+    let validation:ReturnType<typeof validationFeedback>|undefined,interpretation:unknown=actual.text;
+    try{interpretation=JSON.parse(actual.text);assembleNaturalTranslation(interpretation,retainedLearningInput(archive,source),strategy.value,capacity.value.constraints,capacity.value.facts);}
+    catch(error){validation=validationFeedback(error,actual.text);}
+    if(!validation)throw new Error("VALID_TRANSLATION_CANNOT_BE_REJECTED");
+    return AuthorFeedbackSchema.parse({kind:"REJECTED",source:artifactRef(source),input:artifactRef(source),responseDigest:actual.responseDigest,
+      progressDigest:hash("rejected-translation-progress-v1",{strategy:strategy.value.text,interpretation,validation}),
+      validation,rejectedOutput:boundedRejectedOutput(actual.text)});
+  }
   if(source.value.stage!=="INCOMPLETE"||!source.value.learning.strategy)throw new Error("ACTUAL_INCOMPLETE_AUTHOR_REQUIRED");
   const receipt=source.value.learning.translation?retainedArtifact(archive,source.value.learning.translation,"TRANSLATION"):null;
   const origin=receipt?.value.schemaVersion===2?retainedArtifact(archive,receipt.value.input,"CHECKPOINT"):source.value.previous?retainedArtifact(archive,source.value.previous,"CHECKPOINT"):null;
@@ -262,6 +278,18 @@ export async function assertReviewedArtifact(sql:Sql,attempt:PlannerAttemptV2,pa
 export class ReviewedLearningStage {
   constructor(readonly natural:NaturalLearningStage,readonly research:ResearchUnderstanding){}
   get attempts(){return this.natural.attempts;}
+  private async runNatural(token:LeaseToken,signal:AbortSignal){
+    try{return await this.natural.run(token,signal);}catch(error){
+      signal.throwIfAborted();
+      if(!(error instanceof DurablePlannerError)||error.detail.code!=="INVALID_OUTPUT")throw error;
+      const {checkpoint}=await this.natural.state(token);
+      if(checkpoint?.value.stage!=="TRANSLATION"||checkpoint.value.learning.call?.role!=="TRANSLATOR")throw error;
+      let advanced:boolean;
+      try{advanced=await this.routeIncomplete(token,checkpoint);}catch{throw error;}
+      if(!advanced)reject("QUALITY_INCOMPLETE","Translation repeated the same invalid result; the complete strategy and rejected responses are retained.","BLUEPRINT");
+      return (await this.natural.state(token)).checkpoint!;
+    }
+  }
   async routeIncomplete(token:LeaseToken,source:LearningCheckpoint){
     const state=await this.natural.state(token),feedback=await this.attempts.mutate(token,(sql,attempt)=>checkedAuthorFeedback(sql,attempt,state.archive,source));
     if(Object.values(state.archive.entries).some(a=>a.kind==="CHECKPOINT"&&a.value.schemaVersion===3&&a.value.workflow.authorFeedback?.progressDigest===feedback.progressDigest))return false;
@@ -416,7 +444,10 @@ export class ReviewedLearningStage {
     for(;;){
       signal.throwIfAborted();
       let {archive,checkpoint}=await this.natural.state(token);
-      if(!checkpoint){checkpoint=await this.natural.run(token,signal);archive=(await this.natural.state(token)).archive;}
+      if(!checkpoint){checkpoint=await this.runNatural(token,signal);archive=(await this.natural.state(token)).archive;}
+      if(checkpoint.value.schemaVersion===2&&!checkpoint.value.learning.allocated&&!['INCOMPLETE','NEEDS_DECISION'].includes(checkpoint.value.stage)){
+        checkpoint=await this.runNatural(token,signal);archive=(await this.natural.state(token)).archive;
+      }
       const before=checkpoint.value.previous?retainedArtifact(archive,checkpoint.value.previous,"CHECKPOINT"):null;
       const receipt=checkpoint.value.learning.translation?retainedArtifact(archive,checkpoint.value.learning.translation,"TRANSLATION"):null;
       const authorIncomplete=before?.value.schemaVersion!==1&&before?.value.learning.call?.role==="TRANSLATOR"||receipt?.value.schemaVersion===2&&(receipt.value.ambiguities.length>0||receipt.value.elements.some(e=>e.disposition==="GAP"));
@@ -460,7 +491,8 @@ export class ReviewedLearningStage {
         await this.assemble(token,current);continue;
       }
       if(current.value.stage!=="REVIEW"){
-        const allocated=await this.natural.run(token,signal);
+        const allocated=await this.runNatural(token,signal);
+        if(allocated.value.stage==="REFINEMENT")continue;
         if(allocated.value.stage==="INCOMPLETE")continue;
         if(!allocated.value.learning.allocated||allocated.value.stage!=="ALLOCATION")return allocated;
         await this.prepare(token,await this.addressed(token,allocated));continue;

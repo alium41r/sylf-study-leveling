@@ -13,6 +13,7 @@ import { PlannerDatabase } from "@/lib/planner/v2/server/database";
 import { ResearchService } from "@/lib/planner/v2/server/research";
 import { PlannerCalendarCapacity } from "@/lib/planner/v2/server/calendar-capacity";
 import { PlannerFoundationService } from "@/lib/planner/v2/server/foundation";
+import { StudentWorkspaceService } from "@/lib/planner/v2/server/student-workspace";
 import { artifactRef } from "@/lib/planner/v2/intelligence/foundation/validation";
 import { offlineResourcePolicy } from "@/lib/planner/v2/intelligence/foundation/role-calls";
 import { addDays } from "@/lib/calendar/dates";
@@ -50,6 +51,26 @@ async function external(owner:number,options:{fresh?:boolean;planning?:boolean;b
 }
 const value=(a:Awaited<ReturnType<PlannerCalendarCapacity["run"]>>)=>{if(a.value.schemaVersion!==2)throw new Error();return a.value;};
 describe("durable calendar-aware compiler-v2 capacity",()=>{
+ it("does not block planning on terminal legacy failures or withdrawn unresolved work",async()=>{
+   const f=await fixture({seed:async owner=>{
+     await client.query(`INSERT INTO "Quest" ("userId",title,status,"scheduledFor","targetMinutes","requiredMinutes","remainingDisposition") VALUES
+       ($1,'Failed older task','FAILED',$2,30,30,'OPEN'),($1,'Withdrawn older task','PENDING',$2,0,0,'WITHDRAWN')`,[owner,addDays(today(),-1)]);
+   }});
+   expect(value(await capacity.run(f.token,signal()))).toMatchObject({status:"READY"});
+   expect((await client.query('SELECT count(*)::int AS n FROM "Quest" WHERE "userId"=$1',[f.owner])).rows[0].n).toBe(2);
+ });
+ it("names genuinely overdue work and projects only owned safe rescheduling choices",async()=>{
+   const f=await fixture({seed:async owner=>{
+     await client.query(`INSERT INTO "Quest" ("userId",title,status,"scheduledFor","targetMinutes","requiredMinutes") VALUES ($1,'Maths practice','PENDING',$2,30,30)`,[owner,addDays(today(),-1)]);
+   }});
+   const captured=value(await capacity.run(f.token,signal()));
+   expect(captured.status).toBe("NEEDS_DECISION");expect(captured.reasons[0]).toContain('Maths practice');
+   const view=await new StudentWorkspaceService(db).read(f.owner,f.created.plan.id);
+   expect(view.capacityDecision?.overdue).toEqual([expect.objectContaining({title:"Maths practice",remainingMinutes:30,canReschedule:true,date:addDays(today(),-1)})]);
+   await db.coordinated(f.owner,sql=>sql.query('UPDATE "Quest" SET "scheduledFor"=$2 WHERE "userId"=$1',[f.owner,tomorrow()]));
+   expect((await new StudentWorkspaceService(db).read(f.owner,f.created.plan.id)).capacityDecision).toMatchObject({overdue:[],overdueResolved:true});
+   expect(f.calls()).toBe(2);
+ });
  it("retains exact full research correspondence, finite freshness and immutable replay without provider calls",async()=>{const f=await fixture(),before=await attempts.read(f.owner,f.token.attemptId),a=await capacity.run(f.token,signal()),v=value(a);expect(v.status).toBe("READY");expect(v.constraints?.days.find(d=>d.date===tomorrow())).toMatchObject({ceilingMinutes:180,recoveryMinutes:18,availableMinutes:162});expect(f.calls()).toBe(2);expect((await attempts.read(f.owner,f.token.attemptId)).budget).toEqual(before.budget);expect((await capacity.run(f.token,signal())).digest).toBe(a.digest);await capacity.assertCurrent(f.owner,f.token.attemptId,artifactRef(a));const read=await new PlannerFoundationService(attempts).inspect(f.owner,f.token.attemptId);if(read.compilerVersion!==2)throw new Error();const dossiers=Object.values(read.archive.entries).filter(a=>a.kind==="DOSSIER");expect(dossiers.map(d=>d.value.schemaVersion).sort()).toEqual([2,3]);const original=dossiers.find(d=>d.value.schemaVersion===2)!,bound=dossiers.find(d=>d.value.schemaVersion===3)!;expect(bound.value).toMatchObject({research:artifactRef(original),capacity:artifactRef(a)});expect(JSON.stringify(a)).not.toContain("Private commitment");});
  it("rejects foreign ownership and fabricated references",async()=>{const f=await fixture(),a=await capacity.run(f.token,signal()),foreign=await user(client);await expect(capacity.assertCurrent(foreign,f.token.attemptId,artifactRef(a))).rejects.toMatchObject({detail:{code:"REFERENCE_NOT_OWNED"}});await expect(capacity.assertCurrent(f.owner,f.token.attemptId,{...artifactRef(a),digest:"f".repeat(64)})).rejects.toMatchObject({detail:{code:"REFERENCE_NOT_OWNED"}});});
  it("retains missing accepted windows as a consequential decision rather than unlimited capacity",async()=>{const i=intent();delete i.availability!.studyWindows;const f=await fixture({intent:i}),a=await capacity.run(f.token,signal());expect(value(a)).toMatchObject({status:"NEEDS_DECISION",constraints:null,allocation:null});expect((await attempts.read(f.owner,f.token.attemptId)).state).toBe("NEEDS_DECISION");});
@@ -120,6 +141,17 @@ describe("durable calendar-aware compiler-v2 capacity",()=>{
    const old=intent();old.availability!.timezone="Pacific/Kiritimati";
    const f=await fixture({intent:old,prepare:async owner=>{await new IntentService(db).create(owner,randomUUID(),intent());}}),v=value(await capacity.run(f.token,signal()));
    expect(v.status).toBe("READY");expect(v.window.start).toBe(today());expect(v.calendar?.timezone).toBe("UTC");expect(v.constraints?.window.start).toBe(today());
+ });
+ it("keeps daytime capacity current across ordinary minute ticks within civil today while rejecting expired windows or real calendar writes",async()=>{
+   const allDay=intent();allDay.availability!.studyWindows!.weekly=Array.from({length:7},(_,weekday)=>({weekday,startMinute:0,endMinute:1440}));
+   const f=await fixture({intent:allDay}),a=await capacity.run(f.token,signal()),cal=value(a).calendar!,capturedMs=Date.parse(cal.capturedAt);
+   const fiveMinLater=new Date(capturedMs+5*60000);
+   if(fiveMinLater.toISOString().slice(0,10)===today()){
+     await expect(capacity.assertCurrent(f.owner,f.token.attemptId,artifactRef(a),fiveMinLater)).resolves.toBeDefined();
+   }
+   await expect(capacity.assertCurrent(f.owner,f.token.attemptId,artifactRef(a),new Date(Date.parse(cal.validUntil)+1000))).rejects.toMatchObject({detail:{code:"STALE_CONTEXT"}});
+   await native(f.owner,tomorrow(),9,20);
+   await expect(capacity.assertCurrent(f.owner,f.token.attemptId,artifactRef(a))).rejects.toMatchObject({detail:{code:"STALE_CONTEXT"}});
  });
 
 });

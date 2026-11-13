@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown, FileText, Search } from "lucide-react";
-import { SylvieIcon } from "@/app/components/icons";
 import {
   workspaceRequest,
   streamWorkspaceActivity,
@@ -12,23 +11,49 @@ import type {
 } from "@/lib/planner/v2/client/workspace";
 import s from "./StudentPlannerWorkspace.module.css";
 
+function formatElapsed(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+  const mins = Math.floor(seconds / 60);
+  const rem = seconds % 60;
+  return rem > 0 ? `${mins}m ${rem}s` : `${mins}m`;
+}
+
+function inferLiveStage(calls: PlannerActivity["calls"]): number | null {
+  for (let i = calls.length - 1; i >= 0; i--) {
+    const label = calls[i].label;
+    if (/Reviewing/i.test(label)) return 4;
+    if (/Translating/i.test(label)) return 2;
+    if (/strategy/i.test(label)) return 1;
+  }
+  return calls.length > 0 ? 0 : null;
+}
+
 function ReasoningBlock({
   call,
   planId,
   attemptId,
+  now,
   onInspect,
 }: {
   call: PlannerActivity["calls"][number];
   planId: string;
   attemptId: string;
+  now: number;
   onInspect: () => void;
 }) {
-  const [open, setOpen] = useState(call.state === "WORKING"),
+  const [manualOpen, setManualOpen] = useState<boolean | null>(null),
     [full, setFull] = useState<PlannerReasoningText | null>(null),
     [failed, setFailed] = useState(false);
+  const hasReasoning = Boolean(
+    call.reasoning?.recorded &&
+      (call.reasoning.characters > 0 || call.reasoning.text.length > 0)
+  );
+  const open = manualOpen ?? (call.state === "WORKING" && hasReasoning);
+  const streamRef = useRef<HTMLDivElement>(null),
+    pinnedRef = useRef(true);
+
   useEffect(() => {
-    if (!open || call.state === "WORKING" || !call.reasoning?.recorded || full)
-      return;
+    if (!open || call.state === "WORKING" || !hasReasoning || full) return;
     const controller = new AbortController();
     let active = true;
     void workspaceRequest<PlannerReasoningText>(
@@ -49,121 +74,198 @@ function ReasoningBlock({
       active = false;
       controller.abort();
     };
-  }, [
-    open,
-    call.id,
-    call.state,
-    call.reasoning?.recorded,
-    planId,
-    attemptId,
-    full,
-  ]);
+  }, [open, call.id, call.state, hasReasoning, planId, attemptId, full]);
+
   const reasoning = full ?? call.reasoning;
+  const activeText = reasoning?.text ?? "";
+
+  useEffect(() => {
+    if (call.state !== "WORKING") return;
+    const el = streamRef.current;
+    if (el && pinnedRef.current) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [activeText, call.state]);
+
+  const callSeconds =
+    call.state === "WORKING" && call.startedAt
+      ? Math.max(0, Math.floor((now - Date.parse(call.startedAt)) / 1000))
+      : null;
+
+  if (!hasReasoning && call.state !== "WORKING") {
+    return (
+      <div className={s.stepPlain}>
+        <span className={s.thinkingLabel}>
+          <span>{call.label}</span>
+          <small>{call.state === "RECEIVED" ? "Done" : "Stopped"}</small>
+        </span>
+      </div>
+    );
+  }
+
+  if (!hasReasoning && call.state === "WORKING") {
+    return (
+      <div className={s.stepPlain} data-live="true">
+        <span className={s.thinkingLabel}>
+          <span>{call.label}</span>
+          <small>
+            {callSeconds !== null ? formatElapsed(callSeconds) : "Working"}
+          </small>
+        </span>
+      </div>
+    );
+  }
+
   return (
     <details
       className={s.thinkingBlock}
+      data-live={call.state === "WORKING"}
       open={open}
       onToggle={(event) => {
         event.stopPropagation();
-        setOpen(event.currentTarget.open);
+        if (event.currentTarget.open !== open)
+          setManualOpen(event.currentTarget.open);
         if (event.currentTarget.open && call.state !== "WORKING") onInspect();
       }}
     >
       <summary>
-        <span>
-          {call.label}{" "}
+        <span className={s.thinkingLabel}>
+          <span>{call.label}</span>
           <small>
-            ·{" "}
             {call.state === "WORKING"
-              ? "Thinking"
+              ? callSeconds !== null
+                ? `Thinking · ${formatElapsed(callSeconds)}`
+                : "Thinking"
               : call.state === "RECEIVED"
-                ? "Response received"
+                ? "Done"
                 : "Stopped"}
           </small>
         </span>
-        <ChevronDown size={14} />
-        {reasoning?.text && (
-          <span className={s.thinkingExcerpt}>{reasoning.text}</span>
-        )}
+        <ChevronDown size={13} />
       </summary>
       <div className={s.thinkingBody}>
-        <p className={s.muted}>
-          DeepSeek-provided reasoning
-          {reasoning?.redacted
-            ? " · sensitive details and internal references hidden"
-            : ""}
-          .
-        </p>
-        {reasoning?.recorded ? (
-          <div className={s.thinkingText}>{reasoning.text}</div>
-        ) : (
-          <p>
-            {call.state === "WORKING"
-              ? "Waiting for the provider’s reasoning stream…"
-              : "No provider reasoning was recorded for this response."}
-          </p>
-        )}
-        {reasoning?.clipped && (
-          <p className={s.muted}>
-            {call.state === "WORKING"
-              ? "Live display limit reached. The complete provider trace will be available when this response finishes."
-              : "Loading the complete retained provider trace…"}
-          </p>
+        <div
+          ref={streamRef}
+          className={s.thinkingText}
+          data-streaming={call.state === "WORKING"}
+          onScroll={() => {
+            const el = streamRef.current;
+            if (el) {
+              pinnedRef.current =
+                el.scrollHeight - el.clientHeight - el.scrollTop < 36;
+            }
+          }}
+        >
+          {reasoning?.text}
+          {call.state === "WORKING" && (
+            <span className={s.streamCursor} aria-hidden="true" />
+          )}
+        </div>
+        {reasoning?.clipped && call.state !== "WORKING" && (
+          <p className={s.thinkingStatus}>Loading full trace…</p>
         )}
         {failed && (
-          <p role="status">
-            The complete trace could not be loaded. The received preview is
-            retained; reopen this block to retry.
+          <p role="status" className={s.thinkingStatus}>
+            Trace unavailable. Reopen to retry.
           </p>
         )}
       </div>
     </details>
   );
 }
+
 function ToolAction({ event }: { event: PlannerActivity["research"][number] }) {
   const Icon = event.label === "Search" ? Search : FileText;
+  if (!event.reason) {
+    return (
+      <div className={s.traceStatic}>
+        <Icon size={13} />
+        <span>
+          {event.label} <span className={s.muted}>· {event.detail}</span>
+          {event.working ? " · …" : ""}
+        </span>
+      </div>
+    );
+  }
   return (
     <details className={s.traceAction}>
       <summary>
-        <Icon size={15} />
+        <Icon size={13} />
         <span>
           {event.label} <span className={s.muted}>· {event.detail}</span>
-          {event.working ? " · working" : ""}
+          {event.working ? " · …" : ""}
         </span>
       </summary>
-      {event.reason && <p>{event.reason}</p>}
+      <p>{event.reason}</p>
     </details>
   );
 }
+
 export default function PlanningActivity({
   planId,
   attemptId,
   running,
+  onStageHint,
+  onActivityStep,
 }: {
   planId: string;
   attemptId: string;
   running: boolean;
+  onStageHint?: (stageIndex: number | null) => void;
+  onActivityStep?: () => void;
 }) {
   const [activity, setActivity] = useState<PlannerActivity | null>(null),
     [unavailable, setUnavailable] = useState(false),
-    [expanded, setExpanded] = useState(running),
+    [manualExpanded, setManualExpanded] = useState<boolean | null>(null),
+    [draftManualOpen, setDraftManualOpen] = useState<boolean | null>(null),
     [now, setNow] = useState(() => Date.now());
+  const expanded = manualExpanded ?? running;
   const trace = useRef<HTMLDivElement>(null),
-    following = useRef(true);
+    draftRef = useRef<HTMLDivElement>(null),
+    following = useRef(true),
+    stepCbRef = useRef(onActivityStep),
+    stageCbRef = useRef(onStageHint);
+
+  useEffect(() => {
+    stepCbRef.current = onActivityStep;
+    stageCbRef.current = onStageHint;
+  }, [onActivityStep, onStageHint]);
+
+  useEffect(() => {
+    if (!activity) return;
+    stageCbRef.current?.(inferLiveStage(activity.calls));
+  }, [activity]);
+
   useEffect(() => {
     if (trace.current && following.current)
       trace.current.scrollTop = trace.current.scrollHeight;
+    if (
+      draftRef.current &&
+      following.current &&
+      activity?.output?.state === "WRITING"
+    )
+      draftRef.current.scrollTop = draftRef.current.scrollHeight;
   }, [activity]);
+
   useEffect(() => {
     if (!running) return;
     const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
   }, [running]);
+
   useEffect(() => {
     let stopped = false,
       inFlight = false,
-      timer: ReturnType<typeof setTimeout> | undefined;
+      timer: ReturnType<typeof setTimeout> | undefined,
+      notifyTimer: ReturnType<typeof setTimeout> | undefined;
     const controller = new AbortController();
+    const notifyParent = () => {
+      if (stopped || !stepCbRef.current) return;
+      if (notifyTimer) clearTimeout(notifyTimer);
+      notifyTimer = setTimeout(() => {
+        if (!stopped) stepCbRef.current?.();
+      }, 250);
+    };
     const refresh = async () => {
       if (stopped || inFlight || document.hidden) return;
       inFlight = true;
@@ -186,12 +288,13 @@ export default function PlanningActivity({
         if (!stopped) setUnavailable(true);
       } finally {
         inFlight = false;
-        if (!stopped && running) timer = setTimeout(() => void refresh(), 2000);
+        if (!stopped && running) timer = setTimeout(() => void refresh(), 2500);
       }
     };
     let stream: AbortController | undefined,
       connected = false,
-      finished = false;
+      finished = false,
+      seenInitial = false;
     const connect = async () => {
       if (stopped || document.hidden || connected || !running) return;
       connected = true;
@@ -211,6 +314,8 @@ export default function PlanningActivity({
               ) {
                 setActivity(next);
                 setUnavailable(false);
+                if (seenInitial) notifyParent();
+                seenInitial = true;
               }
             } else if (event === "preview") {
               const preview = value as {
@@ -235,8 +340,10 @@ export default function PlanningActivity({
                       }
                     : current
                 );
-            } else if (event === "done") finished = true;
-            else if (event === "unavailable")
+            } else if (event === "done") {
+              finished = true;
+              notifyParent();
+            } else if (event === "unavailable")
               throw new Error("Stream interrupted");
           }
         );
@@ -266,10 +373,12 @@ export default function PlanningActivity({
       controller.abort();
       stream?.abort();
       if (timer) clearTimeout(timer);
+      if (notifyTimer) clearTimeout(notifyTimer);
       document.removeEventListener("visibilitychange", resume);
       window.removeEventListener("online", resume);
     };
   }, [planId, attemptId, running]);
+
   const seconds = activity?.startedAt
     ? Math.max(
         0,
@@ -280,30 +389,42 @@ export default function PlanningActivity({
         )
       )
     : null;
-  const duration =
-    seconds === null ? "" : ` · ${Math.floor(seconds / 60)}m ${seconds % 60}s`;
   const status =
     activity?.state === "SUCCEEDED"
       ? "Completed"
       : running
-        ? "Thinking…"
-        : "Planning trace";
+        ? "Live"
+        : "Trace";
   const known = new Set(activity?.calls.map((call) => call.id));
   const searches =
       activity?.research.filter((event) => event.label === "Search").length ??
       0,
-    reads = (activity?.research.length ?? 0) - searches;
+    reads = activity?.research.filter((event) => event.label === "Read").length ?? 0;
+  const showOutput =
+    !!activity?.output && (running || activity.output.state !== "RECEIVED");
+
   return (
     <details
       className={s.feed}
+      data-running={running}
       open={expanded}
-      onToggle={(event) => setExpanded(event.currentTarget.open)}
+      onToggle={(event) => {
+        if (event.currentTarget.open !== expanded)
+          setManualExpanded(event.currentTarget.open);
+      }}
     >
       <summary className={s.feedHead}>
-        <SylvieIcon size={15} />
-        <span>
-          {status}
-          {duration}
+        <span
+          className={s.feedDot}
+          data-live={running}
+          data-done={activity?.state === "SUCCEEDED"}
+          aria-hidden="true"
+        />
+        <span className={s.feedTitle}>
+          <span>{status}</span>
+          {seconds !== null && (
+            <small className={s.feedDuration}>{formatElapsed(seconds)}</small>
+          )}
         </span>
         {activity && (
           <span className={s.feedStats}>
@@ -321,7 +442,7 @@ export default function PlanningActivity({
             {reads > 0 && <span>{reads} read</span>}
           </span>
         )}
-        <ChevronDown size={15} />
+        <ChevronDown size={14} />
       </summary>
       {unavailable && (
         <p role="status" className={s.feedNote}>
@@ -329,7 +450,7 @@ export default function PlanningActivity({
         </p>
       )}
       {!activity && !unavailable && (
-        <p className={s.feedNote}>Reading saved activity…</p>
+        <p className={s.feedNote}>Starting…</p>
       )}
       <div
         className={s.feedBody}
@@ -349,7 +470,7 @@ export default function PlanningActivity({
               aria-hidden="true"
             >
               {call.state === "RECEIVED" ? (
-                <Check size={11} strokeWidth={3} />
+                <Check size={10} strokeWidth={3} />
               ) : (
                 <i className={s.stepPulse} />
               )}
@@ -358,6 +479,7 @@ export default function PlanningActivity({
               call={call}
               planId={planId}
               attemptId={attemptId}
+              now={now}
               onInspect={() => {
                 following.current = false;
               }}
@@ -374,26 +496,36 @@ export default function PlanningActivity({
           .map((event) => (
             <ToolAction key={event.id} event={event} />
           ))}
-        {activity?.output && (
-          <details className={s.traceDraft}>
+        {showOutput && activity?.output && (
+          <details
+            className={s.traceDraft}
+            open={draftManualOpen ?? activity.output.state === "WRITING"}
+            onToggle={(event) => {
+              event.stopPropagation();
+              const desired =
+                draftManualOpen ?? activity.output?.state === "WRITING";
+              if (event.currentTarget.open !== desired) {
+                setDraftManualOpen(event.currentTarget.open);
+              }
+            }}
+          >
             <summary>
-              Generated strategy{" "}
+              Strategy{" "}
               <span className={s.muted}>
                 ·{" "}
                 {activity.output.state === "WRITING"
-                  ? "streaming"
+                  ? "writing…"
                   : activity.output.state === "INTERRUPTED"
-                    ? "retained partial response"
-                    : "received"}
+                    ? "partial"
+                    : "done"}
               </span>
             </summary>
-            <div className={s.thinkingText}>{activity.output.text}</div>
-            {activity.output.clipped && (
-              <p>
-                The full strategy is retained separately when generation
-                finishes.
-              </p>
-            )}
+            <div ref={draftRef} className={s.strategyStreamText}>
+              {activity.output.text}
+              {activity.output.state === "WRITING" && (
+                <span className={s.streamCursor} aria-hidden="true" />
+              )}
+            </div>
           </details>
         )}
       </div>

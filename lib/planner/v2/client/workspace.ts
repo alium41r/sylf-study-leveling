@@ -10,7 +10,8 @@ import type { FoundationArtifact } from "../intelligence/foundation/contracts";
 import type { AllocationReport } from "../intelligence/schemas/scheduling";
 
 export const LEGACY_STUDENT_RESOURCE_PROFILE = "student-preview-v1";
-export const STUDENT_RESOURCE_PROFILE = "student-preview-v2";
+export const PRIOR_STUDENT_RESOURCE_PROFILE = "student-preview-v2";
+export const STUDENT_RESOURCE_PROFILE = "student-preview-v3";
 export interface StudentReadiness {
   enabled: boolean;
   ready: boolean;
@@ -35,6 +36,11 @@ export interface StudentWorkspace {
     foundationDigest?: string;
     summary: Record<string, string> | null;
     questions: { ref: string; question: string; consequence: string }[];
+  } | null;
+  capacityDecision?: {
+    today: string;
+    overdueResolved?: boolean;
+    overdue: { questId: number; title: string; date: string; remainingMinutes: number; planId: string | null; canReschedule: boolean }[];
   } | null;
   draft: {
     attemptId: string;

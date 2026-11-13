@@ -1,0 +1,47 @@
+{
+  "date": "2026-11-02",
+  "timezone": "Asia/Karachi",
+  "postgres": {
+    "status": "PASSED",
+    "v2": 424,
+    "legacy": 225,
+    "requiredSkipped": 0,
+    "receipt": "../2026-11-01-resumed-full-postgres-2/postgres-harness-run.json",
+    "pins": "../2026-11-01-resumed-full-postgres-2/postgres-source-pins.json",
+    "changedDuringRun": [],
+    "paidCalls": 0
+  },
+  "units": {
+    "passed": 512,
+    "files": 48,
+    "receipt": "units.log"
+  },
+  "typecheck": {
+    "exitCode": 0,
+    "receipt": "typecheck-regenerated.log",
+    "note": "Initial check found malformed generated .next/dev/types/validator.ts; stopped task-owned web/worker, moved only generated dev/types to a temporary backup, ran next typegen and tsc on Node 24.22.1 with temporary 8 GiB heap, then restarted."
+  },
+  "workerBuild": {
+    "exitCode": 0,
+    "runtime": "Node 24.22.1"
+  },
+  "productionBuild": "Last earlier 1 November build is historical; no new app source change in this resumption and no fresh production build claimed.",
+  "sourceQualification": {
+    "testPinsAtCompletion": "unchanged",
+    "nextDayChange": "package.json build script gains command-local 4 GiB heap in unrelated committed performance work; other captured pins still match. Additional unpinned shared app/auth/cache changes are preserved; current browser checks and focused regressions cover their Planner integration, not blanket repo qualification."
+  },
+  "preservation": {
+    "files": 368,
+    "changed": [],
+    "scopes": [
+      "app/components/planner/student",
+      "app/planner",
+      "native",
+      "mobile"
+    ]
+  },
+  "paidCallsDuringVerification": 0,
+  "hostedMigrations": 0,
+  "nativeOrMobileBuilds": 0,
+  "realModelJourney": "NOT_SUBMITTED_AT_VERIFICATION_CLOSURE"
+}

@@ -51,6 +51,9 @@ describe("student workspace contracts and unpaid boundaries", () => {
     const policy = studentResourcePolicy(1.74);
     expect(policy.spending?.maximumMicros).toBe(1740000);
     expect(policy.roles.STRATEGIST.call.completionTokens).toBe(65536);
+    expect(policy.roles.TRANSLATOR.call.completionTokens).toBe(65536);
+    expect(policy.roles.RESEARCH.call.completionTokens).toBe(8192);
+    expect(policy.roles.REVIEWER.call.completionTokens).toBe(8192);
     expect(studentResourcePolicy().spending?.maximumMicros).toBe(1750000);
     expect(() => studentResourcePolicy(1.76)).toThrow();
     expect(() => studentResourcePolicy(1.741)).toThrow();
@@ -78,16 +81,23 @@ describe("student workspace contracts and unpaid boundaries", () => {
     expect(resources.roles.STRATEGIST.format).toBe("TEXT");
     expect(
       Object.values(resources.roles).every(
-        (r) => r.call.completionTokens === 65536
+        (r) => r.call.completionTokens === (r.effort === "DISABLED" ? 8192 : 65536)
       )
     ).toBe(true);
-    expect(resources.roles.RESEARCH.effort).toBe("LOW");
+    expect(resources.roles.RESEARCH.effort).toBe("DISABLED");
+    expect(resources.roles.STRATEGIST.effort).toBe("LOW");
     expect(resources.roles.TRANSLATOR.effort).toBe("LOW");
-    expect(resources.roles.STRATEGIST.effort).toBe("HIGH");
-    expect(resources.roles.REVIEWER.effort).toBe("HIGH");
+    expect(resources.roles.REVIEWER.effort).toBe("DISABLED");
+    const v2 = studentResourcePolicy(undefined, "student-preview-v2");
+    expect(v2.roles.RESEARCH.effort).toBe("LOW");
+    expect(v2.roles.TRANSLATOR.effort).toBe("LOW");
+    expect(v2.roles.STRATEGIST.effort).toBe("HIGH");
+    expect(v2.roles.REVIEWER.effort).toBe("HIGH");
+    expect(v2.policyId).not.toBe(resources.policyId);
     const legacy=studentResourcePolicy(undefined,"student-preview-v1");
     expect(Object.values(legacy.roles).every(r=>r.effort==="HIGH")).toBe(true);
     expect(legacy.policyId).not.toBe(resources.policyId);
+    expect(legacy.policyId).not.toBe(v2.policyId);
     expect(legacy.root).toEqual(resources.root);
     expect(resources.root.calls).toBe(48);
     expect(resources.journeyVersion).toBe(1);

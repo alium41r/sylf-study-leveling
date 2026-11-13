@@ -61,6 +61,23 @@ function completionWithSource():UnderstandingAction {
 }
 function decision(f:Fixture,digest:string,key=randomUUID()) {return {key,parentAttemptId:f.token.attemptId,expectedResearchDigest:digest,answers:[{ref:"question_assignment",text:"Explain Ohm's law using a labelled circuit."}],intents:[{planId:f.attempt.targets[0].planId,expectedIntentId:f.attempt.targets[0].requestedIntentVersionId,expectedPlanningVersion:0,baseRevisionId:null}]};}
 describe("durable compiler-v2 Research & Understanding",()=>{
+  it.each(["\n</｜｜DSML｜｜ parameter>\n</｜｜DSML｜｜ invoke>\n</｜｜DSML｜｜ calls>","\n```"])("repairs non-JSON suffixes rather than accepting a stripped interpretation: %s",async suffix=>{
+    const f=await fixture({research:false});let calls=0,repairSeen=false;
+    const rejected=JSON.stringify(complete())+suffix;
+    const s=scripted(f,[],{provider:{adapter:()=>({generateResponse:async(messages,instruction)=>{
+      calls++;const packet=JSON.parse(messages[0].content!);
+      if(packet.validationRecovery){
+        repairSeen=true;expect(packet.validationRecovery.response).toBe(rejected);
+        expect(packet.validationRecovery.validation.code).toBe("INVALID_JSON");
+      }
+      return {model:"deepseek-flash",finishReason:"STOP",text:calls===1?rejected:JSON.stringify(instruction.startsWith("Check the complete")?{supported:true,explanation:"Accepted facts and disclosed uncertainty are preserved",issues:[]}:complete()),usage:{promptTokens:100,completionTokens:100,totalTokens:200,cacheHitTokens:0}};
+    }})}});
+    expect((await s.stage.run(f.token,new AbortController().signal)).phase).toBe("COMPLETE");
+    expect(repairSeen).toBe(true);expect(calls).toBe(3);
+    const logs=(await client.query('SELECT reservation FROM "AiUsageLog" WHERE "attemptId"=$1 ORDER BY id',[f.token.attemptId])).rows;
+    expect(logs[0].reservation.result.text).toBe(rejected);expect(logs[0].reservation.accepted).toBe(false);
+    expect(logs[1].reservation.accepted).toBe(true);expect(logs[1].reservation.roleCall.key).toMatch(/_repair1$/);
+  });
   it("durably retains a PDF with undecodable NUL glyphs as partial evidence with its original byte hash",async()=>{
     const pdf=Buffer.from(pdfFixture(2).toString().replace("(Contents)","(Con\u0000ents)")),f=await fixture({pdf});
     const draft=complete();if(draft.action!=="COMPLETE")throw new Error("Completion required");

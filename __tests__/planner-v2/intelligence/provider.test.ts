@@ -28,6 +28,38 @@ function fakeMeter() {
   return { meter, events, settled, closed, late, stop: () => { stopped = true; } };
 }
 describe("shared metered provider dispatch", () => {
+  it("coalesces slow display writes across both channels and drains them before settlement",async()=>{
+    vi.useFakeTimers();
+    try{
+      const m=fakeMeter(),p=offlineResourcePolicy("a".repeat(64),"00000000-0000-4000-8000-000000000001");
+      m.meter.rolePolicy=async role=>({...p.roles[role],policyDigest:"a".repeat(64)});
+      let active=0,maximum=0;const writes:{kind:string;text:string}[]=[];
+      const write=(kind:string)=>async(_id:string,text:string)=>{
+        maximum=Math.max(maximum,++active);writes.push({kind,text});
+        await new Promise(resolve=>setTimeout(resolve,800));active--;
+      };
+      m.meter.visibleOutput=write("text");m.meter.reasoningOutput=write("reasoning");
+      const settle=m.meter.settle,close=m.meter.close;
+      m.meter.settle=async(...args)=>{expect(active).toBe(0);await settle(...args);};
+      m.meter.close=async(...args)=>{expect(active).toBe(0);await close(...args);};
+      let full="";
+      const generate=vi.fn(async(_messages,_system,_tools,options)=>{
+        for(let n=0;n<30;n++){
+          full+=`${n} `;options.onReasoningDelta(`${n} `);options.onTextDelta(`${n} `);
+          await new Promise(resolve=>setTimeout(resolve,50));
+        }
+        return {text:full,reasoningText:full,finishReason:"STOP" as const,model:"deepseek-flash",usage:{promptTokens:10,completionTokens:10,totalTokens:20,cacheHitTokens:0}};
+      });
+      const pending=dispatchMeteredProvider(m.meter,{...request(),role:{role:"STRATEGIST",key:"slow_display"},validate:r=>r.text},{adapter:()=>({generateResponse:generate})});
+      await vi.advanceTimersByTimeAsync(6000);
+      expect((await pending).value).toBe(full);
+      expect(maximum).toBe(1);expect(writes.length).toBeLessThanOrEqual(4);
+      expect(writes.filter(w=>w.kind==="text").at(-1)?.text).toBe(full);
+      expect(writes.filter(w=>w.kind==="reasoning").at(-1)?.text).toBe(full);
+      expect(generate).toHaveBeenCalledTimes(1);expect(m.settled).toHaveLength(1);
+      const count=writes.length;await vi.advanceTimersByTimeAsync(3000);expect(writes).toHaveLength(count);
+    }finally{vi.useRealTimers();}
+  });
   it("keeps one settled provider call when best-effort visible progress cannot be written",async()=>{
     const m=fakeMeter(),p=offlineResourcePolicy("a".repeat(64),"00000000-0000-4000-8000-000000000001"),visible=vi.fn().mockRejectedValue(new Error("display unavailable"));
     m.meter.rolePolicy=async role=>({...p.roles[role],policyDigest:"a".repeat(64)});m.meter.visibleOutput=visible;
@@ -58,6 +90,14 @@ describe("shared metered provider dispatch", () => {
   it("retains unknown usage and does not fabricate a settlement", async () => {
     const m = fakeMeter(); await expect(dispatchMeteredProvider(m.meter, request(), { adapter: () => ({ generateResponse: async () => ({ ...response(), usage: undefined }) }) })).rejects.toMatchObject({ detail: { code: "PROVIDER_FAILURE", stage: "BLUEPRINT" } });
     expect(m.settled).toHaveLength(0); expect(m.closed).toHaveLength(2);
+  });
+  it("settles explicit zero-token upstream HTTP status rejections at $0 instead of poisoning unknown spend", async () => {
+    const m = fakeMeter();
+    await expect(dispatchMeteredProvider(m.meter, request(), { adapter: () => ({ generateResponse: async () => {
+      throw Object.assign(new Error("HTTP 503"), { status: 503 });
+    } }) })).rejects.toMatchObject({ detail: { code: "PROVIDER_FAILURE", stage: "BLUEPRINT" } });
+    expect(m.settled).toHaveLength(2);
+    expect(m.settled[0]).toMatchObject({ usage: { inputTokens: 0, outputTokens: 0, costUsd: 0 } });
   });
   it("sends bounded deterministic schema feedback only to the existing fallback and reserves its complete input", async () => {
     const m = fakeMeter(), inputs: number[] = [], original = request(), before = structuredClone(original.messages);

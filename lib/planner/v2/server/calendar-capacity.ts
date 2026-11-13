@@ -11,7 +11,7 @@ import { SchedulingEnvelopeSchema } from "../intelligence/schemas/scheduling";
 import { AllocationFactsSchema } from "../intelligence/schemas/planning";
 import { AttemptService, loadAttempt, type LeaseToken } from "./attempts";
 import { PlannerFoundationService, loadAttemptArtifacts } from "./foundation";
-import { contextInputDigest, liveExecution, contentDigest, externalActivityAlias, mondayIndex } from "./context";
+import { contextInputDigest, liveExecution, contentDigest, externalActivityAlias, mondayIndex, hasOpenRemainingWork } from "./context";
 import { ownedDocumentMetadata } from "./documents";
 import { hash, reject, clock, rows, type Sql } from "./database";
 
@@ -34,7 +34,7 @@ function sameCapacitySources(before:CapacityResult,after:CapacityResult){
  * evidence authorizes no exact appointments, Quest edits or publication. */
 export class PlannerCalendarCapacity {
   constructor(readonly attempts: AttemptService) {}
-  private async capture(sql: Sql, attempt: PlannerAttemptV2, research: Research, now: Date, lockPlans = true): Promise<CapacityResult> {
+  private async capture(sql: Sql, attempt: PlannerAttemptV2, research: Research, now: Date, lockPlans = true, windowAsOf: Date = now): Promise<CapacityResult> {
     const run = research.value.understanding;
     const requested = attempt.targets.map((t, i) => ({ planId: t.planId, planRef: `plan_${i + 1}`, intentId: t.resolvedIntentVersionId! }));
     // The context owner chooses account-wide availability. A selected Plan may
@@ -58,11 +58,11 @@ export class PlannerCalendarCapacity {
     const taskKey = (questId: number) => { const spec = specs.get(questId); return spec && selected.has(spec.planId) ? `${selected.get(spec.planId)}/${spec.blueprintActivityId}` : `quest_${questId}`; };
     const reservations: CalendarReservation[] = [];
     for (const quest of context.quests) {
-      if (quest.status === "COMPLETED" || quest.remainingDisposition !== "OPEN") continue;
+      if (!hasOpenRemainingWork(quest)) continue;
       const spec = specs.get(quest.id), live = spec ? liveExecution(quest, context.sessions) : null;
       if (spec && selected.has(spec.planId) && live?.state === "UNSTARTED") continue;
       const minutes = live?.remainingMinutesEstimate ?? Math.max(1, Math.ceil(quest.requiredMinutes - quest.elapsedSeconds / 60));
-      if (quest.scheduledFor < window.start) { reasons.push("Overdue protected or competing work needs an explicit placement decision; it cannot disappear from future capacity."); continue; }
+      if (quest.scheduledFor < window.start) { reasons.push(`Reschedule unfinished work before planning: “${quest.title.slice(0, 200)}” (${minutes} min, due ${quest.scheduledFor}). Its remaining time still needs a place in your calendar.`); continue; }
       if (quest.scheduledFor > window.end) continue;
       const targetIntent = spec && selected.has(spec.planId) ? run.input.plans.find(p => p.planRef === selected.get(spec.planId))?.intent : null;
       if (targetIntent?.deadline.kind === "FIXED" && (quest.scheduledFor > targetIntent.deadline.date || quest.scheduledFor === targetIntent.deadline.date && !targetIntent.deadline.examDayStudyAllowed)) reasons.push("Protected work conflicts with the accepted hard deadline. An explicit constraint decision is required.");
@@ -83,12 +83,14 @@ export class PlannerCalendarCapacity {
     try {
       const read = await readPlanningCalendar(sql, attempt.ownerId, window.start, addDays(window.end, 1), context.timezone, now);
       if (read.sources.some(s => !s.complete)) { incomplete = true; reasons.push("An included external calendar is disconnected, has pending changes, or lacks fresh complete cached coverage. Sync it in Calendar before relying on capacity."); }
-      const nextMinute = Math.ceil(now.getTime() / 60000) * 60000;
+      const nextMinute = Math.ceil(windowAsOf.getTime() / 60000) * 60000;
       const days = projection.view.actuals.map(day => {
         const override = studyWindows?.overrides.find(o => o.date === day.date);
         const accepted = override?.windows ?? studyWindows?.weekly.filter(w => w.weekday === mondayIndex(day.date)) ?? [];
         const approved = accepted.flatMap(w => {
-          const start = Math.max(Date.parse(minuteISO(day.date, w.startMinute, context.timezone)), nextMinute), end = Date.parse(minuteISO(day.date, w.endMinute, context.timezone));
+          const rawStart = Date.parse(minuteISO(day.date, w.startMinute, context.timezone));
+          const start = day.date === today ? Math.max(rawStart, nextMinute) : rawStart;
+          const end = Date.parse(minuteISO(day.date, w.endMinute, context.timezone));
           return start < end ? [{ start: new Date(start).toISOString(), end: new Date(end).toISOString() }] : [];
         });
         const events = eventsOnDate(read.events, day.date, context.timezone).filter(e => e.external?.busy !== false);
@@ -97,9 +99,11 @@ export class PlannerCalendarCapacity {
           allDayBlocked: events.some(e => e.allDay), excluded: context.restDays.includes((mondayIndex(day.date) + 1) % 7) || context.floatingDates.includes(day.date) || !!availability?.restWeekdays.includes(mondayIndex(day.date)) || !!availability?.blockedDates.includes(day.date) };
       });
       if (days.some(d => d.busy.length > 1000)) throw new CalendarPlanningIncomplete("The complete Calendar range exceeds the retained interval envelope; choose a smaller range before relying on capacity.");
+      const endOfToday = TimezoneService.getStartOfLocalDateUTC(context.timezone, addDays(today, 1)).getTime();
+      const sourceFresh = read.sources.filter(s => s.complete).map(s => Date.parse(s.freshUntil));
       calendar = CalendarCapacitySchema.parse({ schemaVersion: 1, timezone: context.timezone, intentDigest: hash("capacity-accepted-availability-v1", { availability, version: context.availabilityIntentVersionId }),
-        acceptedWindowsDigest: studyWindows ? hash("accepted-study-windows-v1", studyWindows) : null, capturedAt: now.toISOString(),
-        validUntil: new Date(Math.min(now.getTime() + 5 * 60000, ...days.filter(d => d.date === today && d.approved.some(w => Date.parse(w.start) === nextMinute)).map(() => nextMinute + 1))).toISOString(),
+        acceptedWindowsDigest: studyWindows ? hash("accepted-study-windows-v1", studyWindows) : null, capturedAt: windowAsOf.toISOString(),
+        validUntil: new Date(Math.min(endOfToday, windowAsOf.getTime() + 2 * 3600000, ...sourceFresh)).toISOString(),
         policy: { tentative: "BLOCK", allDay: "BLOCK_DATE", transparent: "IGNORE", unavailable: "NEEDS_DECISION" },
         sources: read.sources.map(s => ({ ref: s.ref, versionDigest: hash("calendar-planning-source-v1", s.version), includedInPlanning: true, complete: s.complete, freshUntil: s.freshUntil })), days });
     } catch (error) {
@@ -109,7 +113,7 @@ export class PlannerCalendarCapacity {
     const currentnessDigest = hash("calendar-capacity-input-v1", { window, contextDigests, sources: calendar?.sources.map(({ ref, versionDigest, complete }) => ({ ref, versionDigest, complete })), days: calendar?.days, reservations, reasons });
     const base = { schemaVersion: 2 as const, research: artifactRef(research), previous: null, version: 1, window, currentnessDigest, contextDigests, calendar };
     if (reasons.length || !calendar || !projection.view.envelope) return CapacityResultSchema.parse({ ...base, status: incomplete ? "INCOMPLETE" : "NEEDS_DECISION", constraints: null, facts: null, allocation: null, workloadProof: null, reasons: [...new Set(reasons)] });
-    const free = usableStudyWindows(calendar, now.getTime());
+    const free = usableStudyWindows(calendar, windowAsOf.getTime());
     if (free.status !== "KNOWN") reject("STALE_CONTEXT", "Calendar capacity is not current.", "PREFLIGHT");
     const protectedExecution = projection.view.envelope.protectedExecution.map(p => {
       const quest = projection.registry.find(r => r.ref === p.activityRef), spec = quest && specs.get(quest.questId);
@@ -161,12 +165,13 @@ export class PlannerCalendarCapacity {
       if (retained.compilerVersion !== 2 || !attempt.budget.aiFirst) reject("INTENT_CONFLICT", "Calendar capacity requires admitted compiler v2 research.", "PREFLIGHT");
       const research = Object.values(retained.archive.entries).find(a => a.kind === "DOSSIER" && a.value.schemaVersion === 2) as Research | undefined;
       if (!research) reject("QUALITY_INCOMPLETE", "Complete verified research before capturing capacity.", "PREFLIGHT");
-      const value = structuredClone(frozenCapture??=await this.capture(sql, attempt, research, now));
       const capacities = Object.values(retained.archive.entries).filter(a => a.kind === "CAPACITY" && a.value.schemaVersion === 2);
       const prior = capacities.find(a => !capacities.some(next => next.kind === "CAPACITY" && next.value.schemaVersion === 2 && next.value.previous?.id === a.id));
       if (refresh && (!prior || prior.digest !== refresh.digest || prior.id !== refresh.id)) reject("STALE_CONTEXT", "Refresh must extend the exact current capacity version.", "PREFLIGHT");
+      const replayWindowAsOf = !refresh && prior?.kind === "CAPACITY" && prior.value.schemaVersion === 2 && prior.value.calendar ? new Date(prior.value.calendar.capturedAt) : now;
+      const value = structuredClone(frozenCapture??=await this.capture(sql, attempt, research, now, true, replayWindowAsOf));
       if (prior?.kind === "CAPACITY" && prior.value.schemaVersion === 2) {
-        const changed = prior.value.currentnessDigest !== value.currentnessDigest || prior.value.calendar && Date.parse(prior.value.calendar.validUntil) <= now.getTime();
+        const changed = prior.value.currentnessDigest !== value.currentnessDigest || prior.value.calendar && (Date.parse(prior.value.calendar.validUntil) <= now.getTime() || usableStudyWindows(prior.value.calendar, now.getTime()).status !== "KNOWN");
         if (!changed) return prior;
         if (!refresh) reject("STALE_CONTEXT", "Retained capacity changed or expired. Explicitly refresh it; historical capacity cannot be rebound.", "PREFLIGHT");
         const pendingEducation = await rows(sql, `SELECT id FROM "AiUsageLog" WHERE "userId"=$1 AND "attemptId"=$2 AND
@@ -222,16 +227,17 @@ export class PlannerCalendarCapacity {
   }
   /** Live check is deliberately distinct from immutable historical reading.
    * Future strategy dispatch/publication/apply must call it at their boundary. */
-  async assertCurrent(ownerId: number, attemptId: string, ref: { id: string; digest: string }) {
-    return this.attempts.db.observed(ownerId,sql=>this.assertCurrentAccepted(sql,ownerId,attemptId,ref,false));
+  async assertCurrent(ownerId: number, attemptId: string, ref: { id: string; digest: string }, asOf?: Date) {
+    return this.attempts.db.observed(ownerId,sql=>this.assertCurrentAccepted(sql,ownerId,attemptId,ref,false,asOf));
   }
-  async assertCurrentAccepted(sql:Sql,ownerId:number,attemptId:string,ref:{id:string;digest:string},lockPlans=true){
+  async assertCurrentAccepted(sql:Sql,ownerId:number,attemptId:string,ref:{id:string;digest:string},lockPlans=true,asOf?:Date){
       const retained = await loadAttemptArtifacts(sql, ownerId, attemptId), { attempt } = await loadAttempt(sql, ownerId, attemptId,lockPlans);
       if (retained.compilerVersion !== 2) reject("INVALID_OUTPUT", "Compiler v2 capacity required.", "PREFLIGHT");
       const capacity = retained.archive.entries[ref.id];
       if (capacity?.kind !== "CAPACITY" || capacity.digest !== ref.digest || capacity.value.schemaVersion !== 2) reject("REFERENCE_NOT_OWNED", "Retained capacity is unavailable.");
-      const now = await clock(sql), value = capacity.value, research = retained.archive.entries[value.research.id] as Research;
-      if (!value.calendar || value.status !== "READY" || Date.parse(value.calendar.validUntil) <= now.getTime() || (await this.capture(sql, attempt, research, now,lockPlans)).currentnessDigest !== value.currentnessDigest) reject("STALE_CONTEXT", "Calendar, learning, permissions or protected execution changed; capture a new explicitly linked operation.", "PREFLIGHT");
+      const now = asOf ?? await clock(sql), value = capacity.value, research = retained.archive.entries[value.research.id] as Research;
+      const capturedAt = value.calendar ? new Date(value.calendar.capturedAt) : now;
+      if (!value.calendar || value.status !== "READY" || Date.parse(value.calendar.validUntil) <= now.getTime() || usableStudyWindows(value.calendar, now.getTime()).status !== "KNOWN" || (await this.capture(sql, attempt, research, now, lockPlans, capturedAt)).currentnessDigest !== value.currentnessDigest) reject("STALE_CONTEXT", "Calendar, learning, permissions or protected execution changed; capture a new explicitly linked operation.", "PREFLIGHT");
       return capacity;
   }
 }

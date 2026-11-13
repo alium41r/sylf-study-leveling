@@ -1,0 +1,317 @@
+{
+  "label": "phase1",
+  "files": 1,
+  "passed": 65,
+  "failed": 4,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [
+    {
+      "name": "durable independent complete-result review corrects a settled rejected TARGET translation with exact feedback, preserving strategy and independent review",
+      "messages": [
+        "Error: TRANSLATION_TARGET_NOT_OWNED\n    at validateTranslation (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/intelligence/foundation/validation.ts:249:415)\n    at checkCorrespondence (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/intelligence/natural-learning.ts:97:3)\n    at assembleNaturalTranslation (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/intelligence/natural-learning.ts:92:85)\n    at Object.validate (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/server/natural-learning.ts:137:69)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/intelligence/provider.ts:220:37)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at NaturalLearningStage.invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/server/natural-learning.ts:136:5)\n    at NaturalLearningStage.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/server/natural-learning.ts:173:22)\n    at ReviewedLearningStage.runNatural (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/server/reviewed-learning.ts:282:16)\n    at ReviewedLearningStage.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/server/reviewed-learning.ts:449:20)"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review corrects a settled rejected JSON translation with exact feedback, preserving strategy and independent review",
+      "messages": [
+        "SyntaxError: Unexpected non-whitespace character after JSON at position 2279 (line 2 column 1)\n    at JSON.parse (<anonymous>)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/intelligence/provider.ts:219:46)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at NaturalLearningStage.invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/server/natural-learning.ts:136:5)\n    at NaturalLearningStage.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/server/natural-learning.ts:173:22)\n    at ReviewedLearningStage.runNatural (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/server/reviewed-learning.ts:282:16)\n    at ReviewedLearningStage.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/server/reviewed-learning.ts:449:20)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:54:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review corrects a settled rejected SCHEMA translation with exact feedback, preserving strategy and independent review",
+      "messages": [
+        "ZodError: [\n  {\n    \"code\": \"unrecognized_keys\",\n    \"keys\": [\n      \"extra\"\n    ],\n    \"path\": [],\n    \"message\": \"Unrecognized key: \\\"extra\\\"\"\n  }\n]\n    at assembleNaturalTranslation (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/intelligence/natural-learning.ts:69:53)\n    at Object.validate (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/server/natural-learning.ts:137:69)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/intelligence/provider.ts:220:37)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at NaturalLearningStage.invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/server/natural-learning.ts:136:5)\n    at NaturalLearningStage.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/server/natural-learning.ts:173:22)\n    at ReviewedLearningStage.runNatural (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/server/reviewed-learning.ts:282:16)\n    at ReviewedLearningStage.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/lib/planner/v2/server/reviewed-learning.ts:449:20)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:54:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review stops identical rejected translation cycles without recreating strategy or making a review claim",
+      "messages": [
+        "Error: expected Error: TRANSLATION_TARGET_NOT_OWNED to match object { Object (detail) }\n    at _Assertion.__VITEST_REJECTS__ (file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/expect/dist/index.js:1747:17)\n    at _Assertion.propertyGetter (file:///Users/aliumair/Desktop/sylf/node_modules/chai/index.js:1570:27)\n    at Reflect.get (<anonymous>)\n    at Object.proxyGetter [as get] (file:///Users/aliumair/Desktop/sylf/node_modules/chai/index.js:1659:22)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:73:57\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-eFsp1Y/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts",
+      "cases": [
+        {
+          "name": "durable independent complete-result review corrects a settled rejected TARGET translation with exact feedback, preserving strategy and independent review",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review corrects a settled rejected JSON translation with exact feedback, preserving strategy and independent review",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review corrects a settled rejected SCHEMA translation with exact feedback, preserving strategy and independent review",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review stops identical rejected translation cycles without recreating strategy or making a review claim",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review does not repair a MAX_TOKENS translator result as a complete rejected response",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review does not repair a OTHER translator result as a complete rejected response",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review does not open a translation correction when accounting usage is missing",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review retains a late complete response without usage after cancellation without changing spending uncertainty or failed history",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review fences a generic retry that drops an actual incomplete-author context before any additional paid dispatch",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back incomplete-author feedback, parent stop and automatic Research enqueue together",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review serializes SHARED_PERMISSION changes with the final planning lock and rejects their obsolete capacity",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review serializes CONNECTED_CATALOG changes with the final planning lock and rejects their obsolete capacity",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review serializes SYNC_CACHE changes with the final planning lock and rejects their obsolete capacity",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review serializes EVENT_EXCEPTION changes with the final planning lock and rejects their obsolete capacity",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review routes actual pre-review translator incompleteness to STRATEGIST and fully reviews the repaired result",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review routes actual pre-review translator incompleteness to TRANSLATOR and fully reviews the repaired result",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review supports several real pre-review correspondence corrections without a one-repair cap",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review stops an unchanged pre-review incompleteness cycle without dropping the complete strategy or inventing approval",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review delegates missing author information to actual linked Research and consequential clarification before a complete reviewed journey",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review recovers reviewed publication through actual worker claim, readiness, supervision and versioned dispatch",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review retains long natural reasoning and complete correspondence through actual reviewed publication without clipping",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review requires the actual late questions after a crash before Research handoff, rather than bypassing them through a generic retry",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review preserves every reviewed concern through an explicit stopped retry, including a crash before issue import (false)",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review preserves every reviewed concern through an explicit stopped retry, including a crash before issue import (true)",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review publishes the full ten-source verified dossier and applies a resource outside the old canonical nine-source projection",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review retains a real consequential warning in the existing confirmation acknowledgements",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review retains TRUNCATED independent response accounting without replay, approval or publication",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review retains UNKNOWN_USAGE independent response accounting without replay, approval or publication",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review retains UNKNOWN_COMPLETION independent response accounting without replay, approval or publication",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review retains INVALID_USAGE independent response accounting without replay, approval or publication",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back all selected reviewed revision writes on an interrupted joint publication and recovers without another model call",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review routes an incomplete bounded search through the existing allocator, records real code progress and independently verifies it before Apply",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review withdraws an unsupported allocation objection after an unchanged rerun without claiming code or educational repair",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review corrects translation loss through the translator and reinspects the entire exact strategy before confirmation",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review publishes and applies both reviewed targets as one exact capacity-checked proposal",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review verifies actual uploaded bytes at reviewed publication and atomic confirmation",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review carries full active intelligence and exact source provenance through an actual protected v2 replan",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rejects a Calendar commit in the snapshot/lock acquisition race at PUBLICATION",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rejects a Calendar commit in the snapshot/lock acquisition race at APPLY",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review serializes a phantom Calendar insertion after the final publication lock",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review confirms the complete reviewed journey atomically, retains exact natural history and replays without current Calendar permission",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back reviewed confirmation at the goal boundary without partial execution",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back reviewed confirmation at the quest boundary without partial execution",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back reviewed confirmation at the link boundary without partial execution",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back reviewed confirmation at the pointer boundary without partial execution",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back reviewed confirmation at the receipt boundary without partial execution",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rejects Calendar changes at publication and confirmation while preserving the approved historical result",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review keeps unreviewed education closed and rejects forged executable correspondence",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review inherits every Research-routed issue with exact provenance and verifies actual child corrections without rewriting its parent",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review preserves inherited objections across an unchanged child and requires supported withdrawal instead of a fabricated repair",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review retains late consequential questions separately from immutable Research and accepts only actual linked student answers",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review atomically stops for actual Research reinvestigation and admits one existing-lifecycle child without new permissions or spending reset",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back Research handoff, parent stop and child admission together after an enqueue crash",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review dispatches complete review and exact reviewed publication through the existing compiler",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review fences an earlier natural-learning worker before claiming or taking over a complete journey",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review runs a complete independent review to READY without publication",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review performs several substantive strategy/translation corrections and freshly reviews every named issue and the entire result",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review withdraws a false objection without changing educational content or claiming a repair",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review invalidates a completed assessment after Calendar changes and fully reallocates before a fresh complete review",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rebuilds a stale undispatched review without spending on its obsolete input",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review stops a repeated unchanged correction only after independent reconsideration, retaining the blocker",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review corrects a known complete invalid review while accounting explicitly for its rejected objection",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review never turns a no-op author response into a verified repair and requires actual withdrawal of the false objection",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review retains complete independent inputs, actual producer/finance and immutable approved assessment",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review recovers a complete saved review after a worker assembly interruption without another provider call",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rejects forged approval before an actual independently accepted complete response exists",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review persists grounded blocking issues and their actual routes without creating a cleared candidate",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back issue/review/checkpoint assembly together and preserves the settled response",
+          "status": "passed"
+        },
+        {
+          "name": "durable independent complete-result review enforces ownership, cancellation and fencing before independent dispatch",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

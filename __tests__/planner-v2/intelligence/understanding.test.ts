@@ -11,6 +11,20 @@ import { createHash } from "node:crypto";
 
 afterEach(()=>{vi.unstubAllGlobals();});
 describe("AI-first research contracts and official DeepSeek Search",()=>{
+  it("distinguishes historical objections from current requirements only in newly captured Research",()=>{
+    const input=UnderstandingRunSchema.shape.input.parse({researchProtocolVersion:1,verificationVersion:3,acceptedRequest:{},plans:[{planRef:"plan_1",intent:intentFixture()}],context:{},contextDigests:[],documents:[]});
+    const prior=understandingInstructions({input}),current=understandingInstructions({input:{...input,researchProtocolVersion:2}});
+    for(const role of ["research","verification","synthesis"] as const){
+      expect(prior[role]).not.toContain("Research revision protocol v2");
+      expect(current[role]).toContain("not permanent new student requirements");
+      expect(current[role]).toContain("Genuine unresolved scope, feasibility, priority or permission decisions must still block");
+    }
+    const v3=understandingInstructions({input:{...input,researchProtocolVersion:3}});
+    expect(v3.research).toContain("Output raw JSON only: start with '{' and end with '}'");
+    expect(v3.research).toContain("run at most ONE targeted SEARCH");
+    expect(v3.synthesis).toContain("NEVER set supported: false or consequential: true for concise summary phrasing");
+    expect(understandingInstructions({input})).toEqual(prior);
+  });
   it("pins explicit Calendar interpretation only for new research inputs, retaining historical prompt bytes",()=>{
     const input=UnderstandingRunSchema.shape.input.parse({verificationVersion:3,acceptedRequest:{},plans:[{planRef:"plan_1",intent:intentFixture()}],context:{},contextDigests:[],documents:[]});
     const historical=understandingInstructions({input}),current=understandingInstructions({input:{...input,calendarSemanticsVersion:1}});

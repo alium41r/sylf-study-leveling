@@ -1,0 +1,697 @@
+{
+  "label": "phase1",
+  "files": 1,
+  "passed": 0,
+  "failed": 68,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [
+    {
+      "name": "durable independent complete-result review corrects a settled rejected TARGET translation with exact feedback, preserving strategy and independent review",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:47:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review corrects a settled rejected JSON translation with exact feedback, preserving strategy and independent review",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:47:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review corrects a settled rejected SCHEMA translation with exact feedback, preserving strategy and independent review",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:47:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review stops identical rejected translation cycles without recreating strategy or making a review claim",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:68:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review does not repair a MAX_TOKENS translator result as a complete rejected response",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:80:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review does not repair a OTHER translator result as a complete rejected response",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:80:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review retains a late complete response without usage after cancellation without changing spending uncertainty or failed history",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:85:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review fences a generic retry that drops an actual incomplete-author context before any additional paid dispatch",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:93:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review rolls back incomplete-author feedback, parent stop and automatic Research enqueue together",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:98:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review serializes SHARED_PERMISSION changes with the final planning lock and rejects their obsolete capacity",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:104:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review serializes CONNECTED_CATALOG changes with the final planning lock and rejects their obsolete capacity",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:104:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review serializes SYNC_CACHE changes with the final planning lock and rejects their obsolete capacity",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:104:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review serializes EVENT_EXCEPTION changes with the final planning lock and rejects their obsolete capacity",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:104:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review routes actual pre-review translator incompleteness to STRATEGIST and fully reviews the repaired result",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:118:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review routes actual pre-review translator incompleteness to TRANSLATOR and fully reviews the repaired result",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:118:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review supports several real pre-review correspondence corrections without a one-repair cap",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:123:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review stops an unchanged pre-review incompleteness cycle without dropping the complete strategy or inventing approval",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:127:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review delegates missing author information to actual linked Research and consequential clarification before a complete reviewed journey",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:131:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review recovers reviewed publication through actual worker claim, readiness, supervision and versioned dispatch",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:138:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review retains long natural reasoning and complete correspondence through actual reviewed publication without clipping",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:142:41\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review requires the actual late questions after a crash before Research handoff, rather than bypassing them through a generic retry",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:145:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review preserves every reviewed concern through an explicit stopped retry, including a crash before issue import (false)",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:150:27\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review preserves every reviewed concern through an explicit stopped retry, including a crash before issue import (true)",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:150:27\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review publishes the full ten-source verified dossier and applies a resource outside the old canonical nine-source projection",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:165:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review retains a real consequential warning in the existing confirmation acknowledgements",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:170:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review retains TRUNCATED independent response accounting without replay, approval or publication",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:175:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review retains UNKNOWN_USAGE independent response accounting without replay, approval or publication",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:175:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review retains UNKNOWN_COMPLETION independent response accounting without replay, approval or publication",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:175:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review retains INVALID_USAGE independent response accounting without replay, approval or publication",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:175:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review rolls back all selected reviewed revision writes on an interrupted joint publication and recovers without another model call",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:182:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review routes an incomplete bounded search through the existing allocator, records real code progress and independently verifies it before Apply",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:188:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review withdraws an unsupported allocation objection after an unchanged rerun without claiming code or educational repair",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:197:27\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review corrects translation loss through the translator and reinspects the entire exact strategy before confirmation",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:201:27\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review publishes and applies both reviewed targets as one exact capacity-checked proposal",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:205:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review verifies actual uploaded bytes at reviewed publication and atomic confirmation",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:211:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review carries full active intelligence and exact source provenance through an actual protected v2 replan",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:219:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review rejects a Calendar commit in the snapshot/lock acquisition race at PUBLICATION",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:229:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review rejects a Calendar commit in the snapshot/lock acquisition race at APPLY",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:229:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review serializes a phantom Calendar insertion after the final publication lock",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:236:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review confirms the complete reviewed journey atomically, retains exact natural history and replays without current Calendar permission",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:241:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review rolls back reviewed confirmation at the goal boundary without partial execution",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:255:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review rolls back reviewed confirmation at the quest boundary without partial execution",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:255:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review rolls back reviewed confirmation at the link boundary without partial execution",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:255:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review rolls back reviewed confirmation at the pointer boundary without partial execution",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:255:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review rolls back reviewed confirmation at the receipt boundary without partial execution",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:255:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review rejects Calendar changes at publication and confirmation while preserving the approved historical result",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:263:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review keeps unreviewed education closed and rejects forged executable correspondence",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:277:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review inherits every Research-routed issue with exact provenance and verifies actual child corrections without rewriting its parent",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:282:152\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review preserves inherited objections across an unchanged child and requires supported withdrawal instead of a fabricated repair",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:295:162\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review retains late consequential questions separately from immutable Research and accepts only actual linked student answers",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:296:159\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review atomically stops for actual Research reinvestigation and admits one existing-lifecycle child without new permissions or spending reset",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:297:161\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review rolls back Research handoff, parent stop and child admission together after an enqueue crash",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:298:119\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review dispatches complete review and exact reviewed publication through the existing compiler",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:299:114\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review fences an earlier natural-learning worker before claiming or taking over a complete journey",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:300:118\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review runs a complete independent review to READY without publication",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:301:90\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review performs several substantive strategy/translation corrections and freshly reviews every named issue and the entire result",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:305:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review withdraws a false objection without changing educational content or claiming a repair",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:315:126\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review invalidates a completed assessment after Calendar changes and fully reallocates before a fresh complete review",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:316:170\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review rebuilds a stale undispatched review without spending on its obsolete input",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:317:102\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review stops a repeated unchanged correction only after independent reconsideration, retaining the blocker",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:318:275\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review corrects a known complete invalid review while accounting explicitly for its rejected objection",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:319:122\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review never turns a no-op author response into a verified repair and requires actual withdrawal of the false objection",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:320:288\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review retains complete independent inputs, actual producer/finance and immutable approved assessment",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:322:13\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review recovers a complete saved review after a worker assembly interruption without another provider call",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:333:126\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review rejects forged approval before an actual independently accepted complete response exists",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:334:115\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review persists grounded blocking issues and their actual routes without creating a cleared candidate",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:335:121\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review rolls back issue/review/checkpoint assembly together and preserves the settled response",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:336:114\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "durable independent complete-result review enforces ownership, cancellation and fencing before independent dispatch",
+      "messages": [
+        "Error: The model request failed.\n    at fail (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:178:74)\n    at dispatchMeteredProvider (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/intelligence/provider.ts:367:80)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at invoke (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:184:34)\n    at ResearchUnderstanding.run (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/lib/planner/v2/server/understanding.ts:279:24)\n    at reviewedFixture (/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning-fixture.ts:50:3)\n    at /private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts:337:99\n    at file:///Users/aliumair/Desktop/sylf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-51aGR1/__tests__/planner-v2/postgres/reviewed-learning.postgres.ts",
+      "cases": [
+        {
+          "name": "durable independent complete-result review corrects a settled rejected TARGET translation with exact feedback, preserving strategy and independent review",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review corrects a settled rejected JSON translation with exact feedback, preserving strategy and independent review",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review corrects a settled rejected SCHEMA translation with exact feedback, preserving strategy and independent review",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review stops identical rejected translation cycles without recreating strategy or making a review claim",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review does not repair a MAX_TOKENS translator result as a complete rejected response",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review does not repair a OTHER translator result as a complete rejected response",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review retains a late complete response without usage after cancellation without changing spending uncertainty or failed history",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review fences a generic retry that drops an actual incomplete-author context before any additional paid dispatch",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back incomplete-author feedback, parent stop and automatic Research enqueue together",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review serializes SHARED_PERMISSION changes with the final planning lock and rejects their obsolete capacity",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review serializes CONNECTED_CATALOG changes with the final planning lock and rejects their obsolete capacity",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review serializes SYNC_CACHE changes with the final planning lock and rejects their obsolete capacity",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review serializes EVENT_EXCEPTION changes with the final planning lock and rejects their obsolete capacity",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review routes actual pre-review translator incompleteness to STRATEGIST and fully reviews the repaired result",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review routes actual pre-review translator incompleteness to TRANSLATOR and fully reviews the repaired result",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review supports several real pre-review correspondence corrections without a one-repair cap",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review stops an unchanged pre-review incompleteness cycle without dropping the complete strategy or inventing approval",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review delegates missing author information to actual linked Research and consequential clarification before a complete reviewed journey",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review recovers reviewed publication through actual worker claim, readiness, supervision and versioned dispatch",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review retains long natural reasoning and complete correspondence through actual reviewed publication without clipping",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review requires the actual late questions after a crash before Research handoff, rather than bypassing them through a generic retry",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review preserves every reviewed concern through an explicit stopped retry, including a crash before issue import (false)",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review preserves every reviewed concern through an explicit stopped retry, including a crash before issue import (true)",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review publishes the full ten-source verified dossier and applies a resource outside the old canonical nine-source projection",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review retains a real consequential warning in the existing confirmation acknowledgements",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review retains TRUNCATED independent response accounting without replay, approval or publication",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review retains UNKNOWN_USAGE independent response accounting without replay, approval or publication",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review retains UNKNOWN_COMPLETION independent response accounting without replay, approval or publication",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review retains INVALID_USAGE independent response accounting without replay, approval or publication",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back all selected reviewed revision writes on an interrupted joint publication and recovers without another model call",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review routes an incomplete bounded search through the existing allocator, records real code progress and independently verifies it before Apply",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review withdraws an unsupported allocation objection after an unchanged rerun without claiming code or educational repair",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review corrects translation loss through the translator and reinspects the entire exact strategy before confirmation",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review publishes and applies both reviewed targets as one exact capacity-checked proposal",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review verifies actual uploaded bytes at reviewed publication and atomic confirmation",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review carries full active intelligence and exact source provenance through an actual protected v2 replan",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review rejects a Calendar commit in the snapshot/lock acquisition race at PUBLICATION",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review rejects a Calendar commit in the snapshot/lock acquisition race at APPLY",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review serializes a phantom Calendar insertion after the final publication lock",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review confirms the complete reviewed journey atomically, retains exact natural history and replays without current Calendar permission",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back reviewed confirmation at the goal boundary without partial execution",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back reviewed confirmation at the quest boundary without partial execution",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back reviewed confirmation at the link boundary without partial execution",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back reviewed confirmation at the pointer boundary without partial execution",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back reviewed confirmation at the receipt boundary without partial execution",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review rejects Calendar changes at publication and confirmation while preserving the approved historical result",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review keeps unreviewed education closed and rejects forged executable correspondence",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review inherits every Research-routed issue with exact provenance and verifies actual child corrections without rewriting its parent",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review preserves inherited objections across an unchanged child and requires supported withdrawal instead of a fabricated repair",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review retains late consequential questions separately from immutable Research and accepts only actual linked student answers",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review atomically stops for actual Research reinvestigation and admits one existing-lifecycle child without new permissions or spending reset",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back Research handoff, parent stop and child admission together after an enqueue crash",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review dispatches complete review and exact reviewed publication through the existing compiler",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review fences an earlier natural-learning worker before claiming or taking over a complete journey",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review runs a complete independent review to READY without publication",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review performs several substantive strategy/translation corrections and freshly reviews every named issue and the entire result",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review withdraws a false objection without changing educational content or claiming a repair",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review invalidates a completed assessment after Calendar changes and fully reallocates before a fresh complete review",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review rebuilds a stale undispatched review without spending on its obsolete input",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review stops a repeated unchanged correction only after independent reconsideration, retaining the blocker",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review corrects a known complete invalid review while accounting explicitly for its rejected objection",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review never turns a no-op author response into a verified repair and requires actual withdrawal of the false objection",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review retains complete independent inputs, actual producer/finance and immutable approved assessment",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review recovers a complete saved review after a worker assembly interruption without another provider call",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review rejects forged approval before an actual independently accepted complete response exists",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review persists grounded blocking issues and their actual routes without creating a cleared candidate",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review rolls back issue/review/checkpoint assembly together and preserves the settled response",
+          "status": "failed"
+        },
+        {
+          "name": "durable independent complete-result review enforces ownership, cancellation and fencing before independent dispatch",
+          "status": "failed"
+        }
+      ]
+    }
+  ]
+}

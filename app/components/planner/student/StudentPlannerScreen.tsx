@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowLeft, ChevronDown } from "lucide-react";
-import { SylvieIcon, SystemWarningIcon } from "@/app/components/icons";
+import { AlertCircle, ArrowLeft, ChevronDown } from "lucide-react";
 import { useAuth } from "@/app/components/AuthProvider";
+import { ImmersiveModeButton } from "@/app/components/ImmersiveModeButton";
 import type { PlannerCapabilities } from "@/lib/planner/transport";
 import { workspaceRequest } from "@/lib/planner/v2/client/transport";
 import StudentPlannerEntry from "./StudentPlannerEntry";
@@ -67,25 +67,20 @@ export default function StudentPlannerScreen({
             </button>
             <div className={s.brand}>
               <h1>Planner</h1>
-              <span className={s.badge}>Preview</span>
             </div>
             <div className={s.switcherPlaceholder} aria-hidden="true">
-              <span>Your plans</span>
+              <span>Plans</span>
               <ChevronDown size={14} />
             </div>
+            <ImmersiveModeButton
+              variant="header-pill"
+              className="hidden md:inline-flex"
+            />
           </header>
           <div className={s.gate}>
             {!current ? (
               <div className={s.gateLoading} role="status">
-                <span className={s.loadingEmblem}>
-                  <SylvieIcon size={34} />
-                </span>
-                <strong className={s.loadingTitle}>
-                  Opening Planner Studio
-                </strong>
-                <p className={s.loadingSub}>
-                  Preparing your AI planning workspace…
-                </p>
+                <strong className={s.loadingTitle}>Loading…</strong>
                 <div className={s.loadingTrack} aria-hidden="true">
                   <div className={s.loadingBar} />
                 </div>
@@ -93,7 +88,7 @@ export default function StudentPlannerScreen({
             ) : (
               <div className={s.gateError}>
                 <span className={s.gateWarningIcon}>
-                  <SystemWarningIcon size={32} />
+                  <AlertCircle size={22} />
                 </span>
                 <h2>
                   {current.error
@@ -102,7 +97,7 @@ export default function StudentPlannerScreen({
                 </h2>
                 <p role={current.error ? "alert" : undefined}>
                   {current.error ??
-                    "Your existing Planner remains available in System. The student workspace has not been enabled here."}
+                    "Use Classic Planner in System."}
                 </p>
                 <div className={s.gateActions}>
                   <button

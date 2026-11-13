@@ -42,6 +42,49 @@ async function commitment(owner:number,date:string){await client.query('INSERT I
 function observedDatabase(onQuery:(statement:string)=>Promise<void>){const observed=new PlannerDatabase(pool),coordinate=observed.coordinated.bind(observed);observed.coordinated=(owner,work)=>coordinate(owner,sql=>work({query:(async(...args:unknown[])=>{const text=typeof args[0]==="string"?args[0]:(args[0] as {text?:string})?.text??"";await onQuery(text);return Reflect.apply(sql.query,sql,args);}) as Sql["query"]}));return observed;}
 async function researchChild(f:Awaited<ReturnType<typeof reviewedFixture>>){const parent=await f.research.understanding().read(f.owner,f.token.attemptId),token=(await f.attempts.claim(`research_child_${randomUUID()}`))!;expect(token.attemptId).toBe(parent.continuationAttemptId);await f.research.understanding().run(token,reviewSignal());await new PlannerCalendarCapacity(f.attempts).run(token,reviewSignal());const allocation=await f.learning.natural().run(token,reviewSignal());return {parent,token,allocation};}
 describe("durable independent complete-result review",()=>{
+  it.each(["TARGET","JSON","SCHEMA"])("corrects a settled rejected %s translation with exact feedback, preserving strategy and independent review",async failure=>{
+    let original="";
+    const f=await fixture({expectedInitialFailure:"INVALID_OUTPUT",respond:(role,packet,index)=>{
+      if(role!=="TRANSLATOR"||index!==1)return;
+      const value=naturalProposal(packet.ownedLearning as LearningInput,packet.strategy as StrategyDocument);
+      if(failure==="TARGET")value.elements[0].targets.push({planRef:"plan_1",kind:"STRATEGY",ref:"plan_1"});
+      const broken=failure==="SCHEMA"?{...value,extra:true}:value;
+      original=JSON.stringify(broken)+(failure==="JSON"?"\n</｜｜DSML｜｜ calls>":"");return original;
+    }});
+    expect((await f.reviewed.run(f.token,reviewSignal())).value.stage).toBe("READY");
+    expect(f.calls.filter(c=>c.role==="STRATEGIST")).toHaveLength(1);
+    expect(f.calls.filter(c=>c.role==="TRANSLATOR")).toHaveLength(2);
+    expect(f.calls.filter(c=>c.role==="REVIEWER")).toHaveLength(1);
+    const packet=f.calls.filter(c=>c.role==="TRANSLATOR")[1].packet;
+    expect(packet).toMatchObject({refinement:{authorFeedback:{kind:"REJECTED",validation:{code:failure==="JSON"?"INVALID_JSON":failure==="SCHEMA"?"SCHEMA_MISMATCH":"VALIDATION_REJECTED"}}}});
+    const rows=(await client.query('SELECT "accountingState",reservation FROM "AiUsageLog" WHERE "attemptId"=$1 AND reservation->\'roleCall\'->>\'role\'=\'TRANSLATOR\' ORDER BY id',[f.token.attemptId])).rows;
+    expect(rows.map(r=>r.accountingState)).toEqual(["SETTLED","SETTLED"]);
+    expect(rows[0].reservation).toMatchObject({accepted:false,result:{text:original}});
+    expect(rows[1].reservation).toMatchObject({accepted:true,roleCall:{purpose:"REPAIR"}});
+    const changeSet=await new RevisionService(f.attempts).publishReviewed(f.token);
+    await new ApplyService(db).apply(f.owner,{attemptId:f.token.attemptId,changeSetId:changeSet.changeSetId,acknowledgements:[]});
+  },30000);
+  it("stops identical rejected translation cycles without recreating strategy or making a review claim",async()=>{
+    const f=await fixture({expectedInitialFailure:"INVALID_OUTPUT",respond:(role,packet)=>{
+      if(role!=="TRANSLATOR")return;
+      const value=naturalProposal(packet.ownedLearning as LearningInput,packet.strategy as StrategyDocument);
+      value.elements[0].targets.push({planRef:"plan_1",kind:"STRATEGY",ref:"plan_1"});return value;
+    }});
+    await expect(f.reviewed.run(f.token,reviewSignal())).rejects.toMatchObject({detail:{code:"QUALITY_INCOMPLETE"}});
+    const count=f.calls.length;
+    await expect(f.reviewed.run(f.token,reviewSignal())).rejects.toBeDefined();
+    expect(f.calls).toHaveLength(count);expect(f.calls.filter(c=>c.role==="TRANSLATOR")).toHaveLength(2);
+    expect(f.calls.filter(c=>c.role==="REVIEWER")).toHaveLength(0);
+  },30000);
+  it.each(["MAX_TOKENS","OTHER"] as const)("does not repair a %s translator result as a complete rejected response",async finishReason=>{
+    const f=await fixture({expectedInitialFailure:finishReason==="MAX_TOKENS"?"OUTPUT_TRUNCATED":"INVALID_OUTPUT",metadata:role=>role==="TRANSLATOR"?{finishReason}:{}});
+    const count=f.calls.length;await expect(f.reviewed.run(f.token,reviewSignal())).rejects.toBeDefined();expect(f.calls).toHaveLength(count);
+  },30000);
+  it("does not open a translation correction when accounting usage is missing",async()=>{
+    const f=await fixture({expectedInitialFailure:"PROVIDER_FAILURE",metadata:role=>role==="TRANSLATOR"?{usage:undefined}:{}});
+    const count=f.calls.length;await expect(f.reviewed.run(f.token,reviewSignal())).rejects.toBeDefined();expect(f.calls).toHaveLength(count);
+    expect(f.calls.filter(c=>c.role==="REVIEWER")).toHaveLength(0);
+  },30000);
   it("retains a late complete response without usage after cancellation without changing spending uncertainty or failed history",async()=>{
     let enter!:()=>void,release!:(value:unknown)=>void;const entered=new Promise<void>(r=>{enter=r;});
     const f=await fixture({intent:futureIntent(),respond:role=>{if(role!=="REVIEWER")return;enter();return new Promise(r=>{release=r;});},metadata:role=>role==="REVIEWER"?{usage:undefined}:{}});

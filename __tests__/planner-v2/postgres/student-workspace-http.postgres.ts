@@ -151,7 +151,7 @@ it.each(["direct", "research-recovery", "clarification"] as const)("runs %s stud
     generateResponse: async (messages, instruction) => {
       const packet = JSON.parse(messages[0].content!);
       let value: unknown;
-      if (instruction.startsWith("You are Sylf's Research")) {
+      if (instruction.includes("You are Sylf's Research & Understanding role.")) {
         roles.push("RESEARCH");
         const researchCalls=roles.filter(role=>role==="RESEARCH").length;
         if(scenario==="research-recovery"&&researchCalls===2)expect(packet.gaps.join(" ")).toContain("Server completion validation: unresolved gap_resource");

@@ -25,6 +25,24 @@ export interface SessionRow {
   executionContext: { timezone: string; actualCivilDate: string; toleranceUsedSeconds?: number; lastTransitionAt?: string } | null;
   transitionReceipts: Record<string, { requestHash: string; response: unknown }> | null;
 }
+/** Legacy FAILED is terminal. V2 failures can still carry explicitly OPEN work;
+ * their disposition, execution and reviewed estimate remain authoritative. */
+export function hasOpenRemainingWork(quest: Pick<QuestRow, "status" | "remainingDisposition" | "plannerSpec">): boolean {
+  return quest.status !== "COMPLETED" && quest.remainingDisposition === "OPEN" &&
+    (!!quest.plannerSpec || quest.status !== "FAILED");
+}
+export function overdueCompetingWork(context: Pick<ExecutionContext, "quests" | "sessions" | "today">, selectedIds: ReadonlySet<string>) {
+  return context.quests.flatMap(quest => {
+    if (!hasOpenRemainingWork(quest) || quest.scheduledFor >= context.today) return [];
+    const spec = quest.plannerSpec ? ExecutionTaskSpecV2Schema.parse(quest.plannerSpec) : null;
+    const live = spec ? liveExecution(quest, context.sessions) : null;
+    if (spec && selectedIds.has(spec.planId) && live?.state === "UNSTARTED") return [];
+    return [{ questId: quest.id, title: quest.title, date: quest.scheduledFor,
+      remainingMinutes: live?.remainingMinutesEstimate ?? Math.max(1, Math.ceil(quest.requiredMinutes - quest.elapsedSeconds / 60)),
+      planId: spec?.planId ?? null,
+      canReschedule: !spec && quest.elapsedSeconds === 0 && ["PENDING", "ACTIVE"].includes(quest.status) && !context.sessions.some(s => s.questId === quest.id) }];
+  });
+}
 export const specDigest = (spec: ExecutionTaskSpecV2): string => hash("execution-spec", {
   ...spec, content: JSON.parse(canonicalExecutionContent(spec)),
 });
@@ -82,7 +100,7 @@ export function relevantDependencyQuests(quests: readonly QuestRow[], sessions: 
   if (byKey.size !== parsed.size) reject("INVALID_OUTPUT", "Execution activity identity is ambiguous.", "PREFLIGHT");
   const running = new Set(sessions.filter(session => !session.endedAt).map(session => session.questId));
   const pinned = new Set(pinnedQuestIds);
-  const selected = new Map(quests.filter(quest => quest.status !== "COMPLETED" && quest.remainingDisposition === "OPEN" || running.has(quest.id) ||
+  const selected = new Map(quests.filter(quest => hasOpenRemainingWork(quest) || running.has(quest.id) ||
     activeKeys.has(parsed.get(quest.id)?.activityKey ?? "") || pinned.has(quest.id)).map(quest => [quest.id, quest]));
   if (pinnedQuestIds.some(id => !quests.some(quest => quest.id === id))) reject("REFERENCE_NOT_OWNED", "A required execution reference is unavailable.", "PREFLIGHT");
   const queue = [...selected.values()];
@@ -116,7 +134,7 @@ export async function loadExecutionContext(sql: Sql, ownerId: number, plans: rea
   const floatingDates = (await rows<{ dateKey: string }>(sql, 'SELECT "dateKey" FROM "FloatingRestDay" WHERE "userId"=$1 ORDER BY "dateKey"', [ownerId])).map(row => row.dateKey);
   const legacyExceptions: ExecutionContext["legacyExceptions"] = [];
   let requiresReestimate = false;
-  const commitments = quests.filter(quest => quest.status !== "COMPLETED").map(quest => {
+  const commitments = quests.filter(hasOpenRemainingWork).map(quest => {
     if (quest.plannerSpec) {
       const execution = liveExecution(quest, sessions);
       requiresReestimate ||= execution.requiresReestimate;
@@ -206,7 +224,7 @@ export function executionCapacityLedger(context: ExecutionContext, selectedIds: 
     if (goal) perGoal.set(`${goal}/${weekKey(date)}`, (perGoal.get(`${goal}/${weekKey(date)}`) ?? 0) + session.durationSeconds / 60);
   }
   for (const quest of context.quests) {
-    if (quest.status === "COMPLETED" || quest.remainingDisposition !== "OPEN") continue;
+    if (!hasOpenRemainingWork(quest)) continue;
     const spec = quest.plannerSpec ? ExecutionTaskSpecV2Schema.parse(quest.plannerSpec) : null;
     if (spec && selectedIds.has(spec.planId)) continue;
     const remaining = spec ? liveExecution(quest, context.sessions).remainingMinutesEstimate : Math.max(1, Math.ceil(quest.requiredMinutes - quest.elapsedSeconds / 60));
@@ -222,7 +240,7 @@ export function verifyPlacement(context: ExecutionContext, targets: readonly { p
   if (!targets.length || !context.globalAvailability) reject("CAPACITY_SHORTFALL", "Confirmation needs an accepted availability ceiling.", "APPLY");
   const global = context.globalAvailability;
   const selectedIds = new Set(targets.map(target => target.plan.id));
-  for (const quest of context.quests) if (quest.plannerSpec && liveExecution(quest, context.sessions).requiresReestimate) {
+  for (const quest of context.quests) if (hasOpenRemainingWork(quest) && quest.plannerSpec && liveExecution(quest, context.sessions).requiresReestimate) {
     const current = ExecutionTaskSpecV2Schema.parse(quest.plannerSpec);
     const replacement = targets.flatMap(target => target.specs).find(spec => spec.activityKey === current.activityKey);
     if (!selectedIds.has(current.planId) || replacement && deriveRemainingWorkV2(replacement.effort, quest.elapsedSeconds).requiresReestimate)

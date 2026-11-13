@@ -100,8 +100,8 @@ export async function readPlannerActivity(db:PlannerDatabase,ownerId:number,plan
       const partial=thinking.success&&thinking.data.callId===log.requestId?thinking.data:null;
       const raw=partial?.text??log.reasoningPreview??"",text=studentVisibleText(raw),characters=partial?.receivedCharacters??log.reasoningCharacters??0;
       return {id:log.requestId,label:callLabel(log.reservation.roleCall?.role,log.reservation.roleCall?.key,log.model),startedAt:log.createdAt.toISOString(),...(log.completed?{finishedAt:log.completed}:{}),
-        state:log.accountingState==="DISPATCHED"&&attempt.state==="RUNNING"?"WORKING" as const:log.accountingState==="SETTLED"?"RECEIVED" as const:"STOPPED" as const,
-        ...(log.reservation.roleCall?{reasoning:{text,characters,recorded:!!partial||log.reasoningPreview!==null,complete:log.finish==="STOP",clipped:characters>raw.length,redacted:text!==raw}}:{})};
+        state:["RESERVED","DISPATCHED"].includes(log.accountingState)&&attempt.state==="RUNNING"?"WORKING" as const:log.accountingState==="SETTLED"?"RECEIVED" as const:"STOPPED" as const,
+        ...(log.reservation.roleCall?{reasoning:{text,characters,recorded:(!!partial&&partial.receivedCharacters>0)||(log.reasoningPreview!==null&&(log.reasoningCharacters??0)>0),complete:log.finish==="STOP",clipped:characters>raw.length,redacted:text!==raw}}:{})};
     })};
   });
 }
@@ -111,7 +111,7 @@ export async function readPlannerActivity(db:PlannerDatabase,ownerId:number,plan
 async function liveActivityProjection(db:PlannerDatabase,ownerId:number,planId:string,attemptId:string){
   return db.observed(ownerId,async sql=>{
     const value=(await rows<{state:string;fence:number;checkpoint:string;reasoning:unknown;output:unknown}>(sql,`SELECT a.state,(a.artifact->>'fence')::int AS fence,
-      concat(a.state,':',a.artifact->>'stage',':',a.payload->'understanding'->>'step',':',a.payload->'understanding'->>'toolPending',':',a.payload->'understanding'->'pending'->>'action',':',md5(coalesce((a.payload->'providerCalls')::text,''))) AS checkpoint,
+      concat(a.state,':',a.artifact->>'stage',':',a.payload->'understanding'->>'step',':',a.payload->'understanding'->>'toolPending',':',a.payload->'understanding'->'pending'->>'action',':',md5(coalesce((a.payload->'providerCalls')::text,'')),':',(SELECT count(*) FROM jsonb_object_keys(coalesce(a."intelligenceArtifacts"->'entries','{}'::jsonb))),':',(SELECT coalesce(string_agg(concat(l.id,':',l."accountingState"),',' ORDER BY l.id),'') FROM "AiUsageLog" l WHERE l."attemptId"=a.id AND l."userId"=a."userId")) AS checkpoint,
       a.payload->'providerReasoning' AS reasoning,a.payload->'visibleOutput' AS output
       FROM "PlannerAttempt" a WHERE a.id=$1 AND a."userId"=$2 AND EXISTS(SELECT 1 FROM "PlannerPlan" p WHERE p.id=$3::uuid AND p."userId"=$2)
       AND EXISTS(SELECT 1 FROM jsonb_array_elements(a.artifact->'targets') t WHERE t->>'planId'=$3::text)`,[attemptId,ownerId,planId]))[0];
@@ -140,12 +140,13 @@ export async function streamPlannerActivity(db:PlannerDatabase,ownerId:number,pl
               snapshot=await readPlannerActivity(db,ownerId,planId,attemptId);checkpoint=live.checkpoint;send("activity",snapshot);
             }
             const reasoning=VisibleOutputSchema.safeParse(live.reasoning),output=VisibleOutputSchema.safeParse(live.output);
+            const outputStillWriting=output.success&&live.state==="RUNNING"&&output.data.fence===live.fence&&!snapshot.calls.some(call=>call.id===output.data.callId&&call.state!=="WORKING");
             const preview={attemptId,
               ...(reasoning.success&&live.state==="RUNNING"&&reasoning.data.fence===live.fence?{reasoning:{callId:reasoning.data.callId,text:studentVisibleText(reasoning.data.text),characters:reasoning.data.receivedCharacters,recorded:true,complete:false,clipped:reasoning.data.receivedCharacters>reasoning.data.text.length,redacted:true}}:{}),
-              ...(output.success&&live.state==="RUNNING"&&output.data.fence===live.fence?{output:{text:studentVisibleText(output.data.text),receivedCharacters:output.data.receivedCharacters,clipped:output.data.receivedCharacters>output.data.text.length,updatedAt:output.data.updatedAt,state:"WRITING"}}:{})};
+              ...(outputStillWriting?{output:{text:studentVisibleText(output.data.text),receivedCharacters:output.data.receivedCharacters,clipped:output.data.receivedCharacters>output.data.text.length,updatedAt:output.data.updatedAt,state:"WRITING"}}:{})};
             const serialized=JSON.stringify(preview);if(serialized!==lastPreview){send("preview",preview);lastPreview=serialized;}
             if(!["RUNNING","QUEUED"].includes(live.state)){send("done",{});break;}
-            await new Promise<void>(resolve=>{const done=()=>{clearTimeout(timer);stop.signal.removeEventListener("abort",done);resolve();};const timer=setTimeout(done,400);stop.signal.addEventListener("abort",done,{once:true});if(stop.signal.aborted)done();});
+            await new Promise<void>(resolve=>{const done=()=>{clearTimeout(timer);stop.signal.removeEventListener("abort",done);resolve();};const timer=setTimeout(done,350);stop.signal.addEventListener("abort",done,{once:true});if(stop.signal.aborted)done();});
           }
         }catch{send("unavailable",{});}
         finally{signal.removeEventListener("abort",cancel);try{controller.close();}catch{/* Consumer cancellation already closed the body. */}}

@@ -4,7 +4,7 @@ import { naturalProposal, naturalText } from "./natural-learning-fixture";
 import { id, revisionFixture } from "../contracts/fixtures";
 import { LearningInputSchema } from "@/lib/planner/v2/intelligence/schemas/natural-learning";
 import { strategyDocument } from "@/lib/planner/v2/intelligence/foundation/validation";
-import { assembleNaturalTranslation, naturalRoleInput, naturalRoleInputV1, learningRoleCall } from "@/lib/planner/v2/intelligence/natural-learning";
+import { assembleNaturalTranslation, naturalRoleInput, naturalRoleInputV1, learningRoleCall, translationContract } from "@/lib/planner/v2/intelligence/natural-learning";
 import { allocateLearning } from "@/lib/planner/v2/intelligence/allocator";
 import { hash } from "@/lib/planner/v2/server/database";
 import { learningEnvelope } from "@/lib/planner/v2/server/learning";
@@ -18,6 +18,15 @@ function fixture() {
   return { ...f, input, strategy, response, artifact };
 }
 describe("natural authoring and faithful canonical translation", () => {
+  it("supplies the literal strategy and decisions references and correspondence enums enforced by canonical correspondence",()=>{
+    const f=fixture(),correspondence=translationContract(f.input).correspondence,refs=correspondence.targetRefs;
+    expect(correspondence.meaning).toContain("INSTRUCTION");
+    expect(correspondence.disposition).toEqual(["EXECUTION","RETAINED_GUIDANCE","GAP"]);
+    for(const kind of ["STRATEGY","DECISIONS"] as const)f.response.elements[0].targets.push({planRef:"physics",kind,ref:refs[kind]});
+    expect(()=>assembleNaturalTranslation(f.response,f.input,f.strategy,f.envelope)).not.toThrow();
+    f.response.elements[0].targets.at(-1)!.ref="physics";
+    expect(()=>assembleNaturalTranslation(f.response,f.input,f.strategy,f.envelope)).toThrow("TRANSLATION_TARGET_NOT_OWNED");
+  });
   it("retains arbitrary natural organization, whitespace and Unicode without claiming a model identity", () => { const f = fixture(); expect(f.strategy.text).toBe(naturalText); expect(f.strategy.producer.effectiveModel).toBeNull(); for (const a of f.strategy.anchors) expect(a.textDigest).toBe(hash("strategy-span-v1", naturalText.slice(a.start, a.end))); });
   it("binds the entire research, source and uncertainty input without a nine-source projection", () => { const f = fixture(), research = { sources: Array.from({ length: 20 }, (_, i) => ({ text: `Full source ${i}`, uncertainty: `Uncertainty ${i}` })), acceptedInstructions: "  Exact instruction\n" }, input = naturalRoleInput(research, { verified: true }, f.envelope, f.input, f.strategy), call = learningRoleCall("TRANSLATOR", "translation_key", "Faithfully translate", input, 65536); expect(JSON.parse(call.messages[0].content)).toEqual(input); expect(call.binding.inputDigest).toBe(hash("role-input-v1", { messages: call.messages, systemInstruction: call.systemInstruction, outputTokens: 65536 })); expect(JSON.parse(call.messages[0].content).research.sources).toHaveLength(20); });
   it("pins exact historical instructions and schema inventory instead of rebuilding them from current authoring defaults",()=>{const f=fixture(),oldContract={inventory:"the complete original field inventory"},input=naturalRoleInputV1({}, {}, f.envelope, f.input, f.strategy,oldContract),call=learningRoleCall("TRANSLATOR","historical_key","Original instruction\n  ",input,65536);expect(call.binding).toMatchObject({protocolVersion:1,systemInstruction:"Original instruction\n  ",responseContract:oldContract});const reconstructed=naturalRoleInputV1({}, {}, f.envelope,f.input,f.strategy,call.binding.responseContract!);expect(learningRoleCall("TRANSLATOR","historical_key",call.binding.systemInstruction,reconstructed,call.binding.outputCap).binding).toEqual(call.binding);});

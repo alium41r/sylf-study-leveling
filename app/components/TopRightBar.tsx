@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import { useSettings } from "./SettingsContext";
@@ -9,6 +9,7 @@ import { ImmersiveModeButton } from "./ImmersiveModeButton";
 import { StreakFlameIcon } from "@/app/components/icons";
 
 const INLINE_HEADER_PREFIXES = [
+  "/planner",
   "/system",
   "/social",
   "/shop",
@@ -26,20 +27,25 @@ export default function TopRightBar() {
   const { isOpen: isSettingsModalOpen } = useSettings();
   const [justExtendedStreak, setJustExtendedStreak] = useState(false);
   const [testAnimation, setTestAnimation] = useState(false);
-  const [prevStreak, setPrevStreak] = useState<number | null>(null);
+  const prevStreakRef = useRef<number | null>(null);
   const [isPixelStudioView, setIsPixelStudioView] = useState(false);
   const pathname = usePathname();
+  const userStreakDays = user?.streakDays ?? null;
 
   // Check for streak extension animation
   useEffect(() => {
-    if (user && prevStreak !== null && user.streakDays > prevStreak) {
-      setJustExtendedStreak(true);
-      setTimeout(() => setJustExtendedStreak(false), 3000);
+    if (userStreakDays === null) return;
+    const prev = prevStreakRef.current;
+    prevStreakRef.current = userStreakDays;
+    if (prev !== null && userStreakDays > prev) {
+      const startTimer = setTimeout(() => setJustExtendedStreak(true), 0);
+      const endTimer = setTimeout(() => setJustExtendedStreak(false), 3000);
+      return () => {
+        clearTimeout(startTimer);
+        clearTimeout(endTimer);
+      };
     }
-    if (user) {
-      setPrevStreak(user.streakDays);
-    }
-  }, [user?.streakDays]);
+  }, [userStreakDays]);
 
   useEffect(() => {
     if (typeof document === "undefined") return;

@@ -1,0 +1,127 @@
+{
+  "status": "IN_PROGRESS",
+  "updatedAt": "2026-11-03T01:29:18Z",
+  "live": {
+    "latestAttempt": "14713bf6-26a0-415f-9307-63f6df06b773",
+    "outcome": "INVALID_OUTPUT: trailing DSML tags; strict admission and tolerant recovery mismatch",
+    "paidRootEstimateUsd": 0.043087596,
+    "reconciledAggregateEstimateUsd": 0.620733536,
+    "unknownCosts": 0,
+    "nextMaximumUsd": 1.12,
+    "realEndToEndSuccess": false,
+    "responses": [
+      {
+        "id": 360,
+        "key": "understand_14713bf626a0415f930763f6df06b773_0",
+        "accepted": "true",
+        "state": "SETTLED",
+        "characters": 4513,
+        "hash": "af114de1dd448c0793c1b3ebbafd03c97cf8371dd84187a8982d4dbb1c6557c4",
+        "strictJson": true
+      },
+      {
+        "id": 362,
+        "key": "synthesis_14713bf626a0415f930763f6df06b773_0",
+        "accepted": "true",
+        "state": "SETTLED",
+        "characters": 1122,
+        "hash": "d735d907a61a2204506c717bbc94d4a694f76db1d1a397cd1f576071c0fa71b8",
+        "strictJson": true
+      },
+      {
+        "id": 364,
+        "key": "understand_14713bf626a0415f930763f6df06b773_1",
+        "accepted": "false",
+        "state": "SETTLED",
+        "characters": 5828,
+        "hash": "bddc8f9571e5cec76d2744d263b261665c657092a7b4409617ed31c5ef668f20",
+        "strictJson": true
+      },
+      {
+        "id": 366,
+        "key": "understand_14713bf626a0415f930763f6df06b773_1_repair1",
+        "accepted": "true",
+        "state": "SETTLED",
+        "characters": 6448,
+        "hash": "d599a3c63f4c6d6a08ff5ac3cfdb6b3e06d3c7bb94d4d6b3d17cd0012e6bb08f",
+        "strictJson": true
+      },
+      {
+        "id": 368,
+        "key": "verify_14713bf626a0415f930763f6df06b773_1_0",
+        "accepted": "true",
+        "state": "SETTLED",
+        "characters": 1251,
+        "hash": "6fc0fad475f4dd55c11085e3d0b25e8d0a49997568d8df1752c17026cff987c2",
+        "strictJson": true
+      },
+      {
+        "id": 370,
+        "key": "synthesis_14713bf626a0415f930763f6df06b773_1",
+        "accepted": "true",
+        "state": "SETTLED",
+        "characters": 1360,
+        "hash": "7891ae9c0df7973e9c06195f2e8cfa62e9b2f22bb6624181fa77c57564ca19c8",
+        "strictJson": true
+      },
+      {
+        "id": 372,
+        "key": "understand_14713bf626a0415f930763f6df06b773_2",
+        "accepted": "true",
+        "state": "SETTLED",
+        "characters": 619,
+        "hash": "22217e3cb70532634a24c95f93351a5dbed4bc5e7e903e0fb791c3f7a142ec3b",
+        "strictJson": true
+      },
+      {
+        "id": 374,
+        "accepted": null,
+        "state": "SETTLED",
+        "hash": null,
+        "strictJson": false
+      },
+      {
+        "id": 375,
+        "key": "understand_14713bf626a0415f930763f6df06b773_3",
+        "accepted": "false",
+        "state": "SETTLED",
+        "characters": 8514,
+        "hash": "e9a91f720e1542d47a954250f1cea19f169a31e199547eccb58bba3507ae95d9",
+        "strictJson": false
+      }
+    ]
+  },
+  "checks": {
+    "preFixFullPostgres": {
+      "v2": 424,
+      "legacy": 225,
+      "requiredSkips": 0
+    },
+    "previewPostgres": {
+      "v2": 26,
+      "legacy": 225
+    },
+    "capacityPostgres": {
+      "v2": 31,
+      "legacy": 225
+    },
+    "latestUnits": {
+      "passed": 520,
+      "files": 48
+    },
+    "latestFullWorkflowPostgres": "RUNNING",
+    "webBuild": "RUNNING"
+  },
+  "scope": {
+    "nativeWorkChanged": false,
+    "paidSubmission": "Latest user explicitly authorized autonomous final submission; ordinary UI submitted at 2026-11-02T18:29:41Z",
+    "manualTaskChange": {
+      "questId": 2605,
+      "from": "2026-10-30",
+      "to": "2026-11-03",
+      "statusUnchanged": "PENDING",
+      "minutesUnchanged": 30
+    },
+    "planApplied": false
+  }
+}

@@ -1,5 +1,5 @@
 /** Small shared SSE reader. Handles split UTF-8/codepoints and network frames. */
-export async function readEventStream(response: Response, onEvent: (event: string, data: string) => void, signal?: AbortSignal): Promise<void> {
+export async function readEventStream(response: Response, onEvent: (event: string, data: string) => void, signal?: AbortSignal, idleTimeoutMs?: number): Promise<void> {
   if (!response.body) throw new Error("Response stream unavailable");
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
@@ -9,7 +9,20 @@ export async function readEventStream(response: Response, onEvent: (event: strin
   try {
     while (true) {
       signal?.throwIfAborted();
-      const { value, done } = await reader.read();
+      let idleTimer: ReturnType<typeof setTimeout> | undefined;
+      const { value, done } = await (idleTimeoutMs && idleTimeoutMs > 0
+        ? Promise.race([
+            reader.read(),
+            new Promise<never>((_resolve, reject) => {
+              idleTimer = setTimeout(() => {
+                cancel();
+                reject(new Error("Response stream stalled"));
+              }, idleTimeoutMs);
+            }),
+          ]).finally(() => {
+            if (idleTimer) clearTimeout(idleTimer);
+          })
+        : reader.read());
       signal?.throwIfAborted();
       buffer += decoder.decode(value, { stream: !done });
       buffer = buffer.replace(/\r\n/g, "\n");

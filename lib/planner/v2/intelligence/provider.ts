@@ -112,6 +112,10 @@ export function validationFeedback(error: unknown, rejectedText: string) {
     })), omittedIssues: Math.max(0, error.issues.length - 8) };
   }
   if (error instanceof JsonExtractionError || error instanceof SyntaxError) return { code: "INVALID_JSON", delimiter: delimiterFailure(rejectedText) };
+  if (error instanceof Error && error.message === "TRANSLATION_TARGET_NOT_OWNED") return {
+    code: "VALIDATION_REJECTED", constraint: "CORRESPONDENCE_TARGET_MUST_EXIST_IN_SELECTED_PLAN",
+    targetRefs: { ACTIVITY: "activity.localId", SCOPE: "scope.scopeRef", PHASE: "phase.localId", DECISIONS: "decisions", STRATEGY: "strategy" },
+  };
   // These exact messages are server-owned constants, never interpolated facts.
   // Unknown semantic errors still reveal no diagnostic text or rejected values.
   if (error instanceof DurablePlannerError) {
@@ -238,33 +242,48 @@ export async function dispatchMeteredProvider<T>(meter: ProviderMeter, request: 
     let poll: ReturnType<typeof setInterval> | undefined; let abandoned = false;
     let upstream: Promise<LLMResponse> | undefined; let abortListener: (() => void) | undefined;
     let finishReason: LLMResponse["finishReason"];
-    let preview="",receivedCharacters=0,lastPreviewAt=0,previewWrite:Promise<void>|undefined;
+    let preview="",receivedCharacters=0,reasoningPreview="",reasoningCharacters=0;
     const canPreview=role?.format==="TEXT"&&request.role?.role==="STRATEGIST"&&!!meter.visibleOutput;
-    const flushPreview=async()=>{
-      if(!canPreview||!callId||!receivedCharacters)return;
-      if(previewWrite)await previewWrite;
-      lastPreviewAt=Date.now();
-      previewWrite=meter.visibleOutput!(callId,preview,receivedCharacters).catch(()=>{});
-      await previewWrite;previewWrite=undefined;
+    const canReason=!!role&&route.provider==="deepseek"&&!!meter.reasoningOutput;
+    let previewDirty=false,reasoningDirty=false,previewStopped=false;
+    let previewWrite:Promise<void>|undefined,previewTimer:ReturnType<typeof setTimeout>|undefined;
+    // Both display channels share one writer. Waiting callers must reuse its
+    // promise, not each start another transaction after the same write finishes.
+    // A slow database coalesces intervening deltas instead of building a queue.
+    const flushPreview=():Promise<void>=>{
+      if(previewWrite)return previewWrite;
+      if(!callId||!previewDirty&&!reasoningDirty)return Promise.resolve();
+      const id=callId,content=previewDirty?{text:preview,received:receivedCharacters}:null;
+      const reasoning=reasoningDirty?{text:reasoningPreview,received:reasoningCharacters}:null;
+      previewDirty=false;reasoningDirty=false;
+      previewWrite=(async()=>{
+        if(content)await meter.visibleOutput!(id,content.text,content.received).catch(()=>{});
+        if(reasoning)await meter.reasoningOutput!(id,reasoning.text,reasoning.received).catch(()=>{});
+      })().finally(()=>{
+        previewWrite=undefined;
+        if(!previewStopped&&(previewDirty||reasoningDirty))schedulePreview();
+      });
+      return previewWrite;
+    };
+    const schedulePreview=()=>{
+      if(previewStopped||previewWrite||previewTimer)return;
+      previewTimer=setTimeout(()=>{previewTimer=undefined;void flushPreview();},180);
+    };
+    const stopPreview=async()=>{
+      previewStopped=true;
+      if(previewTimer){clearTimeout(previewTimer);previewTimer=undefined;}
+      await previewWrite;
     };
     const onTextDelta=canPreview?(delta:string)=>{
+      if(previewStopped)return;
       receivedCharacters+=delta.length;
       if(preview.length<VISIBLE_OUTPUT_CHARACTERS)preview=(preview+delta).slice(0,VISIBLE_OUTPUT_CHARACTERS);
-      // Presentation cannot fail, cancel or retry the authoritative provider
-      // operation. One bounded write at a time; no synthetic thinking events.
-      if(!previewWrite&&Date.now()-lastPreviewAt>=350)void flushPreview();
+      previewDirty=true;schedulePreview();
     }:undefined;
-    let reasoningPreview="",reasoningCharacters=0,lastReasoningAt=0,reasoningWrite:Promise<void>|undefined,reasoningTimer:ReturnType<typeof setTimeout>|undefined;
-    const canReason=!!role&&route.provider==="deepseek"&&!!meter.reasoningOutput;
-    const flushReasoning=async()=>{
-      if(!canReason||!callId||!reasoningCharacters)return;
-      if(reasoningWrite)await reasoningWrite;lastReasoningAt=Date.now();
-      reasoningWrite=meter.reasoningOutput!(callId,reasoningPreview,reasoningCharacters).catch(()=>{});await reasoningWrite;reasoningWrite=undefined;
-    };
     const onReasoningDelta=canReason?(delta:string)=>{
+      if(previewStopped)return;
       reasoningCharacters+=delta.length;if(reasoningPreview.length<VISIBLE_OUTPUT_CHARACTERS)reasoningPreview=(reasoningPreview+delta).slice(0,VISIBLE_OUTPUT_CHARACTERS);
-      if(!reasoningWrite&&Date.now()-lastReasoningAt>=350)void flushReasoning();
-      else if(!reasoningTimer)reasoningTimer=setTimeout(()=>{reasoningTimer=undefined;void flushReasoning();},350);
+      reasoningDirty=true;schedulePreview();
     }:undefined;
     try {
       if (controller.signal.aborted) throw cancelled();
@@ -306,6 +325,9 @@ export async function dispatchMeteredProvider<T>(meter: ProviderMeter, request: 
         }
       }).catch(() => {});
       const response = await Promise.race([upstream, aborted]);
+      // Finish the one in-flight display write before authoritative settlement.
+      // No timer may compete with saving/accepting the actual paid response.
+      await stopPreview();
       finishReason = response.finishReason;
       if (response.usage) {
         let usage:ProviderUsage;
@@ -333,22 +355,40 @@ export async function dispatchMeteredProvider<T>(meter: ProviderMeter, request: 
       }
       if (controller.signal.aborted) throw controller.signal.reason;
       await meter.close(callId, { finishReason: response.finishReason, accepted: true });
-      if(canPreview){preview=(response.text??"").slice(0,VISIBLE_OUTPUT_CHARACTERS);receivedCharacters=(response.text??"").length;await flushPreview();}
-      if(canReason&&response.reasoningText!==undefined){reasoningPreview=response.reasoningText.slice(0,VISIBLE_OUTPUT_CHARACTERS);reasoningCharacters=response.reasoningText.length;await flushReasoning();}
+      if(canPreview){preview=(response.text??"").slice(0,VISIBLE_OUTPUT_CHARACTERS);receivedCharacters=(response.text??"").length;previewDirty=receivedCharacters>0;}
+      if(canReason&&response.reasoningText!==undefined){reasoningPreview=response.reasoningText.slice(0,VISIBLE_OUTPUT_CHARACTERS);reasoningCharacters=response.reasoningText.length;reasoningDirty=reasoningCharacters>0;}
+      await flushPreview();
       return { value, provider: route.provider, model: route.model, callId, attempts, ...(role ? { metadata: { effectiveModel: response.model ?? null, fingerprint: response.fingerprint ?? null, reasoningTokens: response.usage?.reasoningTokens ?? null, finishReason: response.finishReason } } : {}) };
     } catch (error) {
       abandoned = true;
+      await stopPreview();
       // Error text/raw reasoning can contain private prompts or provider keys.
       // Persist and return only stable Planner error codes.
       lastError = error instanceof DurablePlannerError ? error : Object.assign(fail("PROVIDER_FAILURE", "The model request failed."), { cause: error });
       if (callId) {
         attempts[attempts.length - 1].code = lastError.detail.code;
+        if (
+          error &&
+          typeof error === "object" &&
+          "status" in error &&
+          typeof (error as { status?: unknown }).status === "number"
+        ) {
+          await meter
+            .settle(callId, {
+              inputTokens: 0,
+              outputTokens: 0,
+              costUsd: 0,
+              cacheHitTokens: 0,
+              effectiveModel: route.model,
+            })
+            .catch(() => {});
+        }
         await meter.close(callId, { finishReason, errorCode: lastError.detail.code }).catch(() => {});
       }
       controller.abort(lastError);
       if (!["PROVIDER_FAILURE", "PROVIDER_TIMEOUT", "OUTPUT_TRUNCATED", "INVALID_OUTPUT"].includes(lastError.detail.code)) throw lastError;
     } finally {
-      if (timer) clearTimeout(timer); if (poll) clearInterval(poll);if(reasoningTimer)clearTimeout(reasoningTimer);if(reasoningWrite)await reasoningWrite;
+      if (timer) clearTimeout(timer); if (poll) clearInterval(poll);await stopPreview();
       if (abortListener) controller.signal.removeEventListener("abort", abortListener);
       request.signal?.removeEventListener("abort", onAbort);
     }

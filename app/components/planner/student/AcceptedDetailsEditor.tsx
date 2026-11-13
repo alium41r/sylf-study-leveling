@@ -6,10 +6,12 @@ import {
 } from "@/lib/planner/v2/contracts";
 import { WEEKDAYS } from "@/lib/planner/v2/client/workspace";
 import s from "./StudentPlannerWorkspace.module.css";
+
 const minute = (time: string) =>
   Number(time.slice(0, 2)) * 60 + Number(time.slice(3));
 const time = (value: number) =>
   `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
+
 /** Edits the accepted contract; no inferred facts, new evidence or authority. */
 export default function AcceptedDetailsEditor({
   intent,
@@ -27,14 +29,13 @@ export default function AcceptedDetailsEditor({
   const availability = draft.availability;
   return (
     <form
+      className={s.editorForm}
       onSubmit={(e) => {
         e.preventDefault();
         setError(null);
         const parsed = CanonicalIntentV2Schema.safeParse(draft);
         if (!parsed.success) {
-          setError(
-            "Check your availability, deadline and goal details. Each study window must end after it starts."
-          );
+          setError("Check goal, deadline, and window times.");
           return;
         }
         void onSave(parsed.data).catch((e) => setError(e.message));
@@ -50,7 +51,7 @@ export default function AcceptedDetailsEditor({
         />
       </label>
       <label>
-        Accepted goal
+        Goal
         <textarea
           required
           rows={3}
@@ -61,7 +62,7 @@ export default function AcceptedDetailsEditor({
       </label>
       <div className={s.columns}>
         <label>
-          Planning approach
+          Type
           <select
             value={draft.policy}
             onChange={(e) =>
@@ -72,10 +73,10 @@ export default function AcceptedDetailsEditor({
               })
             }
           >
-            <option value="GENERAL">General learning / school mock</option>
-            <option value="EXAM">Official external exam</option>
+            <option value="GENERAL">General / mock</option>
+            <option value="EXAM">Official exam</option>
             <option value="MASTERY">Mastery</option>
-            <option value="ROADMAP">Learning roadmap</option>
+            <option value="ROADMAP">Roadmap</option>
           </select>
         </label>
         <label>
@@ -100,44 +101,37 @@ export default function AcceptedDetailsEditor({
       </div>
       {draft.policy === "EXAM" && (
         <fieldset className={s.exam}>
-          <legend>Official assessment identity</legend>
-          <p className={s.muted}>
-            Enter what you know. Research must verify the governing issuer and
-            applicability; these entries are student claims.
-          </p>
-          {(
-            [
-              ["institution", "Issuer / exam board"],
-              ["qualification", "Qualification"],
-              ["syllabusCode", "Syllabus code"],
-              ["component", "Component"],
-              ["examinationCycle", "Examination cycle"],
-            ] as const
-          ).map(([field, title]) => (
-            <label key={field}>
-              {title}
-              <input
-                maxLength={120}
-                value={draft.assessment?.[field] ?? ""}
-                onChange={(e) => {
-                  const next = { ...draft.assessment };
-                  if (e.target.value) next[field] = e.target.value;
-                  else delete next[field];
-                  setDraft({ ...draft, assessment: next });
-                }}
-              />
-            </label>
-          ))}
+          <legend>Exam details</legend>
+          <div className={s.columns}>
+            {(
+              [
+                ["institution", "Exam board"],
+                ["qualification", "Qualification"],
+                ["syllabusCode", "Syllabus code"],
+                ["component", "Component / paper"],
+                ["examinationCycle", "Exam series"],
+              ] as const
+            ).map(([field, title]) => (
+              <label key={field}>
+                {title}
+                <input
+                  maxLength={120}
+                  value={draft.assessment?.[field] ?? ""}
+                  onChange={(e) => {
+                    const next = { ...draft.assessment };
+                    if (e.target.value) next[field] = e.target.value;
+                    else delete next[field];
+                    setDraft({ ...draft, assessment: next });
+                  }}
+                />
+              </label>
+            ))}
+          </div>
         </fieldset>
       )}
       {availability && (
         <>
-          <h4>Study availability · {availability.timezone}</h4>
-          <p className={s.muted}>
-            Your Calendar and account rest days also apply. Existing date
-            overrides and additional windows stay retained unless you remove
-            them.
-          </p>
+          <h4>Availability · {availability.timezone}</h4>
           {WEEKDAYS.map((day, weekday) => {
             const windows =
                 availability.studyWindows?.weekly.filter(
@@ -167,7 +161,7 @@ export default function AcceptedDetailsEditor({
                   {day}
                 </label>
                 <label>
-                  Daily limit
+                  Min / day
                   <input
                     aria-label={`${day} daily limit`}
                     type="number"
@@ -243,20 +237,20 @@ export default function AcceptedDetailsEditor({
                           overrides: availability.studyWindows?.overrides ?? [],
                           weekly: [
                             ...(availability.studyWindows?.weekly ?? []),
-                            { weekday, startMinute: 1020, endMinute: 1140 },
+                            { weekday, startMinute: 480, endMinute: 1320 },
                           ],
                         },
                       },
                     })
                   }
                 >
-                  Add window
+                  + Window
                 </button>
               </div>
             );
           })}
           <label>
-            Recovery margin (%)
+            Buffer (%)
             <input
               type="number"
               min={0}
@@ -285,7 +279,7 @@ export default function AcceptedDetailsEditor({
           Cancel
         </button>
         <button type="submit" className={s.primary} disabled={busy}>
-          Accept these details
+          Save details
         </button>
       </div>
     </form>

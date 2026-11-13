@@ -1,5 +1,9 @@
 # Planner documentation
 
+[**Current resumption handoff — 1 November 2026**](SESSION_HANDOFF_2026-11-01.md) transfers the complete upgrade status, user complaints/priorities, Research/streaming fixes and preservation constraints. The [2 November resumption update](reports/2026-10-30-research-efficiency/README.md#verification) closes its missing full PostgreSQL gate with 649 passes; real-model workflow success remains a separate milestone.
+
+[**Latest continuation — 3 November**](reports/2026-11-02-workflow-ui/README.md) records the preview persistence correction, exact DeepSeek JSON-recovery diagnosis, overdue-task recovery and simpler frontend. Autonomous live verification continues under reconciled existing spending authority; Research has handed off to Strategy. Scripted passing checks remain distinct from a successful real-model journey.
+
 Reports are task history, including files named `FINAL` or `ARCHITECTURE`. Most were untracked when organized on 2 October 2026, so Git cannot establish their chronology. The sequences below follow explicit phase labels and reconciliation statements in their contents; file timestamps are supporting evidence only.
 
 ## Planner V2 target

@@ -1,0 +1,140 @@
+{
+  "label": "phase1",
+  "files": 1,
+  "passed": 31,
+  "failed": 0,
+  "requiredSkipped": 0,
+  "optionalProviderExcluded": 0,
+  "failures": [],
+  "suites": [
+    {
+      "name": "/private/var/folders/05/2l2gdhhs1cqbzfd589rph11c0000gn/T/sylf-planner-ai-first-XtCAO9/__tests__/planner-v2/postgres/calendar-capacity.postgres.ts",
+      "cases": [
+        {
+          "name": "durable calendar-aware compiler-v2 capacity does not block planning on terminal legacy failures or withdrawn unresolved work",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity names genuinely overdue work and projects only owned safe rescheduling choices",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity retains exact full research correspondence, finite freshness and immutable replay without provider calls",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity rejects foreign ownership and fabricated references",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity retains missing accepted windows as a consequential decision rather than unlimited capacity",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity accepts windows only through explicit linked student intent continuation preserving root/deadline",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity unions overlapping native commitments without double-counting minute budget",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity honors all-day blocks, rest days, blocked dates and accepted date overrides",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity uses native recurrence and sparse cancellation/moved overrides from Calendar",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity reports stale cached sources as incomplete without writing sync windows or spending",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity blocks invisible planning calendars and ignores explicitly transparent events",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity excludes opted-out disconnected calendars while detecting their later inclusion",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity does not trust cached free time while provider mutations remain unresolved",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity invalidates changed Calendar content and preserves the immutable historical snapshot",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity reads only active shared membership and rejects subsequent revocation",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity detects indivisible competing work even when scattered free minutes equal its duration",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity keeps actuals and remaining commitments as concurrent bounds charged once",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity proves accepted workload ceiling shortages independently of empty Calendar gaps",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity serializes concurrent captures without creating parallel capacity histories",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity preserves cancellation, stale fences, processing deadlines and zero execution writes",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity retains running selected work once and invalidates capacity when Focus changes",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity replaces selected unstarted work without charging or deleting historical execution",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity rolls back both artifacts if bound-dossier assembly crashes and recovers without losing research",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity fences a Step 3 worker while retaining its research-specific older-worker guard",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity refreshes Calendar-only changes with immutable ancestry and no research/provider replay",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity charges actual accepted study on its session date separately from only the remaining competing work",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity rejects a Calendar write committed during capture before advancing and retains its historical evidence",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity never rebinds a reserved/dispatched educational call during refresh (dispatched=false)",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity never rebinds a reserved/dispatched educational call during refresh (dispatched=true)",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity rejects forged research lineage and capacity ancestry without retaining partial writes",
+          "status": "passed"
+        },
+        {
+          "name": "durable calendar-aware compiler-v2 capacity uses the Research context's account-wide timezone when a selected Plan retains older availability",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

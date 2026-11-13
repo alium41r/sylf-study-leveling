@@ -49,7 +49,7 @@ function projectContext(context: ExecutionContext, targets: readonly ContextTarg
         own.some(s => s.executionState === "PAUSED") ? "PAUSED" : q.elapsedSeconds > 0 || own.length > 0 || q.status === "IN_PROGRESS" ? "ENDED_INCOMPLETE" : "UNSTARTED";
       return { ref: byQuest.get(q.id)!, planRef: null, source: "LEGACY_EXECUTION" as const,
         title: q.title, instructions: q.description, state, protected: state !== "UNSTARTED" || q.executionVersion > 0, actualSeconds: q.elapsedSeconds,
-        remainingMinutes: q.remainingDisposition === "OPEN" ? Number.isSafeInteger(q.requiredMinutes) && q.requiredMinutes > 0 ? Math.max(1, Math.ceil(q.requiredMinutes - q.elapsedSeconds / 60)) : null : 0,
+        remainingMinutes: q.status !== "FAILED" && q.status !== "COMPLETED" && q.remainingDisposition === "OPEN" ? Number.isSafeInteger(q.requiredMinutes) && q.requiredMinutes > 0 ? Math.max(1, Math.ceil(q.requiredMinutes - q.elapsedSeconds / 60)) : null : 0,
         date: q.scheduledFor, remainingDisposition: q.remainingDisposition, executionVersion: q.executionVersion };
     }
     const live = liveExecution(q, context.sessions);

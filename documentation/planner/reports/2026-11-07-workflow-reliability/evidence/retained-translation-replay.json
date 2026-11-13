@@ -1,0 +1,20 @@
+{
+  "attemptId": "4880077a-acac-4cd1-8819-ac4f3441892c",
+  "callId": "ed5f8d4f-0803-41b3-8d74-d51814b154b1",
+  "accepted": false,
+  "accountingState": "SETTLED",
+  "characters": 25459,
+  "responseDigest": "403db108807bdcf7618cae1635a5add762996c8988cec6c44ca2c5b95c17f629",
+  "feedback": {
+    "code": "VALIDATION_REJECTED",
+    "constraint": "CORRESPONDENCE_TARGET_MUST_EXIST_IN_SELECTED_PLAN",
+    "targetRefs": {
+      "ACTIVITY": "activity.localId",
+      "SCOPE": "scope.scopeRef",
+      "PHASE": "phase.localId",
+      "DECISIONS": "decisions",
+      "STRATEGY": "strategy"
+    }
+  },
+  "offlineReplay": true
+}

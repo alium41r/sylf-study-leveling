@@ -1,0 +1,254 @@
+{
+  "at": "2026-11-07T02:21:13.342Z",
+  "queue": [],
+  "plans": [
+    {
+      "id": "9670dd78-9c61-496f-ab6f-ee0d73a8c269",
+      "title": "LUMS Integration Bee preparation",
+      "state": "DRAFT",
+      "createdAt": "2026-11-03 01:50:39.837"
+    },
+    {
+      "id": "8c7f21ac-68b3-4ed7-8f88-1ff45cfd17ed",
+      "title": "further maths mechanics",
+      "state": "DRAFT",
+      "createdAt": "2026-10-30 05:16:24.639"
+    },
+    {
+      "id": "873e178a-3c60-46f9-b1ff-7a90878c58e8",
+      "title": "LUMS integration bee",
+      "state": "DRAFT",
+      "createdAt": "2026-10-30 03:10:27.898"
+    },
+    {
+      "id": "b22dc180-2e09-4e93-a397-87e6820e15f6",
+      "title": "integration bee",
+      "state": "DRAFT",
+      "createdAt": "2026-10-29 07:28:37.727"
+    }
+  ],
+  "attempts": [
+    {
+      "id": "4880077a-acac-4cd1-8819-ac4f3441892c",
+      "state": "FAILED",
+      "createdAt": "2026-11-03 01:40:42.17",
+      "failure": {
+        "code": "INVALID_OUTPUT",
+        "dates": [],
+        "stage": "BLUEPRINT",
+        "message": "The provider result failed structured validation.",
+        "traceId": "f70a92df-87ed-4337-918f-afd87c34b8e2",
+        "fieldRefs": [],
+        "resumable": false,
+        "retryable": false,
+        "activityRefs": [],
+        "schemaVersion": 2,
+        "recoveryAction": "NONE"
+      },
+      "root": "18881c95-2e18-57b0-aaec-b89b03f79a0e"
+    },
+    {
+      "id": "14713bf6-26a0-415f-9307-63f6df06b773",
+      "state": "FAILED",
+      "createdAt": "2026-11-02 18:29:41.975",
+      "failure": {
+        "code": "INVALID_OUTPUT",
+        "dates": [],
+        "stage": "RESEARCH",
+        "message": "The structured role response is not complete JSON.",
+        "traceId": "280ad4f6-e68e-4093-ab3c-ff4ec87e2fbf",
+        "fieldRefs": [],
+        "resumable": false,
+        "retryable": false,
+        "activityRefs": [],
+        "schemaVersion": 2,
+        "recoveryAction": "NONE"
+      },
+      "root": "ce6900f8-d0a3-5aca-a09f-fbcd8727fd21"
+    },
+    {
+      "id": "83d1a945-1bcf-4828-97ba-5c3b96b12f4a",
+      "state": "CANCELLED",
+      "createdAt": "2026-11-02 10:32:42.925",
+      "failure": null,
+      "root": "bfdafaf1-aa54-509f-a5aa-76641761cd85"
+    },
+    {
+      "id": "40036537-a6cb-4ad0-9284-237c8cde839c",
+      "state": "FAILED",
+      "createdAt": "2026-11-02 03:58:43.226",
+      "failure": {
+        "code": "PROVIDER_FAILURE",
+        "dates": [],
+        "stage": "RESEARCH",
+        "message": "The model request failed.",
+        "traceId": "9e441d7e-69af-4ff3-8274-e95cbd2327da",
+        "fieldRefs": [],
+        "resumable": true,
+        "retryable": true,
+        "activityRefs": [],
+        "schemaVersion": 2,
+        "recoveryAction": "RETRY_STAGE"
+      },
+      "root": "1964c6a6-f1fb-5ffb-aa75-fb574298750f"
+    },
+    {
+      "id": "be1c03d4-4852-43b4-9a6f-b8ef1ca06715",
+      "state": "FAILED",
+      "createdAt": "2026-10-30 03:18:09.433",
+      "failure": {
+        "code": "INVALID_OUTPUT",
+        "dates": [],
+        "stage": "RESEARCH",
+        "message": "The provider result failed structured validation.",
+        "traceId": "234eb1a8-39f8-4e1b-aaac-bf6fb0fc1a37",
+        "fieldRefs": [],
+        "resumable": false,
+        "retryable": false,
+        "activityRefs": [],
+        "schemaVersion": 2,
+        "recoveryAction": "NONE"
+      },
+      "root": "e5fd7027-de34-52b4-ad08-e6c013292edd"
+    }
+  ],
+  "roots": [
+    {
+      "rootRequestId": "de90beac-cd26-4c46-aa12-c9e63152e914",
+      "feature": "chat",
+      "accountingState": "SETTLED",
+      "calls": 1,
+      "cost": 0.000569,
+      "unknown": 0,
+      "input": "1858",
+      "completion": "10",
+      "reasoning": null
+    },
+    {
+      "rootRequestId": "82dbdbb3-2a48-5638-afb9-68dfb6da2ff4",
+      "feature": "planner",
+      "accountingState": "SETTLED",
+      "calls": 2,
+      "cost": 0.001938012,
+      "unknown": 0,
+      "input": "5761",
+      "completion": "457",
+      "reasoning": "405"
+    },
+    {
+      "rootRequestId": "4234b385-5300-593c-a61b-a6ebb0f7f792",
+      "feature": "planner",
+      "accountingState": "SETTLED",
+      "calls": 20,
+      "cost": 0.138074988,
+      "unknown": 0,
+      "input": "148889",
+      "completion": "82580",
+      "reasoning": "73999"
+    },
+    {
+      "rootRequestId": "c7873844-929e-54eb-a008-93c77c567f9f",
+      "feature": "planner",
+      "accountingState": "SETTLED",
+      "calls": 1,
+      "cost": 0.002290812,
+      "unknown": 0,
+      "input": "5745",
+      "completion": "755",
+      "reasoning": "711"
+    },
+    {
+      "rootRequestId": "eed3599f-4b2d-5fc9-a549-68767c9d01c1",
+      "feature": "planner",
+      "accountingState": "SETTLED",
+      "calls": 39,
+      "cost": 0.338698884,
+      "unknown": 0,
+      "input": "405231",
+      "completion": "190927",
+      "reasoning": "173826"
+    },
+    {
+      "rootRequestId": "e5fd7027-de34-52b4-ad08-e6c013292edd",
+      "feature": "planner",
+      "accountingState": "SETTLED",
+      "calls": 17,
+      "cost": 0.081774804,
+      "unknown": 0,
+      "input": "146795",
+      "completion": "38290",
+      "reasoning": "27195"
+    },
+    {
+      "rootRequestId": "1964c6a6-f1fb-5ffb-aa75-fb574298750f",
+      "feature": "planner",
+      "accountingState": "SETTLED",
+      "calls": 1,
+      "cost": 0.0029295,
+      "unknown": 0,
+      "input": "7297",
+      "completion": "617",
+      "reasoning": "486"
+    },
+    {
+      "rootRequestId": "bfdafaf1-aa54-509f-a5aa-76641761cd85",
+      "feature": "planner",
+      "accountingState": "SETTLED",
+      "calls": 3,
+      "cost": 0.01136994,
+      "unknown": 0,
+      "input": "18163",
+      "completion": "5875",
+      "reasoning": "4676"
+    },
+    {
+      "rootRequestId": "ce6900f8-d0a3-5aca-a09f-fbcd8727fd21",
+      "feature": "planner",
+      "accountingState": "SETTLED",
+      "calls": 9,
+      "cost": 0.043087596,
+      "unknown": 0,
+      "input": "59597",
+      "completion": "24208",
+      "reasoning": "17581"
+    },
+    {
+      "rootRequestId": "18881c95-2e18-57b0-aaec-b89b03f79a0e",
+      "feature": "planner",
+      "accountingState": "SETTLED",
+      "calls": 4,
+      "cost": 0.070864368,
+      "unknown": 0,
+      "input": "50088",
+      "completion": "46563",
+      "reasoning": "35364"
+    },
+    {
+      "rootRequestId": "ac39ac8a-e60f-43f3-ba71-2af40644581f",
+      "feature": "chat",
+      "accountingState": "SETTLED",
+      "calls": 1,
+      "cost": 0.00056,
+      "unknown": 0,
+      "input": "1832",
+      "completion": "9",
+      "reasoning": null
+    },
+    {
+      "rootRequestId": "84d37e50-9a70-4678-9c02-8bf29a2fe3af",
+      "feature": "chat",
+      "accountingState": "SETTLED",
+      "calls": 1,
+      "cost": 8.5e-05,
+      "unknown": 0,
+      "input": "1853",
+      "completion": "15",
+      "reasoning": null
+    }
+  ],
+  "total": 0.692242904,
+  "configured": {
+    "worker": true,
+    "healthPort": "8082"
+  }
+}

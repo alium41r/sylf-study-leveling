@@ -7,10 +7,14 @@ import "@/app/globals.css";
 const params = new URLSearchParams(location.search),
   scenario = params.get("state") ?? "READY",
   mode =
-    scenario === "empty"
+    scenario === "CAPACITY" ? "CLARIFY" : scenario === "empty"
       ? "READY"
       : (scenario as Parameters<typeof studentFixture>[0]);
 let view = studentFixture(mode);
+if (scenario === "CAPACITY") {
+  view.research!.questions = [];
+  view.capacityDecision = { today: "2026-11-03", overdue: [{ questId: 7, title: "Maths practice", date: "2026-10-30", remainingMinutes: 30, planId: null, canReschedule: true }] };
+}
 if(params.get("live")==="writing"&&view.draft)view.draft.stage="STRATEGY";
 let created=false;
 applyAppearance({
@@ -24,6 +28,10 @@ window.fetch = async (input, init) => {
   const path = String(input),
     body = typeof init?.body === "string" ? JSON.parse(init.body) : null;
   requests.push({ path, action: body?.action ?? null });
+  if (scenario === "CAPACITY" && path === "/api/quests/7" && init?.method === "PATCH") {
+    view.capacityDecision = { today: "2026-11-03", overdue: [], overdueResolved: true };
+    return Response.json({ scheduledFor: body.scheduledFor });
+  }
   if (!path.startsWith("/api/planner"))
     return Response.json(
       { error: { code: "QA_NETWORK_DISABLED" } },

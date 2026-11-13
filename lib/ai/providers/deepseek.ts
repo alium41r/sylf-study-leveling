@@ -230,7 +230,11 @@ export class DeepSeekAdapter implements LLMAdapter {
       payload.temperature = options.temperature;
     }
 
-    payload.max_tokens = options?.maxTokens ?? 16384;
+    const requestedMaxTokens = options?.maxTokens ?? 16384;
+    payload.max_tokens =
+      options?.thinking === "disabled"
+        ? Math.min(requestedMaxTokens, 8192)
+        : requestedMaxTokens;
 
     if (options?.thinking) {
       payload.thinking = { type: options.thinking };
@@ -239,43 +243,130 @@ export class DeepSeekAdapter implements LLMAdapter {
 
     const doRequest = async (reqPayload: Record<string, any>): Promise<any> => observeAiDispatch("deepseek", targetModel, async () => {
       const endpoint = `${this.baseURL}/chat/completions`;
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`,
-        },
-        body: JSON.stringify(reqPayload),
-        signal: aiSignal(options?.signal),
-      });
+      const transientDelaysMs = [700, 1500, 3000];
+      const waitBeforeRetry = (waitMs: number) =>
+        new Promise<void>((resolve, reject) => {
+          const sig = aiSignal(options?.signal);
+          if (sig.aborted) {
+            reject(sig.reason ?? new DOMException("Aborted", "AbortError"));
+            return;
+          }
+          const onAbort = () => {
+            clearTimeout(timer);
+            reject(sig.reason ?? new DOMException("Aborted", "AbortError"));
+          };
+          const timer = setTimeout(() => {
+            sig.removeEventListener("abort", onAbort);
+            resolve();
+          }, waitMs);
+          sig.addEventListener("abort", onAbort, { once: true });
+        });
 
-      if (!response.ok) {
-        let errorBody = "";
+      let response!: Response;
+      for (let attempt = 0; attempt <= transientDelaysMs.length; attempt++) {
         try {
-          errorBody = await response.text();
-        } catch {
-          // ignore
+          let connectTimer: ReturnType<typeof setTimeout> | undefined;
+          const fetchPromise = fetch(endpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${this.apiKey}`,
+            },
+            body: JSON.stringify(reqPayload),
+            signal: aiSignal(options?.signal),
+          });
+          response = reqPayload.stream
+            ? await Promise.race([
+                fetchPromise,
+                new Promise<never>((_resolve, reject) => {
+                  connectTimer = setTimeout(
+                    () => reject(new Error("Response stream stalled")),
+                    35_000
+                  );
+                }),
+              ]).finally(() => {
+                if (connectTimer) clearTimeout(connectTimer);
+              })
+            : await fetchPromise;
+        } catch (err) {
+          const sig = aiSignal(options?.signal);
+          if (
+            !sig.aborted &&
+            attempt < transientDelaysMs.length &&
+            err instanceof Error &&
+            err.message === "Response stream stalled"
+          ) {
+            await waitBeforeRetry(transientDelaysMs[attempt]);
+            continue;
+          }
+          throw err;
         }
 
-        const statusCode = response.status;
-        let errorCode = "api_error";
-        if (statusCode === 401) errorCode = "unauthorized";
-        else if (statusCode === 429) errorCode = "rate_limit";
-        else if (statusCode >= 500) errorCode = "server_error";
+        if (!response.ok) {
+          if (
+            attempt < transientDelaysMs.length &&
+            [429, 500, 502, 503, 504].includes(response.status)
+          ) {
+            try {
+              await response.text();
+            } catch {
+              // drain transient error body before retry
+            }
+            await waitBeforeRetry(transientDelaysMs[attempt]);
+            continue;
+          }
+          let errorBody = "";
+          try {
+            errorBody = await response.text();
+          } catch {
+            // ignore
+          }
 
-        const err = new LLMProviderError(
-          "deepseek",
-          `DeepSeek API responded with HTTP ${statusCode}`,
-          errorBody,
-          errorCode
-        ) as LLMProviderError & { status: number };
-        err.status = statusCode;
-        throw err;
+          const statusCode = response.status;
+          let errorCode = "api_error";
+          if (statusCode === 401) errorCode = "unauthorized";
+          else if (statusCode === 429) errorCode = "rate_limit";
+          else if (statusCode >= 500) errorCode = "server_error";
+
+          const err = new LLMProviderError(
+            "deepseek",
+            `DeepSeek API responded with HTTP ${statusCode}`,
+            errorBody,
+            errorCode
+          ) as LLMProviderError & { status: number };
+          err.status = statusCode;
+          throw err;
+        }
+
+        try {
+          return reqPayload.stream &&
+            (options?.onTextDelta || options?.onReasoningDelta)
+            ? await collectHttpTextStream(
+                response,
+                options.onTextDelta ?? (() => {}),
+                aiSignal(options.signal),
+                options.onReasoningDelta,
+                30_000
+              )
+            : await response.json();
+        } catch (streamErr) {
+          const sig = aiSignal(options?.signal);
+          const msg =
+            streamErr instanceof Error ? streamErr.message : String(streamErr);
+          if (
+            !sig.aborted &&
+            attempt < transientDelaysMs.length &&
+            (msg === "Response stream stalled" ||
+              msg === "Response stream interrupted" ||
+              msg === "Provider stream interrupted")
+          ) {
+            await waitBeforeRetry(transientDelaysMs[attempt]);
+            continue;
+          }
+          throw streamErr;
+        }
       }
-
-      return payload.stream && (options?.onTextDelta||options?.onReasoningDelta)
-        ? collectHttpTextStream(response, options.onTextDelta??(()=>{}), aiSignal(options.signal),options.onReasoningDelta)
-        : response.json();
+      throw new Error("Unreachable DeepSeek dispatch state");
     }, data => ({ model: data.model, usage: openAIUsage(data.usage), finishReason: data.choices?.[0]?.finish_reason }), options?.telemetry !== false, { stage: options?.telemetryStage, retryIndex: options?.retryIndex });
 
     try {

@@ -5,7 +5,7 @@ import s from "./StudentPlannerWorkspace.module.css";
 export const PLANNER_STAGES = [
   "Research",
   "Strategy",
-  "Translation",
+  "Activities",
   "Schedule",
   "Review",
   "Ready",
@@ -39,12 +39,12 @@ export default function StageRail({
           >
             <span className={s.node}>
               {i < index || (tone === "good" && i === index) ? (
-                <Check size={14} strokeWidth={3} />
+                <Check size={11} strokeWidth={2.75} />
               ) : (
                 i + 1
               )}
             </span>
-            {stage}
+            <span>{stage}</span>
           </li>
         ))}
       </ol>

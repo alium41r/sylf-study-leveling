@@ -1,6 +1,6 @@
 # Student Planner workspace
 
-Updated 30 October 2026. Original Phase 3 now exposes the implemented AI-first journey for manual inspection. Formal Phase C educational qualification is **deferred by the user**, not passed. Scripted tests establish mechanics, not real-model educational quality. The [implementation report](reports/2026-10-29-student-workspace/README.md) records verification and limitations.
+Updated 2 November 2026. Original Phase 3 now exposes the implemented AI-first journey for manual inspection. Formal Phase C educational qualification is **deferred by the user**, not passed. Scripted tests establish mechanics, not real-model educational quality. The [implementation report](reports/2026-10-29-student-workspace/README.md) and [latest continuation](reports/2026-11-02-workflow-ui/README.md) record verification and limitations.
 
 ## Entry and activation
 
@@ -67,8 +67,7 @@ is extended by a read or a failed renewal.
 The explicit `student-preview-v2` policy uses the existing DeepSeek Flash role routing with LOW reasoning for Research (including verification/OCR) and translation, and HIGH for strategy and independent review. Its generation/context allowances and downstream reserves are unchanged. Historical `student-preview-v1` admissions and linked continuations retain their immutable HIGH policies; a new profile never silently changes an admitted root. Strategy output is TEXT; Research, translation and review use JSON. Each call permits 65,536 completion tokens and 500,000 input units. One root permits up to 48 calls, 3,000,000 input units and 700,000 completion tokens within four hours, with translation/review holdbacks and finite research-tool limits. These are safeguards, not requested output lengths, expected usage, a dollar quote or new financial entitlement. Existing quota/account authorization and truthful ledger accounting still apply.
 
 New preview requests additionally bind an explicit dollar ceiling to the immutable
-resource policy: at most $1.75, with a lower amount selectable under **Resource
-safeguards**. The existing root ledger accounts for settled costs, concurrent
+resource policy: at most $1.75, with a lower amount selectable in the always-visible **Maximum AI spend (USD)** control. Technical settings remain under **AI settings & limits**. The existing root ledger accounts for settled costs, concurrent
 reserved model calls and research. A complete call must fit its conservative
 price quote before dispatch; the system does not shorten its reasoning/output
 allowance to squeeze it into the remaining money. Unknown costs or dispatches
@@ -132,6 +131,14 @@ identified honestly, and older requests without retained reasoning cannot be
 backfilled. Reasoning tokens remain a subset of completion usage, not a second
 charge. No new scheduler, agent engine, table or migration was introduced.
 
+Both preview channels share a single coalescing writer. Slow saves accumulate the
+latest received text instead of overlapping display transactions; scheduled
+previews stop and the in-flight write drains before authoritative settlement and
+closure. Completed activity and reasoning collapse by default, while active
+reasoning stays expanded. Students can open retained details or keep a manual
+disclosure choice. The progress rail calls translation **Activities**; all six
+backend stages and separate confirmation remain unchanged.
+
 
 ## Focused Research protocol
 
@@ -154,3 +161,10 @@ searches so a new rationale cannot hide the previous operation's result.
 Historical captures without this marker preserve their original prompt packets.
 
 See the [30 October efficiency/streaming report](reports/2026-10-30-research-efficiency/README.md).
+
+
+### 3 November recovery correction
+
+New Research captures pin protocol 2. Prior validator/reviewer objections are historical feedback to independently reassess against the current proposal, not permanent additional student constraints. Older prompt packets remain unchanged. Research uses the same strict whole-response JSON parsing as role admission, including its bounded correction check; rejected suffixes are never silently stripped or accepted. Exact paid responses and receipts remain retained.
+
+Capacity excludes terminal FAILED legacy quests and withdrawn work, while V2 FAILED/OPEN work and actual study time remain counted. The stopped workspace names owned overdue tasks and offers a new-date control only for unstarted manual work through the existing Quest API. Started/linked work uses its existing review flow. New-request UI explicitly closes waiting work before fresh authorization; it does not reset a financial root or grant a new deadline to a continuation. Reserved calls remain visibly active; only actual READ actions count as reads. See the [current reliability report](reports/2026-11-02-workflow-ui/README.md).

@@ -67,7 +67,9 @@ export function verify(input: SolveInput, result: SolveResult): Verification {
       // A sitting longer than the limit (a full paper) may take a day, alone.
       const solo = ofSubject.filter((b) => soloOf(items.get(b.item)!));
       if (solo.length) {
-        if (ofSubject.some((b) => b.item !== solo[0].item)) failures.push({ code: "DAILY_CAP", block: null, item: solo[0].item, detail: `${dayLabel(date)} puts other work of one ${group.startsWith("g:") ? "plan" : "subject"} beside a sitting longer than its cap of ${c.minutes}.` });
+        // Work the student placed beside a full paper themselves stays where they put it; only the plan's own placements are held to this.
+        const beside = ofSubject.filter((b) => b.item !== solo[0].item);
+        if (beside.length && [...beside, ...solo].some((b) => !fixedIds.has(b.id))) failures.push({ code: "DAILY_CAP", block: null, item: solo[0].item, detail: `${dayLabel(date)} puts other work of one ${group.startsWith("g:") ? "plan" : "subject"} beside a sitting longer than its cap of ${c.minutes}.` });
         continue;
       }
       const placedSubject = ofSubject.filter((b) => !fixedIds.has(b.id)).reduce((s, b) => s + blockMinutes(b), 0);

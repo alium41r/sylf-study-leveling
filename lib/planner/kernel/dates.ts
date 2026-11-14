@@ -54,3 +54,20 @@ export const floor5 = (minutes: number) => Math.max(0, Math.floor(minutes / 5) *
 
 /** Monday of the week containing `date`. */
 export const weekStart = (date: string) => addDays(date, -((weekdayOf(date) + 6) % 7));
+
+/**
+ * Where a session the student moves lands. Their placement wins over every rule of the plan (daily and subject caps, rest days, study hours,
+ * commitments, other sessions, topic order): only the clock bounds it, so a time already past moves to the next five minutes from now, and a session
+ * never runs past midnight (with no room left today, it goes to the same time tomorrow). The device and the server both use this.
+ */
+export function studentLanding(date: string, start: number, length: number, today: string, nowMinute: number): { date: string; start: number } {
+  const span = Math.min(Math.max(5, length), 1440);
+  const clamp = (minute: number) => Math.max(0, Math.min(1440 - span, Math.round(minute / 5) * 5));
+  let day = isDateKey(date) && date >= today ? date : today;
+  let at = clamp(start);
+  if (day === today) {
+    at = Math.max(at, Math.ceil(nowMinute / 5) * 5);
+    if (at + span > 1440) { day = addDays(today, 1); at = clamp(start); }
+  }
+  return { date: day, start: at };
+}

@@ -149,13 +149,18 @@ function separateSolo(alloc: Allocation, demands: Demand[], capacity: { cap: num
     for (const [day, m] of days) { used[day] += m; if (group) groupUse.set(`${group}|${day}`, (groupUse.get(`${group}|${day}`) ?? 0) + m); }
   }
   const soloDay = new Map<string, string>();
+  // A day already holding fixed work of the group (a session the student placed) cannot be cleared, so a sitting allocated there moves instead.
+  const onFixed: [string, Demand, string, number][] = [];
   for (const [key, days] of alloc.days) {
     const d = byKey.get(key);
     if (!d || !soloOf(d.item)) continue;
     const group = groupOf(d.item)!;
-    for (const day of [...days.keys()].sort((a, b) => a - b)) if (!soloDay.has(`${group}|${day}`)) soloDay.set(`${group}|${day}`, key);
+    for (const day of [...days.keys()].sort((a, b) => a - b)) {
+      if ((fixedSubject.get(`${group}|${day}`) ?? 0) > 0) { onFixed.push([key, d, group, day]); continue; }
+      if (!soloDay.has(`${group}|${day}`)) soloDay.set(`${group}|${day}`, key);
+    }
   }
-  if (!soloDay.size) return;
+  if (!soloDay.size && !onFixed.length) return;
   const move = (key: string, d: Demand, group: string, day: number, minutes: number, solo: boolean) => {
     const days = alloc.days.get(key)!;
     const limit = caps.get(group)!;
@@ -167,6 +172,7 @@ function separateSolo(alloc: Allocation, demands: Demand[], capacity: { cap: num
     days.set(target, (days.get(target) ?? 0) + minutes); used[target] += minutes; groupUse.set(`${group}|${target}`, (groupUse.get(`${group}|${target}`) ?? 0) + minutes);
     if (solo) soloDay.set(`${group}|${target}`, key);
   };
+  for (const [key, d, group, day] of onFixed) { const days = alloc.days.get(key); if (days?.has(day)) move(key, d, group, day, days.get(day)!, true); }
   for (const [slot, owner] of [...soloDay]) {
     const [group, dayText] = [slot.slice(0, slot.lastIndexOf("|")), slot.slice(slot.lastIndexOf("|") + 1)];
     const day = Number(dayText);
@@ -683,6 +689,17 @@ function keepValidBlocks(ctx: Ctx, blocks: readonly Block[], itemByKey: Map<stri
   const subjectUse = new Map<string, number>();
   const released = new Set<string>();
   const freeOf = new Map<string, [number, number][]>();
+  // What is fixed on a day (a session the student placed, one under way) counts against its cap group first: it leaves less room for the plan's
+  // own sessions, and a fixed full paper keeps its day to itself. The student's placement never moves; the plan's sessions make way.
+  for (const block of fixed) {
+    if (block.state === "missed" || block.state === "skipped" || block.state === "done" || block.date < snapshot.today) continue;
+    const item = itemByKey.get(block.item);
+    const group = item ? groupOf(item) : null;
+    if (!item || !group) continue;
+    const key = `${group}|${block.date}`;
+    subjectUse.set(key, (subjectUse.get(key) ?? 0) + blockMinutes(block));
+    if (soloOf(item)) soloKept.add(key);
+  }
   for (const block of candidates) {
     const item = itemByKey.get(block.item);
     const goal = item?.goal ? ctx.goals.get(item.goal) ?? null : null;

@@ -53,6 +53,9 @@ export function useStudio() {
   const [busy, setBusy] = useState<string | null>(null);
   const [activity, setActivity] = useState<Activity | null>(null);
   const [preview, setPreview] = useState<LocalPreview | null>(null);
+  // Sessions the student has dropped, shown where they landed at once while the server commits them in order.
+  const [moving, setMoving] = useState<Record<string, { date: string; start: number }>>({});
+  const moveQueue = useRef<Promise<void>>(Promise.resolve());
   const keys = useRef(new Map<string, string>());
   const alive = useRef(true);
   const stream = useRef<AbortController | null>(null);
@@ -208,12 +211,45 @@ export function useStudio() {
     const diff = planning.diffPlans({ model: state.model, blocks: state.blocks }, { model: state.model, blocks: result.blocks }, state.snapshot.today);
     const day = state.snapshot.days.find((d) => d.date === date);
     const clash = day?.busy.find((b) => start < b.end && start + length > b.start);
-    const next: LocalPreview = { kind: "move", label: clash ? `Overlaps ${clash.title}` : `Move to ${planning.dayLabel(date)} ${planning.clockLabel(start)}`, blocks: result.blocks, diff, result, pass: verification.pass && !clash, ms: Math.round(now() - t0), move: { block, date, start } };
+    // The student's placement wins: an overlap is said, never refused.
+    const next: LocalPreview = { kind: "move", label: `Move to ${planning.dayLabel(date)} ${planning.clockLabel(start)}${clash ? `, over ${clash.title}` : ""}`, blocks: result.blocks, diff, result, pass: verification.pass, ms: Math.round(now() - t0), move: { block, date, start } };
     setPreview(next);
     return next;
   }, [state]);
 
   const commitMove = useCallback(async (block: string, date: string, start: number) => direct([{ kind: "move", block, date, start }], `move:${block}:${date}:${start}`), [direct]);
+
+  /**
+   * A drag and drop. The session shows where it landed straight away; the server then commits the move, in the order the student made them, with
+   * the plan reflowing around it. Nothing about the plan refuses it: only the clock bounds where it lands (`studentLanding`). A move that fails
+   * on the server returns the session to where it was and says why.
+   */
+  const dropMove = useCallback((block: string, date: string, start: number) => {
+    if (!state || !reads) return;
+    const target = state.blocks.find((b) => b.id === block);
+    if (!target || target.state === "done") return;
+    const placed = planning.studentLanding(date, start, target.end - target.start, state.snapshot.today, state.snapshot.nowMinute);
+    if (placed.date === target.date && placed.start === target.start && target.state === "committed") return;
+    setPreview(null);
+    setMoving((current) => ({ ...current, [block]: placed }));
+    const name = `move:${block}:${placed.date}:${placed.start}`;
+    moveQueue.current = moveQueue.current.then(async () => {
+      try {
+        const value = await reads.direct(keyFor(name), [{ kind: "move", block, date: placed.date, start: placed.start }]);
+        keys.current.delete(name);
+        if (!alive.current) return;
+        setState(value.state);
+        committedNotice(value.summary || `Moved to ${planning.dayLabel(placed.date)} ${planning.clockLabel(placed.start)}.`);
+        if (backend) refreshPlan(backend);
+      } catch (error) {
+        const kind = (error as BackendError)?.kind;
+        if (["invalid", "conflict", "forbidden", "not-found"].includes(kind)) keys.current.delete(name);
+        if (alive.current) notice(describeFailureText(error), { tone: "caution" });
+      } finally {
+        if (alive.current) setMoving((current) => { if (current[block]?.date !== placed.date || current[block]?.start !== placed.start) return current; const next = { ...current }; delete next[block]; return next; });
+      }
+    });
+  }, [state, reads, keyFor, committedNotice, notice, backend]);
 
   const previewWhatIf = useCallback((whatIf: planning.WhatIf, label: string): LocalPreview | null => {
     if (!state) return null;
@@ -255,13 +291,17 @@ export function useStudio() {
   const view = useMemo(() => {
     if (!state) return null;
     // What the timeline draws: a local preview first, then a streamed preview, then an open proposal, then the committed plan.
-    const showing = preview?.blocks ?? activity?.preview?.blocks ?? state.proposal?.result.blocks ?? state.plan.blocks;
-    return { blocks: showing as Block[], source: preview ? preview.kind : activity?.preview ? "stream" : state.proposal ? "proposal" : "plan" };
-  }, [state, preview, activity]);
+    const showing = (preview?.blocks ?? activity?.preview?.blocks ?? state.proposal?.result.blocks ?? state.plan.blocks) as Block[];
+    const placed = (b: Block): Block => { const to = moving[b.id]; return to ? { ...b, date: to.date, start: to.start, end: to.start + (b.end - b.start), pinned: true, state: b.state === "missed" || b.state === "skipped" ? "committed" : b.state } : b; };
+    const moved = Object.keys(moving).length ? showing.map(placed) : showing;
+    // The committed plan with the same drops applied, so a dropped session is never mistaken for a proposal while it saves.
+    const committed = Object.keys(moving).length ? state.blocks.map(placed) : state.blocks;
+    return { blocks: moved, committed, source: preview ? preview.kind : activity?.preview ? "stream" : state.proposal ? "proposal" : "plan" };
+  }, [state, preview, activity, moving]);
 
   return {
     state, failure, offline, busy, activity, preview, view, reads,
-    open, command, addGoal, answer, ask, brief, cancelRun, dismissActivity, accept, discard, undo, direct, previewMove, commitMove,
+    open, command, addGoal, answer, ask, brief, cancelRun, dismissActivity, accept, discard, undo, direct, previewMove, commitMove, dropMove, moving,
     previewWhatIf, keepWhatIf, clearPreview: () => setPreview(null), saveSettings, explain, explainSentence, editSyllabus, recheck, feedback,
   };
 }

@@ -80,7 +80,8 @@ async function run(window, out) {
   const pickDate = async (/** @type {string} */ field, /** @type {string} */ day) => {
     await clickOn(tid(field));
     if (!(await until(tid(`${field}-calendar`), 4000))) return false;
-    for (let step = 0; step < 24 && !(await has(tid(`${field}-calendar-day-${day}`))); step++) await clickOn(tid(`${field}-calendar-next`));
+    for (let step = 0; step < 24 && !(await has(tid(`${field}-calendar-day-${day}`))); step++) { await clickOn(tid(`${field}-calendar-next`)); await sleep(150); }
+    await sleep(150);
     await clickOn(tid(`${field}-calendar-day-${day}`));
     return gone(tid(`${field}-calendar`), 4000);
   };
@@ -214,6 +215,64 @@ async function run(window, out) {
     await shot("06-inspector");
     await clickOn('[aria-label="Close details"]').catch(() => undefined);
   }
+
+  // Drag and drop, with real mouse events. A session picked up by its body and dropped a day later and an hour later lands exactly there, whatever
+  // the plan's own rules (caps, rest days, study hours) say; the rest of the plan reflows around it. Then the same in the month.
+  const dragMouse = async (/** @type {{x:number,y:number}} */ from, /** @type {number} */ dx, /** @type {number} */ dy) => {
+    contents.sendInputEvent({ type: "mouseMove", x: from.x, y: from.y });
+    contents.sendInputEvent({ type: "mouseDown", x: from.x, y: from.y, button: "left", clickCount: 1 });
+    for (let step = 1; step <= 12; step++) { contents.sendInputEvent({ type: "mouseMove", x: Math.round(from.x + (dx * step) / 12), y: Math.round(from.y + (dy * step) / 12), modifiers: ["leftbuttondown"] }); await sleep(30); }
+    await sleep(120);
+    contents.sendInputEvent({ type: "mouseUp", x: Math.round(from.x + dx), y: Math.round(from.y + dy), button: "left", clickCount: 1 });
+  };
+  const blockOf = async (/** @type {string} */ id) => (await studio())?.blocks?.find((/** @type {any} */ b) => b.id === id);
+  await toPlanner();
+  const week = await js(`(() => { const e = document.querySelector('[data-testid="studio-week"]'); if (!e) return null; const r = e.getBoundingClientRect(); return { width: r.width }; })()`);
+  const visible = await js(`[...document.querySelectorAll('[data-testid^="studio-block-"]')].map((e) => e.getAttribute('data-testid').slice(13))`);
+  const now = await studio();
+  const movableBlock = now?.blocks?.filter((/** @type {any} */ b) => b.state === "committed" && b.date > now.snapshot.today && visible?.includes(b.id)).sort((/** @type {any} */ a, /** @type {any} */ b) => a.date.localeCompare(b.date) || a.start - b.start)[0];
+  if (week && movableBlock) {
+    const column = (week.width - 44) / 7;
+    const days = now.snapshot.days.slice(0, 7).map((/** @type {any} */ d) => d.date);
+    const at = days.indexOf(movableBlock.date);
+    const shift = at < days.length - 1 ? 1 : -1;
+    const wantDate = days[at + shift];
+    const wantStart = Math.round((movableBlock.start + 60) / 15) * 15;
+    const from = await center(tid(`studio-block-${movableBlock.id}`));
+    if (from) {
+      await dragMouse(from, shift * column, 46);
+      check("a dragged session shows where it will land", true);
+      let landed = null;
+      for (let wait = 0; wait < 40 && !(landed && landed.date === wantDate); wait++) { await sleep(250); landed = await blockOf(movableBlock.id); }
+      facts.weekDrag = { from: `${movableBlock.date} ${movableBlock.start}`, want: `${wantDate} ${wantStart}`, landed: landed ? `${landed.date} ${landed.start}` : null, pinned: landed?.pinned, rest: now.snapshot.days.find((/** @type {any} */ d) => d.date === wantDate)?.rest ?? false };
+      check("a session dragged in the week lands on the day and time it was dropped", landed?.date === wantDate && landed?.start === wantStart && landed?.pinned === true);
+      await sleep(900);
+      await shot("06c-dragged-week");
+    }
+  }
+  await clickOn(`[aria-label="Timeline zoom"] [aria-label="Month"], [role=radio][aria-label="Month"], [role=tab][aria-label="Month"]`).catch(() => undefined);
+  check("the month view lays out the plan", await until(tid("studio-month"), 6000));
+  await shot("06d-month");
+  const monthNow = await studio();
+  const chipIds = await js(`[...document.querySelectorAll('[data-testid^="studio-month-block-"]')].map((e) => e.getAttribute('data-testid').slice(19))`);
+  const chipBlock = monthNow?.blocks?.filter((/** @type {any} */ b) => b.state === "committed" && b.date > monthNow.snapshot.today && chipIds?.includes(b.id)).sort((/** @type {any} */ a, /** @type {any} */ b) => a.date.localeCompare(b.date) || a.start - b.start)[0];
+  const grid = await js(`(() => { const e = document.querySelector('[data-testid="studio-month"]'); return e ? e.getBoundingClientRect().width : null; })()`);
+  if (chipBlock && grid) {
+    const weekday = (new Date(`${chipBlock.date}T12:00:00Z`).getUTCDay() + 6) % 7;
+    const shift = weekday < 6 ? 1 : -1;
+    const wantDate = new Date(Date.parse(`${chipBlock.date}T12:00:00Z`) + shift * 86_400_000).toISOString().slice(0, 10);
+    const from = await center(tid(`studio-month-block-${chipBlock.id}`));
+    if (from) {
+      await dragMouse(from, (shift * grid) / 7, 0);
+      let landed = null;
+      for (let wait = 0; wait < 40 && !(landed && landed.date === wantDate); wait++) { await sleep(250); landed = await blockOf(chipBlock.id); }
+      facts.monthDrag = { from: `${chipBlock.date} ${chipBlock.start}`, want: `${wantDate} ${chipBlock.start}`, landed: landed ? `${landed.date} ${landed.start}` : null };
+      check("a session dragged in the month moves to that day and keeps its time", landed?.date === wantDate && landed?.start === chipBlock.start);
+      await sleep(900);
+      await shot("06e-dragged-month");
+    }
+  } else check("the month shows the plan's sessions", false);
+  await clickOn(`[aria-label="Timeline zoom"] [aria-label="Week"], [role=radio][aria-label="Week"], [role=tab][aria-label="Week"]`).catch(() => undefined);
 
   // A topic rated weak rebuilds the plan without the model, as a proposal; accepting keeps every existing session's quest.
   const rated = await api("/api/planner/studio", { json: { action: "syllabus", key: `syllabus-${tag}`, goal: goalKey, units: [{ key: "u5", confidence: "weak" }, { key: "u1", confidence: "strong" }] } });

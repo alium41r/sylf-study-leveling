@@ -1,15 +1,22 @@
-// The plan's timeline. Week and Day are time grids: fixed commitments hatched, blocks in subject colours, proposals dashed, done blocks checked, missed
-// blocks with a repair chip, rest days shaded and a line at now. A block can be dragged by its grip: the rest of the plan reflows on the device solver
-// while it moves, and dropping pins it. The same move is available from the inspector for keyboards and screen readers. Term shows weeks as budgets.
-import { memo, useMemo, useRef, useState } from "react";
-import { PanResponder, ScrollView, View, type LayoutChangeEvent } from "react-native";
-import { Icon, Press, Text, useTheme, withAlpha } from "@sylf/design-system";
-import type { planning } from "@sylf/shared";
-import { addDays, blockMinutes, clockLabel, compactLabel, dayLabel, daySummary, formatMinutes, hourRange, itemOf, live, snapMinute, subjectColour, titleOf, weekdayOf } from "./format";
+// The plan's timeline. Week and Day are time grids over the whole day: fixed commitments hatched, sessions in subject colours, proposals dashed,
+// done sessions checked, missed ones with a repair chip, rest days shaded and a line at now. Any session not yet done can be dragged by its whole
+// body to any day and any time (a mouse picks it up after a few pixels, a finger after a short press): the student's placement wins over the plan's
+// rules, the target shows while it moves, and the rest of the plan reflows when it is dropped. The inspector offers the same move to keyboards and
+// screen readers. Sessions sit in one layer over the day columns, so a session crossing days stays the same view and never stops mid-drag.
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Platform, View, type LayoutChangeEvent } from "react-native";
+import { GestureDetector } from "react-native-gesture-handler";
+import Animated, { useAnimatedRef, useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
+import { Icon, Press, Text, useTheme, withAlpha, type ViewHandle } from "@sylf/design-system";
+import { planning } from "@sylf/shared";
+import { addDays, blockMinutes, clockLabel, compactLabel, dayLabel, daySummary, formatMinutes, hourRange, itemOf, live, subjectColour, titleOf, weekdayOf } from "./format";
+import { useDragMove, type AutoScroll } from "./drag";
 
 type Block = planning.Block;
-export type Zoom = "day" | "week" | "term";
+export type Zoom = "day" | "week" | "month" | "term";
 const LABEL_W = 44;
+const SNAP = 15;
+type GridScroll = Animated.ScrollView;
 
 interface TimelineProps {
   snapshot: planning.PlanningSnapshot;
@@ -17,15 +24,16 @@ interface TimelineProps {
   blocks: Block[];
   committed: Block[];
   days: planning.SnapshotDay[];
-  zoom: Exclude<Zoom, "term">;
+  zoom: "day" | "week";
   dayOnly: boolean;
   selected: string | null;
   onSelect: (id: string | null) => void;
-  onDrag: (id: string, date: string, start: number) => void;
+  /** A session dropped on a day and a minute; where it lands is the view's to decide (only the clock bounds it). */
   onDrop: (id: string, date: string, start: number) => void;
-  onDragCancel: () => void;
-  dropLabel: string | null;
 }
+
+/** Whether a session can be picked up: anything not yet done that is the student's plan (not a proposal under review). */
+export const movable = (block: Block, proposal: boolean) => !proposal && block.state !== "done";
 
 function Hatch({ height, color }: { height: number; color: string }) {
   const lines = Math.ceil(height / 9) + 6;
@@ -36,14 +44,15 @@ function Hatch({ height, color }: { height: number; color: string }) {
   );
 }
 
-const BlockBody = memo(function BlockBody({ block, title, compact, colour, height, selected, proposal, onPress, grip }: { block: Block; title: string; compact: { title: string; sub: string | null } | null; colour: string; height: number; selected: boolean; proposal: boolean; onPress: () => void; grip: React.ReactNode }) {
+const BlockBody = memo(function BlockBody({ block, title, compact, colour, height, selected, proposal, draggable, onPress }: { block: Block; title: string; compact: { title: string; sub: string | null } | null; colour: string; height: number; selected: boolean; proposal: boolean; draggable: boolean; onPress: () => void }) {
   const { color, shape } = useTheme();
   const done = block.state === "done";
   const missed = block.state === "missed";
   const skipped = block.state === "skipped";
   const state = done ? "done" : missed ? "missed" : skipped ? "skipped" : proposal ? "proposed" : "planned";
   return (
-    <Press testID={`studio-block-${block.id}`} label={`${title}, ${clockLabel(block.start)} to ${clockLabel(block.end)}, ${state}${block.pinned ? ", pinned" : ""}`} selected={selected} onPress={onPress} height={height} radius={shape.radius.sm} minHit={Math.min(44, height)}
+    <Press testID={`studio-block-${block.id}`} label={`${title}, ${clockLabel(block.start)} to ${clockLabel(block.end)}, ${state}${block.pinned ? ", pinned" : ""}`} hint={draggable ? "Drag to move it to another day or time" : undefined} selected={selected} onPress={onPress} height={height} radius={shape.radius.sm} minHit={Math.min(44, height)}
+      style={draggable ? Platform.select({ web: { cursor: "grab" } as object, default: undefined }) : undefined}
       bodyStyle={{ height, flexDirection: "row", borderRadius: shape.radius.sm, overflow: "hidden", backgroundColor: missed || skipped ? color.sunken : withAlpha(colour, done ? 0.12 : 0.2), borderWidth: proposal || selected ? 1.5 : 1, borderStyle: proposal ? "dashed" : "solid", borderColor: selected ? color.focus : proposal ? colour : withAlpha(colour, 0.45), opacity: done || skipped ? 0.62 : 1 }}>
       <View style={{ width: 3, backgroundColor: missed ? color.caution.mark : colour }} />
       <View style={{ flex: 1, paddingHorizontal: 4, paddingVertical: 2, minWidth: 0 }}>
@@ -53,53 +62,86 @@ const BlockBody = memo(function BlockBody({ block, title, compact, colour, heigh
           <Text variant="caption" numberOfLines={compact ? 1 : height > 40 ? 2 : 1} style={{ flex: 1, textDecorationLine: skipped ? "line-through" : undefined }}>{compact?.title ?? title}</Text>
         </View>
         {height > 34 ? <Text variant="micro" tone="soft" numberOfLines={1}>{compact ? compact.sub ?? clockLabel(block.start) : `${clockLabel(block.start)}–${clockLabel(block.end)}`}</Text> : null}
-        {missed && height > 30 ? <Text variant="micro" tone="caution" numberOfLines={1}>Missed · find time</Text> : null}
+        {missed && height > 30 ? <Text variant="micro" tone="caution" numberOfLines={1}>Missed · drag to a new time</Text> : null}
       </View>
-      {grip}
     </Press>
   );
 });
 
-function DraggableBlock({ block, days, columnWidth, pxPerMinute, range, onStart, onMove, onEnd, children }: { block: Block; days: planning.SnapshotDay[]; columnWidth: number; pxPerMinute: number; range: [number, number]; onStart: () => void; onMove: (date: string, start: number) => void; onEnd: (date: string, start: number, moved: boolean) => void; children: (grip: React.ReactNode, offset: { x: number; y: number }) => React.ReactNode }) {
-  const { color } = useTheme();
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const target = useRef({ date: block.date, start: block.start });
-  const index = days.findIndex((d) => d.date === block.date);
-  const length = block.end - block.start;
-  const responder = useMemo(() => PanResponder.create({
-    onStartShouldSetPanResponder: () => true,
-    onMoveShouldSetPanResponder: () => true,
-    onPanResponderTerminationRequest: () => false,
-    onPanResponderGrant: () => { target.current = { date: block.date, start: block.start }; onStart(); },
-    onPanResponderMove: (_e, g) => {
-      const dayShift = columnWidth > 0 ? Math.round(g.dx / columnWidth) : 0;
-      const nextIndex = Math.max(0, Math.min(days.length - 1, index + dayShift));
-      const start = snapMinute(block.start + g.dy / pxPerMinute, length, range);
-      setOffset({ x: (nextIndex - index) * columnWidth, y: (start - block.start) * pxPerMinute });
-      if (target.current.date !== days[nextIndex].date || target.current.start !== start) { target.current = { date: days[nextIndex].date, start }; onMove(days[nextIndex].date, start); }
-    },
-    onPanResponderRelease: () => { const t = target.current; setOffset({ x: 0, y: 0 }); onEnd(t.date, t.start, t.date !== block.date || t.start !== block.start); },
-    onPanResponderTerminate: () => { setOffset({ x: 0, y: 0 }); onEnd(block.date, block.start, false); },
-  }), [block, days, columnWidth, pxPerMinute, range, index, length, onStart, onMove, onEnd]);
-  const grip = <View {...responder.panHandlers} aria-label="Drag to move" style={{ width: 18, alignItems: "center", justifyContent: "center", cursor: "grab" } as object}><Icon name="grip" size={12} color={color.inkFaint} /></View>;
-  return <>{children(grip, offset)}</>;
+/** One session on the grid, draggable when it can move. */
+function GridBlock({ block, x, y, width, height, draggable, slotOf, onLift, onSlot, onDrop, scroll, children }: { block: Block; x: number; y: number; width: number; height: number; draggable: boolean; slotOf: (dx: number, dy: number) => number; onLift: (id: string) => void; onSlot: (id: string, slot: number) => void; onDrop: (id: string, slot: number) => void; scroll: AutoScroll; children: React.ReactNode }) {
+  const theme = useTheme();
+  const lift = useCallback(() => onLift(block.id), [onLift, block.id]);
+  const slot = useCallback((s: number) => onSlot(block.id, s), [onSlot, block.id]);
+  const drop = useCallback((s: number) => onDrop(block.id, s), [onDrop, block.id]);
+  const drag = useDragMove({ enabled: draggable, x, y, slotOf, onLift: lift, onSlot: slot, onDrop: drop, scroll });
+  const body = (
+    <Animated.View style={[{ position: "absolute", left: x, top: y, width, height }, drag.style]}>
+      <Animated.View pointerEvents="none" style={[theme.surface("float", "sm"), { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "transparent" }, drag.shadow]} />
+      {children}
+    </Animated.View>
+  );
+  return draggable ? <GestureDetector gesture={drag.gesture}>{body}</GestureDetector> : body;
 }
 
-export function WeekGrid({ snapshot, model, blocks, committed, days, zoom, dayOnly, selected, onSelect, onDrag, onDrop, onDragCancel, dropLabel }: TimelineProps) {
+export function WeekGrid({ snapshot, model, blocks, committed, days, zoom, dayOnly, selected, onSelect, onDrop }: TimelineProps) {
   const { color, shape, space } = useTheme();
   const [width, setWidth] = useState(0);
-  const [dragging, setDragging] = useState<string | null>(null);
+  const [target, setTarget] = useState<{ id: string; date: string; start: number; length: number } | null>(null);
+  const lastDrag = useRef(0);
   const HOUR = zoom === "day" ? 64 : 46;
   const pxPerMinute = HOUR / 60;
   const range = hourRange(snapshot, blocks, days);
-  const hours = Array.from({ length: range[1] - range[0] }, (_, i) => range[0] + i);
+  const hours = Array.from({ length: 24 }, (_, i) => i);
   const columnWidth = days.length ? Math.max(0, (width - LABEL_W) / days.length) : 0;
   // Beside the study guide a week's columns are narrow: blocks then show the topic and the kind of session rather than a broken title.
   const narrow = zoom === "week" && columnWidth > 0 && columnWidth < 130;
   const committedIds = new Set(committed.filter(live).map((b) => `${b.id}|${b.date}|${b.start}`));
   const deadlines = (date: string) => model.goals.filter((g) => g.status === "active" && g.due === date);
   const onLayout = (event: LayoutChangeEvent) => setWidth(event.nativeEvent.layout.width);
-  const top = (minute: number) => (minute - range[0] * 60) * pxPerMinute;
+  const top = (minute: number) => minute * pxPerMinute;
+  const dayIndex = useMemo(() => new Map(days.map((d, i) => [d.date, i])), [days]);
+
+  // The grid scrolls by itself while a session is dragged near its top or bottom.
+  const scrollRef = useAnimatedRef<GridScroll>();
+  const frame = useRef<ViewHandle>(null);
+  const offset = useSharedValue(0);
+  const viewTop = useSharedValue(0);
+  const viewHeight = useSharedValue(0);
+  const content = useSharedValue(HOUR * 24);
+  useEffect(() => { content.value = HOUR * 24; }, [HOUR, content]);
+  const onScroll = useAnimatedScrollHandler((event) => { offset.value = event.contentOffset.y; });
+  const scroll: AutoScroll = { ref: scrollRef as never, offset, top: viewTop, height: viewHeight, content };
+  const measure = () => frame.current?.measureInWindow((_x, y, _w, h) => { viewTop.value = y; viewHeight.value = h; });
+  // The grid holds the whole day but opens at the start of the study day, a little before it; again when the days shown change.
+  const firstMinute = Math.max(0, range[0] * 60 - 30);
+  const opened = useRef<string | null>(null);
+  const openedAt = `${zoom}|${days[0]?.date ?? ""}`;
+  useEffect(() => {
+    if (opened.current === openedAt) return;
+    opened.current = openedAt;
+    const y = firstMinute * pxPerMinute;
+    const frameId = requestAnimationFrame(() => (scrollRef.current as unknown as { scrollTo?: (to: { x?: number; y: number; animated?: boolean }) => void } | null)?.scrollTo?.({ x: 0, y, animated: false }));
+    return () => cancelAnimationFrame(frameId);
+  }, [openedAt, firstMinute, pxPerMinute, scrollRef]);
+
+  const landing = useCallback((id: string, slot: number) => {
+    const block = blocks.find((b) => b.id === id);
+    const day = days[Math.floor(slot / 1440)];
+    if (!block || !day) return null;
+    const length = block.end - block.start;
+    return { ...planning.studentLanding(day.date, slot % 1440, length, snapshot.today, snapshot.nowMinute), length };
+  }, [blocks, days, snapshot.today, snapshot.nowMinute]);
+  const onLift = useCallback((id: string) => { lastDrag.current = Date.now(); measure(); const b = blocks.find((x) => x.id === id); if (b) setTarget({ id, date: b.date, start: b.start, length: b.end - b.start }); }, [blocks]);
+  const onSlot = useCallback((id: string, slot: number) => { const to = landing(id, slot); if (to) setTarget({ id, ...to }); }, [landing]);
+  const onDropSlot = useCallback((id: string, slot: number) => {
+    lastDrag.current = Date.now();
+    const to = landing(id, slot);
+    setTarget(null);
+    if (to) onDrop(id, to.date, to.start);
+  }, [landing, onDrop]);
+  // A press that ends a drag is not a tap.
+  const select = (id: string) => { if (Date.now() - lastDrag.current > 250) onSelect(id); };
 
   if (dayOnly) {
     return (
@@ -119,6 +161,9 @@ export function WeekGrid({ snapshot, model, blocks, committed, days, zoom, dayOn
     );
   }
 
+  const targetDay = target ? days.find((d) => d.date === target.date) ?? null : null;
+  const targetNote = target && targetDay ? [targetDay.rest ? "rest day" : null, targetDay.busy.find((b) => target.start < b.end && target.start + target.length > b.start)?.title.replace(/^/, "over ") ?? null].filter(Boolean).join(", ") : "";
+
   return (
     <View testID={zoom === "day" ? "studio-day" : "studio-week"} onLayout={onLayout} style={{ gap: 2 }}>
       <View style={{ flexDirection: "row", paddingLeft: LABEL_W }}>
@@ -130,47 +175,61 @@ export function WeekGrid({ snapshot, model, blocks, committed, days, zoom, dayOn
           </View>
         ))}
       </View>
-      <ScrollView keyboardShouldPersistTaps="handled" nestedScrollEnabled scrollEnabled={!dragging} style={{ maxHeight: zoom === "day" ? 620 : 560 }} showsVerticalScrollIndicator={false} contentOffset={{ x: 0, y: Math.max(0, top(Math.max(range[0] * 60, snapshot.nowMinute - 60)) - 0) * (days.some((d) => d.date === snapshot.today) ? 1 : 0) }}>
-        <View style={{ flexDirection: "row", height: HOUR * hours.length }}>
-          <View style={{ width: LABEL_W }}>{hours.map((h) => <View key={h} style={{ height: HOUR }}><Text variant="micro" tone="faint">{`${String(h).padStart(2, "0")}:00`}</Text></View>)}</View>
-          {days.map((day) => (
-            <View key={day.date} style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: color.line, backgroundColor: day.rest ? withAlpha(color.inkFaint, 0.08) : undefined }}>
-              {hours.map((h) => <Press key={h} feedback="none" radius={0} label={`${dayLabel(day.date)} ${String(h).padStart(2, "0")}:00`} onPress={() => onSelect(null)} height={HOUR} bodyStyle={{ height: HOUR, borderTopWidth: 1, borderTopColor: withAlpha(color.line, 0.6) }}><View /></Press>)}
-              {day.rest ? <View pointerEvents="none" style={{ position: "absolute", top: 8, left: 0, right: 0, alignItems: "center" }}><Text variant="micro" tone="faint">Rest</Text></View> : null}
-              {day.busy.map((busy, i) => {
-                const height = Math.max(14, (busy.end - busy.start) * pxPerMinute - 2);
-                return (
-                  <View key={`${busy.ref ?? i}-${busy.start}`} aria-label={`${busy.title}, ${clockLabel(busy.start)} to ${clockLabel(busy.end)}, fixed`} style={{ position: "absolute", top: top(busy.start) + 1, left: 2, right: 2, height, borderRadius: shape.radius.sm, borderWidth: 1, borderColor: color.lineStrong, backgroundColor: color.sunken, overflow: "hidden", paddingHorizontal: 4, paddingTop: 2 }}>
-                    <Hatch height={height} color={withAlpha(color.inkFaint, 0.25)} />
-                    <Text variant="micro" tone="soft" numberOfLines={height > 30 ? 2 : 1}>{busy.title}</Text>
-                  </View>
-                );
-              })}
-              {blocks.filter((b) => b.date === day.date && b.id !== dragging).map((block) => {
+      <View ref={frame} collapsable={false}>
+        <Animated.ScrollView ref={scrollRef} onScroll={onScroll} scrollEventThrottle={16} keyboardShouldPersistTaps="handled" nestedScrollEnabled scrollEnabled={!target} style={{ maxHeight: zoom === "day" ? 620 : 560 }} showsVerticalScrollIndicator={false} contentOffset={{ x: 0, y: top(firstMinute) }}>
+          <View style={{ flexDirection: "row", height: HOUR * hours.length }}>
+            <View style={{ width: LABEL_W }}>{hours.map((h) => <View key={h} style={{ height: HOUR }}><Text variant="micro" tone="faint">{`${String(h).padStart(2, "0")}:00`}</Text></View>)}</View>
+            {days.map((day) => (
+              <View key={day.date} style={{ flex: 1, borderLeftWidth: 1, borderLeftColor: color.line, backgroundColor: day.rest ? withAlpha(color.inkFaint, 0.08) : undefined }}>
+                {hours.map((h) => <Press key={h} feedback="none" radius={0} label={`${dayLabel(day.date)} ${String(h).padStart(2, "0")}:00`} onPress={() => onSelect(null)} height={HOUR} bodyStyle={{ height: HOUR, borderTopWidth: 1, borderTopColor: withAlpha(color.line, 0.6), backgroundColor: h * 60 < snapshot.settings.dayStart || h * 60 >= snapshot.settings.dayEnd ? withAlpha(color.inkFaint, 0.04) : undefined }}><View /></Press>)}
+                {day.rest ? <View pointerEvents="none" style={{ position: "absolute", top: top(range[0] * 60) + 8, left: 0, right: 0, alignItems: "center" }}><Text variant="micro" tone="faint">Rest</Text></View> : null}
+                {day.busy.map((busy, i) => {
+                  const height = Math.max(14, (busy.end - busy.start) * pxPerMinute - 2);
+                  return (
+                    <View key={`${busy.ref ?? i}-${busy.start}`} pointerEvents="none" aria-label={`${busy.title}, ${clockLabel(busy.start)} to ${clockLabel(busy.end)}, fixed`} style={{ position: "absolute", top: top(busy.start) + 1, left: 2, right: 2, height, borderRadius: shape.radius.sm, borderWidth: 1, borderColor: color.lineStrong, backgroundColor: color.sunken, overflow: "hidden", paddingHorizontal: 4, paddingTop: 2 }}>
+                      <Hatch height={height} color={withAlpha(color.inkFaint, 0.25)} />
+                      <Text variant="micro" tone="soft" numberOfLines={height > 30 ? 2 : 1}>{busy.title}</Text>
+                    </View>
+                  );
+                })}
+                {day.date === snapshot.today ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: top(snapshot.nowMinute), height: 2, backgroundColor: color.accent.fill }} /> : null}
+              </View>
+            ))}
+            {/* Sessions, in one layer over the columns. */}
+            <View pointerEvents="box-none" style={{ position: "absolute", top: 0, bottom: 0, left: LABEL_W, right: 0 }}>
+              {target && targetDay ? <View pointerEvents="none" style={{ position: "absolute", left: (dayIndex.get(target.date) ?? 0) * columnWidth + 2, width: Math.max(0, columnWidth - 4), top: top(target.start) + 1, height: Math.max(16, target.length * pxPerMinute - 2), borderRadius: shape.radius.sm, borderWidth: 1.5, borderStyle: "dashed", borderColor: color.accent.ink, backgroundColor: color.accent.wash }} /> : null}
+              {columnWidth > 0 ? blocks.filter((b) => dayIndex.has(b.date)).map((block) => {
                 const height = Math.max(16, blockMinutes(block) * pxPerMinute - 2);
                 const colour = subjectColour(snapshot, itemOf(model, block.item)?.subject);
                 const proposal = block.state === "proposed" || (live(block) && !committedIds.has(`${block.id}|${block.date}|${block.start}`));
-                const draggable = block.state === "committed" && !proposal && (block.date > snapshot.today || block.start > snapshot.nowMinute);
-                const body = (grip: React.ReactNode) => <BlockBody block={block} title={titleOf(model, block.item)} compact={narrow ? compactLabel(itemOf(model, block.item)) : null} colour={colour} height={height} selected={selected === block.id} proposal={proposal} onPress={() => onSelect(block.id)} grip={grip} />;
-                if (!draggable) return <View key={block.id} style={{ position: "absolute", top: top(block.start) + 1, left: 2, right: 2 }}>{body(null)}</View>;
+                const draggable = movable(block, proposal);
+                const index = dayIndex.get(block.date)!;
+                const length = block.end - block.start;
+                const count = days.length;
+                const from = block.start;
+                const slotOf = (dx: number, dy: number) => {
+                  "worklet";
+                  const shift = Math.round(dx / columnWidth);
+                  const day = Math.max(0, Math.min(count - 1, index + shift));
+                  const minute = Math.max(0, Math.min(1440 - length, Math.round((from + dy / pxPerMinute) / SNAP) * SNAP));
+                  return day * 1440 + minute;
+                };
                 return (
-                  <DraggableBlock key={block.id} block={block} days={days} columnWidth={columnWidth} pxPerMinute={pxPerMinute} range={range}
-                    onStart={() => { setDragging(null); onSelect(block.id); }}
-                    onMove={(date, start) => { setDragging(block.id); onDrag(block.id, date, start); }}
-                    onEnd={(date, start, moved) => { setDragging(null); if (moved) onDrop(block.id, date, start); else onDragCancel(); }}>
-                    {(grip, offset) => <View style={{ position: "absolute", top: top(block.start) + 1 + offset.y, left: 2 + offset.x, right: 2 - offset.x, zIndex: offset.x || offset.y ? 10 : 1, opacity: 1 }}>{body(grip)}</View>}
-                  </DraggableBlock>
+                  <GridBlock key={block.id} block={block} x={index * columnWidth + 2} y={top(block.start) + 1} width={Math.max(0, columnWidth - 4)} height={height} draggable={draggable} slotOf={slotOf} onLift={onLift} onSlot={onSlot} onDrop={onDropSlot} scroll={scroll}>
+                    <BlockBody block={block} title={titleOf(model, block.item)} compact={narrow ? compactLabel(itemOf(model, block.item)) : null} colour={colour} height={height} selected={selected === block.id} proposal={proposal} draggable={draggable} onPress={() => select(block.id)} />
+                  </GridBlock>
                 );
-              })}
-              {dragging ? blocks.filter((b) => b.id === dragging && b.date === day.date).map((block) => (
-                <View key={`ghost-${block.id}`} pointerEvents="none" style={{ position: "absolute", top: top(block.start) + 1, left: 2, right: 2, height: Math.max(16, blockMinutes(block) * pxPerMinute - 2), borderRadius: shape.radius.sm, borderWidth: 1.5, borderStyle: "dashed", borderColor: color.focus, backgroundColor: withAlpha(color.focus, 0.08) }} />
-              )) : null}
-              {day.date === snapshot.today && snapshot.nowMinute >= range[0] * 60 && snapshot.nowMinute <= range[1] * 60 ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: top(snapshot.nowMinute), height: 2, backgroundColor: color.accent.fill }} /> : null}
+              }) : null}
             </View>
-          ))}
+          </View>
+        </Animated.ScrollView>
+      </View>
+      {target ? (
+        <View testID="studio-drop-label" pointerEvents="none" style={{ alignSelf: "center", flexDirection: "row", gap: space.xs, paddingHorizontal: space.md, paddingVertical: 4, borderRadius: shape.radius.full, backgroundColor: color.inverse.fill }}>
+          <Text variant="caption" style={{ color: color.inverse.on }}>{`${dayLabel(target.date)} · ${clockLabel(target.start)}`}</Text>
+          {targetNote ? <Text variant="caption" style={{ color: color.inverse.on, opacity: 0.75 }}>{targetNote}</Text> : null}
         </View>
-      </ScrollView>
-      {dragging && dropLabel ? <View style={{ alignSelf: "center", paddingHorizontal: space.md, paddingVertical: 4, borderRadius: shape.radius.full, backgroundColor: color.inverse.fill }}><Text variant="caption" style={{ color: color.inverse.on }}>{dropLabel}</Text></View> : null}
+      ) : null}
     </View>
   );
 }

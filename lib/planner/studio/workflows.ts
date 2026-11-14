@@ -7,8 +7,8 @@ import { createHash } from "node:crypto";
 import { withAiRequest } from "@/lib/ai/telemetry-runtime";
 import { releaseQuota, reserveQuota } from "@/lib/ai/usage-limiter";
 import {
-  PLAN_PRESETS, agreesWith, papersIn, applyCorrections, applyOperations, autoApplies, boundCorrections, uncoveredUnits, calibrationNote, codeIn, outlineKeys, classifyChange, compileStudyPath, dayLabel, describePath, diffDays, diffPlans, editSyllabus, formatMinutes,
-  coverFocus, dropCoursework, inferGoalType, inferPreset, isDateKey, isFixed, markWeak, namedFocus, paceWork, presetOf, normalizeSizes, normalizeSyllabus, parseCommand, parseTopicCommand, parseTopicList, propose, scaffold,
+  PLAN_PRESETS, agreesWith, studentLanding, papersIn, applyCorrections, applyOperations, autoApplies, boundCorrections, uncoveredUnits, calibrationNote, codeIn, outlineKeys, classifyChange, compileStudyPath, dayLabel, describePath, diffDays, diffPlans, editSyllabus, formatMinutes,
+  coverFocus, dropCoursework, inferGoalType, inferPreset, isDateKey, markWeak, namedFocus, paceWork, presetOf, normalizeSizes, normalizeSyllabus, parseCommand, parseTopicCommand, parseTopicList, propose, scaffold,
   signals as computeSignals,
   type Block, type Confidence, type GoalType, type KGoal, type Op, type OutlineCorrections, type Pace, type SyllabusIdentity, type PlanCandidate, type PlanPreset, type Signal, type Syllabus, type SyllabusUnit, type WhatIf, type WorkItem, type WorkModel,
 } from "../kernel";
@@ -901,21 +901,24 @@ export type BlockEdit = { kind: "move"; block: string; date: string; start: numb
 
 /** Direct manipulation: dropping a block pins it there and the rest reflows; skipping hands its minutes back to the solver. Applied at once, with undo. */
 export async function runDirect(userId: number, input: { key: string; edits: BlockEdit[] }): Promise<CommitOutcome> {
-  const ctx = await compileContext(userId);
+  let ctx = await compileContext(userId);
+  // A session moved past the planning horizon widens it, so the plan can be solved around it there.
+  const furthest = input.edits.filter((e): e is Extract<BlockEdit, { kind: "move" }> => e.kind === "move" && isDateKey(e.date)).map((e) => e.date).sort().at(-1);
+  if (furthest && furthest > (ctx.snapshot.days.at(-1)?.date ?? ctx.snapshot.today)) {
+    const wider = await compileContext(userId, undefined, { until: furthest });
+    if (wider.snapshot.days.length > ctx.snapshot.days.length) ctx = { ...ctx, snapshot: wider.snapshot };
+  }
   const blocks = ctx.blocks.map((b) => ({ ...b }));
   for (const edit of input.edits.slice(0, 20)) {
     const block = blocks.find((b) => b.id === edit.block);
     if (!block) throw new StudioError(404, "NOT_FOUND", "That session is no longer in your plan.");
     if (edit.kind === "move") {
-      if (!isDateKey(edit.date) || edit.date < ctx.snapshot.today) throw new StudioError(400, "INVALID_MOVE", "Choose a time from now on.");
+      if (!isDateKey(edit.date)) throw new StudioError(400, "INVALID_MOVE", "Choose a day for this session.");
+      if (block.state === "done") throw new StudioError(409, "CONFLICT", "That session is already done.");
       const length = block.end - block.start;
-      const start = Math.round(edit.start / 5) * 5;
-      if (start < 0 || start + length > 1440 || (edit.date === ctx.snapshot.today && start < ctx.snapshot.nowMinute)) throw new StudioError(400, "INVALID_MOVE", "Choose a time from now on.");
-      const day = ctx.snapshot.days.find((d) => d.date === edit.date);
-      if (!day) throw new StudioError(400, "INVALID_MOVE", "That day is beyond the plan's horizon.");
-      const clash = day.busy.find((b) => start < b.end && start + length > b.start) ?? blocks.find((b) => b !== block && b.date === edit.date && b.state !== "missed" && b.state !== "skipped" && isFixed(b, ctx.snapshot) && start < b.end && start + length > b.start);
-      if (clash) throw new StudioError(409, "CONFLICT", `That overlaps ${"title" in clash ? clash.title : "another fixed session"}.`);
-      Object.assign(block, { date: edit.date, start, end: start + length, pinned: true });
+      const placed = studentLanding(edit.date, edit.start, length, ctx.snapshot.today, ctx.snapshot.nowMinute);
+      // A missed or skipped session moved to a new time is planned again.
+      Object.assign(block, { date: placed.date, start: placed.start, end: placed.start + length, pinned: true, state: "committed" });
     } else if (edit.kind === "pin") block.pinned = true;
     else if (edit.kind === "unpin") block.pinned = false;
     else if (edit.kind === "skip") { if (block.state === "committed") block.state = "skipped"; }

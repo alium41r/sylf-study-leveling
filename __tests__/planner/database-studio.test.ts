@@ -153,6 +153,26 @@ describe.skipIf(!database)("Planning Studio on PostgreSQL", () => {
     expect(restored.some((b) => b.pinned)).toBe(false);
   });
 
+  it("lands a student's move wherever it is dropped: a rest day late at night, past the horizon, and never in the past", async () => {
+    await acceptProposal(userId, (await planExam(12)).id, key());
+    const block = await prisma.planBlock.findFirstOrThrow({ where: { userId, removedVersion: null, state: "COMMITTED", localDate: { gt: addDays(today(), 1) } }, orderBy: { localDate: "asc" } });
+    const length = block.endMinute - block.startMinute;
+    // The next Sunday is a rest day for this student; 23:00 is outside their study hours.
+    let sunday = addDays(today(), 1);
+    while (new Date(`${sunday}T12:00:00Z`).getUTCDay() !== 0) sunday = addDays(sunday, 1);
+    const late = Math.min(23 * 60, 1440 - length);
+    await runDirect(userId, { key: key(), edits: [{ kind: "move", block: block.blockKey, date: sunday, start: late }] });
+    expect(await prisma.planBlock.findFirstOrThrow({ where: { userId, blockKey: block.blockKey, removedVersion: null } })).toMatchObject({ localDate: sunday, startMinute: late, pinned: true });
+    // Far beyond the planning horizon: the horizon widens to take it.
+    const far = addDays(today(), 40);
+    await runDirect(userId, { key: key(), edits: [{ kind: "move", block: block.blockKey, date: far, start: 9 * 60 }] });
+    expect(await prisma.planBlock.findFirstOrThrow({ where: { userId, blockKey: block.blockKey, removedVersion: null } })).toMatchObject({ localDate: far, startMinute: 540 });
+    // A day already gone lands on today from now on (or tomorrow when today is full), never in the past.
+    await runDirect(userId, { key: key(), edits: [{ kind: "move", block: block.blockKey, date: addDays(today(), -3), start: 9 * 60 }] });
+    const back = await prisma.planBlock.findFirstOrThrow({ where: { userId, blockKey: block.blockKey, removedVersion: null } });
+    expect(back.localDate >= today()).toBe(true);
+  });
+
   it("never deletes or reshapes started work when its goal is dropped", async () => {
     await acceptProposal(userId, (await planExam()).id, key());
     const quests = await prisma.quest.findMany({ where: { userId }, orderBy: { id: "asc" } });

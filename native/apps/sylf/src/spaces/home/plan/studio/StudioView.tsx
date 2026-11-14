@@ -11,6 +11,7 @@ import { GoalMap } from "./GoalMap";
 import { Inspector } from "./Inspector";
 import { HistoryPanel, PreviewBar, SettingsSheet, SignalCards, WhatIfPanel } from "./Panels";
 import { ProposalReview } from "./Review";
+import { MonthView } from "./MonthView";
 import { TermView, WeekGrid, type Zoom } from "./Timeline";
 import { TodayAgenda } from "./TodayAgenda";
 import { useStudio } from "./useStudio";
@@ -52,20 +53,24 @@ export function StudioView() {
   const proposal = state.proposal;
   const shownModel = proposal?.model ?? state.model;
   const blocks = view?.blocks ?? state.plan.blocks;
+  const committed = view?.committed ?? state.blocks;
+  // A day opened from the month: its day view when it is in the detailed calendar.
+  const openDay = (date: string) => { const at = state.snapshot.days.findIndex((d) => d.date === date); if (at >= 0) { setDayIndex(at); setPage(Math.floor(at / 7)); setZoom("day"); } };
   const pages = Math.max(1, Math.ceil(state.snapshot.days.length / 7));
   const days = zoom === "day" ? state.snapshot.days.slice(dayIndex, dayIndex + 1) : state.snapshot.days.slice(page * 7, page * 7 + 7);
   const timeline = (
     <Stack gap="sm" testID="studio-timeline">
       <View style={{ flexDirection: "row", alignItems: "center", gap: space.sm, flexWrap: "wrap" }}>
-        <Segmented<Zoom> label="Timeline zoom" value={zoom} options={[{ value: "day", label: "Day" }, { value: "week", label: "Week" }, { value: "term", label: "Term" }]} onChange={setZoom} />
+        <Segmented<Zoom> label="Timeline zoom" value={zoom} options={[{ value: "day", label: "Day" }, { value: "week", label: "Week" }, { value: "month", label: "Month" }, { value: "term", label: "Term" }]} onChange={setZoom} />
         {zoom === "week" ? <View style={{ flexDirection: "row", alignItems: "center", gap: space.xs }}><Button title="" icon="chevronLeft" size="small" variant="ghost" disabled={page === 0} onPress={() => setPage(page - 1)} aria-label="Previous week" /><Text variant="label" tone="soft">{page === 0 ? "This week" : `From ${dayLabel(days[0]?.date ?? state.snapshot.today)}`}</Text><Button title="" icon="chevronRight" size="small" variant="ghost" disabled={page >= pages - 1} onPress={() => setPage(page + 1)} aria-label="Next week" /></View> : null}
         {zoom === "day" ? <View style={{ flexDirection: "row", alignItems: "center", gap: space.xs }}><Button title="" icon="chevronLeft" size="small" variant="ghost" disabled={dayIndex === 0} onPress={() => setDayIndex(dayIndex - 1)} aria-label="Previous day" /><Text variant="label" tone="soft">{dayLabel(days[0]?.date ?? state.snapshot.today)}</Text><Button title="" icon="chevronRight" size="small" variant="ghost" disabled={dayIndex >= state.snapshot.days.length - 1} onPress={() => setDayIndex(dayIndex + 1)} aria-label="Next day" /></View> : null}
         {view && view.source !== "plan" ? <Text variant="micro" tone="accent">{view.source === "proposal" ? "Showing the proposal" : view.source === "stream" ? "Fitting as the planner writes" : "Preview"}</Text> : null}
       </View>
       {zoom === "term"
         ? <TermView snapshot={state.snapshot} model={shownModel} blocks={blocks} budgets={(proposal?.result.weekBudgets ?? state.plan.weekBudgets) as never} />
-        : <WeekGrid snapshot={state.snapshot} model={shownModel} blocks={blocks} committed={state.blocks} days={days} zoom={zoom} dayOnly={state.settings.dayOnly} selected={selected} onSelect={setSelected}
-            onDrag={(id, date, start) => studio.previewMove(id, date, start)} onDrop={(id, date, start) => { const p = studio.previewMove(id, date, start); if (p?.pass) void studio.commitMove(id, date, start); }} onDragCancel={studio.clearPreview} dropLabel={preview?.kind === "move" ? preview.label : null} />}
+        : zoom === "month"
+          ? <MonthView snapshot={state.snapshot} model={shownModel} blocks={blocks} committed={committed} budgets={(proposal?.result.weekBudgets ?? state.plan.weekBudgets) as planning.WeekBudget[]} selected={selected} onSelect={setSelected} onOpenDay={openDay} onDrop={studio.dropMove} />
+          : <WeekGrid snapshot={state.snapshot} model={shownModel} blocks={blocks} committed={committed} days={days} zoom={zoom} dayOnly={state.settings.dayOnly} selected={selected} onSelect={setSelected} onDrop={studio.dropMove} />}
     </Stack>
   );
   // Selecting a session from the guide opens it in the inspector and turns the timeline to its day.
@@ -73,7 +78,7 @@ export function StudioView() {
     const b = blocks.find((x) => x.id === id);
     if (!b) return;
     setSelected(b.id);
-    if (zoom !== "term") { const at = state.snapshot.days.findIndex((d) => d.date === b.date); if (at >= 0) { setPage(Math.floor(at / 7)); setDayIndex(at); } }
+    if (zoom === "day" || zoom === "week") { const at = state.snapshot.days.findIndex((d) => d.date === b.date); if (at >= 0) { setPage(Math.floor(at / 7)); setDayIndex(at); } }
   };
   const focusItem = (item: string) => { const b = blocks.find((x) => x.item === item && (x.state === "committed" || x.state === "proposed")); if (b) focusBlock(b.id); };
   const budgets = ((preview?.result.weekBudgets ?? (proposal && view?.source !== "plan" ? proposal.result.weekBudgets : state.plan.weekBudgets)) ?? []) as planning.WeekBudget[];

@@ -77,9 +77,27 @@ Evidence: [round 1](evidence/round-1-before-restart.json), [all cases](evidence/
 | `cd native && npm run typecheck && npm run test && npm run check:boundaries` | clean; 658 passed; parity hash unchanged. The boundary check also caught a local variable named `window` in the kernel's paper fitting (from the quality review), now `span` |
 | Electron Studio check (`studio-check`, `SYLF_STUDIO_AI=1`) against the local server | every check passed, including the Cambridge Maths Paper 1 plan confirmed from the checked catalog and the library reuse of Chemistry 9701 Paper 2 |
 
+## Hosted database (applied 14 November 2026)
+
+On the owner's instruction, the three planner migrations were applied to the hosted database through `node scripts/db/apply-migration.mjs --all`: `20261113100000_planning_kernel`, `20261113200000_syllabus_library` and `20261114100000_syllabus_search`. They were the only pending migrations, and no earlier migration was unresolved.
+
+Before applying:
+
+- a read-only check found PostgreSQL 17.6, no existing objects with the new names, integer `User.id` and `Quest.id` for the new foreign keys, and the Supabase client roles present;
+- a private custom-format backup of the `public` and `storage` schemas was taken through the verified TLS bridge (`backups/planner-studio-20261114/before.dump`, gitignored, mode 0600). It lists data for all 74 public tables.
+
+Afterwards, read-only:
+
+- the six new tables have row-level security on and no grants or policies for `anon`, `authenticated`, `service_role` or `PUBLIC`;
+- the three owner triggers and five check constraints exist, and the owner guard is not executable by client roles;
+- the `terms` column and its GIN index exist;
+- public tables went from 74 to 80, users are unchanged at 176, the ledger holds 86 finished migrations, and `--status` reports the schema up to date.
+
+The Planning Studio stays off in production until `SYLF_PLANNING_STUDIO` is set there.
+
 ## Limits, and what waits for the owner
 
-- **Apply the migration** `20261114100000_syllabus_search` to the hosted database with the two earlier planner migrations. Existing library rows are indexed by the server on its first search.
+- **Production switch.** Turning the Studio on in production (`SYLF_PLANNING_STUDIO`) and deploying are the owner's decisions; the database is ready.
 - **First-time research quality is unchanged by this work.** In one early run the double-check added a Paper 3 topic to the Papers 1 and 2 outline; the final saved entry is correct. A wrong entry is shared until a student's "Something's off" corrects it.
 - **The whole 9709 course is researched rather than assembled from the six checked papers.** That is deliberate: which papers make up the course depends on the route a student takes.
 - A model-written topic name can still be shortened to one word at a colon (one run named a topic "Conditional").

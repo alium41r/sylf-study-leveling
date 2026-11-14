@@ -1,0 +1,278 @@
+[
+ {
+  "id": "further-p1p2",
+  "expect": "research: Further Pure Mathematics 1 and 2, never 9709",
+  "seconds": 2.3,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning A level CAIE Further Maths paper 1 and paper 2 complete",
+   "Working out the plan",
+   "Checking Sylf's syllabus library",
+   "Found in Sylf's syllabus library",
+   "13 topics from Sylf's syllabus library",
+   "Building your plan",
+   "36 sessions to Mon 30 Nov",
+   "Fitting 36 pieces of work into your free time",
+   "331 checks passed"
+  ],
+  "preset": "exam",
+  "calls": 1,
+  "syllabus": {
+   "source": "model",
+   "ref": null,
+   "name": "Cambridge International A Level Further Mathematics (9231), Papers 1 & 2",
+   "library": {
+    "id": "57f9a5c1-c2a5-4723-a9cb-980034df74d7",
+    "trust": "CHECKED",
+    "reused": true,
+    "version": 1
+   },
+   "identity": {
+    "code": "9231",
+    "board": "Cambridge International",
+    "edition": "2026–2027 syllabus (9231), covering Papers 1 (Further Pure Mathematics 1) and 2 (Further Pure Mathematics 2)",
+    "subject": "Further Mathematics",
+    "component": "Papers 1 and 2",
+    "qualification": "A Level"
+   },
+   "researched": true,
+   "papers": [
+    {
+     "label": "Paper 1",
+     "marks": 50,
+     "minutes": 120
+    },
+    {
+     "label": "Paper 2",
+     "marks": 50,
+     "minutes": 120
+    }
+   ],
+   "units": [
+    "Roots of polynomial equations",
+    "Rational functions and graphs",
+    "Summation of series",
+    "Matrices",
+    "Polar coordinates",
+    "Vectors",
+    "Proof by induction",
+    "Hyperbolic functions",
+    "Matrices (eigenvalues and eigenvectors)",
+    "Differentiation",
+    "Integration",
+    "Complex numbers",
+    "Differential equations"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ },
+ {
+  "id": "further-again",
+  "expect": "library: the Further Maths entry saved by the first case",
+  "seconds": 1.8,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning Cambridge International A Level Further Mathematics 9231",
+   "Finding the syllabus",
+   "Checking Sylf's syllabus library",
+   "Found in Sylf's syllabus library",
+   "13 topics from Sylf's syllabus library",
+   "Building your plan",
+   "36 sessions to Thu 3 Dec",
+   "Fitting 36 pieces of work into your free time",
+   "333 checks passed"
+  ],
+  "preset": "exam",
+  "calls": 1,
+  "syllabus": {
+   "source": "model",
+   "ref": null,
+   "name": "Cambridge International A Level Further Mathematics (9231), Papers 1 & 2",
+   "library": {
+    "id": "57f9a5c1-c2a5-4723-a9cb-980034df74d7",
+    "trust": "CHECKED",
+    "reused": true,
+    "version": 1
+   },
+   "identity": {
+    "code": "9231",
+    "board": "Cambridge International",
+    "edition": "2026–2027 syllabus (9231), covering Papers 1 (Further Pure Mathematics 1) and 2 (Further Pure Mathematics 2)",
+    "subject": "Further Mathematics",
+    "component": "Papers 1 and 2",
+    "qualification": "A Level"
+   },
+   "researched": true,
+   "papers": [
+    {
+     "label": "Paper 1",
+     "marks": 50,
+     "minutes": 120
+    },
+    {
+     "label": "Paper 2",
+     "marks": 50,
+     "minutes": 120
+    }
+   ],
+   "units": [
+    "Roots of polynomial equations",
+    "Rational functions and graphs",
+    "Summation of series",
+    "Matrices",
+    "Polar coordinates",
+    "Vectors",
+    "Proof by induction",
+    "Hyperbolic functions",
+    "Matrices (eigenvalues and eigenvectors)",
+    "Differentiation",
+    "Integration",
+    "Complex numbers",
+    "Differential equations"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ },
+ {
+  "id": "further-mock-dec",
+  "expect": "library: the Papers 1 and 2 entry",
+  "seconds": 1.7,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning CAIE Further Maths P1 and P2 mock exams in December",
+   "Working out the plan",
+   "Checking Sylf's syllabus library",
+   "Found in Sylf's syllabus library",
+   "13 topics from Sylf's syllabus library",
+   "Building your plan",
+   "36 sessions to Tue 8 Dec",
+   "Fitting 36 pieces of work into your free time",
+   "343 checks passed"
+  ],
+  "preset": "exam",
+  "calls": 1,
+  "syllabus": {
+   "source": "model",
+   "ref": null,
+   "name": "Cambridge International A Level Further Mathematics (9231), Papers 1 & 2",
+   "library": {
+    "id": "57f9a5c1-c2a5-4723-a9cb-980034df74d7",
+    "trust": "CHECKED",
+    "reused": true,
+    "version": 1
+   },
+   "identity": {
+    "code": "9231",
+    "board": "Cambridge International",
+    "edition": "2026–2027 syllabus (9231), covering Papers 1 (Further Pure Mathematics 1) and 2 (Further Pure Mathematics 2)",
+    "subject": "Further Mathematics",
+    "component": "Papers 1 and 2",
+    "qualification": "A Level"
+   },
+   "researched": true,
+   "papers": [
+    {
+     "label": "Paper 1",
+     "marks": 50,
+     "minutes": 120
+    },
+    {
+     "label": "Paper 2",
+     "marks": 50,
+     "minutes": 120
+    }
+   ],
+   "units": [
+    "Roots of polynomial equations",
+    "Rational functions and graphs",
+    "Summation of series",
+    "Matrices",
+    "Polar coordinates",
+    "Vectors",
+    "Proof by induction",
+    "Hyperbolic functions",
+    "Matrices (eigenvalues and eigenvectors)",
+    "Differentiation",
+    "Integration",
+    "Complex numbers",
+    "Differential equations"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ },
+ {
+  "id": "further-fp1",
+  "expect": "research Paper 1 alone, never the 1 and 2 entry",
+  "seconds": 21.1,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning Cambridge A Level Further Mathematics 9231 Paper 1 Further",
+   "Finding the syllabus",
+   "Checking Sylf's syllabus library",
+   "Researching this syllabus for the first time",
+   "Read 8 sources",
+   "Double-checking the topics",
+   "Double-check agreed",
+   "7 topics from research, double-checked",
+   "Building your plan",
+   "22 sessions to Fri 4 Dec",
+   "Fitting 22 pieces of work into your free time",
+   "206 checks passed"
+  ],
+  "preset": "exam",
+  "calls": 3,
+  "syllabus": {
+   "source": "model",
+   "ref": null,
+   "name": "Cambridge International AS & A Level Further Mathematics (9231), Paper 1 Further Pure Mathematics 1",
+   "library": {
+    "id": "9b461652-baf9-4e60-a43a-a1de78d5abaa",
+    "trust": "CHECKED",
+    "reused": false,
+    "version": 1
+   },
+   "identity": {
+    "code": "9231",
+    "board": "Cambridge International",
+    "edition": "2026–2027",
+    "subject": "Further Mathematics",
+    "component": "Paper 1 Further Pure Mathematics 1",
+    "qualification": "A Level"
+   },
+   "researched": true,
+   "papers": [
+    {
+     "label": "Paper 1",
+     "marks": 75,
+     "minutes": 120
+    }
+   ],
+   "units": [
+    "Roots of polynomial equations",
+    "Rational functions and graphs",
+    "Summation of series",
+    "Matrices",
+    "Polar coordinates",
+    "Vectors",
+    "Proof by induction"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ }
+]

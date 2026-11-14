@@ -22,10 +22,10 @@ import { prisma } from "@/lib/prisma";
 import { compileContext } from "@/lib/planner/studio/snapshot";
 import { acceptProposal, commitDirect, undoLatest } from "@/lib/planner/studio/store";
 import { loadState, runAddGoal, runAnswer, runCommand, runDirect, runFeedback } from "@/lib/planner/studio/workflows";
-import { feedbackFor, findOutline, recordFeedback, reviseOutline, saveOutline } from "@/lib/planner/studio/outlines";
+import { feedbackFor, findOutline, recordFeedback, reviseOutline, saveOutline, searchOutlines } from "@/lib/planner/studio/outlines";
 import { repairBeforeDeadline } from "@/lib/planner/studio/events";
 import { localParts } from "@/lib/planner/studio/time";
-import { addDays, normalizeSyllabus, propose } from "@/lib/planner/kernel";
+import { addDays, normalizeSyllabus, propose, syllabusTerms } from "@/lib/planner/kernel";
 
 const key = () => `t${randomUUID().replace(/-/g, "").slice(0, 20)}`;
 const noop = () => undefined;
@@ -207,6 +207,25 @@ describe.skipIf(!database)("Planning Studio on PostgreSQL", () => {
     const row = await prisma.syllabusOutline.findUniqueOrThrow({ where: { id: saved.id } });
     expect(row).toMatchObject({ version: 2, reports: 1 });
     expect(JSON.stringify(row.outline)).not.toContain("42");
+  });
+
+  it("finds stored syllabi with one indexed lookup, the asked-for subject first, and indexes entries saved before search existed", async () => {
+    const tag = randomUUID().slice(0, 8);
+    const outline = (name: string, subject: string, code: string, component: string) => ({ ...normalizeSyllabus({ source: "model", name, units: [{ title: "Complex numbers", points: ["Argand diagrams"] }, { title: "Matrices", points: ["Inverses"] }], papers: [] }), identity: { board: "Cambridge International", qualification: "A Level", subject, code, component, edition: "2025-2027" } });
+    // Saved before the terms column existed: no terms yet.
+    const older = await prisma.syllabusOutline.create({ data: { key: `caie|9231|p1+p2|${tag}`, name: "Further Mathematics Papers 1 and 2", preset: "exam", outline: outline("Further Mathematics Papers 1 and 2", "Further Mathematics", "9231", "Paper 1 and Paper 2") as object, sources: [] } });
+    await saveOutline(`caie|9709|p1|${tag}`, outline("Mathematics Paper 1", "Mathematics", "9709", "Paper 1"), "exam");
+    await saveOutline(`knec|231/1|p1|${tag}`, { ...outline("KCSE Biology Paper 1", "Biology", "231/1", "Paper 1"), identity: { board: "KNEC", qualification: "KCSE", subject: "Biology", code: "231/1", component: "Paper 1", edition: null } }, "exam");
+    const hits = await searchOutlines(syllabusTerms("A level CAIE Further Maths paper 1 and paper 2"));
+    expect(hits[0]?.entry.id).toBe(older.id);
+    expect(hits[0]?.stored).toMatchObject({ subject: "Further Mathematics", code: "9231", papers: ["1", "2"] });
+    expect(hits.some((h) => h.entry.syllabus.name === "KCSE Biology Paper 1")).toBe(false);
+    expect((await prisma.syllabusOutline.findUniqueOrThrow({ where: { id: older.id } })).terms).toEqual(expect.arrayContaining(["code:9231", "w:further", "w:mathematics", "paper:1", "paper:2"]));
+    // A request with no subject word or code reaches nothing.
+    expect(await searchOutlines(syllabusTerms("CAIE A level paper 1"))).toEqual([]);
+    // The lookup can be served by the GIN index (Postgres prefers it once the library outgrows a few pages, so a scan is switched off to show it).
+    const [, plan] = await prisma.$transaction([prisma.$executeRawUnsafe("SET LOCAL enable_seqscan = off"), prisma.$queryRawUnsafe(`EXPLAIN SELECT id FROM "SyllabusOutline" WHERE terms && ARRAY['w:further']::text[]`)]);
+    expect(JSON.stringify(plan)).toContain("SyllabusOutline_terms_idx");
   });
 
   it("records one answer per plan round, counts a confirmation once, and shows it in the state", async () => {

@@ -1,0 +1,168 @@
+[
+ {
+  "id": "further-p1p2",
+  "expect": "research: Further Pure Mathematics 1 and 2, never 9709",
+  "seconds": 1.3,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning A level CAIE Further Maths paper 1 and paper 2 complete for",
+   "Working out the plan",
+   "Checking Sylf's syllabus library",
+   "Found in Sylf's syllabus library",
+   "13 topics from Sylf's syllabus library",
+   "Building your plan",
+   "36 sessions to Mon 30 Nov",
+   "Fitting 36 pieces of work into your free time",
+   "331 checks passed"
+  ],
+  "preset": "exam",
+  "calls": 1,
+  "syllabus": {
+   "source": "model",
+   "ref": null,
+   "name": "Cambridge International A Level Further Mathematics (9231), Papers 1 & 2",
+   "library": {
+    "id": "57f9a5c1-c2a5-4723-a9cb-980034df74d7",
+    "trust": "CHECKED",
+    "reused": true,
+    "version": 1
+   },
+   "identity": {
+    "code": "9231",
+    "board": "Cambridge International",
+    "edition": "2026–2027 syllabus (9231), covering Papers 1 (Further Pure Mathematics 1) and 2 (Further Pure Mathematics 2)",
+    "subject": "Further Mathematics",
+    "component": "Papers 1 and 2",
+    "qualification": "A Level"
+   },
+   "researched": true,
+   "papers": [
+    {
+     "label": "Paper 1",
+     "marks": 50,
+     "minutes": 120
+    },
+    {
+     "label": "Paper 2",
+     "marks": 50,
+     "minutes": 120
+    }
+   ],
+   "units": [
+    "Roots of polynomial equations",
+    "Rational functions and graphs",
+    "Summation of series",
+    "Matrices",
+    "Polar coordinates",
+    "Vectors",
+    "Proof by induction",
+    "Hyperbolic functions",
+    "Matrices (eigenvalues and eigenvectors)",
+    "Differentiation",
+    "Integration",
+    "Complex numbers",
+    "Differential equations"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ },
+ {
+  "id": "further-again",
+  "expect": "library: the Further Maths entry saved by the first case",
+  "seconds": 30.7,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning Cambridge International A Level Further Mathematics 9231 Pap",
+   "Finding the syllabus",
+   "Checking Sylf's syllabus library",
+   "Researching this syllabus for the first time",
+   "Read 8 sources",
+   "Double-checking the topics",
+   "Checking 1 more official topic",
+   "Double-check made 4 corrections",
+   "23 topics from research, double-checked",
+   "Building your plan",
+   "29 sessions to Thu 3 Dec",
+   "Fitting 29 pieces of work into your free time",
+   "252 checks passed"
+  ],
+  "preset": "exam",
+  "calls": 4,
+  "syllabus": {
+   "source": "model",
+   "ref": null,
+   "name": "Cambridge International A Level Further Mathematics (9231)",
+   "library": {
+    "id": "bb630ed8-8e43-4a1c-bb61-86546bd7b952",
+    "trust": "CHECKED",
+    "reused": false,
+    "version": 1
+   },
+   "identity": {
+    "code": "9231",
+    "board": "Cambridge International",
+    "edition": "2026–2027 (version 5, published November 2026)",
+    "subject": "Further Mathematics",
+    "component": "Paper 1",
+    "qualification": "A Level"
+   },
+   "researched": true,
+   "papers": [
+    {
+     "label": "Paper 1",
+     "marks": 75,
+     "minutes": 120
+    },
+    {
+     "label": "Paper 2",
+     "marks": 75,
+     "minutes": 120
+    },
+    {
+     "label": "Paper 3",
+     "marks": 50,
+     "minutes": 90
+    },
+    {
+     "label": "Paper 4",
+     "marks": 50,
+     "minutes": 90
+    }
+   ],
+   "units": [
+    "Roots of polynomial equations",
+    "Rational functions and graphs",
+    "Summation of series",
+    "Matrices",
+    "Polar coordinates",
+    "Vectors",
+    "Proof by induction",
+    "Hyperbolic functions",
+    "Matrices (extended)",
+    "Differentiation and integration (advanced)",
+    "Complex numbers",
+    "Differential equations",
+    "Motion of a projectile",
+    "Equilibrium of a rigid body",
+    "Circular motion",
+    "Hooke's law",
+    "Linear motion under a variable force",
+    "Momentum",
+    "Continuous random variables",
+    "Inference using normal and t-distributions",
+    "Chi-squared tests",
+    "Non-parametric tests",
+    "Probability generating functions"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ }
+]

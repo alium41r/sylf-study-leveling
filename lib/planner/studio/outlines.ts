@@ -4,7 +4,7 @@ import "server-only";
 // the student's own ratings, ticks and syllabus-node links are stripped before saving and re-applied per student when reused. A correction made
 // after a student's report, and confirmed by a fresh check against sources, becomes the entry's next version for everyone.
 import { prisma } from "@/lib/prisma";
-import { normalizeSyllabus, type PlanPreset, type Syllabus } from "../kernel";
+import { anchorTerms, matchScore, normalizeSyllabus, papersIn, syllabusTerms, type PlanPreset, type StoredSyllabus, type Syllabus } from "../kernel";
 
 export interface LibraryEntry { id: string; key: string; version: number; trust: "CHECKED" | "UNVERIFIED"; preset: PlanPreset; syllabus: Syllabus }
 
@@ -32,13 +32,62 @@ export async function findOutline(keys: string | string[]): Promise<LibraryEntry
   return row ? toEntry(row) : null;
 }
 
+/** An entry's search terms: what it is (board, qualification, subject, code, papers), its name, and its keys, which say the same in short form. */
+export function termsFor(syllabus: Syllabus, keys: (string | null | undefined)[]): string[] {
+  const id = syllabus.identity;
+  return syllabusTerms([id?.board, id?.qualification, id?.subject, id?.code, id?.component, syllabus.name, ...keys.map((k) => k?.replace(/\|/g, " "))].filter(Boolean).join(" "));
+}
+
+/** What an entry is, for the model and the match check: from its identity, or from its key when it was saved without one. */
+export function storedOf(entry: LibraryEntry): StoredSyllabus {
+  const id = entry.syllabus.identity;
+  const paper = entry.key.split("|").pop() ?? "";
+  return { board: id?.board ?? null, code: id?.code ?? null, qualification: id?.qualification ?? null, subject: id?.subject ?? null, papers: id?.component ? papersIn(id.component) : paper === "all" ? [] : papersIn(paper.replace(/p/g, " p")), name: entry.syllabus.name };
+}
+
+// Entries saved before the terms column existed are indexed once, the first time this server searches.
+let indexed: Promise<void> | null = null;
+function indexOlderEntries(): Promise<void> {
+  indexed ??= (async () => {
+    const rows = await prisma.syllabusOutline.findMany({ where: { terms: { isEmpty: true } }, take: 500, select: { id: true, key: true, altKey: true, version: true, trust: true, preset: true, outline: true, sources: true, edition: true } });
+    for (const row of rows) await prisma.syllabusOutline.update({ where: { id: row.id }, data: { terms: termsFor(toEntry(row).syllabus, [row.key, row.altKey]) } });
+  })().catch(() => { indexed = null; });
+  return indexed;
+}
+
+export interface LibraryHit { entry: LibraryEntry; stored: StoredSyllabus; score: number }
+
+/**
+ * The library entries a request might mean, best first. One indexed lookup: the GIN index on `terms` finds the rows that share a code or a subject
+ * word with the request, Postgres orders them by how many terms they share, and the top few are scored here. Never a pass over the library.
+ */
+export async function searchOutlines(request: readonly string[], limit = 6): Promise<LibraryHit[]> {
+  const anchors = anchorTerms(request);
+  if (!anchors.length) return [];
+  await indexOlderEntries();
+  const all = [...request];
+  const rows = await prisma.$queryRaw<{ id: string; key: string; version: number; trust: string; preset: string; outline: unknown; sources: unknown; edition: string | null; terms: string[] }[]>`
+    SELECT "id", "key", "version", "trust", "preset", "outline", "sources", "edition", "terms" FROM "SyllabusOutline"
+    WHERE "terms" && ${anchors}::text[]
+    ORDER BY cardinality(ARRAY(SELECT unnest("terms") INTERSECT SELECT unnest(${all}::text[]))) DESC, "confirmations" DESC, "createdAt" ASC
+    LIMIT 30`;
+  return rows.map((row) => { const entry = toEntry(row); return { entry, stored: storedOf(entry), score: matchScore(request, row.terms) }; })
+    .filter((hit) => hit.score > 0).sort((a, b) => b.score - a.score).slice(0, limit);
+}
+
+/** The entry with this id, as the model chose it from a search. */
+export async function outlineById(id: string): Promise<LibraryEntry | null> {
+  const row = await prisma.syllabusOutline.findUnique({ where: { id } });
+  return row ? toEntry(row) : null;
+}
+
 /** Saves a newly checked syllabus under its keys. If another student saved the same syllabus a moment earlier, theirs is kept and returned. */
 export async function saveOutline(keys: string | string[], syllabus: Syllabus, preset: PlanPreset): Promise<LibraryEntry> {
   const [key, altKey] = Array.isArray(keys) ? keys : [keys];
   const shared = shareable(syllabus);
   const trust = shared.sources?.length ? "CHECKED" : "UNVERIFIED";
   try {
-    const row = await prisma.syllabusOutline.create({ data: { key, altKey: altKey && altKey !== key ? altKey : null, name: shared.name.slice(0, 200), preset, outline: shared as object, sources: (shared.sources ?? []) as object, edition: shared.identity?.edition ?? null, trust, checkedAt: trust === "CHECKED" ? new Date() : null } });
+    const row = await prisma.syllabusOutline.create({ data: { key, altKey: altKey && altKey !== key ? altKey : null, name: shared.name.slice(0, 200), preset, outline: shared as object, sources: (shared.sources ?? []) as object, edition: shared.identity?.edition ?? null, trust, checkedAt: trust === "CHECKED" ? new Date() : null, terms: termsFor(shared, [key, altKey]) } });
     return { ...toEntry(row), syllabus: { ...syllabus, library: { id: row.id, version: row.version, trust, reused: false } } };
   } catch (error) {
     if ((error as { code?: string })?.code !== "P2002") throw error;
@@ -51,7 +100,8 @@ export async function saveOutline(keys: string | string[], syllabus: Syllabus, p
 /** A correction confirmed by a fresh check against sources: the entry's next version, for everyone who plans it from now on. */
 export async function reviseOutline(id: string, syllabus: Syllabus): Promise<{ version: number }> {
   const shared = shareable(syllabus);
-  const row = await prisma.syllabusOutline.update({ where: { id }, data: { outline: shared as object, sources: (shared.sources ?? []) as object, edition: shared.identity?.edition ?? null, trust: shared.sources?.length ? "CHECKED" : "UNVERIFIED", version: { increment: 1 }, reports: { increment: 1 }, checkedAt: new Date() } });
+  const before = await prisma.syllabusOutline.findUnique({ where: { id }, select: { key: true, altKey: true } });
+  const row = await prisma.syllabusOutline.update({ where: { id }, data: { terms: termsFor(shared, [before?.key, before?.altKey]), outline: shared as object, sources: (shared.sources ?? []) as object, edition: shared.identity?.edition ?? null, trust: shared.sources?.length ? "CHECKED" : "UNVERIFIED", version: { increment: 1 }, reports: { increment: 1 }, checkedAt: new Date() } });
   return { version: row.version };
 }
 

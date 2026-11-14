@@ -18,7 +18,7 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 // Increment this version whenever schema fields are modified
-const SCHEMA_BUILD_VERSION = 43;
+const SCHEMA_BUILD_VERSION = 44;
 let applicationPool: Pool | undefined;
 
 /** Raw durable-core transactions reuse the web pool already owned by Prisma. */

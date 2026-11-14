@@ -765,6 +765,11 @@ model SyllabusOutline {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   feedback      PlanFeedback[]
+  /// Search terms (`board:caie`, `code:9709`, `paper:1`, `w:mathematics`) from lib/planner/kernel `syllabusTerms`, GIN-indexed so a request finds
+  /// the few entries that might be its syllabus in one lookup.
+  terms         String[]       @default([])
+
+  @@index([terms], type: Gin)
 }
 
 /// A student's answer to "Is this plan right?" for one plan of one goal. A re-check starts a new round, which can be answered again.

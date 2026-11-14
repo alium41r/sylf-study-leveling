@@ -432,8 +432,8 @@ function fitPapers(days: Days, papers: SyllabusPaper[], count: number, before: n
   let k = count;
   while (k > 1) {
     const tail = Math.max(2 * k + 1, Math.floor(before / 3));
-    const window = days.capacity.slice(Math.max(0, before - tail), before);
-    const room = window.reduce((sum, c) => sum + c, 0) - [...window].sort((a, b) => b - a).slice(0, k).reduce((sum, c) => sum + c, 0);
+    const span = days.capacity.slice(Math.max(0, before - tail), before);
+    const room = span.reduce((sum, c) => sum + c, 0) - [...span].sort((a, b) => b - a).slice(0, k).reduce((sum, c) => sum + c, 0);
     let need = 60;
     for (let i = 0; i < k; i++) need += correctionsFor(papers[i % papers.length]);
     if (2 * k <= Math.max(2, Math.floor(before / 3)) && need <= room * 0.85) break;
@@ -450,7 +450,7 @@ function tailDaysFor(days: Days, papers: SyllabusPaper[], count: number, before:
   let need = 60 + 60 + weak * 50;
   for (let i = 0; i < count; i++) need += correctionsFor(papers[i % papers.length]);
   let tail = count * 2;
-  const room = (t: number) => { const window = days.capacity.slice(Math.max(0, before - t), before); return window.reduce((sum, c) => sum + c, 0) - [...window].sort((a, b) => b - a).slice(0, count).reduce((sum, c) => sum + c, 0); };
+  const room = (t: number) => { const span = days.capacity.slice(Math.max(0, before - t), before); return span.reduce((sum, c) => sum + c, 0) - [...span].sort((a, b) => b - a).slice(0, count).reduce((sum, c) => sum + c, 0); };
   while (tail < Math.floor(before / 3) && room(tail) * 0.85 < need) tail++;
   return tail;
 }
@@ -1359,7 +1359,9 @@ export function outlineKey(identity: SyllabusIdentity | null | undefined): strin
   let qualification = slug(identity.qualification).replace(/\b(as and a|as a|a and as)\b/g, "a").replace(/\blevels?\b/g, "level").replace(/\s+/g, " ").trim();
   // Cambridge's AS and A Level share one syllabus per subject; other boards' AS and A Level are separate qualifications and stay apart.
   if (board === "caie" && /^(as|a2|a)\s*level$/.test(qualification)) qualification = "a level";
-  const paper = /\b(?:paper|component|p|unit)\s*([0-9]+[a-z]?|[ivx]+)\b/.exec(slug(identity.component))?.[1] ?? slug(identity.component).replace(/\s+/g, "-");
+  // Every paper named, so "Paper 1 and Paper 2" is its own entry rather than finding Paper 1's.
+  const numbered = papersIn(identity.component ?? "");
+  const paper = numbered.length ? numbered.join("+p") : /\b(?:paper|component|p|unit)\s*([0-9]+[a-z]?|[ivx]+)\b/.exec(slug(identity.component))?.[1] ?? slug(identity.component).replace(/\s+/g, "-");
   if (!board && !code) return null;
   if (!code && !subject) return null;
   const parts = [board || "any", code || `${qualification || "any"}|${subject}`, paper ? `p${paper.replace(/^p/, "")}` : "all"];
@@ -1375,6 +1377,118 @@ export function outlineKeys(identity: SyllabusIdentity | null | undefined): stri
   if (!primary || !identity) return [];
   const described = identity.code && identity.subject ? outlineKey({ ...identity, code: null }) : null;
   return [...new Set([primary, described].filter((k): k is string => Boolean(k)))];
+}
+
+// ── Finding a syllabus Sylf already holds ──────────────────────────────────────────────────────────────────────────────────────────────────────
+// A request and every stored syllabus (the checked catalog and the shared library) are reduced to the same small vocabulary of terms: the board,
+// the qualification, codes, papers and subject words, each with its kind as a prefix ("board:caie", "code:9709", "paper:1", "w:mathematics"). Stores
+// index those terms (an inverted index for the catalog, a GIN-indexed array for the library), so finding the few syllabi a request might mean is
+// one indexed lookup, never a pass over every entry. The model then decides which, if any, is the one asked for; `agreesWith` checks its choice.
+
+const QUALIFICATIONS: [RegExp, string][] = [
+  [/\b(?:a|as)[\s-]?levels?\b|\ba2\b|\badvanced (?:subsidiary|level)\b/, "alevel"], [/\bigcse\b/, "igcse"], [/\bgcse\b/, "gcse"], [/\bo[\s-]?levels?\b/, "olevel"],
+  [/\bap\b|\badvanced placement\b/, "ap"], [/\bib\b|\binternational baccalaureate\b|\bdiploma programme\b/, "ib"], [/\bkcse\b/, "kcse"], [/\bhssc\b|\bfsc\b/, "hssc"],
+  [/\bssc\b|\bmatric(?:ulation)?\b/, "ssc"], [/\bclass\s*(?:12|xii)\b/, "class12"], [/\bclass\s*(?:11|xi)\b/, "class11"], [/\bclass\s*(?:10|x)\b/, "class10"],
+  [/\bbtec\b/, "btec"], [/\bhigher\s+level\b|\bhl\b/, "hl"], [/\bstandard\s+level\b|\bsl\b/, "sl"], [/\bbaccalaureat\b|\bbac\b/, "bac"],
+];
+const SYNONYMS: Record<string, string> = { math: "mathematics", maths: "mathematics", bio: "biology", chem: "chemistry", phys: "physics", econ: "economics", econs: "economics", stats: "statistics", mech: "mechanics", geog: "geography", psych: "psychology", comp: "computer", compsci: "computer", lit: "literature", lang: "language", calc: "calculus" };
+const NOT_SUBJECT = new Set(("the and for with from into about your their this that these those only both all any whole full complete completed exam exams examination examinations paper papers " +
+  "level levels prep preparation prepare preparing revise revision revising study studying plan planning syllabus specification spec course courses module modules final finals mid midterm midterms " +
+  "term terms mock mocks test tests quiz quizzes practice past session sessions week weeks month months day days tomorrow today next year years grade grades unit units component components " +
+  "topic topics chapter chapters board boards international cambridge edexcel pearson assessment caie cie aqa ocr wjec eduqas ibo knec waec cbse cisce icse isc fbise sqa college " +
+  "advanced subsidiary diploma programme certificate general secondary education qualification qualifications igcse gcse alevel ap ib kcse hssc ssc fsc matric btec hl sl bac " +
+  "one two three four five six first second third fourth fifth sixth higher foundation tier standard new old edition upcoming coming my our for get pass passing ace score target " +
+  "january february march april may june july august september october november december jan feb mar apr jun jul aug sep sept oct nov dec spring summer autumn fall winter series session").split(" "));
+const PAPER_WORDS: Record<string, string> = { one: "1", two: "2", three: "3", four: "4", five: "5", six: "6", i: "1", ii: "2", iii: "3", iv: "4", v: "5", vi: "6" };
+
+/** Paper numbers a text names: "Paper 1 and Paper 2", "papers 1, 3", "P1/P3", "paper one", "component 2". Sorted, without repeats. */
+export function papersIn(text: string): string[] {
+  const found = new Set<string>();
+  const lower = text.toLowerCase();
+  const token = "(?:[1-9]|one|two|three|four|five|six|iv|vi|v|i{1,3})\\b";
+  const list = new RegExp(`\\b(?:papers?|components?|units?)\\s*(${token}(?:\\s*(?:,|&|and|\\/|\\+|or)\\s*(?:(?:paper|component|unit)\\s*)?${token})*)`, "g");
+  for (const match of lower.matchAll(list)) {
+    for (const part of match[1].split(/\s*(?:,|&|\band\b|\/|\+|\bor\b|paper|component|unit)\s*/)) { const n = PAPER_WORDS[part.trim()] ?? part.trim(); if (/^[1-9]$/.test(n)) found.add(n); }
+  }
+  for (const match of lower.matchAll(/\bp\s?([1-9])\b/g)) found.add(match[1]);
+  return [...found].sort();
+}
+
+/** Every syllabus or module code in a text (4-digit codes, "231/1", "4MA1"), never a year. */
+export function codesIn(text: string | null | undefined): string[] {
+  const codes = new Set<string>();
+  for (const match of (text ?? "").matchAll(/\b(\d{3,4}\/\d|\d[A-Z]{2}\d|\d{4})\b/gi)) if (!/^(19|20)\d{2}$/.test(match[1])) codes.add(match[1].toLowerCase());
+  return [...codes];
+}
+
+/** A request's or a syllabus's search terms. Both sides use this one function, so they always speak the same vocabulary. */
+export function syllabusTerms(text: string | null | undefined): string[] {
+  const raw = slug(text);
+  const terms = new Set<string>();
+  for (const [re, board] of BOARDS) if (re.test(raw)) terms.add(`board:${board}`);
+  for (const [re, qualification] of QUALIFICATIONS) if (re.test(raw)) terms.add(`qual:${qualification}`);
+  for (const code of codesIn(text)) terms.add(`code:${code}`);
+  for (const paper of papersIn(text ?? "")) terms.add(`paper:${paper}`);
+  // GCSE tiers are different papers of one specification.
+  const tiered = /\btier\b|\bgcse\b/.test(raw);
+  if (tiered && /\bhigher\b/.test(raw)) terms.add("tier:higher");
+  if (tiered && /\bfoundation\b/.test(raw)) terms.add("tier:foundation");
+  for (const word of raw.split(/[^a-z0-9]+/)) {
+    if (word.length < 3 || /^\d+$/.test(word) || NOT_SUBJECT.has(word)) continue;
+    const plain = SYNONYMS[word] ?? word;
+    if (!NOT_SUBJECT.has(plain)) terms.add(`w:${plain}`);
+  }
+  return [...terms];
+}
+
+/** The terms that are enough to make a stored syllabus a candidate at all: a code or a subject word. A board or a paper number alone is not. */
+export const anchorTerms = (terms: readonly string[]) => terms.filter((t) => t.startsWith("code:") || t.startsWith("w:"));
+
+const TERM_WEIGHT: Record<string, number> = { code: 8, w: 3, paper: 2, board: 2, qual: 2, tier: 1 };
+const kindOf = (term: string) => term.slice(0, term.indexOf(":"));
+
+/**
+ * How well a stored syllabus fits a request, for ranking the few candidates shown to the model. Shared terms count by kind; subject words on one
+ * side only count against (Further Mathematics is not Mathematics); a different code or board counts heavily against.
+ */
+export function matchScore(request: readonly string[], stored: readonly string[]): number {
+  const mine = new Set(request), theirs = new Set(stored);
+  let score = 0;
+  for (const term of mine) if (theirs.has(term)) score += TERM_WEIGHT[kindOf(term)] ?? 1;
+  for (const term of mine) if (term.startsWith("w:") && !theirs.has(term)) score -= 1;
+  for (const term of theirs) if (term.startsWith("w:") && !mine.has(term)) score -= 1;
+  const differ = (kind: string) => { const a = [...mine].filter((t) => t.startsWith(kind)), b = [...theirs].filter((t) => t.startsWith(kind)); return a.length > 0 && b.length > 0 && !a.some((t) => theirs.has(t)); };
+  if (differ("code:")) score -= 10;
+  if (differ("board:")) score -= 6;
+  return score;
+}
+
+/** What a stored syllabus is, as the model and the match check see it. */
+export interface StoredSyllabus { board: string | null; code: string | null; qualification: string | null; subject: string | null; papers: string[]; name: string }
+
+/**
+ * Whether the model's choice agrees with what it identified the request as. A choice is refused when the codes differ, the boards differ, the
+ * subject has words the stored syllabus lacks or the other way round ("Further Mathematics" against "Mathematics"), or the stored papers are not
+ * exactly the papers asked for (none named means the whole course, which a single paper is not). Anything unsure falls through to research.
+ */
+export function agreesWith(identity: SyllabusIdentity, chosen: StoredSyllabus[]): boolean {
+  if (!chosen.length) return false;
+  const norm = (code: string | null | undefined) => slug(code).replace(/\s+/g, "");
+  const boardOf = (text: string | null | undefined) => { const raw = slug(text); return BOARDS.find(([re]) => re.test(raw))?.[1] ?? raw; };
+  const words = (text: string | null | undefined) => syllabusTerms(text).filter((t) => t.startsWith("w:"));
+  const wanted = new Set(words(identity.subject));
+  const asked = papersIn(identity.component ?? "");
+  const papers = [...new Set(chosen.flatMap((c) => c.papers))].sort();
+  for (const stored of chosen) {
+    if (identity.code && stored.code && norm(identity.code) !== norm(stored.code)) return false;
+    if (identity.board && stored.board && boardOf(identity.board) !== boardOf(stored.board)) return false;
+    // Every subject word asked for is in the stored syllabus's subject or name, and every word of its subject was asked for.
+    const own = words(stored.subject), named = new Set([...own, ...words(stored.name)]);
+    if ([...wanted].some((w) => !named.has(w))) return false;
+    if (wanted.size && own.some((w) => !wanted.has(w))) return false;
+  }
+  if (asked.length ? papers.join(",") !== asked.join(",") : papers.length > 0) return false;
+  return true;
 }
 
 /** A checker's corrections to an outline: topics to add (after a named topic or at the end), to remove, to rename, and corrected papers. */

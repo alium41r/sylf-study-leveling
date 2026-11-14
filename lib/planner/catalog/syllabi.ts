@@ -5,9 +5,9 @@
 // Sources: Cambridge International AS & A Level Mathematics 9709 syllabus for examination from 2020 (topics 1.1–6.5) and Physics 9702 syllabus for
 // examination from 2022 (AS topics 1–11, A Level topics 12–25), with paper lengths and marks from the same documents. Extend this file by adding
 // entries to a family (or a family); the matcher and the planner need no change.
-import { normalizeSyllabus, type Syllabus } from "../kernel";
+import { anchorTerms, matchScore, normalizeSyllabus, syllabusTerms, type StoredSyllabus, type Syllabus } from "../kernel";
 
-interface Entry {
+export interface Entry {
   id: string;
   board: "CAIE";
   code: string;
@@ -140,10 +140,12 @@ const PHYSICS: Entry[] = [
   },
 ];
 
-interface Family { code: string; entries: Entry[]; subject: (text: string) => boolean; fallback?: (text: string) => string | null }
+interface Family { code: string; subject: string; edition: string; entries: Entry[]; named: (text: string) => boolean; fallback?: (text: string) => string | null }
+// A family's subject test is strict: a variant with its own syllabus (Further Mathematics 9231, Additional Mathematics) is never this one.
+const VARIANT = /\bfurther\b|\badditional\b|\badd\.?\s*math/i;
 const FAMILIES: Family[] = [
-  { code: "9709", entries: ENTRIES, subject: (t) => /\bmath(?:s|ematics)?\b/i.test(t) || (/\bpure\b|\bmechanics\b|\bstatistics\b/i.test(t) && !/\bphysics\b/i.test(t)) },
-  { code: "9702", entries: PHYSICS, subject: (t) => /\bphysics\b/i.test(t), fallback: (t) => (/\b(?:a2|a[\s-]?level\s+only)\b/i.test(t) ? null : /\bas[\s-]?levels?\b/i.test(t) ? "2" : null) },
+  { code: "9709", subject: "Mathematics", edition: "for examination from 2020", entries: ENTRIES, named: (t) => !VARIANT.test(t) && (/\bmath(?:s|ematics)?\b/i.test(t) || (/\bpure\b|\bmechanics\b|\bstatistics\b/i.test(t) && !/\bphysics\b/i.test(t))) },
+  { code: "9702", subject: "Physics", edition: "for examination from 2022", entries: PHYSICS, named: (t) => /\bphysics\b/i.test(t), fallback: (t) => (/\b(?:a2|a[\s-]?level\s+only)\b/i.test(t) ? null : /\bas[\s-]?levels?\b/i.test(t) ? "2" : null) },
 ];
 
 export interface CatalogSubject { name?: string | null; code?: string | null; board?: string | null; level?: string | null }
@@ -166,7 +168,7 @@ export function matchSyllabi(text: string, subject?: CatalogSubject | null): Ent
   }
   for (const family of FAMILIES) {
     const coded = has(new RegExp(`\\b${family.code}\\b`), all, subject?.code);
-    if (!coded && !(boardNamed && levelNamed && family.subject(all))) continue;
+    if (!coded && !(boardNamed && levelNamed && family.named(all))) continue;
     const found = new Set([...named].filter((n) => family.entries.some((e) => e.component === n)));
     for (const entry of family.entries) if (entry.aliases.some((re) => re.test(all))) found.add(entry.component);
     if (!found.size && family.fallback) { const fallback = family.fallback(all); if (fallback) found.add(fallback); }
@@ -175,6 +177,32 @@ export function matchSyllabi(text: string, subject?: CatalogSubject | null): Ent
   }
   return [];
 }
+
+// ── The catalog as a search index ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
+// Each paper is indexed under its search terms (lib/planner/kernel, syllabusTerms) in an inverted index built once, so a request reaches the few
+// papers that share a code or a subject word with it directly. The planner shows those to the model, which decides whether one is the syllabus asked
+// for. `matchSyllabi` above stays as the strict fallback for when no model is available.
+
+/** A catalog paper as a search result. */
+export interface CatalogHit { entry: Entry; stored: StoredSyllabus; edition: string; score: number }
+
+const INDEXED = FAMILIES.flatMap((family) => family.entries.map((entry) => {
+  const stored: StoredSyllabus = { board: "Cambridge International", code: entry.code, qualification: "AS & A Level", subject: family.subject, papers: [entry.component], name: entry.name };
+  return { entry, stored, edition: family.edition, terms: syllabusTerms(`${stored.board} ${stored.qualification} ${stored.subject} ${entry.code} Paper ${entry.component} ${entry.name}`) };
+}));
+const POSTINGS = new Map<string, number[]>();
+INDEXED.forEach((item, index) => item.terms.forEach((term) => POSTINGS.set(term, [...(POSTINGS.get(term) ?? []), index])));
+
+/** The catalog papers a request might mean, best first: only papers sharing a code or a subject word are scored at all. */
+export function searchCatalog(request: readonly string[], limit = 6): CatalogHit[] {
+  const hits = new Set<number>();
+  for (const term of anchorTerms(request)) for (const index of POSTINGS.get(term) ?? []) hits.add(index);
+  return [...hits].map((index) => ({ ...INDEXED[index], score: matchScore(request, INDEXED[index].terms) })).filter((hit) => hit.score > 0)
+    .sort((a, b) => b.score - a.score || a.entry.id.localeCompare(b.entry.id)).slice(0, limit).map(({ entry, stored, edition, score }) => ({ entry, stored, edition, score }));
+}
+
+/** Catalog papers by id, in syllabus order. */
+export const catalogEntries = (ids: readonly string[]): Entry[] => INDEXED.filter((item) => ids.includes(item.entry.id)).map((item) => item.entry);
 
 /** A matched entry (or several papers of one exam) as the goal's syllabus. */
 export function catalogSyllabus(entries: Entry[]): Syllabus | null {

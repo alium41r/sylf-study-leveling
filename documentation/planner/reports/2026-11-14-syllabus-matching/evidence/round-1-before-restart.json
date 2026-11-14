@@ -1,0 +1,657 @@
+[
+ {
+  "id": "further-p1p2",
+  "expect": "research: Further Pure Mathematics 1 and 2, never 9709",
+  "seconds": 24.3,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning A level CAIE Further Maths paper 1 and paper 2 complete for",
+   "Working out the plan",
+   "Checking Sylf's syllabus library",
+   "Researching this syllabus for the first time",
+   "Read 8 sources",
+   "Double-checking the topics",
+   "Double-check made 5 corrections",
+   "14 topics from the AI, checked against sources",
+   "Building your plan",
+   "39 sessions to Mon 30 Nov",
+   "Fitting 39 pieces of work into your free time",
+   "219 checks passed"
+  ],
+  "preset": "course",
+  "calls": 3,
+  "syllabus": {
+   "source": "model",
+   "ref": null,
+   "name": "Cambridge International A Level Further Mathematics (9231), Papers 1 and 2",
+   "library": null,
+   "identity": {
+    "code": "9231",
+    "board": "Cambridge International",
+    "edition": "2026–2027 syllabus (version 5, published November 2026)",
+    "subject": "Further Mathematics",
+    "component": "Paper 1 & Paper 2",
+    "qualification": "A Level"
+   },
+   "researched": true,
+   "papers": [
+    {
+     "label": "Paper 1",
+     "marks": 75,
+     "minutes": 120
+    },
+    {
+     "label": "Paper 2",
+     "marks": 75,
+     "minutes": 120
+    }
+   ],
+   "units": [
+    "Roots of polynomial equations",
+    "Rational functions and graphs",
+    "Summation of series",
+    "Matrices",
+    "Polar coordinates",
+    "Vectors",
+    "Proof by induction",
+    "Hyperbolic functions",
+    "Matrices (further)",
+    "Differentiation",
+    "Integration",
+    "Complex numbers",
+    "Differential equations",
+    "Linear motion under a variable force"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ },
+ {
+  "id": "maths-p1",
+  "expect": "catalog 9709 P1",
+  "seconds": 1.7,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning Maths mid term Complete Paper 1 CAIE A levels",
+   "Working out the plan",
+   "Checking Sylf's syllabus library",
+   "Matched Sylf's checked syllabus",
+   "8 topics from Sylf's syllabus list",
+   "Building your plan",
+   "24 sessions to Tue 1 Dec",
+   "Fitting 24 pieces of work into your free time",
+   "224 checks passed"
+  ],
+  "preset": "exam",
+  "calls": 1,
+  "syllabus": {
+   "source": "catalog",
+   "ref": "caie-9709-p1",
+   "name": "Cambridge International AS & A Level Mathematics (9709), Paper 1: Pure Mathematics 1",
+   "library": null,
+   "identity": null,
+   "researched": false,
+   "papers": [
+    {
+     "label": "Paper 1",
+     "marks": 75,
+     "minutes": 110
+    }
+   ],
+   "units": [
+    "Quadratics",
+    "Functions",
+    "Coordinate geometry",
+    "Circular measure",
+    "Trigonometry",
+    "Series",
+    "Differentiation",
+    "Integration"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ },
+ {
+  "id": "physics-p4",
+  "expect": "catalog 9702 P4",
+  "seconds": 1.6,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning Cambridge International A Level Physics 9702 Paper 4 mock",
+   "Finding the syllabus",
+   "Checking Sylf's syllabus library",
+   "Matched Sylf's checked syllabus",
+   "14 topics from Sylf's syllabus list",
+   "Building your plan",
+   "40 sessions to Sat 12 Dec",
+   "Fitting 40 pieces of work into your free time",
+   "221 checks passed"
+  ],
+  "preset": "exam",
+  "calls": 1,
+  "syllabus": {
+   "source": "catalog",
+   "ref": "caie-9702-p4",
+   "name": "Cambridge International A Level Physics (9702), Paper 4: A Level Structured Questions",
+   "library": null,
+   "identity": null,
+   "researched": false,
+   "papers": [
+    {
+     "label": "Paper 4",
+     "marks": 100,
+     "minutes": 120
+    }
+   ],
+   "units": [
+    "Motion in a circle",
+    "Gravitational fields",
+    "Temperature",
+    "Ideal gases",
+    "Thermodynamics",
+    "Oscillations",
+    "Electric fields",
+    "Capacitance",
+    "Magnetic fields",
+    "Alternating currents",
+    "Quantum physics",
+    "Nuclear physics",
+    "Medical physics",
+    "Astronomy and cosmology"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ },
+ {
+  "id": "maths-p1p3",
+  "expect": "catalog 9709 P1 + P3",
+  "seconds": 1.8,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning CAIE A level maths papers 1 and 3 mocks",
+   "Finding the syllabus",
+   "Checking Sylf's syllabus library",
+   "Matched Sylf's checked syllabus",
+   "17 topics from Sylf's syllabus list",
+   "Building your plan",
+   "45 sessions to Tue 8 Dec",
+   "Fitting 45 pieces of work into your free time",
+   "418 checks passed"
+  ],
+  "preset": "exam",
+  "calls": 1,
+  "syllabus": {
+   "source": "catalog",
+   "ref": "caie-9709-p1+caie-9709-p3",
+   "name": "Cambridge International AS & A Level Mathematics (9709), Paper 1 and Paper 3",
+   "library": null,
+   "identity": null,
+   "researched": false,
+   "papers": [
+    {
+     "label": "Paper 1",
+     "marks": 75,
+     "minutes": 110
+    },
+    {
+     "label": "Paper 3",
+     "marks": 75,
+     "minutes": 110
+    }
+   ],
+   "units": [
+    "Quadratics",
+    "Functions",
+    "Coordinate geometry",
+    "Circular measure",
+    "Trigonometry (P1)",
+    "Series",
+    "Differentiation (P1)",
+    "Integration (P1)",
+    "Algebra",
+    "Logarithms and exponentials",
+    "Trigonometry (P3)",
+    "Differentiation (P3)",
+    "Integration (P3)",
+    "Numerical solution of equations",
+    "Vectors",
+    "Differential equations",
+    "Complex numbers"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ },
+ {
+  "id": "further-again",
+  "expect": "library: the Further Maths entry saved by the first case",
+  "seconds": 28.1,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning Cambridge International A Level Further Mathematics 9231 Pap",
+   "Finding the syllabus",
+   "Checking Sylf's syllabus library",
+   "Researching this syllabus for the first time",
+   "Read 8 sources",
+   "Double-checking the topics",
+   "Double-check made 1 correction",
+   "25 topics from the AI, checked against sources",
+   "Building your plan",
+   "31 sessions to Thu 3 Dec",
+   "Fitting 31 pieces of work into your free time",
+   "268 checks passed"
+  ],
+  "preset": "exam",
+  "calls": 3,
+  "syllabus": {
+   "source": "model",
+   "ref": null,
+   "name": "Cambridge International A Level Further Mathematics (9231)",
+   "library": null,
+   "identity": {
+    "code": "9231",
+    "board": "Cambridge International",
+    "edition": "2026-2027 syllabus (version 5, published November 2026)",
+    "subject": "Further Mathematics",
+    "component": null,
+    "qualification": "A Level"
+   },
+   "researched": true,
+   "papers": [
+    {
+     "label": "Paper 1",
+     "marks": 75,
+     "minutes": 120
+    },
+    {
+     "label": "Paper 2",
+     "marks": 75,
+     "minutes": 120
+    },
+    {
+     "label": "Paper 3",
+     "marks": 75,
+     "minutes": 120
+    },
+    {
+     "label": "Paper 4",
+     "marks": 75,
+     "minutes": 120
+    }
+   ],
+   "units": [
+    "Roots of polynomial equations",
+    "Rational functions and graphs",
+    "Summation of series",
+    "Matrices",
+    "Polar coordinates",
+    "Vectors",
+    "Proof by induction",
+    "Hyperbolic functions",
+    "Matrices in three dimensions",
+    "Differentiation and integration",
+    "Differential equations",
+    "Complex numbers",
+    "Maclaurin and Taylor series",
+    "Motion of a projectile",
+    "Equilibrium of a rigid body",
+    "Circular motion",
+    "Hooke's law",
+    "Linear motion under a variable force",
+    "Momentum",
+    "Continuous random variables",
+    "Probability generating functions",
+    "Linear combinations of random variables",
+    "Estimation and hypothesis testing",
+    "Bivariate data and correlation",
+    "Distribution-free tests"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ },
+ {
+  "id": "further-p3",
+  "expect": "research (paper 3 is not stored), never the P1+P2 entry",
+  "seconds": 21.7,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning CAIE A Level Further Mathematics Paper 3 Further Mechanics",
+   "Finding the syllabus",
+   "Checking Sylf's syllabus library",
+   "Researching this syllabus for the first time",
+   "Read 8 sources",
+   "Double-checking the topics",
+   "Double-check agreed",
+   "6 topics from the AI, checked against sources",
+   "Building your plan",
+   "20 sessions to Thu 3 Dec",
+   "Fitting 20 pieces of work into your free time",
+   "187 checks passed"
+  ],
+  "preset": "exam",
+  "calls": 3,
+  "syllabus": {
+   "source": "model",
+   "ref": null,
+   "name": "Cambridge International A Level Further Mathematics (9231), Paper 3 Further Mechanics",
+   "library": null,
+   "identity": {
+    "code": null,
+    "board": "Cambridge International",
+    "edition": "9231 syllabus for 2026–2027 (current A Level Further Mathematics, Papers 1–4)",
+    "subject": "Further Mathematics",
+    "component": "Paper 3: Further Mechanics",
+    "qualification": "A Level"
+   },
+   "researched": true,
+   "papers": [
+    {
+     "label": "Paper 3",
+     "marks": 50,
+     "minutes": 90
+    }
+   ],
+   "units": [
+    "Motion of a projectile",
+    "Equilibrium of a rigid body",
+    "Circular motion",
+    "Hooke's law",
+    "Linear motion under a variable force",
+    "Momentum"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ },
+ {
+  "id": "edexcel-further",
+  "expect": "research (another board), never CAIE",
+  "seconds": 24,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning Edexcel A level Further Maths Core Pure 1 exam",
+   "Finding the syllabus",
+   "Checking Sylf's syllabus library",
+   "Researching this syllabus for the first time",
+   "Read 8 sources",
+   "Double-checking the topics",
+   "Double-check made 1 correction",
+   "9 topics from the AI, checked against sources",
+   "Building your plan",
+   "29 sessions to Sat 12 Dec",
+   "Fitting 29 pieces of work into your free time",
+   "151 checks passed"
+  ],
+  "preset": "exam",
+  "calls": 3,
+  "syllabus": {
+   "source": "model",
+   "ref": null,
+   "name": "Edexcel A Level Further Maths Core Pure 1 (9FM0 Paper 1)",
+   "library": null,
+   "identity": {
+    "code": null,
+    "board": "Pearson Edexcel",
+    "edition": "Edexcel A Level Further Mathematics (9FM0) Core Pure Mathematics Book 1 – current specification",
+    "subject": "Further Mathematics",
+    "component": "Core Pure Mathematics 1",
+    "qualification": "A Level"
+   },
+   "researched": true,
+   "papers": [
+    {
+     "label": "Core Pure 1",
+     "marks": 75,
+     "minutes": 90
+    }
+   ],
+   "units": [
+    "Complex numbers",
+    "Argand diagrams",
+    "Series",
+    "Roots of polynomials",
+    "Volumes of revolution",
+    "Matrices",
+    "Linear transformations",
+    "Proof by induction",
+    "Vectors"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ },
+ {
+  "id": "maths-whole",
+  "expect": "research a whole course: one paper is not the course",
+  "seconds": 45.3,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning Cambridge A Level Mathematics 9709, the whole course for May",
+   "Mapping the course",
+   "Checking Sylf's syllabus library",
+   "Researching this syllabus for the first time",
+   "Read 8 sources",
+   "Double-checking the topics",
+   "Checking 2 more official topics",
+   "Double-check made 2 corrections",
+   "38 topics from the AI, checked against sources",
+   "Building your plan",
+   "126 sessions to Mon 12 Apr",
+   "Fitting 126 pieces of work into your free time",
+   "222 checks passed"
+  ],
+  "preset": "course",
+  "calls": 4,
+  "syllabus": {
+   "source": "model",
+   "ref": null,
+   "name": "Cambridge International A Level Mathematics (9709)",
+   "library": null,
+   "identity": {
+    "code": "9709",
+    "board": "Cambridge International",
+    "edition": "For examination from 2020 (current 9709 syllabus, Papers 1–6)",
+    "subject": "Mathematics",
+    "component": null,
+    "qualification": "A Level"
+   },
+   "researched": true,
+   "papers": [
+    {
+     "label": "Paper 1 Pure 1",
+     "marks": 75,
+     "minutes": 110
+    },
+    {
+     "label": "Paper 2 Pure 2",
+     "marks": 50,
+     "minutes": 75
+    },
+    {
+     "label": "Paper 3 Pure 3",
+     "marks": 75,
+     "minutes": 110
+    },
+    {
+     "label": "Paper 4 Mechanics",
+     "marks": 50,
+     "minutes": 75
+    }
+   ],
+   "units": [
+    "Quadratics",
+    "Functions",
+    "Coordinate geometry",
+    "Circular measure",
+    "Trigonometry",
+    "Series",
+    "Differentiation",
+    "Integration",
+    "Algebra (P2)",
+    "Logarithmic and exponential functions (P2)",
+    "Trigonometry (P2)",
+    "Differentiation (P2)",
+    "Integration (P2)",
+    "Numerical solution of equations (P2)",
+    "Algebra (P3)",
+    "Logarithmic and exponential functions (P3)",
+    "Trigonometry (P3)",
+    "Differentiation (P3)",
+    "Integration (P3)",
+    "Numerical solution of equations (P3)",
+    "Vectors",
+    "Differential equations",
+    "Complex numbers",
+    "Forces and equilibrium",
+    "Kinematics of motion in a straight line",
+    "Momentum",
+    "Newton's laws of motion",
+    "Energy, work and power",
+    "Representation of data",
+    "Permutations and combinations",
+    "Probability",
+    "Discrete random variables",
+    "The normal distribution",
+    "The Poisson distribution",
+    "Linear combinations of random variables",
+    "Continuous random variables",
+    "Sampling and estimation",
+    "Hypothesis tests"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ },
+ {
+  "id": "igcse-0580",
+  "expect": "research; not A Level 9709",
+  "seconds": 27.5,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning IGCSE Mathematics 0580 Paper 4 extended",
+   "Finding the syllabus",
+   "Checking Sylf's syllabus library",
+   "Researching this syllabus for the first time",
+   "Read 8 sources",
+   "Double-checking the topics",
+   "Double-check made 5 corrections",
+   "11 topics from the AI, checked against sources",
+   "Building your plan",
+   "44 sessions to Wed 23 Dec",
+   "Fitting 44 pieces of work into your free time",
+   "161 checks passed"
+  ],
+  "preset": "exam",
+  "calls": 3,
+  "syllabus": {
+   "source": "model",
+   "ref": null,
+   "name": "Cambridge IGCSE Mathematics (0580), Paper 4 (Extended)",
+   "library": null,
+   "identity": {
+    "code": "0580",
+    "board": "Cambridge International",
+    "edition": "Cambridge IGCSE Mathematics 0580 (Extended), for examination from 2025 (2025–2027 series)",
+    "subject": "Mathematics",
+    "component": "Paper 4 (Extended)",
+    "qualification": "IGCSE"
+   },
+   "researched": true,
+   "papers": [
+    {
+     "label": "Paper 4",
+     "marks": 100,
+     "minutes": 150
+    }
+   ],
+   "units": [
+    "Number",
+    "Algebra and graphs",
+    "Graphs in practical situations",
+    "Straight line and curve graphs",
+    "Coordinate geometry",
+    "Geometry",
+    "Mensuration",
+    "Trigonometry",
+    "Transformations and vectors",
+    "Probability",
+    "Statistics"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ },
+ {
+  "id": "bayes",
+  "expect": "not a named syllabus: mapped as before",
+  "seconds": 15,
+  "status": 200,
+  "error": null,
+  "stages": [
+   "Reading your week",
+   "Reading your week · 0 commitments",
+   "Planning I keep failing probability questions, especially conditional",
+   "Working out the plan",
+   "Checking Sylf's syllabus library",
+   "Looking up the syllabus",
+   "Read 6 sources",
+   "7 topics from the AI, checked against sources",
+   "Building your plan",
+   "9 sessions to Mon 23 Nov",
+   "Fitting 9 pieces of work into your free time",
+   "88 checks passed"
+  ],
+  "preset": "mastery",
+  "calls": 3,
+  "syllabus": {
+   "source": "model",
+   "ref": null,
+   "name": "Conditional probability",
+   "library": null,
+   "identity": null,
+   "researched": true,
+   "papers": [],
+   "units": [
+    "Sample spaces and events",
+    "Two-way tables and tree diagrams",
+    "The definition of conditional probability",
+    "Conditional",
+    "Independence vs conditional dependence",
+    "Total probability and Bayes' theorem",
+    "Named conditional results"
+   ]
+  },
+  "notes": [],
+  "pass": true
+ }
+]

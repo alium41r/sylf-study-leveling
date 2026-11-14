@@ -17,7 +17,7 @@ export const PROFILES: Record<ProfileName, Profile> = {
   "intent.parse": { maxTokens: 700, deadlineMs: 15_000, hedgeMs: 2_500, thinking: "disabled" },
   "goal.decompose": { maxTokens: 3_400, deadlineMs: 45_000, hedgeMs: 2_500, thinking: "disabled" },
   "syllabus.map": { maxTokens: 5_000, deadlineMs: 70_000, hedgeMs: 2_500, thinking: "disabled" },
-  "syllabus.identify": { maxTokens: 300, deadlineMs: 15_000, hedgeMs: 2_500, thinking: "disabled" },
+  "syllabus.identify": { maxTokens: 450, deadlineMs: 15_000, hedgeMs: 2_500, thinking: "disabled" },
   "syllabus.verify": { maxTokens: 3_000, deadlineMs: 55_000, hedgeMs: null, thinking: "disabled" },
   "plan.critique": { maxTokens: 1_000, deadlineMs: 20_000, hedgeMs: null, thinking: "disabled" },
   "copy.brief": { maxTokens: 220, deadlineMs: 10_000, hedgeMs: 2_500, thinking: "disabled" },

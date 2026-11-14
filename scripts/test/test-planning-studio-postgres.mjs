@@ -1,7 +1,7 @@
 /** Disposable PostgreSQL verification for the Planning Studio. Never reads a hosted database URL.
  * Usage: node scripts/test/test-planning-studio-postgres.mjs [path-filter] (Docker Desktop required).
  * Builds today's schema without the Studio's six tables from the Prisma schema, installs the Supabase roles the migrations grant against, then
- * applies prisma/migrations/20261113100000_planning_kernel and 20261113200000_syllabus_library unchanged, so its constraints, partial index, ownership triggers and RLS are the ones
+ * applies prisma/migrations/20261113100000_planning_kernel, 20261113200000_syllabus_library and 20261114100000_syllabus_search unchanged, so its constraints, partial index, ownership triggers and RLS are the ones
  * under test. Existing planner guard migrations are not replayed here; the Studio writes only quests that no other planner links.
  */
 import { execFileSync } from "node:child_process";
@@ -44,6 +44,7 @@ CREATE PUBLICATION supabase_realtime;
   stage("00000000000000_audited_schema", bootstrap + baseline);
   stage("20261113100000_planning_kernel", readFileSync(join(root, "prisma/migrations/20261113100000_planning_kernel/migration.sql"), "utf8"));
   stage("20261113200000_syllabus_library", readFileSync(join(root, "prisma/migrations/20261113200000_syllabus_library/migration.sql"), "utf8"));
+  stage("20261114100000_syllabus_search", readFileSync(join(root, "prisma/migrations/20261114100000_syllabus_search/migration.sql"), "utf8"));
   copyFileSync(join(root, "prisma/migrations/migration_lock.toml"), join(migrations, "migration_lock.toml"));
   const config = join(temp, "prisma.config.ts");
   writeFileSync(config, `export default ${JSON.stringify({ schema: join(root, "prisma/schema.prisma"), migrations: { path: migrations }, datasource: { url } })};`);

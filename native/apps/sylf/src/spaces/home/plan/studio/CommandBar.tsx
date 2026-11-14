@@ -3,10 +3,10 @@
 // the activity line reports real stages with real counts while a workflow runs.
 import { useEffect, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
-import { Activity as Spinner, Badge, Button, Chip, Icon, IconButton, Plane, Popover, Press, Select, Sheet, Stack, Text, TextField, useTheme, type ViewHandle } from "@sylf/design-system";
+import { Activity as Spinner, Badge, Button, Chip, DateField, Icon, IconButton, Plane, Popover, Press, Select, Sheet, Stack, Text, TextField, useTheme, type ViewHandle } from "@sylf/design-system";
 import { planning } from "@sylf/shared";
 import type { StudioState } from "@sylf/backend";
-import { addDays, dayLabel, ESTIMATE, isQuestion, PRESET_WORDS, sessionLabel } from "./format";
+import { addDays, daysAway, ESTIMATE, isQuestion, PRESET_WORDS, sessionLabel } from "./format";
 import type { Activity, Studio } from "./useStudio";
 
 const SUGGESTIONS = ["Max 2 hours a day on weekdays", "I'm sick today", "Am I on track?"];
@@ -173,6 +173,7 @@ export function GoalComposer({ state, studio, onDone, inline }: { state: StudioS
   const today = state.snapshot.today;
   const dueValid = !due || (planning.isDateKey(due) && due >= today);
   const startValid = !values.start || (planning.isDateKey(values.start) && values.start >= today);
+  const startAt = open.includes("start") && values.start && startValid ? values.start : null;
   const running = studio.activity?.running === true;
   const ready = title.trim().length >= 2 && dueValid && startValid && !running;
   const fields = [...FIELDS[preset], ...(state.snapshot.subjects.length ? ["subject" as Field] : [])];
@@ -199,8 +200,7 @@ export function GoalComposer({ state, studio, onDone, inline }: { state: StudioS
           <Text variant="label" tone="soft">{`${PRESET_WORDS[preset].due}${preset === "skill" || preset === "course" ? " (optional)" : ""}`}</Text>
           {DATE_CHIPS.map((c) => { const d = addDays(today, c.days); return <Chip key={c.days} label={c.label} radio selected={due === d} onPress={() => setDue(due === d ? "" : d)} />; })}
         </View>
-        <TextField label={PRESET_WORDS[preset].due} hideLabel placeholder="YYYY-MM-DD" value={due} onChangeText={setDue} error={dueValid ? undefined : "Choose a date from today on."} testID="studio-goal-due" />
-        {due && dueValid ? <Text variant="micro" tone="soft">{`${dayLabel(due)} · ${planning.diffDays(due, today)} days`}</Text> : null}
+        <DateField label={PRESET_WORDS[preset].due} hideLabel value={due} onChange={setDue} min={startAt ?? today} today={today} optional placeholder="Choose a date" error={dueValid ? undefined : "Choose a date from today on."} helper={due && dueValid ? daysAway(due, today) : undefined} testID="studio-goal-due" />
       </Stack>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.xs }} testID="studio-composer-prompts">
         {fields.filter((f) => !open.includes(f)).map((f) => <Chip key={f} label={FIELD_LABEL[f]} icon="plus" onPress={() => toggle(f)} />)}
@@ -216,8 +216,10 @@ export function GoalComposer({ state, studio, onDone, inline }: { state: StudioS
               <ChoiceRow label={FIELD_LABEL.session} value={values.session} options={["15", "20", "30", "45", "60"].map((m) => [m, `${m} min`])} onChange={(v) => set("session", v)} />
             ) : field === "subject" ? (
               <Select label={FIELD_LABEL.subject} value={values.subject ?? "none"} options={[{ value: "none", label: "No subject" }, ...state.snapshot.subjects.map((x) => ({ value: String(x.id), label: x.name }))]} onChange={(v) => set("subject", v)} />
+            ) : field === "start" ? (
+              <DateField label={FIELD_LABEL.start} value={values.start ?? ""} onChange={(v) => set("start", v)} min={today} max={due && dueValid ? due : null} today={today} error={startValid ? undefined : "Choose a date from today on."} helper={startAt ? daysAway(startAt, today) : undefined} testID="studio-field-start" />
             ) : (
-              <TextField label={field === "topics" && preset === "reading" ? "Chapters" : field === "level" && preset === "skill" ? "Your level" : field === "target" && preset === "skill" ? "Goal" : FIELD_LABEL[field]} placeholder={field === "start" ? "YYYY-MM-DD" : hint(field)} value={values[field] ?? ""} onChangeText={(v) => set(field, v)} multiline={field === "topics" || field === "notes"} error={field === "start" && !startValid ? "Choose a date from today on." : undefined} testID={`studio-field-${field}`} />
+              <TextField label={field === "topics" && preset === "reading" ? "Chapters" : field === "level" && preset === "skill" ? "Your level" : field === "target" && preset === "skill" ? "Goal" : FIELD_LABEL[field]} placeholder={hint(field)} value={values[field] ?? ""} onChangeText={(v) => set(field, v)} multiline={field === "topics" || field === "notes"} testID={`studio-field-${field}`} />
             )}
           </View>
           <IconButton icon="close" label={`Remove ${FIELD_LABEL[field]}`} onPress={() => toggle(field)} />

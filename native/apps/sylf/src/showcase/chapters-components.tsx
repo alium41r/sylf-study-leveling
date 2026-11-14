@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Platform, View, useWindowDimensions } from "react-native";
-import { Activity, Avatar, Badge, Button, Callout, Checkbox, Chip, Columns, ContextArea, Dialog, Disclosure, Divider, EmptyState, IconButton, Keycap, Lift, ListRow, Marker, Menu, Meter, Placeholder, Plane, Popover, Progress, RadioGroup, Readout, Row, Segmented, Select, Sheet, Slider, Splitter, Stack, Text, TextField, Toggle, Tooltip, resolveDesign, useAppearance, useInputFormat, useInputMode, useNotice, useTheme, useWindowClass, MOTION_CHARACTERS, resolveAxes, type ViewHandle } from "@sylf/design-system";
+import { Activity, Avatar, Badge, Button, Callout, Checkbox, Chip, Columns, ContextArea, DateField, Dialog, Disclosure, Divider, EmptyState, IconButton, Keycap, Lift, ListRow, Marker, Menu, Meter, Placeholder, Plane, Popover, Progress, RadioGroup, Readout, Row, Segmented, Select, Sheet, Slider, Splitter, Stack, Text, TextField, Toggle, Tooltip, resolveDesign, todayKey, useAppearance, useInputFormat, useInputMode, useNotice, useTheme, useWindowClass, MOTION_CHARACTERS, resolveAxes, type ViewHandle } from "@sylf/design-system";
 import { Chapter, Specimen } from "./chrome";
 
 export function ControlsChapter() {
@@ -36,6 +36,7 @@ export function FieldsChapter() {
   const [bad, setBad] = useState("not a color");
   const [area, setArea] = useState("");
   const [choice, setChoice] = useState("thu");
+  const [day, setDay] = useState("");
   return (
     <Chapter index="09" title="Fields and lists" lede="Inputs are trays with a rule that grows on focus. Errors appear as text, never as color alone.">
       <Columns max={2}>
@@ -47,6 +48,7 @@ export function FieldsChapter() {
             <TextField label="Disabled" value="Locked by your plan" editable={false} />
             <TextField label="Notes" multiline placeholder="Multiple lines" value={area} onChangeText={setArea} />
             <Select label="Exam day" value={choice} onChange={setChoice} options={[{ value: "tue", label: "Tuesday" }, { value: "thu", label: "Thursday" }, { value: "sat", label: "Saturday" }]} />
+            <DateField label="Exam date" optional value={day} onChange={setDay} min={todayKey()} helper="Opens the mini calendar." testID="showcase-date" />
           </Stack>,
           <Stack key="b" gap="xs">
             <ListRow title="Further mathematics" detail="Complex numbers" icon="notes" selected onPress={() => undefined} />

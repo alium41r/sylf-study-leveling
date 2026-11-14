@@ -151,6 +151,11 @@ export function agendaFor(model: Model, goal: string, blocks: readonly Block[]):
 }
 
 /** "Fri 13 Nov – Thu 26 Nov", or one day. */
+/** How far away a chosen day is, under a date field: "Today", "Tomorrow", "17 days from today". */
+export function daysAway(day: string, today: string) {
+  const delta = diffDays(day, today);
+  return delta === 0 ? "Today" : delta === 1 ? "Tomorrow" : delta > 1 ? `${delta} days from today` : delta === -1 ? "Yesterday" : `${-delta} days ago`;
+}
 export const dateSpan = (from: string | null, to: string | null) => (!from ? "not scheduled yet" : !to || to === from ? dayLabel(from) : `${dayLabel(from)} – ${dayLabel(to)}`);
 
 const SHORT_ROLE: Record<planning.StudyRole, string> = {

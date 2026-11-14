@@ -2,7 +2,7 @@
 // moved this, so the person chooses what happens to their words. Events from a connected or shared calendar are read here, because they belong elsewhere.
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import { Button, Callout, Select, Sheet, Stack, Text, TextField, Toggle, useNotice, useTheme } from "@sylf/design-system";
+import { Button, Callout, DateField, Select, Sheet, Stack, Text, TextField, Toggle, useNotice, useTheme } from "@sylf/design-system";
 import type { EventData, PlanEvent } from "@sylf/backend";
 import { useLiveBackend } from "../../../shell/backend";
 import { describeFailureText } from "../../../shell/account/failure";
@@ -93,7 +93,7 @@ export function EventSheet({ target, onClose }: { target: EventTarget | null; on
           {stale ? <View testID="event-stale"><Callout tone="caution" title="This event changed elsewhere" message="Your words are still here. Open the latest version to save them over it." /></View> : null}
           <TextField label="Title" value={title} onChangeText={setTitle} testID="event-title" editable={!readOnly} returnKeyType="done" />
           <Toggle label="All day" value={allDay} onChange={setAllDay} disabled={readOnly} />
-          <TextField label="Date" helper="Year, month, day" value={day} onChangeText={setDay} testID="event-day" autoCapitalize="none" editable={!readOnly} />
+          <DateField label="Date" value={day} onChange={setDay} testID="event-day" disabled={readOnly} />
           {allDay ? null : (
             <View style={{ flexDirection: "row", gap: space.sm }}>
               <View style={{ flex: 1 }}><TextField label="Starts" value={start} onChangeText={setStart} testID="event-start" error={validTime(start) ? undefined : "Use 24-hour time, such as 14:30."} editable={!readOnly} /></View>

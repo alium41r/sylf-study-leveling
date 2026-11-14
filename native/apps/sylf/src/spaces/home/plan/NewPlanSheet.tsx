@@ -1,7 +1,7 @@
 // Step 1 of a plan: the details the student accepts. Saving is free, because nothing here asks a model for anything, and the sheet says so.
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import { Button, Sheet, Stack, Text, TextField, useNotice, useTheme } from "@sylf/design-system";
+import { Button, DateField, Sheet, Stack, Text, TextField, todayKey, useNotice, useTheme } from "@sylf/design-system";
 import type { BackendError } from "@sylf/backend";
 import { useLiveBackend } from "../../../shell/backend";
 import { describeFailureText } from "../../../shell/account/failure";
@@ -62,7 +62,7 @@ export function NewPlanSheet({ open, onClose, onCreated, initialGoal = "" }: { o
           <Text variant="small" tone="soft">Saving these details is free. Nothing is asked of the AI until you say so on the next page.</Text>
           <TextField label="Name" value={title} onChangeText={setTitle} testID="newplan-title" />
           <TextField label="What do you want to achieve?" value={goal} onChangeText={setGoal} multiline testID="newplan-goal" />
-          <TextField label="Deadline" helper="Year, month, day. Leave empty for none." value={deadline} onChangeText={setDeadline} autoCapitalize="none" testID="newplan-deadline" />
+          <DateField label="Deadline" helper="Optional. Leave it empty for none." optional min={todayKey()} value={deadline} onChange={setDeadline} testID="newplan-deadline" />
           <TextField label="Topics" helper="One per line, or separated by commas." value={topics} onChangeText={setTopics} multiline testID="newplan-topics" />
           <TextField label="Minutes you can study on a study day" value={minutes} onChangeText={setMinutes} keyboardType="number-pad" testID="newplan-minutes" />
           <Stack gap="xs">

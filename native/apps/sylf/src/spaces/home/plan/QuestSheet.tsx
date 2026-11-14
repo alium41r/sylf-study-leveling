@@ -1,7 +1,7 @@
 // One quest. A quest that belongs to a plan says so and stays as the plan made it, because the server guards those edits. Everything else is the student's.
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import { Button, Select, Sheet, Stack, Text, TextField, useNotice, useTheme } from "@sylf/design-system";
+import { Button, DateField, Select, Sheet, Stack, Text, TextField, useNotice, useTheme } from "@sylf/design-system";
 import type { DayQuest, GoalDetail, Quest, Subject } from "@sylf/backend";
 import { useLiveBackend } from "../../../shell/backend";
 import { describeFailureText } from "../../../shell/account/failure";
@@ -66,7 +66,7 @@ export function QuestSheet({ target, onClose }: { target: QuestTarget | null; on
         <Stack gap="md">
           {planned ? <Text variant="small" tone="soft">This quest belongs to a plan, so it changes with the plan.</Text> : closed ? <Text variant="small" tone="soft">{questDone(quest!) ? "This quest is finished." : "This quest wasn't finished in time."}</Text> : null}
           <TextField label="Title" value={title} onChangeText={setTitle} testID="quest-title" editable={!locked} />
-          <TextField label="Day" helper="Year, month, day" value={day} onChangeText={setDay} testID="quest-day" autoCapitalize="none" editable={!locked} />
+          <DateField label="Day" value={day} onChange={setDay} testID="quest-day" disabled={locked} />
           <TextField label="Minutes" value={minutes} onChangeText={setMinutes} keyboardType="number-pad" testID="quest-minutes" editable={!locked} />
           {locked ? null : <Select<Difficulty> label="Difficulty" value={difficulty} options={[...DIFFICULTIES]} onChange={setDifficulty} />}
           {locked || quest ? null : <Select<string> label="Subject" value={subject} options={[{ value: NONE, label: "No subject" }, ...subjects.map((item) => ({ value: String(item.id), label: item.name }))]} onChange={setSubject} />}

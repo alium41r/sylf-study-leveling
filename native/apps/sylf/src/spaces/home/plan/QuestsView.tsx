@@ -2,7 +2,7 @@
 // here too, because they are what a plan is made of. A goal with a plan behind it says so: the server guards those, and its refusal is shown as given.
 import { useMemo, useState } from "react";
 import { View } from "react-native";
-import { Badge, Button, Callout, Chip, ListRow, Plane, Press, Progress, Sheet, Stack, Text, TextField, useNotice, useTheme, useWindowClass } from "@sylf/design-system";
+import { Badge, Button, Callout, Chip, DateField, ListRow, Plane, Press, Progress, Sheet, Stack, Text, TextField, useNotice, useTheme, useWindowClass } from "@sylf/design-system";
 import type { GoalDetail, Quest, StudySchedule, Subject } from "@sylf/backend";
 import { useLiveBackend, useOptionalResource } from "../../../shell/backend";
 import { describeFailureText } from "../../../shell/account/failure";
@@ -59,8 +59,8 @@ function GoalSheet({ goal, open, onClose }: { goal: GoalDetail | null; open: boo
       <View style={{ padding: space.lg }}>
         <Stack gap="md">
           <TextField label="What are you working towards?" value={title} onChangeText={setTitle} testID="goal-title" />
-          <TextField label="By when" helper="Optional. Year, month, day" value={due} onChangeText={setDue} autoCapitalize="none" testID="goal-due" />
-          <Button title={busy ? "Saving" : goal ? "Save" : "Add goal"} variant="emphasis" disabled={invalid || busy} testID="goal-save" onPress={() => backend && void act(() => (goal ? backend.reads.plan.updateGoal(goal.id, { title: title.trim(), ...(due ? { targetDate: due } : {}) }) : backend.reads.plan.createGoal({ title: title.trim(), ...(due ? { targetDate: due } : {}) })))} />
+          <DateField label="By when" helper="Optional" optional value={due} onChange={setDue} testID="goal-due" />
+          <Button title={busy ? "Saving" : goal ? "Save" : "Add goal"} variant="emphasis" disabled={invalid || busy} testID="goal-save" onPress={() => backend && void act(() => (goal ? backend.reads.plan.updateGoal(goal.id, { title: title.trim(), ...(due ? { targetDate: due } : goal.targetDate ? { targetDate: null } : {}) }) : backend.reads.plan.createGoal({ title: title.trim(), ...(due ? { targetDate: due } : {}) })))} />
           {goal && goal.status !== "COMPLETED" ? <Button title="Mark as finished" testID="goal-finish" disabled={busy} onPress={() => backend && void act(() => backend.reads.plan.updateGoal(goal.id, { status: "COMPLETED" }), "Goal finished.")} /> : null}
           {goal ? <Button title="Delete goal" variant="critical" testID="goal-delete" disabled={busy} onPress={() => backend && void act(() => backend.reads.plan.deleteGoal(goal.id), "Goal deleted.")} /> : null}
         </Stack>

@@ -59,6 +59,7 @@ const store = createAppearanceStore(adapters.preferences);   // outside React
 | `Slider` | Needle on a rule. Touch, pen and mouse drag, tap to set, arrow keys, Home and End, and screen-reader increment and decrement. Gesture tracking runs on the UI thread. `track` replaces the rule (used by the color picker). |
 | `TextField` | Tray with a rule that grows on focus. `error`, `helper`, `icon`, `multiline`, `monospace`. |
 | `Select` | Opens a `Menu` matched to its width. Options can preview their own font. |
+| `DateField`, `MiniCalendar` | The one way the app asks for a date. A tray showing the day in words ("Tue, 1 December 2026") opens the mini calendar in a `Popover`: Monday-first weeks, always six rows so it never changes height, the chosen day filled in the accent, today carrying the Marker, days outside `min` and `max` faded and inert. Arrows move by day and week, Page Up and Page Down by month (Shift for a year), Home and End to the week's ends, Enter chooses. `optional` adds Clear to the field and the calendar. Values are `YYYY-MM-DD` civil days; the date math is pure in `logic/calendar.ts`. |
 
 ## Overlays
 

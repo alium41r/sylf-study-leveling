@@ -64,7 +64,7 @@ export function createPlanReads(client: BackendClient) {
 
     goals: (signal: AbortSignal) => client.get("/api/goals", z.array(goalDetailSchema), { signal }),
     createGoal: (goal: { title: string; targetDate?: string }) => client.send("POST", "/api/goals", { body: goal }),
-    updateGoal: (id: number, change: { title?: string; status?: string; targetDate?: string }) => client.send("PATCH", `/api/goals/${id}`, { body: change }),
+    updateGoal: (id: number, change: { title?: string; status?: string; targetDate?: string | null }) => client.send("PATCH", `/api/goals/${id}`, { body: change }),
     deleteGoal: (id: number) => client.send("DELETE", `/api/goals/${id}`),
 
     /** The server wants a code, unique per person. It is derived, because a student thinks in names. */

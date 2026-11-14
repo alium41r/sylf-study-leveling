@@ -70,6 +70,21 @@ async function run(window, out) {
     await js(`(() => { const e = document.querySelector(${JSON.stringify(selector)}); e.focus(); e.select?.(); })()`);
     contents.insertText(value); await sleep(150);
   };
+  const key = async (/** @type {string} */ keyCode) => {
+    contents.sendInputEvent({ type: "keyDown", keyCode });
+    // Native buttons activate from the character event, so Return needs one too, as in the other desktop checks.
+    if (keyCode === "Return") contents.sendInputEvent({ type: "char", keyCode: "\r" });
+    contents.sendInputEvent({ type: "keyUp", keyCode }); await sleep(160);
+  };
+  /** A date is chosen in Sylf's mini calendar, as a student would: open the field, page to the month, press the day. */
+  const pickDate = async (/** @type {string} */ field, /** @type {string} */ day) => {
+    await clickOn(tid(field));
+    if (!(await until(tid(`${field}-calendar`), 4000))) return false;
+    for (let step = 0; step < 24 && !(await has(tid(`${field}-calendar-day-${day}`))); step++) await clickOn(tid(`${field}-calendar-next`));
+    await clickOn(tid(`${field}-calendar-day-${day}`));
+    return gone(tid(`${field}-calendar`), 4000);
+  };
+  const localDay = (/** @type {number} */ days) => { const d = new Date(Date.now() + days * 86_400_000); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
   const open = async (/** @type {string} */ query) => {
     const url = `${APP_ORIGIN}/${query ? `?${query}` : ""}`;
     await contents.loadURL(url).catch(async () => { await sleep(500); await contents.loadURL(url); });
@@ -116,8 +131,15 @@ async function run(window, out) {
 
   // A new exam, in the student's own words: the syllabus is found, topics stream in, the study path is built and fitted, then the proposal.
   await type(tid("studio-goal-title"), "Maths mid term Complete Paper 1 CAIE A levels");
-  const due = new Date(Date.now() + 18 * 86_400_000).toISOString().slice(0, 10);
-  await type(tid("studio-goal-due"), due);
+  // The date comes from Sylf's mini calendar: by keyboard first (arrows move a day, Enter chooses), then by pointer, paging to the month.
+  const due = localDay(18);
+  await clickOn(tid("studio-goal-due"));
+  check("the date field opens the mini calendar", await until(tid("studio-goal-due-calendar"), 4000));
+  check("days before today cannot be chosen", (await js(`document.querySelector('[data-testid="studio-goal-due-calendar-day-${localDay(-1)}"]')?.getAttribute("aria-disabled") ?? "absent"`)) !== "false");
+  await shot("01b-date-calendar");
+  await key("Right"); await key("Return");
+  check("the keyboard chooses tomorrow", (await gone(tid("studio-goal-due-calendar"), 4000)) && (await textOf(tid("studio-goal-due")))?.includes(String(Number(localDay(1).slice(8)))) === true);
+  check("a day is chosen in the calendar and shown in words", (await pickDate("studio-goal-due", due)) && /[A-Za-z]/.test((await textOf(tid("studio-goal-due"))) ?? "") && (await textOf(tid("studio-goal-due")))?.includes(String(Number(due.slice(8)))) === true);
   // Two of the composer's prompts: hours a day, and a weak spot.
   await clickOn(`${tid("studio-composer-prompts")} [aria-label="Hours a day"]`);
   await clickOn('[role=radiogroup][aria-label="Hours a day"] [aria-label="2 h"]');
@@ -257,7 +279,7 @@ async function run(window, out) {
     await clickOn(tid("studio-add-goal"));
     check("the new-plan sheet opens", await until(tid("studio-goal-sheet")));
     await type(tid("studio-goal-title"), "CAIE A level Chemistry Paper 2 mock");
-    await type(tid("studio-goal-due"), new Date(Date.now() + 15 * 86_400_000).toISOString().slice(0, 10));
+    await pickDate("studio-goal-due", localDay(15));
     const m0 = Date.now();
     await clickOn(tid("studio-goal-submit"));
     const units = await until(tid("studio-activity-units"), 40000);
